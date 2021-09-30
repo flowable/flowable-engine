@@ -61,6 +61,7 @@ public class JobCollectionResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns jobs without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return jobs part of an execution with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return jobs with the given process definition id", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
@@ -76,6 +77,7 @@ public class JobCollectionResource {
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "locked", dataType = "boolean", value = "If true, only return jobs which are locked.  If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "unlocked", dataType = "boolean", value = "If true, only return jobs which are unlocked. If false, this parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns jobs without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeType", dataType = "boolean", value = "If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,dueDate,executionId,processInstanceId,retries,tenantId", paramType = "query")
     })
@@ -92,6 +94,9 @@ public class JobCollectionResource {
         }
         if (allRequestParams.containsKey("processInstanceId")) {
             query.processInstanceId(allRequestParams.get("processInstanceId"));
+        }
+        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
+            query.withoutProcessInstanceId();
         }
         if (allRequestParams.containsKey("executionId")) {
             query.executionId(allRequestParams.get("executionId"));
@@ -113,10 +118,8 @@ public class JobCollectionResource {
                 query.timers();
             }
         }
-        if (allRequestParams.containsKey("messagesOnly")) {
-            if (Boolean.valueOf(allRequestParams.get("messagesOnly"))) {
-                query.messages();
-            }
+        if (allRequestParams.containsKey("messagesOnly") && Boolean.valueOf(allRequestParams.get("messagesOnly"))) {
+            query.messages();
         }
         if (allRequestParams.containsKey("dueBefore")) {
             query.duedateLowerThan(RequestUtil.getDate(allRequestParams, "dueBefore"));
@@ -124,10 +127,8 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("dueAfter")) {
             query.duedateHigherThan(RequestUtil.getDate(allRequestParams, "dueAfter"));
         }
-        if (allRequestParams.containsKey("withException")) {
-            if (Boolean.valueOf(allRequestParams.get("withException"))) {
-                query.withException();
-            }
+        if (allRequestParams.containsKey("withException") && Boolean.valueOf(allRequestParams.get("withException"))) {
+            query.withException();
         }
         if (allRequestParams.containsKey("exceptionMessage")) {
             query.exceptionMessage(allRequestParams.get("exceptionMessage"));
@@ -138,25 +139,20 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             query.jobTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
-        if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
-                query.jobWithoutTenantId();
-            }
+        if (allRequestParams.containsKey("withoutTenantId") && Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            query.jobWithoutTenantId();
         }
-        if (allRequestParams.containsKey("locked")) {
-            if (Boolean.valueOf(allRequestParams.get("locked"))) {
-                query.locked();
-            }
+        if (allRequestParams.containsKey("locked") && Boolean.valueOf(allRequestParams.get("locked"))) {
+            query.locked();
         }
-        if (allRequestParams.containsKey("unlocked")) {
-            if (Boolean.valueOf(allRequestParams.get("unlocked"))) {
-                query.unlocked();
-            }
+        if (allRequestParams.containsKey("unlocked") && Boolean.valueOf(allRequestParams.get("unlocked"))) {
+            query.unlocked();
         }
-        if (allRequestParams.containsKey("withoutScopeType")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
-                query.withoutScopeType();
-            }
+        if (allRequestParams.containsKey("withoutScopeType") && Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
+            query.withoutScopeType();
+        }
+        if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
+            query.withoutScopeId();
         }
         
         if (restApiInterceptor != null) {

@@ -75,6 +75,15 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryWithoutProcessInstanceId() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().withoutProcessInstanceId();
+        assertThat(query.count()).isEqualTo(0);
+    }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
@@ -121,6 +130,24 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryWithoutScopeId() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().withoutScopeId();
+        assertThat(query.count()).isEqualTo(4);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
+
+        query = managementService.createExternalWorkerJobQuery().withoutScopeId().processInstanceId(processInstance2.getId());
+        assertThat(query.count()).isEqualTo(2);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsOnly(processInstance2.getId());
     }
 
     @Test

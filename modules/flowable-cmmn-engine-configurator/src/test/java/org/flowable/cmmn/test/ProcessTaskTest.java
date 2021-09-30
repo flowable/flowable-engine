@@ -1907,6 +1907,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             
             assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).count()).isEqualTo(1);
             assertThat(processEngine.getRuntimeService().createEventSubscriptionQuery().processInstanceId(subProcessInstanceId).count()).isEqualTo(1);
+            assertThat(cmmnRuntimeService.createEventSubscriptionQuery().withoutScopeId().count()).isEqualTo(1);
+            assertThat(processEngine.getRuntimeService().createEventSubscriptionQuery().withoutProcessInstanceId().count()).isEqualTo(1);
             
             cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
             assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).count()).isZero();

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.rest.service.api.runtime.process;
+package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
@@ -19,12 +19,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
-import org.flowable.engine.RuntimeService;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
-import org.flowable.rest.service.api.BpmnRestApiInterceptor;
-import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,13 +47,13 @@ import io.swagger.annotations.Authorization;
 public class EventSubscriptionCollectionResource {
 
     @Autowired
-    protected RestResponseFactory restResponseFactory;
+    protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
-    protected RuntimeService runtimeService;
+    protected CmmnRuntimeService runtimeService;
     
     @Autowired(required=false)
-    protected BpmnRestApiInterceptor restApiInterceptor;
+    protected CmmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List of event subscriptions", tags = { "Event subscriptions" }, nickname = "listEventSubscriptions")
     @ApiImplicitParams({
@@ -61,29 +61,26 @@ public class EventSubscriptionCollectionResource {
             @ApiImplicitParam(name = "eventType", dataType = "string", value = "Only return event subscriptions with the given event type", paramType = "query"),
             @ApiImplicitParam(name = "eventName", dataType = "string", value = "Only return event subscriptions with the given event name", paramType = "query"),
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return event subscriptions with the given activity id", paramType = "query"),
-            @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return event subscriptions with the given execution id", paramType = "query"),
-            @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return event subscriptions part of a process with the given id", paramType = "query"),
-            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "Only return event subscriptions that have no process instance id", paramType = "query"),
-            @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return event subscriptions with the given process definition id", paramType = "query"),
-            @ApiImplicitParam(name = "withoutProcessDefinitionId", dataType = "boolean", value = "Only return event subscriptions that have no process definition id", paramType = "query"),
-            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return event subscriptions part of a scope with the given id", paramType = "query"),
-            @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return event subscriptions part of a sub scope with the given id", paramType = "query"),
-            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "Only return event subscriptions that have no scope id", paramType = "query"),
-            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return event subscriptions with the given scope definition id", paramType = "query"),
-            @ApiImplicitParam(name = "withoutScopeDefinitionId", dataType = "boolean", value = "Only return event subscriptions that have no scope definition id", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return event subscriptions part of a process with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "Only return event subscriptions that have no process instance id", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return event subscriptions with the given process definition id", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeDefinitionId", dataType = "boolean", value = "Only return event subscriptions that have no process definition id", paramType = "query"),
+            @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return event subscriptions part of a scope with the given id", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string", format="date-time", value = "Only return event subscriptions which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string", format="date-time", value = "Only return event subscriptions which are created after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return event subscriptions with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "Only return event subscriptions that have no tenant id", paramType = "query"),
             @ApiImplicitParam(name = "configuration", dataType = "string", value = "Only return event subscriptions with the given configuration value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutConfiguration", dataType = "boolean", value = "Only return event subscriptions that have no configuration value", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "Only return event subscriptions that have no process instance id", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessDefinitionId", dataType = "boolean", value = "Only return event subscriptions that have no process definition id", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,created,executionId,processInstanceId,processDefinitionId,tenantId", paramType = "query")
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested event subscriptions were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
-    @GetMapping(value = "/runtime/event-subscriptions", produces = "application/json")
+    @GetMapping(value = "/cmmn-runtime/event-subscriptions", produces = "application/json")
     public DataResponse<EventSubscriptionResponse> getEventSubscriptions(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
@@ -99,35 +96,20 @@ public class EventSubscriptionCollectionResource {
         if (allRequestParams.containsKey("activityId")) {
             query.activityId(allRequestParams.get("activityId"));
         }
-        if (allRequestParams.containsKey("executionId")) {
-            query.executionId(allRequestParams.get("executionId"));
-        }
-        if (allRequestParams.containsKey("processInstanceId")) {
-            query.processInstanceId(allRequestParams.get("processInstanceId"));
-        }
-        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
-            query.withoutProcessInstanceId();
-        }
-        if (allRequestParams.containsKey("processDefinitionId")) {
-            query.processDefinitionId(allRequestParams.get("processDefinitionId"));
-        }
-        if (allRequestParams.containsKey("withoutProcessDefinitionId") && Boolean.valueOf(allRequestParams.get("withoutProcessDefinitionId"))) {
-            query.withoutProcessDefinitionId();
-        }
-        if (allRequestParams.containsKey("scopeId")) {
-            query.scopeId(allRequestParams.get("scopeId"));
+        if (allRequestParams.containsKey("caseInstanceId")) {
+            query.caseInstanceId(allRequestParams.get("caseInstanceId"));
         }
         if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
             query.withoutScopeId();
         }
-        if (allRequestParams.containsKey("subScopeId")) {
-            query.subScopeId(allRequestParams.get("subScopeId"));
-        }
-        if (allRequestParams.containsKey("scopeDefinitionId")) {
-            query.scopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
+        if (allRequestParams.containsKey("caseDefinitionId")) {
+            query.caseDefinitionId(allRequestParams.get("caseDefinitionId"));
         }
         if (allRequestParams.containsKey("withoutScopeDefinitionId") && Boolean.valueOf(allRequestParams.get("withoutScopeDefinitionId"))) {
             query.withoutScopeDefinitionId();
+        }
+        if (allRequestParams.containsKey("planItemInstanceId")) {
+            query.planItemInstanceId(allRequestParams.get("planItemInstanceId"));
         }
         if (allRequestParams.containsKey("createdBefore")) {
             query.createdBefore(RequestUtil.getDate(allRequestParams, "createdBefore"));
@@ -152,7 +134,6 @@ public class EventSubscriptionCollectionResource {
             restApiInterceptor.accessEventSubscriptionInfoWithQuery(query);
         }
 
-        return paginateList(allRequestParams, query, "id", EventSubscriptionQueryProperties.PROPERTIES,
-            restResponseFactory::createEventSubscriptionResponseList);
+        return paginateList(allRequestParams, query, "id", EventSubscriptionQueryProperties.PROPERTIES, restResponseFactory::createEventSubscriptionResponseList);
     }
 }

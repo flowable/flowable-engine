@@ -177,8 +177,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         // create output decision nodes
         decisionService.getOutputDecisions()
-            .forEach(decisionRef -> outputDecisionChildShapeNodes
-                .add(createOutputDecisionNode(decisionRef, decisionService.getId(), sourceTargetRefMap, model, converterContext)));
+                .forEach(decisionRef -> outputDecisionChildShapeNodes
+                        .add(createOutputDecisionNode(decisionRef, decisionService.getId(), sourceTargetRefMap, model, converterContext)));
 
         // create encapsulated decisions section node
         ObjectNode encapsulatedDecisionsNode = createEncapsulatedDecisionsNode(decisionService, model);
@@ -189,13 +189,13 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         // create encapsulated decision nodes
         decisionService.getEncapsulatedDecisions().forEach(
-            decisionRef -> encapsulatedDecisionChildShapeNodes
-                .add(createEncapsulatedDecisionNode(decisionRef, decisionService.getId(), sourceTargetRefMap, model, converterContext)));
+                decisionRef -> encapsulatedDecisionChildShapeNodes
+                        .add(createEncapsulatedDecisionNode(decisionRef, decisionService.getId(), sourceTargetRefMap, model, converterContext)));
 
         // create information requirement nodes
         if (model.getFlowLocationMapByDiagramId(diDiagram.getId()) != null) {
             model.getFlowLocationMapByDiagramId(diDiagram.getId())
-                .forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, model)));
+                    .forEach((id, graphicInfoList) -> shapesArrayNode.add(createInformationRequirementNode(id, graphicInfoList, model)));
         }
         return modelNode;
     }
@@ -223,10 +223,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         GraphicInfo upperLeftGraphicInfo = graphicInfoList.get(1);
 
         ObjectNode informationRequirementNode = DmnJsonConverterUtil.createChildShape(resourceId, DmnStencilConstants.STENCIL_INFORMATION_REQUIREMENT,
-            lowerRightGraphicInfo.getX(),
-            lowerRightGraphicInfo.getY(),
-            upperLeftGraphicInfo.getX(),
-            upperLeftGraphicInfo.getY());
+                lowerRightGraphicInfo.getX(),
+                lowerRightGraphicInfo.getY(),
+                upperLeftGraphicInfo.getX(),
+                upperLeftGraphicInfo.getY());
 
         // find corresponding decision
         String targetDecisionId = null;
@@ -279,15 +279,15 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected ObjectNode createOutputDecisionNode(DmnElementReference decisionRef, String decisionServiceId, String diagramId,
-        Map<String, List<String>> sourceTargetRefMap, DmnDefinition model, DmnJsonConverterContext converterContext) {
+            Map<String, List<String>> sourceTargetRefMap, DmnDefinition model, DmnJsonConverterContext converterContext) {
         Decision decision = model.getDecisionById(decisionRef.getParsedId());
         GraphicInfo graphicInfo = getGraphicInfo(decision.getId(), diagramId, model);
         GraphicInfo decisionServiceGraphicInfo = getGraphicInfo(decisionServiceId, diagramId, model);
 
         ObjectNode decisionNode = DmnJsonConverterUtil.createChildShape(decision.getId(), DmnStencilConstants.STENCIL_DECISION,
-            graphicInfo.getX() - decisionServiceGraphicInfo.getX() + graphicInfo.getWidth(),
-            graphicInfo.getY() - decisionServiceGraphicInfo.getY() + graphicInfo.getHeight(), graphicInfo.getX() - decisionServiceGraphicInfo.getX(),
-            graphicInfo.getY() - decisionServiceGraphicInfo.getY());
+                graphicInfo.getX() - decisionServiceGraphicInfo.getX() + graphicInfo.getWidth(),
+                graphicInfo.getY() - decisionServiceGraphicInfo.getY() + graphicInfo.getHeight(), graphicInfo.getX() - decisionServiceGraphicInfo.getX(),
+                graphicInfo.getY() - decisionServiceGraphicInfo.getY());
 
         return populateDecisionNode(decisionNode, decision, sourceTargetRefMap, converterContext);
     }
@@ -298,22 +298,22 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected ObjectNode createEncapsulatedDecisionNode(DmnElementReference decisionRef, String decisionServiceId, String diagramId,
-        Map<String, List<String>> sourceTargetRefMap, DmnDefinition model, DmnJsonConverterContext converterContext) {
+            Map<String, List<String>> sourceTargetRefMap, DmnDefinition model, DmnJsonConverterContext converterContext) {
         Decision decision = model.getDecisionById(decisionRef.getParsedId());
         GraphicInfo graphicInfo = getGraphicInfo(decision.getId(), diagramId, model);
         List<GraphicInfo> decisionServiceDividerGraphicInfoList = getDecisionServiceDividerGraphicInfos(decisionServiceId, diagramId, model);
         GraphicInfo encapsulatedDecisionsGraphicInfo = decisionServiceDividerGraphicInfoList.get(0);
 
         ObjectNode decisionNode = DmnJsonConverterUtil.createChildShape(decision.getId(), DmnStencilConstants.STENCIL_DECISION,
-            graphicInfo.getX() - encapsulatedDecisionsGraphicInfo.getX() + graphicInfo.getWidth(),
-            graphicInfo.getY() - encapsulatedDecisionsGraphicInfo.getY() + graphicInfo.getHeight(),
-            graphicInfo.getX() - encapsulatedDecisionsGraphicInfo.getX(), graphicInfo.getY() - encapsulatedDecisionsGraphicInfo.getY());
+                graphicInfo.getX() - encapsulatedDecisionsGraphicInfo.getX() + graphicInfo.getWidth(),
+                graphicInfo.getY() - encapsulatedDecisionsGraphicInfo.getY() + graphicInfo.getHeight(),
+                graphicInfo.getX() - encapsulatedDecisionsGraphicInfo.getX(), graphicInfo.getY() - encapsulatedDecisionsGraphicInfo.getY());
 
         return populateDecisionNode(decisionNode, decision, sourceTargetRefMap, converterContext);
     }
 
     protected ObjectNode populateDecisionNode(ObjectNode decisionNode, Decision decision, Map<String, List<String>> sourceTargetRefMap,
-        DmnJsonConverterContext converterContext) {
+            DmnJsonConverterContext converterContext) {
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         decisionNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         propertiesNode.put(PROPERTY_NAME, decision.getName());
@@ -354,8 +354,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         String resourceId = decisionService.getId() + "_outputDecisions";
         ObjectNode outputDecisionsNode = DmnJsonConverterUtil
-            .createChildShape(resourceId, DmnStencilConstants.STENCIL_OUTPUT_DECISIONS, outputDecisionsGraphicInfo.getWidth(),
-                outputDecisionsGraphicInfo.getHeight(), 0, 0);
+                .createChildShape(resourceId, DmnStencilConstants.STENCIL_OUTPUT_DECISIONS, outputDecisionsGraphicInfo.getWidth(),
+                        outputDecisionsGraphicInfo.getHeight(), 0, 0);
 
         return outputDecisionsNode;
     }
@@ -371,8 +371,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         String resourceId = decisionService.getId() + "_encapsulatedDecisions";
         ObjectNode encapsulatedDecisionsNode = DmnJsonConverterUtil
-            .createChildShape(resourceId, DmnStencilConstants.STENCIL_ENCAPSULATED_DECISIONS, encapsulatedDecisionsGraphicInfo.getWidth(),
-                encapsulatedDecisionsGraphicInfo.getHeight() + outputDecisionsGraphicInfo.getHeight(), 0, outputDecisionsGraphicInfo.getHeight());
+                .createChildShape(resourceId, DmnStencilConstants.STENCIL_ENCAPSULATED_DECISIONS, encapsulatedDecisionsGraphicInfo.getWidth(),
+                        encapsulatedDecisionsGraphicInfo.getHeight() + outputDecisionsGraphicInfo.getHeight(), 0, outputDecisionsGraphicInfo.getHeight());
 
         return encapsulatedDecisionsNode;
     }
@@ -384,8 +384,9 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     protected ObjectNode createExpandedDecisionServiceNode(DecisionService decisionService, String diDiagramId, DmnDefinition model) {
         GraphicInfo decisionServiceGraphicInfo = getGraphicInfo(decisionService.getId(), diDiagramId, model);
         ObjectNode decisionServiceNode = DmnJsonConverterUtil.createChildShape(decisionService.getId(), DmnStencilConstants.STENCIL_EXPANDED_DECISION_SERVICE,
-            decisionServiceGraphicInfo.getX() + decisionServiceGraphicInfo.getWidth(),
-            decisionServiceGraphicInfo.getY() + decisionServiceGraphicInfo.getHeight(), decisionServiceGraphicInfo.getX(), decisionServiceGraphicInfo.getY());
+                decisionServiceGraphicInfo.getX() + decisionServiceGraphicInfo.getWidth(),
+                decisionServiceGraphicInfo.getY() + decisionServiceGraphicInfo.getHeight(), decisionServiceGraphicInfo.getX(),
+                decisionServiceGraphicInfo.getY());
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         if (StringUtils.isNotEmpty(decisionService.getId())) {
@@ -442,7 +443,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         modelNode.put("id", id);
         modelNode.put("key", decision.getId());
         modelNode.put("name", name);
-        modelNode.put("version", MODEL_VERSION);
+        modelNode.put("modelVersion", MODEL_VERSION);
         modelNode.put("description", description);
 
         // only decision table decision are supported for now
@@ -450,7 +451,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             return modelNode;
         }
 
-        modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
+        modelNode.put("hitIndicator", decisionTable.getHitPolicy().getValue());
 
         if (decisionTable.getAggregation() != null) {
             modelNode.put("collectOperator", decisionTable.getAggregation().name());
@@ -473,6 +474,14 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             inputExpressionNode.put("label", clause.getLabel());
             inputExpressionNode.put("variableId", inputExpression.getText());
 
+            if (clause.getInputValues() != null) {
+                ArrayNode inputValues = objectMapper.createArrayNode();
+                inputExpressionNode.set("entries", inputValues);
+                for (Object inputValue : clause.getInputValues().getTextValues()) {
+                    inputValues.add(String.valueOf(inputValue));
+                }
+            }
+
             inputExpressionsNode.add(inputExpressionNode);
         }
 
@@ -488,6 +497,14 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             outputExpressionNode.put("type", clause.getTypeRef());
             outputExpressionNode.put("label", clause.getLabel());
             outputExpressionNode.put("variableId", clause.getName());
+
+            if (clause.getOutputValues() != null) {
+                ArrayNode outputValues = objectMapper.createArrayNode();
+                outputExpressionNode.set("entries", outputValues);
+                for (Object outputValue : clause.getOutputValues().getTextValues()) {
+                    outputValues.add(String.valueOf(outputValue));
+                }
+            }
 
             outputExpressionsNode.add(outputExpressionNode);
         }
@@ -606,10 +623,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                     String decisionServiceChildNodeStencilId = DmnJsonConverterUtil.getStencilId(decisionServiceChildNode);
                     if (STENCIL_OUTPUT_DECISIONS.equals(decisionServiceChildNodeStencilId)) {
                         processDRDDecision(definition, decisionServiceChildNode, converterContext, sourceRefMap, targetRefMap,
-                            decisionService.getOutputDecisions());
+                                decisionService.getOutputDecisions());
                     } else if (STENCIL_ENCAPSULATED_DECISIONS.equals(decisionServiceChildNodeStencilId)) {
                         processDRDDecision(definition, decisionServiceChildNode, converterContext, sourceRefMap, targetRefMap,
-                            decisionService.getEncapsulatedDecisions());
+                                decisionService.getEncapsulatedDecisions());
                     }
                 });
             }
@@ -663,7 +680,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
                         definition.addDecisionServiceDividerGraphicInfoListByDiagramId(currentDiagramId, parentElementId, graphicInfoList);
                         readShapeDI(jsonChildNode, upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX,
-                            upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
+                                upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
                     } else if (STENCIL_ENCAPSULATED_DECISIONS.equals(stencilId)) {
                         GraphicInfo graphicInfoRight = new GraphicInfo();
                         graphicInfoRight.setX(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
@@ -673,7 +690,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
                         definition.getDecisionServiceDividerLocationMapByDiagramId(currentDiagramId).get(parentElementId).add(graphicInfoRight);
                         readShapeDI(jsonChildNode, upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX,
-                            upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
+                                upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY, definition, currentDiagramId, currentElementId);
                     } else {
                         GraphicInfo graphicInfo = new GraphicInfo();
 
@@ -804,7 +821,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void processDRDDecision(DmnDefinition definition, JsonNode decisionServiceChildNode, DmnJsonConverterContext converterContext,
-        Map<String, JsonNode> sourceRefMap, Map<String, List<JsonNode>> targetRefMap, List<DmnElementReference> decisionServiceDecisions) {
+            Map<String, JsonNode> sourceRefMap, Map<String, List<JsonNode>> targetRefMap, List<DmnElementReference> decisionServiceDecisions) {
 
         ArrayNode decisionsArrayNode = (ArrayNode) decisionServiceChildNode.get(EDITOR_CHILD_SHAPES);
         if (decisionsArrayNode == null || decisionsArrayNode.size() == 0) {
@@ -905,7 +922,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void preProcessFlows(JsonNode objectNode, Map<String, JsonNode> edgeMap, Map<String, JsonNode> shapeMap, Map<String, JsonNode> sourceRefMap,
-        Map<String, List<JsonNode>> sourceAndTargetMap, Map<String, List<JsonNode>> targetRefMap) {
+            Map<String, List<JsonNode>> sourceAndTargetMap, Map<String, List<JsonNode>> targetRefMap) {
 
         if (objectNode.get(EDITOR_CHILD_SHAPES) != null) {
             for (JsonNode jsonChildNode : objectNode.get(EDITOR_CHILD_SHAPES)) {
@@ -1012,7 +1029,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap,
-        Map<String, String> newOldIdMap, DecisionTable decisionTable) {
+            Map<String, String> newOldIdMap, DecisionTable decisionTable) {
 
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
@@ -1039,13 +1056,16 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 inputClause.setInputExpression(inputExpression);
 
                 if (inputExpressionNode.get("entries") != null && !inputExpressionNode.get("entries").isNull()
-                    && inputExpressionNode.get("entries").isArray() && inputExpressionNode.get("entries").size() > 0) {
+                        && inputExpressionNode.get("entries").isArray() && inputExpressionNode.get("entries").size() > 0) {
                     UnaryTests inputValues = new UnaryTests();
                     List<Object> inputEntries = new ArrayList<>();
                     for (JsonNode entriesNode : inputExpressionNode.get("entries")) {
                         inputEntries.add(entriesNode.asText());
                     }
                     inputValues.setTextValues(inputEntries);
+
+                    String inputValuesText = formatInputOutputValuesText(inputExpression.getTypeRef(), inputEntries);
+                    inputValues.setText(inputValuesText);
 
                     // add to clause
                     inputClause.setInputValues(inputValues);
@@ -1059,8 +1079,16 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         }
     }
 
+    protected String formatInputOutputValuesText(String type, List<Object> inputOutputValues) {
+        if ("number".equals(type) || "double".equals(type) || "boolean".equals(type)) {
+            return StringUtils.join(inputOutputValues, ",");
+        } else {
+            return "\"" + StringUtils.join(inputOutputValues, "\",\"") + "\"";
+        }
+    }
+
     protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap,
-        List<String> complexExpressionIds, Map<String, String> newOldIdMap, DecisionTable decisionTable) {
+            List<String> complexExpressionIds, Map<String, String> newOldIdMap, DecisionTable decisionTable) {
 
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
@@ -1083,13 +1111,16 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 outputClause.setTypeRef(DmnJsonConverterUtil.getValueAsString("type", outputExpressionNode));
 
                 if (outputExpressionNode.get("entries") != null && !outputExpressionNode.get("entries").isNull()
-                    && outputExpressionNode.get("entries").isArray() && outputExpressionNode.get("entries").size() > 0) {
+                        && outputExpressionNode.get("entries").isArray() && outputExpressionNode.get("entries").size() > 0) {
                     UnaryTests outputValues = new UnaryTests();
                     List<Object> outputEntries = new ArrayList<>();
                     for (JsonNode entriesNode : outputExpressionNode.get("entries")) {
                         outputEntries.add(entriesNode.asText());
                     }
                     outputValues.setTextValues(outputEntries);
+
+                    String outputValuesText = formatInputOutputValuesText(outputClause.getTypeRef(), outputEntries);
+                    outputValues.setText(outputValuesText);
 
                     // add to clause
                     outputClause.setOutputValues(outputValues);
@@ -1110,7 +1141,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap,
-        List<String> complexExpressionIds, Map<String, String> newOldIdMap, DecisionTable decisionTable) {
+            List<String> complexExpressionIds, Map<String, String> newOldIdMap, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 
@@ -1157,10 +1188,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         String formattedCollectionExpression;
                         if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
                             formattedCollectionExpression = DmnJsonConverterUtil
-                                .formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
+                                    .formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
                         } else {
                             formattedCollectionExpression = DmnJsonConverterUtil
-                                .formatCollectionExpression(operatorValue, expressionValue, inputExpressionVariable);
+                                    .formatCollectionExpression(operatorValue, expressionValue, inputExpressionVariable);
                         }
 
                         inputEntry.setText(formattedCollectionExpression);
@@ -1170,11 +1201,11 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         addExtensionElement("expression", expressionValue, inputEntry);
 
                     } else if ("collection".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && StringUtils.isNotEmpty(expressionValue)) {
+                            && StringUtils.isNotEmpty(expressionValue)) {
 
                         String inputExpressionVariable = ruleInputClauseContainer.getInputClause().getInputExpression().getText();
                         String formattedCollectionExpression = DmnJsonConverterUtil
-                            .formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
+                                .formatCollectionExpression(operatorValue, inputExpressionVariable, expressionValue);
 
                         inputEntry.setText(formattedCollectionExpression);
 
@@ -1190,14 +1221,14 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
                         // add quotes for string
                         if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                            && !expressionValue.startsWith("\"")
-                            && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
+                                && !expressionValue.startsWith("\"")
+                                && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
 
                             stringBuilder.append("\"");
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("\"");
                         } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                            && StringUtils.isNotEmpty(expressionValue)) {
+                                && StringUtils.isNotEmpty(expressionValue)) {
 
                             // wrap in built in toDate function
                             stringBuilder.append("date:toDate('");
@@ -1233,11 +1264,11 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                             outputEntry.setText(expressionValue);
                         } else {
                             if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
-                                && !expressionValue.startsWith("\"")
-                                && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
+                                    && !expressionValue.startsWith("\"")
+                                    && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                                 outputEntry.setText("\"" + expressionValue + "\"");
                             } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
-                                && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
+                                    && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
                                 outputEntry.setText("date:toDate('" + expressionValue + "')");
                             } else {
                                 outputEntry.setText(expressionValue);

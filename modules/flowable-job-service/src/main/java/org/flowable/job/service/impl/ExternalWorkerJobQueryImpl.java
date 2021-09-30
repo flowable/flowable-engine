@@ -38,6 +38,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     
     protected String id;
     protected String processInstanceId;
+    protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
@@ -46,6 +47,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String elementId;
     protected String elementName;
     protected String scopeId;
+    protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
     protected boolean withoutScopeType;
@@ -95,6 +97,12 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
         }
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+    
+    @Override
+    public ExternalWorkerJobQuery withoutProcessInstanceId() {
+        this.withoutProcessInstanceId = true;
         return this;
     }
 
@@ -149,6 +157,12 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
         this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public ExternalWorkerJobQuery withoutScopeId() {
+        this.withoutScopeId = true;
         return this;
     }
 
@@ -383,6 +397,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     public String getProcessInstanceId() {
         return processInstanceId;
     }
+    
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
 
     public String getExecutionId() {
         return executionId;
@@ -450,6 +468,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
     }
 
     public String getSubScopeId() {

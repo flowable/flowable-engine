@@ -38,12 +38,27 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
 
     /** Only select event subscriptions which have the given process instance id. **/
     EventSubscriptionQuery processInstanceId(String processInstanceId);
+    
+    /** Only select event subscriptions without a process instance id value. **/
+    EventSubscriptionQuery withoutProcessInstanceId();
 
     /** Only select event subscriptions which have the given process definition id. **/
     EventSubscriptionQuery processDefinitionId(String processDefinitionId);
+    
+    /** Only select event subscriptions without a process definition id value. **/
+    EventSubscriptionQuery withoutProcessDefinitionId();
 
     /** Only select event subscriptions which have an activity with the given id. **/
     EventSubscriptionQuery activityId(String activityId);
+    
+    /** Only select event subscriptions which have the given case instance id. **/
+    EventSubscriptionQuery caseInstanceId(String caseInstanceId);
+    
+    /** Only select event subscriptions which have the given plan item instance id. **/
+    EventSubscriptionQuery planItemInstanceId(String planItemInstanceId);
+    
+    /** Only select event subscriptions which have the given case definition id. **/
+    EventSubscriptionQuery caseDefinitionId(String caseDefinitionId);
     
     /** Only select event subscriptions which have a sub scope id with the given value. **/
     EventSubscriptionQuery subScopeId(String subScopeId);
@@ -51,8 +66,14 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
     /** Only select event subscriptions which have a scope id with the given value. **/
     EventSubscriptionQuery scopeId(String scopeId);
     
+    /** Only select event subscriptions without a scope id value. **/
+    EventSubscriptionQuery withoutScopeId();
+    
     /** Only select event subscriptions which have a scope definition id with the given value. **/
     EventSubscriptionQuery scopeDefinitionId(String scopeDefinitionId);
+    
+    /** Only select event subscriptions without a scope definition id value. **/
+    EventSubscriptionQuery withoutScopeDefinitionId();
     
     /** Only select event subscriptions which have a scope type with the given value. **/
     EventSubscriptionQuery scopeType(String scopeType);

@@ -30,6 +30,9 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
 
     /** Only select jobs which exist for the given process instance. **/
     SuspendedJobQuery processInstanceId(String processInstanceId);
+    
+    /** Only select jobs without a process instance id value. **/
+    SuspendedJobQuery withoutProcessInstanceId();
 
     /** Only select jobs which exist for the given execution */
     SuspendedJobQuery executionId(String executionId);
@@ -54,6 +57,9 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     
     /** Only select jobs for the given scope identifier. */
     SuspendedJobQuery scopeId(String scopeId);
+    
+    /** Only select jobs without a scope id value. **/
+    SuspendedJobQuery withoutScopeId();
 
     /** Only select jobs for the given sub scope identifier. */
     SuspendedJobQuery subScopeId(String subScopeId);

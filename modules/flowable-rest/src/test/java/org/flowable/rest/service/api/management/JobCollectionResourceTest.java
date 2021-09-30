@@ -76,6 +76,9 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, timerJob.getId());
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?processInstanceId=" + processInstance.getId() + "xyzzy";
         assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutProcessInstanceId=true";
+        assertResultsPresentInDataResponse(url);
 
         // Fetch using executionId
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?executionId=" + timerJob.getExecutionId();
@@ -143,6 +146,9 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?exceptionMessage=FlowableException";
         assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutScopeId=true";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
 
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
         for (int i = 0; i < timerJob2.getRetries(); i++) {
@@ -151,7 +157,7 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
                 managementService.moveTimerToExecutableJob(timerJob2.getId());
                 managementService.executeJob(timerJob2.getId());
             })
-                    .isExactlyInstanceOf(FlowableException.class);
+            .isExactlyInstanceOf(FlowableException.class);
         }
 
         timerJob = managementService.createDeadLetterJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
@@ -185,6 +191,12 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, asyncJob.getId());
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?processInstanceId=unexisting";
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?withoutProcessInstanceId=true";
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?withoutProcessInstanceId=true";
         assertResultsPresentInDataResponse(url);
 
         // Fetch using executionId
@@ -223,6 +235,12 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         // Fetch using withRetriesLeft
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?withRetriesLeft=true";
         assertResultsPresentInDataResponse(url, asyncJob.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?withoutScopeId=true";
+        assertResultsPresentInDataResponse(url, asyncJob.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?withoutScopeId=true";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
 
         // Fetch using executable
         // url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION)

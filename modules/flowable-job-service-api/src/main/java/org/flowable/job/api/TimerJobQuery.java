@@ -30,6 +30,9 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
 
     /** Only select jobs which exist for the given process instance. **/
     TimerJobQuery processInstanceId(String processInstanceId);
+    
+    /** Only select jobs without a process instance id value. **/
+    TimerJobQuery withoutProcessInstanceId();
 
     /** Only select jobs which exist for the given execution */
     TimerJobQuery executionId(String executionId);
@@ -51,6 +54,9 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     
     /** Only select jobs for the given scope identifier. */
     TimerJobQuery scopeId(String scopeId);
+    
+    /** Only select jobs without a scope id value. **/
+    TimerJobQuery withoutScopeId();
 
     /** Only select jobs for the given sub scope identifier. */
     TimerJobQuery subScopeId(String subScopeId);

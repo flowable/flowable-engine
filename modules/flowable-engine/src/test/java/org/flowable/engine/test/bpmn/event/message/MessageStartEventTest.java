@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.event.message;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.Calendar;
@@ -270,6 +271,10 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId(processDefinition.getId()).orderByProcessInstanceId().desc(), 2);
 
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId("nonexisting"), 0);
+        
+        assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().withoutProcessDefinitionId(), 0);
+        
+        assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().withoutScopeDefinitionId(), 2);
 
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().activityId("messageStart").orderByTenantId().asc(), 1);
 
