@@ -144,6 +144,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignal");
 
         assertThat(createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().withoutProcessInstanceId().count()).isZero();
+        assertThat(createEventSubscriptionQuery().withoutScopeId().count()).isEqualTo(1);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         Map<String, Object> signalVariableMap = new HashMap<>();

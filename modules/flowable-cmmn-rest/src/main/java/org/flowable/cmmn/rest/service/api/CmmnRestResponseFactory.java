@@ -48,6 +48,7 @@ import org.flowable.cmmn.rest.service.api.repository.DecisionResponse;
 import org.flowable.cmmn.rest.service.api.repository.DeploymentResourceResponse;
 import org.flowable.cmmn.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceResponse;
+import org.flowable.cmmn.rest.service.api.runtime.caze.EventSubscriptionResponse;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceResponse;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskResponse;
 import org.flowable.common.engine.api.FlowableException;
@@ -68,6 +69,7 @@ import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
 import org.flowable.dmn.api.DmnDecision;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -564,6 +566,56 @@ public class CmmnRestResponseFactory {
         result.setTenantId(planItemInstance.getTenantId());
 
         return result;
+    }
+    
+    public List<EventSubscriptionResponse> createEventSubscriptionResponseList(List<EventSubscription> eventSubscriptions) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<EventSubscriptionResponse> responseList = new ArrayList<>(eventSubscriptions.size());
+        for (EventSubscription instance : eventSubscriptions) {
+            responseList.add(createEventSubscriptionResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public EventSubscriptionResponse createEventSubscriptionResponse(EventSubscription eventSubscription) {
+        return createEventSubscriptionResponse(eventSubscription, createUrlBuilder());
+    }
+
+    public EventSubscriptionResponse createEventSubscriptionResponse(EventSubscription eventSubscription, RestUrlBuilder urlBuilder) {
+        EventSubscriptionResponse response = new EventSubscriptionResponse();
+        response.setId(eventSubscription.getId());
+        response.setCreated(eventSubscription.getCreated());
+        response.setEventType(eventSubscription.getEventType());
+        response.setEventName(eventSubscription.getEventName());
+        response.setActivityId(eventSubscription.getActivityId());
+        response.setPlanItemInstanceId(eventSubscription.getSubScopeId());
+        response.setCaseDefinitionId(eventSubscription.getScopeDefinitionId());
+        response.setCaseInstanceId(eventSubscription.getScopeId());
+        response.setExecutionId(eventSubscription.getExecutionId());
+        response.setProcessInstanceId(eventSubscription.getProcessInstanceId());
+        response.setProcessDefinitionId(eventSubscription.getProcessDefinitionId());
+        response.setSubScopeId(eventSubscription.getSubScopeId());
+        response.setScopeId(eventSubscription.getScopeId());
+        response.setScopeType(eventSubscription.getScopeType());
+        response.setScopeDefinitionId(eventSubscription.getScopeDefinitionId());
+        response.setConfiguration(eventSubscription.getConfiguration());
+        response.setTenantId(eventSubscription.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_EVENT_SUBSCRIPTION, eventSubscription.getId()));
+
+        if (eventSubscription.getScopeDefinitionId() != null) {
+            response.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, eventSubscription.getScopeDefinitionId()));
+        }
+
+        if (eventSubscription.getScopeId() != null) {
+            response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, eventSubscription.getScopeId()));
+        }
+
+        if (eventSubscription.getSubScopeId() != null) {
+            response.setPlanItemInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, eventSubscription.getSubScopeId()));
+        }
+
+        return response;
     }
 
     public List<HistoricCaseInstanceResponse> createHistoricCaseInstanceResponseList(List<HistoricCaseInstance> caseInstances) {
