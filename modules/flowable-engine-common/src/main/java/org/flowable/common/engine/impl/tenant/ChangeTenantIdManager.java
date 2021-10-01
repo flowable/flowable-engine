@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.tenant;
 
-import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 
 /**
@@ -20,8 +19,8 @@ import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
  */
 public interface ChangeTenantIdManager {
 
-    ChangeTenantIdResult simulate(ChangeTenantIdRequest request);
+    ChangeTenantIdResult simulate(ChangeTenantIdBuilderImpl builder);
 
-    ChangeTenantIdResult complete(ChangeTenantIdRequest request);
+    ChangeTenantIdResult complete(ChangeTenantIdBuilderImpl builder);
 
 }

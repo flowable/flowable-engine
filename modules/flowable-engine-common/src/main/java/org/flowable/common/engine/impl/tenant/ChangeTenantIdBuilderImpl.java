@@ -14,13 +14,12 @@ package org.flowable.common.engine.impl.tenant;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
-import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 
 /**
  * @author Filip Hrisafov
  */
-public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder, ChangeTenantIdRequest {
+public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder {
 
     protected final String sourceTenantId;
     protected final String targetTenantId;
@@ -53,17 +52,14 @@ public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder, ChangeT
         return changeTenantIdManager.complete(this);
     }
 
-    @Override
     public String getSourceTenantId() {
         return sourceTenantId;
     }
 
-    @Override
     public String getTargetTenantId() {
         return targetTenantId;
     }
 
-    @Override
     public boolean isOnlyInstancesFromDefaultTenantDefinitions() {
         return onlyInstancesFromDefaultTenantDefinitions;
     }

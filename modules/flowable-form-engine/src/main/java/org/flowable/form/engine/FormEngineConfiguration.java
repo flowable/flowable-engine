@@ -15,6 +15,7 @@ package org.flowable.form.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -31,7 +32,9 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.editor.form.converter.FormJsonConverter;
+import org.flowable.form.api.FormChangeTenantIdEntityTypes;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -69,7 +72,6 @@ import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDef
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormDeploymentDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormInstanceDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.impl.MybatisFormResourceDataManager;
-import org.flowable.form.engine.impl.persistence.tenant.FormMyBatisChangeTenantIdManager;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -215,7 +217,8 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     public void initChangeTenantIdManager() {
         if (changeTenantIdManager == null) {
-            changeTenantIdManager = new FormMyBatisChangeTenantIdManager(commandExecutor);
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.FORM,
+                    Collections.singleton(FormChangeTenantIdEntityTypes.FORM_INSTANCES));
         }
     }
 

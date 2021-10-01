@@ -19,8 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -31,6 +33,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
+import org.flowable.cmmn.api.CmmnChangeTenantIdEntityTypes;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -195,7 +198,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanIte
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
-import org.flowable.cmmn.engine.impl.persistence.tenant.CmmnMyBatisChangeTenantIdManager;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
@@ -268,6 +270,7 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -1319,7 +1322,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initChangeTenantIdManager() {
         if (changeTenantIdManager == null) {
-            changeTenantIdManager = new CmmnMyBatisChangeTenantIdManager(commandExecutor, isDbHistoryUsed);
+            Set<String> entityTypes = new HashSet<>(CmmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+            if (isDbHistoryUsed) {
+                entityTypes.addAll(CmmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+            }
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.CMMN, entityTypes);
         }
     }
     

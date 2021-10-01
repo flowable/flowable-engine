@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.api;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Filip Hrisafov
  */
@@ -32,5 +36,26 @@ public interface CmmnChangeTenantIdEntityTypes {
     String SUSPENDED_JOBS = "CmmnSuspendedJobs";
     String TIMER_JOBS = "CmmnTimerJobs";
     String DEADLETTER_JOBS = "CmmnDeadLetterJobs";
+
+    Set<String> RUNTIME_TYPES = new HashSet<>(Arrays.asList(
+            CmmnChangeTenantIdEntityTypes.CASE_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.MILESTONE_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.PLAN_ITEM_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.EVENT_SUBSCRIPTIONS,
+            CmmnChangeTenantIdEntityTypes.DEADLETTER_JOBS,
+            CmmnChangeTenantIdEntityTypes.EXTERNAL_WORKER_JOBS,
+            CmmnChangeTenantIdEntityTypes.JOBS,
+            CmmnChangeTenantIdEntityTypes.SUSPENDED_JOBS,
+            CmmnChangeTenantIdEntityTypes.TIMER_JOBS,
+            CmmnChangeTenantIdEntityTypes.TASKS
+    ));
+
+    Set<String> HISTORIC_TYPES = new HashSet<>(Arrays.asList(
+            CmmnChangeTenantIdEntityTypes.HISTORIC_CASE_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.HISTORIC_MILESTONE_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.HISTORIC_PLAN_ITEM_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.HISTORIC_TASK_INSTANCES,
+            CmmnChangeTenantIdEntityTypes.HISTORIC_TASK_LOG_ENTRIES
+    ));
 
 }

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +29,15 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
 
     protected final Set<String> entityTypes;
 
-    public ExecuteChangeTenantIdCmd(ChangeTenantIdRequest request, String engineScopeType, Set<String> entityTypes) {
-        super(request, engineScopeType);
+    public ExecuteChangeTenantIdCmd(ChangeTenantIdBuilderImpl builder, String engineScopeType, Set<String> entityTypes) {
+        super(builder, engineScopeType);
         this.entityTypes = entityTypes;
     }
 
     @Override
     protected Map<String, Long> executeOperation(DbSqlSession dbSqlSession, Map<String, Object> parameters) {
         if (LOGGER.isDebugEnabled()) {
-            String option = request.isOnlyInstancesFromDefaultTenantDefinitions()
+            String option = builder.isOnlyInstancesFromDefaultTenantDefinitions()
                     ? " but only for instances from the default tenant definitions"
                     : "";
             LOGGER.debug("Executing instance migration from '{}' to '{}'{}.",

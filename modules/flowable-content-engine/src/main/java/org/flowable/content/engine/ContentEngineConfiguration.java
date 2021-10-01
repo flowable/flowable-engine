@@ -15,6 +15,7 @@ package org.flowable.content.engine;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,8 @@ import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
+import org.flowable.content.api.ContentChangeTenantIdEntityTypes;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
@@ -49,7 +52,6 @@ import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityMana
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
-import org.flowable.content.engine.impl.persistence.tenant.ContentMyBatisChangeTenantIdManager;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
 
@@ -201,7 +203,8 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     public void initChangeTenantIdManager() {
         if (changeTenantIdManager == null) {
-            changeTenantIdManager = new ContentMyBatisChangeTenantIdManager(commandExecutor);
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor,
+                    "content", Collections.singleton(ContentChangeTenantIdEntityTypes.CONTENT_ITEM_INSTANCES));
         }
     }
 

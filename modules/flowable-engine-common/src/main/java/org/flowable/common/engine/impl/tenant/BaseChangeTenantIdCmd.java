@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.DbSqlSession;
@@ -28,23 +27,23 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public abstract class BaseChangeTenantIdCmd implements Command<ChangeTenantIdResult> {
 
-    protected final ChangeTenantIdRequest request;
+    protected final ChangeTenantIdBuilderImpl builder;
     protected String engineScopeType;
 
-    protected BaseChangeTenantIdCmd(ChangeTenantIdRequest request, String engineScopeType) {
-        this.request = request;
+    protected BaseChangeTenantIdCmd(ChangeTenantIdBuilderImpl builder, String engineScopeType) {
+        this.builder = builder;
         this.engineScopeType = engineScopeType;
     }
 
     @Override
     public ChangeTenantIdResult execute(CommandContext commandContext) {
-        String sourceTenantId = request.getSourceTenantId();
-        String targetTenantId = request.getTargetTenantId();
+        String sourceTenantId = builder.getSourceTenantId();
+        String targetTenantId = builder.getTargetTenantId();
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        boolean onlyInstancesFromDefaultTenantDefinitions = request.isOnlyInstancesFromDefaultTenantDefinitions();
+        boolean onlyInstancesFromDefaultTenantDefinitions = builder.isOnlyInstancesFromDefaultTenantDefinitions();
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         if (onlyInstancesFromDefaultTenantDefinitions) {
             String defaultTenantId = getDefaultTenantId(commandContext, sourceTenantId);

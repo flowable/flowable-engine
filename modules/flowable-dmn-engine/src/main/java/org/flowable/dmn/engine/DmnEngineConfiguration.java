@@ -15,6 +15,7 @@ package org.flowable.dmn.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
+import org.flowable.dmn.api.DmnChangeTenantIdEntityTypes;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
@@ -106,7 +109,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecision
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
-import org.flowable.dmn.engine.impl.persistence.tenant.DmnMyBatisChangeTenantIdManager;
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
 import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
 
@@ -429,7 +431,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     public void initChangeTenantIdManager() {
         if (changeTenantIdManager == null) {
-            changeTenantIdManager = new DmnMyBatisChangeTenantIdManager(commandExecutor);
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.DMN,
+                    Collections.singleton(DmnChangeTenantIdEntityTypes.HISTORIC_DECISION_EXECUTIONS));
         }
     }
 

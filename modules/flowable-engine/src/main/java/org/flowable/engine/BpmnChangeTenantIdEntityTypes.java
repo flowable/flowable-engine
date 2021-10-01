@@ -12,6 +12,10 @@
  */
 package org.flowable.engine;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public interface BpmnChangeTenantIdEntityTypes {
 
     String ACTIVITY_INSTANCES = "ActivityInstances";
@@ -27,5 +31,24 @@ public interface BpmnChangeTenantIdEntityTypes {
     String SUSPENDED_JOBS = "BpmnSuspendedJobs";
     String TIMER_JOBS = "BpmnTimerJobs";
     String DEADLETTER_JOBS = "BpmnDeadLetterJobs";
+
+    Set<String> RUNTIME_TYPES = new HashSet<>(Arrays.asList(
+            BpmnChangeTenantIdEntityTypes.EXECUTIONS,
+            BpmnChangeTenantIdEntityTypes.ACTIVITY_INSTANCES,
+            BpmnChangeTenantIdEntityTypes.EVENT_SUBSCRIPTIONS,
+            BpmnChangeTenantIdEntityTypes.DEADLETTER_JOBS,
+            BpmnChangeTenantIdEntityTypes.EXTERNAL_WORKER_JOBS,
+            BpmnChangeTenantIdEntityTypes.JOBS,
+            BpmnChangeTenantIdEntityTypes.SUSPENDED_JOBS,
+            BpmnChangeTenantIdEntityTypes.TIMER_JOBS,
+            BpmnChangeTenantIdEntityTypes.TASKS
+    ));
+
+    Set<String> HISTORIC_TYPES = new HashSet<>(Arrays.asList(
+            BpmnChangeTenantIdEntityTypes.HISTORIC_PROCESS_INSTANCES,
+            BpmnChangeTenantIdEntityTypes.HISTORIC_ACTIVITY_INSTANCES,
+            BpmnChangeTenantIdEntityTypes.HISTORIC_TASK_INSTANCES,
+            BpmnChangeTenantIdEntityTypes.HISTORIC_TASK_LOG_ENTRIES
+    ));
 
 }

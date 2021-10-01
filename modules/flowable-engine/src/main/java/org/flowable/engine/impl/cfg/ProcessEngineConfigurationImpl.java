@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,8 +104,10 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
+import org.flowable.engine.BpmnChangeTenantIdEntityTypes;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.DefaultCandidateManager;
@@ -347,7 +350,6 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataMan
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.engine.impl.persistence.tenant.BpmnMyBatisChangeTenantIdManager;
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -1311,7 +1313,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initChangeTenantIdManager() {
         if (changeTenantIdManager == null) {
-            changeTenantIdManager = new BpmnMyBatisChangeTenantIdManager(commandExecutor, isDbHistoryUsed);
+            Set<String> entityTypes = new HashSet<>(BpmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+            if (isDbHistoryUsed) {
+                entityTypes.addAll(BpmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+            }
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.BPMN, entityTypes);
         }
     }
 
