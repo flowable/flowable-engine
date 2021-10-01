@@ -37,10 +37,10 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
     private static final String TEST_TENANT_B = "test-tenant-b";
     private static final String TEST_TENANT_C = "test-tenant-c";
 
-    private String deploymentIdWithTenantA;
-    private String deploymentIdWithTenantB;
-    private String deploymentIdWithTenantC;
-    private String deploymentIdWithoutTenant;
+    protected String deploymentIdWithTenantA;
+    protected String deploymentIdWithTenantB;
+    protected String deploymentIdWithTenantC;
+    protected String deploymentIdWithoutTenant;
 
     @Before
     public void setUp() {

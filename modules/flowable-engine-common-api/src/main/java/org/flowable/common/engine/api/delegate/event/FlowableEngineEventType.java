@@ -347,6 +347,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * The event is dispatched after the associated {@link #ENTITY_INITIALIZED} and the variables have been set.
      */
     CASE_STARTED,
+
+    /**
+     * A change tenant id was executed.
+     */
+    CHANGE_TENANT_ID,
     ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};

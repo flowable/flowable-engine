@@ -28,6 +28,12 @@ public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder {
     protected boolean onlyInstancesFromDefaultTenantDefinitions;
 
     public ChangeTenantIdBuilderImpl(String sourceTenantId, String targetTenantId, ChangeTenantIdManager changeTenantIdManager) {
+        if (sourceTenantId == null) {
+            throw new FlowableIllegalArgumentException("The source tenant id must not be null.");
+        }
+        if (targetTenantId == null) {
+            throw new FlowableIllegalArgumentException("The target tenant id must not be null.");
+        }
         this.sourceTenantId = sourceTenantId;
         this.targetTenantId = targetTenantId;
         if (sourceTenantId.equals(targetTenantId)) {

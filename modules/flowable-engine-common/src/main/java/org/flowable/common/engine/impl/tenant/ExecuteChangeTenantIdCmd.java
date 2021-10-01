@@ -16,7 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.event.FlowableChangeTenantIdEventImpl;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,4 +56,20 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
         return results;
     }
 
+    @Override
+    protected void beforeReturn(CommandContext commandContext, ChangeTenantIdResult result) {
+        FlowableEventDispatcher eventDispatcher = getEngineConfiguration(commandContext)
+                .getEventDispatcher();
+
+        if (eventDispatcher.isEnabled()) {
+            String sourceTenantId = builder.getSourceTenantId();
+            String targetTenantId = builder.getTargetTenantId();
+            String definitionTenantId = null;
+            if (builder.isOnlyInstancesFromDefaultTenantDefinitions()) {
+                definitionTenantId = getDefaultTenantId(commandContext, sourceTenantId);
+            }
+            eventDispatcher.dispatchEvent(new FlowableChangeTenantIdEventImpl(engineScopeType, sourceTenantId, targetTenantId, definitionTenantId),
+                    engineScopeType);
+        }
+    }
 }

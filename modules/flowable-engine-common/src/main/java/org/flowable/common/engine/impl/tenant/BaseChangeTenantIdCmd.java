@@ -53,19 +53,30 @@ public abstract class BaseChangeTenantIdCmd implements Command<ChangeTenantIdRes
         DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
 
         Map<String, Long> results = executeOperation(dbSqlSession, parameters);
-        return new DefaultChangeTenantIdResult(results);
+        DefaultChangeTenantIdResult result = new DefaultChangeTenantIdResult(results);
+        beforeReturn(commandContext, result);
+        return result;
+    }
+
+    protected void beforeReturn(CommandContext commandContext, ChangeTenantIdResult result) {
+        // Nothing to do
     }
 
     protected abstract Map<String, Long> executeOperation(DbSqlSession dbSqlSession, Map<String, Object> parameters);
 
-    protected String getDefaultTenantId(CommandContext commandContext, String sourceTenantId) {
+    protected AbstractEngineConfiguration getEngineConfiguration(CommandContext commandContext) {
         AbstractEngineConfiguration configuration = commandContext.getEngineConfigurations().get(engineScopeType);
         if (configuration != null) {
-            return configuration.getDefaultTenantProvider()
-                    .getDefaultTenant(sourceTenantId, engineScopeType, null);
+            return configuration;
         }
 
         throw new FlowableException("There is no engine registered for the scope type " + engineScopeType);
+    }
+
+    protected String getDefaultTenantId(CommandContext commandContext, String sourceTenantId) {
+        return getEngineConfiguration(commandContext)
+                .getDefaultTenantProvider()
+                .getDefaultTenant(sourceTenantId, engineScopeType, null);
     }
 
 }

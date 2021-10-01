@@ -15,14 +15,24 @@ package org.flowable.engine.test.tenant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableChangeTenantIdEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.BpmnChangeTenantIdEntityTypes;
@@ -30,6 +40,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.test.api.event.TestBaseEntityEventListener;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
@@ -42,11 +53,12 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
     private static final String TEST_TENANT_B = "test-tenant-b";
     private static final String TEST_TENANT_C = "test-tenant-c";
 
-    private String deploymentIdWithTenantA;
-    private String deploymentIdWithTenantB;
-    private String deploymentIdWithTenantC;
-    private String deploymentIdWithoutTenant;
-    private String deploymentIdWithTenantAForJobs;
+    protected String deploymentIdWithTenantA;
+    protected String deploymentIdWithTenantB;
+    protected String deploymentIdWithTenantC;
+    protected String deploymentIdWithoutTenant;
+    protected String deploymentIdWithTenantAForJobs;
+    protected TestEventListener eventListener = new TestEventListener();
 
     @BeforeEach
     void setUp() {
@@ -64,6 +76,8 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         this.deploymentIdWithTenantAForJobs = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcessForJobsAndEventSubscriptions.bpmn20.xml").tenantId(TEST_TENANT_A)
                 .deploy().getId();
+
+        processEngineConfiguration.getEventDispatcher().addEventListener(eventListener);
     }
 
     @AfterEach
@@ -73,6 +87,7 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deploymentIdWithTenantC, true);
         repositoryService.deleteDeployment(deploymentIdWithoutTenant, true);
         repositoryService.deleteDeployment(deploymentIdWithTenantAForJobs, true);
+        processEngineConfiguration.getEventDispatcher().removeEventListener(eventListener);
     }
 
     @Test
@@ -176,6 +191,13 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstanceIdBActive);
         completeTask(processInstanceIdCActive);
         assertProcessEnded(processInstanceIdCActive);
+
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(event.getSourceTenantId()).isEqualTo(TEST_TENANT_A);
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isNull();
     }
 
     @Test
@@ -281,6 +303,13 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstanceIdBActive);
         completeTask(processInstanceIdCActive);
         assertProcessEnded(processInstanceIdCActive);
+
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(event.getSourceTenantId()).isEqualTo("");
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isNull();
     }
 
     private void checkTenantIdForAllInstances(Set<String> processInstanceIds, String expectedTenantId, String moment) {
@@ -478,16 +507,37 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         completeTask(processInstanceIdCActive);
         assertProcessEnded(processInstanceIdCActive);
 
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.BPMN);
+        assertThat(event.getSourceTenantId()).isEqualTo(TEST_TENANT_A);
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isEqualTo("");
+
     }
 
     @Test
-    void changeTenantIdWhenSourceAndTargetAreEqual() {
+    void changeTenantIdWhenTenantsAreInvalid() {
         assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).simulate())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("The source and the target tenant ids must be different.");
         assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).complete())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("The source and the target tenant ids must be different.");
+
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(null, TEST_TENANT_A).simulate())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The source tenant id must not be null.");
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(null, TEST_TENANT_A).complete())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The source tenant id must not be null.");
+
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, null).simulate())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The target tenant id must not be null.");
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, null).complete())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The target tenant id must not be null.");
     }
 
     private String startProcess(String tenantId, String processDefinitionKey, String processInstanceName, int completeTaskLoops) {
@@ -516,4 +566,25 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
+    protected static class TestEventListener extends AbstractFlowableEventListener {
+
+        protected final List<FlowableChangeTenantIdEvent> events = new ArrayList<>();
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            if (event instanceof FlowableChangeTenantIdEvent) {
+                events.add((FlowableChangeTenantIdEvent) event);
+            }
+        }
+
+        @Override
+        public boolean isFailOnException() {
+            return true;
+        }
+
+        @Override
+        public Collection<? extends FlowableEventType> getTypes() {
+            return Collections.singleton(FlowableEngineEventType.CHANGE_TENANT_ID);
+        }
+    }
 }

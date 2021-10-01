@@ -14,7 +14,10 @@ package org.flowable.cmmn.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,11 +30,17 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableChangeTenantIdEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,11 +50,12 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
     private static final String TEST_TENANT_B = "test-tenant-b";
     private static final String TEST_TENANT_C = "test-tenant-c";
 
-    private String deploymentIdWithTenantA;
-    private String deploymentIdWithTenantB;
-    private String deploymentIdWithTenantC;
-    private String deploymentIdWithoutTenant;
-    private String deploymentIdWithTenantAForJobs;
+    protected String deploymentIdWithTenantA;
+    protected String deploymentIdWithTenantB;
+    protected String deploymentIdWithTenantC;
+    protected String deploymentIdWithoutTenant;
+    protected String deploymentIdWithTenantAForJobs;
+    protected TestEventListener eventListener = new TestEventListener();
 
     @Before
     public void setUp() {
@@ -64,6 +74,12 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         this.deploymentIdWithTenantAForJobs = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/tenant/caseForJobsAndEventSubscriptions.cmmn.xml").tenantId(TEST_TENANT_A).deploy().getId();
         addDeploymentForAutoCleanup(deploymentIdWithTenantAForJobs);
+        cmmnEngineConfiguration.getEventDispatcher().addEventListener(eventListener);
+    }
+
+    @After
+    public void tearDown() {
+        cmmnEngineConfiguration.getEventDispatcher().removeEventListener(eventListener);
     }
 
     @Test
@@ -158,6 +174,13 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstanceIdBActive);
         completeTask(caseInstanceIdCActive);
         assertCaseInstanceEnded(caseInstanceIdCActive);
+
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(event.getSourceTenantId()).isEqualTo(TEST_TENANT_A);
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isNull();
     }
 
     @Test
@@ -252,6 +275,13 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstanceIdBActive);
         completeTask(caseInstanceIdCActive);
         assertCaseInstanceEnded(caseInstanceIdCActive);
+
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(event.getSourceTenantId()).isEqualTo("");
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isNull();
     }
 
     private String startCase(String tenantId, String caseDefinitionKey, String name, int completeTaskLoops) {
@@ -452,6 +482,34 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstanceIdBActive);
         completeTask(caseInstanceIdCActive);
         assertCaseInstanceEnded(caseInstanceIdCActive);
+
+        assertThat(eventListener.events).hasSize(1);
+        FlowableChangeTenantIdEvent event = eventListener.events.get(0);
+        assertThat(event.getEngineScopeType()).isEqualTo(ScopeTypes.CMMN);
+        assertThat(event.getSourceTenantId()).isEqualTo(TEST_TENANT_A);
+        assertThat(event.getTargetTenantId()).isEqualTo(TEST_TENANT_B);
+        assertThat(event.getDefinitionTenantId()).isEqualTo("");
     }
 
+    protected static class TestEventListener extends AbstractFlowableEventListener {
+
+        protected final List<FlowableChangeTenantIdEvent> events = new ArrayList<>();
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            if (event instanceof FlowableChangeTenantIdEvent) {
+                events.add((FlowableChangeTenantIdEvent) event);
+            }
+        }
+
+        @Override
+        public boolean isFailOnException() {
+            return true;
+        }
+
+        @Override
+        public Collection<? extends FlowableEventType> getTypes() {
+            return Collections.singleton(FlowableEngineEventType.CHANGE_TENANT_ID);
+        }
+    }
 }
