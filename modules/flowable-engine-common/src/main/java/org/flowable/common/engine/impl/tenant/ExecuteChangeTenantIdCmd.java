@@ -61,7 +61,7 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
         FlowableEventDispatcher eventDispatcher = getEngineConfiguration(commandContext)
                 .getEventDispatcher();
 
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             String sourceTenantId = builder.getSourceTenantId();
             String targetTenantId = builder.getTargetTenantId();
             String definitionTenantId = null;
