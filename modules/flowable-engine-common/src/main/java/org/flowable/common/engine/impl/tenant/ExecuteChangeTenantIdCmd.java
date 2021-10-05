@@ -41,8 +41,9 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
     @Override
     protected Map<String, Long> executeOperation(DbSqlSession dbSqlSession, Map<String, Object> parameters) {
         if (LOGGER.isDebugEnabled()) {
-            String option = builder.isOnlyInstancesFromDefaultTenantDefinitions()
-                    ? " but only for instances from the default tenant definitions"
+            String definitionTenantId = builder.getDefinitionTenantId();
+            String option = definitionTenantId != null
+                    ? " but only for instances from the '" + definitionTenantId + "' tenant definitions"
                     : "";
             LOGGER.debug("Executing instance migration from '{}' to '{}'{}.",
                     parameters.get("sourceTenantId"), parameters.get("targetTenantId"), option);
@@ -64,10 +65,7 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             String sourceTenantId = builder.getSourceTenantId();
             String targetTenantId = builder.getTargetTenantId();
-            String definitionTenantId = null;
-            if (builder.isOnlyInstancesFromDefaultTenantDefinitions()) {
-                definitionTenantId = getDefaultTenantId(commandContext, sourceTenantId);
-            }
+            String definitionTenantId = builder.getDefinitionTenantId();
             eventDispatcher.dispatchEvent(new FlowableChangeTenantIdEventImpl(engineScopeType, sourceTenantId, targetTenantId, definitionTenantId),
                     engineScopeType);
         }

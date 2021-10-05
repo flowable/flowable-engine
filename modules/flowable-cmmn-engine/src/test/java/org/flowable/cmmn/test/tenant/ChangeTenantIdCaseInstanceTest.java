@@ -381,7 +381,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void changeTenantIdCaseInstanceWithOnlyDefaultTenantDefinitionInstances() {
+    public void changeTenantIdCaseInstanceWithDefinedDefinitionTenant() {
         // In this test we will mark the instances created with a definition from the
         // default tenant with DT
 
@@ -414,7 +414,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
 
         // First we simulate the change
         ChangeTenantIdResult simulationResult = cmmnManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions().simulate();
+                .definitionTenantId("").simulate();
 
         // All the instances should stay in the original tenant after the simulation
         checkTenantIdForAllInstances(caseInstanceIdsTenantAAll, TEST_TENANT_A, "after simulating the change to " + TEST_TENANT_B);
@@ -423,7 +423,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
 
         // We now proceed with the changeTenantId operation for all the instances
         ChangeTenantIdResult result = cmmnManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions().complete();
+                .definitionTenantId("").complete();
 
         // All the instances from the default tenant should now be assigned to the tenant B
         checkTenantIdForAllInstances(caseInstanceIdsTenantADTOnly, TEST_TENANT_B, "after the change to " + TEST_TENANT_B);

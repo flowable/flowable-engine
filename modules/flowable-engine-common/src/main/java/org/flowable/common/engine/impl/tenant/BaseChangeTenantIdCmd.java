@@ -43,12 +43,7 @@ public abstract class BaseChangeTenantIdCmd implements Command<ChangeTenantIdRes
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        boolean onlyInstancesFromDefaultTenantDefinitions = builder.isOnlyInstancesFromDefaultTenantDefinitions();
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        if (onlyInstancesFromDefaultTenantDefinitions) {
-            String defaultTenantId = getDefaultTenantId(commandContext, sourceTenantId);
-            parameters.put("defaultTenantId", defaultTenantId);
-        }
+        parameters.put("definitionTenantId", builder.getDefinitionTenantId());
 
         DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
 
@@ -71,12 +66,6 @@ public abstract class BaseChangeTenantIdCmd implements Command<ChangeTenantIdRes
         }
 
         throw new FlowableException("There is no engine registered for the scope type " + engineScopeType);
-    }
-
-    protected String getDefaultTenantId(CommandContext commandContext, String sourceTenantId) {
-        return getEngineConfiguration(commandContext)
-                .getDefaultTenantProvider()
-                .getDefaultTenant(sourceTenantId, engineScopeType, null);
     }
 
 }

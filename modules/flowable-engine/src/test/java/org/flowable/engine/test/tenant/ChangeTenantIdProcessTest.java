@@ -405,7 +405,7 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    void changeTenantIdWithOnlyDefaultTenantDefinitionInstances() {
+    void changeTenantIdWithDefinedDefinitionTenant() {
 
         //Starting process instances that will be completed
         String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", 2);
@@ -436,7 +436,7 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         // First, we simulate the change
         ChangeTenantIdResult simulationResult = managementService
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions()
+                .definitionTenantId("")
                 .simulate();
 
         // All the instances should stay in the original tenant after the simulation
@@ -447,7 +447,7 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         // We now proceed with the changeTenantId operation for all the instances
         ChangeTenantIdResult result = managementService
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions()
+                .definitionTenantId("")
                 .complete();
 
         // All the instances from the default tenant should now be assigned to the tenant B
@@ -537,6 +537,10 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, null).complete())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("The target tenant id must not be null.");
+
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B).definitionTenantId(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("definitionTenantId must not be null");
     }
 
     private String startProcess(String tenantId, String processDefinitionKey, String processInstanceName, int completeTaskLoops) {

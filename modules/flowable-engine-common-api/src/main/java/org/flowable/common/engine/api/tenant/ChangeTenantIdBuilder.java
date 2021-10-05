@@ -19,14 +19,14 @@ package org.flowable.common.engine.api.tenant;
  * An instance can be created with the corresponding management service of each of the BPMN, CMMN or DMN scopes.
  *
  * @author Jorge Mora Giménez
+ * @author Filip Hrisafov
  */
 public interface ChangeTenantIdBuilder {
 
     /**
-     * Only the instances that were created following a definition from the default tenant will be affected by the change,
-     * that is, if the instance was created with the "fallback to default tenant" feature.
+     * Perform the change only for instances that were created using a definition from the given tenant.
      */
-    ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions();
+    ChangeTenantIdBuilder definitionTenantId(String definitionTenantId);
 
     /**
      * Executes a simulation of the change of tenant id, calculating the number of instances that will be affected

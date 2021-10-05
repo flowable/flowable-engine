@@ -25,7 +25,7 @@ public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder {
     protected final String targetTenantId;
     protected final ChangeTenantIdManager changeTenantIdManager;
 
-    protected boolean onlyInstancesFromDefaultTenantDefinitions;
+    protected String definitionTenantId;
 
     public ChangeTenantIdBuilderImpl(String sourceTenantId, String targetTenantId, ChangeTenantIdManager changeTenantIdManager) {
         if (sourceTenantId == null) {
@@ -43,8 +43,11 @@ public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder {
     }
 
     @Override
-    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions() {
-        this.onlyInstancesFromDefaultTenantDefinitions = true;
+    public ChangeTenantIdBuilder definitionTenantId(String definitionTenantId) {
+        if (definitionTenantId == null) {
+            throw new FlowableIllegalArgumentException("definitionTenantId must not be null");
+        }
+        this.definitionTenantId = definitionTenantId;
         return this;
     }
 
@@ -66,7 +69,7 @@ public class ChangeTenantIdBuilderImpl implements ChangeTenantIdBuilder {
         return targetTenantId;
     }
 
-    public boolean isOnlyInstancesFromDefaultTenantDefinitions() {
-        return onlyInstancesFromDefaultTenantDefinitions;
+    public String getDefinitionTenantId() {
+        return definitionTenantId;
     }
 }

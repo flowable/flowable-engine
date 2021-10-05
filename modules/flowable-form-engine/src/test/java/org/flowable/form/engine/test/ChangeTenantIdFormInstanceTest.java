@@ -211,7 +211,7 @@ class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
     }
 
     @Test
-    void changeTenantIdFormInstanceWithOnlyDefaultTenantDefinitionInstances() {
+    void changeTenantIdFormInstanceWithDefinedDefinitionTenant() {
         // Starting Form instances
         String formInstanceIdABpmn = createFormInstance(TEST_TENANT_A, "form1", false, ScopeTypes.BPMN);
         String formInstanceIdADTBpmn = createFormInstance(TEST_TENANT_A, "simpleExample", true, ScopeTypes.BPMN);
@@ -235,7 +235,7 @@ class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
         // First we simulate the change
         ChangeTenantIdResult simulationResult = formEngine.getFormManagementService()
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions()
+                .definitionTenantId("")
                 .simulate();
 
         // All the instances should stay in the original tenant after the simulation
@@ -251,7 +251,7 @@ class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
         // We now proceed with the changeTenantId operation for all the instances
         ChangeTenantIdResult result = formEngine.getFormManagementService()
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions()
+                .definitionTenantId("")
                 .complete();
 
         // All the instances from the default tenant should now be assigned to the tenant B

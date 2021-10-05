@@ -41,14 +41,14 @@
       <when test="sourceTenantId == null or sourceTenantId == ''">RES.TENANT_ID_ IS NULL OR RES.TENANT_ID_ = ''</when>
       <otherwise>RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}</otherwise>
     </choose>
-    <if test="onlyInstancesFromDefaultTenantDefinitions">
+    <if test="definitionTenantId != null">
       and RES.DECISION_DEFINITION_ID_ in (
           select SUB.ID_
           from ${prefix}ACT_DMN_DECISION SUB
           where
           <choose>
-            <when test="defaultTenantId == null or defaultTenantId == ''"> SUB.TENANT_ID_ IS NULL OR SUB.TENANT_ID_ = ''</when>
-            <otherwise>SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+            <when test="definitionTenantId == ''"> SUB.TENANT_ID_ IS NULL OR SUB.TENANT_ID_ = ''</when>
+            <otherwise>SUB.TENANT_ID_ = #{definitionTenantId, jdbcType=VARCHAR}</otherwise>
           </choose>
         )
     </if>
