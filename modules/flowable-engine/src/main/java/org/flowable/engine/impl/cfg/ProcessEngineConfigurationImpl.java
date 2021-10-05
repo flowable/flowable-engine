@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -527,6 +528,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Change Tenant ID Manager
 
     protected ChangeTenantIdManager changeTenantIdManager;
+    protected Set<String> changeTenantEntityTypes;
 
     // Job Manager
 
@@ -1312,12 +1314,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Change Tenant ID manager ////////////////////////////////////////////////////
 
     public void initChangeTenantIdManager() {
+        if (changeTenantEntityTypes == null) {
+            changeTenantEntityTypes = new LinkedHashSet<>();
+        }
+        changeTenantEntityTypes.addAll(BpmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+
+        if (isDbHistoryUsed) {
+            changeTenantEntityTypes.addAll(BpmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+        }
+
         if (changeTenantIdManager == null) {
-            Set<String> entityTypes = new HashSet<>(BpmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
-            if (isDbHistoryUsed) {
-                entityTypes.addAll(BpmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
-            }
-            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.BPMN, entityTypes);
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.BPMN, changeTenantEntityTypes);
         }
     }
 
@@ -4357,6 +4364,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
         this.changeTenantIdManager = changeTenantIdManager;
+        return this;
+    }
+
+    public Set<String> getChangeTenantEntityTypes() {
+        return changeTenantEntityTypes;
+    }
+
+    public ProcessEngineConfigurationImpl setChangeTenantEntityTypes(Set<String> changeTenantEntityTypes) {
+        this.changeTenantEntityTypes = changeTenantEntityTypes;
         return this;
     }
 

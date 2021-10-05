@@ -14,6 +14,7 @@ package org.flowable.cmmn.api;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -37,7 +38,7 @@ public interface CmmnChangeTenantIdEntityTypes {
     String TIMER_JOBS = "CmmnTimerJobs";
     String DEADLETTER_JOBS = "CmmnDeadLetterJobs";
 
-    Set<String> RUNTIME_TYPES = new HashSet<>(Arrays.asList(
+    Set<String> RUNTIME_TYPES = new LinkedHashSet<>(Arrays.asList(
             CmmnChangeTenantIdEntityTypes.CASE_INSTANCES,
             CmmnChangeTenantIdEntityTypes.MILESTONE_INSTANCES,
             CmmnChangeTenantIdEntityTypes.PLAN_ITEM_INSTANCES,
@@ -50,7 +51,7 @@ public interface CmmnChangeTenantIdEntityTypes {
             CmmnChangeTenantIdEntityTypes.TASKS
     ));
 
-    Set<String> HISTORIC_TYPES = new HashSet<>(Arrays.asList(
+    Set<String> HISTORIC_TYPES = new LinkedHashSet<>(Arrays.asList(
             CmmnChangeTenantIdEntityTypes.HISTORIC_CASE_INSTANCES,
             CmmnChangeTenantIdEntityTypes.HISTORIC_MILESTONE_INSTANCES,
             CmmnChangeTenantIdEntityTypes.HISTORIC_PLAN_ITEM_INSTANCES,

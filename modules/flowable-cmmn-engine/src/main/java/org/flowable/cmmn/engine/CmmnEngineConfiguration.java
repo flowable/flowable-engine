@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -396,7 +397,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
-    protected ChangeTenantIdManager changeTenantIdManager;
     protected CmmnDynamicStateManager dynamicStateManager;
     protected CaseInstanceMigrationManager caseInstanceMigrationManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
@@ -407,6 +407,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
     protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
+
+    protected ChangeTenantIdManager changeTenantIdManager;
+    protected Set<String> changeTenantEntityTypes;
 
     protected boolean executeServiceSchemaManagers = true;
 
@@ -1321,12 +1324,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public void initChangeTenantIdManager() {
+        if (changeTenantEntityTypes == null) {
+            changeTenantEntityTypes = new LinkedHashSet<>();
+        }
+        changeTenantEntityTypes.addAll(CmmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+
+        if (isDbHistoryUsed) {
+            changeTenantEntityTypes.addAll(CmmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+        }
+
         if (changeTenantIdManager == null) {
-            Set<String> entityTypes = new HashSet<>(CmmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
-            if (isDbHistoryUsed) {
-                entityTypes.addAll(CmmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
-            }
-            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.CMMN, entityTypes);
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.CMMN, changeTenantEntityTypes);
         }
     }
     
@@ -2340,15 +2348,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public ChangeTenantIdManager getChangeTenantIdManager() {
-        return changeTenantIdManager;
-    }
-
-    public CmmnEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
-        this.changeTenantIdManager = changeTenantIdManager;
-        return this;
-    }
-
     public CmmnDynamicStateManager getDynamicStateManager() {
         return dynamicStateManager;
     }
@@ -2364,6 +2363,24 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCaseInstanceMigrationManager(CaseInstanceMigrationManager caseInstanceMigrationManager) {
         this.caseInstanceMigrationManager = caseInstanceMigrationManager;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public CmmnEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
+        return this;
+    }
+
+    public Set<String> getChangeTenantEntityTypes() {
+        return changeTenantEntityTypes;
+    }
+
+    public CmmnEngineConfiguration setChangeTenantEntityTypes(Set<String> changeTenantEntityTypes) {
+        this.changeTenantEntityTypes = changeTenantEntityTypes;
         return this;
     }
 

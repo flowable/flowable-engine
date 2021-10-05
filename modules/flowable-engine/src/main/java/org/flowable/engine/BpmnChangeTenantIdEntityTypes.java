@@ -14,6 +14,7 @@ package org.flowable.engine;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public interface BpmnChangeTenantIdEntityTypes {
@@ -32,7 +33,7 @@ public interface BpmnChangeTenantIdEntityTypes {
     String TIMER_JOBS = "BpmnTimerJobs";
     String DEADLETTER_JOBS = "BpmnDeadLetterJobs";
 
-    Set<String> RUNTIME_TYPES = new HashSet<>(Arrays.asList(
+    Set<String> RUNTIME_TYPES = new LinkedHashSet<>(Arrays.asList(
             BpmnChangeTenantIdEntityTypes.EXECUTIONS,
             BpmnChangeTenantIdEntityTypes.ACTIVITY_INSTANCES,
             BpmnChangeTenantIdEntityTypes.EVENT_SUBSCRIPTIONS,
@@ -44,7 +45,7 @@ public interface BpmnChangeTenantIdEntityTypes {
             BpmnChangeTenantIdEntityTypes.TASKS
     ));
 
-    Set<String> HISTORIC_TYPES = new HashSet<>(Arrays.asList(
+    Set<String> HISTORIC_TYPES = new LinkedHashSet<>(Arrays.asList(
             BpmnChangeTenantIdEntityTypes.HISTORIC_PROCESS_INSTANCES,
             BpmnChangeTenantIdEntityTypes.HISTORIC_ACTIVITY_INSTANCES,
             BpmnChangeTenantIdEntityTypes.HISTORIC_TASK_INSTANCES,

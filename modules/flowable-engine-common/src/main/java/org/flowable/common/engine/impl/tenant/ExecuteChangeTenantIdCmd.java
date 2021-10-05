@@ -32,10 +32,16 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ExecuteChangeTenantIdCmd.class);
 
     protected final Set<String> entityTypes;
+    protected final boolean dispatchEvent;
 
     public ExecuteChangeTenantIdCmd(ChangeTenantIdBuilderImpl builder, String engineScopeType, Set<String> entityTypes) {
+        this(builder, engineScopeType, entityTypes, true);
+    }
+
+    public ExecuteChangeTenantIdCmd(ChangeTenantIdBuilderImpl builder, String engineScopeType, Set<String> entityTypes, boolean dispatchEvent) {
         super(builder, engineScopeType);
         this.entityTypes = entityTypes;
+        this.dispatchEvent = dispatchEvent;
     }
 
     @Override
@@ -62,7 +68,7 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
         FlowableEventDispatcher eventDispatcher = getEngineConfiguration(commandContext)
                 .getEventDispatcher();
 
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+        if (dispatchEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             String sourceTenantId = builder.getSourceTenantId();
             String targetTenantId = builder.getTargetTenantId();
             String definitionTenantId = builder.getDefinitionTenantId();
