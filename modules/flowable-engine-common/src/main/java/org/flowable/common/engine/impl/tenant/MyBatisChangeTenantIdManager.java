@@ -20,7 +20,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 /**
  * @author Filip Hrisafov
  */
-public class MyBatisChangeTenantIdManager implements ChangeTenantIdManager{
+public class MyBatisChangeTenantIdManager implements ChangeTenantIdManager {
 
     protected final CommandExecutor commandExecutor;
     protected final String engineScopeType;

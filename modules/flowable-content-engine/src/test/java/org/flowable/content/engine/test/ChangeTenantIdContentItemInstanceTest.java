@@ -72,10 +72,14 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
 
         resultMap.forEach((key, value) -> {
             //Check simulation result content
-            assertThat(simulationResult.getChangedInstances(key)).isEqualTo(value);
+            assertThat(simulationResult.getChangedInstances(key))
+                    .as(key)
+                    .isEqualTo(value);
 
             //Check result content
-            assertThat(result.getChangedInstances(key)).isEqualTo(value);
+            assertThat(result.getChangedInstances(key))
+                    .as(key)
+                    .isEqualTo(value);
         });
     }
 
@@ -120,10 +124,14 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
 
         resultMap.forEach((key, value) -> {
             //Check simulation result content
-            assertThat(simulationResult.getChangedInstances(key)).isEqualTo(value);
+            assertThat(simulationResult.getChangedInstances(key))
+                    .as(key)
+                    .isEqualTo(value);
 
             //Check result content
-            assertThat(result.getChangedInstances(key)).isEqualTo(value);
+            assertThat(result.getChangedInstances(key))
+                    .as(key)
+                    .isEqualTo(value);
         });
     }
 
