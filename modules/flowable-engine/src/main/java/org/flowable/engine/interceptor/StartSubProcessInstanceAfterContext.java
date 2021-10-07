@@ -30,11 +30,11 @@ public class StartSubProcessInstanceAfterContext extends AbstractStartProcessIns
         
     }
     
-    public StartSubProcessInstanceAfterContext(ExecutionEntity processInstance, ExecutionEntity childExecution, Map<String, Object> variables, 
-                    ExecutionEntity callActivityExecution, List<IOParameter> inParameters, FlowElement initialFlowElement, 
-                    Process process, ProcessDefinition processDefinition) {
+    public StartSubProcessInstanceAfterContext(ExecutionEntity processInstance, ExecutionEntity childExecution, Map<String, Object> variables,
+                    Map<String, Object> transientVariables, ExecutionEntity callActivityExecution, List<IOParameter> inParameters,
+                    FlowElement initialFlowElement, Process process, ProcessDefinition processDefinition) {
         
-        super(processInstance, childExecution, variables, initialFlowElement, process, processDefinition);
+        super(processInstance, childExecution, variables, transientVariables, initialFlowElement, process, processDefinition);
         
         this.callActivityExecution = callActivityExecution;
         this.inParameters = inParameters;
