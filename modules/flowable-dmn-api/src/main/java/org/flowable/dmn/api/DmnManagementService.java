@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 
 /**
  * Service for admin and maintenance operations on the dmn engine.
@@ -46,4 +47,11 @@ public interface DmnManagementService {
      */
     TablePageQuery createTablePageQuery();
 
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the Historic Decision instances.
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. 
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+    
 }

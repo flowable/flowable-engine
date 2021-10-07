@@ -15,6 +15,7 @@ package org.flowable.dmn.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,9 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
+import org.flowable.dmn.api.DmnChangeTenantIdEntityTypes;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
@@ -140,6 +144,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected DecisionEntityManager decisionEntityManager;
     protected DmnResourceEntityManager resourceEntityManager;
     protected HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager;
+
+    protected ChangeTenantIdManager changeTenantIdManager;
 
     // EXPRESSION MANAGER /////////////////////////////////////////////
     protected ExpressionManager expressionManager;
@@ -269,6 +275,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
         initSessionFactories();
         initServices();
+        initChangeTenantIdManager();
         initDataManagers();
         initEntityManagers();
         initDeployers();
@@ -419,6 +426,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
         if (this.customFlowableFunctionDelegates != null) {
             this.flowableFunctionDelegates.addAll(this.customFlowableFunctionDelegates);
+        }
+    }
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.DMN,
+                    Collections.singleton(DmnChangeTenantIdEntityTypes.HISTORIC_DECISION_EXECUTIONS));
         }
     }
 
@@ -782,6 +796,15 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     }
 
     public DmnEngineConfiguration getDmnEngineConfiguration() {
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public DmnEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
         return this;
     }
 

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.engine.impl.persistence.tenant.ChangeTenantBpmn">
+
+  <!-- Executions -->
+  <select id="countChangeTenantIdExecutions" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_EXECUTION RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdExecutions" parameterType="map">
+    update ${prefix}ACT_RU_EXECUTION <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_EXECUTION RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </update>
+
+  <!-- Activity instances -->
+  <select id="countChangeTenantIdActivityInstances" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_ACTINST RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdActivityInstances" parameterType="map">
+    update ${prefix}ACT_RU_ACTINST <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_ACTINST RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </update>
+
+  <!-- Historic Activity instances -->
+  <select id="countChangeTenantIdHistoricActivityInstances" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_ACTINST RES
+    <include refid="changeTenantIdProcessCriteriaSql" />
+  </select>
+
+  <update id="changeTenantIdHistoricActivityInstances" parameterType="map">
+    update ${prefix}ACT_HI_ACTINST <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_HI_ACTINST RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </update>
+
+  <!-- Historic Process instances  -->
+  <select id="countChangeTenantIdHistoricProcessInstances" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_PROCINST RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdHistoricProcessInstances" parameterType="map">
+    update ${prefix}ACT_HI_PROCINST <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_HI_PROCINST RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+  </update>
+
+  <!-- Event Subscriptions -->
+  <select id="countChangeTenantIdBpmnEventSubscriptions" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_EVENT_SUBSCR RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnEventSubscriptions" parameterType="map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_EVENT_SUBSCR RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </update>
+
+  <!-- Dead letter jobs -->
+  <select id="countChangeTenantIdBpmnDeadLetterJobs" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_DEADLETTER_JOB RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnDeadLetterJobs" parameterType="map">
+    update ${prefix}ACT_RU_DEADLETTER_JOB <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_DEADLETTER_JOB RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </update>
+
+  <!-- External Worker jobs -->
+  <select id="countChangeTenantIdBpmnExternalWorkerJobs" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_EXTERNAL_JOB RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnExternalWorkerJobs" parameterType="map">
+    update ${prefix}ACT_RU_EXTERNAL_JOB <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_EXTERNAL_JOB RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </update>
+
+  <!-- Async Jobs -->
+  <select id="countChangeTenantIdBpmnJobs" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_JOB RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnJobs" parameterType="map">
+    update ${prefix}ACT_RU_JOB <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_JOB RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </update>
+
+  <!-- Suspended jobs -->
+  <select id="countChangeTenantIdBpmnSuspendedJobs" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_SUSPENDED_JOB RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnSuspendedJobs" parameterType="map">
+    update ${prefix}ACT_RU_SUSPENDED_JOB <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_SUSPENDED_JOB RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </update>
+
+  <!-- Timer jobs -->
+  <select id="countChangeTenantIdBpmnTimerJobs" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_TIMER_JOB RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnTimerJobs" parameterType="map">
+    update ${prefix}ACT_RU_TIMER_JOB <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_TIMER_JOB RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROCESS_INSTANCE_ID_ is not null
+  </update>
+
+  <!-- Tasks -->
+  <select id="countChangeTenantIdBpmnTasks" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_TASK RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnTasks" parameterType="map">
+    update ${prefix}ACT_RU_TASK <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_TASK RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </update>
+
+  <!-- Historic Tasks -->
+  <select id="countChangeTenantIdBpmnHistoricTaskInstances" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_TASKINST RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnHistoricTaskInstances" parameterType="map">
+    update ${prefix}ACT_HI_TASKINST <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_HI_TASKINST RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </update>
+
+  <!-- Historic Task Log Entries -->
+  <select id="countChangeTenantIdBpmnHistoricTaskLogEntries" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_TSK_LOG RES
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </select>
+
+  <update id="changeTenantIdBpmnHistoricTaskLogEntries" parameterType="map">
+    update ${prefix}ACT_HI_TSK_LOG <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_HI_TSK_LOG RES</if>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
+    and RES.PROC_INST_ID_ is not null
+  </update>
+
+  <!-- Common SQL -->
+  <sql id="changeTenantIdProcessCriteriaSql">
+    where
+    <choose>
+      <when test="sourceTenantId == null or sourceTenantId == ''">RES.TENANT_ID_ IS NULL OR RES.TENANT_ID_ = ''</when>
+      <otherwise>RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}</otherwise>
+    </choose>
+    <if test="definitionTenantId != null">
+      and RES.PROC_DEF_ID_ in (
+        select SUB.ID_
+        from ${prefix}ACT_RE_PROCDEF SUB
+        where
+        <choose>
+          <when test="definitionTenantId == ''"> SUB.TENANT_ID_ IS NULL OR SUB.TENANT_ID_ = ''</when>
+          <otherwise>SUB.TENANT_ID_ = #{definitionTenantId, jdbcType=VARCHAR}</otherwise>
+        </choose>
+      )
+    </if>
+  </sql>
+
+</mapper>
