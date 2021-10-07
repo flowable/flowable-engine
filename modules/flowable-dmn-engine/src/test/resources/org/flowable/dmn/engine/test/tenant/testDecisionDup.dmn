@@ -1,0 +1,29 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="definition_637ab543-8ed0-11eb-89e4-0242ac1c0003" name="Test Decision" namespace="http://www.flowable.org/dmn">
+  <decision id="testDecisionDup" name="Test Decision">
+    <decisionTable id="decisionTable_a675abd3-04d4-465a-baea-78ed4aa8e8a5" hitPolicy="FIRST">
+      <input label="Input Var">
+        <inputExpression id="inputExpression_f7fb466c-d113-4585-b991-1fb3cb9d1260" typeRef="string">
+          <text>inputVar</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_b32ca140-0cd6-4510-935c-61d9430878a6" label="Output Var" name="outputVar" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_f7fb466c-d113-4585-b991-1fb3cb9d1260_1">
+          <text><![CDATA[== "a"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_b32ca140-0cd6-4510-935c-61d9430878a6_1">
+          <text><![CDATA["A"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_f7fb466c-d113-4585-b991-1fb3cb9d1260_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_b32ca140-0cd6-4510-935c-61d9430878a6_2">
+          <text><![CDATA["B"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI></dmndi:DMNDI>
+</definitions>

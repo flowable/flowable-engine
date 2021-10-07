@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -31,6 +34,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
+import org.flowable.cmmn.api.CmmnChangeTenantIdEntityTypes;
 import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -266,6 +270,8 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -401,6 +407,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
     protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
+
+    protected ChangeTenantIdManager changeTenantIdManager;
+    protected Set<String> changeTenantEntityTypes;
 
     protected boolean executeServiceSchemaManagers = true;
 
@@ -809,6 +818,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCandidateManager();
         initVariableAggregator();
         initHistoryManager();
+        initChangeTenantIdManager();
         initDynamicStateManager();
         initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
@@ -1310,6 +1320,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
             }
+        }
+    }
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantEntityTypes == null) {
+            changeTenantEntityTypes = new LinkedHashSet<>();
+        }
+        changeTenantEntityTypes.addAll(CmmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+
+        if (isDbHistoryUsed) {
+            changeTenantEntityTypes.addAll(CmmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+        }
+
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.CMMN, changeTenantEntityTypes);
         }
     }
     
@@ -2338,6 +2363,24 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCaseInstanceMigrationManager(CaseInstanceMigrationManager caseInstanceMigrationManager) {
         this.caseInstanceMigrationManager = caseInstanceMigrationManager;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public CmmnEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
+        return this;
+    }
+
+    public Set<String> getChangeTenantEntityTypes() {
+        return changeTenantEntityTypes;
+    }
+
+    public CmmnEngineConfiguration setChangeTenantEntityTypes(Set<String> changeTenantEntityTypes) {
+        this.changeTenantEntityTypes = changeTenantEntityTypes;
         return this;
     }
 
