@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,8 +104,11 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
+import org.flowable.engine.BpmnChangeTenantIdEntityTypes;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.DefaultCandidateManager;
@@ -519,6 +524,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean isAsyncHistoryJsonGroupingEnabled;
     protected int asyncHistoryJsonGroupingThreshold = 10;
     protected AsyncHistoryListener asyncHistoryListener;
+
+    // Change Tenant ID Manager
+
+    protected ChangeTenantIdManager changeTenantIdManager;
+    protected Set<String> changeTenantEntityTypes;
 
     // Job Manager
 
@@ -987,6 +997,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCandidateManager();
         initVariableAggregator();
         initHistoryManager();
+        initChangeTenantIdManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
         initIdentityLinkInterceptor();
@@ -1297,6 +1308,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             } else {
                 historyManager = new DefaultHistoryManager(this);
             }
+        }
+    }
+
+    // Change Tenant ID manager ////////////////////////////////////////////////////
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantEntityTypes == null) {
+            changeTenantEntityTypes = new LinkedHashSet<>();
+        }
+        changeTenantEntityTypes.addAll(BpmnChangeTenantIdEntityTypes.RUNTIME_TYPES);
+
+        if (isDbHistoryUsed) {
+            changeTenantEntityTypes.addAll(BpmnChangeTenantIdEntityTypes.HISTORIC_TYPES);
+        }
+
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.BPMN, changeTenantEntityTypes);
         }
     }
 
@@ -4327,6 +4355,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public ProcessEngineConfigurationImpl setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
+        return this;
+    }
+
+    public Set<String> getChangeTenantEntityTypes() {
+        return changeTenantEntityTypes;
+    }
+
+    public ProcessEngineConfigurationImpl setChangeTenantEntityTypes(Set<String> changeTenantEntityTypes) {
+        this.changeTenantEntityTypes = changeTenantEntityTypes;
         return this;
     }
 

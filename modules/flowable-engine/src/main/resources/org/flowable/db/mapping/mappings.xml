@@ -21,6 +21,8 @@
     </typeHandlers>
 
     <mappers>
+        <mapper resource="org/flowable/db/mapping/ChangeTenantBpmn.xml" />
+
         <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Comment.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
