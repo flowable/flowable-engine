@@ -50,7 +50,7 @@ public final class ContentRestUrls {
      * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by
      * first argument value).
      */
-    public static final String createRelativeResourceUrl(String[] segments, Object... arguments) {
+    public static String createRelativeResourceUrl(String[] segments, Object... arguments) {
         return MessageFormat.format(StringUtils.join(segments, '/'), arguments);
     }
 }
