@@ -92,7 +92,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             tenantId(planItemInstanceEntity.getTenantId());
 
         String fallBackToDefaultTenantValue = getFieldString(STRING_DECISION_TABLE_FALLBACK_TO_DEFAULT_TENANT);
-        if (fallBackToDefaultTenantValue != null && Boolean.parseBoolean(fallBackToDefaultTenantValue)) {
+        if (Boolean.parseBoolean(fallBackToDefaultTenantValue)) {
             executeDecisionBuilder.fallbackToDefaultTenant();
         }
 
