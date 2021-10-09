@@ -38,7 +38,7 @@ public class CommandContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
-    protected LinkedList<String> engineCfgStack = new LinkedList<String>();
+    protected LinkedList<String> engineCfgStack = new LinkedList<>();
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<>();
