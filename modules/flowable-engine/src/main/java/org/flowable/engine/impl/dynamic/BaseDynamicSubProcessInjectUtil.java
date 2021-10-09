@@ -120,7 +120,7 @@ public class BaseDynamicSubProcessInjectUtil {
             }
 
             if (maxLengthReached) {
-                newFlowElementId = prefix + "-" + UUID.randomUUID().toString();
+                newFlowElementId = prefix + "-" + UUID.randomUUID();
             }
 
             duplicateFlowElement.setId(newFlowElementId);

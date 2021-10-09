@@ -86,7 +86,7 @@ public class EnsureCleanDbUtils {
                                 stringJoiner.add(key + " = " + stringValue);
                             }
 
-                            outputMessage.append(stringJoiner.toString());
+                            outputMessage.append(stringJoiner);
                             outputMessage.append("\n");
                         }
                     }

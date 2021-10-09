@@ -133,7 +133,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                 .isEqualTo("{"
                         + "  name: 'variable',"
                         + "  type: 'localDate',"
-                        + "  value: '" + now.toString() + "'"
+                        + "  value: '" + now + "'"
                         + "}");
     }
 
@@ -158,7 +158,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                 .isEqualTo("{"
                         + "  name: 'variable',"
                         + "  type: 'localDateTime',"
-                        + "  value: '" + nowWithoutNanos.toString() + "'"
+                        + "  value: '" + nowWithoutNanos + "'"
                         + "}");
     }
 

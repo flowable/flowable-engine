@@ -274,7 +274,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
         if (StringUtils.isEmpty(prefix)) {
             return uuid.toString();
         } else {
-            return String.format("%s_%s", prefix, uuid.toString());
+            return String.format("%s_%s", prefix, uuid);
         }
     }
 }
