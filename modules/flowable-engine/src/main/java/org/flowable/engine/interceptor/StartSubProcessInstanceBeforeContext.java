@@ -31,12 +31,12 @@ public class StartSubProcessInstanceBeforeContext extends AbstractStartProcessIn
         
     }
     
-    public StartSubProcessInstanceBeforeContext(String businessKey, String processInstanceName, Map<String, Object> variables, 
-                    ExecutionEntity callActivityExecution, List<IOParameter> inParameters,
+    public StartSubProcessInstanceBeforeContext(String businessKey, String processInstanceName, Map<String, Object> variables,
+                    Map<String, Object> transientVariables, ExecutionEntity callActivityExecution, List<IOParameter> inParameters,
                     boolean inheritVariables, String initialActivityId, FlowElement initialFlowElement, 
                     Process process, ProcessDefinition processDefinition) {
         
-        super(businessKey, processInstanceName, variables, initialActivityId, initialFlowElement, process, processDefinition);
+        super(businessKey, processInstanceName, variables, transientVariables, initialActivityId, initialFlowElement, process, processDefinition);
         
         this.callActivityExecution = callActivityExecution;
         this.inParameters = inParameters;

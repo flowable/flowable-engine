@@ -23,6 +23,7 @@ public class AbstractStartProcessInstanceBeforeContext {
     protected String businessKey;
     protected String processInstanceName;
     protected Map<String, Object> variables;
+    protected Map<String, Object> transientVariables;
     protected String initialActivityId;
     protected FlowElement initialFlowElement;
     protected Process process;
@@ -32,12 +33,14 @@ public class AbstractStartProcessInstanceBeforeContext {
         
     }
 
-    public AbstractStartProcessInstanceBeforeContext(String businessKey, String processInstanceName, Map<String, Object> variables, 
-                    String initialActivityId, FlowElement initialFlowElement, Process process, ProcessDefinition processDefinition) {
+    public AbstractStartProcessInstanceBeforeContext(String businessKey, String processInstanceName, Map<String, Object> variables,
+            Map<String, Object> transientVariables, String initialActivityId, FlowElement initialFlowElement,
+            Process process, ProcessDefinition processDefinition) {
         
         this.businessKey = businessKey;
         this.processInstanceName = processInstanceName;
         this.variables = variables;
+        this.transientVariables = transientVariables;
         this.initialActivityId = initialActivityId;
         this.initialFlowElement = initialFlowElement;
         this.process = process;
@@ -66,6 +69,14 @@ public class AbstractStartProcessInstanceBeforeContext {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public Map<String, Object> getTransientVariables() {
+        return transientVariables;
+    }
+
+    public void setTransientVariables(Map<String, Object> transientVariables) {
+        this.transientVariables = transientVariables;
     }
 
     public String getInitialActivityId() {

@@ -1018,7 +1018,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     protected Map<String, Object> collectTransientVariables(HashMap<String, Object> variables) {
         VariableScopeImpl parentScope = getParentVariableScope();
         if (parentScope != null) {
-            variables.putAll(parentScope.collectVariables(variables));
+            variables.putAll(parentScope.collectTransientVariables(variables));
         }
 
         if (transientVariables != null) {
