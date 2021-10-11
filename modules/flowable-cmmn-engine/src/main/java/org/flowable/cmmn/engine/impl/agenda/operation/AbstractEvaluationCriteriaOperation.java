@@ -788,7 +788,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
         childPlanItemInstanceEntity.setState(newState);
         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+            .executeLifecycleListeners(commandContext, childPlanItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
