@@ -13,9 +13,6 @@
 
 package org.flowable.cmmn.engine.impl.history;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
@@ -24,8 +21,6 @@ import org.flowable.common.engine.api.query.QueryProperty;
 public class HistoricPlanItemInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Map<String, HistoricPlanItemInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricPlanItemInstanceQueryProperty CREATE_TIME = new HistoricPlanItemInstanceQueryProperty("RES.CREATE_TIME_");
     public static final HistoricPlanItemInstanceQueryProperty ENDED_TIME = new HistoricPlanItemInstanceQueryProperty("RES.ENDED_TIME_");
@@ -45,7 +40,6 @@ public class HistoricPlanItemInstanceQueryProperty implements QueryProperty {
 
     public HistoricPlanItemInstanceQueryProperty(String name) {
         this.name = name;
-        properties.put(name, this);
     }
 
     @Override
