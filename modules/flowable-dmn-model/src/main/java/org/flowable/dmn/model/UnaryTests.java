@@ -14,8 +14,6 @@ package org.flowable.dmn.model;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author Yvo Swillens
  */

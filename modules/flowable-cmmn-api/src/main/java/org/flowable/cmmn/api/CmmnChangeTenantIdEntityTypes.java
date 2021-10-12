@@ -13,7 +13,6 @@
 package org.flowable.cmmn.api;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
