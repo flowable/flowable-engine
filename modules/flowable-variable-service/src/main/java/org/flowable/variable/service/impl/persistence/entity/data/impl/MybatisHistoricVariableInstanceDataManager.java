@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
@@ -123,11 +124,15 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
     }
 
     @Override
     public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
     }
 

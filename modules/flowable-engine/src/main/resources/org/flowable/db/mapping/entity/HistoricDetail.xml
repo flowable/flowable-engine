@@ -173,6 +173,22 @@
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
 
+  <delete id="bulkDeleteBytesForHistoricDetailForNonExistingProcessInstances" parameterType="map">
+      delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+      where BYTES_.ID_ in (
+          select HIDETAIL.BYTEARRAY_ID_
+          from ${prefix}ACT_HI_DETAIL HIDETAIL
+          where HIDETAIL.PROC_INST_ID_ is not null
+              <if test="_databaseId != 'oracle'">and HIDETAIL.PROC_INST_ID_ != ''</if>
+              and not exists (
+                  select PROCINST.ID_
+                  from ${prefix}ACT_HI_PROCINST PROCINST
+                  where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_
+              )
+              and HIDETAIL.BYTEARRAY_ID_ is not null
+      )
+  </delete>
+
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />

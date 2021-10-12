@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
@@ -39,6 +40,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
@@ -46,6 +48,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
+        cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
         cmmnTaskService.complete(task.getId());
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -75,6 +78,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -86,6 +90,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
             cmmnTaskService.complete(task.getId());
         }
 
@@ -110,7 +115,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
                 } else {
                     assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).hasSize(1);
                     assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(1);
-                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(2);
+                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(3);
                     assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
                             .isEqualTo(1);
                 }
@@ -127,6 +132,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -138,6 +144,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
             cmmnTaskService.complete(task.getId());
         }
 
@@ -158,12 +165,13 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
 
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);
-            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(2);
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(3);
             assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);
         }
 
