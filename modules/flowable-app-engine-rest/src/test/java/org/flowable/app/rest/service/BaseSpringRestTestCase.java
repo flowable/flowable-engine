@@ -227,7 +227,7 @@ public class BaseSpringRestTestCase extends TestCase {
     }
 
     protected CloseableHttpResponse internalExecuteRequest(HttpUriRequest request, int expectedStatusCode, boolean addJsonContentType) {
-        CloseableHttpResponse response = null;
+        CloseableHttpResponse response;
         try {
             if (addJsonContentType && request.getFirstHeader(HttpHeaders.CONTENT_TYPE) == null) {
                 // Revert to default content-type

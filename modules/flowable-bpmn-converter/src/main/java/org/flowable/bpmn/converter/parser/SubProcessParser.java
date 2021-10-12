@@ -31,10 +31,9 @@ import org.flowable.bpmn.model.Transaction;
 public class SubProcessParser implements BpmnXMLConstants {
 
     public void parse(XMLStreamReader xtr, List<SubProcess> activeSubProcessList, Process activeProcess) {
-        SubProcess subProcess = null;
+        SubProcess subProcess;
         if (ELEMENT_TRANSACTION.equalsIgnoreCase(xtr.getLocalName())) {
             subProcess = new Transaction();
-
         } else if (ELEMENT_ADHOC_SUBPROCESS.equalsIgnoreCase(xtr.getLocalName())) {
             AdhocSubProcess adhocSubProcess = new AdhocSubProcess();
             String orderingAttributeValue = xtr.getAttributeValue(null, ATTRIBUTE_ORDERING);

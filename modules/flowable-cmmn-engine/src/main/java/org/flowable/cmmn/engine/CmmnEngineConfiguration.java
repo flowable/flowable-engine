@@ -1394,7 +1394,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
     
     public void afterInitEventRegistryEventBusConsumer() {
-        EventRegistryEventConsumer cmmnEventRegistryEventConsumer = null;
+        EventRegistryEventConsumer cmmnEventRegistryEventConsumer;
         if (eventRegistryEventConsumer != null) {
             cmmnEventRegistryEventConsumer = eventRegistryEventConsumer;
         } else {

@@ -262,7 +262,7 @@ public class BPMNLayout extends mxGraphLayout {
                         }
                     }
 
-                    mxRectangle bounds = null;
+                    mxRectangle bounds;
 
                     if (horizontal) {
                         bounds = horizontalLayout(node, x0, y0, null);

@@ -61,8 +61,8 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         internalExecute();
         
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-            String loggingType = null;
-            String message = null;
+            String loggingType;
+            String message;
             if (oldState == null) {
                 loggingType = CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_CREATED;
                 message = "Plan item instance created with type " + planItemInstanceEntity.getPlanItemDefinitionType() + 

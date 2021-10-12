@@ -42,7 +42,7 @@ public abstract class AppTestHelper {
 
     public static String annotationDeploymentSetUp(AppEngine appEngine, Class<?> testClass, String methodName) {
         String deploymentId = null;
-        Method method = null;
+        Method method;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
         } catch (Exception e) {

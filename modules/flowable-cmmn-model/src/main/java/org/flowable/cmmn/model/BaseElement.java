@@ -59,7 +59,7 @@ public class BaseElement implements HasExtensionAttributes {
 
     public void addExtensionElement(ExtensionElement extensionElement) {
         if (extensionElement != null && extensionElement.getName() != null) {
-            List<ExtensionElement> elementList = null;
+            List<ExtensionElement> elementList;
             if (!this.extensionElements.containsKey(extensionElement.getName())) {
                 elementList = new ArrayList<>();
                 this.extensionElements.put(extensionElement.getName(), elementList);
@@ -93,7 +93,7 @@ public class BaseElement implements HasExtensionAttributes {
     @Override
     public void addAttribute(ExtensionAttribute attribute) {
         if (attribute != null && attribute.getName() != null) {
-            List<ExtensionAttribute> attributeList = null;
+            List<ExtensionAttribute> attributeList;
             if (!this.attributes.containsKey(attribute.getName())) {
                 attributeList = new ArrayList<>();
                 this.attributes.put(attribute.getName(), attributeList);

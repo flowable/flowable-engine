@@ -52,7 +52,7 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
             throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
         }
 
-        byte[] bytes = null;
+        byte[] bytes;
         try {
             bytes = IoUtil.readInputStream(inputStream, resourceName);
         } catch (Exception e) {

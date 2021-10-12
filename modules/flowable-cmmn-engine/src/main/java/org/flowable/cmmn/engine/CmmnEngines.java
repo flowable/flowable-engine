@@ -55,7 +55,7 @@ public abstract class CmmnEngines {
                 cmmnEngines = new HashMap<>();
             }
             ClassLoader classLoader = CmmnEngines.class.getClassLoader();
-            Enumeration<URL> resources = null;
+            Enumeration<URL> resources;
             try {
                 resources = classLoader.getResources("flowable.cmmn.cfg.xml");
             } catch (IOException e) {

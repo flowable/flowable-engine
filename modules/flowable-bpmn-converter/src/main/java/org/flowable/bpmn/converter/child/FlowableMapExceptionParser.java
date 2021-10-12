@@ -41,7 +41,7 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
         String andChildren = xtr.getAttributeValue(null, MAP_EXCEPTION_ANDCHILDREN);
         String rootCause = xtr.getAttributeValue(null, MAP_EXCEPTION_ROOTCAUSE);
         String exceptionClass = xtr.getElementText();
-        boolean hasChildrenBool = false;
+        boolean hasChildrenBool;
 
         if (StringUtils.isEmpty(andChildren) || "false".equals(andChildren.toLowerCase())) {
             hasChildrenBool = false;

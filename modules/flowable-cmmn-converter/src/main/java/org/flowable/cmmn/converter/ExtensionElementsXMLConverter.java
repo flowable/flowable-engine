@@ -379,7 +379,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     protected void readEventType(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
 
-        String eventType = null;
+        String eventType;
         try {
 
             // Parsing and storing as an extension element, which means the export will work automatically

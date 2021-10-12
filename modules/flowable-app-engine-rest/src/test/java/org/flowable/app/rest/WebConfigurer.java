@@ -50,7 +50,7 @@ public class WebConfigurer implements ServletContextListener {
 
         LOGGER.debug("Configuring Spring root application context");
 
-        AnnotationConfigWebApplicationContext rootContext = null;
+        AnnotationConfigWebApplicationContext rootContext;
 
         if (context == null) {
             rootContext = new AnnotationConfigWebApplicationContext();

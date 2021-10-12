@@ -75,7 +75,7 @@ public class BpmnModel {
 
     public void addDefinitionsAttribute(ExtensionAttribute attribute) {
         if (attribute != null && StringUtils.isNotEmpty(attribute.getName())) {
-            List<ExtensionAttribute> attributeList = null;
+            List<ExtensionAttribute> attributeList;
             if (!this.definitionsAttributes.containsKey(attribute.getName())) {
                 attributeList = new ArrayList<>();
                 this.definitionsAttributes.put(attribute.getName(), attributeList);

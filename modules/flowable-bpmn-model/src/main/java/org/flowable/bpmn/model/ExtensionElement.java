@@ -65,7 +65,7 @@ public class ExtensionElement extends BaseElement {
 
     public void addChildElement(ExtensionElement childElement) {
         if (childElement != null && StringUtils.isNotEmpty(childElement.getName())) {
-            List<ExtensionElement> elementList = null;
+            List<ExtensionElement> elementList;
             if (!this.childElements.containsKey(childElement.getName())) {
                 elementList = new ArrayList<>();
                 this.childElements.put(childElement.getName(), elementList);

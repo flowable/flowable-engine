@@ -44,7 +44,7 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        Task task = null;
+        Task task;
         String type = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TYPE);
         String className = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CLASS);
 

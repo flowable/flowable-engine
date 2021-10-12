@@ -40,7 +40,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
         // BPMN DI information
         xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_DIAGRAM, BPMNDI_NAMESPACE);
 
-        String processId = null;
+        String processId;
         if (!model.getPools().isEmpty()) {
             processId = "Collaboration";
         } else {

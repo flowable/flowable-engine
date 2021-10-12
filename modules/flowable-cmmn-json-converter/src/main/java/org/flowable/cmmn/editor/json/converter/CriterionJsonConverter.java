@@ -74,7 +74,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
 
-        GraphicInfo parentGraphicInfo = null;
+        GraphicInfo parentGraphicInfo;
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         if (criterion.getAttachedToRefId() != null) {
             if (criterion.getAttachedToRefId().equals(planModel.getId())) {

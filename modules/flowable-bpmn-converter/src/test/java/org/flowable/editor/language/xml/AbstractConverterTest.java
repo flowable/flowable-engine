@@ -51,14 +51,14 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map<String, Map> parseBPMNDI(byte[] xml) throws Exception {
     	Map<String, Map> bpmnDIMap = new HashMap<>();
-    	Map<String, List<GraphicInfo>> edgesMap = null;
-    	Map<String, GraphicInfo> shapesMap = null;
+    	Map<String, List<GraphicInfo>> edgesMap;
+    	Map<String, GraphicInfo> shapesMap;
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
 
-    	String diagramId = null;
+    	String diagramId;
     	while (xtr.hasNext() && !(xtr.isEndElement() && xtr.getLocalName().equalsIgnoreCase(ELEMENT_DEFINITIONS))) {
     		if (xtr.isStartElement() && xtr.getLocalName().equalsIgnoreCase(ELEMENT_DI_PLANE)) {
     			diagramId = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);

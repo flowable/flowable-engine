@@ -55,7 +55,7 @@ public abstract class AppEngines {
                 appEngines = new HashMap<>();
             }
             ClassLoader classLoader = AppEngines.class.getClassLoader();
-            Enumeration<URL> resources = null;
+            Enumeration<URL> resources;
             try {
                 resources = classLoader.getResources("flowable.app.cfg.xml");
             } catch (IOException e) {

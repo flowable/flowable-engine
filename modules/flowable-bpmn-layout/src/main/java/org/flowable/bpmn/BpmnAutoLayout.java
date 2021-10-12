@@ -238,7 +238,7 @@ public class BpmnAutoLayout {
             boundaryPort.setId("boundary-event-" + boundaryEvent.getId());
             boundaryPort.setVertex(true);
 
-            Object portParent = null;
+            Object portParent;
             if (boundaryEvent.getAttachedToRefId() != null) {
                 portParent = generatedVertices.get(boundaryEvent.getAttachedToRefId());
             } else if (boundaryEvent.getAttachedToRef() != null) {
@@ -273,7 +273,7 @@ public class BpmnAutoLayout {
             Object sourceVertex = generatedVertices.get(sequenceFlow.getSourceRef());
             Object targetVertex = generatedVertices.get(sequenceFlow.getTargetRef());
 
-            String style = null;
+            String style;
 
             if (handledFlowElements.get(sequenceFlow.getSourceRef()) instanceof BoundaryEvent) {
                 // Sequence flow out of boundary events are handled in a
@@ -311,7 +311,7 @@ public class BpmnAutoLayout {
             Object sourceVertex = generatedVertices.get(association.getSourceRef());
             Object targetVertex = generatedVertices.get(association.getTargetRef());
 
-            String style = null;
+            String style;
 
             if (handledFlowElements.get(association.getSourceRef()) instanceof BoundaryEvent) {
                 // Sequence flow out of boundary events are handled in a different way,

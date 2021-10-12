@@ -142,7 +142,7 @@ public class ValuedDataObjectXMLConverter extends BaseBpmnXMLConverter {
 
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DATA_VALUE, FLOWABLE_EXTENSIONS_NAMESPACE);
             if (dataObject.getValue() != null) {
-                String value = null;
+                String value;
                 if (dataObject instanceof DateDataObject) {
                     value = sdf.format(dataObject.getValue());
                 } else {

@@ -54,7 +54,7 @@ public abstract class FlowableAppTestCase {
 
     protected static void initAppEngine() {
         try (InputStream inputStream = FlowableAppTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_APP_CFG_XML)) {
-            AppEngine appEngine = null;
+            AppEngine appEngine;
             if (inputStream != null) {
                 appEngine = AppEngineConfiguration.createAppEngineConfigurationFromInputStream(inputStream).buildAppEngine();
             } else {

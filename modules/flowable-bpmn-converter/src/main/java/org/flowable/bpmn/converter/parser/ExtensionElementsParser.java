@@ -32,10 +32,9 @@ import org.flowable.bpmn.model.SubProcess;
 public class ExtensionElementsParser implements BpmnXMLConstants {
 
     public void parse(XMLStreamReader xtr, List<SubProcess> activeSubProcessList, Process activeProcess, BpmnModel model) throws Exception {
-        BaseElement parentElement = null;
+        BaseElement parentElement;
         if (!activeSubProcessList.isEmpty()) {
             parentElement = activeSubProcessList.get(activeSubProcessList.size() - 1);
-
         } else {
             parentElement = activeProcess;
         }

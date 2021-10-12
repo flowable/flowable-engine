@@ -78,7 +78,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         String serviceTaskType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr);
         
-        ServiceTask serviceTask = null;
+        ServiceTask serviceTask;
         if (ServiceTask.HTTP_TASK.equals(serviceTaskType)) {
             serviceTask = new HttpServiceTask();
             

@@ -42,7 +42,7 @@ public class AppDeployer implements EngineDeployer {
 
         AppEngineConfiguration appEngineConfiguration = CommandContextUtil.getAppEngineConfiguration();
         
-        AppModel appResourceModel = null;
+        AppModel appResourceModel;
         AppDeploymentEntity deploymentEntity = (AppDeploymentEntity) deployment;
         Map<String, EngineResource> resources = deploymentEntity.getResources();
         
@@ -91,7 +91,7 @@ public class AppDeployer implements EngineDeployer {
     
     protected AppDefinitionEntity getMostRecentVersionOfAppDefinition(AppModel appModel, String tenantId) {
         AppDefinitionEntityManager appDefinitionEntityManager = CommandContextUtil.getAppDefinitionEntityManager();
-        AppDefinitionEntity existingAppDefinition = null;
+        AppDefinitionEntity existingAppDefinition;
         if (tenantId != null && !tenantId.equals(AppEngineConfiguration.NO_TENANT_ID)) {
             existingAppDefinition = appDefinitionEntityManager.findLatestAppDefinitionByKeyAndTenantId(appModel.getKey(), tenantId);
         } else {
@@ -103,7 +103,7 @@ public class AppDeployer implements EngineDeployer {
     
     protected AppDefinitionEntity getPersistedInstanceOfAppDefinition(String key, String deploymentId, String tenantId) {
         AppDefinitionEntityManager appDefinitionEntityManager = CommandContextUtil.getAppDefinitionEntityManager();
-        AppDefinitionEntity persistedAppDefinitionEntity = null;
+        AppDefinitionEntity persistedAppDefinitionEntity;
         if (tenantId == null || AppEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             persistedAppDefinitionEntity = appDefinitionEntityManager.findAppDefinitionByDeploymentAndKey(deploymentId, key);
         } else {

@@ -57,7 +57,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
             .recordCaseInstanceEnd(caseInstanceEntity, newState, cmmnEngineConfiguration.getClock().getCurrentTime());
 
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            String loggingType = null;
+            String loggingType;
             if (CaseInstanceState.TERMINATED.equals(getNewState())) {
                 loggingType = CmmnLoggingSessionConstants.TYPE_CASE_TERMINATED;
             } else {

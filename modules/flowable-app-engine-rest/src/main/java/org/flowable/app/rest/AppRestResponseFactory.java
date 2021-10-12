@@ -70,7 +70,7 @@ public class AppRestResponseFactory {
         // Add additional metadata to the artifact-strings before returning
         List<AppDeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
-            String contentType = null;
+            String contentType;
             if (resourceId.toLowerCase().endsWith(".app")) {
                 contentType = ContentType.APPLICATION_JSON.getMimeType();
             } else {

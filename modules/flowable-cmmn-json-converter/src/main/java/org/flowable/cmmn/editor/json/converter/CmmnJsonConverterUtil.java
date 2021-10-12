@@ -77,7 +77,7 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
     }
 
     public static String getElementId(JsonNode objectNode) {
-        String elementId = null;
+        String elementId;
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_OVERRIDE_ID, objectNode))) {
             elementId = getPropertyValueAsString(PROPERTY_OVERRIDE_ID, objectNode).trim();
         } else {
