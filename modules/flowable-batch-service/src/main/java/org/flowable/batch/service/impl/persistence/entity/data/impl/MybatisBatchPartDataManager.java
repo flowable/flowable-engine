@@ -67,7 +67,7 @@ public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEn
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
         
-        return getDbSqlSession().selectList("selectBatchPartsByScopeIdAndType", params);
+        return getDbSqlSession().selectList("selectBatchPartsByScopeIdAndScopeType", params);
     }
     
     @Override

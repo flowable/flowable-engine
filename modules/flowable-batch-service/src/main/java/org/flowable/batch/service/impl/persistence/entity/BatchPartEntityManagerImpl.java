@@ -48,10 +48,13 @@ public class BatchPartEntityManagerImpl
     public BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType) {
         BatchPartEntity batchPartEntity = dataManager.create();
         batchPartEntity.setBatchId(parentBatch.getId());
+        batchPartEntity.setType(parentBatch.getBatchType());
         batchPartEntity.setBatchType(parentBatch.getBatchType());
         batchPartEntity.setScopeId(scopeId);
         batchPartEntity.setSubScopeId(subScopeId);
         batchPartEntity.setScopeType(scopeType);
+        batchPartEntity.setSearchKey(parentBatch.getBatchSearchKey());
+        batchPartEntity.setSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setBatchSearchKey(parentBatch.getBatchSearchKey());
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);

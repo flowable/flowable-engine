@@ -8,17 +8,21 @@
         <id property="id" column="ID_" jdbcType="VARCHAR"/>
         <result property="revision" column="REV_" jdbcType="INTEGER"/>
         <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR"/>
-        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
+        <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
         <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
+        <result property="searchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
+        <result property="searchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
         <result property="status" column="STATUS_" jdbcType="VARCHAR"/>
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="resultDocRefId" column="RESULT_DOC_ID_" typeHandler="BatchByteArrayRefTypeHandler"/>
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+
+        <result property="batchType" column="BATCH_TYPE_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey" column="BATCH_SEARCH_KEY_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey2" column="BATCH_SEARCH_KEY2_" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- BatchPart INSERTS -->
@@ -27,12 +31,12 @@
         VALUES (#{id, jdbcType=VARCHAR},
             #{revision, jdbcType=INTEGER},
             #{batchId, jdbcType=VARCHAR},
-            #{batchType, jdbcType=VARCHAR},
+            #{type, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
-            #{batchSearchKey, jdbcType=VARCHAR},
-            #{batchSearchKey2, jdbcType=VARCHAR},
+            #{searchKey, jdbcType=VARCHAR},
+            #{searchKey2, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{completeTime, jdbcType=TIMESTAMP},
             #{resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
@@ -46,12 +50,12 @@
             (#{batchPart.id, jdbcType=VARCHAR},
             #{batchPart.revision, jdbcType=INTEGER},
             #{batchPart.batchId, jdbcType=VARCHAR},
-            #{batchPart.batchType, jdbcType=VARCHAR},
+            #{batchPart.type, jdbcType=VARCHAR},
             #{batchPart.scopeId, jdbcType=VARCHAR},
             #{batchPart.subScopeId, jdbcType=VARCHAR},
             #{batchPart.scopeType, jdbcType=VARCHAR},
-            #{batchPart.batchSearchKey, jdbcType=VARCHAR},
-            #{batchPart.batchSearchKey2, jdbcType=VARCHAR},
+            #{batchPart.searchKey, jdbcType=VARCHAR},
+            #{batchPart.searchKey2, jdbcType=VARCHAR},
             #{batchPart.createTime, jdbcType=TIMESTAMP},
             #{batchPart.completeTime, jdbcType=TIMESTAMP},
             #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
@@ -66,12 +70,12 @@
             (#{batchPart.id, jdbcType=VARCHAR},
             #{batchPart.revision, jdbcType=INTEGER},
             #{batchPart.batchId, jdbcType=VARCHAR},
-            #{batchPart.batchType, jdbcType=VARCHAR},
+            #{batchPart.type, jdbcType=VARCHAR},
             #{batchPart.scopeId, jdbcType=VARCHAR},
             #{batchPart.subScopeId, jdbcType=VARCHAR},
             #{batchPart.scopeType, jdbcType=VARCHAR},
-            #{batchPart.batchSearchKey, jdbcType=VARCHAR},
-            #{batchPart.batchSearchKey2, jdbcType=VARCHAR},
+            #{batchPart.searchKey, jdbcType=VARCHAR},
+            #{batchPart.searchKey2, jdbcType=VARCHAR},
             #{batchPart.createTime, jdbcType=TIMESTAMP},
             #{batchPart.completeTime, jdbcType=TIMESTAMP},
             #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
@@ -113,23 +117,29 @@
 
     <!-- BatchPart SELECT -->
     <select id="selectBatchPart" parameterType="string" resultMap="batchPartMap">
-      select * from ${prefix}FLW_RU_BATCH_PART where ID_ = #{id, jdbcType=VARCHAR}
+        <include refid="selectBatchPartsWithBatchJoinSql"/>
+        where RES.ID_ = #{id, jdbcType=VARCHAR}
     </select>
     
     <select id="selectBatchPartsByBatchId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
-      select * from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR}
+        <include refid="selectBatchPartsWithBatchJoinSql"/>
+        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR}
     </select>
     
     <select id="selectBatchPartsByBatchIdAndStatus" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
-      select * from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR} and STATUS_ = #{parameter.status, jdbcType=VARCHAR}
+        <include refid="selectBatchPartsWithBatchJoinSql"/>
+        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR} and RES.STATUS_ = #{parameter.status, jdbcType=VARCHAR}
     </select>
     
-    <select id="selectBatchPartsBySearchKey" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
-      select * from ${prefix}FLW_RU_BATCH_PART where SEARCH_KEY_ = #{parameter.searchKey, jdbcType=VARCHAR} or SEARCH_KEY2_ = #{parameter.searchKey2, jdbcType=VARCHAR}
+    <select id="selectBatchPartsByScopeIdAndScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
+        <include refid="selectBatchPartsWithBatchJoinSql"/>
+        where RES.SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} or RES.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
     </select>
-    
-    <select id="selectBatchPartsByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
-      select * from ${prefix}FLW_RU_BATCH_PART where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} or SCOPE_Type_ = #{parameter.scopeType, jdbcType=VARCHAR}
-    </select>
+
+    <sql id="selectBatchPartsWithBatchJoinSql">
+        select RES.*, BATCH_.TYPE_ as BATCH_TYPE_, BATCH_.SEARCH_KEY_ as BATCH_SEARCH_KEY_, BATCH_.SEARCH_KEY2_ as BATCH_SEARCH_KEY2_
+        from ${prefix}FLW_RU_BATCH_PART RES
+        inner join ${prefix}FLW_RU_BATCH BATCH_ on RES.BATCH_ID_ = BATCH_.ID_
+    </sql>
 
 </mapper>
