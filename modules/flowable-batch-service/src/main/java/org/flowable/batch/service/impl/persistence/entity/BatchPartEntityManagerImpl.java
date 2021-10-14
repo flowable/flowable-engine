@@ -16,7 +16,9 @@ package org.flowable.batch.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.service.BatchServiceConfiguration;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
@@ -42,6 +44,16 @@ public class BatchPartEntityManagerImpl
     @Override
     public List<BatchPart> findBatchPartsByScopeIdAndType(String scopeId, String scopeType) {
         return dataManager.findBatchPartsByScopeIdAndType(scopeId, scopeType);
+    }
+
+    @Override
+    public List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQuery batchPartQuery) {
+        return dataManager.findBatchPartsByQueryCriteria((BatchPartQueryImpl) batchPartQuery);
+    }
+
+    @Override
+    public long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery) {
+        return dataManager.findBatchPartCountByQueryCriteria((BatchPartQueryImpl) batchPartQuery);
     }
 
     @Override

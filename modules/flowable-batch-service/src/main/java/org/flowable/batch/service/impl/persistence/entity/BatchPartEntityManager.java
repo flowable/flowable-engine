@@ -15,6 +15,7 @@ package org.flowable.batch.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 public interface BatchPartEntityManager extends EntityManager<BatchPartEntity> {
@@ -24,6 +25,10 @@ public interface BatchPartEntityManager extends EntityManager<BatchPartEntity> {
     List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
     
     List<BatchPart> findBatchPartsByScopeIdAndType(String scopeId, String scopeType);
+
+    List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQuery batchPartQuery);
+
+    long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery);
 
     BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType);
     

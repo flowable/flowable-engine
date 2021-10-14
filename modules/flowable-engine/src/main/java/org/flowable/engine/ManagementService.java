@@ -19,6 +19,8 @@ import java.util.Map;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchBuilder;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -412,6 +414,13 @@ public interface ManagementService {
     
     BatchBuilder createBatchBuilder();
     
+    /**
+     * Returns a new BatchPartQuery implementation, that can be used to dynamically query the batch parts.
+     */
+    BatchPartQuery createBatchPartQuery();
+
+    BatchPartBuilder createBatchPartBuilder(Batch batch);
+
     void deleteBatch(String batchId);
 
     /** get the list of properties. */

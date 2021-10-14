@@ -19,8 +19,12 @@ import java.util.Map;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchBuilder;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.service.BatchPartBuilderImpl;
 import org.flowable.batch.service.impl.BatchBuilderImpl;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -354,6 +358,16 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
         return new BatchBuilderImpl(commandExecutor, configuration.getBatchServiceConfiguration());
     }
     
+    @Override
+    public BatchPartQuery createBatchPartQuery() {
+        return new BatchPartQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchPartBuilder createBatchPartBuilder(Batch batch) {
+        return new BatchPartBuilderImpl(batch, configuration.getBatchServiceConfiguration(), commandExecutor);
+    }
+
     @Override
     public void deleteBatch(String batchId) {
         commandExecutor.execute(new DeleteBatchCmd(batchId));

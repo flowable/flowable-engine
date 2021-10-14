@@ -15,6 +15,7 @@ package org.flowable.batch.service.impl.persistence.entity.data;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
@@ -25,4 +26,8 @@ public interface BatchPartDataManager extends DataManager<BatchPartEntity> {
     List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
     
     List<BatchPart> findBatchPartsByScopeIdAndType(String scopeId, String scopeType);
+
+    List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQueryImpl batchPartQuery);
+
+    long findBatchPartCountByQueryCriteria(BatchPartQueryImpl batchPartQuery);
 }
