@@ -584,7 +584,7 @@ curl http://localhost:8080/tasks?assignee=1
 
 Flowable提供了Spring Boot Actuator Endpoint，以提供正在运行的流程的信息。
 默认情况下 `flowable` 端点映射至 `/actuator/flowable` 。
-Spring Boot默认只提供 `info` 与 `health` 端点。要启用 `flowable` 端点，需要在 `application.properties` 中添加 `management.endpoint.flowable.enabled=true` 。
+Spring Boot默认只暴露少许端点（例如：在 `spring-boot-starter-actuator:2.5.4` 中， Spring Boot 默认只暴露 `health` 端点。更多有关于 Spring Boot 默认暴露的端点，请参考 [https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.exposing](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.exposing) ）。要使用 `flowable` 端点，需要在 `application.properties` 中添加 `management.endpoints.web.exposure.include=flowable` （注意： `org.flowable.spring.boot.EndpointAutoConfiguration` 类没有使用 `@ConditionalOnAvailableEndpoint` 注解检查 `flowable` 的端点是否同时被启用和被暴露。所以为了使用 `flowable` 端点，你只需要在配置文件中添加 `management.endpoints.web.exposure.include=flowable` 或 `management.endpoints.web.exposure.include=*` 即可）。
 
 `curl http://localhost:8080/actuator/flowable`
 
