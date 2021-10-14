@@ -126,7 +126,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
 
         for (ProcessInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_WAITING);
-            assertThat(part.getResult()).isNull();
+            assertThat(part.getResult()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_WAITING);
         }
 
         // Start async executor to process the batches
@@ -228,7 +228,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
 
         for (ProcessInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_WAITING);
-            assertThat(part.getResult()).isNull();
+            assertThat(part.getResult()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_WAITING);
         }
 
         // Start async executor to process the batches
@@ -386,10 +386,49 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(managementService.createBatchQuery().createTimeLowerThan(new Date()).count()).isEqualTo(1);
         assertThat(managementService.createBatchQuery().createTimeHigherThan(new Date()).count()).isZero();
 
+        assertThat(managementService.createBatchPartQuery().batchId(migrationBatch.getId()).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().batchId(migrationBatch.getId()).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().searchKey(version1ProcessDef.getId()).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().searchKey(version1ProcessDef.getId()).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().searchKey(version2ProcessDef.getId()).count()).isZero();
+        assertThat(managementService.createBatchPartQuery().searchKey(version2ProcessDef.getId()).list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().searchKey2(version1ProcessDef.getId()).count()).isZero();
+        assertThat(managementService.createBatchPartQuery().searchKey2(version1ProcessDef.getId()).list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().searchKey2(version2ProcessDef.getId()).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().searchKey2(version2ProcessDef.getId()).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().type(Batch.PROCESS_MIGRATION_TYPE).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().type(Batch.PROCESS_MIGRATION_TYPE).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().type("unknown").count()).isZero();
+        assertThat(managementService.createBatchPartQuery().type("unknown").list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().batchSearchKey(version1ProcessDef.getId()).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().batchSearchKey(version1ProcessDef.getId()).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().batchSearchKey(version2ProcessDef.getId()).count()).isZero();
+        assertThat(managementService.createBatchPartQuery().batchSearchKey(version2ProcessDef.getId()).list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().batchSearchKey2(version1ProcessDef.getId()).count()).isZero();
+        assertThat(managementService.createBatchPartQuery().batchSearchKey2(version1ProcessDef.getId()).list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().batchSearchKey2(version2ProcessDef.getId()).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().batchSearchKey2(version2ProcessDef.getId()).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().batchType(Batch.PROCESS_MIGRATION_TYPE).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().batchType(Batch.PROCESS_MIGRATION_TYPE).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().batchType("unknown").count()).isZero();
+        assertThat(managementService.createBatchPartQuery().batchType("unknown").list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().scopeType(ScopeTypes.CMMN).count()).isZero();
+        assertThat(managementService.createBatchPartQuery().scopeType(ScopeTypes.CMMN).list()).isEmpty();
+        assertThat(managementService.createBatchPartQuery().scopeType(ScopeTypes.BPMN).count()).isEqualTo(20);
+        assertThat(managementService.createBatchPartQuery().scopeType(ScopeTypes.BPMN).list()).hasSize(20);
+        assertThat(managementService.createBatchPartQuery().scopeId(allInstances.get(0)).scopeType(ScopeTypes.BPMN).count()).isEqualTo(1);
+        assertThat(managementService.createBatchPartQuery().scopeId(allInstances.get(0)).scopeType(ScopeTypes.BPMN).singleResult()).isNotNull();
+
         List<BatchPart> searchBatchParts = managementService.findBatchPartsByBatchId(migrationBatch.getId());
+        assertThat(searchBatchParts).hasSize(20);
+
+        searchBatchParts = managementService.createBatchPartQuery().batchId(migrationBatch.getId()).list();
         assertThat(searchBatchParts).hasSize(20);
         for (BatchPart batchPart : searchBatchParts) {
             assertThat(batchPart.getBatchId()).isEqualTo(migrationBatch.getId());
+            assertThat(batchPart.getType()).isEqualTo(Batch.PROCESS_MIGRATION_TYPE);
+            assertThat(batchPart.getSearchKey()).isEqualTo(version1ProcessDef.getId());
+            assertThat(batchPart.getSearchKey2()).isEqualTo(version2ProcessDef.getId());
             assertThat(batchPart.getBatchSearchKey()).isEqualTo(version1ProcessDef.getId());
             assertThat(batchPart.getBatchSearchKey2()).isEqualTo(version2ProcessDef.getId());
             assertThat(batchPart.getBatchType()).isEqualTo(Batch.PROCESS_MIGRATION_TYPE);
