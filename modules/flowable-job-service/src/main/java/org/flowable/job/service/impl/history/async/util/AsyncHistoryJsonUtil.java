@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.history.async.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -40,11 +42,26 @@ public class AsyncHistoryJsonUtil {
         }
     }
 
+    public static void putIfNotNullOrEmpty(ObjectNode map, String key, Collection<String> value) {
+        if (value != null && !value.isEmpty()) {
+            ArrayNode arrayNode = map.putArray(key);
+            value.forEach(arrayNode::add);
+        }
+    }
+
+    public static void putIfTrue(ObjectNode map, String key, boolean value) {
+        if (value) {
+            map.put(key, true);
+        }
+    }
+
     public static void putIfNotNull(Map<String, String> map, String key, int value) {
         map.put(key, Integer.toString(value));
     }
-    public static void putIfNotNull(ObjectNode map, String key, int value) {
-        map.put(key, value);
+    public static void putIfNotNull(ObjectNode map, String key, Integer value) {
+        if (value != null) {
+            map.put(key, value);
+        }
     }
     
     public static void putIfNotNull(Map<String, String> map, String key, Double value) {

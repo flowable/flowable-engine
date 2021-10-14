@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
@@ -23,6 +24,8 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
 
     public static final String TYPE = "bpmn-history-cleanup";
 
+    private static final String DEFAULT_BATCH_NAME = "Flowable BPMN History Cleanup";
+
     @Override
     public String getType() {
         return TYPE;
@@ -32,7 +35,14 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
-        processEngineConfiguration.getHistoryCleaningManager().createHistoricProcessInstanceCleaningQuery().deleteWithRelatedData();
+        int batchSize = processEngineConfiguration.getCleanInstancesBatchSize();
+
+        HistoricProcessInstanceQuery query = processEngineConfiguration.getHistoryCleaningManager().createHistoricProcessInstanceCleaningQuery();
+        if (processEngineConfiguration.isCleanInstancesSequentially()) {
+            query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        } else {
+            query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        }
     }
     
 }
