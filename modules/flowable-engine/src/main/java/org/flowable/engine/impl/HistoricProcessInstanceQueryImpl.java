@@ -34,6 +34,7 @@ import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstancesUsingBatchesCmd;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -899,6 +900,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         } else {
             throw new FlowableException("deleting historic process instances with related data requires CommandExecutor");
         }
+    }
+
+    @Override
+    public String deleteInParallelUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricProcessInstancesUsingBatchesCmd(this, batchSize, batchName, false));
+    }
+
+    @Override
+    public String deleteSequentiallyUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricProcessInstancesUsingBatchesCmd(this, batchSize, batchName, true));
     }
 
     public String getBusinessKey() {

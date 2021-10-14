@@ -126,6 +126,8 @@ public class FlowableProperties {
     private boolean enableHistoryCleaning = false;
     private String historyCleaningCycle = "0 0 1 * * ?";
     private int historyCleaningAfterDays = 365;
+    private int historyCleaningBatchSize = 100;
+    private boolean historyCleaningSequential = false;
 
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
@@ -366,5 +368,21 @@ public class FlowableProperties {
     }
     public void setHistoryCleaningAfterDays(int historyCleaningAfterDays) {
         this.historyCleaningAfterDays = historyCleaningAfterDays;
+    }
+
+    public int getHistoryCleaningBatchSize() {
+        return historyCleaningBatchSize;
+    }
+
+    public void setHistoryCleaningBatchSize(int historyCleaningBatchSize) {
+        this.historyCleaningBatchSize = historyCleaningBatchSize;
+    }
+
+    public boolean isHistoryCleaningSequential() {
+        return historyCleaningSequential;
+    }
+
+    public void setHistoryCleaningSequential(boolean historyCleaningSequential) {
+        this.historyCleaningSequential = historyCleaningSequential;
     }
 }

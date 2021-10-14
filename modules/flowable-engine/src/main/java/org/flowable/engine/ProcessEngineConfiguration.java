@@ -155,6 +155,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean enableHistoryCleaning = false;
     protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
     protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected int cleanInstancesBatchSize = 100;
+    protected boolean cleanInstancesSequentially = false;
     protected HistoryCleaningManager historyCleaningManager;
 
 
@@ -822,6 +824,24 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
         this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return this;
+    }
+
+    public int getCleanInstancesBatchSize() {
+        return cleanInstancesBatchSize;
+    }
+
+    public ProcessEngineConfiguration setCleanInstancesBatchSize(int cleanInstancesBatchSize) {
+        this.cleanInstancesBatchSize = cleanInstancesBatchSize;
+        return this;
+    }
+
+    public boolean isCleanInstancesSequentially() {
+        return cleanInstancesSequentially;
+    }
+
+    public ProcessEngineConfiguration setCleanInstancesSequentially(boolean cleanInstancesSequentially) {
+        this.cleanInstancesSequentially = cleanInstancesSequentially;
         return this;
     }
 
