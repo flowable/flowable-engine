@@ -128,6 +128,46 @@ public class ProcessEngineAutoConfigurationTest {
     }
 
     @Test
+    public void historyCleaningProperties() {
+        contextRunner.withPropertyValues(
+            "flowable.history-cleaning-cycle=0 2 * * * ?",
+            "flowable.history-cleaning-after=P90D",
+            "flowable.history-cleaning-batch-size=500",
+            "flowable.history-cleaning-sequential=true"
+        ).run(context -> {
+            ProcessEngine engine = context.getBean(ProcessEngine.class);
+            ProcessEngineConfiguration engineConfiguration = engine.getProcessEngineConfiguration();
+
+            assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
+            assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
+            assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
+            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
+
+            deleteDeployments(engine);
+        });
+    }
+
+    @Test
+    public void historyCleaningPropertiesBackwardsCompatible() {
+        contextRunner.withPropertyValues(
+            "flowable.history-cleaning-cycle=0 2 * * * ?",
+            "flowable.history-cleaning-after-days=90",
+            "flowable.history-cleaning-batch-size=500",
+            "flowable.history-cleaning-sequential=true"
+        ).run(context -> {
+            ProcessEngine engine = context.getBean(ProcessEngine.class);
+            ProcessEngineConfiguration engineConfiguration = engine.getProcessEngineConfiguration();
+
+            assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
+            assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
+            assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
+            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
+
+            deleteDeployments(engine);
+        });
+    }
+
+    @Test
     public void standaloneProcessEngineWithBasicDatasource() {
         contextRunner.run(context -> {
             assertThat(context).as("Process engine")
@@ -180,6 +220,11 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                     assertThat(strategy.getLockName()).isNull();
                 });
+
+            assertThat(springProcessEngineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 0 1 * * ?");
+            assertThat(springProcessEngineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(365));
+            assertThat(springProcessEngineConfiguration.getCleanInstancesBatchSize()).isEqualTo(100);
+            assertThat(springProcessEngineConfiguration.isCleanInstancesSequentially()).isFalse();
 
             deleteDeployments(processEngine);
         });

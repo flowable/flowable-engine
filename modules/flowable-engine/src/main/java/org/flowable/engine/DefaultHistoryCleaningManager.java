@@ -12,8 +12,9 @@
  */
 package org.flowable.engine;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,12 +29,11 @@ public class DefaultHistoryCleaningManager implements HistoryCleaningManager {
 
     @Override
     public HistoricProcessInstanceQueryImpl createHistoricProcessInstanceCleaningQuery() {
-        int days = processEngineConfiguration.getCleanInstancesEndedAfterNumberOfDays();
-        Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_YEAR, -days);
+        Duration endedAfterDuration = processEngineConfiguration.getCleanInstancesEndedAfter();
+        Instant endedAfter = Instant.now().minus(endedAfterDuration);
         HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = new HistoricProcessInstanceQueryImpl(
                 processEngineConfiguration.getCommandExecutor(), processEngineConfiguration);
-        historicProcessInstanceQuery.finishedBefore(cal.getTime());
+        historicProcessInstanceQuery.finishedBefore(Date.from(endedAfter));
         return historicProcessInstanceQuery;
     }
 }
