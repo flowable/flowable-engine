@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -285,6 +286,47 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .or()
                 .caseDefinitionId(caseInstance.getCaseDefinitionId())
+                .caseInstanceId("undefinedId")
+                .endOr()
+                .singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        }
+    }
+
+    @Test
+    public void getCaseInstanceByCaseDefinitionIds() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            Set<String> definitionIds = new HashSet<>(Arrays.asList(caseInstance.getCaseDefinitionId(), "dummy"));
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(definitionIds).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(definitionIds).list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(definitionIds).singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(Collections.singleton("unknown")).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(Collections.singleton("unknown")).list()).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionIds(Collections.singleton("unknown")).singleResult()).isNull();
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseDefinitionIds(definitionIds)
+                .caseInstanceId("undefinedId")
+                .endOr()
+                .count())
+                .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseDefinitionIds(definitionIds)
+                .caseInstanceId("undefinedId")
+                .endOr().list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseDefinitionIds(definitionIds)
                 .caseInstanceId("undefinedId")
                 .endOr()
                 .singleResult().getId())

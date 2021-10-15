@@ -131,6 +131,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricCaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds) {
+        if (caseDefinitionIds == null) {
+            throw new FlowableIllegalArgumentException("Case definition ids is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionIds = caseDefinitionIds;
+        } else {
+            this.caseDefinitionIds = caseDefinitionIds;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricCaseInstanceQueryImpl caseDefinitionKey(String caseDefinitionKey) {
         if (caseDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Case definition key is null");
