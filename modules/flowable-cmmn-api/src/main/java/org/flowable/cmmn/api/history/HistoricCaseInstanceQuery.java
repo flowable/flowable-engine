@@ -65,6 +65,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the given case definition identifier.
      */
     HistoricCaseInstanceQuery caseDefinitionId(String caseDefinitionId);
+
+    /**
+     * Only select historic case instances with the given case definition ids.
+     */
+    HistoricCaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds);
     
     /**
      * Only select historic case instances with the given case definition category.
