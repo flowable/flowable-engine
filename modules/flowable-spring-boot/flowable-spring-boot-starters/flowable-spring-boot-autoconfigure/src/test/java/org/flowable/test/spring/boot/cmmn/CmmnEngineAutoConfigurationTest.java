@@ -121,6 +121,46 @@ public class CmmnEngineAutoConfigurationTest {
     }
 
     @Test
+    public void historyCleaningProperties() {
+        contextRunner.withPropertyValues(
+                "flowable.history-cleaning-cycle=0 2 * * * ?",
+                "flowable.history-cleaning-after=P90D",
+                "flowable.history-cleaning-batch-size=500",
+                "flowable.history-cleaning-sequential=true"
+        ).run(context -> {
+            CmmnEngine engine = context.getBean(CmmnEngine.class);
+            CmmnEngineConfiguration engineConfiguration = engine.getCmmnEngineConfiguration();
+
+            assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
+            assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
+            assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
+            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
+
+            deleteDeployments(engine);
+        });
+    }
+
+    @Test
+    public void historyCleaningPropertiesBackwardsCompatible() {
+        contextRunner.withPropertyValues(
+                "flowable.history-cleaning-cycle=0 2 * * * ?",
+                "flowable.history-cleaning-after-days=90",
+                "flowable.history-cleaning-batch-size=500",
+                "flowable.history-cleaning-sequential=true"
+        ).run(context -> {
+            CmmnEngine engine = context.getBean(CmmnEngine.class);
+            CmmnEngineConfiguration engineConfiguration = engine.getCmmnEngineConfiguration();
+
+            assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
+            assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
+            assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
+            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
+
+            deleteDeployments(engine);
+        });
+    }
+
+    @Test
     public void standaloneCmmnEngineWithBasicDataSource() {
         contextRunner.run(context -> {
             assertThat(context)
@@ -171,6 +211,11 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
                     assertThat(strategy.getLockName()).isNull();
                 });
+
+            assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 0 1 * * ?");
+            assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(365));
+            assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(100);
+            assertThat(engineConfiguration.isCleanInstancesSequentially()).isFalse();
 
             deleteDeployments(cmmnEngine);
         });

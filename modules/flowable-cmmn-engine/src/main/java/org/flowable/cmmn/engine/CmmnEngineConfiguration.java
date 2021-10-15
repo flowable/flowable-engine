@@ -702,7 +702,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected boolean enableHistoryCleaning = false;
     protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
-    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected Duration cleanInstancesEndedAfter = Duration.ofDays(365);
     protected int cleanInstancesBatchSize = 100;
     protected boolean cleanInstancesSequentially = false;
     protected CmmnHistoryCleaningManager cmmnHistoryCleaningManager;
@@ -4279,12 +4279,28 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    /**
+     * @deprecated use {@link #getCleanInstancesEndedAfter()} instead
+     */
+    @Deprecated
     public int getCleanInstancesEndedAfterNumberOfDays() {
-        return cleanInstancesEndedAfterNumberOfDays;
+        return (int) cleanInstancesEndedAfter.toDays();
     }
 
+    /**
+     * @deprecated use {@link #setCleanInstancesEndedAfter(Duration)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
-        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return setCleanInstancesEndedAfter(Duration.ofDays(cleanInstancesEndedAfterNumberOfDays));
+    }
+
+    public Duration getCleanInstancesEndedAfter() {
+        return cleanInstancesEndedAfter;
+    }
+
+    public CmmnEngineConfiguration setCleanInstancesEndedAfter(Duration cleanInstancesEndedAfter) {
+        this.cleanInstancesEndedAfter = cleanInstancesEndedAfter;
         return this;
     }
 

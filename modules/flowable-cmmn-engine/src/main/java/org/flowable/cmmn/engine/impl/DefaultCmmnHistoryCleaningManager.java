@@ -12,8 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
@@ -30,12 +31,11 @@ public class DefaultCmmnHistoryCleaningManager implements CmmnHistoryCleaningMan
 
     @Override
     public HistoricCaseInstanceQuery createHistoricCaseInstanceCleaningQuery() {
-        int days = cmmnEngineConfiguration.getCleanInstancesEndedAfterNumberOfDays();
-        Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_YEAR, -days);
+        Duration endedAfterDuration = cmmnEngineConfiguration.getCleanInstancesEndedAfter();
+        Instant endedAfter = Instant.now().minus(endedAfterDuration);
         HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(
                 cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration);
-        historicCaseInstanceQuery.finishedBefore(cal.getTime());
+        historicCaseInstanceQuery.finishedBefore(Date.from(endedAfter));
         return historicCaseInstanceQuery;
     }
 }
