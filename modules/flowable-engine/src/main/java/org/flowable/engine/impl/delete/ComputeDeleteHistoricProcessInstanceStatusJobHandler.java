@@ -106,21 +106,20 @@ public class ComputeDeleteHistoricProcessInstanceStatusJobHandler implements Job
                 timerJobService.scheduleTimerJob(timerJob);
 
             } else {
-                updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
+                completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
             }
 
             job.setRepeat(null);
         } else if (computeBatchParts.isEmpty()) {
-            updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
+            completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             job.setRepeat(null);
         }
 
     }
 
-    protected void updateBatchStatus(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
-        ((BatchEntity) batch).setStatus(status);
+    protected void completeBatch(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
         engineConfiguration.getBatchServiceConfiguration()
                 .getBatchService()
-                .updateBatch(batch);
+                .completeBatch(batch.getId(), status);
     }
 }

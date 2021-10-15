@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
-import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ManagementService;
@@ -70,23 +69,22 @@ public class DeleteHistoricProcessInstanceIdsStatusJobHandler implements JobHand
 
         if (completedDeletes == deleteBatchParts.size()) {
             if (failedComputes == 0) {
-                updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
+                completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             } else {
-                updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
+                completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
             }
 
             job.setRepeat(null);
         } else if (deleteBatchParts.isEmpty()) {
-            updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
+            completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             job.setRepeat(null);
         }
 
     }
 
-    protected void updateBatchStatus(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
-        ((BatchEntity) batch).setStatus(status);
+    protected void completeBatch(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
         engineConfiguration.getBatchServiceConfiguration()
                 .getBatchService()
-                .updateBatch(batch);
+                .completeBatch(batch.getId(), status);
     }
 }

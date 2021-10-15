@@ -23,7 +23,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
-import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -163,15 +162,14 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
             String resultJson, boolean synchronousExecution) {
         batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_FAILED, resultJson);
         if (synchronousExecution) {
-            updateBatchStatus(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
+            completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
         }
     }
 
-    protected void updateBatchStatus(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
-        ((BatchEntity) batch).setStatus(status);
+    protected void completeBatch(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
         engineConfiguration.getBatchServiceConfiguration()
                 .getBatchService()
-                .updateBatch(batch);
+                .completeBatch(batch.getId(), status);
     }
 
     protected HistoricProcessInstanceQuery createQuery(JsonNode queryNode, ProcessEngineConfigurationImpl engineConfiguration) {

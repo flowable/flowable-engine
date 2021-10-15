@@ -110,6 +110,11 @@ public class BatchServiceImpl extends CommonServiceImpl<BatchServiceConfiguratio
         return getBatchPartEntityManager().completeBatchPart(batchPartId, status, resultJson);
     }
     
+    @Override
+    public Batch completeBatch(String batchId, String status) {
+        return getBatchEntityManager().completeBatch(batchId, status);
+    }
+
     public Batch createBatch(BatchBuilder batchBuilder) {
         return getBatchEntityManager().createBatch(batchBuilder);
     }

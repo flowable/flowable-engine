@@ -495,6 +495,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch).isNotNull();
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
+            assertThat(batch.getCompleteTime()).isNotNull();
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
@@ -676,6 +677,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
+            assertThat(batch.getCompleteTime()).isNull();
 
             assertThat(managementService.createBatchPartQuery().list())
                     .extracting(BatchPart::getStatus, BatchPart::getType)
@@ -780,6 +782,12 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             batchJob = managementService.createJobQuery().singleResult();
             managementService.executeJob(batchJob.getId());
             assertThat(managementService.createJobQuery().list()).isEmpty();
+
+            batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+            assertThat(batch).isNotNull();
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
+            assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+            assertThat(batch.getCompleteTime()).isNotNull();
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
