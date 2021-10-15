@@ -69,6 +69,7 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
         result.setSourceProcessDefinitionId(batch.getBatchSearchKey());
         result.setTargetProcessDefinitionId(batch.getBatchSearchKey2());
         result.setStatus(batch.getStatus());
+        result.setCompleteTime(batch.getCompleteTime());
 
         return result;
     }

@@ -96,9 +96,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
                 .batchType(Batch.HISTORIC_PROCESS_DELETE_TYPE)
                 .tenantId(tenantId)
                 .searchKey(batchName)
-                .status(numberOfProcessInstancesToDelete > 0 ?
-                        DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS :
-                        DeleteProcessInstanceBatchConstants.STATUS_COMPLETED)
+                .status(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS)
                 .batchDocumentJson(batchConfiguration.toString())
                 .create();
 
@@ -111,6 +109,8 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
             } else {
                 createBatchPartsForParallelExecution(engineConfiguration, batch, numberOfBatchParts);
             }
+        } else {
+            batchService.completeBatch(batch.getId(), DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
         }
 
         return batch.getId();

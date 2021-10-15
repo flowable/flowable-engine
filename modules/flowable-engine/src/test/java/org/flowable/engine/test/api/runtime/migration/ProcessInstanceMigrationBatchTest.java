@@ -119,6 +119,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResult.getCompleteTime()).isNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
         assertThat(migrationResult.getWaitingMigrationParts()).hasSize(2);
         assertThat(migrationResult.getSuccessfulMigrationParts()).isEmpty();
@@ -145,6 +146,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
 
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult.getCompleteTime()).isNotNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
         assertThat(migrationResult.getWaitingMigrationParts()).isEmpty();
         assertThat(migrationResult.getSuccessfulMigrationParts()).isEmpty();
@@ -221,6 +223,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResult.getCompleteTime()).isNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
         assertThat(migrationResult.getWaitingMigrationParts()).hasSize(2);
         assertThat(migrationResult.getSuccessfulMigrationParts()).isEmpty();
@@ -246,6 +249,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
 
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult.getCompleteTime()).isNotNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
         assertThat(migrationResult.getWaitingMigrationParts()).isEmpty();
         assertThat(migrationResult.getSuccessfulMigrationParts()).hasSize(1);
@@ -328,6 +332,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResult.getCompleteTime()).isNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(successInstances.size() + failedInstances.size());
         assertThat(migrationResult.getWaitingMigrationParts()).hasSize(successInstances.size() + failedInstances.size());
         assertThat(migrationResult.getSuccessfulMigrationParts()).isEmpty();
@@ -354,6 +359,7 @@ public class ProcessInstanceMigrationBatchTest extends PluggableFlowableTestCase
         assertThat(migrationResult).isNotNull();
         assertThat(migrationResult.getBatchId()).isEqualTo(migrationBatch.getId());
         assertThat(migrationResult.getStatus()).isEqualTo(ProcessInstanceBatchMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult.getCompleteTime()).isNotNull();
         assertThat(migrationResult.getAllMigrationParts()).hasSize(successInstances.size() + failedInstances.size());
         assertThat(migrationResult.getWaitingMigrationParts()).isEmpty();
         assertThat(migrationResult.getSuccessfulMigrationParts()).hasSameSizeAs(successInstances);

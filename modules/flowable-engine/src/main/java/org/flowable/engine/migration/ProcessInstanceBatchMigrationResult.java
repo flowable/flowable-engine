@@ -14,6 +14,7 @@
 package org.flowable.engine.migration;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ProcessInstanceBatchMigrationResult {
@@ -27,6 +28,7 @@ public class ProcessInstanceBatchMigrationResult {
 
     protected String batchId;
     protected String status;
+    protected Date completeTime;
     protected String sourceProcessDefinitionId;
     protected String targetProcessDefinitionId;
     protected List<ProcessInstanceBatchMigrationPartResult> allMigrationParts = new ArrayList<>();
@@ -48,6 +50,14 @@ public class ProcessInstanceBatchMigrationResult {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getCompleteTime() {
+        return completeTime;
+    }
+
+    public void setCompleteTime(Date completeTime) {
+        this.completeTime = completeTime;
     }
 
     public String getSourceProcessDefinitionId() {
