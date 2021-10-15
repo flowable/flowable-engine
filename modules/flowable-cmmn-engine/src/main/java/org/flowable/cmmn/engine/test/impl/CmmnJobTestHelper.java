@@ -50,6 +50,19 @@ public class CmmnJobTestHelper {
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
+    public static void waitForJobExecutorToProcessAllAsyncJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait,
+            final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() {
+                return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0;
+            }
+
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+
     public static void waitForJobExecutorOnCondition(CmmnEngineConfiguration cmmnEngineConfiguration, long maxMillisToWait, long intervalMillis, Callable<Boolean> predicate) {
         waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), () -> !predicate.call(), maxMillisToWait, intervalMillis, true);
     }

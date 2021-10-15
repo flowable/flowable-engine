@@ -10,34 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.batch.api;
+package org.flowable.cmmn.engine.impl.delete;
 
-import java.util.Date;
+/**
+ * @author Filip Hrisafov
+ */
+public interface DeleteCaseInstanceBatchConstants {
 
-public interface Batch {
+    String STATUS_IN_PROGRESS = "inProgress";
+    String STATUS_WAITING = "waiting";
+    String STATUS_COMPLETED = "completed";
+    String STATUS_FAILED = "failed";
 
-    String PROCESS_MIGRATION_TYPE = "processMigration";
-
-    String HISTORIC_PROCESS_DELETE_TYPE = "historicProcessDelete";
-
-    String HISTORIC_CASE_DELETE_TYPE = "historicCaseDelete";
-
-    String getId();
-
-    String getBatchType();
-
-    Date getCreateTime();
-    
-    Date getCompleteTime();
-
-    String getBatchSearchKey();
-
-    String getBatchSearchKey2();
-    
-    String getStatus();
-
-    String getBatchDocumentJson(String engineType);
-    
-    String getTenantId();
-
+    String BATCH_PART_COMPUTE_IDS_TYPE = "computeDeleteCaseInstanceIds";
+    String BATCH_PART_DELETE_CASE_INSTANCES_TYPE = "deleteCase";
 }

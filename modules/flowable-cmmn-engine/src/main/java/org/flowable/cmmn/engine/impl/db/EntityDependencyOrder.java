@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
+import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl;
@@ -61,6 +63,8 @@ public class EntityDependencyOrder {
     static {
 
         DELETE_ORDER.add(PropertyEntityImpl.class);
+        DELETE_ORDER.add(BatchPartEntityImpl.class);
+        DELETE_ORDER.add(BatchEntityImpl.class);
         DELETE_ORDER.add(JobEntityImpl.class);
         DELETE_ORDER.add(ExternalWorkerJobEntityImpl.class);
         DELETE_ORDER.add(TimerJobEntityImpl.class);

@@ -15,9 +15,19 @@ package org.flowable.cmmn.engine.impl;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.service.BatchPartBuilderImpl;
+import org.flowable.batch.service.impl.BatchBuilderImpl;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
+import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.cmd.DeleteBatchCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
@@ -227,6 +237,31 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
         commandExecutor.execute(new HandleHistoryCleanupTimerJobCmd());
     }
     
+    @Override
+    public BatchQuery createBatchQuery() {
+        return new BatchQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchBuilder createBatchBuilder() {
+        return new BatchBuilderImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchPartQuery createBatchPartQuery() {
+        return new BatchPartQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchPartBuilder createBatchPartBuilder(Batch batch) {
+        return new BatchPartBuilderImpl(batch, configuration.getBatchServiceConfiguration(), commandExecutor);
+    }
+
+    @Override
+    public void deleteBatch(String batchId) {
+        commandExecutor.execute(new DeleteBatchCmd(batchId));
+    }
+
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
