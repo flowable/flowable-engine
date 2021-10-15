@@ -15,6 +15,11 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
@@ -262,6 +267,22 @@ public interface CmmnManagementService {
     String getExternalWorkerJobErrorDetails(String jobId);
     
     void handleHistoryCleanupTimerJob();
+
+    /**
+     * Returns a new BatchQuery implementation, that can be used to dynamically query the batches.
+     */
+    BatchQuery createBatchQuery();
+
+    BatchBuilder createBatchBuilder();
+
+    /**
+     * Returns a new BatchPartQuery implementation, that can be used to dynamically query the batch parts.
+     */
+    BatchPartQuery createBatchPartQuery();
+
+    BatchPartBuilder createBatchPartBuilder(Batch batch);
+
+    void deleteBatch(String batchId);
     
     /**
      * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.

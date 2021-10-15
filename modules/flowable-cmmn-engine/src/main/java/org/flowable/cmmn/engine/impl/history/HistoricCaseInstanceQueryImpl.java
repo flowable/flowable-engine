@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.impl.IdentityLinkQueryObject;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesUsingBatchesCmd;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -637,6 +638,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public String deleteInParallelUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricCaseInstancesUsingBatchesCmd(this, batchSize, batchName, false));
+    }
+
+    @Override
+    public String deleteSequentiallyUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricCaseInstancesUsingBatchesCmd(this, batchSize, batchName, true));
+    }
+
+    @Override
     public HistoricCaseInstanceQuery includeCaseVariables() {
         this.includeCaseVariables = true;
         return this;
@@ -995,6 +1006,18 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return startedBy;
     }
     
+    public Date getLastReactivatedBefore() {
+        return lastReactivatedBefore;
+    }
+
+    public Date getLastReactivatedAfter() {
+        return lastReactivatedAfter;
+    }
+
+    public String getLastReactivatedBy() {
+        return lastReactivatedBy;
+    }
+
     public String getCallbackId() {
         return callbackId;
     }
