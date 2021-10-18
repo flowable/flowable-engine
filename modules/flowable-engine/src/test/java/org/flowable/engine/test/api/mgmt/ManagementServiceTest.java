@@ -447,6 +447,43 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    void testAcquireExpiredAcquiredLockWithZInTheHostName() {
+        String lockName = "testLock";
+        try {
+            Instant startTime = Instant.now();
+            LockManager testLockManager1 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), processEngineConfiguration.getEngineCfgKey());
+
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            // acquiring the lock from the same lock manager should always return true
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            Map<String, String> properties = managementService.getProperties();
+            assertThat(properties).containsKey(lockName);
+            assertThat(properties.get(lockName)).isNotNull();
+
+            String updatedPropertyValue = startTime.minus(2, ChronoUnit.HOURS).toString() + " - Zulu";
+            updatePropertyValue(lockName, updatedPropertyValue);
+
+            LockManager testLockManager2 = managementService.getLockManager(lockName);
+            assertThat(testLockManager2.acquireLock()).isFalse();
+
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(3), processEngineConfiguration.getEngineCfgKey());
+            assertThat(testLockManager2.acquireLock()).isFalse();
+
+            properties = managementService.getProperties();
+            assertThat(properties.get(lockName)).isEqualTo(updatedPropertyValue);
+
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(1), processEngineConfiguration.getEngineCfgKey());
+            assertThat(testLockManager2.acquireLock()).isTrue();
+
+            properties = managementService.getProperties();
+            assertThat(properties.get(lockName)).isNotEqualTo(updatedPropertyValue);
+
+        } finally {
+            deletePropertyIfExists(lockName);
+        }
+    }
+
+    @Test
     void testFindJobByCorrelationId() {
         Job asyncJob = managementService.executeCommand(context -> {
             JobService jobService = CommandContextUtil.getJobService(context);
