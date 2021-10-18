@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
@@ -29,11 +31,22 @@ public class DefaultHistoryCleaningManager implements HistoryCleaningManager {
 
     @Override
     public HistoricProcessInstanceQueryImpl createHistoricProcessInstanceCleaningQuery() {
-        Duration endedAfterDuration = processEngineConfiguration.getCleanInstancesEndedAfter();
-        Instant endedAfter = Instant.now().minus(endedAfterDuration);
         HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = new HistoricProcessInstanceQueryImpl(
                 processEngineConfiguration.getCommandExecutor(), processEngineConfiguration);
-        historicProcessInstanceQuery.finishedBefore(Date.from(endedAfter));
+        historicProcessInstanceQuery.finishedBefore(getEndedAfter());
         return historicProcessInstanceQuery;
+    }
+
+    @Override
+    public BatchQuery createBatchCleaningQuery() {
+        return processEngineConfiguration.getManagementService().createBatchQuery()
+                .completeTimeLowerThan(getEndedAfter())
+                .batchType(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+    }
+
+    protected Date getEndedAfter() {
+        Duration endedAfterDuration = processEngineConfiguration.getCleanInstancesEndedAfter();
+        Instant endedAfter = Instant.now().minus(endedAfterDuration);
+        return Date.from(endedAfter);
     }
 }

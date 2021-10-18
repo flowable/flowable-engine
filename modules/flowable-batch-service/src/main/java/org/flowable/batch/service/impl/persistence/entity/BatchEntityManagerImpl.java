@@ -79,6 +79,11 @@ public class BatchEntityManagerImpl
     }
 
     @Override
+    public void deleteBatches(BatchQueryImpl batchQuery) {
+        dataManager.deleteBatches(batchQuery);
+    }
+
+    @Override
     public void delete(String batchId) {
         BatchEntity batch = dataManager.findById(batchId);
         List<BatchPart> batchParts = getBatchPartEntityManager().findBatchPartsByBatchId(batch.getId());
