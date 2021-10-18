@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -156,7 +157,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(3); // loopCardinality of 3
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("sendEventTask").list();
             assertThat(historicActivityInstances).hasSize(3);
             assertThat(historicActivityInstances).extracting(HistoricActivityInstance::getEndTime).isNotNull();
@@ -176,7 +177,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(managementService.createJobQuery().list()).isEmpty();
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(3); // loopCardinality of 3
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("sendEventTask").list();
             assertThat(historicActivityInstances).hasSize(3);
             assertThat(historicActivityInstances).extracting(HistoricActivityInstance::getEndTime).isNotNull();

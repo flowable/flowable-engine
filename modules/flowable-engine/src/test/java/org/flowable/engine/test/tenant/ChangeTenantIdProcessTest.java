@@ -52,40 +52,30 @@ class ChangeTenantIdProcessTest extends PluggableFlowableTestCase {
     private static final String TEST_TENANT_B = "test-tenant-b";
     private static final String TEST_TENANT_C = "test-tenant-c";
 
-    protected String deploymentIdWithTenantA;
-    protected String deploymentIdWithTenantB;
-    protected String deploymentIdWithTenantC;
-    protected String deploymentIdWithoutTenant;
-    protected String deploymentIdWithTenantAForJobs;
     protected TestEventListener eventListener = new TestEventListener();
 
     @BeforeEach
     void setUp() {
-        this.deploymentIdWithTenantA = repositoryService.createDeployment()
+        deploymentIdsForAutoCleanup.add(repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcess.bpmn20.xml").tenantId(TEST_TENANT_A)
-                .deploy().getId();
-        this.deploymentIdWithTenantB = repositoryService.createDeployment()
+                .deploy().getId());
+        deploymentIdsForAutoCleanup.add(repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcess.bpmn20.xml").tenantId(TEST_TENANT_B)
-                .deploy().getId();
-        this.deploymentIdWithTenantC = repositoryService.createDeployment()
+                .deploy().getId());
+        deploymentIdsForAutoCleanup.add(repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcess.bpmn20.xml").tenantId(TEST_TENANT_C)
-                .deploy().getId();
-        this.deploymentIdWithoutTenant = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/tenant/testProcessDup.bpmn20.xml").deploy().getId();
-        this.deploymentIdWithTenantAForJobs = repositoryService.createDeployment()
+                .deploy().getId());
+        deploymentIdsForAutoCleanup.add(repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/tenant/testProcessDup.bpmn20.xml").deploy().getId());
+        deploymentIdsForAutoCleanup.add(repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcessForJobsAndEventSubscriptions.bpmn20.xml").tenantId(TEST_TENANT_A)
-                .deploy().getId();
+                .deploy().getId());
 
         processEngineConfiguration.getEventDispatcher().addEventListener(eventListener);
     }
 
     @AfterEach
     void cleanUp() {
-        repositoryService.deleteDeployment(deploymentIdWithTenantA, true);
-        repositoryService.deleteDeployment(deploymentIdWithTenantB, true);
-        repositoryService.deleteDeployment(deploymentIdWithTenantC, true);
-        repositoryService.deleteDeployment(deploymentIdWithoutTenant, true);
-        repositoryService.deleteDeployment(deploymentIdWithTenantAForJobs, true);
         processEngineConfiguration.getEventDispatcher().removeEventListener(eventListener);
     }
 
