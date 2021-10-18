@@ -19,7 +19,6 @@ import java.util.Map;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
-import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
