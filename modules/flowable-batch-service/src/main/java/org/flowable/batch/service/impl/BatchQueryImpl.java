@@ -23,6 +23,7 @@ import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -191,6 +192,27 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     @Override
     public List<Batch> executeList(CommandContext commandContext) {
         return batchServiceConfiguration.getBatchEntityManager().findBatchesByQueryCriteria(this);
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(context -> {
+                executeDelete(context);
+                return null;
+            });
+        } else {
+            executeDelete(Context.getCommandContext());
+        }
+    }
+
+    protected void executeDelete(CommandContext commandContext) {
+        batchServiceConfiguration.getBatchEntityManager().deleteBatches(this);
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        delete();
     }
     
     // getters //////////////////////////////////////////

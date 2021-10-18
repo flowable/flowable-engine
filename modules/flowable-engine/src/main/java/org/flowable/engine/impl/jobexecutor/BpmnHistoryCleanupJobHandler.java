@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -42,6 +43,11 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
             query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
         } else {
             query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        }
+
+        BatchQuery batchCleaningQuery = processEngineConfiguration.getHistoryCleaningManager().createBatchCleaningQuery();
+        if (batchCleaningQuery != null) {
+            batchCleaningQuery.deleteWithRelatedData();
         }
     }
     

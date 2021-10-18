@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.job;
 
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -42,6 +43,11 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
             query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
         } else {
             query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        }
+
+        BatchQuery batchCleaningQuery = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createBatchCleaningQuery();
+        if (batchCleaningQuery != null) {
+            batchCleaningQuery.deleteWithRelatedData();
         }
     }
     

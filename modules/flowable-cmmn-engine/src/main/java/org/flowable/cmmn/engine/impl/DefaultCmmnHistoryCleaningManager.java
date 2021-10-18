@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.CmmnHistoryCleaningManager;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -31,11 +33,22 @@ public class DefaultCmmnHistoryCleaningManager implements CmmnHistoryCleaningMan
 
     @Override
     public HistoricCaseInstanceQuery createHistoricCaseInstanceCleaningQuery() {
-        Duration endedAfterDuration = cmmnEngineConfiguration.getCleanInstancesEndedAfter();
-        Instant endedAfter = Instant.now().minus(endedAfterDuration);
         HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(
                 cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration);
-        historicCaseInstanceQuery.finishedBefore(Date.from(endedAfter));
+        historicCaseInstanceQuery.finishedBefore(getEndedAfter());
         return historicCaseInstanceQuery;
+    }
+
+    @Override
+    public BatchQuery createBatchCleaningQuery() {
+        return cmmnEngineConfiguration.getCmmnManagementService().createBatchQuery()
+                .completeTimeLowerThan(getEndedAfter())
+                .batchType(Batch.HISTORIC_CASE_DELETE_TYPE);
+    }
+
+    protected Date getEndedAfter() {
+        Duration endedAfterDuration = cmmnEngineConfiguration.getCleanInstancesEndedAfter();
+        Instant endedAfter = Instant.now().minus(endedAfterDuration);
+        return Date.from(endedAfter);
     }
 }

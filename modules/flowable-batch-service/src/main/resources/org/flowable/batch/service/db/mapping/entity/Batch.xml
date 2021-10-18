@@ -93,6 +93,42 @@
         where ID_ = #{id, jdbcType=VARCHAR}
     </delete>
 
+    <delete id="bulkDeleteBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> RES </if>
+        <include refid="selectBatchByQueryCriteriaSql" />
+    </delete>
+
+    <delete id="bulkDeleteBytesForBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if>
+        from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select RES.BATCH_DOC_ID_
+            <include refid="selectBatchByQueryCriteriaSql" />
+                and RES.BATCH_DOC_ID_ is not null
+                <if test="_databaseId != 'oracle'">and RES.BATCH_DOC_ID_ != ''</if>
+
+            union all
+
+            select PARTS_.RESULT_DOC_ID_
+            from ${prefix}FLW_RU_BATCH_PART PARTS_
+            where PARTS_.RESULT_DOC_ID_ is not null
+                <if test="_databaseId != 'oracle'">and PARTS_.RESULT_DOC_ID_ != ''</if>
+                and PARTS_.BATCH_ID_ in (
+                    select RES.ID_
+                    <include refid="selectBatchByQueryCriteriaSql" />
+                )
+        )
+    </delete>
+
+    <delete id="bulkDeleteBatchPartsForBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> PARTS_ </if>
+        from ${prefix}FLW_RU_BATCH_PART PARTS_
+        where PARTS_.BATCH_ID_ in (
+            select RES.ID_
+            <include refid="selectBatchByQueryCriteriaSql" />
+        )
+    </delete>
+
     <!-- Batch SELECT -->
     <select id="selectBatch" parameterType="string" resultMap="batchResultMap">
         select *
