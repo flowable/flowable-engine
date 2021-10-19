@@ -34,4 +34,5 @@ public interface HistoricDecisionExecutionEntityManager extends EntityManager<Hi
 
     long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
+    void delete(HistoricDecisionExecutionQueryImpl query);
 }

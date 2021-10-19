@@ -68,4 +68,9 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     public long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricDecisionExecutionCountByNativeQuery", parameterMap);
     }
+
+    @Override
+    public void delete(HistoricDecisionExecutionQueryImpl query) {
+        getDbSqlSession().delete("bulkDeleteHistoricDecisionExecutions", query, getManagedEntityClass());
+    }
 }

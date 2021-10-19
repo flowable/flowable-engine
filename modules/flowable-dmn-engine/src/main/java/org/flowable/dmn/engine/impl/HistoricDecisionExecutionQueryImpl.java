@@ -18,11 +18,13 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
+import org.flowable.dmn.engine.impl.cmd.DeleteHistoricDecisionExecutionsByQueryCmd;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
@@ -207,6 +209,20 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     @Override
     public List<DmnHistoricDecisionExecution> executeList(CommandContext commandContext) {
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionsByQueryCriteria(this);
+    }
+
+    @Override
+    public void delete() {
+        if (commandExecutor != null) {
+            commandExecutor.execute(new DeleteHistoricDecisionExecutionsByQueryCmd(this));
+        } else {
+            new DeleteHistoricDecisionExecutionsByQueryCmd(this).execute(Context.getCommandContext());
+        }
+    }
+
+    @Override
+    public void deleteWithRelatedData() {
+        delete();
     }
 
     // getters ////////////////////////////////////////////

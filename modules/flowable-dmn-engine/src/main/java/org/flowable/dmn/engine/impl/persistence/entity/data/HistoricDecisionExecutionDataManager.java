@@ -34,4 +34,6 @@ public interface HistoricDecisionExecutionDataManager extends DataManager<Histor
     List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap);
+
+    void delete(HistoricDecisionExecutionQueryImpl query);
 }
