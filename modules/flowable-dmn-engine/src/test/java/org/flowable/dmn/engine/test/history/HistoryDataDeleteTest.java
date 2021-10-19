@@ -253,6 +253,45 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
     }
 
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
+    public void testDeleteByInstanceIdAndWithoutScopeType() {
+        ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .activityId("execution-1")
+                .instanceId("proc-1")
+                .scopeType(ScopeTypes.BPMN)
+                .executeWithSingleResult();
+
+        ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .activityId("execution-2")
+                .instanceId("proc-1")
+                .executeWithSingleResult();
+
+        ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .activityId("execution-3")
+                .instanceId("case-1")
+                .executeWithSingleResult();
+
+        ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .activityId("execution-4")
+                .instanceId("proc-2")
+                .scopeType(ScopeTypes.BPMN)
+                .executeWithSingleResult();
+
+        assertThat(historyService.createHistoricDecisionExecutionQuery().list())
+                .extracting(DmnHistoricDecisionExecution::getActivityId)
+                .containsExactlyInAnyOrder("execution-1", "execution-2", "execution-3", "execution-4");
+
+        historyService.createHistoricDecisionExecutionQuery().instanceId("proc-1").withoutScopeType().delete();
+
+        assertThat(historyService.createHistoricDecisionExecutionQuery().list())
+                .extracting(DmnHistoricDecisionExecution::getActivityId)
+                .containsExactlyInAnyOrder("execution-1", "execution-3", "execution-4");
+    }
+
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByActivityId() {
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")

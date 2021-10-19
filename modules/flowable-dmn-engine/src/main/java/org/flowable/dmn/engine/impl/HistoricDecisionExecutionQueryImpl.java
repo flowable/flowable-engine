@@ -44,6 +44,7 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     protected String executionId;
     protected String activityId;
     protected String scopeType;
+    protected boolean withoutScopeType;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
     protected Boolean failed;
@@ -137,6 +138,12 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
         return this;
     }
     
+    @Override
+    public DmnHistoricDecisionExecutionQuery withoutScopeType() {
+        this.withoutScopeType = true;
+        return this;
+    }
+
     @Override
     public DmnHistoricDecisionExecutionQuery processInstanceIdWithChildren(String processInstanceId) {
         this.processInstanceIdWithChildren = processInstanceId;
@@ -263,7 +270,11 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     public String getScopeType() {
         return scopeType;
     }
-    
+
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
+    }
+
     public String getProcessInstanceIdWithChildren() {
         return processInstanceIdWithChildren;
     }

@@ -74,6 +74,7 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return historic decision executions with the given execution id.", paramType = "query"),
             @ApiImplicitParam(name = "instanceId", dataType = "string", value = "Only return historic decision executions with the given instance id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic decision executions with the given scope type.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeType", dataType = "string", value = "Only return historic decision executions without a scope type.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Return all historic decision executions with the given process instance id or its entity link children.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Return all historic decision executions with the given case instance id or its entity link children.", paramType = "query"),
             @ApiImplicitParam(name = "failed", dataType = "string", value = "Only return historic decision executions with the failed state.", paramType = "query"),
@@ -113,6 +114,9 @@ public class HistoryDecisionExecutionCollectionResource {
         }
         if (allRequestParams.containsKey("scopeType")) {
             historicDecisionExecutionQuery.scopeType(allRequestParams.get("scopeType"));
+        }
+        if (Boolean.TRUE.equals(Boolean.valueOf(allRequestParams.get("withoutScopeType")))) {
+            historicDecisionExecutionQuery.withoutScopeType();
         }
         if (allRequestParams.containsKey("processInstanceIdWithChildren")) {
             historicDecisionExecutionQuery.processInstanceIdWithChildren(allRequestParams.get("processInstanceIdWithChildren"));
