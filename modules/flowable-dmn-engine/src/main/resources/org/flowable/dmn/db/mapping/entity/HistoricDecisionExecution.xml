@@ -88,6 +88,12 @@
             <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
         )
     </delete>
+
+    <!-- For MySQL / MariaDB we cannot use the table we want to delete from in a subquery -->
+    <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" databaseId="mysql">
+        delete RES
+        <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
+    </delete>
   
   <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
 
