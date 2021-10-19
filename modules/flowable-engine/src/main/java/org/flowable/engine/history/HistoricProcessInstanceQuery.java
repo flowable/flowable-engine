@@ -383,6 +383,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
 
     /**
+     * Only select process instances that do not have a callback identifier.
+     */
+    HistoricProcessInstanceQuery withoutProcessInstanceCallbackId();
+
+    /**
      * Only select process instances with the given reference identifier.
      */
     HistoricProcessInstanceQuery processInstanceReferenceId(String referenceId);

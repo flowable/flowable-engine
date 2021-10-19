@@ -229,6 +229,11 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
                 case "caseInstanceParentId":
                     query.caseInstanceParentId(value.textValue());
                     break;
+                case "withoutCaseInstanceParentId":
+                    if (value.booleanValue()) {
+                        query.withoutCaseInstanceParent();
+                    }
+                    break;
                 case "deploymentId":
                     query.deploymentId(value.textValue());
                     break;
@@ -273,6 +278,11 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
                     break;
                 case "callbackType":
                     query.caseInstanceCallbackType(value.textValue());
+                    break;
+                case "withoutCallbackId":
+                    if (value.booleanValue()) {
+                        query.withoutCaseInstanceCallbackId();
+                    }
                     break;
                 case "referenceId":
                     query.caseInstanceReferenceId(value.textValue());

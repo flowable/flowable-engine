@@ -64,6 +64,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String businessKey;
     protected String businessStatus;
     protected String caseInstanceParentId;
+    protected boolean withoutCaseInstanceParentId;
     protected String deploymentId;
     protected List<String> deploymentIds;
     protected boolean finished;
@@ -78,6 +79,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
+    protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
     protected String tenantId;
@@ -275,6 +277,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
     
     @Override
+    public HistoricCaseInstanceQuery withoutCaseInstanceParent() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutCaseInstanceParentId = true;
+        } else {
+            this.withoutCaseInstanceParentId = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricCaseInstanceQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("Deployment id is null");
@@ -450,6 +462,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery withoutCaseInstanceCallbackId() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutCallbackId = true;
+        } else {
+            this.withoutCallbackId = true;
         }
         return this;
     }
@@ -978,6 +1000,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return caseInstanceParentId;
     }
 
+    public boolean isWithoutCaseInstanceParentId() {
+        return withoutCaseInstanceParentId;
+    }
+
     public boolean isFinished() {
         return finished;
     }
@@ -1024,6 +1050,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public boolean isWithoutCallbackId() {
+        return withoutCallbackId;
     }
 
     public String getReferenceId() {

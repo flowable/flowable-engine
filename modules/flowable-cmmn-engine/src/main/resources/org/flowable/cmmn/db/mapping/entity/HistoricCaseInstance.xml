@@ -586,6 +586,9 @@
         <if test="caseInstanceParentId != null">
             and ${queryTablePrefix}PARENT_ID_ = #{caseInstanceParentId}
         </if>
+        <if test="withoutCaseInstanceParentId">
+            and ${queryTablePrefix}PARENT_ID_ is null
+        </if>
         <if test="businessKey != null">
             and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
         </if>
@@ -627,6 +630,9 @@
         </if>
         <if test="callbackType != null">
             and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
+        </if>
+        <if test="withoutCallbackId">
+            and ${queryTablePrefix}CALLBACK_ID_ is null
         </if>
         <if test="referenceId != null">
             and ${queryTablePrefix}REFERENCE_ID_ = #{referenceId}
@@ -703,6 +709,9 @@
         <if test="orQueryObject.caseInstanceParentId != null">
             or ${queryTablePrefix}PARENT_ID_ = #{orQueryObject.caseInstanceParentId}
         </if>
+        <if test="orQueryObject.withoutCaseInstanceParentId">
+            or ${queryTablePrefix}PARENT_ID_ is null
+        </if>
         <if test="orQueryObject.businessKey != null">
             or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}
         </if>
@@ -744,6 +753,9 @@
         </if>
         <if test="orQueryObject.callbackType != null">
             or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+        </if>
+        <if test="orQueryObject.withoutCallbackId">
+            or ${queryTablePrefix}CALLBACK_ID_ is null
         </if>
         <if test="orQueryObject.referenceId != null">
             or ${queryTablePrefix}REFERENCE_ID_ = #{orQueryObject.referenceId}

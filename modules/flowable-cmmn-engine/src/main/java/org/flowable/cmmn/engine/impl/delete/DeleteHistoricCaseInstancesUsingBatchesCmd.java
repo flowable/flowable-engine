@@ -199,6 +199,7 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "businessKey", query.getBusinessKey());
         putIfNotNull(queryNode, "businessStatus", query.getBusinessStatus());
         putIfNotNull(queryNode, "caseInstanceParentId", query.getCaseInstanceParentId());
+        putIfTrue(queryNode, "withoutCaseInstanceParentId", query.isWithoutCaseInstanceParentId());
         putIfNotNull(queryNode, "deploymentId", query.getDeploymentId());
         putIfNotNullOrEmpty(queryNode, "deploymentIds", query.getDeploymentIds());
         putIfTrue(queryNode, "finished", query.isFinished());
@@ -213,6 +214,7 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "lastReactivatedBy", query.getLastReactivatedBy());
         putIfNotNull(queryNode, "callbackId", query.getCallbackId());
         putIfNotNull(queryNode, "callbackType", query.getCallbackType());
+        putIfTrue(queryNode, "withoutCallbackId", query.isWithoutCallbackId());
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());
         putIfNotNull(queryNode, "referenceType", query.getReferenceType());
         putIfNotNull(queryNode, "tenantId", query.getTenantId());

@@ -476,6 +476,85 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByParentId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .parentId("parentId")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId("parentId").count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId("parentId").list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId("parentId").singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseInstanceParentId("parentId")
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseInstanceParentId("parentId")
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseInstanceParentId("parentId")
+                    .caseDefinitionId("undefined")
+                    .endOr()
+                    .singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
+        }
+    }
+
+    @Test
+    public void getCaseInstanceByWithoutParentId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .parentId("parentId")
+                .start();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("myCase").singleResult();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceParent().count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceParent().list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceParent().singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceParent()
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceParent()
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceParent()
+                    .caseDefinitionId("undefined")
+                    .endOr()
+                    .singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
+        }
+    }
+
+    @Test
     public void getCaseInstanceByStartedBefore() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
@@ -648,6 +727,49 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .endOr()
                 .singleResult().getId())
                 .isEqualTo(caseInstance.getId());
+        }
+    }
+
+    @Test
+    public void getCaseInstanceWithoutCallbackId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .callbackId("callbackId")
+                .start();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("myCase")
+                .singleResult();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceCallbackId().count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceCallbackId().list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceCallbackId().singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceCallbackId()
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceCallbackId()
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .list().get(0).getId())
+                    .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .withoutCaseInstanceCallbackId()
+                    .caseDefinitionId("undefined")
+                    .endOr()
+                    .singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
         }
     }
 

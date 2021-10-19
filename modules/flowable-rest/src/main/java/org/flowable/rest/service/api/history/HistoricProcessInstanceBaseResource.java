@@ -170,6 +170,9 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
         }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutCallbackId())) {
+            query.withoutProcessInstanceCallbackId();
+        }
         
         if (queryRequest.getTenantId() != null) {
             query.processInstanceTenantId(queryRequest.getTenantId());

@@ -324,6 +324,11 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
                 case "callbackType":
                     query.processInstanceCallbackType(value.textValue());
                     break;
+                case "withoutCallbackId":
+                    if (value.booleanValue()) {
+                        query.withoutProcessInstanceCallbackId();
+                    }
+                    break;
                 case "referenceId":
                     query.processInstanceReferenceId(value.textValue());
                     break;

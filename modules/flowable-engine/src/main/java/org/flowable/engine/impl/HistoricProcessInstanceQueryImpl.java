@@ -97,6 +97,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String nameLikeIgnoreCase;
     protected String callbackId;
     protected String callbackType;
+    protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
     protected String locale;
@@ -564,6 +565,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery withoutProcessInstanceCallbackId() {
+        if (inOrStatement) {
+            currentOrQueryObject.withoutCallbackId = true;
+        } else {
+            this.withoutCallbackId = true;
         }
         return this;
     }
@@ -1087,6 +1098,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public boolean isWithoutCallbackId() {
+        return withoutCallbackId;
     }
 
     public String getReferenceId() {

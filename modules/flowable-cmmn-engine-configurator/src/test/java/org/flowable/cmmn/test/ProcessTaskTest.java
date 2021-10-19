@@ -685,6 +685,9 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                     .processInstanceCallbackId(processTaskPlanItemInstance.getId())
                     .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
+            assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .withoutProcessInstanceCallbackId()
+                    .singleResult()).isNull();
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
