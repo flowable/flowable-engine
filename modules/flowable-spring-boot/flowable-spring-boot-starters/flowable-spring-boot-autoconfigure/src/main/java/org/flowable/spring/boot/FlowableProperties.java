@@ -125,7 +125,9 @@ public class FlowableProperties {
 
     private boolean enableHistoryCleaning = false;
     private String historyCleaningCycle = "0 0 1 * * ?";
-    private int historyCleaningAfterDays = 365;
+    private Duration historyCleaningAfter = Duration.ofDays(365);
+    private int historyCleaningBatchSize = 100;
+    private boolean historyCleaningSequential = false;
 
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
@@ -361,10 +363,33 @@ public class FlowableProperties {
     public void setHistoryCleaningCycle(String historyCleaningCycle) {
         this.historyCleaningCycle = historyCleaningCycle;
     }
-    public int getHistoryCleaningAfterDays() {
-        return historyCleaningAfterDays;
-    }
+    @Deprecated
+    @DeprecatedConfigurationProperty(replacement = "flowable.history-cleaning-after", reason = "Switched to using a Duration that allows more flexible configuration")
     public void setHistoryCleaningAfterDays(int historyCleaningAfterDays) {
-        this.historyCleaningAfterDays = historyCleaningAfterDays;
+        this.historyCleaningAfter = Duration.ofDays(historyCleaningAfterDays);
+    }
+
+    public Duration getHistoryCleaningAfter() {
+        return historyCleaningAfter;
+    }
+
+    public void setHistoryCleaningAfter(Duration historyCleaningAfter) {
+        this.historyCleaningAfter = historyCleaningAfter;
+    }
+
+    public int getHistoryCleaningBatchSize() {
+        return historyCleaningBatchSize;
+    }
+
+    public void setHistoryCleaningBatchSize(int historyCleaningBatchSize) {
+        this.historyCleaningBatchSize = historyCleaningBatchSize;
+    }
+
+    public boolean isHistoryCleaningSequential() {
+        return historyCleaningSequential;
+    }
+
+    public void setHistoryCleaningSequential(boolean historyCleaningSequential) {
+        this.historyCleaningSequential = historyCleaningSequential;
     }
 }

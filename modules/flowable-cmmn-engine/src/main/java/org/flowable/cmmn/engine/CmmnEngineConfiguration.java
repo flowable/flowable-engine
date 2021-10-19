@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,8 @@ import javax.sql.DataSource;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
+import org.flowable.batch.service.BatchServiceConfiguration;
+import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
 import org.flowable.cmmn.api.CmmnChangeTenantIdEntityTypes;
@@ -70,6 +71,10 @@ import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.delegate.JsonPlanItemVariableAggregator;
+import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceIdsJobHandler;
+import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceStatusJobHandler;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsJobHandler;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsStatusJobHandler;
 import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
@@ -464,6 +469,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected SchemaManager variableSchemaManager;
     protected SchemaManager taskSchemaManager;
     protected SchemaManager jobSchemaManager;
+    protected SchemaManager batchSchemaManager;
 
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
@@ -493,6 +499,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
     protected IdentityLinkEventHandler identityLinkEventHandler;
     protected boolean isEnableTaskRelationshipCounts = true;
+
+    // Batch support
+    protected BatchServiceConfiguration batchServiceConfiguration;
 
     // Variable support
     protected VariableTypes variableTypes;
@@ -689,9 +698,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
     protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
 
+    protected String batchStatusTimeCycleConfig = "30 * * * * ?";
+
     protected boolean enableHistoryCleaning = false;
     protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
-    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected Duration cleanInstancesEndedAfter = Duration.ofDays(365);
+    protected int cleanInstancesBatchSize = 100;
+    protected boolean cleanInstancesSequentially = false;
     protected CmmnHistoryCleaningManager cmmnHistoryCleaningManager;
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
@@ -836,6 +849,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initHistoryJobHandlers();
         initFailedJobCommandFactory();
         initJobServiceConfiguration();
+        initBatchServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
         initScriptingEngines();
@@ -863,6 +877,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             initVariableSchemaManager();
             initTaskSchemaManager();
             initJobSchemaManager();
+            initBatchSchemaManager();
         }
     }
     
@@ -917,6 +932,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initJobSchemaManager() {
         if (this.jobSchemaManager == null) {
             this.jobSchemaManager = new JobDbSchemaManager();
+        }
+    }
+
+    protected void initBatchSchemaManager() {
+        if (this.batchSchemaManager == null) {
+            this.batchSchemaManager = new BatchDbSchemaManager();
         }
     }
 
@@ -1652,6 +1673,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
         jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
+        addJobHandler(new ComputeDeleteHistoricCaseInstanceIdsJobHandler());
+        addJobHandler(new ComputeDeleteHistoricCaseInstanceStatusJobHandler());
+        addJobHandler(new DeleteHistoricCaseInstanceIdsJobHandler());
+        addJobHandler(new DeleteHistoricCaseInstanceIdsStatusJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {
@@ -1977,6 +2002,24 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         return asyncHistoryExecutorConfiguration;
+    }
+
+    public void initBatchServiceConfiguration() {
+        if (batchServiceConfiguration == null) {
+            this.batchServiceConfiguration = instantiateBatchServiceConfiguration();
+            this.batchServiceConfiguration.setClock(this.clock);
+            this.batchServiceConfiguration.setIdGenerator(this.idGenerator);
+            this.batchServiceConfiguration.setObjectMapper(this.objectMapper);
+            this.batchServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+            this.batchServiceConfiguration.init();
+        }
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_BATCH_SERVICE_CONFIG, this.batchServiceConfiguration);
+    }
+
+    protected BatchServiceConfiguration instantiateBatchServiceConfiguration() {
+        return new BatchServiceConfiguration(ScopeTypes.CMMN);
     }
 
     @Override
@@ -2837,6 +2880,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public SchemaManager getBatchSchemaManager() {
+        return batchSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setBatchSchemaManager(SchemaManager batchSchemaManager) {
+        this.batchSchemaManager = batchSchemaManager;
+        return this;
+    }
+
     @Override
     public VariableTypes getVariableTypes() {
         return variableTypes;
@@ -2927,6 +2979,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEnableTaskRelationshipCounts(boolean isEnableTaskRelationshipCounts) {
         this.isEnableTaskRelationshipCounts = isEnableTaskRelationshipCounts;
+        return this;
+    }
+
+    public BatchServiceConfiguration getBatchServiceConfiguration() {
+        return batchServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setBatchServiceConfiguration(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
         return this;
     }
 
@@ -4191,6 +4252,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.enableHistoricTaskLogging = enableHistoricTaskLogging;
     }
 
+    public String getBatchStatusTimeCycleConfig() {
+        return batchStatusTimeCycleConfig;
+    }
+
+    public CmmnEngineConfiguration setBatchStatusTimeCycleConfig(String batchStatusTimeCycleConfig) {
+        this.batchStatusTimeCycleConfig = batchStatusTimeCycleConfig;
+        return this;
+    }
+
     public boolean isEnableHistoryCleaning() {
         return enableHistoryCleaning;
     }
@@ -4209,12 +4279,46 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    /**
+     * @deprecated use {@link #getCleanInstancesEndedAfter()} instead
+     */
+    @Deprecated
     public int getCleanInstancesEndedAfterNumberOfDays() {
-        return cleanInstancesEndedAfterNumberOfDays;
+        return (int) cleanInstancesEndedAfter.toDays();
     }
 
+    /**
+     * @deprecated use {@link #setCleanInstancesEndedAfter(Duration)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
-        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return setCleanInstancesEndedAfter(Duration.ofDays(cleanInstancesEndedAfterNumberOfDays));
+    }
+
+    public Duration getCleanInstancesEndedAfter() {
+        return cleanInstancesEndedAfter;
+    }
+
+    public CmmnEngineConfiguration setCleanInstancesEndedAfter(Duration cleanInstancesEndedAfter) {
+        this.cleanInstancesEndedAfter = cleanInstancesEndedAfter;
+        return this;
+    }
+
+    public int getCleanInstancesBatchSize() {
+        return cleanInstancesBatchSize;
+    }
+
+    public CmmnEngineConfiguration setCleanInstancesBatchSize(int cleanInstancesBatchSize) {
+        this.cleanInstancesBatchSize = cleanInstancesBatchSize;
+        return this;
+    }
+
+    public boolean isCleanInstancesSequentially() {
+        return cleanInstancesSequentially;
+    }
+
+    public CmmnEngineConfiguration setCleanInstancesSequentially(boolean cleanInstancesSequentially) {
+        this.cleanInstancesSequentially = cleanInstancesSequentially;
         return this;
     }
 

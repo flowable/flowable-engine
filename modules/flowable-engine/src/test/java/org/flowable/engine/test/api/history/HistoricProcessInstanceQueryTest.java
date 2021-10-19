@@ -106,6 +106,101 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
     }
 
     @Test
+    public void testQueryByCallbackId() {
+        deployOneTaskTestProcess();
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .callbackId("callbackId")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(2);
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("callbackId").count()).isEqualTo(1);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("callbackId").list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .processInstanceCallbackId("callbackId")
+                    .processInstanceName("doesn't exist")
+                    .endOr().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("invalid").list()).isEmpty();
+        }
+    }
+
+    @Test
+    public void testQueryByCallbackType() {
+        deployOneTaskTestProcess();
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .callbackType("callbackType")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(2);
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackType("callbackType").count()).isEqualTo(1);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackType("callbackType").list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .processInstanceCallbackType("callbackType")
+                    .processInstanceName("doesn't exist")
+                    .endOr().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackType("invalid").list()).isEmpty();
+        }
+    }
+
+    @Test
+    public void testQueryByWithoutCallbackId() {
+        deployOneTaskTestProcess();
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .callbackId("callbackId")
+                .start();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(2);
+            assertThat(historyService.createHistoricProcessInstanceQuery().withoutProcessInstanceCallbackId().count()).isEqualTo(1);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().withoutProcessInstanceCallbackId().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .withoutProcessInstanceCallbackId()
+                    .processInstanceName("doesn't exist")
+                    .endOr().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .contains(processInstance.getId());
+        }
+    }
+
+    @Test
     public void testQueryByReferenceId() {
         deployOneTaskTestProcess();
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()

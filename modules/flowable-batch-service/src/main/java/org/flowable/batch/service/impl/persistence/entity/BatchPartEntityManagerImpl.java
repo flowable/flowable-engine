@@ -16,7 +16,9 @@ package org.flowable.batch.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.service.BatchServiceConfiguration;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
@@ -45,13 +47,26 @@ public class BatchPartEntityManagerImpl
     }
 
     @Override
+    public List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQuery batchPartQuery) {
+        return dataManager.findBatchPartsByQueryCriteria((BatchPartQueryImpl) batchPartQuery);
+    }
+
+    @Override
+    public long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery) {
+        return dataManager.findBatchPartCountByQueryCriteria((BatchPartQueryImpl) batchPartQuery);
+    }
+
+    @Override
     public BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType) {
         BatchPartEntity batchPartEntity = dataManager.create();
         batchPartEntity.setBatchId(parentBatch.getId());
+        batchPartEntity.setType(parentBatch.getBatchType());
         batchPartEntity.setBatchType(parentBatch.getBatchType());
         batchPartEntity.setScopeId(scopeId);
         batchPartEntity.setSubScopeId(subScopeId);
         batchPartEntity.setScopeType(scopeType);
+        batchPartEntity.setSearchKey(parentBatch.getBatchSearchKey());
+        batchPartEntity.setSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setBatchSearchKey(parentBatch.getBatchSearchKey());
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);

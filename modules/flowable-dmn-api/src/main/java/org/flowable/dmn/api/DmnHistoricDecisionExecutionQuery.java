@@ -15,6 +15,7 @@ package org.flowable.dmn.api;
 
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 
 /**
@@ -22,7 +23,8 @@ import org.flowable.common.engine.api.query.Query;
  * 
  * @author Tijs Rademakers
  */
-public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> {
+public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution>,
+        DeleteQuery<DmnHistoricDecisionExecutionQuery, DmnHistoricDecisionExecution> {
 
     /** Only select decision execution with the given id. */
     DmnHistoricDecisionExecutionQuery id(String id);
@@ -50,6 +52,9 @@ public interface DmnHistoricDecisionExecutionQuery extends Query<DmnHistoricDeci
     
     /** Only select decision executions with the given scope type. */
     DmnHistoricDecisionExecutionQuery scopeType(String scopeType);
+
+    /** Only select decision executions without a scope type. */
+    DmnHistoricDecisionExecutionQuery withoutScopeType();
     
     /**
      * Select all decision executions for the given process instance id and its children.

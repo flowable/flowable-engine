@@ -28,4 +28,6 @@ public interface BatchDataManager extends DataManager<BatchEntity> {
     List<Batch> findBatchesByQueryCriteria(BatchQueryImpl batchQuery);
     
     long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery);
+
+    void deleteBatches(BatchQueryImpl batchQuery);
 }

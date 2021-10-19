@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -218,6 +217,10 @@ import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.JsonVariableAggregator;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceIdsJobHandler;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsJobHandler;
+import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceStatusJobHandler;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsStatusJobHandler;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
@@ -2062,6 +2065,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler parallelMultiInstanceWithNoWaitStateCompletionJobHandler = new ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler();
         jobHandlers.put(parallelMultiInstanceWithNoWaitStateCompletionJobHandler.getType(), parallelMultiInstanceWithNoWaitStateCompletionJobHandler);
+
+        ComputeDeleteHistoricProcessInstanceIdsJobHandler computeDeleteHistoricProcessInstanceIdsJobHandler = new ComputeDeleteHistoricProcessInstanceIdsJobHandler();
+        jobHandlers.put(computeDeleteHistoricProcessInstanceIdsJobHandler.getType(), computeDeleteHistoricProcessInstanceIdsJobHandler);
+
+        DeleteHistoricProcessInstanceIdsJobHandler deleteHistoricProcessInstanceBatchJobHandler = new DeleteHistoricProcessInstanceIdsJobHandler();
+        jobHandlers.put(deleteHistoricProcessInstanceBatchJobHandler.getType(), deleteHistoricProcessInstanceBatchJobHandler);
+
+        ComputeDeleteHistoricProcessInstanceStatusJobHandler computeDeleteHistoricProcessInstanceStatusJobHandler = new ComputeDeleteHistoricProcessInstanceStatusJobHandler();
+        jobHandlers.put(computeDeleteHistoricProcessInstanceStatusJobHandler.getType(), computeDeleteHistoricProcessInstanceStatusJobHandler);
+
+        DeleteHistoricProcessInstanceIdsStatusJobHandler deleteHistoricProcessInstanceStatusJobHandler = new DeleteHistoricProcessInstanceIdsStatusJobHandler();
+        jobHandlers.put(deleteHistoricProcessInstanceStatusJobHandler.getType(), deleteHistoricProcessInstanceStatusJobHandler);
 
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {

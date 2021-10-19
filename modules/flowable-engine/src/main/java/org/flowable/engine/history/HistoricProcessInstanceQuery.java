@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.BatchDeleteQuery;
 import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
@@ -30,7 +31,8 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
  * @author Tijs Rademakers
  * @author Falko Menge
  */
-public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInstanceQuery, HistoricProcessInstance>, DeleteQuery<HistoricProcessInstanceQuery, HistoricProcessInstance> {
+public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInstanceQuery, HistoricProcessInstance>, DeleteQuery<HistoricProcessInstanceQuery, HistoricProcessInstance>,
+        BatchDeleteQuery<HistoricProcessInstanceQuery> {
 
     /**
      * Only select historic process instances with the given process instance. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
@@ -379,6 +381,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select process instances with the given callback type. 
      */
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
+
+    /**
+     * Only select process instances that do not have a callback identifier.
+     */
+    HistoricProcessInstanceQuery withoutProcessInstanceCallbackId();
 
     /**
      * Only select process instances with the given reference identifier.

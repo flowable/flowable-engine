@@ -788,6 +788,9 @@
       <if test="callbackType != null">
         and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType}
       </if>
+      <if test="withoutCallbackId">
+        and ${queryTablePrefix}CALLBACK_ID_ is null
+      </if>
       <if test="referenceId != null">
           and ${queryTablePrefix}REFERENCE_ID_ = #{referenceId}
       </if>
@@ -915,6 +918,9 @@
       </if>
       <if test="orQueryObject.callbackType != null">
         or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+      </if>
+      <if test="orQueryObject.withoutCallbackId">
+          or ${queryTablePrefix}CALLBACK_ID_ is null
       </if>
       <if test="orQueryObject.referenceId != null">
           or ${queryTablePrefix}REFERENCE_ID_ = #{orQueryObject.referenceId}

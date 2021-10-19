@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.service.BatchServiceConfiguration;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntity;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
@@ -67,9 +68,20 @@ public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEn
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
         
-        return getDbSqlSession().selectList("selectBatchPartsByScopeIdAndType", params);
+        return getDbSqlSession().selectList("selectBatchPartsByScopeIdAndScopeType", params);
     }
     
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQueryImpl batchPartQuery) {
+        return getDbSqlSession().selectList("selectBatchPartsByQueryCriteria", batchPartQuery, getManagedEntityClass());
+    }
+
+    @Override
+    public long findBatchPartCountByQueryCriteria(BatchPartQueryImpl batchPartQuery) {
+        return (Long) getDbSqlSession().selectOne("selectBatchPartCountByQueryCriteria", batchPartQuery);
+    }
+
     @Override
     protected IdGenerator getIdGenerator() {
         return batchServiceConfiguration.getIdGenerator();

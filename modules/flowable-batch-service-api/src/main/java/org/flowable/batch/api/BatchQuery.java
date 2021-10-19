@@ -15,9 +15,10 @@ package org.flowable.batch.api;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 
-public interface BatchQuery extends Query<BatchQuery, Batch> {
+public interface BatchQuery extends Query<BatchQuery, Batch>, DeleteQuery<BatchQuery, Batch> {
 
     /** Only select batches with the given id */
     BatchQuery batchId(String batchId);

@@ -166,6 +166,22 @@
         delete from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
         PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
     </delete>
+
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where VARINST.PROC_INST_ID_ is not null
+                <if test="_databaseId != 'oracle'">and VARINST.PROC_INST_ID_ != ''</if>
+                and not exists (
+                    select PROCINST.ID_
+                    from ${prefix}ACT_HI_PROCINST PROCINST
+                    where VARINST.PROC_INST_ID_ = PROCINST.ID_
+                )
+                and VARINST.BYTEARRAY_ID_ is not null
+        )
+    </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
         delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
@@ -185,6 +201,23 @@
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" databaseId="hsql" parameterType="java.util.Map">
         delete from ${prefix}ACT_HI_VARINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
         SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
+    </delete>
+
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForNonExistingCaseInstances" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where VARINST.SCOPE_ID_ is not null
+                <if test="_databaseId != 'oracle'">and VARINST.SCOPE_ID_ != ''</if>
+                and VARINST.SCOPE_TYPE_ = 'cmmn'
+                and not exists (
+                    select CASEINST.ID_
+                    from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST
+                    where VARINST.SCOPE_ID_ = CASEINST.ID_
+                )
+                and VARINST.BYTEARRAY_ID_ is not null
+        )
     </delete>
 
     <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->

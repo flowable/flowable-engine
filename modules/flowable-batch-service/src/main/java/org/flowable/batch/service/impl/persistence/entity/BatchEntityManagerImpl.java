@@ -54,7 +54,7 @@ public class BatchEntityManagerImpl
 
     @Override
     public BatchEntity createBatch(BatchBuilder batchBuilder) {
-        BatchEntityImpl batchEntity = (BatchEntityImpl) dataManager.create();
+        BatchEntity batchEntity = dataManager.create();
         batchEntity.setBatchType(batchBuilder.getBatchType());
         batchEntity.setBatchSearchKey(batchBuilder.getSearchKey());
         batchEntity.setBatchSearchKey2(batchBuilder.getSearchKey2());
@@ -66,6 +66,21 @@ public class BatchEntityManagerImpl
         dataManager.insert(batchEntity);
         
         return batchEntity;
+    }
+
+    @Override
+    public Batch completeBatch(String batchId, String status) {
+        BatchEntity batchEntity = findById(batchId);
+
+        batchEntity.setCompleteTime(getClock().getCurrentTime());
+        batchEntity.setStatus(status);
+
+        return batchEntity;
+    }
+
+    @Override
+    public void deleteBatches(BatchQueryImpl batchQuery) {
+        dataManager.deleteBatches(batchQuery);
     }
 
     @Override

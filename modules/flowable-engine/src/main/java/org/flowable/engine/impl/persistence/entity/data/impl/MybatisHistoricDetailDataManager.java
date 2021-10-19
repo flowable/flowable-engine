@@ -15,6 +15,7 @@ package org.flowable.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -100,6 +101,8 @@ public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager
 
     @Override
     public void deleteHistoricDetailForNonExistingProcessInstances() {
+        // Using HistoricDetailEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricDetailEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricDetailForNonExistingProcessInstances", null, HistoricDetailEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricDetailForNonExistingProcessInstances", null, HistoricDetailEntity.class);
     }
 }
