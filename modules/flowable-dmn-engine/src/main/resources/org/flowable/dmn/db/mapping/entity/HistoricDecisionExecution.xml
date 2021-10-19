@@ -81,9 +81,9 @@
   </delete>
 
     <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl">
-        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> RES </if>
-        from ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
-        where RES.ID_ in (
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> DEL_RES </if>
+        from ${prefix}ACT_DMN_HI_DECISION_EXECUTION DEL_RES
+        where DEL_RES.ID_ in (
             select RES.ID_
             <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
         )
