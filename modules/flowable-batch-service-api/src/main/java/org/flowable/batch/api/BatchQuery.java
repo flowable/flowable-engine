@@ -13,6 +13,7 @@
 
 package org.flowable.batch.api;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.common.engine.api.query.DeleteQuery;
@@ -25,6 +26,9 @@ public interface BatchQuery extends Query<BatchQuery, Batch>, DeleteQuery<BatchQ
     
     /** Only select batches which exist for the given type. **/
     BatchQuery batchType(String batchType);
+    
+    /** Only select batches which exist for the given types. **/
+    BatchQuery batchTypes(Collection<String> batchTypes);
     
     /** Only select batches which exist for the given search key. **/
     BatchQuery searchKey(String searchKey);

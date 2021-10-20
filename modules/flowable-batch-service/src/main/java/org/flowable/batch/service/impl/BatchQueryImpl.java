@@ -14,6 +14,7 @@
 package org.flowable.batch.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     
     protected String id;
     protected String batchType;
+    protected Collection<String> batchTypes;
     protected String searchKey;
     protected String searchKey2;
     protected Date createTimeHigherThan;
@@ -75,6 +77,15 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
             throw new FlowableIllegalArgumentException("Provided batch type is null");
         }
         this.batchType = batchType;
+        return this;
+    }
+
+    @Override
+    public BatchQuery batchTypes(Collection<String> batchTypes) {
+        if (batchTypes == null || batchTypes.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Provided batch types must be provided and not empty");
+        }
+        this.batchTypes = batchTypes;
         return this;
     }
 
@@ -224,6 +235,10 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
 
     public String getBatchType() {
         return batchType;
+    }
+
+    public Collection<String> getBatchTypes() {
+        return batchTypes;
     }
 
     public String getSearchKey() {

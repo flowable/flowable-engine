@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.mgmt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.batch.api.Batch;
@@ -339,5 +340,135 @@ class ManagementServiceBatchTest extends PluggableFlowableTestCase {
                         tuple("acme3", "subAcme3")
                 );
         assertThat(managementService.createBatchPartQuery().tenantIdLike("%acm%").count()).isEqualTo(3);
+    }
+
+    @Test
+    void queryBatches() {
+        managementService.createBatchBuilder()
+                .batchType("testFlowable")
+                .searchKey("search 1")
+                .searchKey2("flowable search 1")
+                .status("start")
+                .tenantId("flowable")
+                .create();
+        Batch acmeBatch = managementService.createBatchBuilder()
+                .batchType("testAcme")
+                .searchKey("search 1")
+                .searchKey2("acme search 1")
+                .status("start")
+                .tenantId("acme")
+                .create();
+        managementService.createBatchBuilder()
+                .batchType("testMuppets")
+                .searchKey("search 2")
+                .searchKey2("muppets search 1")
+                .status("start")
+                .tenantId("muppets")
+                .create();
+
+        assertThat(managementService.createBatchQuery().list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1",
+                        "acme search 1",
+                        "muppets search 1"
+                );
+        assertThat(managementService.createBatchQuery().count()).isEqualTo(3);
+
+        assertThat(managementService.createBatchQuery().batchId(acmeBatch.getId()).list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "acme search 1"
+                );
+        assertThat(managementService.createBatchQuery().batchId(acmeBatch.getId()).count()).isEqualTo(1);
+
+        assertThat(managementService.createBatchQuery().batchType("testFlowable").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1"
+                );
+        assertThat(managementService.createBatchQuery().batchType("testFlowable").count()).isEqualTo(1);
+
+        assertThat(managementService.createBatchQuery().batchType("unknown").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .isEmpty();
+        assertThat(managementService.createBatchQuery().batchType("unknown").count()).isZero();
+        
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("testFlowable", "unknown")).list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1"
+                );
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("testFlowable", "unknown")).count()).isEqualTo(1);
+        
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("testFlowable", "testAcme")).list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1",
+                        "acme search 1"
+                );
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("testFlowable", "testAcme")).count()).isEqualTo(2);
+        
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("unknown1", "unknown2")).list())
+                .extracting(Batch::getBatchSearchKey2)
+                .isEmpty();
+        assertThat(managementService.createBatchQuery().batchTypes(Arrays.asList("unknown1", "unknown2")).count()).isZero();
+        
+        assertThat(managementService.createBatchQuery().searchKey("search 1").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1",
+                        "acme search 1"
+                );
+        assertThat(managementService.createBatchQuery().searchKey("search 1").count()).isEqualTo(2);
+
+        assertThat(managementService.createBatchQuery().searchKey2("search 1").list()).isEmpty();
+        assertThat(managementService.createBatchQuery().searchKey2("search 1").count()).isZero();
+
+        assertThat(managementService.createBatchQuery().searchKey2("muppets search 1").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "muppets search 1"
+                );
+        assertThat(managementService.createBatchQuery().searchKey2("muppets search 1").count()).isEqualTo(1);
+
+        assertThat(managementService.createBatchQuery().status("start").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1",
+                        "acme search 1",
+                        "muppets search 1"
+                );
+        assertThat(managementService.createBatchQuery().status("start").count()).isEqualTo(3);
+
+        assertThat(managementService.createBatchQuery().status("unknown").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .isEmpty();
+        assertThat(managementService.createBatchQuery().status("unknown").count()).isZero();
+
+        assertThat(managementService.createBatchQuery().tenantId("flowable").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1"
+                );
+        assertThat(managementService.createBatchQuery().tenantId("flowable").count()).isEqualTo(1);
+
+        assertThat(managementService.createBatchQuery().tenantId("unknown").list()).isEmpty();
+        assertThat(managementService.createBatchQuery().tenantId("unknown").count()).isZero();
+
+        assertThat(managementService.createBatchQuery().tenantIdLike("%a%").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "flowable search 1",
+                        "acme search 1"
+                );
+        assertThat(managementService.createBatchQuery().tenantIdLike("%a%").count()).isEqualTo(2);
+
+        assertThat(managementService.createBatchQuery().tenantIdLike("%acm%").list())
+                .extracting(Batch::getBatchSearchKey2)
+                .containsExactlyInAnyOrder(
+                        "acme search 1"
+                );
+        assertThat(managementService.createBatchQuery().tenantIdLike("%acm%").count()).isEqualTo(1);
     }
 }
