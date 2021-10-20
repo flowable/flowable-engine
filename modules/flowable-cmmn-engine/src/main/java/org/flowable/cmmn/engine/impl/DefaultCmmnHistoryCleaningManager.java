@@ -35,20 +35,20 @@ public class DefaultCmmnHistoryCleaningManager implements CmmnHistoryCleaningMan
     public HistoricCaseInstanceQuery createHistoricCaseInstanceCleaningQuery() {
         HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(
                 cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration);
-        historicCaseInstanceQuery.finishedBefore(getEndedAfter());
+        historicCaseInstanceQuery.finishedBefore(getEndedBefore());
         return historicCaseInstanceQuery;
     }
 
     @Override
     public BatchQuery createBatchCleaningQuery() {
         return cmmnEngineConfiguration.getCmmnManagementService().createBatchQuery()
-                .completeTimeLowerThan(getEndedAfter())
+                .completeTimeLowerThan(getEndedBefore())
                 .batchType(Batch.HISTORIC_CASE_DELETE_TYPE);
     }
 
-    protected Date getEndedAfter() {
+    protected Date getEndedBefore() {
         Duration endedAfterDuration = cmmnEngineConfiguration.getCleanInstancesEndedAfter();
-        Instant endedAfter = Instant.now().minus(endedAfterDuration);
-        return Date.from(endedAfter);
+        Instant endedBefore = Instant.now().minus(endedAfterDuration);
+        return Date.from(endedBefore);
     }
 }
