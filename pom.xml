@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.5.5</spring.boot.version>
-		<spring.framework.version>5.3.10</spring.framework.version>
-		<spring.security.version>5.5.2</spring.security.version>
-		<spring.amqp.version>2.3.10</spring.amqp.version>
-		<spring.kafka.version>2.7.7</spring.kafka.version>
+		<spring.boot.version>2.5.6</spring.boot.version>
+		<spring.framework.version>5.3.12</spring.framework.version>
+		<spring.security.version>5.5.3</spring.security.version>
+		<spring.amqp.version>2.3.11</spring.amqp.version>
+		<spring.kafka.version>2.7.8</spring.kafka.version>
 		<reactor-netty.version>1.0.6</reactor-netty.version>
 		<jackson.version>2.12.5</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
@@ -222,7 +222,7 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>8.0.19</version>
+				<version>8.0.27</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
