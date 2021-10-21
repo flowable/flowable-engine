@@ -22,6 +22,7 @@ import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -340,6 +341,49 @@ class ManagementServiceBatchTest extends PluggableFlowableTestCase {
                         tuple("acme3", "subAcme3")
                 );
         assertThat(managementService.createBatchPartQuery().tenantIdLike("%acm%").count()).isEqualTo(3);
+    }
+
+    @Test
+    void queryCompletedBatchParts() {
+        Batch batch = managementService.createBatchBuilder()
+                .batchType("test")
+                .status("start")
+                .create();
+
+        BatchPart completedBatchPart = managementService.createBatchPartBuilder(batch)
+                .type("start")
+                .status("completed")
+                .searchKey("Completed Part")
+                .create();
+
+        managementService.createBatchPartBuilder(batch)
+                .type("start")
+                .status("waiting")
+                .searchKey("Not Completed Part")
+                .create();
+
+        assertThat(managementService.createBatchPartQuery().list())
+                .extracting(BatchPart::getSearchKey)
+                .containsExactlyInAnyOrder(
+                        "Completed Part",
+                        "Not Completed Part"
+                );
+
+        assertThat(managementService.createBatchPartQuery().completed().list())
+                .extracting(BatchPart::getSearchKey)
+                .isEmpty();
+
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getBatchService(commandContext)
+                    .completeBatchPart(completedBatchPart.getId(), "completed", "{}");
+            return null;
+        });
+
+        assertThat(managementService.createBatchPartQuery().completed().list())
+                .extracting(BatchPart::getSearchKey)
+                .containsExactlyInAnyOrder(
+                        "Completed Part"
+                );
     }
 
     @Test

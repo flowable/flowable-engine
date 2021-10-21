@@ -44,6 +44,7 @@ public class BatchPartQueryImpl extends AbstractQuery<BatchPartQuery, BatchPart>
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected boolean completed;
 
     public BatchPartQueryImpl(CommandExecutor commandExecutor, BatchServiceConfiguration batchServiceConfiguration) {
         super(commandExecutor);
@@ -193,6 +194,12 @@ public class BatchPartQueryImpl extends AbstractQuery<BatchPartQuery, BatchPart>
     }
 
     @Override
+    public BatchPartQuery completed() {
+        this.completed = true;
+        return this;
+    }
+
+    @Override
     public BatchPartQuery orderByBatchId() {
         return orderBy(BatchPartQueryProperty.BATCH_ID);
     }
@@ -260,5 +267,9 @@ public class BatchPartQueryImpl extends AbstractQuery<BatchPartQuery, BatchPart>
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isCompleted() {
+        return completed;
     }
 }

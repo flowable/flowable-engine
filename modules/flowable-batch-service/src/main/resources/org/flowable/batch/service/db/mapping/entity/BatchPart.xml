@@ -209,6 +209,9 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <if test="completed">
+                and RES.COMPLETE_TIME_ is not null
+            </if>
         </where>
     </sql>
 

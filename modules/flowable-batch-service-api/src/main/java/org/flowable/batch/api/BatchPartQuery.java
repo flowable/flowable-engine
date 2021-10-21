@@ -92,6 +92,11 @@ public interface BatchPartQuery extends Query<BatchPartQuery, BatchPart> {
      **/
     BatchPartQuery withoutTenantId();
 
+    /**
+     * Only select batch parts that have been completed.
+     **/
+    BatchPartQuery completed();
+
     // sorting //////////////////////////////////////////
 
     /**
