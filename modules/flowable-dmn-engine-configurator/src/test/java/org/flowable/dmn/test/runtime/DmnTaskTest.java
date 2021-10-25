@@ -19,6 +19,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
@@ -28,6 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,6 +52,16 @@ public class DmnTaskTest {
     void setUp(ProcessEngineConfiguration processEngineConfiguration) {
         this.processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngineConfiguration;
         runtimeService = processEngineConfiguration.getRuntimeService();
+    }
+
+    @AfterEach
+    protected void deleteAllDmnDeployments() {
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list()
+                .forEach(
+                        deployment -> dmnEngineConfiguration.getDmnRepositoryService().deleteDeployment(deployment.getId())
+                );
     }
 
     @Test

@@ -114,6 +114,9 @@ public class EngineMappingsValidationTest {
         "PrivilegeMapping",
         "Membership");
 
+    private static final Pattern ENTITY_RESOURCE_PATTERN = Pattern.compile(".*/entity/(.*)\\.xml");
+
+
     @ParameterizedTest(name = "Package {0}")
     @ArgumentsSource(PackageArgumentsProvider.class)
     public void verifyMappedEntitiesExist(EntityMappingPackageInformation packageInformation) {
@@ -281,14 +284,11 @@ public class EngineMappingsValidationTest {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                if (!resource.endsWith("common.xml")) {
-
+                Matcher resourceMatcher = ENTITY_RESOURCE_PATTERN.matcher(resource);
+                if (resourceMatcher.matches()) {
+                    String entity = resourceMatcher.group(1);
                     Document entityMappingXmlContent = readXmlDocument(resource);
-
-                    resource = resource.substring(resource.lastIndexOf("/") + 1);
-                    resource = resource.replaceAll(".xml", "");
-
-                    resources.put(resource, entityMappingXmlContent);
+                    resources.put(entity, entityMappingXmlContent);
                 }
             }
 
