@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -37,30 +38,39 @@ public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Seriali
     public Object execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ManagementService managementService = processEngineConfiguration.getManagementService();
-        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<Job> cleanupJobs = managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).list();
         
         if (cleanupJobs.isEmpty()) {
-            TimerJobEntity timerJob = timerJobService.createTimerJob();
-            timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
-            timerJob.setRevision(1);
-            timerJob.setJobHandlerType(BpmnHistoryCleanupJobHandler.TYPE);
+            scheduleTimerJob(processEngineConfiguration);
             
-            BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
-            timerJob.setDuedate(businessCalendar.resolveDuedate(processEngineConfiguration.getHistoryCleaningTimeCycleConfig()));
-            timerJob.setRepeat(processEngineConfiguration.getHistoryCleaningTimeCycleConfig());
-            
-            timerJobService.scheduleTimerJob(timerJob);
-            
+        } else if (cleanupJobs.size() == 1) {
+            TimerJobEntity timerJob = (TimerJobEntity) cleanupJobs.get(0);
+            if (!Objects.equals(processEngineConfiguration.getHistoryCleaningTimeCycleConfig(), timerJob.getRepeat())) {
+                // If the cleaning time cycle config has changed we need to create a new timer job
+                managementService.deleteTimerJob(timerJob.getId());
+                scheduleTimerJob(processEngineConfiguration);
+            }
         } else {
-            if (cleanupJobs.size() > 1) {
-                for (int i = 1; i < cleanupJobs.size(); i++) {
-                    managementService.deleteTimerJob(cleanupJobs.get(i).getId());
-                }
+            for (int i = 1; i < cleanupJobs.size(); i++) {
+                managementService.deleteTimerJob(cleanupJobs.get(i).getId());
             }
         }
 
         return null;
+    }
+
+    protected void scheduleTimerJob(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
+        TimerJobEntity timerJob = timerJobService.createTimerJob();
+        timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+        timerJob.setRevision(1);
+        timerJob.setJobHandlerType(BpmnHistoryCleanupJobHandler.TYPE);
+
+        BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
+        timerJob.setDuedate(businessCalendar.resolveDuedate(processEngineConfiguration.getHistoryCleaningTimeCycleConfig()));
+        timerJob.setRepeat(processEngineConfiguration.getHistoryCleaningTimeCycleConfig());
+
+        timerJobService.scheduleTimerJob(timerJob);
     }
 
 }
