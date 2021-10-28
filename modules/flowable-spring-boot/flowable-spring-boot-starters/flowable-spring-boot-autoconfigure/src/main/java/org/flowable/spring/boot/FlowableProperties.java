@@ -13,12 +13,14 @@
 package org.flowable.spring.boot;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+import org.springframework.boot.convert.DurationUnit;
 
 /**
  * @author Josh Long
@@ -125,6 +127,7 @@ public class FlowableProperties {
 
     private boolean enableHistoryCleaning = false;
     private String historyCleaningCycle = "0 0 1 * * ?";
+    @DurationUnit(ChronoUnit.DAYS)
     private Duration historyCleaningAfter = Duration.ofDays(365);
     private int historyCleaningBatchSize = 100;
     private boolean historyCleaningSequential = false;
