@@ -936,6 +936,36 @@ paths:
           \ set. If false, the withoutTenantId parameter is ignored."
         required: false
         type: "boolean"
+      - name: "order"
+        in: "query"
+        description: "sorting order which can be 'asc' or 'desc'."
+        required: false
+        type: "string"
+        enum:
+        - "asc"
+        - "desc"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "deleteReason"
+        - "duration"
+        - "endTime"
+        - "executionId"
+        - "taskInstanceId"
+        - "processDefinitionId"
+        - "processInstanceId"
+        - "assignee"
+        - "taskDefinitionKey"
+        - "description"
+        - "dueDate"
+        - "name"
+        - "owner"
+        - "priority"
+        - "tenantId"
+        - "startTime"
       responses:
         200:
           description: "Indicates that historic task instances could be queried."
