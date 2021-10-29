@@ -5,7 +5,7 @@
     <parent>
         <artifactId>flowable-root</artifactId>
         <groupId>org.flowable</groupId>
-        <version>6.7.0.7</version>
+        <version>6.7.0.8</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
