@@ -75,7 +75,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         ObjectNode batchConfiguration = engineConfiguration.getObjectMapper().createObjectNode();
         batchConfiguration.put("batchSize", batchSize);
         if (sequential) {
-            batchConfiguration.put("synchronous", true);
+            batchConfiguration.put("sequential", true);
         }
 
         ObjectNode queryNode = batchConfiguration.putObject("query");

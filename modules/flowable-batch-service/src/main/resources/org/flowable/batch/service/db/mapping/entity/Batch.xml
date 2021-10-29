@@ -168,6 +168,13 @@
             <if test="batchType != null">
                 and RES.TYPE_ = #{batchType}
             </if>
+            <if test="batchTypes != null and !batchTypes.isEmpty()">
+                and RES.TYPE_ IN
+                <foreach item="batchTypeItem" index="index" collection="batchTypes"
+                         open="(" separator="," close=")">
+                    #{batchTypeItem}
+                </foreach>
+            </if>
             <if test="searchKey != null">
                 and RES.SEARCH_KEY_ = #{searchKey}
             </if>

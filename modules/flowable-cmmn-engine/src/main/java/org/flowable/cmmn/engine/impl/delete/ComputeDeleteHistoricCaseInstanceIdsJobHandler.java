@@ -70,19 +70,19 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
 
         Batch batch = batchService.getBatch(batchPart.getBatchId());
         JsonNode batchConfiguration = getBatchConfiguration(batch, engineConfiguration);
-        boolean synchronousExecution = batchConfiguration.path("synchronous").booleanValue();
+        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue();
 
         JsonNode queryNode = batchConfiguration.path("query");
         if (queryNode.isMissingNode()) {
             failBatchPart(engineConfiguration, batchService, batchPart, batch,
-                    prepareFailedResultAsJsonString("Batch configuration has no query definition", engineConfiguration), synchronousExecution);
+                    prepareFailedResultAsJsonString("Batch configuration has no query definition", engineConfiguration), sequentialExecution);
             return;
         }
 
         JsonNode batchSizeNode = batchConfiguration.path("batchSize");
         if (batchSizeNode.isMissingNode()) {
             failBatchPart(engineConfiguration, batchService, batchPart, batch,
-                    prepareFailedResultAsJsonString("Batch configuration has no batch size", engineConfiguration), synchronousExecution);
+                    prepareFailedResultAsJsonString("Batch configuration has no batch size", engineConfiguration), sequentialExecution);
             return;
         }
 
@@ -92,7 +92,7 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
             query = createQuery(queryNode, engineConfiguration);
         } catch (FlowableException exception) {
             failBatchPart(engineConfiguration, batchService, batchPart, batch,
-                    prepareFailedResultAsJsonString("Failed to create query", exception, engineConfiguration), synchronousExecution);
+                    prepareFailedResultAsJsonString("Failed to create query", exception, engineConfiguration), sequentialExecution);
             return;
         }
 
@@ -119,9 +119,9 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
                 .create();
 
         resultNode.put("deleteBatchPart", batchPartForDelete.getId());
-        if (synchronousExecution) {
-            resultNode.put("synchronous", true);
-            // If the computation was synchronous we need to schedule the next job
+        if (sequentialExecution) {
+            resultNode.put("sequential", true);
+            // If the computation was sequential we need to schedule the next job
             List<BatchPart> nextComputeParts = engineConfiguration.getCmmnManagementService()
                     .createBatchPartQuery()
                     .batchId(batch.getId())
@@ -162,9 +162,9 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
     }
 
     private void failBatchPart(CmmnEngineConfiguration engineConfiguration, BatchService batchService, BatchPart batchPart, Batch batch,
-            String resultJson, boolean synchronousExecution) {
+            String resultJson, boolean sequentialExecution) {
         batchService.completeBatchPart(batchPart.getId(), DeleteCaseInstanceBatchConstants.STATUS_FAILED, resultJson);
-        if (synchronousExecution) {
+        if (sequentialExecution) {
             completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
         }
     }

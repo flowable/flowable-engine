@@ -40,6 +40,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.history.SerializableVariable;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -979,6 +980,44 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+        }
+    }
+
+    @Test
+    void testHistoryCleanupTimerJobCorrectlyUpdated() {
+        String originalConfig = processEngineConfiguration.getHistoryCleaningTimeCycleConfig();
+        String initialConfig = "0 0 1 * * ?";
+        processEngineConfiguration.setHistoryCleaningTimeCycleConfig(initialConfig);
+
+        try {
+            assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isZero();
+
+            managementService.handleHistoryCleanupTimerJob();
+
+            assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            Job job = managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).singleResult();
+            TimerJobEntity timerJob = (TimerJobEntity) job;
+            assertThat(timerJob.getRepeat()).isEqualTo(initialConfig);
+
+            managementService.handleHistoryCleanupTimerJob();
+            assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            job = managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).singleResult();
+            assertThat(job.getId()).isEqualTo(timerJob.getId());
+
+            processEngineConfiguration.setHistoryCleaningTimeCycleConfig("0 0 2 * * ?");
+
+            managementService.handleHistoryCleanupTimerJob();
+            assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            job = managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).singleResult();
+            assertThat(job.getId()).isNotEqualTo(timerJob.getId());
+
+            timerJob = (TimerJobEntity) job;
+            assertThat(timerJob.getRepeat()).isEqualTo("0 0 2 * * ?");
+
+        } finally {
+            processEngineConfiguration.setHistoryCleaningTimeCycleConfig(originalConfig);
+            managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).list()
+                    .forEach(job -> managementService.deleteTimerJob(job.getId()));
         }
     }
 

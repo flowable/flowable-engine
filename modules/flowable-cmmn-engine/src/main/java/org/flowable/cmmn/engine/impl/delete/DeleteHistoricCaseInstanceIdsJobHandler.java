@@ -107,8 +107,8 @@ public class DeleteHistoricCaseInstanceIdsJobHandler implements JobHandler {
 
         batchService.completeBatchPart(batchPart.getId(), status, resultNode.toString());
 
-        if (computeBatchPartResult.path("synchronous").booleanValue()) {
-            // If the computation was synchronous we need to schedule the next job
+        if (computeBatchPartResult.path("sequential").booleanValue()) {
+            // If the computation was sequential we need to schedule the next job
             List<BatchPart> nextDeleteParts = engineConfiguration.getCmmnManagementService()
                     .createBatchPartQuery()
                     .batchId(batchPart.getBatchId())

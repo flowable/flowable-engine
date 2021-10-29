@@ -35,7 +35,6 @@ public interface BatchDeleteQuery<Q extends BatchDeleteQuery<Q>> {
      * @param batchName the name of the batch
      * @return the id the batch that is doing the deletion
      */
-    String deleteSequentiallyUsingBatch
-    (int batchSize, String batchName);
+    String deleteSequentiallyUsingBatch(int batchSize, String batchName);
 
 }

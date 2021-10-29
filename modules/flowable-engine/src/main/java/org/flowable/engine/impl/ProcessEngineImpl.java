@@ -14,6 +14,7 @@ package org.flowable.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -111,7 +112,11 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
         
         if (processEngineConfiguration.isEnableHistoryCleaning()) {
-            managementService.handleHistoryCleanupTimerJob();
+            try {
+                managementService.handleHistoryCleanupTimerJob();
+            } catch (FlowableOptimisticLockingException ex) {
+                LOGGER.warn("Optimistic locking exception when creating timer history clean jobs. Cleanup timer job was created / updated by another instance.");
+            }
         }
     }
 

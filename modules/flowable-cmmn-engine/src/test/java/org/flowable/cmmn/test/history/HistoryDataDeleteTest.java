@@ -31,12 +31,14 @@ import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceSta
 import org.flowable.cmmn.engine.impl.delete.DeleteCaseInstanceBatchConstants;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsStatusJobHandler;
+import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Test;
@@ -759,6 +761,44 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
                             .isEqualTo(1);
                 }
             }
+        }
+    }
+
+    @Test
+    public void testHistoryCleanupTimerJobCorrectlyUpdated() {
+        String originalConfig = cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig();
+        String initialConfig = "0 0 1 * * ?";
+        cmmnEngineConfiguration.setHistoryCleaningTimeCycleConfig(initialConfig);
+
+        try {
+            assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isZero();
+
+            cmmnManagementService.handleHistoryCleanupTimerJob();
+
+            assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            Job job = cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult();
+            TimerJobEntity timerJob = (TimerJobEntity) job;
+            assertThat(timerJob.getRepeat()).isEqualTo(initialConfig);
+
+            cmmnManagementService.handleHistoryCleanupTimerJob();
+            assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            job = cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult();
+            assertThat(job.getId()).isEqualTo(timerJob.getId());
+
+            cmmnEngineConfiguration.setHistoryCleaningTimeCycleConfig("0 0 2 * * ?");
+
+            cmmnManagementService.handleHistoryCleanupTimerJob();
+            assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+            job = cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult();
+            assertThat(job.getId()).isNotEqualTo(timerJob.getId());
+
+            timerJob = (TimerJobEntity) job;
+            assertThat(timerJob.getRepeat()).isEqualTo("0 0 2 * * ?");
+
+        } finally {
+            cmmnEngineConfiguration.setHistoryCleaningTimeCycleConfig(originalConfig);
+            cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).list()
+                    .forEach(job -> cmmnManagementService.deleteTimerJob(job.getId()));
         }
     }
 }

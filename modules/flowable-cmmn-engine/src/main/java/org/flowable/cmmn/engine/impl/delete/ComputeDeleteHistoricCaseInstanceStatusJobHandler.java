@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -56,26 +57,15 @@ public class ComputeDeleteHistoricCaseInstanceStatusJobHandler implements JobHan
             throw new FlowableIllegalArgumentException("There is no batch with the id " + configuration);
         }
 
-        List<BatchPart> computeBatchParts = managementService.createBatchPartQuery()
-                .batchId(batch.getId())
-                .type(DeleteCaseInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE)
-                .list();
+        long totalBatchParts = createStatusQuery(batch, managementService).count();
+        long totalCompleted = createStatusQuery(batch, managementService).completed().count();
 
-        int completedComputes = 0;
-        int failedComputes = 0;
+        if (totalBatchParts == totalCompleted) {
+            long totalFailed = createStatusQuery(batch, managementService)
+                    .status(DeleteCaseInstanceBatchConstants.STATUS_FAILED)
+                    .count();
 
-        for (BatchPart computeBatchPart : computeBatchParts) {
-            if (computeBatchPart.isCompleted()) {
-                completedComputes++;
-
-                if (DeleteCaseInstanceBatchConstants.STATUS_FAILED.equals(computeBatchPart.getStatus())) {
-                    failedComputes++;
-                }
-            }
-        }
-
-        if (completedComputes == computeBatchParts.size()) {
-            if (failedComputes == 0) {
+            if (totalFailed == 0) {
                 List<BatchPart> deleteBatchParts = managementService.createBatchPartQuery()
                         .batchId(batch.getId())
                         .type(DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE)
@@ -113,11 +103,17 @@ public class ComputeDeleteHistoricCaseInstanceStatusJobHandler implements JobHan
             }
 
             job.setRepeat(null);
-        } else if (computeBatchParts.isEmpty()) {
+        } else if (totalBatchParts == 0) {
             completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             job.setRepeat(null);
         }
 
+    }
+
+    protected BatchPartQuery createStatusQuery(Batch batch, CmmnManagementService managementService) {
+        return managementService.createBatchPartQuery()
+                .batchId(batch.getId())
+                .type(DeleteCaseInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE);
     }
 
     protected void completeBatch(Batch batch, String status, CmmnEngineConfiguration engineConfiguration) {

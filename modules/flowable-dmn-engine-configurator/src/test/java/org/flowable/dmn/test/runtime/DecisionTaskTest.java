@@ -34,6 +34,7 @@ import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.task.api.Task;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -54,6 +55,11 @@ public class DecisionTaskTest {
     
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    @After
+    public void tearDown() {
+        deleteAllDmnDeployments();
+    }
 
     @Test
     @CmmnDeployment(

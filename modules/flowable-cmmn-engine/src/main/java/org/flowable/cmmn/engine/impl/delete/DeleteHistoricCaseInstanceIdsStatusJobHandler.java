@@ -12,10 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.delete;
 
-import java.util.List;
-
 import org.flowable.batch.api.Batch;
-import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -49,37 +47,32 @@ public class DeleteHistoricCaseInstanceIdsStatusJobHandler implements JobHandler
             throw new FlowableIllegalArgumentException("There is no batch with the id " + configuration);
         }
 
-        List<BatchPart> deleteBatchParts = managementService.createBatchPartQuery()
-                .batchId(batch.getId())
-                .type(DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE)
-                .list();
+        long totalBatchParts = createStatusQuery(batch, managementService).count();
+        long totalCompleted = createStatusQuery(batch, managementService).completed().count();
 
-        int completedDeletes = 0;
-        int failedComputes = 0;
+        if (totalBatchParts == totalCompleted) {
+            long totalFailed = createStatusQuery(batch, managementService)
+                    .status(DeleteCaseInstanceBatchConstants.STATUS_FAILED)
+                    .count();
 
-        for (BatchPart deleteBatchPart : deleteBatchParts) {
-            if (deleteBatchPart.isCompleted()) {
-                completedDeletes++;
-
-                if (DeleteCaseInstanceBatchConstants.STATUS_FAILED.equals(deleteBatchPart.getStatus())) {
-                    failedComputes++;
-                }
-            }
-        }
-
-        if (completedDeletes == deleteBatchParts.size()) {
-            if (failedComputes == 0) {
+            if (totalFailed == 0) {
                 completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             } else {
                 completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
             }
 
             job.setRepeat(null);
-        } else if (deleteBatchParts.isEmpty()) {
+        } else if (totalBatchParts == 0) {
             completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             job.setRepeat(null);
         }
 
+    }
+
+    protected BatchPartQuery createStatusQuery(Batch batch, CmmnManagementService managementService) {
+        return managementService.createBatchPartQuery()
+                .batchId(batch.getId())
+                .type(DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE);
     }
 
     protected void completeBatch(Batch batch, String status, CmmnEngineConfiguration engineConfiguration) {

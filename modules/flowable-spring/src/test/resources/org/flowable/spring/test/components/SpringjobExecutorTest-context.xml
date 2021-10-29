@@ -49,7 +49,11 @@
 
     <bean id="springAsyncExecutor" class="org.flowable.spring.job.service.SpringAsyncExecutor">
         <property name="taskExecutor">
-            <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+            <bean class="org.flowable.common.spring.async.SpringAsyncTaskExecutor">
+                <constructor-arg>
+                    <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+                </constructor-arg>
+            </bean>
         </property>
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
         <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />

@@ -105,6 +105,12 @@ public class EventSubscriptionCollectionResource {
         if (allRequestParams.containsKey("caseDefinitionId")) {
             query.caseDefinitionId(allRequestParams.get("caseDefinitionId"));
         }
+        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
+            query.withoutProcessInstanceId();
+        }
+        if (allRequestParams.containsKey("withoutProcessDefinitionId") && Boolean.valueOf(allRequestParams.get("withoutProcessDefinitionId"))) {
+            query.withoutProcessDefinitionId();
+        }
         if (allRequestParams.containsKey("withoutScopeDefinitionId") && Boolean.valueOf(allRequestParams.get("withoutScopeDefinitionId"))) {
             query.withoutScopeDefinitionId();
         }

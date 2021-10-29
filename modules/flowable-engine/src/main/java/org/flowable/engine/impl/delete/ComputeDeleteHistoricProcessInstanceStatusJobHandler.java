@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
@@ -55,26 +56,14 @@ public class ComputeDeleteHistoricProcessInstanceStatusJobHandler implements Job
             throw new FlowableIllegalArgumentException("There is no batch with the id " + configuration);
         }
 
-        List<BatchPart> computeBatchParts = managementService.createBatchPartQuery()
-                .batchId(batch.getId())
-                .type(DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE)
-                .list();
+        long totalBatchParts = createStatusQuery(batch, managementService).count();
+        long totalCompleted = createStatusQuery(batch, managementService).completed().count();
 
-        int completedComputes = 0;
-        int failedComputes = 0;
-
-        for (BatchPart computeBatchPart : computeBatchParts) {
-            if (computeBatchPart.isCompleted()) {
-                completedComputes++;
-
-                if (DeleteProcessInstanceBatchConstants.STATUS_FAILED.equals(computeBatchPart.getStatus())) {
-                    failedComputes++;
-                }
-            }
-        }
-
-        if (completedComputes == computeBatchParts.size()) {
-            if (failedComputes == 0) {
+        if (totalBatchParts == totalCompleted) {
+            long totalFailed = createStatusQuery(batch, managementService)
+                    .status(DeleteProcessInstanceBatchConstants.STATUS_FAILED)
+                    .count();
+            if (totalFailed == 0) {
                 List<BatchPart> deleteBatchParts = managementService.createBatchPartQuery()
                         .batchId(batch.getId())
                         .type(DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
@@ -110,11 +99,17 @@ public class ComputeDeleteHistoricProcessInstanceStatusJobHandler implements Job
             }
 
             job.setRepeat(null);
-        } else if (computeBatchParts.isEmpty()) {
+        } else if (totalBatchParts == 0) {
             completeBatch(batch, DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             job.setRepeat(null);
         }
 
+    }
+
+    protected BatchPartQuery createStatusQuery(Batch batch, ManagementService managementService) {
+        return managementService.createBatchPartQuery()
+                .batchId(batch.getId())
+                .type(DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE);
     }
 
     protected void completeBatch(Batch batch, String status, ProcessEngineConfigurationImpl engineConfiguration) {
