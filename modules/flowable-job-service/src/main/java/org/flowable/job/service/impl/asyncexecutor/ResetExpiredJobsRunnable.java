@@ -151,5 +151,11 @@ public class ResetExpiredJobsRunnable implements Runnable {
     protected String getEngineName() {
         return asyncExecutor.getJobServiceConfiguration().getEngineName();
     }
-    
+
+    public boolean isInterrupted() {
+        return isInterrupted;
+    }
+    public void setInterrupted(boolean interrupted) {
+        isInterrupted = interrupted;
+    }
 }
