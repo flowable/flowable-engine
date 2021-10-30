@@ -99,8 +99,12 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         params.put("jobExecutionScope", jobServiceConfiguration.getJobExecutionScope());
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
-        params.put("maxTimeout", maxTimeout);
+
+        // The max timeout only is relevant for the message queue based executor, the threadpool one picks up anything without a lock owner.
+        if (jobServiceConfiguration.isAsyncHistoryExecutorMessageQueueMode()) {
+            Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
+            params.put("maxTimeout", maxTimeout);
+        }
         
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);

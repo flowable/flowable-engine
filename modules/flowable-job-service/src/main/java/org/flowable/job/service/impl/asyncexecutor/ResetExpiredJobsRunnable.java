@@ -102,7 +102,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
     protected void resetJobs(JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
 
         boolean hasExpiredJobs = true;
-        while (hasExpiredJobs) {
+        while (hasExpiredJobs && !isInterrupted) {
 
             try {
                 JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
