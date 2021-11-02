@@ -147,7 +147,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                 .isEqualTo("{"
                         + "  name: 'variable',"
                         + "  type: 'localDate',"
-                        + "  value: '" + now.toString() + "'"
+                        + "  value: '" + now + "'"
                         + "}");
     }
 
@@ -174,7 +174,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                 .isEqualTo("{"
                         + "  name: 'variable',"
                         + "  type: 'localDateTime',"
-                        + "  value: '" + nowWithoutNanos.toString() + "'"
+                        + "  value: '" + nowWithoutNanos + "'"
                         + "}");
     }
 

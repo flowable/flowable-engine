@@ -184,14 +184,14 @@ public class BpmnAutoLayout {
         // We really must have ids for sequence flow to be able to generate
         // stuff
         if (sequenceFlow.getId() == null) {
-            sequenceFlow.setId("sequenceFlow-" + UUID.randomUUID().toString());
+            sequenceFlow.setId("sequenceFlow-" + UUID.randomUUID());
         }
     }
 
     protected void ensureArtifactIdSet(Artifact artifact) {
         // We really must have ids for sequence flow to be able to generate stuff
         if (artifact.getId() == null) {
-            artifact.setId("artifact-" + UUID.randomUUID().toString());
+            artifact.setId("artifact-" + UUID.randomUUID());
         }
     }
 

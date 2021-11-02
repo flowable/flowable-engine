@@ -59,7 +59,7 @@ public class SimulationEvent {
 
     @Override
     public String toString() {
-        String date = hasSimulationTime() ? (new Date(simulationTime)).toString() + ", " : "now ";
+        String date = hasSimulationTime() ? (new Date(simulationTime)) + ", " : "now ";
         return date + type + ", " + priority + ", " + properties;
     }
 
