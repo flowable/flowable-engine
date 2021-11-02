@@ -400,12 +400,16 @@ public class ProcessDefinitionSuspensionTest extends PluggableFlowableTestCase {
         assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
         assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(nrOfProcessDefinitions);
         assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().latestVersion().suspended().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().latestVersion().active().count()).isOne();
 
         // Suspend all process definitions with same key
         repositoryService.suspendProcessDefinitionByKey("oneTaskProcess");
         assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(nrOfProcessDefinitions);
         assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
         assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(nrOfProcessDefinitions);
+        assertThat(repositoryService.createProcessDefinitionQuery().latestVersion().suspended().count()).isOne();
+        assertThat(repositoryService.createProcessDefinitionQuery().latestVersion().active().count()).isZero();
 
         // Activate again
         repositoryService.activateProcessDefinitionByKey("oneTaskProcess");
