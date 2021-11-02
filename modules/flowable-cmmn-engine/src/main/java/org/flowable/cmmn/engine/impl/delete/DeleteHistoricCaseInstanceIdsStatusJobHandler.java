@@ -12,16 +12,27 @@
  */
 package org.flowable.cmmn.engine.impl.delete;
 
+import java.util.List;
+
 import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -51,14 +62,15 @@ public class DeleteHistoricCaseInstanceIdsStatusJobHandler implements JobHandler
         long totalCompleted = createStatusQuery(batch, managementService).completed().count();
 
         if (totalBatchParts == totalCompleted) {
-            long totalFailed = createStatusQuery(batch, managementService)
+            List<BatchPart> failedParts = createStatusQuery(batch, managementService)
                     .status(DeleteCaseInstanceBatchConstants.STATUS_FAILED)
-                    .count();
+                    .list();
+            long totalFailed = failedParts.size();
 
             if (totalFailed == 0) {
                 completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, engineConfiguration);
             } else {
-                completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
+                completeBatchFail(batch, failedParts, engineConfiguration);
             }
 
             job.setRepeat(null);
@@ -79,5 +91,35 @@ public class DeleteHistoricCaseInstanceIdsStatusJobHandler implements JobHandler
         engineConfiguration.getBatchServiceConfiguration()
                 .getBatchService()
                 .completeBatch(batch.getId(), status);
+    }
+
+    protected void completeBatchFail(Batch batch, List<BatchPart> failedParts, CmmnEngineConfiguration engineConfiguration) {
+        completeBatch(batch, DeleteCaseInstanceBatchConstants.STATUS_FAILED, engineConfiguration);
+
+        long totalFailedInstances = 0;
+
+        ObjectMapper objectMapper = engineConfiguration.getObjectMapper();
+        for (BatchPart failedPart : failedParts) {
+            JsonNode node = readJson(failedPart.getResultDocumentJson(ScopeTypes.CMMN), objectMapper);
+            if (node != null) {
+                totalFailedInstances += node.path("caseInstanceIdsFailedToDelete").size();
+            }
+        }
+
+        ObjectNode batchDocument = (ObjectNode) readJson(batch.getBatchDocumentJson(ScopeTypes.CMMN), objectMapper);
+        batchDocument.put("numberOfFailedInstances", totalFailedInstances);
+
+        ((BatchEntity) batch).setBatchDocumentJson(batchDocument.toString(), ScopeTypes.CMMN);
+    }
+
+    protected JsonNode readJson(String json, ObjectMapper objectMapper) {
+        if (json == null) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            throw new FlowableException("Failed to read json", e);
+        }
     }
 }

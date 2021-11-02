@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.bpmn;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
@@ -368,6 +370,143 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeleteHistoricInstancesUsingBatchAndDeleteFails() {
+        List<String> processInstanceIds = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+            processInstanceIds.add(processInstance.getId());
+            runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+
+            for (int i = 0; i < 10; i++) {
+                Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
+                taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.complete(task.getId());
+            }
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            String batchId = historyService.createHistoricProcessInstanceQuery()
+                    .deleteInParallelUsingBatch(5, "Test Deletion with fail");
+            batchesToRemove.add(batchId);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(80);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(20);
+
+            Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+            assertThat(batch).isNotNull();
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
+            assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 20,"
+                            + "  batchSize: 5,"
+                            + "  query: { }"
+                            + "}");
+
+            assertThat(managementService.createBatchPartQuery().list())
+                    .hasSize(4)
+                    .allSatisfy(part -> {
+                        assertThat(part.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_WAITING);
+                        assertThat(part.getType()).isEqualTo(DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE);
+                    });
+
+            assertThat(managementService.createJobQuery().list())
+                    .hasSize(4)
+                    .allSatisfy(job -> {
+                        assertThat(job.getJobHandlerType()).isEqualTo(ComputeDeleteHistoricProcessInstanceIdsJobHandler.TYPE);
+                    });
+
+            waitForJobExecutorToProcessAllJobsAndAllTimerJobs(10000, 200);
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            Job timer = managementService.createTimerJobQuery().singleResult();
+            assertThat(timer).isNotNull();
+            assertThat(timer.getJobHandlerType()).isEqualTo(ComputeDeleteHistoricProcessInstanceStatusJobHandler.TYPE);
+            assertThat(timer.getJobHandlerConfiguration()).isEqualTo(batchId);
+            managementService.moveTimerToExecutableJob(timer.getId());
+            managementService.executeJob(timer.getId());
+            assertThat(managementService.createBatchPartQuery().list())
+                    .extracting(BatchPart::getStatus, BatchPart::getType)
+                    .containsExactlyInAnyOrder(
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
+                    );
+            assertThat(managementService.createJobQuery().list())
+                    .hasSize(4)
+                    .allSatisfy(job -> {
+                        assertThat(job.getJobHandlerType()).isEqualTo(DeleteHistoricProcessInstanceIdsJobHandler.TYPE);
+                    });
+
+            waitForJobExecutorToProcessAllJobsAndAllTimerJobs(10000, 200);
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            timer = managementService.createTimerJobQuery().singleResult();
+            assertThat(timer).isNotNull();
+            assertThat(timer.getJobHandlerType()).isEqualTo(DeleteHistoricProcessInstanceIdsStatusJobHandler.TYPE);
+            assertThat(timer.getJobHandlerConfiguration()).isEqualTo(batchId);
+            managementService.moveTimerToExecutableJob(timer.getId());
+            managementService.executeJob(timer.getId());
+            timer = managementService.createTimerJobQuery().singleResult();
+            assertThat(timer).isNull();
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+            assertThat(batch).isNotNull();
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_FAILED);
+            assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 20,"
+                            + "  numberOfFailedInstances: 10,"
+                            + "  batchSize: 5,"
+                            + "  query: { }"
+                            + "}");
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(30);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+
+            for (int i = 0; i < 20; i++) {
+                if (i < 10) {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    }
+
+                } else {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(1);
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testDeleteHistoricInstancesWithOrAndVariableValueUsingBatch() {
         List<String> processInstanceIds = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -412,6 +551,25 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
             assertThat(batch).isNotNull();
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 3,"
+                            + "  batchSize: 5,"
+                            + "  query: {"
+                            + "    finished: true,"
+                            + "    orQueryObjects: ["
+                            + "      {"
+                            + "        queryVariableValues: ["
+                            + "          { name: 'numVar', operator: 'EQUALS', textValue: '1', longValue: 1, type: 'integer' },"
+                            + "          { name: 'numVar', operator: 'EQUALS', textValue: '2', longValue: 2, type: 'integer' },"
+                            + "          { name: 'numVar', operator: 'EQUALS', textValue: '3', longValue: 3, type: 'integer' },"
+                            + "          { name: 'numVar', operator: 'EQUALS', textValue: '6', longValue: 6, type: 'integer' },"
+                            + "          { name: 'numVar', operator: 'EQUALS', textValue: '7', longValue: 7, type: 'integer' }"
+                            + "        ]"
+                            + "      }"
+                            + "    ]"
+                            + "  }"
+                            + "}");
 
             waitForJobExecutorToProcessAllJobsAndAllTimerJobs(10000, 200);
             Job timer = managementService.createTimerJobQuery().singleResult();
@@ -497,6 +655,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
             assertThat(batch.getCompleteTime()).isNotNull();
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 0,"
+                            + "  batchSize: 5,"
+                            + "  query: {"
+                            + "    finished: true,"
+                            + "    processDefinitionKey: 'dummy'"
+                            + "  }"
+                            + "}");
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
@@ -553,6 +720,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getCompleteTime()).isNull();
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion Uneven");
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 10,"
+                            + "  batchSize: 7,"
+                            + "  query: {"
+                            + "    finished: true,"
+                            + "    finishedBefore: '${json-unit.any-string}'"
+                            + "  }"
+                            + "}");
 
             assertThat(managementService.createBatchPartQuery().list())
                     .hasSize(2)
@@ -605,6 +781,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getCompleteTime()).isNotNull();
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 10,"
+                            + "  batchSize: 7,"
+                            + "  query: {"
+                            + "    finished: true,"
+                            + "    finishedBefore: '${json-unit.any-string}'"
+                            + "  }"
+                            + "}");
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
@@ -679,6 +864,16 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
             assertThat(batch.getCompleteTime()).isNull();
+            assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                    .isEqualTo("{"
+                            + "  numberOfInstances: 10,"
+                            + "  batchSize: 5,"
+                            + "  sequential: true,"
+                            + "  query: {"
+                            + "    finished: true,"
+                            + "    finishedBefore: '${json-unit.any-string}'"
+                            + "  }"
+                            + "}");
 
             assertThat(managementService.createBatchPartQuery().list())
                     .extracting(BatchPart::getStatus, BatchPart::getType)
@@ -872,6 +1067,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
                 assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
                 assertThat(batch.getBatchSearchKey()).isEqualTo("Flowable BPMN History Cleanup");
+                assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                        .isEqualTo("{"
+                                + "  numberOfInstances: 10,"
+                                + "  batchSize: 100,"
+                                + "  query: {"
+                                + "    finished: true,"
+                                + "    finishedBefore: '${json-unit.any-string}'"
+                                + "  }"
+                                + "}");
 
                 assertThat(managementService.createBatchPartQuery().list())
                         .hasSize(1)

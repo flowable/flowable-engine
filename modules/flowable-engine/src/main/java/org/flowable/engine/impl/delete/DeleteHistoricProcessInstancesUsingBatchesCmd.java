@@ -73,6 +73,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         long numberOfProcessInstancesToDelete = historicProcessInstanceQuery.count();
 
         ObjectNode batchConfiguration = engineConfiguration.getObjectMapper().createObjectNode();
+        batchConfiguration.put("numberOfInstances", numberOfProcessInstancesToDelete);
         batchConfiguration.put("batchSize", batchSize);
         if (sequential) {
             batchConfiguration.put("sequential", true);

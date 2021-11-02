@@ -74,6 +74,7 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         long numberOfCaseInstancesToDelete = historicCaseInstanceQuery.count();
 
         ObjectNode batchConfiguration = engineConfiguration.getObjectMapper().createObjectNode();
+        batchConfiguration.put("numberOfInstances", numberOfCaseInstancesToDelete);
         batchConfiguration.put("batchSize", batchSize);
         if (sequential) {
             batchConfiguration.put("sequential", true);
