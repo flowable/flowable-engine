@@ -526,8 +526,8 @@ And the task list is now fetched using the person ID:
 ## Flowable Actuator Endpoints
 
 Flowable provides a Spring Boot Actuator Endpoint that exposes information for the Processes that are running.
-By default the `flowable` endpoint is mapped to `/actuator/flowable`.
-Spring Boot by default only exposes the `info` and `health` endpoints. In order to enable the `flowable` endpoint you need to add `management.endpoint.flowable.enabled=true` to your `application.properties`.
+By default, the `flowable` endpoint is mapped to `/actuator/flowable`.
+Spring Boot by default only exposes a few endpoints to the web (e.g.: In `spring-boot-starter-actuator:2.5.4` , Spring Boot by default only exposes the `health` endpoint to the web. For more information about the endpoints exposed to the web by default, see [https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.exposing](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.exposing) ). In order to use the `flowable` endpoint through the web, you need to add `management.endpoints.web.exposure.include=flowable` to your `application.properties` (Note: The `org.flowable.spring.boot.EndpointAutoConfiguration` class does not use the `@ConditionalOnAvailableEndpoint` annotation to check whether the `flowable` endpoint is both enabled and exposed like the `HealthEndpointAutoConfiguration` class. So the only thing you need to do to use the `flowable` endpoint through the web is to add `management.endpoints.web.exposure.include=flowable` or `management.endpoints.web.exposure.include=*` to your configuration file.).
 
 In order to make enable Actuator endpoints you need to add a dependency on Actuator, e.g. by using {sc-flowable-starter}/flowable-spring-boot-starter-actuator/pom.xml\[flowable-spring-boot-starter-actuator\].
 
