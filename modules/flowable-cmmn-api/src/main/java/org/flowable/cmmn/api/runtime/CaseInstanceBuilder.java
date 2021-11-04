@@ -42,6 +42,8 @@ public interface CaseInstanceBuilder {
 
     CaseInstanceBuilder businessKey(String businessKey);
 
+    CaseInstanceBuilder businessStatus(String businessStatus);
+
     CaseInstanceBuilder variables(Map<String, Object> variables);
 
     CaseInstanceBuilder variable(String variableName, Object value);
@@ -124,6 +126,8 @@ public interface CaseInstanceBuilder {
     String getName();
 
     String getBusinessKey();
+
+    String getBusinessStatus();
 
     Map<String, Object> getVariables();
 

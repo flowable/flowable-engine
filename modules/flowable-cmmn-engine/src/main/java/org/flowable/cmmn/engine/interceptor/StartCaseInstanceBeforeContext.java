@@ -35,13 +35,13 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
         
     }
     
-    public StartCaseInstanceBeforeContext(String businessKey, String caseInstanceName, String callbackId, String callbackType,
+    public StartCaseInstanceBeforeContext(String businessKey,String businessStatus, String caseInstanceName, String callbackId, String callbackType,
                     String referenceId, String referenceType, String parentId, Map<String, Object> variables,
                     Map<String, Object> transientVariables, String tenantId,
                     String initiatorVariableName, Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel,
                     String overrideDefinitionTenantId, String predefinedCaseInstanceId) {
         
-        super(businessKey, caseInstanceName, variables, caseModel, caseDefinition, cmmnModel);
+        super(businessKey,businessStatus, caseInstanceName, variables, caseModel, caseDefinition, cmmnModel);
         
         this.callbackId = callbackId;
         this.callbackType = callbackType;

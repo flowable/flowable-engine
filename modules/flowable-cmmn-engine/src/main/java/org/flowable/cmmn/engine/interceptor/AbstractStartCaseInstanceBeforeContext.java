@@ -26,12 +26,13 @@ public class AbstractStartCaseInstanceBeforeContext {
     protected Case caseModel;
     protected CaseDefinition caseDefinition;
     protected CmmnModel cmmnModel;
-    
+    protected String businessStatus;
+
     public AbstractStartCaseInstanceBeforeContext() {
-        
+
     }
 
-    public AbstractStartCaseInstanceBeforeContext(String businessKey, String caseInstanceName, Map<String, Object> variables, 
+    public AbstractStartCaseInstanceBeforeContext(String businessKey,String businessStatus, String caseInstanceName, Map<String, Object> variables,
                     Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel) {
         
         this.businessKey = businessKey;
@@ -40,10 +41,14 @@ public class AbstractStartCaseInstanceBeforeContext {
         this.caseModel = caseModel;
         this.caseDefinition = caseDefinition;
         this.cmmnModel = cmmnModel;
+        this.businessStatus = businessStatus;
     }
 
     public String getBusinessKey() {
         return businessKey;
+    }
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     public void setBusinessKey(String businessKey) {
