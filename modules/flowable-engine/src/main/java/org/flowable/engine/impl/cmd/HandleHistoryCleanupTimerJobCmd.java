@@ -51,6 +51,13 @@ public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Seriali
                 scheduleTimerJob(processEngineConfiguration);
             }
         } else {
+            TimerJobEntity timerJob = (TimerJobEntity) cleanupJobs.get(0);
+            if (!Objects.equals(processEngineConfiguration.getHistoryCleaningTimeCycleConfig(), timerJob.getRepeat())) {
+                // If the cleaning time cycle config has changed we need to create a new timer job
+                managementService.deleteTimerJob(timerJob.getId());
+                scheduleTimerJob(processEngineConfiguration);
+            }
+
             for (int i = 1; i < cleanupJobs.size(); i++) {
                 managementService.deleteTimerJob(cleanupJobs.get(i).getId());
             }
