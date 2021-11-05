@@ -62,7 +62,7 @@ public class SignalEventHandler extends AbstractEventHandler {
             }
 
             ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-            processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinition, null, null, flowElement, process, getPayloadAsMap(payload), null, true);
+            processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinition, null,null, null, flowElement, process, getPayloadAsMap(payload), null, true);
 
         } else if (eventSubscription.getScopeId() != null && ScopeTypes.CMMN.equals(eventSubscription.getScopeType())) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getCaseInstanceService().handleSignalEvent(eventSubscription, getPayloadAsMap(payload));

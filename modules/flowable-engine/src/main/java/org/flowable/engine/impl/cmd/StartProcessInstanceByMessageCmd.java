@@ -37,6 +37,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
     protected String messageName;
     protected String businessKey;
+    protected String businessStatus;
     protected Map<String, Object> processVariables;
     protected Map<String, Object> transientVariables;
     protected String callbackId;
@@ -62,6 +63,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
         this.callbackType = processInstanceBuilder.getCallbackType();
         this.referenceId = processInstanceBuilder.getReferenceId();
         this.referenceType = processInstanceBuilder.getReferenceType();
+        this.businessStatus = processInstanceBuilder.getBusinessStatus();
     }
 
     @Override
@@ -93,7 +95,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
         ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition, 
-            messageName, businessKey, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
+            messageName, businessKey,businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
 
         return processInstance;
     }

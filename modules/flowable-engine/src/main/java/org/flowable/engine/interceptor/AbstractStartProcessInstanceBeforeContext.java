@@ -29,15 +29,19 @@ public class AbstractStartProcessInstanceBeforeContext {
     protected Process process;
     protected ProcessDefinition processDefinition;
     
+    protected String businessStatus;
+
+
     public AbstractStartProcessInstanceBeforeContext() {
         
     }
 
-    public AbstractStartProcessInstanceBeforeContext(String businessKey, String processInstanceName, Map<String, Object> variables,
+    public AbstractStartProcessInstanceBeforeContext(String businessKey,String businessStatus, String processInstanceName, Map<String, Object> variables,
             Map<String, Object> transientVariables, String initialActivityId, FlowElement initialFlowElement,
             Process process, ProcessDefinition processDefinition) {
         
         this.businessKey = businessKey;
+        this.businessStatus = businessStatus;
         this.processInstanceName = processInstanceName;
         this.variables = variables;
         this.transientVariables = transientVariables;
@@ -49,6 +53,9 @@ public class AbstractStartProcessInstanceBeforeContext {
 
     public String getBusinessKey() {
         return businessKey;
+    }
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     public void setBusinessKey(String businessKey) {
