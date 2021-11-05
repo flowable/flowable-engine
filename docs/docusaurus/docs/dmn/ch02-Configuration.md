@@ -11,7 +11,7 @@ The Flowable DMN engine is configured through an XML file named flowable.dmn.cfg
 
 The easiest way to obtain a DmnEngine, is to use the org.flowable.dmn.engine.DmnEngines class:
 
-    DmnEngine dmnEngine = DMNEngines.getDefaultDmnEngine()
+    DmnEngine dmnEngine = DmnEngines.getDefaultDmnEngine()
 
 This will look for a flowable.dmn.cfg.xml file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration. The following sections will give a detailed overview of the configuration properties.
 
