@@ -51,4 +51,6 @@ public interface BatchService {
     
     BatchPart completeBatchPart(String batchPartId, String status, String resultJson);
     
+    Batch completeBatch(String batchId, String status);
+
 }

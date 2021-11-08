@@ -52,6 +52,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
     private static final String MESSAGE_TRIGGERED_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_messageTriggeredProcess.bpmn.xml";
     private static final String INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testInheritVariablesCallActivity_mainProcess.bpmn20.xml";
     private static final String INHERIT_VARIABLES_CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSameDeploymentCallActivity_childProcess.bpmn20.xml";
+    private static final String INHERIT_VARIABLES_CHILD_PROCESS_TRANSIENT_VAR_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.childProcess_transient_var.bpmn20.xml";
     private static final String SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSameDeploymentCallActivity_mainProcess.bpmn20.xml";
     private static final String SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSameDeploymentCallActivity_childProcess.bpmn20.xml";
     private static final String SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE = "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSameDeploymentCallActivity_childProcess_v2.bpmn20.xml";
@@ -198,6 +199,40 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         List<HistoricVariableInstance> variableInstances = variableInstanceQuery.list();
 
         assertThat(variableInstances).isEmpty();
+    }
+
+    @Test
+    public void testInheritTransientVariablesAsTransient() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(INHERIT_VARIABLES_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(INHERIT_VARIABLES_CHILD_PROCESS_TRANSIENT_VAR_RESOURCE);
+
+        processEngine.getRepositoryService()
+            .createDeployment()
+            .name("mainProcessDeployment")
+            .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
+
+        processEngine.getRepositoryService()
+            .createDeployment()
+            .name("childProcessDeployment")
+            .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+
+        Map<String, Object> persistentVariables = new HashMap<>();
+        persistentVariables.put("persistentVar1", "hello world");
+        persistentVariables.put("persistentVar2", 123456);
+
+        ProcessInstance mainProcessInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("mainProcess")
+            .variable("persistentVar1", "hello world")
+            .variable("persistentVar2", 123)
+            .transientVariable("transientVar1", "transient hello world")
+            .transientVariable("transientVar2", 1234)
+            .transientVariable("transientVar3", false)
+            .start();
+
+        ProcessInstance calledProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(mainProcessInstance.getId()).singleResult();
+        assertThat(runtimeService.getVariables(calledProcessInstance.getId())).containsOnlyKeys("persistentVar1", "persistentVar2");
+
+        assertThat(taskService.createTaskQuery().processInstanceId(calledProcessInstance.getId()).singleResult().getName()).isEqualTo("transient hello world");
     }
 
     @Test

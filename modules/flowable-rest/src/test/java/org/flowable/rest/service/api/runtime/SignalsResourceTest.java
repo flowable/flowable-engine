@@ -184,6 +184,18 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?activityId=nonexisting";
         assertEmptyResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?withoutProcessInstanceId=true";
+        assertResultsPresentInDataResponse(url, eventSubscription.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?withoutProcessDefinitionId=true";
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?withoutScopeId=true";
+        assertResultsPresentInDataResponse(url, eventSubscription.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?withoutScopeDefinitionId=true";
+        assertResultsPresentInDataResponse(url, eventSubscription.getId());
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EVENT_SUBSCRIPTION_COLLECTION) + "?processDefinitionId=" + processDefinition.getId();
         assertResultsPresentInDataResponse(url, eventSubscription.getId());

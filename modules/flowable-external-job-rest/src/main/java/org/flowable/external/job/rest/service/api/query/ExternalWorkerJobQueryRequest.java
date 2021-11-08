@@ -25,9 +25,11 @@ public class ExternalWorkerJobQueryRequest extends PaginateRequest {
 
     protected String id;
     protected String processInstanceId;
+    protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String processDefinitionId;
     protected String scopeId;
+    protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeDefinitionId;
     protected String scopeType;
@@ -60,6 +62,15 @@ public class ExternalWorkerJobQueryRequest extends PaginateRequest {
         this.processInstanceId = processInstanceId;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
+    @ApiParam("Only return jobs without a process instance id")
+    public void setWithoutProcessInstanceId(boolean withoutProcessInstanceId) {
+        this.withoutProcessInstanceId = withoutProcessInstanceId;
+    }
+
     public String getExecutionId() {
         return executionId;
     }
@@ -85,6 +96,15 @@ public class ExternalWorkerJobQueryRequest extends PaginateRequest {
     @ApiParam("Only return jobs with the given scopeId")
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
+    }
+
+    @ApiParam("Only return jobs without a scope id")
+    public void setWithoutScopeId(boolean withoutScopeId) {
+        this.withoutScopeId = withoutScopeId;
     }
 
     public String getSubScopeId() {

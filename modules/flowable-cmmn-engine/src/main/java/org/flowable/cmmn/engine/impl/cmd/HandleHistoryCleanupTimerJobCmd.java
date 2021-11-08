@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -41,31 +42,46 @@ public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Seriali
     public Object execute(CommandContext commandContext) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnManagementService managementService = cmmnEngineConfiguration.getCmmnManagementService();
-        TimerJobService timerJobService = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<Job> cleanupJobs = managementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).list();
         
         if (cleanupJobs.isEmpty()) {
-            TimerJobEntity timerJob = timerJobService.createTimerJob();
-            timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
-            timerJob.setRevision(1);
-            timerJob.setJobHandlerType(CmmnHistoryCleanupJobHandler.TYPE);
-            timerJob.setScopeType(ScopeTypes.CMMN);
-
-            BusinessCalendar businessCalendar = cmmnEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
-            timerJob.setDuedate(businessCalendar.resolveDuedate(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig()));
-            timerJob.setRepeat(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig());
+            scheduleTimerJob(cmmnEngineConfiguration);
             
-            timerJobService.scheduleTimerJob(timerJob);
-            
+        } else if (cleanupJobs.size() == 1) {
+            TimerJobEntity timerJob = (TimerJobEntity) cleanupJobs.get(0);
+            if (!Objects.equals(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig(), timerJob.getRepeat())) {
+                managementService.deleteTimerJob(timerJob.getId());
+                scheduleTimerJob(cmmnEngineConfiguration);
+            }
         } else {
-            if (cleanupJobs.size() > 1) {
-                for (int i = 1; i < cleanupJobs.size(); i++) {
-                    managementService.deleteTimerJob(cleanupJobs.get(i).getId());
-                }
+            TimerJobEntity timerJob = (TimerJobEntity) cleanupJobs.get(0);
+            if (!Objects.equals(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig(), timerJob.getRepeat())) {
+                // If the cleaning time cycle config has changed we need to create a new timer job
+                managementService.deleteTimerJob(timerJob.getId());
+                scheduleTimerJob(cmmnEngineConfiguration);
+            }
+
+            for (int i = 1; i < cleanupJobs.size(); i++) {
+                managementService.deleteTimerJob(cleanupJobs.get(i).getId());
             }
         }
 
         return null;
+    }
+
+    protected void scheduleTimerJob(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        TimerJobService timerJobService = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
+        TimerJobEntity timerJob = timerJobService.createTimerJob();
+        timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+        timerJob.setRevision(1);
+        timerJob.setJobHandlerType(CmmnHistoryCleanupJobHandler.TYPE);
+        timerJob.setScopeType(ScopeTypes.CMMN);
+
+        BusinessCalendar businessCalendar = cmmnEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
+        timerJob.setDuedate(businessCalendar.resolveDuedate(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig()));
+        timerJob.setRepeat(cmmnEngineConfiguration.getHistoryCleaningTimeCycleConfig());
+
+        timerJobService.scheduleTimerJob(timerJob);
     }
 
 }

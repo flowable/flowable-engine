@@ -24,6 +24,7 @@ public class AbstractStartProcessInstanceAfterContext {
     protected ExecutionEntity processInstance;
     protected ExecutionEntity childExecution;
     protected Map<String, Object> variables;
+    protected Map<String, Object> transientVariables;
     protected FlowElement initialFlowElement;
     protected Process process;
     protected ProcessDefinition processDefinition;
@@ -32,12 +33,14 @@ public class AbstractStartProcessInstanceAfterContext {
         
     }
     
-    public AbstractStartProcessInstanceAfterContext(ExecutionEntity processInstance, ExecutionEntity childExecution, Map<String, Object> variables, 
-                    FlowElement initialFlowElement, Process process, ProcessDefinition processDefinition) {
+    public AbstractStartProcessInstanceAfterContext(ExecutionEntity processInstance, ExecutionEntity childExecution,
+            Map<String, Object> variables, Map<String, Object> transientVariables,
+            FlowElement initialFlowElement, Process process, ProcessDefinition processDefinition) {
         
         this.processInstance = processInstance;
         this.childExecution = childExecution;
         this.variables = variables;
+        this.transientVariables = transientVariables;
         this.initialFlowElement = initialFlowElement;
         this.process = process;
         this.processDefinition = processDefinition;
@@ -65,6 +68,14 @@ public class AbstractStartProcessInstanceAfterContext {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public Map<String, Object> getTransientVariables() {
+        return transientVariables;
+    }
+
+    public void setTransientVariables(Map<String, Object> transientVariables) {
+        this.transientVariables = transientVariables;
     }
 
     public FlowElement getInitialFlowElement() {

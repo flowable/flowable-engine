@@ -358,7 +358,7 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         if (StringUtils.isEmpty(prefix)) {
             return uuid.toString();
         } else {
-            return String.format("%s_%s", prefix, uuid.toString());
+            return String.format("%s_%s", prefix, uuid);
         }
     }
 

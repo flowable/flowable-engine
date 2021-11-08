@@ -59,6 +59,7 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private List<QueryVariable> variables;
     private String callbackId;
     private String callbackType;
+    private Boolean withoutCallbackId;
     private String tenantId;
     private String tenantIdLike;
     private Boolean withoutTenantId;
@@ -310,6 +311,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public Boolean getWithoutCallbackId() {
+        return withoutCallbackId;
+    }
+
+    public void setWithoutCallbackId(Boolean withoutCallbackId) {
+        this.withoutCallbackId = withoutCallbackId;
     }
 
     public String getTenantId() {

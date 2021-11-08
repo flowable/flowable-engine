@@ -270,6 +270,10 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId(processDefinition.getId()).orderByProcessInstanceId().desc(), 2);
 
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().processDefinitionId("nonexisting"), 0);
+        
+        assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().withoutProcessDefinitionId(), 0);
+        
+        assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().withoutScopeDefinitionId(), 2);
 
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().activityId("messageStart").orderByTenantId().asc(), 1);
 

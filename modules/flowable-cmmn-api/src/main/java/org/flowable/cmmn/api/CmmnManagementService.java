@@ -15,8 +15,14 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
@@ -261,6 +267,22 @@ public interface CmmnManagementService {
     String getExternalWorkerJobErrorDetails(String jobId);
     
     void handleHistoryCleanupTimerJob();
+
+    /**
+     * Returns a new BatchQuery implementation, that can be used to dynamically query the batches.
+     */
+    BatchQuery createBatchQuery();
+
+    BatchBuilder createBatchBuilder();
+
+    /**
+     * Returns a new BatchPartQuery implementation, that can be used to dynamically query the batch parts.
+     */
+    BatchPartQuery createBatchPartQuery();
+
+    BatchPartBuilder createBatchPartBuilder(Batch batch);
+
+    void deleteBatch(String batchId);
     
     /**
      * Returns a new HistoryJobQuery implementation, that can be used to dynamically query the history jobs.
@@ -318,4 +340,12 @@ public interface CmmnManagementService {
      */
     CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the case instances
+     * and all the related instances. See {@link CmmnChangeTenantIdEntityTypes} for related instances.
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the CMMN scope
+     * will be changed to the target tenant id.
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
 }

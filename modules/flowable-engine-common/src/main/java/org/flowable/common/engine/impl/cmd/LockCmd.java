@@ -81,9 +81,12 @@ public class LockCmd implements Command<Boolean> {
             return true;
         } else if (forceAcquireAfter != null) {
             // If the lock is held longer than the force acquire duration we have to force the lock acquire
+            // e.g. if the lock was acquired at 17:00
+            // When the forceAcquireAfter is 10 minutes it means that the lock should be force acquired
+            // when the time is after 17:10, i.e. acquireLock + forceAcquire < now (17:10)
             String value = property.getValue();
-            Instant lockAcquireTime = Instant.parse(value.substring(0, value.lastIndexOf('Z') + 1));
-            if (lockAcquireTime.plus(forceAcquireAfter).isAfter(Instant.now())) {
+            Instant lockAcquireTime = Instant.parse(value.substring(0, value.indexOf('Z') + 1));
+            if (lockAcquireTime.plus(forceAcquireAfter).isBefore(Instant.now())) {
                 property.setValue(Instant.now().toString() + hostLockDescription);
                 return true;
             }

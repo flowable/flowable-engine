@@ -201,6 +201,9 @@ public class TaskBaseResource {
         if (request.getScopeId() != null) {
             taskQuery.scopeId(request.getScopeId());
         }
+        if (Boolean.TRUE.equals(request.getWithoutScopeId())) {
+            taskQuery.withoutScopeId();
+        }
         if (request.getSubScopeId() != null) {
             taskQuery.subScopeId(request.getSubScopeId());
         }
@@ -296,6 +299,10 @@ public class TaskBaseResource {
 
         if (Boolean.TRUE.equals(request.getWithoutTenantId())) {
             taskQuery.taskWithoutTenantId();
+        }
+        
+        if (Boolean.TRUE.equals(request.getWithoutProcessInstanceId())) {
+            taskQuery.withoutProcessInstanceId();
         }
 
         if (request.getCandidateOrAssigned() != null) {

@@ -517,6 +517,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         // Manually trigger the reset
         ResetExpiredJobsRunnable resetExpiredJobsRunnable = ((ResetExpiredJobsRunnable) runnable);
+        resetExpiredJobsRunnable.setInterrupted(false); // the shutdown() above will have interrupted the runnable, hence why it needs to be reset
         resetExpiredJobsRunnable.resetJobs();
 
         // The lock expiration time should be null now

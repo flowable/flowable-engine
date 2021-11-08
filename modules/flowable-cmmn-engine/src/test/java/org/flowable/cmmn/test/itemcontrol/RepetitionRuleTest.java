@@ -14,11 +14,16 @@ package org.flowable.cmmn.test.itemcontrol;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -558,6 +563,51 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
 
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testPlanItemInstanceLifecycleListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repeatingTask").start();
+        for (int i = 0; i < 10; i++) {
+
+            TestPlanItemInstanceLifecycleListener.stateChanges.clear();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task).as("No task found for index " + i).isNotNull();
+            assertThat(task.getName()).isEqualTo("My Task " + i);
+            cmmnTaskService.complete(task.getId());
+
+            assertThat(TestPlanItemInstanceLifecycleListener.stateChanges)
+                .extracting(Pair::getKey, Pair::getValue)
+                .containsExactly(
+                    tuple(PlanItemInstanceState.ACTIVE, PlanItemInstanceState.COMPLETED),
+                    tuple(null, PlanItemInstanceState.WAITING_FOR_REPETITION),
+                    tuple(PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemInstanceState.ACTIVE)
+                );
+            TestPlanItemInstanceLifecycleListener.stateChanges.clear();
+        }
+    }
+
+    public static class TestPlanItemInstanceLifecycleListener implements PlanItemInstanceLifecycleListener {
+
+        public static List<Pair<String, String>> stateChanges = new ArrayList<>();
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+            stateChanges.add(Pair.of(oldState, newState));
+        }
+
     }
 
 }

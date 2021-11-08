@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.form.engine.impl.persistence.ChangeTenantForm">
+
+  <!-- Form instances -->
+  <select id="countChangeTenantIdFormInstances" parameterType="map" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_FO_FORM_INSTANCE RES
+    <include refid="changeTenantIdFormInstanceCriteriaSql" />
+  </select>
+
+  <update id="changeTenantIdFormInstances" parameterType="map">
+    update ${prefix}ACT_FO_FORM_INSTANCE <if test="_databaseId != 'mssql'">RES</if>
+    <set>
+      TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+    </set>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_FO_FORM_INSTANCE RES</if>
+    <include refid="changeTenantIdFormInstanceCriteriaSql" />
+  </update>
+
+  <!-- Common SQL -->
+  <sql id="changeTenantIdFormInstanceCriteriaSql">
+    where
+    <choose>
+      <when test="sourceTenantId == null or sourceTenantId == ''">RES.TENANT_ID_ IS NULL OR RES.TENANT_ID_ = ''</when>
+      <otherwise>RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}</otherwise>
+    </choose>
+    <if test="definitionTenantId != null">
+      and RES.FORM_DEFINITION_ID_ in (
+          select SUB.ID_
+          from ${prefix}ACT_FO_FORM_DEFINITION SUB
+          where
+          <choose>
+            <when test="definitionTenantId == ''"> SUB.TENANT_ID_ IS NULL OR SUB.TENANT_ID_ = ''</when>
+            <otherwise>SUB.TENANT_ID_ = #{definitionTenantId, jdbcType=VARCHAR}</otherwise>
+          </choose>
+        )
+    </if>
+  </sql>
+</mapper>

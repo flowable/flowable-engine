@@ -62,7 +62,7 @@ public class OutputValuesParserTest {
 
     @Test
     void outputValuesParsing() {
-        List<Object> splitAndFormattedOutputValues = new OutputValuesParser().splitAndFormatOutputValues(LONG_LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValues = new OutputValuesParser().splitAndFormatInputOutputValues(LONG_LIST_OUTPUT_VALUES);
 
         assertThat(splitAndFormattedOutputValues)
                 .hasSize(5761)
@@ -72,13 +72,13 @@ public class OutputValuesParserTest {
 
     @Test
     void outputValuesParsingRegressionStackOverflow() {
-        Assert.assertThrows(StackOverflowError.class, () -> splitAndFormatOutputValues(LONG_LIST_OUTPUT_VALUES));
+        Assert.assertThrows(StackOverflowError.class, () -> splitAndFormatInputOutputValues(LONG_LIST_OUTPUT_VALUES));
     }
 
     @Test
     void regressionOutputValuesParsing() {
-        List<Object> splitAndFormattedOutputValuesNew = new OutputValuesParser().splitAndFormatOutputValues(LIST_OUTPUT_VALUES);
-        List<Object> splitAndFormattedOutputValuesOld = splitAndFormatOutputValues(LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValuesNew = new OutputValuesParser().splitAndFormatInputOutputValues(LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValuesOld = splitAndFormatInputOutputValues(LIST_OUTPUT_VALUES);
 
         assertThat(splitAndFormattedOutputValuesNew)
                 .isEqualTo(splitAndFormattedOutputValuesOld);
@@ -86,14 +86,14 @@ public class OutputValuesParserTest {
 
     @Test
     void regressionOutputValuesNumbersParsing() {
-        List<Object> splitAndFormattedOutputValuesNew = new OutputValuesParser().splitAndFormatOutputValues(LIST_OUTPUT_VALUES_NUMBER);
-        List<Object> splitAndFormattedOutputValuesOld = splitAndFormatOutputValues(LIST_OUTPUT_VALUES_NUMBER);
+        List<Object> splitAndFormattedOutputValuesNew = new OutputValuesParser().splitAndFormatInputOutputValues(LIST_OUTPUT_VALUES_NUMBER);
+        List<Object> splitAndFormattedOutputValuesOld = splitAndFormatInputOutputValues(LIST_OUTPUT_VALUES_NUMBER);
 
         assertThat(splitAndFormattedOutputValuesNew)
                 .isEqualTo(splitAndFormattedOutputValuesOld);
     }
 
-    protected static List<Object> splitAndFormatOutputValues(String outputValuesText) {
+    protected static List<Object> splitAndFormatInputOutputValues(String outputValuesText) {
         if (StringUtils.isEmpty(outputValuesText)) {
             return Collections.emptyList();
         }

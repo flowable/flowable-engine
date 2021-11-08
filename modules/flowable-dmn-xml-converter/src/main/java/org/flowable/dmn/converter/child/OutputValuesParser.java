@@ -12,13 +12,8 @@
  */
 package org.flowable.dmn.converter.child;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.OutputClause;
@@ -48,8 +43,9 @@ public class OutputValuesParser extends BaseChildElementParser {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     String outputValuesText = xtr.getElementText();
+                    outputValues.setText(outputValuesText);
 
-                    outputValues.setTextValues(splitAndFormatOutputValues(outputValuesText));
+                    outputValues.setTextValues(splitAndFormatInputOutputValues(outputValuesText));
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithOutputValues = true;
                 }
@@ -59,51 +55,5 @@ public class OutputValuesParser extends BaseChildElementParser {
         }
 
         clause.setOutputValues(outputValues);
-    }
-
-    public List<Object> splitAndFormatOutputValues(String outputValuesText) {
-        if (StringUtils.isEmpty(outputValuesText)) {
-            return Collections.emptyList();
-        }
-
-        List<Object> result = new ArrayList<>();
-        int start = 0;
-        int subStart, subEnd;
-        boolean inQuotes = false;
-        for (int current = 0; current < outputValuesText.length(); current++) {
-            if (outputValuesText.charAt(current) == '\"') {
-                inQuotes = !inQuotes;
-            } else if (outputValuesText.charAt(current) == ',' && !inQuotes) {
-                subStart = getSubStringStartPos(start, outputValuesText);
-                subEnd = getSubStringEndPos(current, outputValuesText);
-
-                result.add(outputValuesText.substring(subStart, subEnd));
-
-                start = current + 1;
-                if (outputValuesText.charAt(start) == ' ') {
-                    start++;
-                }
-            }
-        }
-
-        subStart = getSubStringStartPos(start, outputValuesText);
-        subEnd = getSubStringEndPos(outputValuesText.length(), outputValuesText);
-        result.add(outputValuesText.substring(subStart, subEnd));
-
-        return result;
-    }
-
-    protected int getSubStringStartPos(int initialStart, String searchString) {
-        if (searchString.charAt(initialStart) == '\"') {
-            return initialStart + 1;
-        }
-        return initialStart;
-    }
-
-    protected int getSubStringEndPos(int initialEnd, String searchString) {
-        if (searchString.charAt(initialEnd - 1) == '\"') {
-            return initialEnd - 1;
-        }
-        return initialEnd;
     }
 }

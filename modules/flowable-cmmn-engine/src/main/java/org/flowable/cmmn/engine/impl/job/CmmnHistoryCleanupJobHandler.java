@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.job;
 
+import org.flowable.batch.api.BatchQuery;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -23,6 +25,8 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
 
     public static final String TYPE = "cmmn-history-cleanup";
 
+    private static final String DEFAULT_BATCH_NAME = "Flowable CMMN History Cleanup";
+
     @Override
     public String getType() {
         return TYPE;
@@ -32,7 +36,19 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
-        cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createHistoricCaseInstanceCleaningQuery().deleteWithRelatedData();
+        int batchSize = cmmnEngineConfiguration.getCleanInstancesBatchSize();
+        HistoricCaseInstanceQuery query = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createHistoricCaseInstanceCleaningQuery();
+
+        if (cmmnEngineConfiguration.isCleanInstancesSequentially()) {
+            query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        } else {
+            query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
+        }
+
+        BatchQuery batchCleaningQuery = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createBatchCleaningQuery();
+        if (batchCleaningQuery != null) {
+            batchCleaningQuery.deleteWithRelatedData();
+        }
     }
     
 }

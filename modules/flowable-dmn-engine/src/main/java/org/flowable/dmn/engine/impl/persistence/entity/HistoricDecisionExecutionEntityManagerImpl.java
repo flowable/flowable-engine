@@ -61,4 +61,8 @@ public class HistoricDecisionExecutionEntityManagerImpl
         return dataManager.findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
     }
 
+    @Override
+    public void delete(HistoricDecisionExecutionQueryImpl query) {
+        dataManager.delete(query);
+    }
 }

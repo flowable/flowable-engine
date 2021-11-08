@@ -578,6 +578,9 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
             HistoricCaseInstance historicChildCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId())
                 .singleResult();
             assertThat(historicChildCaseInstance).isNotNull();
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().withoutCaseInstanceParent().singleResult().getId())
+                    .isEqualTo(caseInstance.getId());
         }
 
         cmmnRuntimeService.terminateCaseInstance(childCaseInstance.getId());

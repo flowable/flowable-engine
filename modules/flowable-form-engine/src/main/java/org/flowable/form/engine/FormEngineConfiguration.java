@@ -15,6 +15,7 @@ package org.flowable.form.engine;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -30,7 +31,10 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
+import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.editor.form.converter.FormJsonConverter;
+import org.flowable.form.api.FormChangeTenantIdEntityTypes;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -88,6 +92,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     protected FormManagementService formManagementService = new FormManagementServiceImpl(this);
     protected FormRepositoryService formRepositoryService = new FormRepositoryServiceImpl(this);
     protected FormService formService = new FormServiceImpl(this);
+    protected ChangeTenantIdManager changeTenantIdManager;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -194,6 +199,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
         initSessionFactories();
         initServices();
+        initChangeTenantIdManager();
         configuratorsAfterInit();
         initDataManagers();
         initEntityManagers();
@@ -207,6 +213,13 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initService(formManagementService);
         initService(formRepositoryService);
         initService(formService);
+    }
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new MyBatisChangeTenantIdManager(commandExecutor, ScopeTypes.FORM,
+                    Collections.singleton(FormChangeTenantIdEntityTypes.FORM_INSTANCES));
+        }
     }
 
     public void initExpressionManager() {
@@ -482,6 +495,15 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     public FormEngineConfiguration setFormService(FormService formService) {
         this.formService = formService;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public FormEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
         return this;
     }
 

@@ -67,6 +67,11 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
     public void testByProcessInstanceId() {
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstanceId).list()).hasSize(3);
     }
+    
+    @Test
+    public void testWithoutProcessInstanceId() {
+        assertThat(managementService.createTimerJobQuery().withoutProcessInstanceId().list()).hasSize(0);
+    }
 
     @Test
     public void testByExecutionId() {
@@ -82,6 +87,11 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         String processDefinitionid = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).list()).hasSize(3);
+    }
+    
+    @Test
+    public void testWithoutScopeId() {
+        assertThat(managementService.createTimerJobQuery().withoutScopeId().list()).hasSize(3);
     }
 
     @Test

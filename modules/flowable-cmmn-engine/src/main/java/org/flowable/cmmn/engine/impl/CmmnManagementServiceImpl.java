@@ -15,19 +15,31 @@ package org.flowable.cmmn.engine.impl;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.service.BatchPartBuilderImpl;
+import org.flowable.batch.service.impl.BatchBuilderImpl;
+import org.flowable.batch.service.impl.BatchPartQueryImpl;
+import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.cmd.DeleteBatchCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdBuilderImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
@@ -226,6 +238,31 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     }
     
     @Override
+    public BatchQuery createBatchQuery() {
+        return new BatchQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchBuilder createBatchBuilder() {
+        return new BatchBuilderImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchPartQuery createBatchPartQuery() {
+        return new BatchPartQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
+    }
+
+    @Override
+    public BatchPartBuilder createBatchPartBuilder(Batch batch) {
+        return new BatchPartBuilderImpl(batch, configuration.getBatchServiceConfiguration(), commandExecutor);
+    }
+
+    @Override
+    public void deleteBatch(String batchId) {
+        commandExecutor.execute(new DeleteBatchCmd(batchId));
+    }
+
+    @Override
     public HistoryJobQuery createHistoryJobQuery() {
         return new HistoryJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
@@ -245,6 +282,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
         return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
     
+    @Override
+    public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
+        return new ChangeTenantIdBuilderImpl(fromTenantId, toTenantId, configuration.getChangeTenantIdManager());
+    }
+
     public <T> T executeCommand(Command<T> command) {
         if (command == null) {
             throw new FlowableIllegalArgumentException("The command is null");

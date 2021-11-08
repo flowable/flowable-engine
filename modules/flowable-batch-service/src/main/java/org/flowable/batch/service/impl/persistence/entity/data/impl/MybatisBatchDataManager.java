@@ -70,6 +70,13 @@ public class MybatisBatchDataManager extends AbstractDataManager<BatchEntity> im
     }
 
     @Override
+    public void deleteBatches(BatchQueryImpl batchQuery) {
+        getDbSqlSession().delete("bulkDeleteBytesForBatches", batchQuery, getManagedEntityClass());
+        getDbSqlSession().delete("bulkDeleteBatchPartsForBatches", batchQuery, getManagedEntityClass());
+        getDbSqlSession().delete("bulkDeleteBatches", batchQuery, getManagedEntityClass());
+    }
+
+    @Override
     protected IdGenerator getIdGenerator() {
         return batchServiceConfiguration.getIdGenerator();
     }

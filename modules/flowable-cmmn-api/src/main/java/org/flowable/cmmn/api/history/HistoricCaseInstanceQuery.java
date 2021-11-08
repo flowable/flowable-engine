@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.query.BatchDeleteQuery;
 import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
 
@@ -24,7 +25,8 @@ import org.flowable.common.engine.api.query.Query;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> {
+public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance>,
+        BatchDeleteQuery<HistoricCaseInstanceQuery> {
 
     /**
      * Only select historic case instances with the given identifier.
@@ -50,6 +52,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the parent identifier.
      */
     HistoricCaseInstanceQuery caseInstanceParentId(String parentId);
+
+    /**
+     * Only select historic case instances without a parent identifier.
+     */
+    HistoricCaseInstanceQuery withoutCaseInstanceParent();
     
     /**
      * Only select historic case instances with the given key.
@@ -65,6 +72,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the given case definition identifier.
      */
     HistoricCaseInstanceQuery caseDefinitionId(String caseDefinitionId);
+
+    /**
+     * Only select historic case instances with the given case definition ids.
+     */
+    HistoricCaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds);
     
     /**
      * Only select historic case instances with the given case definition category.
@@ -162,6 +174,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have the provided callback type.
      */
     HistoricCaseInstanceQuery caseInstanceCallbackType(String callbackType);
+
+    /**
+     * Only select historic case instances that do not have a callback identifier.
+     */
+    HistoricCaseInstanceQuery withoutCaseInstanceCallbackId();
 
     /**
      * Only select historic case instance that have the provided reference identifier.

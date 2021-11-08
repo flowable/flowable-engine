@@ -34,6 +34,7 @@ import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstancesUsingBatchesCmd;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -96,6 +97,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String nameLikeIgnoreCase;
     protected String callbackId;
     protected String callbackType;
+    protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
     protected String locale;
@@ -568,6 +570,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
+    public HistoricProcessInstanceQuery withoutProcessInstanceCallbackId() {
+        if (inOrStatement) {
+            currentOrQueryObject.withoutCallbackId = true;
+        } else {
+            this.withoutCallbackId = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricProcessInstanceQuery processInstanceReferenceId(String referenceId) {
         if (inOrStatement) {
             currentOrQueryObject.referenceId = referenceId;
@@ -901,6 +913,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
     }
 
+    @Override
+    public String deleteInParallelUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricProcessInstancesUsingBatchesCmd(this, batchSize, batchName, false));
+    }
+
+    @Override
+    public String deleteSequentiallyUsingBatch(int batchSize, String batchName) {
+        return commandExecutor.execute(new DeleteHistoricProcessInstancesUsingBatchesCmd(this, batchSize, batchName, true));
+    }
+
     public String getBusinessKey() {
         return businessKey;
     }
@@ -1076,6 +1098,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public boolean isWithoutCallbackId() {
+        return withoutCallbackId;
     }
 
     public String getReferenceId() {

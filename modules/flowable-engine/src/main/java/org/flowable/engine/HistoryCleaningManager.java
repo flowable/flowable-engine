@@ -12,10 +12,12 @@
  */
 package org.flowable.engine;
 
+import org.flowable.batch.api.BatchQuery;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 
 public interface HistoryCleaningManager {
 
     HistoricProcessInstanceQuery createHistoricProcessInstanceCleaningQuery();
 
+    BatchQuery createBatchCleaningQuery();
 }

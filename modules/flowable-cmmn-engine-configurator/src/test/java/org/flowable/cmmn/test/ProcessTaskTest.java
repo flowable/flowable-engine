@@ -685,6 +685,9 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                     .processInstanceCallbackId(processTaskPlanItemInstance.getId())
                     .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
+            assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .withoutProcessInstanceCallbackId()
+                    .singleResult()).isNull();
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -1907,6 +1910,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             
             assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).count()).isEqualTo(1);
             assertThat(processEngine.getRuntimeService().createEventSubscriptionQuery().processInstanceId(subProcessInstanceId).count()).isEqualTo(1);
+            assertThat(cmmnRuntimeService.createEventSubscriptionQuery().withoutScopeId().count()).isEqualTo(1);
+            assertThat(processEngine.getRuntimeService().createEventSubscriptionQuery().withoutProcessInstanceId().count()).isEqualTo(1);
             
             cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
             assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).count()).isZero();

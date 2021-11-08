@@ -31,6 +31,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String taskId;
     protected String processInstanceId;
     protected String processInstanceIdWithChildren;
+    protected Boolean withoutProcessInstanceId;
     protected String processBusinessKey;
     protected String processBusinessKeyLike;
     protected String processDefinitionId;
@@ -76,6 +77,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected List<QueryVariable> processVariables;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected Boolean withoutScopeId;
     protected String scopeType;
     protected String propagatedStageInstanceId;
     protected String tenantId;
@@ -107,6 +109,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessInstanceIdWithChildren(String processInstanceIdWithChildren) {
         this.processInstanceIdWithChildren = processInstanceIdWithChildren;
+    }
+
+    public Boolean getWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
+    public void setWithoutProcessInstanceId(Boolean withoutProcessInstanceId) {
+        this.withoutProcessInstanceId = withoutProcessInstanceId;
     }
 
     public String getProcessBusinessKey() {
@@ -469,6 +479,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+
+    public Boolean getWithoutScopeId() {
+        return withoutScopeId;
+    }
+
+    public void setWithoutScopeId(Boolean withoutScopeId) {
+        this.withoutScopeId = withoutScopeId;
     }
 
     public String getScopeType() {

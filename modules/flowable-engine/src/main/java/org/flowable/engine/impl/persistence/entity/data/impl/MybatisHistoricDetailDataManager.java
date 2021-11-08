@@ -100,6 +100,8 @@ public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager
 
     @Override
     public void deleteHistoricDetailForNonExistingProcessInstances() {
+        // Using HistoricDetailEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricDetailEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricDetailForNonExistingProcessInstances", null, HistoricDetailEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricDetailForNonExistingProcessInstances", null, HistoricDetailEntity.class);
     }
 }

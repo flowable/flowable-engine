@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -44,11 +45,15 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     protected String eventName;
     protected String executionId;
     protected String processInstanceId;
+    protected boolean withoutProcessInstanceId;
     protected String processDefinitionId;
+    protected boolean withoutProcessDefinitionId;
     protected String activityId;
     protected String subScopeId;
     protected String scopeId;
+    protected boolean withoutScopeId;
     protected String scopeDefinitionId;
+    protected boolean withoutScopeDefinitionId;
     protected String scopeType;
     protected Date createdBefore;
     protected Date createdAfter;
@@ -151,6 +156,17 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
         return this;
     }
+    
+    @Override
+    public EventSubscriptionQueryImpl withoutProcessInstanceId() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutProcessInstanceId = true;
+        } else {
+            this.withoutProcessInstanceId = true;
+        }
+
+        return this;
+    }
 
     @Override
     public EventSubscriptionQueryImpl processDefinitionId(String processDefinitionId) {
@@ -166,6 +182,17 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
         return this;
     }
+    
+    @Override
+    public EventSubscriptionQueryImpl withoutProcessDefinitionId() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutProcessDefinitionId = true;
+        } else {
+            this.withoutProcessDefinitionId = true;
+        }
+
+        return this;
+    }
 
     @Override
     public EventSubscriptionQueryImpl activityId(String activityId) {
@@ -177,6 +204,57 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
             this.currentOrQueryObject.activityId = activityId;
         } else {
             this.activityId = activityId;
+        }
+
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl caseInstanceId(String caseInstanceId) {
+        if (caseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided case instance id is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeId = caseInstanceId;
+            this.currentOrQueryObject.scopeType = ScopeTypes.CMMN;
+        } else {
+            this.scopeId = caseInstanceId;
+            this.scopeType = ScopeTypes.CMMN;
+        }
+
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl planItemInstanceId(String planItemInstanceId) {
+        if (planItemInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided plan item instance id is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.subScopeId = planItemInstanceId;
+            this.currentOrQueryObject.scopeType = ScopeTypes.CMMN;
+        } else {
+            this.subScopeId = planItemInstanceId;
+            this.scopeType = ScopeTypes.CMMN;
+        }
+
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl caseDefinitionId(String caseDefinitionId) {
+        if (caseDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition id is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeDefinitionId = caseDefinitionId;
+            this.currentOrQueryObject.scopeType = ScopeTypes.CMMN;
+        } else {
+            this.scopeDefinitionId = caseDefinitionId;
+            this.scopeType = ScopeTypes.CMMN;
         }
 
         return this;
@@ -213,6 +291,17 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
     
     @Override
+    public EventSubscriptionQueryImpl withoutScopeId() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeId = true;
+        } else {
+            this.withoutScopeId = true;
+        }
+
+        return this;
+    }
+    
+    @Override
     public EventSubscriptionQueryImpl scopeDefinitionId(String scopeDefinitionId) {
         if (scopeDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided scope definition id is null");
@@ -222,6 +311,17 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
             this.currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+
+        return this;
+    }
+    
+    @Override
+    public EventSubscriptionQueryImpl withoutScopeDefinitionId() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeDefinitionId = true;
+        } else {
+            this.withoutScopeDefinitionId = true;
         }
 
         return this;
@@ -445,12 +545,20 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return processInstanceId;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
     public String getActivityId() {
         return activityId;
     }
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+
+    public boolean isWithoutProcessDefinitionId() {
+        return withoutProcessDefinitionId;
     }
 
     public String getSubScopeId() {
@@ -460,9 +568,17 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     public String getScopeId() {
         return scopeId;
     }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
+    }
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+    
+    public boolean isWithoutScopeDefinitionId() {
+        return withoutScopeDefinitionId;
     }
 
     public String getScopeType() {

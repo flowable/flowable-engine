@@ -128,7 +128,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
         
         StartSubProcessInstanceBeforeContext instanceBeforeContext = new StartSubProcessInstanceBeforeContext(businessKey, callActivity.getProcessInstanceName(), 
-                        new HashMap<>(), executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(),
+                        new HashMap<>(), new HashMap<>(), executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(),
                         initialFlowElement.getId(), initialFlowElement, subProcess, processDefinition);
         
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
@@ -150,10 +150,23 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
 
         if (instanceBeforeContext.isInheritVariables()) {
+
             Map<String, Object> executionVariables = execution.getVariables();
+            Map<String, Object> transientVariables = execution.getTransientVariables();
             for (Map.Entry<String, Object> entry : executionVariables.entrySet()) {
-                instanceBeforeContext.getVariables().put(entry.getKey(), entry.getValue());
+
+                // The executionVariables contain all variables, including the transient variables.
+                // Hence why that map is iterated and the transient variables are split off
+                String variableName = entry.getKey();
+                if (transientVariables.containsKey(variableName)) {
+                    instanceBeforeContext.getTransientVariables().put(variableName, entry.getValue());
+
+                } else {
+                    instanceBeforeContext.getVariables().put(variableName, entry.getValue());
+
+                }
             }
+
         }
         
         // copy process variables
@@ -190,6 +203,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         if (!instanceBeforeContext.getVariables().isEmpty()) {
             initializeVariables(subProcessInstance, instanceBeforeContext.getVariables());
         }
+
+        if (!instanceBeforeContext.getTransientVariables().isEmpty()) {
+            initializeTransientVariables(subProcessInstance, instanceBeforeContext.getTransientVariables());
+        }
         
         // Process instance name is resolved after setting the variables on the process instance, so they can be used in the expression
         String processInstanceName = null;
@@ -223,8 +240,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
             StartSubProcessInstanceAfterContext instanceAfterContext = new StartSubProcessInstanceAfterContext(subProcessInstance, subProcessInitialExecution,
-                instanceBeforeContext.getVariables(), instanceBeforeContext.getCallActivityExecution(), instanceBeforeContext.getInParameters(),
-                instanceBeforeContext.getInitialFlowElement(), instanceBeforeContext.getProcess(), instanceBeforeContext.getProcessDefinition());
+                instanceBeforeContext.getVariables(), instanceBeforeContext.getTransientVariables(), instanceBeforeContext.getCallActivityExecution(),
+                instanceBeforeContext.getInParameters(), instanceBeforeContext.getInitialFlowElement(), instanceBeforeContext.getProcess(),
+                instanceBeforeContext.getProcessDefinition());
 
             processEngineConfiguration.getStartProcessInstanceInterceptor().afterStartSubProcessInstance(instanceAfterContext);
         }
@@ -234,7 +252,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, instanceBeforeContext.getVariables(), false),
+            Map<String, Object> allVariables = new HashMap<>();
+            allVariables.putAll(instanceBeforeContext.getVariables());
+            allVariables.putAll(instanceBeforeContext.getTransientVariables());
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, allVariables, false),
                     processEngineConfiguration.getEngineCfgKey());
         }
         
@@ -389,5 +410,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     // Allow a subclass to override how variables are initialized.
     protected void initializeVariables(ExecutionEntity subProcessInstance, Map<String, Object> variables) {
         subProcessInstance.setVariables(variables);
+    }
+
+    // Allow a subclass to override how variables are initialized.
+    protected void initializeTransientVariables(ExecutionEntity subProcessInstance, Map<String, Object> transientVariables) {
+        subProcessInstance.setTransientVariables(transientVariables);
     }
 }

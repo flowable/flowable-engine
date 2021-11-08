@@ -123,11 +123,15 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
     }
 
     @Override
     public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
     }
 

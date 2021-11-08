@@ -42,6 +42,8 @@ import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQuery
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
@@ -120,6 +122,10 @@ public interface CmmnRestApiInterceptor {
     void deleteJob(Job job);
 
     void deleteHistoryJob(HistoryJob historyJob);
+    
+    void accessEventSubscriptionById(EventSubscription eventSubscription);
+    
+    void accessEventSubscriptionInfoWithQuery(EventSubscriptionQuery eventSubscriptionQuery);
     
     void accessManagementInfo();
     

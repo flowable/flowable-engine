@@ -511,6 +511,46 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
     }
     
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryWithoutProcessInstanceId() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().withoutProcessInstanceId();
+        assertThat(taskInstanceQuery.count()).isZero();
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryWithoutScopeId() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().withoutScopeId();
+        assertThat(taskInstanceQuery.count()).isEqualTo(5);
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(5);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().withoutScopeId().processDefinitionKey("oneTaskProcess2");
+        assertThat(taskInstanceQuery.count()).isEqualTo(1);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(1);
+    }
+    
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessCandidateGroups.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
     public void testHistoricTaskInstanceQueryByCandidateGroups() {
         for (int i = 0; i < 4; i++) {

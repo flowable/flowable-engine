@@ -79,6 +79,21 @@
   <delete id="deleteHistoricDecisionExecutionsByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where DEPLOYMENT_ID_ = #{deploymenId} 
   </delete>
+
+    <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> DEL_RES </if>
+        from ${prefix}ACT_DMN_HI_DECISION_EXECUTION DEL_RES
+        where DEL_RES.ID_ in (
+            select RES.ID_
+            <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
+        )
+    </delete>
+
+    <!-- For MySQL / MariaDB we cannot use the table we want to delete from in a subquery -->
+    <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" databaseId="mysql">
+        delete RES
+        <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
+    </delete>
   
   <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
 
@@ -153,6 +168,9 @@
       </if>
       <if test="scopeType != null">
         and RES.SCOPE_TYPE_ = #{scopeType}
+      </if>
+      <if test="withoutScopeType">
+        and RES.SCOPE_TYPE_ is null
       </if>
       <if test="processInstanceIdWithChildren != null">
         and (RES.INSTANCE_ID_ = #{processInstanceIdWithChildren} or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 

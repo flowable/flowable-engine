@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.impl.cmd.ClearCaseInstanceLockTimesCmd;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -93,7 +94,12 @@ public class CmmnEngineImpl implements CmmnEngine {
         }
         
         if (cmmnEngineConfiguration.isEnableHistoryCleaning()) {
-            cmmnManagementService.handleHistoryCleanupTimerJob();
+            try {
+                cmmnManagementService.handleHistoryCleanupTimerJob();
+            } catch (FlowableOptimisticLockingException ex) {
+                LOGGER.warn(
+                        "Optimistic locking exception when creating timer history clean jobs. Cleanup timer job was created / updated by another instance.");
+            }
         }
     }
     

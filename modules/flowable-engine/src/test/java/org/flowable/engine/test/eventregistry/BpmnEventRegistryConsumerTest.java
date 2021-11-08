@@ -23,6 +23,8 @@ import java.util.Random;
 
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -378,6 +380,10 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
     public void testStartOneInstanceWithMultipleProcessDefinitionVersions() {
         inboundEventChannelAdapter.triggerTestEvent("testCustomer");
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+        }
         
         org.flowable.engine.repository.Deployment deployment = null;
         try {
@@ -389,14 +395,28 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             
             inboundEventChannelAdapter.triggerTestEvent("testCustomer");
             assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+            }
     
             inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
             assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+            }
             inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
             assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+            }
             
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                // nothing to do, isHistoryLevelAtLeast will execute the jobs
+            }
         }
     }
 
@@ -574,6 +594,9 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         // Removing the second definition should recreate the one from the first one
         // There won't be a process instance since we will do cascaded delete of the deployment
         repositoryService.deleteDeployment(deployment2.getId(), true);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // nothing to do, isHistoryLevelAtLeast will execute the jobs
+        }
 
         assertThat( runtimeService.createEventSubscriptionQuery().list())
                 .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
@@ -648,6 +671,10 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         // Removing the second definition should recreate the one from the first one
         // There won't be a process instance since we will do cascaded delete of the deployment
         repositoryService.deleteDeployment(deployment1.getId(), true);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // nothing to do, isHistoryLevelAtLeast will execute the jobs
+        }
 
         assertThat( runtimeService.createEventSubscriptionQuery().list())
                 .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
