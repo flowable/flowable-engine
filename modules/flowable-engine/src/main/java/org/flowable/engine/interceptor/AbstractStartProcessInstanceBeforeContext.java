@@ -28,9 +28,7 @@ public class AbstractStartProcessInstanceBeforeContext {
     protected FlowElement initialFlowElement;
     protected Process process;
     protected ProcessDefinition processDefinition;
-    
     protected String businessStatus;
-
 
     public AbstractStartProcessInstanceBeforeContext() {
         
