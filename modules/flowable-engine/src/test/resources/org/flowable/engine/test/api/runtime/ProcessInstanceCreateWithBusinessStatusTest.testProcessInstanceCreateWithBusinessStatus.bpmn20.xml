@@ -4,10 +4,6 @@
 	targetNamespace="Examples">
 
 	<process id="businessStatusProcess" name="Update business status Example">
-		<extensionElements>
-			<flowable:executionListener event="start"
-				class="org.flowable.engine.test.api.runtime.ProcessInstanceUpdateBusinessStatusTest$UpdateBusinessStatusExecutionListener" />
-		</extensionElements>
 
 		<startEvent id="theStart" />
 

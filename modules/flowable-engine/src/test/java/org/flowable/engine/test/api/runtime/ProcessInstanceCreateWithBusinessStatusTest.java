@@ -26,53 +26,37 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
-public class ProcessInstanceUpdateBusinessStatusTest extends PluggableFlowableTestCase {
+class ProcessInstanceCreateWithBusinessStatusTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
-    public void testProcessInstanceUpdateBusinessStatus() {
-        runtimeService.startProcessInstanceByKey("businessStatusProcess");
+    void testProcessInstanceCreateWithBusinessStatus() {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-        assertThat(processInstance.getBusinessStatus()).isEqualTo("bzStatus");
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
-            assertThat(historicProcessInstance.getBusinessStatus()).isEqualTo("bzStatus");
-        }
-    }
-
-    @Test
-    @Deployment
-    public void testUpdateExistingBusinessStatus() {
-        runtimeService.startProcessInstanceByKey("businessStatusProcess");
-
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-        assertThat(processInstance.getBusinessStatus()).isEqualTo("bzStatus");
-
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
-            assertThat(historicProcessInstance.getBusinessStatus()).isEqualTo("bzStatus");
-        }
-
-        runtimeService.updateBusinessStatus(processInstance.getId(), "newStatus");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("businessStatusProcess")
+                .businessStatus("testStatus").start();
+        assertThat(processInstance.getBusinessStatus()).isEqualTo("testStatus");
 
         processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-        assertThat(processInstance.getBusinessStatus()).isEqualTo("newStatus");
+        assertThat(processInstance.getBusinessStatus()).isEqualTo("testStatus");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
-            assertThat(historicProcessInstance.getBusinessStatus()).isEqualTo("newStatus");
+            assertThat(historicProcessInstance.getBusinessStatus()).isEqualTo("testStatus");
         }
     }
 
-    public static class UpdateBusinessStatusExecutionListener implements ExecutionListener {
+    @Test
+    @Deployment
+    void testProcessInstanceCreateWithoutBusinessStatus() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("businessStatusProcess").start();
+        assertThat(processInstance.getBusinessStatus()).isNull();
 
-        private static final long serialVersionUID = 1L;
+        processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance.getBusinessStatus()).isNull();
 
-        @Override
-        public void notify(DelegateExecution delegateExecution) {
-            CommandContextUtil.getExecutionEntityManager().updateProcessInstanceBusinessStatus((ExecutionEntity) delegateExecution, "bzStatus");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+            assertThat(historicProcessInstance.getBusinessStatus()).isNull();
         }
     }
 
