@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
@@ -28,10 +29,12 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -80,11 +83,28 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             handleEventInstance(planItemInstanceEntity, eventInstance);
         }
         
-        PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-        eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
-        CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
-        agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        if (repetitionRule != null) {
+            PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+            eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+            agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
+            agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+            
+        } else {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            String eventDefinitionKey = resolveEventDefinitionKey(planItemInstanceEntity);
+
+            List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
+            for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
+                    eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                }
+            }
+            
+            CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+        }
     }
 
     protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance) {

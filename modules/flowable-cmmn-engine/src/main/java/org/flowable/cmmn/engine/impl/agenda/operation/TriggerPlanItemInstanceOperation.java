@@ -34,10 +34,10 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
     @Override
     public void run() {
         if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())
-                ||  (planItemInstanceEntity.getPlanItem() != null 
+                || (planItemInstanceEntity.getPlanItem() != null 
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener
-                && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))
-            ){
+                && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))){
+            
             executeTrigger();
 
         } else {

@@ -25,8 +25,10 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.VariableEventListener;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -99,11 +101,17 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
             }
         }
         
-        PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-        eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
-        CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
-        agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        if (repetitionRule != null) {
+            PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+            eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+            agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
+            agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+            
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+        }
     }
 
 }
