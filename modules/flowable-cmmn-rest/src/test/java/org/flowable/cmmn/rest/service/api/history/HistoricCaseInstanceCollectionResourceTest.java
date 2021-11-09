@@ -324,7 +324,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         // Do the actual call
         CloseableHttpResponse response = executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceParentId=true"), HttpStatus.SC_OK);
-        // Check status and size
+
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(responseNode)
@@ -338,7 +338,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         response = executeRequest(new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceCallbackId=true"),
                 HttpStatus.SC_OK);
-        // Check status and size
+
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(responseNode)
@@ -353,7 +353,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         response = executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceParentId=false&withoutCaseInstanceCallbackId=false"),
                 HttpStatus.SC_OK);
-        // Check status and size
+        
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThatJson(responseNode)
