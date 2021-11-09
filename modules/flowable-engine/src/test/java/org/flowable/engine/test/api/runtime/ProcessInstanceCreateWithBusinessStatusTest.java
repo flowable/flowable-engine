@@ -15,13 +15,9 @@ package org.flowable.engine.test.api.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -29,10 +25,10 @@ import org.junit.jupiter.api.Test;
 class ProcessInstanceCreateWithBusinessStatusTest extends PluggableFlowableTestCase {
 
     @Test
-    @Deployment
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     void testProcessInstanceCreateWithBusinessStatus() {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("businessStatusProcess")
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
                 .businessStatus("testStatus").start();
         assertThat(processInstance.getBusinessStatus()).isEqualTo("testStatus");
 
@@ -46,9 +42,9 @@ class ProcessInstanceCreateWithBusinessStatusTest extends PluggableFlowableTestC
     }
 
     @Test
-    @Deployment
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     void testProcessInstanceCreateWithoutBusinessStatus() {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("businessStatusProcess").start();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").start();
         assertThat(processInstance.getBusinessStatus()).isNull();
 
         processInstance = runtimeService.createProcessInstanceQuery().singleResult();

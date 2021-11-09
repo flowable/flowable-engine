@@ -55,9 +55,9 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
     public StartProcessInstanceByMessageCmd(ProcessInstanceBuilderImpl processInstanceBuilder) {
         this(processInstanceBuilder.getMessageName(),
-             processInstanceBuilder.getBusinessKey(),
-             processInstanceBuilder.getVariables(),
-             processInstanceBuilder.getTenantId());
+                processInstanceBuilder.getBusinessKey(),
+                processInstanceBuilder.getVariables(),
+                processInstanceBuilder.getTenantId());
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
@@ -94,8 +94,8 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
         }
 
         ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
-        ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition, 
-            messageName, businessKey,businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
+        ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition,
+                messageName, businessKey, businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
 
         return processInstance;
     }

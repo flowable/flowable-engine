@@ -21,6 +21,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 public class AbstractStartProcessInstanceBeforeContext {
 
     protected String businessKey;
+    protected String businessStatus;
     protected String processInstanceName;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
@@ -28,13 +29,12 @@ public class AbstractStartProcessInstanceBeforeContext {
     protected FlowElement initialFlowElement;
     protected Process process;
     protected ProcessDefinition processDefinition;
-    protected String businessStatus;
 
     public AbstractStartProcessInstanceBeforeContext() {
         
     }
 
-    public AbstractStartProcessInstanceBeforeContext(String businessKey,String businessStatus, String processInstanceName, Map<String, Object> variables,
+    public AbstractStartProcessInstanceBeforeContext(String businessKey, String businessStatus, String processInstanceName, Map<String, Object> variables,
             Map<String, Object> transientVariables, String initialActivityId, FlowElement initialFlowElement,
             Process process, ProcessDefinition processDefinition) {
         
@@ -52,12 +52,13 @@ public class AbstractStartProcessInstanceBeforeContext {
     public String getBusinessKey() {
         return businessKey;
     }
-    public String getBusinessStatus() {
-        return businessStatus;
-    }
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     public String getProcessInstanceName() {

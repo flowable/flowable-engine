@@ -14,49 +14,25 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
-import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class CaseInstanceCreateWithBusinessStatusTest extends FlowableCmmnTestCase {
 
-    private String deplId;
-
-    @Before
-    public void createCase() {
-        org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceCreateWithBusinessStatusTest.testCaseCreateWithBusinessStatus.cmmn")
-                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceCreateWithBusinessStatusTest.testCaseCreateWithoutBusinessStatus.cmmn")
-                .deploy();
-
-        deplId = deployment.getId();
-    }
-
-    @After
-    public void deleteCase() {
-        cmmnRepositoryService.deleteDeployment(deplId, true);
-    }
-
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
     public void testCaseCreateWithBusinessStatus() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("businessKeyCase").businessStatus("businessStatus").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessStatus("businessStatus")
+                .start();
         assertThat(caseInstance.getBusinessStatus()).isEqualTo("businessStatus");
 
-        caseInstance  = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
         assertThat(caseInstance.getBusinessStatus()).isEqualTo("businessStatus");
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
@@ -68,13 +44,13 @@ public class CaseInstanceCreateWithBusinessStatusTest extends FlowableCmmnTestCa
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
     public void testCaseCreateWithoutBusinessStatus() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("businessKeyCaseWithout").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         assertThat(caseInstance.getBusinessStatus()).isNull();
 
-        caseInstance  = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
-        assertThat(caseInstance.getBusinessStatus()).isEqualTo("businessStatus");
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isNull();
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
