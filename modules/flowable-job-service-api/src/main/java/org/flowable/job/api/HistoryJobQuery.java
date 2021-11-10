@@ -13,6 +13,8 @@
 
 package org.flowable.job.api;
 
+import java.util.Collection;
+
 import org.flowable.common.engine.api.query.Query;
 
 /**
@@ -30,6 +32,10 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
     HistoryJobQuery handlerType(String handlerType);
 
     /** Only select jobs that failed due to an exception. */
+    /**
+     * Select jobs which have given job handler type
+     */
+    HistoryJobQuery handlerTypes(Collection<String> handlerType);
     HistoryJobQuery withException();
 
     /** Only select jobs that failed due to an exception with the given message. */

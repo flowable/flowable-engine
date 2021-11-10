@@ -98,6 +98,12 @@
             <if test="handlerType != null">
                 and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
+            <if test="handlerTypes != null">
+                and RES.HANDLER_TYPE_ in
+                <foreach item="item" index="index" collection="handlerTypes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="withException">
                 and (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
             </if>
