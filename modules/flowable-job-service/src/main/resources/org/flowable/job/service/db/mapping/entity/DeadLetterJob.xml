@@ -257,6 +257,12 @@
             <if test="handlerType != null">
                 and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
+            <if test="handlerTypes != null">
+                and RES.HANDLER_TYPE_ in
+                <foreach item="item" index="index" collection="handlerTypes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
             </if>

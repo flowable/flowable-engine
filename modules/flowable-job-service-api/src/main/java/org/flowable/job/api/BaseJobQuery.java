@@ -13,6 +13,7 @@
 
 package org.flowable.job.api;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.common.engine.api.query.Query;
@@ -49,6 +50,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Select jobs which have given job handler type
      */
     U handlerType(String handlerType);
+
+    /**
+     * Select jobs which have one of the given job handler type
+     */
+    U handlerTypes(Collection<String> handlerTypes);
 
     /**
      * Only select jobs which exist for the given process definition id
