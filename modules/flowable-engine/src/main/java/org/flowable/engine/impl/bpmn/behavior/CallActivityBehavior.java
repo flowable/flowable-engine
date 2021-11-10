@@ -127,9 +127,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             businessKey = processInstance.getBusinessKey();
         }
 
-        StartSubProcessInstanceBeforeContext instanceBeforeContext = new StartSubProcessInstanceBeforeContext(businessKey,null, callActivity.getProcessInstanceName(),
-                        new HashMap<>(), new HashMap<>(), executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(),
-                        initialFlowElement.getId(), initialFlowElement, subProcess, processDefinition);
+        StartSubProcessInstanceBeforeContext instanceBeforeContext = new StartSubProcessInstanceBeforeContext(businessKey, null,
+                callActivity.getProcessInstanceName(), new HashMap<>(), new HashMap<>(), executionEntity, callActivity.getInParameters(),
+                callActivity.isInheritVariables(), initialFlowElement.getId(), initialFlowElement, subProcess, processDefinition);
         
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
             processEngineConfiguration.getStartProcessInstanceInterceptor().beforeStartSubProcessInstance(instanceBeforeContext);
