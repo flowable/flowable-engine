@@ -58,9 +58,9 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
 
         // TODO: backwards compatibility? Only create the process instance and not start it? How?
         if (businessKey != null) {
-            processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, businessKey, null, null, null);
+            processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, businessKey, null, null, null, null);
         } else {
-            processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, null, null, null, null);
+            processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, null, null, null, null, null);
         }
 
         CommandContextUtil.getHistoryManager(commandContext).recordFormPropertiesSubmitted(processInstance.getExecutions().get(0), properties, null,

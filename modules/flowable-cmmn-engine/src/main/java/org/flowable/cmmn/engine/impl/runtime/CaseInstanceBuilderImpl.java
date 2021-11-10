@@ -31,6 +31,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected String predefinedCaseInstanceId;
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
@@ -86,6 +87,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public CaseInstanceBuilder businessKey(String businessKey) {
         this.businessKey = businessKey;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceBuilder businessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
         return this;
     }
 
@@ -234,6 +241,10 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public String getBusinessKey() {
         return businessKey;
+    }
+    @Override
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     @Override

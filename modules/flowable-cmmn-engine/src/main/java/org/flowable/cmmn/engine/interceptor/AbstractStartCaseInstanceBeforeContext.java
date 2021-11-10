@@ -21,20 +21,22 @@ import org.flowable.cmmn.model.CmmnModel;
 public class AbstractStartCaseInstanceBeforeContext {
 
     protected String businessKey;
+    protected String businessStatus;
     protected String caseInstanceName;
     protected Map<String, Object> variables;
     protected Case caseModel;
     protected CaseDefinition caseDefinition;
     protected CmmnModel cmmnModel;
-    
+
     public AbstractStartCaseInstanceBeforeContext() {
-        
+
     }
 
-    public AbstractStartCaseInstanceBeforeContext(String businessKey, String caseInstanceName, Map<String, Object> variables, 
-                    Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel) {
-        
+    public AbstractStartCaseInstanceBeforeContext(String businessKey, String businessStatus, String caseInstanceName, Map<String, Object> variables,
+            Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel) {
+
         this.businessKey = businessKey;
+        this.businessStatus = businessStatus;
         this.caseInstanceName = caseInstanceName;
         this.variables = variables;
         this.caseModel = caseModel;
@@ -48,6 +50,10 @@ public class AbstractStartCaseInstanceBeforeContext {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     public String getCaseInstanceName() {

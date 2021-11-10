@@ -66,7 +66,12 @@ public interface ProcessInstanceBuilder {
      * Set the businessKey of process instance
      **/
     ProcessInstanceBuilder businessKey(String businessKey);
-    
+
+    /**
+     * Set the businessStatus of process instance
+     **/
+    ProcessInstanceBuilder businessStatus(String businessStatus);
+
     /**
      * Sets the callback identifier of the process instance.
      */

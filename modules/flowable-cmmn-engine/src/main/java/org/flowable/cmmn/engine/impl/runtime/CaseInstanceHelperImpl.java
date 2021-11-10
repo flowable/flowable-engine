@@ -267,14 +267,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
     protected CaseInstanceEntity initializeCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition, 
             CmmnModel cmmnModel, Case caseModel, CaseInstanceBuilder caseInstanceBuilder) {
-        
-        StartCaseInstanceBeforeContext instanceBeforeContext = new StartCaseInstanceBeforeContext(caseInstanceBuilder.getBusinessKey(), caseInstanceBuilder.getName(),
-                        caseInstanceBuilder.getCallbackId(), caseInstanceBuilder.getCallbackType(),
-                        caseInstanceBuilder.getReferenceId(), caseInstanceBuilder.getReferenceType(),
-                        caseInstanceBuilder.getParentId(), caseInstanceBuilder.getVariables(),
-                        caseInstanceBuilder.getTransientVariables(), caseInstanceBuilder.getTenantId(), caseModel.getInitiatorVariableName(),
-                        caseModel, caseDefinition, cmmnModel, caseInstanceBuilder.getOverrideDefinitionTenantId(), caseInstanceBuilder.getPredefinedCaseInstanceId());
-        
+
+        StartCaseInstanceBeforeContext instanceBeforeContext = new StartCaseInstanceBeforeContext(caseInstanceBuilder.getBusinessKey(),
+                caseInstanceBuilder.getBusinessStatus(), caseInstanceBuilder.getName(), caseInstanceBuilder.getCallbackId(),
+                caseInstanceBuilder.getCallbackType(), caseInstanceBuilder.getReferenceId(), caseInstanceBuilder.getReferenceType(),
+                caseInstanceBuilder.getParentId(), caseInstanceBuilder.getVariables(), caseInstanceBuilder.getTransientVariables(),
+                caseInstanceBuilder.getTenantId(), caseModel.getInitiatorVariableName(), caseModel, caseDefinition, cmmnModel,
+                caseInstanceBuilder.getOverrideDefinitionTenantId(), caseInstanceBuilder.getPredefinedCaseInstanceId());
+
         if (cmmnEngineConfiguration.getStartCaseInstanceInterceptor() != null) {
             cmmnEngineConfiguration.getStartCaseInstanceInterceptor().beforeStartCaseInstance(instanceBeforeContext);
         }
@@ -315,6 +315,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         if (instanceBeforeContext.getBusinessKey() != null) {
             caseInstanceEntity.setBusinessKey(instanceBeforeContext.getBusinessKey());
+        }
+        if (instanceBeforeContext.getBusinessStatus() != null) {
+            caseInstanceEntity.setBusinessStatus(instanceBeforeContext.getBusinessStatus());
         }
 
         if (instanceBeforeContext.getOverrideDefinitionTenantId() != null) {
