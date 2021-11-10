@@ -14,6 +14,7 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     protected String id;
     protected String handlerType;
+    protected Collection<String> handlerTypes;
     protected boolean withException;
     protected String exceptionMessage;
     protected String scopeType;
@@ -77,6 +79,15 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
         this.handlerType = handlerType;
+        return this;
+    }
+
+    @Override
+    public HistoryJobQuery handlerTypes(Collection<String> handlerTypes) {
+        if (handlerTypes == null) {
+            throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
+        }
+        this.handlerTypes = handlerTypes;
         return this;
     }
 

@@ -15,13 +15,20 @@ package org.flowable.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -30,6 +37,9 @@ import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -197,6 +207,33 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         query = managementService.createExternalWorkerJobQuery().handlerType("invalid");
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
+    }
+
+    @Test
+    public void testQueryByHandlerTypes() {
+
+        List<String> testTypes = new ArrayList<>();
+        createExternalWorkerJobWithHandlerType("Type1");
+        createExternalWorkerJobWithHandlerType("Type2");
+
+        assertThat(managementService.createExternalWorkerJobQuery().handlerType("Type1").singleResult()).isNotNull();
+        assertThat(managementService.createExternalWorkerJobQuery().handlerType("Type2").singleResult()).isNotNull();
+
+        testTypes.add("TestType");
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).singleResult()).isNull();
+
+        testTypes.add("Type1");
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).count()).isEqualTo(1);
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).singleResult().getJobHandlerType()).isEqualTo("Type1");
+
+        testTypes.add("Type2");
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).count()).isEqualTo(2);
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).list())
+                .extracting(JobInfo::getJobHandlerType)
+                .containsExactlyInAnyOrder("Type1", "Type2");
+
+        managementService.deleteExternalWorkerJob(managementService.createExternalWorkerJobQuery().handlerType("Type1").singleResult().getId());
+        managementService.deleteExternalWorkerJob(managementService.createExternalWorkerJobQuery().handlerType("Type2").singleResult().getId());
     }
 
     @Test
@@ -428,5 +465,29 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         });
     }
 
+    private void createExternalWorkerJobWithHandlerType(String handlerType) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                ExternalWorkerJobEntity jobEntity = jobService.createExternalWorkerJob();
+                jobEntity.setJobType(Job.JOB_TYPE_EXTERNAL_WORKER);
+                //jobEntity.setLockOwner(UUID.randomUUID().toString());
+                jobEntity.setRetries(0);
+                jobEntity.setJobHandlerType(handlerType);
+
+                StringWriter stringWriter = new StringWriter();
+                NullPointerException exception = new NullPointerException();
+                exception.printStackTrace(new PrintWriter(stringWriter));
+                jobEntity.setExceptionStacktrace(stringWriter.toString());
+
+                jobService.insertExternalWorkerJob(jobEntity);
+                assertThat(jobEntity.getId()).isNotNull();
+                return null;
+            }
+        });
+    }
 
 }
