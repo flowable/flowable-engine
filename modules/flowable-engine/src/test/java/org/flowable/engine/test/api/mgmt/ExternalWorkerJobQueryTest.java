@@ -37,6 +37,7 @@ import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.junit.jupiter.api.Test;
@@ -227,8 +228,9 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
 
         testTypes.add("Type2");
         assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).count()).isEqualTo(2);
-        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).list().get(0).getJobHandlerType()).isEqualTo("Type1");
-        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).list().get(1).getJobHandlerType()).isEqualTo("Type2");
+        assertThat(managementService.createExternalWorkerJobQuery().handlerTypes(testTypes).list())
+                .extracting(JobInfo::getJobHandlerType)
+                .containsExactlyInAnyOrder("Type1", "Type2");
 
         managementService.deleteExternalWorkerJob(managementService.createExternalWorkerJobQuery().handlerType("Type1").singleResult().getId());
         managementService.deleteExternalWorkerJob(managementService.createExternalWorkerJobQuery().handlerType("Type2").singleResult().getId());
