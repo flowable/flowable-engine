@@ -32,6 +32,7 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -101,6 +102,13 @@ public class EventRegistryKafkaConfiguration {
         adminProperties.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
 
         return AdminClient.create(adminProperties);
+    }
+
+    @Bean
+    public KafkaAdmin kafkaAdmin(KafkaContainer kafkaContainer) {
+        Map<String, Object> adminProperties = new HashMap<>();
+        adminProperties.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        return new KafkaAdmin(adminProperties);
     }
 
     @Bean(destroyMethod = "stop")

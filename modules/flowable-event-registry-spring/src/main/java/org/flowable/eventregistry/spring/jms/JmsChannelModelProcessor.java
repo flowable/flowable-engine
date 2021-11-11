@@ -197,6 +197,7 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
         // If we do not do that then it is possible that @JmsListener will not be started
         // We also need to start immediately if the application context has already been refreshed.
         // If we don't and the endpoint has no registered containers then our endpoint will never be started.
+        // This also makes sure that we are not going to start our listener earlier than the JmsListenerEndpointRegistry
         boolean startImmediately = contextRefreshed || endpointRegistry.isRunning();
         logger.info("Registering endpoint {} with start immediately {}", endpoint, startImmediately);
         endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), startImmediately);
