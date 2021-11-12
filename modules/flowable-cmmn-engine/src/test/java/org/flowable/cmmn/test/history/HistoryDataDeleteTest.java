@@ -39,6 +39,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
@@ -56,6 +57,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
     @After
     public void tearDown() {
         batchesToRemove.forEach(cmmnManagementService::deleteBatch);
+        Authentication.setAuthenticatedUserId(null);
     }
 
     @Test
@@ -332,6 +334,23 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
                 }
             }
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
+    public void testDeleteHistoricInstancesUsingBatchWithAuthenticatedUser() {
+        Authentication.setAuthenticatedUserId("test-user");
+        String batchId = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseDefinitionKey("dummy")
+                .deleteInParallelUsingBatch(5, "Test Deletion");
+        batchesToRemove.add(batchId);
+
+        Batch batch = cmmnManagementService.createBatchQuery().batchId(batchId).singleResult();
+        assertThat(batch).isNotNull();
+        assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED);
+        assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_CASE_DELETE_TYPE);
+        assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
+        assertThat(batch.getBatchSearchKey2()).isEqualTo("test-user");
     }
 
     @Test
@@ -678,6 +697,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_IN_PROGRESS);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_CASE_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion Uneven");
+            assertThat(batch.getBatchSearchKey2()).isNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.CMMN))
                     .isEqualTo("{"
                             + "  numberOfInstances: 10,"
@@ -741,6 +761,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_CASE_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion Uneven");
+            assertThat(batch.getBatchSearchKey2()).isNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.CMMN))
                     .isEqualTo("{"
                             + "  numberOfInstances: 10,"
@@ -814,6 +835,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_IN_PROGRESS);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_CASE_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
+            assertThat(batch.getBatchSearchKey2()).isNull();
             assertThat(batch.getCompleteTime()).isNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.CMMN))
                     .isEqualTo("{"
