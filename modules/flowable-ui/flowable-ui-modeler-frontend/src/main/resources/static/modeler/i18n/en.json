@@ -952,6 +952,12 @@
             "DESCRIPTION" : "Enable to terminate the process instance"
           }
         },
+        "DECISIONTASKDECISIONTABLEREFERENCEKEYDEFINITIONPACKAGE" : {
+          "DECISIONTASKDECISIONTABLEREFERENCEKEY" : {
+            "TITLE" : "Decision table key",
+            "DESCRIPTION" : "Set the decision table key as a plain text or expression. A reference without model consistency checks. Decision service/table reference has precedence before key in export/import"
+          }
+        },
         "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE" : {
           "DECISIONTASKDECISIONTABLEREFERENCE" : {
             "TITLE" : "Decision table reference",
@@ -1514,6 +1520,12 @@
           "FORMREFERENCE": {
             "TITLE": "Form reference",
             "DESCRIPTION": "Reference to a form"
+          }
+        },
+        "DECISIONTASKDECISIONTABLEREFERENCEKEYDEFINITIONPACKAGE": {
+          "DECISIONTASKDECISIONTABLEREFERENCEKEY": {
+            "TITLE": "Decision table key",
+            "DESCRIPTION" : "Set the decision table key as a plain text or expression. A reference without model consistency checks. Decision service/table reference has precedence before key in export/import"
           }
         },
         "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE": {

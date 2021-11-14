@@ -309,6 +309,7 @@ public interface StencilConstants {
     final String PROPERTY_TERMINATE_ALL = "terminateall";
     final String PROPERTY_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";
 
+    final String PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION = "decisiontaskdecisiontablereferencekeydefinition";
     final String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
     final String PROPERTY_DECISIONSERVICE_REFERENCE = "decisiontaskdecisionservicereference";
     final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";

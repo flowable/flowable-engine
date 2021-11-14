@@ -99,6 +99,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
                             decisionTableReferenceNode.put("id", decisionTableModelInfo.get("id"));
                             decisionTableReferenceNode.put("name", decisionTableModelInfo.get("name"));
                             decisionTableReferenceNode.put("key", decisionTableModelInfo.get("key"));
+                        } else {
+                            setPropertyValue(PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION, fieldExtension.getStringValue(), propertiesNode);
                         }
                     }
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {

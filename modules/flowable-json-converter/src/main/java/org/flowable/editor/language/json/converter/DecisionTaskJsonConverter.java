@@ -58,7 +58,8 @@ public class DecisionTaskJsonConverter extends BaseBpmnJsonConverter {
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);
 
-        String decisionModelKey = null;
+        // When decision table key is present, can be still overridden by decision table/service references
+        String decisionModelKey = getPropertyValueAsString(PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION, elementNode);
         String referenceType = null;
 
         // when both decision table and decision service reference are present

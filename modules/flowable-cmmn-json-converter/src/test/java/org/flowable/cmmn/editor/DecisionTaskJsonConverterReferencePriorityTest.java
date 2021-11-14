@@ -13,12 +13,10 @@
 package org.flowable.cmmn.editor;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -26,41 +24,22 @@ import org.flowable.cmmn.model.Stage;
 /**
  * @author martin.grofcik
  */
-public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
+public class DecisionTaskJsonConverterReferencePriorityTest extends AbstractConverterTest {
 
     @Override
     protected String getResource() {
-        return "test.dmnTaskModel.json";
+        return "test.dmnTaskModelReferencePriority.json";
     }
 
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertThat(caseModel.getId()).isEqualTo("dmnExportCase");
-        assertThat(caseModel.getName()).isEqualTo("dmnExportCase");
-
         Stage planModelStage = caseModel.getPlanModel();
-        assertThat(planModelStage).isNotNull();
-        assertThat(planModelStage.getId()).isEqualTo("casePlanModel");
-
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertThat(planItem).isNotNull();
-        assertThat(planItem.getId()).isEqualTo("planItem1");
-        assertThat(planItem.getName()).isEqualTo("dmnTask");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         assertThat(planItemDefinition).isInstanceOf(DecisionTask.class);
         DecisionTask decisionTask = (DecisionTask) planItemDefinition;
-        assertThat(decisionTask.getId()).isEqualTo("sid-F4BCA0C7-8737-4279-B50F-59272C7C65A2");
-        assertThat(decisionTask.getName()).isEqualTo("dmnTask");
-        assertThat(decisionTask.getDecisionRef()).isEqualTo("dmnTableReference");
-
-        assertThat(decisionTask.getFieldExtensions())
-                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
-                .as("fieldName, stringValue")
-                .contains(
-                        tuple("fallbackToDefaultTenant", "true"),
-                        tuple("decisionTaskThrowErrorOnNoHits", "false")
-                );
+        assertThat(decisionTask.getDecisionRef()).isEqualTo("tableKey");
     }
 
 }

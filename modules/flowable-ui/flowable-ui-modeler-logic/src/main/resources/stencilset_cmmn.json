@@ -404,6 +404,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskdecisiontablereferencekeydefinitionpackage",
+    "properties" : [ {
+      "id" : "decisiontaskdecisiontablereferencekeydefinition",
+      "type" : "String",
+      "title" : "CMMN.PROPERTYPACKAGES.DECISIONTASKDECISIONTABLEREFERENCEKEYDEFINITIONPACKAGE.DECISIONTASKDECISIONTABLEREFERENCEKEY.TITLE",
+      "value" : "",
+      "description" : "CMMN.PROPERTYPACKAGES.DECISIONTASKDECISIONTABLEREFERENCEKEYDEFINITIONPACKAGE.DECISIONTASKDECISIONTABLEREFERENCEKEY.DESCRIPTION",
+      "popular" : true
+    } ]
+  }, {
     "name" : "decisiontaskdecisionservicereferencepackage",
     "properties" : [ {
       "id" : "decisiontaskdecisionservicereference",
@@ -1303,6 +1313,7 @@
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
+        "decisiontaskdecisiontablereferencekeydefinitionpackage",
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskdecisionservicereferencepackage",
         "decisiontaskthrowerroronnohitspackage",

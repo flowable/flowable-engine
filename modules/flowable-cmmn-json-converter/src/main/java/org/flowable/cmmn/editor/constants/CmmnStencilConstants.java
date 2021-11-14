@@ -134,6 +134,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_SCRIPT_TASK_SCRIPT_FORMAT = "scriptformat";
     String PROPERTY_SCRIPT_TASK_SCRIPT_TEXT = "scripttext";
 
+    String PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION = "decisiontaskdecisiontablereferencekeydefinition";
     String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
     String PROPERTY_DECISIONSERVICE_REFERENCE = "decisiontaskdecisionservicereference";
     String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";

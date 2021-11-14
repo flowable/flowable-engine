@@ -53,7 +53,8 @@ public class DecisionTaskConverterTest extends AbstractConverterTest {
                 .as("fieldName, stringValue")
                 .contains(
                         tuple("fallbackToDefaultTenant", "true"),
-                        tuple("decisionTaskThrowErrorOnNoHits", "true")
+                        tuple("decisionTaskThrowErrorOnNoHits", "true"),
+                        tuple("decisionTableReferenceKey", "tableKey")
                 );
     }
 }

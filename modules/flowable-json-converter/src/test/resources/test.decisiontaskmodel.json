@@ -35,6 +35,7 @@
         "dockers" : [  ],
         "outgoing" : [ { "resourceId" : "sid-3E39A302-9778-49BA-AEBE-5609C72C7C65" } ],
         "properties" : {
+            "decisiontaskdecisiontablereferencekeydefinition": "tableKey",
             "decisiontaskfallbacktodefaulttenant": "true",
             "decisiontaskthrowerroronnohits": "true",
             "documentation" : "",

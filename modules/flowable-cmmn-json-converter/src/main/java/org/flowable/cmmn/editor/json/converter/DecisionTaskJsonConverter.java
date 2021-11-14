@@ -61,6 +61,12 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
         DecisionTask decisionTask = new DecisionTask();
         String referenceType = null;
 
+        String decisionKey = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION, elementNode);
+        if (StringUtils.isNotEmpty(decisionKey)) {
+            decisionTask.setDecisionRef(decisionKey);
+            referenceType = REFERENCE_TYPE_DECISION_TABLE;
+        }
+
         // when both decision table and decision service reference are present
         // decision services reference will prevail
         JsonNode decisionTableReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
@@ -115,6 +121,8 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter {
                 decisionReferenceNode.put("id", modelInfo.get("id"));
                 decisionReferenceNode.put("name", modelInfo.get("name"));
                 decisionReferenceNode.put("key", modelInfo.get("key"));
+            } else {
+                propertiesNode.put(PROPERTY_DECISIONTABLE_REFERENCE_KEY_DEFINITION, decisionTask.getDecisionRef());
             }
         }
 
