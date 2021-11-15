@@ -5,7 +5,7 @@ This is a helm chart for the [Flowable UI apps][flowable].
 ## TL;DR;
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable https://flowable.github.io/helm/
 
 helm install my-flowable flowable/flowable
 ```
@@ -21,7 +21,7 @@ helm install my-flowable ./flowable
 To install the *repo* chart with the release name `my-flowable`:
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable https://flowable.github.io/helm/
 
 helm install my-flowable ./flowable \
     --create-namespace --namespace=flowable \
