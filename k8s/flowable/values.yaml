@@ -36,7 +36,7 @@ ui:
   ingressPath: /
   image:
     repository: flowable/flowable-ui
-    tag: 6.7.0
+    tag: 6.7.1
     pullPolicy: Always
   resources:
     requests:
@@ -64,7 +64,7 @@ rest:
   ingressPath: /
   image:
     repository: flowable/flowable-rest
-    tag: 6.7.0
+    tag: 6.7.1
     pullPolicy: Always
   resources:
     requests:
