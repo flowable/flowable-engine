@@ -27,7 +27,7 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.2.1
         with:
-          charts_dir: k8s/flowable
+          charts_dir: /k8s/flowable
           charts_repo_url: https://flowable.github.io/helm/
         env:
           CR_OWNER: flowable
