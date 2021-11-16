@@ -136,6 +136,70 @@ public class DmnTaskTest {
     @Test
     @Deployment(resources = {
             "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
+    void collectHitPolicyNoAggregatorUseArrays_AllHits() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 1)
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(3);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
+    void collectHitPolicyNoAggregatorUseArrays_2Hits() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 15)
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
+    void collectHitPolicyNoAggregatorUseArrays_OneHit() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 25)
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
+    void collectHitPolicyNoAggregatorUseArrays_NoneHit() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .variable("inputVariable1", 35)
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object resultObject = processVariables.get("DecisionTable");
+        assertThat(resultObject).isInstanceOf(ArrayNode.class);
+        ArrayNode result = (ArrayNode) resultObject;
+        assertThat(result).hasSize(0);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
             "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
     void withRuleOrder_ensureListOfItemIsReturnedEvenIfNoRowIsHit() {
         ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
