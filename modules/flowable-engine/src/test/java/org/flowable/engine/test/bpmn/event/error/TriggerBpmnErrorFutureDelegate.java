@@ -25,21 +25,7 @@ public class TriggerBpmnErrorFutureDelegate implements TriggerableActivityBehavi
 
     @Override
     public String prepareExecutionData(DelegateExecution execution) {
-        String throwErrorIn = (String) execution.getVariable("throwErrorIn");
-        Integer beforeExecutionsBeforeError = (Integer) execution.getVariable("beforeExecutionsBeforeError");
-        Integer beforeExecutions = (Integer) execution.getVariable("beforeExecutions");
-        if (beforeExecutions == null) {
-            beforeExecutions = 0;
-        }
-        beforeExecutions++;
-        if (beforeExecutionsBeforeError == null || beforeExecutionsBeforeError < beforeExecutions) {
-            if ("beforeExecution".equals(throwErrorIn)) {
-                throw new BpmnError("beforeExecution", "This is a business fault, which can be caught by a BPMN Error Event.");
-            }
-        }
-        execution.setVariable("beforeExecutions", beforeExecutions);
-
-        return throwErrorIn;
+        return "";
     }
 
     @Override
@@ -49,19 +35,7 @@ public class TriggerBpmnErrorFutureDelegate implements TriggerableActivityBehavi
 
     @Override
     public void afterExecution(DelegateExecution execution, Object executionData) {
-        String throwErrorIn = (String) execution.getVariable("throwErrorIn");
-        Integer afterExecutionsBeforeError = (Integer) execution.getVariable("afterExecutionsBeforeError");
-        Integer afterExecutions = (Integer) execution.getVariable("afterExecutions");
-        if (afterExecutions == null) {
-            afterExecutions = 0;
-        }
-        afterExecutions++;
-        if (afterExecutionsBeforeError == null || afterExecutionsBeforeError < afterExecutions) {
-            if ("afterExecution".equals(throwErrorIn)) {
-                throw new BpmnError("afterExecution", "This is a business fault, which can be caught by a BPMN Error Event.");
-            }
-        }
-        execution.setVariable("afterExecutions", afterExecutions);
+
     }
 
     @Override
@@ -71,6 +45,6 @@ public class TriggerBpmnErrorFutureDelegate implements TriggerableActivityBehavi
 
     @Override
     public void execute(DelegateExecution execution) {
-        System.out.println("HelloWorld");
+
     }
 }
