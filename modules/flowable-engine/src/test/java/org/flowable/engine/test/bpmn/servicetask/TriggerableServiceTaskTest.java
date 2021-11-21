@@ -50,6 +50,16 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableServiceTaskTest.testClassDelegateTriggerException.bpmn20.xml")
+    public void classDelegateTriggerBpmnException() {
+        String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThatBpmnSubProcessActive(processId);
+    }
+
+    @Test
     @Deployment
     public void testDelegateExpression() {
         Map<String, Object> varMap = new HashMap<>();
@@ -69,6 +79,19 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
         assertThat(execution).isNotNull();
         assertThat(runtimeService.getVariable(processId, "count")).isEqualTo(3);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableServiceTaskTest.testDelegateExpression.bpmn20.xml")
+    public void delegateExpressionTriggerBmnError() {
+        Map<String, Object> varMap = new HashMap<>();
+        varMap.put("triggerableServiceTask", new ThrowBpmnErrorTriggerableServiceTask());
+
+        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThatBpmnSubProcessActive(processId);
     }
 
     @Test
@@ -138,5 +161,9 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("taskAfterErrorCatch").singleResult();
         assertThat(execution).isNotNull();
+    }
+
+    protected void assertThatBpmnSubProcessActive(String processId) {
+        assertThat(taskService.createTaskQuery().processInstanceId(processId).taskName("Escalated Task").singleResult()).isNotNull();
     }
 }

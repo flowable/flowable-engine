@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Falko Menge
  * @author Saeid Mirzaei
  * @author Yvo Swillens
+ * @author martin.grofcik
  */
 public class ClassDelegate extends AbstractClassDelegate implements TaskListener, ExecutionListener, TransactionDependentExecutionListener, TransactionDependentTaskListener, SubProcessActivityBehavior, CustomPropertiesResolver {
 
@@ -216,7 +217,15 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         }
 
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
-            ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+            try {
+                ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+            } catch (BpmnError error) {
+                ErrorPropagation.propagateError(error, execution);
+            } catch (RuntimeException e) {
+                if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                    throw e;
+                }
+            }
             if (triggerable) {
                 leave(execution);
             }
