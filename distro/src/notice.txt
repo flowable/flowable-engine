@@ -127,9 +127,9 @@ org.apache.httpcomponents       httpclient                  4.5.13          Apac
 org.apache.httpcomponents       httpcore                    4.4.14          Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.13          Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy                      3.0.8           The Apache Software License, Version 2.0
-org.codehaus.groovy             groovy-jsr223               3.0.8           The Apache Software License, Version 2.0
-org.liquibase                   liquibase-core              4.3.5           Apache License, Version 2.0
+org.codehaus.groovy             groovy                      3.0.9           The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy-jsr223               3.0.9           The Apache Software License, Version 2.0
+org.liquibase                   liquibase-core              4.5.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.7           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.6           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
@@ -148,10 +148,10 @@ org.springframework             spring-aop                  5.3.13          The 
 org.springframework             spring-core                 5.3.13          The Apache Software License, Version 2.0
 org.springframework             spring-expression           5.3.13          The Apache Software License, Version 2.0
 org.springframework             spring-orm                  5.3.13          The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      5.5.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        5.5.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      5.5.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         5.5.3           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      5.6.0           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        5.6.0           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      5.6.0           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         5.6.0           The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0
