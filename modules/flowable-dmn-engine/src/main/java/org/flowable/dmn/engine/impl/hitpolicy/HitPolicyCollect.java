@@ -27,6 +27,7 @@ import org.flowable.dmn.model.HitPolicy;
 
 /**
  * @author Yvo Swillens
+ * @author martin.grofcik
  */
 public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
 
