@@ -68,7 +68,7 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
             }
         }
         executionContext.getAuditContainer().setDecisionResult(decisionResults);
-        // the `multipleResults` flag depends on the aggregator. If there is no aggregation there are more results
+        // the `multipleResults` flag depends on the aggregator. If there is no aggregation there are more results.
         executionContext.getAuditContainer().setMultipleResults(isMultipleResults(executionContext.getAggregator()));
     }
 
