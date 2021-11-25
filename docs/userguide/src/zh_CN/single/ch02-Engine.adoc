@@ -62,7 +62,7 @@ include::../dmn/ch04-Spring.adoc[leveloffset=+2]
 include::../dmn/ch05-Deployment.adoc[leveloffset=+2]
 
 
-=== FORMS
+=== 表单
 
 include::../form/ch02-Configuration.adoc[leveloffset=+2]
 
@@ -72,13 +72,13 @@ include::../form/ch04-Spring.adoc[leveloffset=+2]
 
 include::../form/ch05-Deployment.adoc[leveloffset=+2]
 
-=== Integration
+=== 整合
 
 include::../bpmn/ch16-Cdi.adoc[leveloffset=+2]
 
 include::../bpmn/ch16-Ldap.adoc[leveloffset=+2]
 
-// ADVANCED
+// 建议
 
 include::../bpmn/ch17-Advanced.adoc[leveloffset=+1]
 
