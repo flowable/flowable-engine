@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ConditionUtil {
 
     public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
+        boolean result=false;
         String conditionExpression = null;
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode elementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
@@ -41,13 +42,19 @@ public class ConditionUtil {
         }
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
+            try {
+                Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+                Condition condition = new UelExpressionCondition(expression);
+                result= condition.evaluate(sequenceFlow.getId(), execution);
+            }catch (Exception e){
+                result=false;
+            }
 
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
-            Condition condition = new UelExpressionCondition(expression);
-            return condition.evaluate(sequenceFlow.getId(), execution);
+
         } else {
-            return true;
+            result=true;
         }
+        return  result;
 
     }
 

@@ -1,6 +1,6 @@
 [[restApiChapter]]
 
-== REST API
+== REST 接口
 
 include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.rest]
 

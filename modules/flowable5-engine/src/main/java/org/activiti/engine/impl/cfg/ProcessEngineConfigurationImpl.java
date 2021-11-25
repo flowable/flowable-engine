@@ -1048,9 +1048,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
                 for (ProcessEngineConfigurator configurator : allConfigurators) {
-                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
             }
@@ -1060,14 +1058,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected void configuratorsBeforeInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
-            configurator.beforeInit(this);
+            Engine Configurators            configurator.beforeInit(this);
         }
     }
 
     protected void configuratorsAfterInit() {
         for (ProcessEngineConfigurator configurator : allConfigurators) {
-            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
     }

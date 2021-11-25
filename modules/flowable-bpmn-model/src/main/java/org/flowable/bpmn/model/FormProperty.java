@@ -118,6 +118,7 @@ public class FormProperty extends BaseElement {
         return clone;
     }
 
+
     public void setValues(FormProperty otherProperty) {
         super.setValues(otherProperty);
         setName(otherProperty.getName());
