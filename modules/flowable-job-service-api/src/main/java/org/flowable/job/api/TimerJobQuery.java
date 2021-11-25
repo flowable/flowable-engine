@@ -29,6 +29,7 @@ public interface TimerJobQuery extends BaseJobQuery<TimerJobQuery, Job> {
     /**
      * Select jobs which have given job handler type
      */
+    @Override
     TimerJobQuery handlerType(String handlerType);
 
     /**
