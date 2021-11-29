@@ -53,7 +53,7 @@ public class DMNDIExport implements DmnXMLConstants {
             // DI shape
             for (Map.Entry<String, GraphicInfo> graphicInfoEntry : graphicInfoMap.entrySet()) {
                 xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_SHAPE, DMNDI_NAMESPACE);
-                xtw.writeAttribute(ATTRIBUTE_ID, DmnXMLUtil.getUniqueElementId("DMNShape"));
+                xtw.writeAttribute(ATTRIBUTE_ID, "DMNShape_" + graphicInfoEntry.getKey());
                 xtw.writeAttribute(ATTRIBUTE_DI_DMN_ELEMENT_REF, graphicInfoEntry.getKey());
 
                 createDmnShapeBounds(graphicInfoEntry.getValue(), xtw);
@@ -106,7 +106,7 @@ public class DMNDIExport implements DmnXMLConstants {
 
     protected static void createDmnEdge(String elementId, List<GraphicInfo> graphicInfoList, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(DMNDI_PREFIX, ELEMENT_DI_EDGE, DMNDI_NAMESPACE);
-        xtw.writeAttribute(ATTRIBUTE_ID, DmnXMLUtil.getUniqueElementId("DMNEdge"));
+        xtw.writeAttribute(ATTRIBUTE_ID, "DMNEdge_" + elementId);
         xtw.writeAttribute(ATTRIBUTE_DI_DMN_ELEMENT_REF, elementId);
 
         for (GraphicInfo graphicInfo : graphicInfoList) {
