@@ -859,7 +859,7 @@
 			<dependency>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>org.apache.felix.fileinstall</artifactId>
-				<version>3.6.4</version>
+				<version>3.6.6</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
