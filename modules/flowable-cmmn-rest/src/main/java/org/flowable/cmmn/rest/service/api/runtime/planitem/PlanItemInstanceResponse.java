@@ -84,7 +84,7 @@ public class PlanItemInstanceResponse {
         this.id = id;
     }
 
-    @ApiModelProperty(example = "http://localhost:8182/runtime/executions/5")
+    @ApiModelProperty(example = "http://localhost:8182/cmmn-runtime/plan-item-instances/5")
     public String getUrl() {
         return url;
     }
