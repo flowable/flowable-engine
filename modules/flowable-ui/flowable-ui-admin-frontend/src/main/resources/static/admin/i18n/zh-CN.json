@@ -779,7 +779,8 @@
         },
         "APP-DEPLOYMENT": {
         	"DELETED-APP": "删除应用程序'{{appDefinition.name}}'",
-        	"DELETE-ERROR": "不能删除应用程序。{{message || ''}}"
+        	"DELETE-ERROR": "不能删除应用程序。{{message || ''}}",
+            "DELETED-DEPLOYMENT": "删除成功"
         }
     },
     "CMMN-DEPLOYMENTS": {
