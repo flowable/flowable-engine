@@ -422,8 +422,8 @@
                 "ERROR": "不能上传这个文件"
             },
             "DELETE": {
-            	"CONFIRM-MESSAGE": "删除部署 '{{name}}'?"
-            	}
+                "CONFIRM-MESSAGE": "删除部署 '{{name}}'?"
+            }
         }
     },
     "DEPLOYMENT": {
@@ -475,13 +475,13 @@
         "LIST-MESSAGE": "显示{{size}} 条结果,总计{{total}}个匹配到的jobs.",
         "LIST-MESSAGE-EMPTY": "没有匹配到jobs",
         "FILTER": {
-        	"JOBTYPE": {
-        		"LABEL": "Job类型",
-        		"EXECUTABLE-JOB": "可以执行的jobs",
-        		"TIMER-JOB": "定时的jobs",
-        		"SUSPENDED-JOB": "挂起的jobs",
-        		"DEADLETTER-JOB": "死信的jobs"
-        	},
+            "JOBTYPE": {
+                "LABEL": "Job类型",
+                "EXECUTABLE-JOB": "可以执行的jobs",
+                "TIMER-JOB": "定时的jobs",
+                "SUSPENDED-JOB": "挂起的jobs",
+                "DEADLETTER-JOB": "死信的jobs"
+            },
             "PROCESS-DEFINITION": "流程定义",
             "ALL-PROCESS-DEFINITIONS": "所有的流程定义",
             "PROCESS-INSTANCE-ID": "流程实例ID",
@@ -527,10 +527,10 @@
         "TENANT-ID": "租户:"
     },
     "EVENT-SUBSCRIPTIONS": {
-    	"TITLE": "事件订阅",
+        "TITLE": "事件订阅",
         "LIST-MESSAGE": "显示{{size}} 条结果,总计{{total}}个匹配到的事件订阅",
         "LIST-MESSAGE-EMPTY": "没有匹配到事件订阅",
-    	"FILTER": {
+        "FILTER": {
             "PROCESS-DEFINITION": "流程定义",
             "ALL-PROCESS-DEFINITIONS": "所有的流程定义",
             "PROCESS-INSTANCE-ID": "流程实例ID",
@@ -543,7 +543,7 @@
             "CREATE-DATE": "已经创建",
             "PROCESS-INSTANCE-ID": "流程实例ID"
         },
-    	"HEADER": {
+        "HEADER": {
             "ID": "ID",
             "CREATE-DATE": "已经创建",
             "PROCESS-DEFINITION": "流程定义",
@@ -680,44 +680,6 @@
             }
         }
     },
-    "APP-DEPLOYMENTS": {
-        "TITLE": "应用程序部署对象",
-        "LIST-MESSAGE": "显示{{size}} 条结果,总计{{total}}个匹配到的应用部署对象.",
-        "LIST-MESSAGE-EMPTY": "没有匹配到应用部署对象.",
-        "FILTER": {
-            "NAME": "名称",
-            "TENANTID": "租户标识符",
-            "LATEST": "最新版本",
-            "LATEST-HELP": "仅显示最近的部署时间"
-        },
-        "SORT": {
-            "ID": "ID",
-            "NAME": "名称"
-        },
-        "HEADER": {
-            "ID": "ID",
-            "APP-DEFINITION-ID": "应用程序ID",
-            "DEPLOYMENT-ID": "流程部署ID",
-            "DMN-DEPLOYMENT-ID": "DMN部署ID",
-            "NAME": "名称",
-            "DEPLOY-TIME": "部署时间",
-            "DEPLOYED-BY": "Deployed by",
-            "TENANT": "租户ID"
-        },
-        "ACTION": {
-            "UPLOAD": "上传和发布应用程序"
-        },
-        "POPUP": {
-            "UPLOAD": {
-                "DESCRIPTION": "选择一个.zip应用程序定义去部署",
-                "WARNING": "只能在Flowable UI实例中上传一个流程。",
-                "DROPZONE": "或在此处拖拽一个文件",
-                "NO-DROP": "浏览器不支持文件丢拖拽",
-                "CANCEL-UPLOAD": "取消上传",
-                "ERROR": "不能上传这个文件"
-            }
-        }
-    },
     "VARIABLES": {
         "HEADER": {
             "NAME": "名称",
@@ -748,7 +710,7 @@
             "EXECUTED": "Job '{{id}}' 执行成功"
         },
         "EVENT-SUBSCRIPTION": {
-        	"TRIGGERED": "事件订阅 '{{id}}'成功被触发."
+            "TRIGGERED": "事件订阅 '{{id}}'成功被触发."
         },
         "PROCESS-INSTANCE": {
             "DELETED": "流程实例 '{{id}}'成功删除。",
@@ -773,13 +735,18 @@
             "CATEGORY-UPDATED": "流程定义分类被更新"
         },
         "DEPLOYMENT": {
-        	"DELETED-DEPLOYMENT": "删除部署对象'{{name}}'",
-        	"DELETE-ERROR": "不能删除部署对象. {{exception || ''}}",
-        	"DEPLOYMENT-SUCCESS": "部署成功"
+            "DELETED-DEPLOYMENT": "删除部署对象'{{name}}'",
+            "DELETE-ERROR": "不能删除部署对象. {{exception || ''}}",
+            "DEPLOYMENT-SUCCESS": "部署成功"
         },
         "APP-DEPLOYMENT": {
-        	"DELETED-APP": "删除应用程序'{{appDefinition.name}}'",
-        	"DELETE-ERROR": "不能删除应用程序。{{message || ''}}",
+            "DELETED-APP": "删除应用程序'{{appDefinition.name}}'",
+            "DELETE-ERROR": "不能删除应用程序。{{message || ''}}",
+            "DELETED-DEPLOYMENT": "删除成功"
+        },
+        "FORM-DEPLOYMENT": {
+            "DELETED-FORM": "删除表单'{{appDefinition.name}}'",
+            "DELETE-ERROR": "不能删除表单。{{message || ''}}",
             "DELETED-DEPLOYMENT": "删除成功"
         }
     },
@@ -816,7 +783,7 @@
             },
             "DELETE": {
                 "CONFIRM-MESSAGE": "删除部署 '{{name}}'?"
-                }
+            }
         }
     },
     "CMMN-DEPLOYMENT": {
@@ -1067,7 +1034,7 @@
             },
             "DELETE": {
                 "CONFIRM-MESSAGE": "删除部署 '{{name}}'?"
-                }
+            }
         }
     },
     "APP-DEPLOYMENT": {
@@ -1161,7 +1128,8 @@
             "TENANT": "租户"
         },
         "ACTION": {
-            "DELETE": "删除部署"
+            "DELETE": "删除部署",
+            "UPLOAD": "上传决策表"
         }
     },
     "DECISION-TABLE-DEPLOYMENT": {
@@ -1311,7 +1279,7 @@
         }
     },
     "FORM-DEFINITIONS": {
-    	"TITLE": "表单定义",
+        "TITLE": "表单定义",
         "LIST-MESSAGE": "显示{{size}} 条结果,总计{{total}}个匹配到的表单定义.",
         "LIST-MESSAGE-EMPTY": "没有匹配到表单定义",
         "HEADER": {
@@ -1358,20 +1326,20 @@
             "TITLE": "表单: "
         },
         "FIELD-PREVIEW" : {
-        	"DISPLAY-REF": "显示值",
-        	"SELECT-FIELD": "(没有选择字段)",
-        	"FIELD-VALUE": "显示\"{{name}}\" 字段值",
-        	"UNKNOWN-TYPE": "未知字段类型 {{type}}",
-        	"TEXT-VALUE": "文本",
-        	"MULTI-TEXT-VALUE": "多行文本",
-        	"NUMBER-VALUE": "123",
-        	"DATE-VALUE": "日期",
-        	"DROPDOWN-VALUE": "选择...",
-        	"UPLOAD-VALUE": "上传或者导入content...",
-        	"RADIOS-OPTION1": "选择 1",
-        	"SELECT-PERSON": "选择一个人",
-        	"SELECT-GROUP": "选择一个组"
-        	}
+            "DISPLAY-REF": "显示值",
+            "SELECT-FIELD": "(没有选择字段)",
+            "FIELD-VALUE": "显示\"{{name}}\" 字段值",
+            "UNKNOWN-TYPE": "未知字段类型 {{type}}",
+            "TEXT-VALUE": "文本",
+            "MULTI-TEXT-VALUE": "多行文本",
+            "NUMBER-VALUE": "123",
+            "DATE-VALUE": "日期",
+            "DROPDOWN-VALUE": "选择...",
+            "UPLOAD-VALUE": "上传或者导入content...",
+            "RADIOS-OPTION1": "选择 1",
+            "SELECT-PERSON": "选择一个人",
+            "SELECT-GROUP": "选择一个组"
+        }
     },
     "FORM-DEPLOYMENTS": {
         "TITLE": "表单部署对象",
