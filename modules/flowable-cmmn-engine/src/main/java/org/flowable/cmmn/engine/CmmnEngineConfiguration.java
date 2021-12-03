@@ -49,6 +49,7 @@ import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -522,6 +523,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected boolean jsonVariableTypeTrackObjects = true;
 
+    protected List<CaseInstanceMigrationCallback> caseInstanceMigrationCallbacks;
 
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
@@ -4054,6 +4056,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setHistoryJobExecutionScope(String historyJobExecutionScope) {
         this.historyJobExecutionScope = historyJobExecutionScope;
+        return this;
+    }
+
+    public List<CaseInstanceMigrationCallback> getCaseInstanceMigrationCallbacks() {
+        return caseInstanceMigrationCallbacks;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceMigrationCallbacks(List<CaseInstanceMigrationCallback> caseInstanceMigrationCallbacks) {
+        this.caseInstanceMigrationCallbacks = caseInstanceMigrationCallbacks;
         return this;
     }
 

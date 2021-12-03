@@ -71,6 +71,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.migration.ActivityMigrationMapping;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
+import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
@@ -463,6 +464,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             LOGGER.debug("Execute post upgrade process instance script");
             executeExpression(processInstance, procDefToMigrateTo, document.getPostUpgradeJavaDelegateExpression(), commandContext);
         }
+        
+        List<ProcessInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationCallbacks();
+        if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
+            for (ProcessInstanceMigrationCallback processInstanceMigrationCallback : migrationCallbacks) {
+                processInstanceMigrationCallback.processInstanceMigrated(processInstance, procDefToMigrateTo, document, commandContext);
+            }
+        }
 
         LOGGER.debug("Process migration ended for process instance with Id:'{}'", processInstance.getId());
     }
@@ -492,15 +500,17 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         }
     }
 
-    protected void executeJavaDelegate(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeJavaDelegate,
-        CommandContext commandContext) {
+    protected void executeJavaDelegate(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, 
+            String preUpgradeJavaDelegate, CommandContext commandContext) {
+        
         CommandContextUtil.getProcessEngineConfiguration(commandContext).getDelegateInterceptor()
             .handleInvocation(new JavaDelegateInvocation((JavaDelegate) defaultInstantiateDelegate(preUpgradeJavaDelegate, Collections.emptyList()),
                 (ExecutionEntityImpl) processInstance));
     }
 
-    protected void executeExpression(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, String preUpgradeJavaDelegateExpression,
-        CommandContext commandContext) {
+    protected void executeExpression(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, 
+            String preUpgradeJavaDelegateExpression, CommandContext commandContext) {
+        
         Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(preUpgradeJavaDelegateExpression);
 
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, (VariableContainer) processInstance, Collections.emptyList());
