@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -203,6 +204,13 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
         LOGGER.debug("Updating case definition reference in history");
         changeCaseDefinitionReferenceOfHistory(caseInstance, caseDefinitionToMigrateTo, commandContext);
+        
+        List<CaseInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationCallbacks();
+        if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
+            for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
+                caseInstanceMigrationCallback.caseInstanceMigrated(caseInstance, caseDefinitionToMigrateTo, document);
+            }
+        }
     }
 
     protected ChangePlanItemStateBuilderImpl prepareChangeStateBuilder(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, 
