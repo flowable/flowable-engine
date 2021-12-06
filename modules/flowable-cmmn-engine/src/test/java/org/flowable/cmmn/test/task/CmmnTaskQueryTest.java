@@ -214,6 +214,58 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void queryTasksIncludeIdentityLinksAndCaseVariables() {
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                .list();
+        assertThat(caseInstances).hasSize(5);
+
+        for (Task task : cmmnTaskService.createTaskQuery()
+                .list()) {
+            cmmnTaskService.addUserIdentityLink(task.getId(), "kermit", IdentityLinkType.CANDIDATE);
+            cmmnTaskService.addGroupIdentityLink(task.getId(), "muppets", IdentityLinkType.CANDIDATE);
+        }
+
+        for (CaseInstance caseInstance : caseInstances) {
+
+            List<Task> tasks = cmmnTaskService.createTaskQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .includeIdentityLinks()
+                    .list();
+            assertThat(tasks)
+                    .extracting(Task::getScopeId, Task::getScopeType)
+                    .containsExactly(tuple(caseInstance.getId(), ScopeTypes.CMMN));
+
+            assertThat(tasks.get(0)
+                    .getIdentityLinks())
+                    .extracting(IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getType)
+                    .containsOnly(
+                            tuple("kermit", null, IdentityLinkType.CANDIDATE),
+                            tuple(null, "muppets", IdentityLinkType.CANDIDATE)
+                    );
+        }
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+
+            for (CaseInstance caseInstance : caseInstances) {
+                List<HistoricTaskInstance> tasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .includeIdentityLinks()
+                        .list();
+                assertThat(tasks)
+                        .extracting(HistoricTaskInstance::getScopeId, HistoricTaskInstance::getScopeType)
+                        .containsExactly(tuple(caseInstance.getId(), ScopeTypes.CMMN));
+
+                assertThat(tasks.get(0)
+                        .getIdentityLinks())
+                        .extracting(IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getType)
+                        .containsOnly(
+                                tuple("kermit", null, IdentityLinkType.CANDIDATE),
+                                tuple(null, "muppets", IdentityLinkType.CANDIDATE)
+                        );
+            }
+        }
+    }
+    @Test
     public void queryTasksByCaseInstanceIdIncludeIdentityLinksWithDifferentIdentityLinks() {
         List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
         assertThat(caseInstances).hasSize(5);

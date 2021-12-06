@@ -414,6 +414,8 @@
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
+      <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+      <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     </collection>
     <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
       <id property="id" column="ILINK_ID_"/>
@@ -462,19 +464,21 @@
 
   <select id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskAndRelatedEntitiesResultMap">
     select RES.*,
-    <if test="includeTaskLocalVariables or includeProcessVariables">
+    <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
       VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.VAR_TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
       VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
       VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
-      VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, VAR.LONG_ as VAR_LONG_
+      VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, VAR.LONG_ as VAR_LONG_,
+      VAR.SCOPE_ID_ AS VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ AS VAR_SUB_SCOPE_ID_,VAR.SCOPE_TYPE_ AS VAR_SCOPE_TYPE_
     </if>
-    <if test="(includeTaskLocalVariables or includeProcessVariables) and includeIdentityLinks">
+    <if test="(includeTaskLocalVariables or includeProcessVariables or includeCaseVariables) and includeIdentityLinks">
       ,
     </if>
     <if test="includeIdentityLinks">
       ILINK.ID_ as ILINK_ID_, ILINK.TYPE_ as ILINK_TYPE_, ILINK.USER_ID_ as ILINK_USER_ID_,
       ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
-      ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.CREATE_TIME_ as ILINK_CREATE_TIME_
+      ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.CREATE_TIME_ as ILINK_CREATE_TIME_,
+      ILINK.SCOPE_ID_ as ILINK_SCOPE_ID_, ILINK.SCOPE_DEFINITION_ID_ AS ILINK_SCOPE_DEFINITION_ID_
     </if>
     from (
       <if test="needsPaging">${limitBefore}</if>
@@ -484,19 +488,15 @@
       ${orderBy}
       <if test="needsPaging">${limitAfter}</if>
     ) RES
-    <choose>
-      <when test="includeTaskLocalVariables &amp;&amp; includeProcessVariables">
-        left outer join ${prefix}ACT_HI_VARINST VAR ON RES.ID_ = VAR.TASK_ID_ or (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_)
-      </when>
-      <otherwise>
-        <if test="includeTaskLocalVariables">
-          left outer join ${prefix}ACT_HI_VARINST VAR ON RES.ID_ = VAR.TASK_ID_
-        </if>
-        <if test="includeProcessVariables">
-          left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
-        </if>
-      </otherwise>
-    </choose>
+
+    <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
+      left outer join ${prefix}ACT_HI_VARINST VAR ON
+      <trim prefixOverrides="OR">
+        <if test="includeTaskLocalVariables">OR RES.ID_ = VAR.TASK_ID_</if>
+        <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ AND VAR.TASK_ID_ is null)</if>
+        <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn' AND VAR.TASK_ID_ is null)</if>
+      </trim>
+    </if>
     <if test="includeIdentityLinks">
       left outer join ${prefix}ACT_HI_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
     </if>
@@ -643,7 +643,14 @@
               and EXISTS (
                 select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
-                    and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                  <choose>
+                    <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                      and RES.PROC_INST_ID_ = PROC_INST_ID_
+                    </when>
+                    <otherwise>
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                    </otherwise>
+                  </choose>
                 </if>
                 <if test="queryVar.local">
                     and RES.ID_ = TASK_ID_
@@ -654,7 +661,15 @@
               and NOT EXISTS (
                 select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
-                    and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                  <choose>
+                    <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                      and RES.PROC_INST_ID_ = PROC_INST_ID_
+                    </when>
+                    <otherwise>
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                    </otherwise>
+                  </choose>
+                  AND TASK_ID_ is null
                 </if>
                 <if test="queryVar.local">
                     and RES.ID_ = TASK_ID_
@@ -667,10 +682,18 @@
                 from ${prefix}ACT_HI_VARINST V
                 <where>
                   <if test="!queryVar.local">
-                    and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                    <choose>
+                      <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                        and RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                      </when>
+                      <otherwise>
+                        and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{queryVar.scopeType}
+                      </otherwise>
+                    </choose>
+                    AND TASK_ID_ is null
                   </if>
                   <if test="queryVar.local">
-                    and RES.ID_ = TASK_ID_
+                    and RES.ID_ = V.TASK_ID_
                   </if>
                   <if test="queryVar.name != null">
                     <!-- Match-all variable-names when name is null -->
@@ -872,9 +895,17 @@
                 <when test="queryVar.operator.equals('EXISTS')">
                     and EXISTS (
                         select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
-                    <if test="!queryVar.local">
-                        and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
-                    </if>
+                  <if test="!queryVar.local">
+                    <choose>
+                      <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                        and RES.PROC_INST_ID_ = PROC_INST_ID_
+                      </when>
+                      <otherwise>
+                        and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                      </otherwise>
+                    </choose>
+                    AND TASK_ID_ is null
+                  </if>
                     <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_
                     </if>
@@ -884,7 +915,15 @@
                     and NOT EXISTS (
                         select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
-                        and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                      <choose>
+                        <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                          and RES.PROC_INST_ID_ = PROC_INST_ID_
+                        </when>
+                        <otherwise>
+                          and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                        </otherwise>
+                      </choose>
+                      AND TASK_ID_ is null
                     </if>
                     <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_
@@ -897,7 +936,15 @@
                     from ${prefix}ACT_HI_VARINST V
                     <where>
                       <if test="!queryVar.local">
-                        and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                        <choose>
+                          <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                            and RES.PROC_INST_ID_ = PROC_INST_ID_
+                          </when>
+                          <otherwise>
+                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                          </otherwise>
+                        </choose>
+                        AND TASK_ID_ is null
                       </if>
                       <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_

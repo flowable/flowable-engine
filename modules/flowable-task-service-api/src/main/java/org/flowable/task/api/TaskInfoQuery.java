@@ -198,7 +198,9 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      */
     T withoutProcessInstanceId();
 
-    /** Only select tasks for the given business key */
+    /**
+     * Only select tasks for the given business key
+     */
     T processInstanceBusinessKey(String processInstanceBusinessKey);
 
     /**
@@ -669,14 +671,119 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T processVariableNotExists(String name);
 
     /**
+     * Only select tasks which are part of a case that has a variable with the given name set to the given value.
+     */
+    T caseVariableValueEquals(String variableName, Object variableValue);
+
+    /**
+     * Only select tasks which are part of a case that has at least one variable with the given value.
+     */
+    T caseVariableValueEquals(Object variableValue);
+
+    /**
+     * Only select tasks which are part of a case that has a local string variable which is not the given value, case insensitive.
+     * <p>
+     * This method only works if your database has encoding/collation that supports case-sensitive queries. For example, use "collate UTF-8" on MySQL and for MSSQL, select one of the case-sensitive
+     * Collations available (<a href="http://msdn.microsoft.com/en-us/library/ms144250(v=sql.105).aspx" >MSDN Server Collation Reference</a>).
+     * </p>
+     */
+    T caseVariableValueEqualsIgnoreCase(String name, String value);
+
+    /**
+     * Only select tasks which have a variable with the given name, but with a different value than the passed value. Byte-arrays and {@link Serializable} objects (which are not primitive type
+     * wrappers) are not supported.
+     */
+    T caseVariableValueNotEquals(String variableName, Object variableValue);
+
+    /**
+     * Only select tasks which are part of a case that has a string variable with the given value, case insensitive.
+     * <p>
+     * This method only works if your database has encoding/collation that supports case-sensitive queries. For example, use "collate UTF-8" on MySQL and for MSSQL, select one of the case-sensitive
+     * Collations available (<a href="http://msdn.microsoft.com/en-us/library/ms144250(v=sql.105).aspx" >MSDN Server Collation Reference</a>).
+     * </p>
+     */
+    T caseVariableValueNotEqualsIgnoreCase(String name, String value);
+
+    /**
+     * Only select tasks which have a global variable value greater than the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type
+     * wrappers) are not supported.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null.
+     */
+    T caseVariableValueGreaterThan(String name, Object value);
+
+    /**
+     * Only select tasks which have a global variable value greater than or equal to the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive
+     * type wrappers) are not supported.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null.
+     */
+    T caseVariableValueGreaterThanOrEqual(String name, Object value);
+
+    /**
+     * Only select tasks which have a global variable value less than the passed value when the ended.Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are
+     * not supported.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null.
+     */
+    T caseVariableValueLessThan(String name, Object value);
+
+    /**
+     * Only select tasks which have a global variable value less than or equal to the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type
+     * wrappers) are not supported.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null.
+     */
+    T caseVariableValueLessThanOrEqual(String name, Object value);
+
+    /**
+     * Only select tasks which have a global variable value like the given value when they ended. This can be used on string variables only.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    T caseVariableValueLike(String name, String value);
+
+    /**
+     * Only select tasks which have a global variable value like the given value (case insensitive) when they ended. This can be used on string variables only.
+     *
+     * @param name cannot be null.
+     * @param value cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    T caseVariableValueLikeIgnoreCase(String name, String value);
+
+    /**
+     * Only select tasks which have a global variable with the given name.
+     *
+     * @param name cannot be null.
+     */
+    T caseVariableExists(String name);
+
+    /**
+     * Only select tasks which does not have a global variable with the given name.
+     *
+     * @param name cannot be null.
+     */
+    T caseVariableNotExists(String name);
+
+    /**
      * Include local task variables in the task query result
      */
     T includeTaskLocalVariables();
 
     /**
-     * Include global task variables in the task query result
+     * Include global process variables in the task query result
      */
     T includeProcessVariables();
+
+    /**
+     * Include global case variables in the task query result
+     */
+    T includeCaseVariables();
 
     /**
      * Limit task variables

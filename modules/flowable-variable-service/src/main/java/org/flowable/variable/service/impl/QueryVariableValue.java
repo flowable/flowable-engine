@@ -38,11 +38,18 @@ public class QueryVariableValue implements Serializable {
     private VariableInstanceEntity variableInstanceEntity;
     private boolean local;
 
+    private String scopeType;
+
     public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
         this.name = name;
         this.value = value;
         this.operator = operator;
         this.local = local;
+    }
+
+    public QueryVariableValue(String name, Object value, QueryOperator operator, String scopeType) {
+        this(name, value, operator, false);
+        this.scopeType = scopeType;
     }
 
     public void initialize(VariableServiceConfiguration variableServiceConfiguration) {
@@ -122,5 +129,9 @@ public class QueryVariableValue implements Serializable {
 
     public boolean isLocal() {
         return local;
+    }
+
+    public String getScopeType() {
+        return scopeType;
     }
 }

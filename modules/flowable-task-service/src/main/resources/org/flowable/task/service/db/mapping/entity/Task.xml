@@ -362,6 +362,8 @@
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
+      <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+      <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     </collection>
     <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
       <id property="id" column="ILINK_ID_"/>
@@ -428,47 +430,44 @@
 
     <!-- The ordering and the querying is done within a sub select, and then we do a join on the related entities -->
     <select id="selectTasksWithRelatedEntitiesByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskQueryImpl" resultMap="taskAndRelatedEntitiesResultMap">
-      SELECT RES.*,
-      <if test="includeTaskLocalVariables or includeProcessVariables">
-        VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
-        VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
-        VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
-        VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
-      </if>
-      <if test="(includeTaskLocalVariables or includeProcessVariables) and includeIdentityLinks">
-          ,
-      </if>
-      <if test="includeIdentityLinks">
-          ILINK.ID_ as ILINK_ID_, ILINK.TYPE_ as ILINK_TYPE_, ILINK.USER_ID_ as ILINK_USER_ID_,
-          ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
-          ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.PROC_DEF_ID_ as ILINK_PROC_DEF_ID_
-      </if>
-      FROM (
-          <!-- top 100 percent is only needed when doing order by in a subselect -->
-          <if test="needsPaging">${limitBefore}</if>
-          SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>
-          <include refid="selectTaskByQueryCriteriaSql"/>
-          ${orderBy}
-          <if test="needsPaging">${limitAfter}</if>
-      ) RES
-      <choose>
-          <when test="includeTaskLocalVariables &amp;&amp; includeProcessVariables">
-              left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.TASK_ID_ or RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
-          </when>
-          <otherwise>
-              <if test="includeTaskLocalVariables">
-                  left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.TASK_ID_
-              </if>
-              <if test="includeProcessVariables">
-                  left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
-              </if>
-          </otherwise>
-      </choose>
-      <if test="includeIdentityLinks">
-          left outer join ${prefix}ACT_RU_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
-      </if>
-      ${outerJoinOrderBy}
-  </select>
+        SELECT RES.*,
+        <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
+            VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+            VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
+            VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+            VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_,
+            VAR.SCOPE_ID_ AS VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ AS VAR_SUB_SCOPE_ID_,VAR.SCOPE_TYPE_ AS VAR_SCOPE_TYPE_
+        </if>
+        <if test="(includeTaskLocalVariables or includeProcessVariables or includeCaseVariables) and includeIdentityLinks">
+            ,
+        </if>
+        <if test="includeIdentityLinks">
+            ILINK.ID_ as ILINK_ID_, ILINK.TYPE_ as ILINK_TYPE_, ILINK.USER_ID_ as ILINK_USER_ID_,
+            ILINK.GROUP_ID_ as ILINK_GROUP_ID_, ILINK.TASK_ID_ as ILINK_TASK_ID_,
+            ILINK.PROC_INST_ID_ as ILINK_PROC_INST_ID_, ILINK.PROC_DEF_ID_ as ILINK_PROC_DEF_ID_,
+            ILINK.SCOPE_ID_ as ILINK_SCOPE_ID_, ILINK.SCOPE_DEFINITION_ID_ AS ILINK_SCOPE_DEFINITION_ID_
+        </if>
+        FROM (
+        <!-- top 100 percent is only needed when doing order by in a subselect -->
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectTaskByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+        ) RES
+        <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
+            left outer join ${prefix}ACT_RU_VARIABLE VAR ON
+            <trim prefixOverrides="OR">
+                <if test="includeTaskLocalVariables">OR RES.ID_ = VAR.TASK_ID_</if>
+                <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ AND VAR.TASK_ID_ is null)</if>
+                <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn' AND VAR.TASK_ID_ is null)</if>
+            </trim>
+        </if>
+        <if test="includeIdentityLinks">
+            left outer join ${prefix}ACT_RU_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
+        </if>
+        ${outerJoinOrderBy}
+    </select>
 
   <sql id="commonSelectTaskByQueryCriteriaSql">
     <where>
@@ -817,7 +816,15 @@
               and EXISTS (
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                 <if test="!var.local">
-                    and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                    <choose>
+                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                            and RES.PROC_INST_ID_ = PROC_INST_ID_
+                        </when>
+                        <otherwise>
+                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                        </otherwise>
+                    </choose>
+                    and TASK_ID_ is null
                 </if>
                 <if test="var.local">
                     and RES.ID_ = TASK_ID_
@@ -828,7 +835,15 @@
               and NOT EXISTS (
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                 <if test="!var.local">
-                    and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                    <choose>
+                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                            and RES.PROC_INST_ID_ = PROC_INST_ID_
+                        </when>
+                        <otherwise>
+                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                        </otherwise>
+                    </choose>
+                    and TASK_ID_ is null
                 </if>
                 <if test="var.local">
                     and RES.ID_ = TASK_ID_
@@ -841,7 +856,15 @@
                     from ${prefix}ACT_RU_VARIABLE V
                     <where>
                         <if test="!var.local">
-                            and RES.PROC_INST_ID_ = V.PROC_INST_ID_ and V.TASK_ID_ is null
+                            <choose>
+                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                    and RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                                </when>
+                                <otherwise>
+                                    and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{var.scopeType}
+                                </otherwise>
+                            </choose>
+                            and TASK_ID_ is null
                         </if>
                         <if test="var.local">
                             and RES.ID_ = V.TASK_ID_
@@ -1335,7 +1358,15 @@
                         and EXISTS (
                             select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                         <if test="!var.local">
-                            and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                            <choose>
+                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                    and RES.PROC_INST_ID_ = PROC_INST_ID_
+                                </when>
+                                <otherwise>
+                                    and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                                </otherwise>
+                            </choose>
+                            and TASK_ID_ is null
                         </if>
                         <if test="var.local">
                             and RES.ID_ = TASK_ID_
@@ -1346,7 +1377,15 @@
                         and NOT EXISTS (
                             select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                         <if test="!var.local">
-                            and RES.PROC_INST_ID_ = PROC_INST_ID_ and TASK_ID_ is null
+                            <choose>
+                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                    and RES.PROC_INST_ID_ = PROC_INST_ID_
+                                </when>
+                                <otherwise>
+                                    and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                                </otherwise>
+                            </choose>
+                            and TASK_ID_ is null
                         </if>
                         <if test="var.local">
                             and RES.ID_ = TASK_ID_
@@ -1359,7 +1398,15 @@
                             from ${prefix}ACT_RU_VARIABLE V
                             <where>
                                 <if test="!var.local">
-                                    and RES.PROC_INST_ID_ = V.PROC_INST_ID_ and V.TASK_ID_ is null
+                                    <choose>
+                                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                            and RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                                        </when>
+                                        <otherwise>
+                                            and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{var.scopeType}
+                                        </otherwise>
+                                    </choose>
+                                    and TASK_ID_ is null
                                 </if>
                                 <if test="var.local">
                                     and RES.ID_ = V.TASK_ID_

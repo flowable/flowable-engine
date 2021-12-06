@@ -462,7 +462,22 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
-                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                if (this.getProcessInstanceId() != null && this.getProcessInstanceId()
+                        .equals(variableInstance.getProcessInstanceId()) && variableInstance.getTaskId() == null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
+                if (this.getScopeId() != null && this.getScopeId()
+                        .equals(variableInstance.getScopeId()) && variableInstance.getTaskId() == null) {
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }
