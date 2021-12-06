@@ -134,8 +134,10 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
     protected void processOutboundDefinition(RabbitOutboundChannelModel channelDefinition) {
         String routingKey = channelDefinition.getRoutingKey();
         if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(routingKey)) {
+            String resolvedRoutingKey = resolve(routingKey);
+            String exchange = resolve(channelDefinition.getExchange());
             channelDefinition
-                .setOutboundEventChannelAdapter(new RabbitOperationsOutboundEventChannelAdapter(rabbitOperations, channelDefinition.getExchange(), routingKey));
+                .setOutboundEventChannelAdapter(new RabbitOperationsOutboundEventChannelAdapter(rabbitOperations, exchange, resolvedRoutingKey));
         }
     }
 

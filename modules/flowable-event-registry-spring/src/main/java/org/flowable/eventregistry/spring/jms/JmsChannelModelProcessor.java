@@ -140,7 +140,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     }
 
     protected OutboundEventChannelAdapter createOutboundEventChannelAdapter(JmsOutboundChannelModel channelModel) {
-        return new JmsOperationsOutboundEventChannelAdapter(jmsOperations, channelModel.getDestination());
+        String destination = resolve(channelModel.getDestination());
+        return new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination);
     }
 
     @Override
