@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -445,5 +446,116 @@ class JmsChannelDefinitionProcessorTest {
         } finally {
             eventRepositoryService.deleteDeployment(deployment.getId());
         }
+    }
+
+    @Test
+    void jmsOutboundChannelShouldResolveDestinationFromExpression() {
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outbound.channel")
+                .jmsChannelAdapter("${application.test.jms-queue}")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
+
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+        Object message = await("receive message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("test-expression-customer"), Objects::nonNull);
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+                .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
+    }
+
+    @Test
+    void jmsOutboundChannelShouldResolveDestinationFromExpressionUsingCombinationForProperty() {
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outbound.channel")
+                .jmsChannelAdapter("test-combination.${application.test.jms-queue}")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
+
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+        Object message = await("receive message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("test-combination.test-expression-customer"), Objects::nonNull);;
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+                .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
+    }
+
+    @Test
+    void jmsOutboundChannelShouldResolveDestinationFromExpressionUsingEnvironmentAsBean() {
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outbound.channel")
+                .jmsChannelAdapter("test.#{environment.getProperty('application.test.jms-queue')}")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
+
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+        Object message = await("receive message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("test.test-expression-customer"), Objects::nonNull);
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+                .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
     }
 }

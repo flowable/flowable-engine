@@ -127,8 +127,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     protected void processOutboundDefinition(KafkaOutboundChannelModel channelModel) {
         String topic = channelModel.getTopic();
         if (channelModel.getOutboundEventChannelAdapter() == null && StringUtils.hasText(topic)) {
+            String resolvedTopic = resolve(topic);
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
-                            kafkaOperations, topic, channelModel.getRecordKey()));
+                            kafkaOperations, resolvedTopic, channelModel.getRecordKey()));
         }
     }
 
