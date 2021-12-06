@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class DmnRestUrls {
 
     public static final String SEGMENT_REPOSITORY_RESOURCES = "dmn-repository";
+    public static final String SEGMENT_DECISION_RESOURCES = "dmn-decision";
     public static final String SEGMENT_RULES_RESOURCES = "dmn-rule";
     public static final String SEGMENT_HISTORY_RESOURCES = "dmn-history";
 
@@ -33,6 +34,8 @@ public final class DmnRestUrls {
     public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_AUDITDATA = "auditdata";
     public static final String SEGMENT_DECISION_MODEL = "model";
     public static final String SEGMENT_EXECUTE_RESOURCE = "execute";
+    public static final String SEGMENT_EXECUTE_DECISION_RESOURCE = "execute-decision";
+    public static final String SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE = "execute-decision-service";
     public static final String SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE = "single-result";
 
     /**
@@ -101,6 +104,36 @@ public final class DmnRestUrls {
      * URL template for the resource of a single deployment: <i>/dmn-repository/deployments/{0:deploymentId}/resourcedata/{1:resourceId}</i>
      */
     public static final String[] URL_DEPLOYMENT_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DEPLOYMENT_RESOURCE, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT, "{1}" };
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute/single-result</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE_SINGLE_RESULT = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE_DECISION = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_DECISION_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision/single-result</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE_DECISION_SINGLE_RESULT = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_DECISION_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision-service</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE_DECISION_SERVICE = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision-service/single-result</i>
+     */
+    public static final String[] URL_DECISION_SERVICE_EXECUTE_DECISION_SERVICE_SINGLE_RESULT = { SEGMENT_DECISION_RESOURCES, SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
 
     /**
      * URL template for a decision executor: <i>/dmn-rule/execute</i>

@@ -29,9 +29,13 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
+import org.flowable.dmn.rest.service.api.decision.DmnDecisionServiceResponse;
+import org.flowable.dmn.rest.service.api.decision.DmnDecisionServiceSingleResponse;
 import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceResponse;
 import org.flowable.dmn.rest.service.api.decision.DmnRuleServiceSingleResponse;
 import org.flowable.dmn.rest.service.api.history.HistoricDecisionExecutionResponse;
@@ -151,6 +155,109 @@ public class DmnRestResponseFactory {
 
         return response;
     }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(Map<String, List<Map<String, Object>>> executionResults) {
+        return createDmnDecisionServiceResponse(executionResults, createUrlBuilder());
+    }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(List<Map<String, Object>> executionResults) {
+        return createDmnDecisionServiceResponse(executionResults, createUrlBuilder());
+    }
+
+    public DmnDecisionServiceSingleResponse createDmnDecisionServiceSingleResponse(Map<String, Object> executionResult) {
+        return createDmnDecisionServiceSingleResponse(executionResult, createUrlBuilder());
+    }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(Map<String, List<Map<String, Object>>> executionResults, DmnRestUrlBuilder urlBuilder) {
+        DmnDecisionServiceResponse response = new DmnDecisionServiceResponse();
+
+        if (executionResults != null && !executionResults.isEmpty()) {
+            for (String decisionName : executionResults.keySet()) {
+                for (Map<String, Object> executionResult : executionResults.get(decisionName)) {
+                    List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                    for (String variableName : executionResult.keySet()) {
+                        ruleResults.add(createRestVariable(variableName, executionResult.get(variableName), false));
+                    }
+                    response.addResultVariables(ruleResults);
+                }
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_SERVICE_EXECUTE));
+
+        return response;
+    }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(List<Map<String, Object>> executionResults, DmnRestUrlBuilder urlBuilder) {
+        DmnDecisionServiceResponse response = new DmnDecisionServiceResponse();
+
+        if (executionResults != null && !executionResults.isEmpty()) {
+            for (Map<String, Object> executionResult : executionResults) {
+                List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                for (String name : executionResult.keySet()) {
+                    ruleResults.add(createRestVariable(name, executionResult.get(name), false));
+                }
+                response.addResultVariables(ruleResults);
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_SERVICE_EXECUTE));
+
+        return response;
+    }
+
+    public DmnDecisionServiceSingleResponse createDmnDecisionServiceSingleResponse(Map<String, Object> executionResult, DmnRestUrlBuilder urlBuilder) {
+        DmnDecisionServiceSingleResponse response = new DmnDecisionServiceSingleResponse();
+
+        if (executionResult != null) {
+            for (String name : executionResult.keySet()) {
+                response.addResultVariable(createRestVariable(name, executionResult.get(name), false));
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_SERVICE_EXECUTE));
+
+        return response;
+    }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(DecisionExecutionAuditContainer decisionExecutionAuditContainer) {
+        return createDmnDecisionServiceResponse(decisionExecutionAuditContainer, createUrlBuilder());
+    }
+
+    public DmnDecisionServiceResponse createDmnDecisionServiceResponse(DecisionExecutionAuditContainer decisionExecutionAuditContainer, DmnRestUrlBuilder urlBuilder){
+        DmnDecisionServiceResponse response = new DmnDecisionServiceResponse();
+
+        if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
+            DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            Map<String, List<Map<String, Object>>> executionResults = decisionServiceExecutionAuditContainer.getDecisionServiceResult();
+
+            if (executionResults != null && !executionResults.isEmpty()) {
+                for (String decisionName : executionResults.keySet()) {
+                    for (Map<String, Object> executionResult : executionResults.get(decisionName)) {
+                        List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                        for (String variableName : executionResult.keySet()) {
+                            ruleResults.add(createRestVariable(variableName, executionResult.get(variableName), false));
+                        }
+                        response.addResultVariables(ruleResults);
+                    }
+                }
+            }
+        } else {
+            List<Map<String, Object>> executionResults = decisionExecutionAuditContainer.getDecisionResult();
+            if (executionResults != null && !executionResults.isEmpty()) {
+                for (Map<String, Object> executionResult : executionResults) {
+                    List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                    for (String name : executionResult.keySet()) {
+                        ruleResults.add(createRestVariable(name, executionResult.get(name), false));
+                    }
+                    response.addResultVariables(ruleResults);
+                }
+            }
+        }
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_DECISION_SERVICE_EXECUTE));
+        return response;
+    }
+
     
     public List<HistoricDecisionExecutionResponse> createHistoricDecisionExecutionResponseList(List<DmnHistoricDecisionExecution> historicDecisionExecutions) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
