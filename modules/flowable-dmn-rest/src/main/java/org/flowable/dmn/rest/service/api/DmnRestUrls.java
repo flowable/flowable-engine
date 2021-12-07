@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 public final class DmnRestUrls {
 
     public static final String SEGMENT_REPOSITORY_RESOURCES = "dmn-repository";
-    public static final String SEGMENT_DECISION_RESOURCES = "dmn-decision";
     public static final String SEGMENT_RULES_RESOURCES = "dmn-rule";
     public static final String SEGMENT_HISTORY_RESOURCES = "dmn-history";
 
