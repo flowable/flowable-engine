@@ -81,7 +81,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     protected T variableValueEquals(Object value, String scopeType) {
-        queryVariableValues.add(new QueryVariableValue(null, value, QueryOperator.EQUALS, scopeType));
+        queryVariableValues.add(new QueryVariableValue(null, value, QueryOperator.EQUALS, false,scopeType));
         return (T) this;
     }
 
@@ -304,10 +304,11 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
                 throw new FlowableIllegalArgumentException("Only string values can be used with 'like' condition");
             }
         }
-        if (scopeType != null)
-            queryVariableValues.add(new QueryVariableValue(name, value, operator, scopeType));
-        else
+        if (scopeType != null) {
+            queryVariableValues.add(new QueryVariableValue(name, value, operator, localScope, scopeType));
+        } else {
             queryVariableValues.add(new QueryVariableValue(name, value, operator, localScope));
+        }
 
     }
 

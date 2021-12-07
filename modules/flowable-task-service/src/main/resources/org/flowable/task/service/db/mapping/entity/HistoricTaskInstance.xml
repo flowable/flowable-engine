@@ -415,6 +415,7 @@
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
       <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+      <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
       <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     </collection>
     <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
@@ -895,25 +896,6 @@
                 <when test="queryVar.operator.equals('EXISTS')">
                     and EXISTS (
                         select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
-                  <if test="!queryVar.local">
-                    <choose>
-                      <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
-                        and RES.PROC_INST_ID_ = PROC_INST_ID_
-                      </when>
-                      <otherwise>
-                        and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
-                      </otherwise>
-                    </choose>
-                    AND TASK_ID_ is null
-                  </if>
-                    <if test="queryVar.local">
-                        and RES.ID_ = TASK_ID_
-                    </if>
-                    )
-                </when>
-                <when test="queryVar.operator.equals('NOT_EXISTS')">
-                    and NOT EXISTS (
-                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
                       <choose>
                         <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
@@ -928,14 +910,12 @@
                     <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_
                     </if>
-                    )
+                   )
                 </when>
-                <otherwise>
-                and exists (
-                    select 1
-                    from ${prefix}ACT_HI_VARINST V
-                    <where>
-                      <if test="!queryVar.local">
+                <when test="queryVar.operator.equals('NOT_EXISTS')">
+                    and NOT EXISTS (
+                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
+                    <if test="!queryVar.local">
                         <choose>
                           <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
                             and RES.PROC_INST_ID_ = PROC_INST_ID_
@@ -945,6 +925,27 @@
                           </otherwise>
                         </choose>
                         AND TASK_ID_ is null
+                    </if>
+                    <if test="queryVar.local">
+                        and RES.ID_ = TASK_ID_
+                    </if>
+                    )
+                </when>
+                <otherwise>
+                and exists (
+                    select 1
+                    from ${prefix}ACT_HI_VARINST V
+                    <where>
+                      <if test="!queryVar.local">
+                          <choose>
+                            <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                              and RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                            </when>
+                            <otherwise>
+                              and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{queryVar.scopeType}
+                            </otherwise>
+                          </choose>
+                          AND TASK_ID_ is null
                       </if>
                       <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_

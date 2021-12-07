@@ -40,6 +40,7 @@ import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -799,8 +800,8 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
-                if (this.getScopeId() != null && this.getScopeId()
-                        .equals(variableInstance.getScopeId()) && variableInstance.getTaskId() == null) {
+                if (TaskVariableUtils.isCaseRelated(variableInstance) && variableInstance.getScopeId().equals(this.getScopeId())
+                        && variableInstance.getTaskId() == null) {
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }

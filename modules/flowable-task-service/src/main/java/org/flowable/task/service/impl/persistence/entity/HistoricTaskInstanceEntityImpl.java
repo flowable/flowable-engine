@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
@@ -476,8 +477,8 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
-                if (this.getScopeId() != null && this.getScopeId()
-                        .equals(variableInstance.getScopeId()) && variableInstance.getTaskId() == null) {
+                if (TaskVariableUtils.isCaseRelated(variableInstance) && variableInstance.getScopeId().equals(this.getScopeId())
+                        && variableInstance.getTaskId() == null){
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }

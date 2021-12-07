@@ -47,8 +47,8 @@ public class QueryVariableValue implements Serializable {
         this.local = local;
     }
 
-    public QueryVariableValue(String name, Object value, QueryOperator operator, String scopeType) {
-        this(name, value, operator, false);
+    public QueryVariableValue(String name, Object value, QueryOperator operator,boolean local, String scopeType) {
+        this(name, value, operator, local);
         this.scopeType = scopeType;
     }
 
