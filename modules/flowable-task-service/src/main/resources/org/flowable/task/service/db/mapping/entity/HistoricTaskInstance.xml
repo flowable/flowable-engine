@@ -692,7 +692,7 @@
                         and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
                       </otherwise>
                     </choose>
-                    AND TASK_ID_ is null
+                    AND V.TASK_ID_ is null
                   </if>
                   <if test="queryVar.local">
                     and RES.ID_ = V.TASK_ID_
@@ -946,7 +946,7 @@
                               and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
                             </otherwise>
                           </choose>
-                          AND TASK_ID_ is null
+                          AND V.TASK_ID_ is null
                       </if>
                       <if test="queryVar.local">
                         and RES.ID_ = TASK_ID_
