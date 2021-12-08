@@ -19,11 +19,13 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -40,12 +42,15 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
+    
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case_No_Event.cmmn.xml")
     public void simpleCaseReactivationMissingCaseFailureTest() {
@@ -162,6 +167,22 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
 
             // make sure we have exactly the same variables as the historic case
             assertSameVariables(historicCase, reactivatedCase);
+            
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
+            assertThat(historicPlanItemInstances).isNotNull().hasSize(8);
+            
+            Map<String, HistoricPlanItemInstance> historicPlanItemInstanceMap = new HashMap<>();
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                historicPlanItemInstanceMap.put(historicPlanItemInstance.getId(), historicPlanItemInstance);
+            }
+            
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                assertThat(historicPlanItemInstanceMap.containsKey(planItemInstance.getId())).isTrue();
+                HistoricPlanItemInstance historicPlanItemInstance = historicPlanItemInstanceMap.get(planItemInstance.getId());
+                assertThat(historicPlanItemInstance.getState()).isEqualTo(planItemInstance.getState());
+                assertThat(historicPlanItemInstance.getElementId()).isEqualTo(planItemInstance.getElementId());
+            }
+            
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -184,6 +205,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             // check the state being in sync with the runtime instance and the end time being reset as the case is not ended anymore
             assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCase.getState());
             assertThat(historicCaseInstance.getEndTime()).isNull();
+            
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -250,10 +272,17 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCase.getState());
             assertThat(historicCaseInstance.getEndTime()).isNull();
 
-            Map<String, VariableInstance> reactivatedVars = cmmnEngineConfiguration.getCmmnRuntimeService().getVariableInstances(reactivatedCase.getId());
+            Map<String, VariableInstance> reactivatedVars = cmmnRuntimeService.getVariableInstances(reactivatedCase.getId());
             assertThat(reactivatedVars).isNotNull().hasSize(4);
             assertVariableValue(reactivatedVars, "varA", "varAValue");
             assertThat(reactivatedVars).doesNotContainKey("varB");
+            
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(reactivatedCase.getId()).variableName("varA").singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getScopeId()).isEqualTo(reactivatedCase.getId());
+            
+            VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(reactivatedCase.getId(), "varA");
+            assertThat(variableInstance.getId()).isEqualTo(historicVariableInstance.getId());
 
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
@@ -310,6 +339,25 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             assertThat(identityLinks)
                 .extracting(IdentityLinkInfo::getType)
                 .containsExactlyInAnyOrder(IdentityLinkType.STARTER, IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
+            
+            Map<String, HistoricIdentityLink> historicIdentityLinkMap = new HashMap<>();
+            for (HistoricIdentityLink historicIdentityLink : historicIdentityLinks) {
+                historicIdentityLinkMap.put(((HistoricIdentityLinkEntity) historicIdentityLink).getId(), historicIdentityLink);
+            }
+            
+            for (IdentityLink identityLink : identityLinks) {
+                if (!IdentityLinkType.REACTIVATOR.equals(identityLink.getType())) {
+                    String identityLinkId = ((IdentityLinkEntity) identityLink).getId();
+                    assertThat(historicIdentityLinkMap.containsKey(identityLinkId)).isTrue();
+                    
+                    HistoricIdentityLink historicIdentityLink = historicIdentityLinkMap.get(identityLinkId);
+                    assertThat(historicIdentityLink.getScopeId()).isEqualTo(identityLink.getScopeId());
+                    assertThat(historicIdentityLink.getScopeDefinitionId()).isEqualTo(identityLink.getScopeDefinitionId());
+                    assertThat(historicIdentityLink.getType()).isEqualTo(identityLink.getType());
+                    assertThat(historicIdentityLink.getUserId()).isEqualTo(identityLink.getUserId());
+                }
+            }
+            
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
