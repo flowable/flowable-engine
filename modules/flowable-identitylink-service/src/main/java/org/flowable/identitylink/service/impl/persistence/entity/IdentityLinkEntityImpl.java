@@ -42,6 +42,7 @@ public class IdentityLinkEntityImpl extends AbstractIdentityLinkServiceNoRevisio
     }
 
     public IdentityLinkEntityImpl(HistoricIdentityLink historicIdentityLink) {
+        this.id = ((HistoricIdentityLinkEntity) historicIdentityLink).getId();
         this.type = historicIdentityLink.getType();
         this.userId = historicIdentityLink.getUserId();
         this.groupId = historicIdentityLink.getGroupId();
