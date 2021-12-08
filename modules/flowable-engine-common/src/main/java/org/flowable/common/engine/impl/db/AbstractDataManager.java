@@ -89,10 +89,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
     @Override
     public void delete(String id) {
         EntityImpl entity = findById(id);
-        
-        if (entity != null) {
-            delete(entity);
-        }
+        delete(entity);
     }
 
     @Override
