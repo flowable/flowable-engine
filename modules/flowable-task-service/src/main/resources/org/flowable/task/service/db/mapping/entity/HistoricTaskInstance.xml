@@ -494,8 +494,8 @@
       left outer join ${prefix}ACT_HI_VARINST VAR ON
       <trim prefixOverrides="OR">
         <if test="includeTaskLocalVariables">OR RES.ID_ = VAR.TASK_ID_</if>
-        <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ AND VAR.TASK_ID_ is null)</if>
-        <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn' AND VAR.TASK_ID_ is null)</if>
+        <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_)</if>
+        <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn')</if>
       </trim>
     </if>
     <if test="includeIdentityLinks">
@@ -645,13 +645,14 @@
                 select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
                   <choose>
-                    <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                    <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                       and RES.PROC_INST_ID_ = PROC_INST_ID_
                     </when>
                     <otherwise>
-                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
                     </otherwise>
                   </choose>
+                  AND TASK_ID_ is null
                 </if>
                 <if test="queryVar.local">
                     and RES.ID_ = TASK_ID_
@@ -663,11 +664,11 @@
                 select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                 <if test="!queryVar.local">
                   <choose>
-                    <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                    <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                       and RES.PROC_INST_ID_ = PROC_INST_ID_
                     </when>
                     <otherwise>
-                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
                     </otherwise>
                   </choose>
                   AND TASK_ID_ is null
@@ -684,11 +685,11 @@
                 <where>
                   <if test="!queryVar.local">
                     <choose>
-                      <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                      <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                         and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                       </when>
                       <otherwise>
-                        and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{queryVar.scopeType}
+                        and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
                       </otherwise>
                     </choose>
                     AND TASK_ID_ is null
@@ -898,11 +899,11 @@
                         select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
                       <choose>
-                        <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                        <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                           and RES.PROC_INST_ID_ = PROC_INST_ID_
                         </when>
                         <otherwise>
-                          and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                          and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
                         </otherwise>
                       </choose>
                       AND TASK_ID_ is null
@@ -917,11 +918,11 @@
                         select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
                     <if test="!queryVar.local">
                         <choose>
-                          <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                          <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                             and RES.PROC_INST_ID_ = PROC_INST_ID_
                           </when>
                           <otherwise>
-                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{queryVar.scopeType}
+                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
                           </otherwise>
                         </choose>
                         AND TASK_ID_ is null
@@ -938,11 +939,11 @@
                     <where>
                       <if test="!queryVar.local">
                           <choose>
-                            <when test="queryVar.scopeType == null or queryVar.scopeType =='bpmn'">
+                            <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                               and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                             </when>
                             <otherwise>
-                              and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{queryVar.scopeType}
+                              and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
                             </otherwise>
                           </choose>
                           AND TASK_ID_ is null

@@ -236,9 +236,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
                         if (task.getId().equals(cachedVariableEntity.getTaskId())) {
                             ((HistoricTaskInstanceEntity) task).getQueryVariables().add(cachedVariableEntity);
                         }
-                    } else if (TaskVariableUtils.isProcessRelatedAndProcessIdEquals(task, cachedVariableEntity.getProcessInstanceId())) {
-                        ((HistoricTaskInstanceEntity) task).getQueryVariables().add(cachedVariableEntity);
-                    } else if (TaskVariableUtils.isCaseRelatedAndScopeIdEquals(task, cachedVariableEntity.getScopeId())) {
+                    } else if (TaskVariableUtils.doesVariableBelongToTask(cachedVariableEntity, task)) {
                         ((HistoricTaskInstanceEntity) task).getQueryVariables().add(cachedVariableEntity);
                     }
                 }

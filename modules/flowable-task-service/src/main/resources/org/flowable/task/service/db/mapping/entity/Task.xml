@@ -459,8 +459,8 @@
           left outer join ${prefix}ACT_RU_VARIABLE VAR ON
           <trim prefixOverrides="OR">
               <if test="includeTaskLocalVariables">OR RES.ID_ = VAR.TASK_ID_</if>
-              <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_ AND VAR.TASK_ID_ is null)</if>
-              <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn' AND VAR.TASK_ID_ is null)</if>
+              <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_)</if>
+              <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn')</if>
           </trim>
       </if>
       <if test="includeIdentityLinks">
@@ -817,11 +817,11 @@
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                 <if test="!var.local">
                     <choose>
-                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                        <when test="var.scopeType == null or var.scopeType == 'bpmn'">
                             and RES.PROC_INST_ID_ = PROC_INST_ID_
                         </when>
                         <otherwise>
-                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                            and RES.SCOPE_ID_ = SCOPE_ID_ and SCOPE_TYPE_ = #{var.scopeType}
                         </otherwise>
                     </choose>
                     and TASK_ID_ is null
@@ -836,11 +836,11 @@
                 select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                 <if test="!var.local">
                     <choose>
-                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                        <when test="var.scopeType == null or var.scopeType == 'bpmn'">
                             and RES.PROC_INST_ID_ = PROC_INST_ID_
                         </when>
                         <otherwise>
-                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                            and RES.SCOPE_ID_ = SCOPE_ID_ and SCOPE_TYPE_ = #{var.scopeType}
                         </otherwise>
                     </choose>
                     and TASK_ID_ is null
@@ -857,14 +857,14 @@
                     <where>
                         <if test="!var.local">
                             <choose>
-                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                <when test="var.scopeType == null or var.scopeType == 'bpmn'">
                                     and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                                 </when>
                                 <otherwise>
-                                    and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ =#{var.scopeType}
+                                    and RES.SCOPE_ID_ = V.SCOPE_ID_ and V.SCOPE_TYPE_ = #{var.scopeType}
                                 </otherwise>
                             </choose>
-                            and v.TASK_ID_ is null
+                            and V.TASK_ID_ is null
                         </if>
                         <if test="var.local">
                             and RES.ID_ = V.TASK_ID_
@@ -1359,11 +1359,11 @@
                             select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                         <if test="!var.local">
                             <choose>
-                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                <when test="var.scopeType == null or var.scopeType == 'bpmn'">
                                     and RES.PROC_INST_ID_ = PROC_INST_ID_
                                 </when>
                                 <otherwise>
-                                    and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                                    and RES.SCOPE_ID_ = SCOPE_ID_ and SCOPE_TYPE_ = #{var.scopeType}
                                 </otherwise>
                             </choose>
                             and TASK_ID_ is null
@@ -1378,11 +1378,11 @@
                             select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{var.name}
                         <if test="!var.local">
                             <choose>
-                                <when test="var.scopeType == null or var.scopeType =='bpmn'">
+                                <when test="var.scopeType == null or var.scopeType == 'bpmn'">
                                     and RES.PROC_INST_ID_ = PROC_INST_ID_
                                 </when>
                                 <otherwise>
-                                    and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ =#{var.scopeType}
+                                    and RES.SCOPE_ID_ = SCOPE_ID_ and SCOPE_TYPE_ = #{var.scopeType}
                                 </otherwise>
                             </choose>
                             and TASK_ID_ is null
@@ -1399,14 +1399,14 @@
                             <where>
                                 <if test="!var.local">
                                     <choose>
-                                        <when test="var.scopeType == null or var.scopeType =='bpmn'">
-                                            and RES.PROC_INST_ID_ = v.PROC_INST_ID_
+                                        <when test="var.scopeType == null or var.scopeType == 'bpmn'">
+                                            and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                                         </when>
                                         <otherwise>
-                                            and RES.SCOPE_ID_ = v.SCOPE_ID_ AND v.SCOPE_TYPE_ =#{var.scopeType}
+                                            and RES.SCOPE_ID_ = V.SCOPE_ID_ and V.SCOPE_TYPE_ = #{var.scopeType}
                                         </otherwise>
                                     </choose>
-                                    and v.TASK_ID_ is null
+                                    and V.TASK_ID_ is null
                                 </if>
                                 <if test="var.local">
                                     and RES.ID_ = V.TASK_ID_

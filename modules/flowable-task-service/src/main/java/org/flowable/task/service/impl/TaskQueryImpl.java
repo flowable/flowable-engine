@@ -1920,12 +1920,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
                             ((TaskEntity) task).getQueryVariables()
                                     .add(cachedVariableEntity);
                         }
-                    } else if (TaskVariableUtils.isProcessRelatedAndProcessIdEquals(task, cachedVariableEntity.getProcessInstanceId())) {
-                        ((TaskEntity) task).getQueryVariables()
-                                .add(cachedVariableEntity);
-                    } else if (TaskVariableUtils.isCaseRelatedAndScopeIdEquals(task, cachedVariableEntity.getScopeId())) {
-                        ((TaskEntity) task).getQueryVariables()
-                                .add(cachedVariableEntity);
+                    } else if (TaskVariableUtils.doesVariableBelongToTask(cachedVariableEntity, task)) {
+                        ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
                     }
                 }
             }

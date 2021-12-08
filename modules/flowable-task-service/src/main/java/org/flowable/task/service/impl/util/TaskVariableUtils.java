@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.task.service.impl.util;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -18,25 +30,22 @@ public class TaskVariableUtils {
         return scopeId != null && ScopeTypes.CMMN.equals(scopeType);
     }
 
-    public static boolean isProcessRelated(ValueFields valueField) {
-        return isCaseRelated(valueField.getScopeId(), valueField.getScopeType());
-    }
-
     public static boolean isProcessRelated(TaskInfo task) {
         return task.getProcessInstanceId() != null;
     }
 
-    private static boolean isProcessRelated(String scopeId) {
-        return scopeId != null;
-    }
+    public static boolean doesVariableBelongToTask(ValueFields valueFields, TaskInfo taskInfo) {
+        if (taskInfo.getProcessInstanceId() != null) {
+            return taskInfo.getProcessInstanceId()
+                    .equals(valueFields.getProcessInstanceId());
+        }
 
-    public static boolean isProcessRelatedAndProcessIdEquals(TaskInfo task, String processInstanceId) {
-        return isProcessRelated(task) && task.getProcessInstanceId()
-                .equals(processInstanceId);
-    }
+        if (taskInfo.getScopeType() != null && valueFields.getScopeId() != null) {
+            return taskInfo.getScopeType()
+                    .equals(valueFields.getScopeType()) && valueFields.getScopeId()
+                    .equals(taskInfo.getScopeId());
+        }
 
-    public static boolean isCaseRelatedAndScopeIdEquals(TaskInfo task, String scopeId) {
-        return isCaseRelated(task) && task.getScopeId()
-                .equals(scopeId);
+        return false;
     }
 }
