@@ -361,6 +361,8 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
                 .singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(eventInstance.getId());
         
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        
         assertCaseInstanceEnded(caseInstance);
     }
     

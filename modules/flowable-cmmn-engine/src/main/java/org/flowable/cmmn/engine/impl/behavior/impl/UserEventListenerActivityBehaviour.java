@@ -59,6 +59,10 @@ public class UserEventListenerActivityBehaviour extends CoreCmmnTriggerableActiv
                 agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
                 agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
                 
+                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
+                        commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
+                
+                
             } else {
                 CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
             }
