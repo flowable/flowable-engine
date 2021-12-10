@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
+import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
@@ -56,6 +57,10 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
+
         validateIdentityLinkArguments(identityId, type);
 
         IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
@@ -73,6 +78,10 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.DELETE_IDENTITY_LINKS_ACTION);
+        }
 
         validateIdentityLinkArguments(identityId, type);
 

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -55,6 +56,9 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
 
         Task task = getTaskFromRequest(taskId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         validateIdentityLinkArguments(family, identityId, type);
 
         IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
@@ -73,7 +77,9 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             HttpServletResponse response) {
 
         Task task = getTaskFromRequest(taskId);
-
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.DELETE_IDENTITY_LINKS_ACTION);
+        }
         validateIdentityLinkArguments(family, identityId, type);
 
         // Check if identitylink to delete exists

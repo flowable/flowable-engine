@@ -20,7 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +40,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceIdentityLinkCollectionResource {
+public class HistoricTaskInstanceIdentityLinkCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -52,7 +54,11 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource {
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
     @GetMapping(value = "/history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doHistoricTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
 
         if (identityLinks != null) {
             return restResponseFactory.createHistoricIdentityLinkResponseList(identityLinks);

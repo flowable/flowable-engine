@@ -70,6 +70,8 @@ public interface CmmnRestApiInterceptor {
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
+
+    void doTaskAction(Task task, RestActionRequest actionRequest);
     
     void accessCaseInstanceInfoById(CaseInstance caseInstance);
 
@@ -136,12 +138,16 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryTaskInfoWithQuery(HistoricTaskInstanceQuery historicTaskInstanceQuery, HistoricTaskInstanceQueryRequest request);
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
+
+    void doHistoricTaskAction(HistoricTaskInstance historicTaskInstance, RestActionRequest actionRequest);
     
     void accessHistoryCaseInfoById(HistoricCaseInstance historicCaseInstance);
     
     void accessHistoryCaseInfoWithQuery(HistoricCaseInstanceQuery historicCaseInstanceQuery, HistoricCaseInstanceQueryRequest request);
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
+
+    void doHistoricCaseAction(HistoricCaseInstance historicCaseInstance, RestActionRequest actionRequest);
     
     void accessStageOverview(CaseInstance caseInstance);
 

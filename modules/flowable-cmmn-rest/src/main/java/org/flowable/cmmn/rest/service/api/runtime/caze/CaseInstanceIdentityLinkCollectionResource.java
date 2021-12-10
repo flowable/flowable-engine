@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
+import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,9 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForCaseInstance(caseInstance.getId()));
     }
 
@@ -65,6 +69,10 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.CREATE_IDENTITY_LINKS_ACTION);
+        }
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a case instance.");

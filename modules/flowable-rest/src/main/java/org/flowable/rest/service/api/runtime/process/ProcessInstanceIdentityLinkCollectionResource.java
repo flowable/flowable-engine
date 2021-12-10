@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,9 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doProcessInstanceAction(processInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()));
     }
 
@@ -65,7 +69,9 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
-
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doProcessInstanceAction(processInstance, IdentityLinksActionRequest.CREATE_IDENTITY_LINKS_ACTION);
+        }
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");
         }

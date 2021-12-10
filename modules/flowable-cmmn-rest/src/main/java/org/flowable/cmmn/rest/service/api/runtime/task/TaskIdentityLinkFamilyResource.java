@@ -19,6 +19,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
@@ -51,7 +52,9 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
     public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
         Task task = getTaskFromRequest(taskId);
-
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
         }

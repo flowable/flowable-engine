@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,7 +55,9 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource extends Histo
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
         HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
-        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doHistoricProcessInstanceAction(processInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
 
         if (identityLinks != null) {

@@ -90,6 +90,8 @@ public interface BpmnRestApiInterceptor {
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
+
+    void doTaskAction(Task task, RestActionRequest actionRequest);
     
     void accessExecutionInfoById(Execution execution);
 
@@ -106,6 +108,8 @@ public interface BpmnRestApiInterceptor {
     void updateProcessInstance(ProcessInstance processInstance, ProcessInstanceUpdateRequest updateRequest);
 
     void deleteProcessInstance(ProcessInstance processInstance);
+
+    void doProcessInstanceAction(ProcessInstance processInstance, RestActionRequest actionRequest);
     
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);
     
@@ -178,12 +182,16 @@ public interface BpmnRestApiInterceptor {
     void accessHistoryTaskInfoWithQuery(HistoricTaskInstanceQuery historicTaskInstanceQuery, HistoricTaskInstanceQueryRequest request);
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
+
+    void doHistoricTaskAction(HistoricTaskInstance historicTaskInstance, RestActionRequest actionRequest);
     
     void accessHistoryProcessInfoById(HistoricProcessInstance historicProcessInstance);
     
     void accessHistoryProcessInfoWithQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery, HistoricProcessInstanceQueryRequest request);
     
     void deleteHistoricProcess(HistoricProcessInstance historicProcessInstance);
+
+    void doHistoricProcessInstanceAction(HistoricProcessInstance historicProcessInstance, RestActionRequest actionRequest);
     
     void accessHistoryActivityInfoWithQuery(HistoricActivityInstanceQuery historicActivityInstanceQuery, HistoricActivityInstanceQueryRequest request);
     

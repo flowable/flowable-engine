@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,9 @@ public class HistoricCaseInstanceIdentityLinkCollectionResource extends Historic
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getCaseIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
         HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
-        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doHistoricCaseAction(caseInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        }
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
 
         if (identityLinks != null) {
