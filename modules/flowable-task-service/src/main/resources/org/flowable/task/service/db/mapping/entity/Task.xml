@@ -363,6 +363,7 @@
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
       <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+      <result property="subScopeId " column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
       <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
     </collection>
     <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">

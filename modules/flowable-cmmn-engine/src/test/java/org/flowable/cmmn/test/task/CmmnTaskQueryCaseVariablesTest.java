@@ -419,7 +419,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCrocessVariableValueEqualsOn() throws Exception {
+    public void testCaseVariableValueEqualsOr() throws Exception {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);

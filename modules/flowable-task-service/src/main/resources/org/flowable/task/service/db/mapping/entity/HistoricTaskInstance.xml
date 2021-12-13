@@ -949,7 +949,7 @@
                           AND V.TASK_ID_ is null
                       </if>
                       <if test="queryVar.local">
-                        and RES.ID_ = TASK_ID_
+                        and RES.ID_ = V.TASK_ID_
                       </if>
                       <if test="queryVar.name != null">
                         <!-- Match-all variable-names when name is null -->
