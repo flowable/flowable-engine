@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
@@ -71,7 +72,13 @@ public interface CmmnRestApiInterceptor {
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
 
-    void doTaskAction(Task task, RestActionRequest actionRequest);
+    void accessTaskIdentityLinks(Task task);
+
+    void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
+
+    void updateTaskIdentityLink(Task task, RestIdentityLink identityLink);
+
+    void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
     void accessCaseInstanceInfoById(CaseInstance caseInstance);
 
@@ -87,6 +94,14 @@ public interface CmmnRestApiInterceptor {
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
     
+    void accessCaseInstanceIdentityLinks(CaseInstance caseInstance);
+
+    void deleteCaseInstanceIdentityLink(CaseInstance caseInstance, String identityId, String type);
+
+    void updateCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
+
+    void createCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
+
     void accessPlanItemInstanceInfoById(PlanItemInstance planItemInstance);
 
     void accessPlanItemInstanceInfoWithQuery(PlanItemInstanceQuery planItemInstanceQuery, PlanItemInstanceQueryRequest request);
@@ -139,7 +154,7 @@ public interface CmmnRestApiInterceptor {
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
 
-    void doHistoricTaskAction(HistoricTaskInstance historicTaskInstance, RestActionRequest actionRequest);
+    void accessHistoricTaskIdentityLinks(HistoricTaskInstance historicTaskInstance);
     
     void accessHistoryCaseInfoById(HistoricCaseInstance historicCaseInstance);
     
@@ -147,7 +162,7 @@ public interface CmmnRestApiInterceptor {
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
 
-    void doHistoricCaseAction(HistoricCaseInstance historicCaseInstance, RestActionRequest actionRequest);
+    void accessHistoricCaseIdentityLinks(HistoricCaseInstance historicCaseInstance);
     
     void accessStageOverview(CaseInstance caseInstance);
 

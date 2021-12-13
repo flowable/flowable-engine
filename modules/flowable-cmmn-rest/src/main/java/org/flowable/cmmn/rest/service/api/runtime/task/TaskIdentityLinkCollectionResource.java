@@ -18,9 +18,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.task.api.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,10 +50,15 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, HttpServletRequest request) {
-        Task task = getTaskFromRequest(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
+        }
+
         return restResponseFactory.createRestIdentityLinks(taskService.getIdentityLinksForTask(task.getId()));
     }
 
@@ -66,9 +71,9 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.CREATE_IDENTITY_LINKS_ACTION);
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
@@ -80,6 +85,10 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTaskIdentityLink(task, identityLink);
         }
 
         if (identityLink.getGroup() != null) {

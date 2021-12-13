@@ -22,7 +22,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,11 +54,15 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doProcessInstanceAction(processInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
         }
+
         validateIdentityLinkArguments(identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
+        }
 
         IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
         return restResponseFactory.createRestIdentityLink(link);
@@ -75,11 +78,15 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doProcessInstanceAction(processInstance, IdentityLinksActionRequest.DELETE_IDENTITY_LINKS_ACTION);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
         }
+
         validateIdentityLinkArguments(identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteProcessInstanceIdentityLink(processInstance, identityId, type);
+        }
 
         getIdentityLink(identityId, type, processInstance.getId());
 

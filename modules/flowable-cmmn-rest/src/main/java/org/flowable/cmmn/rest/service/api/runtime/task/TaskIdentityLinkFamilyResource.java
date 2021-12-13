@@ -19,9 +19,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.Task;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,12 +51,16 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks/{family}", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
         if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
         }
 
         boolean isUser = family.equals(CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);

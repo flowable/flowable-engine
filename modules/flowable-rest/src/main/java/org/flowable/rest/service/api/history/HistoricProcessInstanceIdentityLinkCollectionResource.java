@@ -18,10 +18,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,10 +54,15 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource extends Histo
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doHistoricProcessInstanceAction(processInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
         }
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricProcessIdentityLinks(processInstance);
+        }
+
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
 
         if (identityLinks != null) {

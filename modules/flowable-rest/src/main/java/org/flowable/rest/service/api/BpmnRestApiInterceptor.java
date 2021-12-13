@@ -46,6 +46,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.flowable.rest.service.api.form.SubmitFormRequest;
 import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
@@ -91,7 +92,13 @@ public interface BpmnRestApiInterceptor {
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
 
-    void doTaskAction(Task task, RestActionRequest actionRequest);
+    void accessTaskIdentityLinks(Task task);
+
+    void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
+
+    void updateTaskIdentityLink(Task task, RestIdentityLink identityLink);
+
+    void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
     void accessExecutionInfoById(Execution execution);
 
@@ -109,7 +116,13 @@ public interface BpmnRestApiInterceptor {
 
     void deleteProcessInstance(ProcessInstance processInstance);
 
-    void doProcessInstanceAction(ProcessInstance processInstance, RestActionRequest actionRequest);
+    void accessProcessInstanceIdentityLinks(ProcessInstance processInstance);
+
+    void deleteProcessInstanceIdentityLink(ProcessInstance processInstance, String identityId, String type);
+
+    void updateProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
+
+    void createProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
     
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);
     
@@ -183,7 +196,7 @@ public interface BpmnRestApiInterceptor {
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
 
-    void doHistoricTaskAction(HistoricTaskInstance historicTaskInstance, RestActionRequest actionRequest);
+    void accessHistoricTaskIdentityLinks(HistoricTaskInstance historicTaskInstance);
     
     void accessHistoryProcessInfoById(HistoricProcessInstance historicProcessInstance);
     
@@ -191,7 +204,7 @@ public interface BpmnRestApiInterceptor {
     
     void deleteHistoricProcess(HistoricProcessInstance historicProcessInstance);
 
-    void doHistoricProcessInstanceAction(HistoricProcessInstance historicProcessInstance, RestActionRequest actionRequest);
+    void accessHistoricProcessIdentityLinks(HistoricProcessInstance historicProcessInstance);
     
     void accessHistoryActivityInfoWithQuery(HistoricActivityInstanceQuery historicActivityInstanceQuery, HistoricActivityInstanceQueryRequest request);
     

@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
-import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
@@ -55,13 +54,15 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
 
         validateIdentityLinkArguments(identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceIdentityLinks(caseInstance);
+        }
 
         IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
         return restResponseFactory.createRestIdentityLink(link);
@@ -77,13 +78,15 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.DELETE_IDENTITY_LINKS_ACTION);
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
 
         validateIdentityLinkArguments(identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceIdentityLink(caseInstance, identityId, type);
+        }
 
         getIdentityLink(identityId, type, caseInstance.getId());
 

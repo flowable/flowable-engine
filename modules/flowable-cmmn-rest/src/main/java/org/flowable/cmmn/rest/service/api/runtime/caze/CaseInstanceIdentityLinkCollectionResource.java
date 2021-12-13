@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
-import org.flowable.cmmn.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,10 +51,15 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceIdentityLinks(caseInstance);
+        }
+
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForCaseInstance(caseInstance.getId()));
     }
 
@@ -68,10 +73,9 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doCaseInstanceAction(caseInstance, IdentityLinksActionRequest.CREATE_IDENTITY_LINKS_ACTION);
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
 
         if (identityLink.getGroup() != null) {
@@ -84,6 +88,10 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createCaseInstanceIdentityLink(caseInstance, identityLink);
         }
 
         runtimeService.addUserIdentityLink(caseInstance.getId(), identityLink.getUser(), identityLink.getType());

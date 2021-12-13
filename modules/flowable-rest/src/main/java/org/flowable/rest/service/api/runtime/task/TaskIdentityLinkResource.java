@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.rest.service.api.IdentityLinksActionRequest;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.flowable.task.api.Task;
@@ -55,11 +54,15 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.ACCESS_IDENTITY_LINKS_ACTION);
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+
         validateIdentityLinkArguments(family, identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
+        }
 
         IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
 
@@ -76,11 +79,15 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.doTaskAction(task, IdentityLinksActionRequest.DELETE_IDENTITY_LINKS_ACTION);
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+
         validateIdentityLinkArguments(family, identityId, type);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskIdentityLink(task, identityId, family, type);
+        }
 
         // Check if identitylink to delete exists
         getIdentityLink(family, identityId, type, task.getId());
