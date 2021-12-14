@@ -96,8 +96,6 @@ public interface BpmnRestApiInterceptor {
 
     void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
 
-    void updateTaskIdentityLink(Task task, RestIdentityLink identityLink);
-
     void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
     void accessExecutionInfoById(Execution execution);
@@ -119,8 +117,6 @@ public interface BpmnRestApiInterceptor {
     void accessProcessInstanceIdentityLinks(ProcessInstance processInstance);
 
     void deleteProcessInstanceIdentityLink(ProcessInstance processInstance, String identityId, String type);
-
-    void updateProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
 
     void createProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
     

@@ -76,8 +76,6 @@ public interface CmmnRestApiInterceptor {
 
     void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
 
-    void updateTaskIdentityLink(Task task, RestIdentityLink identityLink);
-
     void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
     void accessCaseInstanceInfoById(CaseInstance caseInstance);
@@ -97,8 +95,6 @@ public interface CmmnRestApiInterceptor {
     void accessCaseInstanceIdentityLinks(CaseInstance caseInstance);
 
     void deleteCaseInstanceIdentityLink(CaseInstance caseInstance, String identityId, String type);
-
-    void updateCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
 
     void createCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
 
