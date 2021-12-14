@@ -461,7 +461,7 @@
           <trim prefixOverrides="OR">
               <if test="includeTaskLocalVariables">OR RES.ID_ = VAR.TASK_ID_</if>
               <if test="includeProcessVariables">OR (RES.PROC_INST_ID_ = VAR.EXECUTION_ID_)</if>
-              <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn')</if>
+              <if test="includeCaseVariables">OR (RES.SCOPE_ID_ = VAR.SCOPE_ID_ AND VAR.SCOPE_TYPE_ = 'cmmn' and VAR.task_id_ is null)</if>
           </trim>
       </if>
       <if test="includeIdentityLinks">
