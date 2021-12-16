@@ -15,7 +15,7 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.5.7</spring.boot.version>
-		<spring.framework.version>5.3.13</spring.framework.version>
+		<spring.framework.version>5.3.14</spring.framework.version>
 		<spring.security.version>5.5.3</spring.security.version>
 		<spring.amqp.version>2.3.12</spring.amqp.version>
 		<spring.kafka.version>2.7.9</spring.kafka.version>
@@ -30,7 +30,7 @@
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.7.2</junit.jupiter.version>
+		<junit.jupiter.version>5.8.2</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
