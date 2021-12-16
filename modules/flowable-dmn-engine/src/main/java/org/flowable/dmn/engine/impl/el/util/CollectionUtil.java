@@ -37,7 +37,7 @@ public class CollectionUtil {
         }
 
         if (value == null) {
-            throw new IllegalArgumentException("value cannot be null");
+            return false;
         }
 
         // collection to check against
@@ -79,7 +79,7 @@ public class CollectionUtil {
         }
 
         if (value == null) {
-            throw new IllegalArgumentException("value cannot be null");
+            return false;
         }
 
         // collection to check against
@@ -121,7 +121,7 @@ public class CollectionUtil {
         }
 
         if (value == null) {
-            throw new IllegalArgumentException("value cannot be null");
+            return false;
         }
 
         // collection to check against
@@ -163,7 +163,7 @@ public class CollectionUtil {
         }
 
         if (value == null) {
-            throw new IllegalArgumentException("value cannot be null");
+            return false;
         }
 
         // collection to check against

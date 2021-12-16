@@ -27,13 +27,16 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), Arrays.asList("group3", "group4"))).isTrue();
         assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), Arrays.asList("group1", "group2"))).isFalse();
         assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), Arrays.asList("group2", "group3"))).isFalse();
+        assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), "group3")).isTrue();
         assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), "group2")).isFalse();
+        assertThat(CollectionUtil.noneOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.noneOf("group1, group2", "group3, group4")).isTrue();
         assertThat(CollectionUtil.noneOf("group1, group2", "group1, group2")).isFalse();
         assertThat(CollectionUtil.noneOf("group1, group2", "group2, group3")).isFalse();
+        assertThat(CollectionUtil.noneOf("group1, group2", null)).isFalse();
 
         ObjectMapper mapper = new ObjectMapper();
         assertThat(CollectionUtil.noneOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group3", "group4"))))
@@ -41,6 +44,8 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.noneOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group1", "group2"))))
                 .isFalse();
         assertThat(CollectionUtil.noneOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group2", "group3"))))
+                .isFalse();
+        assertThat(CollectionUtil.noneOf(mapper.valueToTree(Arrays.asList("group1", "group2")), null))
                 .isFalse();
     }
 
@@ -50,19 +55,23 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), Arrays.asList("group3", "group4"))).isFalse();
         assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), Arrays.asList("group1", "group2"))).isTrue();
         assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), Arrays.asList("group2", "group3"))).isTrue();
+        assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), "group3")).isFalse();
         assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), "group2")).isTrue();
+        assertThat(CollectionUtil.anyOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.anyOf("group1, group2", "group3, group4")).isFalse();
         assertThat(CollectionUtil.anyOf("group1, group2", "group1, group2")).isTrue();
         assertThat(CollectionUtil.anyOf("group1, group2", "group2, group3")).isTrue();
+        assertThat(CollectionUtil.anyOf("group1, group2", null)).isFalse();
 
         ObjectMapper mapper = new ObjectMapper();
         assertThat(CollectionUtil.anyOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group3", "group4"))))
                 .isFalse();
         assertThat(CollectionUtil.anyOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group1", "group2")))).isTrue();
         assertThat(CollectionUtil.anyOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group2", "group3")))).isTrue();
+        assertThat(CollectionUtil.anyOf(mapper.valueToTree(Arrays.asList("group1", "group2")), null)).isFalse();
     }
 
     @Test
@@ -70,13 +79,16 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), Arrays.asList("group3", "group4"))).isTrue();
         assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), Arrays.asList("group1", "group2"))).isFalse();
         assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), Arrays.asList("group2", "group3"))).isTrue();
+        assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), "group3")).isTrue();
         assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), "group2")).isFalse();
+        assertThat(CollectionUtil.notAllOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.notAllOf("group1, group2", "group3, group4")).isTrue();
         assertThat(CollectionUtil.notAllOf("group1, group2", "group1, group2")).isFalse();
         assertThat(CollectionUtil.notAllOf("group1, group2", "group2, group3")).isTrue();
+        assertThat(CollectionUtil.notAllOf("group1, group2", null)).isFalse();
 
         ObjectMapper mapper = new ObjectMapper();
         assertThat(CollectionUtil.notAllOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group3", "group4"))))
@@ -85,6 +97,8 @@ public class CollectionUtilTest {
                 .isFalse();
         assertThat(CollectionUtil.notAllOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group2", "group3"))))
                 .isTrue();
+        assertThat(CollectionUtil.notAllOf(mapper.valueToTree(Arrays.asList("group1", "group2")), null))
+                .isFalse();
     }
 
     @Test
@@ -92,6 +106,7 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), Arrays.asList("group3", "group4"))).isFalse();
         assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), Arrays.asList("group1", "group2"))).isTrue();
         assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), Arrays.asList("group2", "group3"))).isFalse();
+        assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), null)).isFalse();
 
         assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), "group3")).isFalse();
         assertThat(CollectionUtil.allOf(Arrays.asList("group1", "group2"), "group2")).isTrue();
@@ -99,6 +114,7 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.allOf("group1, group2", "group3, group4")).isFalse();
         assertThat(CollectionUtil.allOf("group1, group2", "group1, group2")).isTrue();
         assertThat(CollectionUtil.allOf("group1, group2", "group2, group3")).isFalse();
+        assertThat(CollectionUtil.allOf("group1, group2", null)).isFalse();
 
         ObjectMapper mapper = new ObjectMapper();
         assertThat(CollectionUtil.allOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group3", "group4"))))
@@ -106,6 +122,7 @@ public class CollectionUtilTest {
         assertThat(CollectionUtil.allOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group1", "group2")))).isTrue();
         assertThat(CollectionUtil.allOf(mapper.valueToTree(Arrays.asList("group1", "group2")), mapper.valueToTree(Arrays.asList("group2", "group3"))))
                 .isFalse();
+        assertThat(CollectionUtil.allOf(mapper.valueToTree(Arrays.asList("group1", "group2")), null)).isFalse();
     }
 
 }
