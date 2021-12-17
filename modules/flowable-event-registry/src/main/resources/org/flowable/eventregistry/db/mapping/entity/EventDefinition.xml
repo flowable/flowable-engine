@@ -140,11 +140,17 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}
       </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
       <if test="keyLike != null">
         and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="keyLikeIgnoreCase != null">
+        and lower(RES.KEY_) like lower(#{keyLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}
