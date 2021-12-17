@@ -97,4 +97,8 @@ public class ChannelDefinitionEntityManagerImpl
         dataManager.updateChannelDefinitionTenantIdForDeployment(deploymentId, newTenantId);
     }
 
+    @Override
+    public void updateChannelDefinitionTypeAndImplementation(String channelDefinitionId, String type, String implementation) {
+        dataManager.updateChannelDefinitionTypeAndImplementation(channelDefinitionId, type, implementation);
+    }
 }

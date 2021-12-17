@@ -93,4 +93,17 @@
 
     </changeSet>
 
+    <changeSet id="2" author="flowable">
+        <addColumn tableName="FLW_CHANNEL_DEFINITION">
+            <column name="TYPE_" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="FLW_CHANNEL_DEFINITION">
+            <column name="IMPLEMENTATION_" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="3" author="flowable">
+        <customChange class="org.flowable.eventregistry.impl.db.SetChannelDefinitionTypeAndImplementationCustomChange" />
+    </changeSet>
+
 </databaseChangeLog>

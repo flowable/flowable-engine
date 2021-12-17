@@ -31,6 +31,10 @@ public interface ChannelDefinitionEntity extends ChannelDefinition, Entity {
 
     void setDescription(String description);
 
+    void setType(String type);
+
+    void setImplementation(String implementation);
+
     void setDeploymentId(String deploymentId);
     
     void setCreateTime(Date createTime);
