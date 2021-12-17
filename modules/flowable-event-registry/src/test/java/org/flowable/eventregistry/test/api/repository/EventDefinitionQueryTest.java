@@ -15,8 +15,13 @@ package org.flowable.eventregistry.test.api.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.test.AbstractFlowableEventTest;
+import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,43 +31,40 @@ import org.junit.jupiter.api.Test;
  */
 class EventDefinitionQueryTest extends AbstractFlowableEventTest {
 
-    protected String deployment1Id;
-    protected String deployment2Id;
-    protected String deployment3Id;
+    protected Collection<String> deploymentsToDelete = new HashSet<>();
 
-    @BeforeEach
-    void setUp() {
-        deployment1Id = repositoryService.createDeployment()
+    @AfterEach
+    void tearDown() {
+        deploymentsToDelete.forEach(repositoryService::deleteDeployment);
+        deploymentsToDelete.clear();
+    }
+
+    @Test
+    void queryByParentDeploymentId() {
+        String deployment1Id = repositoryService.createDeployment()
                 .name("Deployment 1")
                 .parentDeploymentId("parent1")
                 .addClasspathResource("org/flowable/eventregistry/test/repository/one.event")
                 .deploy()
                 .getId();
+        deploymentsToDelete.add(deployment1Id);
 
-        deployment2Id = repositoryService.createDeployment()
+        String deployment2Id = repositoryService.createDeployment()
                 .name("Deployment 2")
                 .parentDeploymentId("parent2")
                 .addClasspathResource("org/flowable/eventregistry/test/repository/one.event")
                 .addClasspathResource("org/flowable/eventregistry/test/repository/two.event")
                 .deploy()
                 .getId();
+        deploymentsToDelete.add(deployment2Id);
 
-        deployment3Id = repositoryService.createDeployment()
+        String deployment3Id = repositoryService.createDeployment()
                 .name("Deployment 3")
                 .addClasspathResource("org/flowable/eventregistry/test/repository/one.event")
                 .deploy()
                 .getId();
-    }
+        deploymentsToDelete.add(deployment3Id);
 
-    @AfterEach
-    void tearDown() {
-        repositoryService.deleteDeployment(deployment1Id);
-        repositoryService.deleteDeployment(deployment2Id);
-        repositoryService.deleteDeployment(deployment3Id);
-    }
-
-    @Test
-    void queryByParentDeploymentId() {
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent1").list())
                 .extracting(EventDefinition::getKey, EventDefinition::getDeploymentId)
                 .containsExactlyInAnyOrder(
@@ -80,5 +82,83 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
 
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
+    }
+
+    @Test
+    @EventDeploymentAnnotation(resources = {
+            "org/flowable/eventregistry/test/repository/one.event",
+            "org/flowable/eventregistry/test/repository/two.event"
+    })
+    void queryByNameLikeIgnoreCase() {
+        assertThat(repositoryService.createEventDefinitionQuery().list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("one", "My first Event"),
+                        tuple("two", "My second event")
+                );
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(2);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%event").list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("two", "My second event")
+                );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%event").count()).isEqualTo(1);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%Event").list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("one", "My first Event")
+                );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%Event").count()).isEqualTo(1);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%event").list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("one", "My first Event"),
+                        tuple("two", "My second event")
+                );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%event").count()).isEqualTo(2);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%Event").list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("one", "My first Event"),
+                        tuple("two", "My second event")
+                );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%Event").count()).isEqualTo(2);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%dummy").list())
+                .extracting(EventDefinition::getKey, EventDefinition::getName)
+                .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%dummy").count()).isZero();
+    }
+
+    @Test
+    @EventDeploymentAnnotation(resources = {
+            "org/flowable/eventregistry/test/repository/one.event",
+            "org/flowable/eventregistry/test/repository/one-test.event",
+            "org/flowable/eventregistry/test/repository/two.event"
+    })
+    void queryByKeyLikeIgnoreCase() {
+        assertThat(repositoryService.createEventDefinitionQuery().list())
+                .extracting(EventDefinition::getKey)
+                .containsExactlyInAnyOrder("one", "one-test", "two");
+        assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(3);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLike("%Ne%").list())
+                .extracting(EventDefinition::getKey)
+                .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLike("%Ne%").count()).isZero();
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%Ne%").list())
+                .extracting(EventDefinition::getKey)
+                .containsExactlyInAnyOrder("one", "one-test");
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%Ne%").count()).isEqualTo(2);
+
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%dummy").list())
+                .extracting(EventDefinition::getKey)
+                .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%dummy").count()).isZero();
     }
 }
