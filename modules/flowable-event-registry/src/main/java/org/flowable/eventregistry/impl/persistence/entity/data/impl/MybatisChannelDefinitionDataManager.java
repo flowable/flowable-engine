@@ -154,4 +154,12 @@ public class MybatisChannelDefinitionDataManager extends AbstractEventDataManage
         getDbSqlSession().update("updateChannelDefinitionTenantIdForDeploymentId", params);
     }
 
+    @Override
+    public void updateChannelDefinitionTypeAndImplementation(String channelDefinitionId, String type, String implementation) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", channelDefinitionId);
+        params.put("type", type);
+        params.put("implementation", implementation);
+        getDbSqlSession().update("updateChannelDefinitionTypeAndImplementationById", params);
+    }
 }
