@@ -35,6 +35,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.User;
@@ -94,7 +95,9 @@ public interface BpmnRestApiInterceptor {
 
     void accessTaskIdentityLinks(Task task);
 
-    void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
+    void accessTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void deleteTaskIdentityLink(Task task, IdentityLink identityLink);
 
     void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
@@ -116,7 +119,9 @@ public interface BpmnRestApiInterceptor {
 
     void accessProcessInstanceIdentityLinks(ProcessInstance processInstance);
 
-    void deleteProcessInstanceIdentityLink(ProcessInstance processInstance, String identityId, String type);
+    void accessProcessInstanceIdentityLink(ProcessInstance processInstance, IdentityLink identityLink);
+
+    void deleteProcessInstanceIdentityLink(ProcessInstance processInstance, IdentityLink identityLink);
 
     void createProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
     

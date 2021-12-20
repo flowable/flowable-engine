@@ -60,11 +60,13 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
         }
 
         validateIdentityLinkArguments(identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseInstanceIdentityLinks(caseInstance);
-        }
 
         IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceIdentityLink(caseInstance, link);
+        }
+
         return restResponseFactory.createRestIdentityLink(link);
     }
 
@@ -84,11 +86,12 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
         }
 
         validateIdentityLinkArguments(identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.deleteCaseInstanceIdentityLink(caseInstance, identityId, type);
-        }
 
-        getIdentityLink(identityId, type, caseInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceIdentityLink(caseInstance, link);
+        }
 
         runtimeService.deleteUserIdentityLink(caseInstance.getId(), identityId, type);
 

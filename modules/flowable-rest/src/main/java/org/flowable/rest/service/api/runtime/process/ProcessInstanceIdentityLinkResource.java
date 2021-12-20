@@ -60,11 +60,13 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
         }
 
         validateIdentityLinkArguments(identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
-        }
 
         IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceIdentityLink(processInstance, link);
+        }
+
         return restResponseFactory.createRestIdentityLink(link);
     }
 
@@ -84,11 +86,12 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
         }
 
         validateIdentityLinkArguments(identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.deleteProcessInstanceIdentityLink(processInstance, identityId, type);
-        }
 
-        getIdentityLink(identityId, type, processInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteProcessInstanceIdentityLink(processInstance, link);
+        }
 
         runtimeService.deleteUserIdentityLink(processInstance.getId(), identityId, type);
 

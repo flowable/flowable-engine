@@ -60,11 +60,12 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         }
 
         validateIdentityLinkArguments(family, identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessTaskIdentityLinks(task);
-        }
 
         IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLink(task, link);
+        }
 
         return restResponseFactory.createRestIdentityLink(link);
     }
@@ -85,12 +86,13 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         }
 
         validateIdentityLinkArguments(family, identityId, type);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.deleteTaskIdentityLink(task, identityId, family, type);
-        }
 
         // Check if identitylink to delete exists
-        getIdentityLink(family, identityId, type, task.getId());
+        IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskIdentityLink(task, link);
+        }
 
         if (CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family)) {
             taskService.deleteUserIdentityLink(task.getId(), identityId, type);

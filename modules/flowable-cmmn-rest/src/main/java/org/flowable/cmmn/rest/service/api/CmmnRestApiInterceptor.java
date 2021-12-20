@@ -45,6 +45,7 @@ import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
@@ -74,7 +75,9 @@ public interface CmmnRestApiInterceptor {
 
     void accessTaskIdentityLinks(Task task);
 
-    void deleteTaskIdentityLink(Task task, String identityId, String family, String type);
+    void accessTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void deleteTaskIdentityLink(Task task, IdentityLink identityLink);
 
     void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
     
@@ -94,7 +97,9 @@ public interface CmmnRestApiInterceptor {
     
     void accessCaseInstanceIdentityLinks(CaseInstance caseInstance);
 
-    void deleteCaseInstanceIdentityLink(CaseInstance caseInstance, String identityId, String type);
+    void accessCaseInstanceIdentityLink(CaseInstance caseInstance, IdentityLink identityLink);
+
+    void deleteCaseInstanceIdentityLink(CaseInstance caseInstance, IdentityLink identityLink);
 
     void createCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
 
