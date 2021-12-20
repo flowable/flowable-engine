@@ -34,6 +34,8 @@ jobs:
         # needed because the mariadb container does not provide a health check
         options: --health-cmd="mariadb-admin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mariadb:rw
     steps:
+      - name: "Set MariaDB collation"
+        run: docker exec ${{ job.services.mariadb.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
