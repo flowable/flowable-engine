@@ -496,12 +496,20 @@ public class TaskBaseResource {
      * Get valid task from request. Throws exception if task doesn't exist or if task id is not provided.
      */
     protected Task getTaskFromRequest(String taskId) {
+        return getTaskFromRequest(taskId, true);
+    }
+
+    protected Task getTaskFromRequestWithoutInterceptor(String taskId) {
+        return getTaskFromRequest(taskId, false);
+    }
+
+    protected Task getTaskFromRequest(String taskId, boolean invokeInterceptor) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
 
-        if (restApiInterceptor != null) {
+        if (invokeInterceptor && restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoById(task);
         }
 

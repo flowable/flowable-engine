@@ -54,10 +54,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
@@ -80,10 +77,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 

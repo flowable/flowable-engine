@@ -140,6 +140,14 @@ public interface BpmnRestApiInterceptor {
     void accessEventSubscriptionInfoWithQuery(EventSubscriptionQuery eventSubscriptionQuery);
     
     void accessProcessDefinitionById(ProcessDefinition processDefinition);
+
+    void accessProcessDefinitionIdentityLinks(ProcessDefinition processDefinition);
+
+    void accessProcessDefinitionIdentityLink(ProcessDefinition processDefinition, IdentityLink identityLink);
+
+    void deleteProcessDefinitionIdentityLink(ProcessDefinition processDefinition, IdentityLink identityLink);
+
+    void createProcessDefinitionIdentityLink(ProcessDefinition processDefinition, RestIdentityLink identityLink);
     
     void accessProcessDefinitionsWithQuery(ProcessDefinitionQuery processDefinitionQuery);
     

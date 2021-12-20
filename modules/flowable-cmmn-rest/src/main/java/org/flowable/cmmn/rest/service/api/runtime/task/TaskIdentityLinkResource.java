@@ -54,10 +54,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
 
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
-        }
+        Task task = getTaskFromRequestWithoutInterceptor(taskId);
 
         validateIdentityLinkArguments(family, identityId, type);
 
@@ -80,10 +77,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
-        }
+        Task task = getTaskFromRequestWithoutInterceptor(taskId);
 
         validateIdentityLinkArguments(family, identityId, type);
 

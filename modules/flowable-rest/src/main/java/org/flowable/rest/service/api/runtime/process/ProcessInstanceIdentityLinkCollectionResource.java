@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
@@ -52,10 +51,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
-        }
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
         }
@@ -73,10 +69,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
-        }
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");

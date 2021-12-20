@@ -54,10 +54,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
-        }
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
@@ -80,10 +77,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
-        }
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 

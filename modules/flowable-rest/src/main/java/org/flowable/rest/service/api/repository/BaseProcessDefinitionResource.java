@@ -38,13 +38,21 @@ public class BaseProcessDefinitionResource {
      * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
+        return getProcessDefinitionFromRequest(processDefinitionId, true);
+    }
+
+    protected ProcessDefinition getProcessDefinitionFromRequestWithoutInterceptor(String processDefinitionId) {
+        return getProcessDefinitionFromRequest(processDefinitionId, false);
+    }
+
+    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId, boolean invokeInterceptor) {
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
         
-        if (restApiInterceptor != null) {
+        if (invokeInterceptor && restApiInterceptor != null) {
             restApiInterceptor.accessProcessDefinitionById(processDefinition);
         }
         

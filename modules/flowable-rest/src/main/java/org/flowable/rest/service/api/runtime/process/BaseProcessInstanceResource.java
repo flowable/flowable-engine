@@ -301,12 +301,20 @@ public class BaseProcessInstanceResource {
     }
 
     protected ProcessInstance getProcessInstanceFromRequest(String processInstanceId) {
+        return getProcessInstanceFromRequest(processInstanceId, true);
+    }
+
+    protected ProcessInstance getProcessInstanceFromRequestWithoutInterceptor(String processInstanceId) {
+        return getProcessInstanceFromRequest(processInstanceId, false);
+    }
+
+    protected ProcessInstance getProcessInstanceFromRequest(String processInstanceId, boolean invokeInterceptor) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
         }
         
-        if (restApiInterceptor != null) {
+        if (invokeInterceptor && restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceInfoById(processInstance);
         }
         

@@ -50,7 +50,12 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutInterceptor(caseDefinitionId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionIdentityLinks(caseDefinition);
+        }
+
         return restResponseFactory.createRestIdentityLinks(repositoryService.getIdentityLinksForCaseDefinition(caseDefinition.getId()));
     }
 
@@ -64,7 +69,7 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
     @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutInterceptor(caseDefinitionId);
 
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
@@ -72,6 +77,10 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
 
         if (identityLink.getGroup() != null && identityLink.getUser() != null) {
             throw new FlowableIllegalArgumentException("Only one of user or group can be used to create an identity link.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createCaseDefinitionIdentityLink(caseDefinition, identityLink);
         }
 
         if (identityLink.getGroup() != null) {

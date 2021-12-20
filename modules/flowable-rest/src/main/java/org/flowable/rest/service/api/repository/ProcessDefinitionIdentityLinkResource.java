@@ -55,12 +55,16 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutInterceptor(processDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to get exists
         IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessDefinitionIdentityLink(processDefinition, link);
+        }
 
         return restResponseFactory.createRestIdentityLink(link);
     }
@@ -75,12 +79,17 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletResponse response) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutInterceptor(processDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to delete exists
         IdentityLink link = getIdentityLink(family, identityId, processDefinition.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteProcessDefinitionIdentityLink(processDefinition, link);
+        }
+
         if (link.getUserId() != null) {
             repositoryService.deleteCandidateStarterUser(processDefinition.getId(), link.getUserId());
         } else {

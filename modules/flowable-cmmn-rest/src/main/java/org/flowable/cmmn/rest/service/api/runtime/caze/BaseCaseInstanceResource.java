@@ -153,12 +153,20 @@ public class BaseCaseInstanceResource {
     }
 
     protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
+        return getCaseInstanceFromRequest(caseInstanceId, true);
+    }
+
+    protected CaseInstance getCaseInstanceFromRequestWithoutInterceptor(String caseInstanceId) {
+        return getCaseInstanceFromRequest(caseInstanceId, false);
+    }
+
+    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId, boolean invokeInterceptor) {
         CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
 
-        if (restApiInterceptor != null) {
+        if (invokeInterceptor && restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
         }
 

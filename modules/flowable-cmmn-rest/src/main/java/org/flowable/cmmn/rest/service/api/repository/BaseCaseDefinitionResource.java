@@ -38,13 +38,21 @@ public class BaseCaseDefinitionResource {
      * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
      */
     protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId) {
+        return getCaseDefinitionFromRequest(caseDefinitionId, true);
+    }
+
+    protected CaseDefinition getCaseDefinitionFromRequestWithoutInterceptor(String caseDefinitionId) {
+        return getCaseDefinitionFromRequest(caseDefinitionId, false);
+    }
+
+    protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId, boolean invokeInterceptor) {
         CaseDefinition caseDefinition = repositoryService.getCaseDefinition(caseDefinitionId);
 
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a case definition with id '" + caseDefinitionId + "'.", CaseDefinition.class);
         }
         
-        if (restApiInterceptor != null) {
+        if (invokeInterceptor && restApiInterceptor != null) {
             restApiInterceptor.accessCaseDefinitionById(caseDefinition);
         }
         

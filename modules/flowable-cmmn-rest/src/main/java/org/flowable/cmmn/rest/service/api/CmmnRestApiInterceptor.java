@@ -110,6 +110,14 @@ public interface CmmnRestApiInterceptor {
     void doPlanItemInstanceAction(PlanItemInstance planItemInstance, RestActionRequest actionRequest);
     
     void accessCaseDefinitionById(CaseDefinition caseDefinition);
+
+    void accessCaseDefinitionIdentityLinks(CaseDefinition caseDefinition);
+
+    void accessCaseDefinitionIdentityLink(CaseDefinition caseDefinition, IdentityLink identityLink);
+
+    void deleteCaseDefinitionIdentityLink(CaseDefinition caseDefinition, IdentityLink identityLink);
+
+    void createCaseDefinitionIdentityLink(CaseDefinition caseDefinition, RestIdentityLink identityLink);
     
     void accessCaseDefinitionsWithQuery(CaseDefinitionQuery caseDefinitionQuery);
     
