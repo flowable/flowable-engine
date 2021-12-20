@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
@@ -34,8 +35,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Tom Baeyens
@@ -424,16 +423,16 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     //Tests adding identity link in same transaction as task completion
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
-    public void testAddGroupIdentityLinkAndCompleteTaskInSameTransaction(){
+    public void testAddGroupIdentityLinkAndCompleteTaskInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String groupId="user1";
-        identityService.newGroup(groupId);
+        String groupId = "user1";
 
         managementService.executeCommand(new Command<Void>() {
+
             @Override
-            public Void execute(CommandContext context){
+            public Void execute(CommandContext context) {
                 taskService.addGroupIdentityLink(taskId, groupId, IdentityLinkType.PARTICIPANT);
                 taskService.complete(taskId);
                 return null;
@@ -444,22 +443,20 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertThat(historicIdentityLinks.size()).isEqualTo(1);
         assertThat(historicIdentityLinks.get(0).getGroupId()).isEqualTo(groupId);
-
-        identityService.deleteGroup(groupId);
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
-    public void testAddUserIdentityLinkAndCompleteTaskInSameTransaction(){
+    public void testAddUserIdentityLinkAndCompleteTaskInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String userId="user1";
-        identityService.newUser("user1");
+        String userId = "user1";
 
         managementService.executeCommand(new Command<Void>() {
+
             @Override
-            public Void execute(CommandContext context){
+            public Void execute(CommandContext context) {
                 taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.ASSIGNEE);
                 taskService.complete(taskId);
 
@@ -471,21 +468,19 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertThat(historicIdentityLinks.size()).isEqualTo(1);
         assertThat(historicIdentityLinks.get(0).getUserId()).isEqualTo(userId);
-
-        identityService.deleteUser(userId);
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
-    public void testCompleteTaskAndAddGroupIdentityLinkAfterInSameTransaction(){
+    public void testCompleteTaskAndAddGroupIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String groupId="user1";
-        identityService.newGroup(groupId);
+        String groupId = "user1";
 
-        assertThatThrownBy( () -> {
+        assertThatThrownBy(() -> {
             managementService.executeCommand(new Command<Void>() {
+
                 @Override
                 public Void execute(CommandContext context) {
                     taskService.complete(taskId);
@@ -494,21 +489,19 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 }
             });
         }).isInstanceOf(FlowableException.class).hasMessageContaining("Task is already deleted");
-
-        identityService.deleteGroup(groupId);
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
-    public void testCompleteTaskAndAddUserIdentityLinkAfterInSameTransaction(){
+    public void testCompleteTaskAndAddUserIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String userId="user1";
-        identityService.newGroup(userId);
+        String userId = "user1";
 
-        assertThatThrownBy( () -> {
+        assertThatThrownBy(() -> {
             managementService.executeCommand(new Command<Void>() {
+
                 @Override
                 public Void execute(CommandContext context) {
                     taskService.complete(taskId);
@@ -517,8 +510,6 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 }
             });
         }).isInstanceOf(FlowableException.class).hasMessageContaining("Task is already deleted");
-
-        identityService.deleteUser(userId);
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,
