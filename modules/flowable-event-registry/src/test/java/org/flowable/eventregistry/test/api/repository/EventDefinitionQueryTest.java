@@ -19,11 +19,9 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.flowable.eventregistry.api.EventDefinition;
-import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.test.AbstractFlowableEventTest;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
