@@ -36,6 +36,8 @@ jobs:
         # needed because the mysql container does not provide a health check
         options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
     steps:
+      - name: "Set MySQL collation"
+        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
@@ -77,6 +79,8 @@ jobs:
         # needed because the mysql container does not provide a health check
         options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
     steps:
+      - name: "Set MySQL collation"
+        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
