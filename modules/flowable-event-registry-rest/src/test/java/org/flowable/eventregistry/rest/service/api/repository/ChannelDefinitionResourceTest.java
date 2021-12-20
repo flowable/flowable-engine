@@ -59,6 +59,8 @@ public class ChannelDefinitionResourceTest extends BaseSpringRestTestCase {
                         + "version: " + channelDefinition.getVersion() + ","
                         + "name: '" + channelDefinition.getName() + "',"
                         + "description: '" + channelDefinition.getDescription() + "',"
+                        + "type: '" + channelDefinition.getType() + "',"
+                        + "implementation: '" + channelDefinition.getImplementation() + "',"
                         + "deploymentId: '" + channelDefinition.getDeploymentId() + "',"
                         + "deploymentUrl: '" + SERVER_URL_PREFIX + EventRestUrls
                         .createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, channelDefinition.getDeploymentId()) + "',"

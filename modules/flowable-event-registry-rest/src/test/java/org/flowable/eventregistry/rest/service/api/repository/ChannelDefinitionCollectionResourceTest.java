@@ -12,12 +12,19 @@
  */
 package org.flowable.eventregistry.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.util.List;
 
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
+import org.flowable.eventregistry.test.EventDeploymentAnnotation;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -71,12 +78,20 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
             url = baseUrl + "?nameLike=" + encode("Order%");
             assertResultsPresentInDataResponse(url, orderChannelDef.getId(), orderChannelDef2.getId());
 
+            // Test nameLikeIgnoreCase filtering
+            url = baseUrl + "?nameLikeIgnoreCase=" + encode("order%");
+            assertResultsPresentInDataResponse(url, orderChannelDef.getId(), orderChannelDef2.getId());
+
             // Test key filtering
             url = baseUrl + "?key=orderChannel";
             assertResultsPresentInDataResponse(url, orderChannelDef.getId(), orderChannelDef2.getId());
 
             // Test keyLike filtering
             url = baseUrl + "?keyLike=" + encode("order%");
+            assertResultsPresentInDataResponse(url, orderChannelDef.getId(), orderChannelDef2.getId());
+
+            // Test keyLikeIgnoreCase filtering
+            url = baseUrl + "?keyLikeIgnoreCase=" + encode("Order%");
             assertResultsPresentInDataResponse(url, orderChannelDef.getId(), orderChannelDef2.getId());
 
             // Test resourceName filtering
@@ -116,5 +131,62 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
                 repositoryService.deleteDeployment(deployment.getId());
             }
         }
+    }
+
+    @EventDeploymentAnnotation(resources = {
+            "org/flowable/eventregistry/rest/service/api/repository/jmsInbound.channel",
+            "org/flowable/eventregistry/rest/service/api/repository/jmsOutbound.channel",
+            "org/flowable/eventregistry/rest/service/api/repository/kafkaInbound.channel",
+            "org/flowable/eventregistry/rest/service/api/repository/kafkaOutbound.channel",
+    })
+    public void testQueryInChannelTypeAndImplementation() {
+        JsonNode response = executeAndReadGetRequest("/event-registry-repository/channel-definitions");
+
+        assertThatJson(response)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data")
+                .isEqualTo("["
+                        + "  { key: 'jmsInbound', type: 'inbound', implementation: 'jms' },"
+                        + "  { key: 'jmsOutbound', type: 'outbound', implementation: 'jms' },"
+                        + "  { key: 'kafkaInbound', type: 'inbound', implementation: 'kafka' },"
+                        + "  { key: 'kafkaOutbound', type: 'outbound', implementation: 'kafka' }"
+                        + "]");
+
+        response = executeAndReadGetRequest("/event-registry-repository/channel-definitions?onlyInbound=true");
+
+        assertThatJson(response)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data")
+                .isEqualTo("["
+                        + "  { key: 'jmsInbound', type: 'inbound', implementation: 'jms' },"
+                        + "  { key: 'kafkaInbound', type: 'inbound', implementation: 'kafka' }"
+                        + "]");
+
+        response = executeAndReadGetRequest("/event-registry-repository/channel-definitions?onlyOutbound=true");
+
+        assertThatJson(response)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data")
+                .isEqualTo("["
+                        + "  { key: 'jmsOutbound', type: 'outbound', implementation: 'jms' },"
+                        + "  { key: 'kafkaOutbound', type: 'outbound', implementation: 'kafka' }"
+                        + "]");
+
+        response = executeAndReadGetRequest("/event-registry-repository/channel-definitions?implementation=jms");
+
+        assertThatJson(response)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data")
+                .isEqualTo("["
+                        + "  { key: 'jmsInbound', type: 'inbound', implementation: 'jms' },"
+                        + "  { key: 'jmsOutbound', type: 'outbound', implementation: 'jms' }"
+                        + "]");
+
+        response = executeAndReadGetRequest("/event-registry-repository/channel-definitions?implementation=dummy");
+
+        assertThatJson(response)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data")
+                .isEqualTo("[]");
     }
 }
