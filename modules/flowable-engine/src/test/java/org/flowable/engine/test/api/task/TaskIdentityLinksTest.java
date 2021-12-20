@@ -14,17 +14,20 @@
 package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
@@ -414,6 +417,86 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                         tuple("businessAdministrator", null, "management"),
                         tuple("businessAdministrator", null, "sales")
                 );
+    }
+
+    //Tests adding identity link in same transaction as task completion
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+    public void testAddGroupIdentityLinkAndCompleteTaskInSameTransaction() {
+        runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId)).isEmpty();
+        }
+
+        managementService.executeCommand(context -> {
+            taskService.addGroupIdentityLink(taskId, "group1", IdentityLinkType.PARTICIPANT);
+            taskService.complete(taskId);
+            return null;
+        });
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId))
+                    .extracting(IdentityLinkInfo::getGroupId)
+                    .containsExactlyInAnyOrder("group1");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+    public void testAddUserIdentityLinkAndCompleteTaskInSameTransaction() {
+        runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId)).isEmpty();
+        }
+
+        managementService.executeCommand(context -> {
+            taskService.addUserIdentityLink(taskId, "user1", IdentityLinkType.ASSIGNEE);
+            taskService.complete(taskId);
+
+            return null;
+        });
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId))
+                    .extracting(IdentityLinkInfo::getUserId)
+                    .containsExactlyInAnyOrder("user1");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+    public void testCompleteTaskAndAddGroupIdentityLinkAfterInSameTransaction() {
+        runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        assertThatThrownBy(() -> managementService.executeCommand(context -> {
+            taskService.complete(taskId);
+            taskService.addGroupIdentityLink(taskId, "group1", IdentityLinkType.PARTICIPANT);
+            return null;
+        }))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Task is already deleted");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+    public void testCompleteTaskAndAddUserIdentityLinkAfterInSameTransaction() {
+        runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        assertThatThrownBy(() -> managementService.executeCommand(context -> {
+            taskService.complete(taskId);
+            taskService.addUserIdentityLink(taskId, "user1", IdentityLinkType.ASSIGNEE);
+            return null;
+        }))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Task is already deleted");
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,

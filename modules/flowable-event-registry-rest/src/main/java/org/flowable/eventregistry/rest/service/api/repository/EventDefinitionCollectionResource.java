@@ -73,8 +73,10 @@ public class EventDefinitionCollectionResource {
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return event definitions with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return event definitions with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return event definitions with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return event definitions with a name like the given name (case-insensitive).", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return event definitions with the given key.", paramType = "query"),
             @ApiImplicitParam(name = "keyLike", dataType = "string", value = "Only return event definitions with a name like the given key.", paramType = "query"),
+            @ApiImplicitParam(name = "keyLikeIgnoreCase", dataType = "string", value = "Only return event definitions with a name like the given key (case-insensitive).", paramType = "query"),
             @ApiImplicitParam(name = "resourceName", dataType = "string", value = "Only return event definitions with the given resource name.", paramType = "query"),
             @ApiImplicitParam(name = "resourceNameLike", dataType = "string", value = "Only return event definitions with a name like the given resource name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return event definitions with the given category.", paramType = "query"),
@@ -109,11 +111,17 @@ public class EventDefinitionCollectionResource {
         if (allRequestParams.containsKey("keyLike")) {
             eventDefinitionQuery.eventDefinitionKeyLike(allRequestParams.get("keyLike"));
         }
+        if (allRequestParams.containsKey("keyLikeIgnoreCase")) {
+            eventDefinitionQuery.eventDefinitionKeyLikeIgnoreCase(allRequestParams.get("keyLikeIgnoreCase"));
+        }
         if (allRequestParams.containsKey("name")) {
             eventDefinitionQuery.eventDefinitionName(allRequestParams.get("name"));
         }
         if (allRequestParams.containsKey("nameLike")) {
             eventDefinitionQuery.eventDefinitionNameLike(allRequestParams.get("nameLike"));
+        }
+        if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
+            eventDefinitionQuery.eventDefinitionNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
         if (allRequestParams.containsKey("resourceName")) {
             eventDefinitionQuery.eventDefinitionResourceName(allRequestParams.get("resourceName"));

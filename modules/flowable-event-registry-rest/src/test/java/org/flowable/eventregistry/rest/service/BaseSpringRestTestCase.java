@@ -245,6 +245,14 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         idmIdentityService.createMembership(user.getId(), group.getId());
     }
 
+    public JsonNode executeAndReadGetRequest(String url) {
+        try (CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK)) {
+            return objectMapper.readTree(response.getEntity().getContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to close request", e);
+        }
+    }
+
     /**
      * IMPORTANT: calling method is responsible for calling close() on returned {@link HttpResponse} to free the connection.
      */
