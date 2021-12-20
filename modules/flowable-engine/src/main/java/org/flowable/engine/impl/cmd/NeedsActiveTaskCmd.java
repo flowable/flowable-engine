@@ -53,6 +53,10 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
         }
 
+        if (task.isDeleted()) {
+            throw new FlowableException("Task is already deleted");
+        }
+
         if (task.isSuspended()) {
             throw new FlowableException(getSuspendedTaskException());
         }
