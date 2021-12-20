@@ -2366,7 +2366,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml" })
-    public void testProcessVariableValueEqualsOn() throws Exception {
+    public void testProcessVariableValueEqualsOr() throws Exception {
         Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
         variables.put("shortVar", (short) 123);

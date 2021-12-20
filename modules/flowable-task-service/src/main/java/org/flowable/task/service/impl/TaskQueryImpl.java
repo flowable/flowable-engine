@@ -33,6 +33,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
@@ -135,6 +136,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean excludeSubtasks;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
+    protected boolean includeCaseVariables;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -149,7 +151,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQueryImpl() {
     }
 
-    public TaskQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration, 
+    public TaskQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration,
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandContext, variableServiceConfiguration);
@@ -157,7 +159,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         this.idmIdentityService = idmIdentityService;
     }
 
-    public TaskQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration, 
+    public TaskQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration,
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandExecutor, variableServiceConfiguration);
@@ -1270,6 +1272,137 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery caseVariableValueEquals(String variableName, Object variableValue) {
+        if (orActive) {
+            currentOrQueryObject.variableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
+        } else {
+            this.variableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueEquals(Object variableValue) {
+        if (orActive) {
+            currentOrQueryObject.variableValueEquals(variableValue, ScopeTypes.CMMN);
+        } else {
+            variableValueEquals(variableValue, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueEqualsIgnoreCase(String name, String value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueNotEquals(String variableName, Object variableValue) {
+        if (orActive) {
+            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
+        } else {
+            this.variableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
+            ;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueNotEqualsIgnoreCase(String name, String value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, ScopeTypes.CMMN);
+        } else {
+            this.variableValueNotEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueGreaterThan(String name, Object value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueGreaterThan(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueGreaterThan(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueGreaterThanOrEqual(String name, Object value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueLessThan(String name, Object value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueLessThan(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueLessThan(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueLessThanOrEqual(String name, Object value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueLike(String name, String value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueLike(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueLike(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableValueLikeIgnoreCase(String name, String value) {
+        if (orActive) {
+            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
+        } else {
+            this.variableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableExists(name, ScopeTypes.CMMN);
+        } else {
+            this.variableExists(name, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery caseVariableNotExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableNotExists(name, ScopeTypes.CMMN);
+        } else {
+            this.variableNotExists(name, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
     public TaskQuery processDefinitionKey(String processDefinitionKey) {
         if (orActive) {
             currentOrQueryObject.processDefinitionKey = processDefinitionKey;
@@ -1550,6 +1683,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery includeCaseVariables() {
+        this.includeCaseVariables = true;
+        return this;
+    }
+
+    @Override
     public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
         return this;
     }
@@ -1587,7 +1726,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Collection<String> getGroupsForCandidateUser(String candidateUser) {
         Collection<String> groupIds = new ArrayList<>();
         if (idmIdentityService != null) {
-            List<Group> groups = idmIdentityService.createGroupQuery().groupMember(candidateUser).list();
+            List<Group> groups = idmIdentityService.createGroupQuery()
+                    .groupMember(candidateUser)
+                    .list();
             for (Group group : groups) {
                 groupIds.add(group.getId());
             }
@@ -1729,14 +1870,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         ensureVariablesInitialized();
         List<Task> tasks = null;
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
-            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+            taskServiceConfiguration.getTaskQueryInterceptor()
+                    .beforeTaskQueryExecute(this);
         }
 
-        if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks) {
-            tasks = taskServiceConfiguration.getTaskEntityManager().findTasksWithRelatedEntitiesByQueryCriteria(this);
+        if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks || includeCaseVariables) {
+            tasks = taskServiceConfiguration.getTaskEntityManager()
+                    .findTasksWithRelatedEntitiesByQueryCriteria(this);
 
             if (taskId != null) {
-                if (includeProcessVariables) {
+                if (includeProcessVariables|| includeCaseVariables) {
                     addCachedVariableForQueryById(commandContext, tasks, false);
                 } else if (includeTaskLocalVariables) {
                     addCachedVariableForQueryById(commandContext, tasks, true);
@@ -1744,17 +1887,20 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             }
 
         } else {
-            tasks = taskServiceConfiguration.getTaskEntityManager().findTasksByQueryCriteria(this);
+            tasks = taskServiceConfiguration.getTaskEntityManager()
+                    .findTasksByQueryCriteria(this);
         }
 
         if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
-                taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
+                taskServiceConfiguration.getInternalTaskLocalizationManager()
+                        .localize(task, locale, withLocalizationFallback);
             }
         }
 
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
-            taskServiceConfiguration.getTaskQueryInterceptor().afterTaskQueryExecute(this, tasks);
+            taskServiceConfiguration.getTaskQueryInterceptor()
+                    .afterTaskQueryExecute(this, tasks);
         }
 
         return tasks;
@@ -1769,28 +1915,33 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
                 for (VariableInstanceEntity cachedVariableEntity : cachedVariableEntities) {
 
                     if (local) {
-                        if (task.getId().equals(cachedVariableEntity.getTaskId())) {
-                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
+                        if (task.getId()
+                                .equals(cachedVariableEntity.getTaskId())) {
+                            ((TaskEntity) task).getQueryVariables()
+                                    .add(cachedVariableEntity);
                         }
-                    } else {
-                        if (task.getProcessInstanceId().equals(cachedVariableEntity.getProcessInstanceId())) {
-                            ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
-                        }
+                    } else if (TaskVariableUtils.doesVariableBelongToTask(cachedVariableEntity, task)) {
+                        ((TaskEntity) task).getQueryVariables().add(cachedVariableEntity);
                     }
                 }
-
             }
         }
     }
 
     @Override
     public void enhanceCachedValue(TaskEntity task) {
-        if (includeProcessVariables) {
-            task.getQueryVariables().addAll(variableServiceConfiguration.getVariableService()
-                    .findVariableInstancesByExecutionId(task.getProcessInstanceId()));
+        if (includeProcessVariables && task.getProcessInstanceId() != null) {
+            task.getQueryVariables()
+                    .addAll(variableServiceConfiguration.getVariableService()
+                            .findVariableInstancesByExecutionId(task.getProcessInstanceId()));
+        } else if (includeCaseVariables && TaskVariableUtils.isCaseRelated(task)) {
+            task.getQueryVariables()
+                    .addAll((variableServiceConfiguration.getVariableService()
+                            .findVariableInstanceByScopeIdAndScopeType(task.getScopeId(), task.getScopeType())));
         } else if (includeTaskLocalVariables) {
             task.getQueryVariables()
-                    .addAll(task.getVariableInstanceEntities().values());
+                    .addAll(task.getVariableInstanceEntities()
+                            .values());
         }
     }
 
@@ -1799,10 +1950,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         ensureVariablesInitialized();
 
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
-            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+            taskServiceConfiguration.getTaskQueryInterceptor()
+                    .beforeTaskQueryExecute(this);
         }
 
-        return taskServiceConfiguration.getTaskEntityManager().findTaskCountByQueryCriteria(this);
+        return taskServiceConfiguration.getTaskEntityManager()
+                .findTaskCountByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////////////
@@ -2110,6 +2263,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isIncludeProcessVariables() {
         return includeProcessVariables;
+    }
+
+    public boolean isIncludeCaseVariables() {
+        return includeCaseVariables;
     }
 
     public boolean isIncludeIdentityLinks() {
