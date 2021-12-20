@@ -22,13 +22,12 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
@@ -427,22 +426,22 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String groupId = "user1";
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId)).isEmpty();
+        }
 
-        managementService.executeCommand(new Command<Void>() {
-
-            @Override
-            public Void execute(CommandContext context) {
-                taskService.addGroupIdentityLink(taskId, groupId, IdentityLinkType.PARTICIPANT);
-                taskService.complete(taskId);
-                return null;
-            }
+        managementService.executeCommand(context -> {
+            taskService.addGroupIdentityLink(taskId, "group1", IdentityLinkType.PARTICIPANT);
+            taskService.complete(taskId);
+            return null;
         });
 
-        List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
 
-        assertThat(historicIdentityLinks.size()).isEqualTo(1);
-        assertThat(historicIdentityLinks.get(0).getGroupId()).isEqualTo(groupId);
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId))
+                    .extracting(IdentityLinkInfo::getGroupId)
+                    .containsExactlyInAnyOrder("group1");
+        }
     }
 
     @Test
@@ -451,23 +450,23 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String userId = "user1";
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId)).isEmpty();
+        }
 
-        managementService.executeCommand(new Command<Void>() {
+        managementService.executeCommand(context -> {
+            taskService.addUserIdentityLink(taskId, "user1", IdentityLinkType.ASSIGNEE);
+            taskService.complete(taskId);
 
-            @Override
-            public Void execute(CommandContext context) {
-                taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.ASSIGNEE);
-                taskService.complete(taskId);
-
-                return null;
-            }
+            return null;
         });
 
-        List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
 
-        assertThat(historicIdentityLinks.size()).isEqualTo(1);
-        assertThat(historicIdentityLinks.get(0).getUserId()).isEqualTo(userId);
+            assertThat(historyService.getHistoricIdentityLinksForTask(taskId))
+                    .extracting(IdentityLinkInfo::getUserId)
+                    .containsExactlyInAnyOrder("user1");
+        }
     }
 
     @Test
@@ -476,19 +475,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String groupId = "user1";
-
-        assertThatThrownBy(() -> {
-            managementService.executeCommand(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext context) {
-                    taskService.complete(taskId);
-                    taskService.addGroupIdentityLink(taskId, groupId, IdentityLinkType.PARTICIPANT);
-                    return null;
-                }
-            });
-        }).isInstanceOf(FlowableException.class).hasMessageContaining("Task is already deleted");
+        assertThatThrownBy(() -> managementService.executeCommand(context -> {
+            taskService.complete(taskId);
+            taskService.addGroupIdentityLink(taskId, "group1", IdentityLinkType.PARTICIPANT);
+            return null;
+        }))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Task is already deleted");
     }
 
     @Test
@@ -497,19 +490,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        String userId = "user1";
-
-        assertThatThrownBy(() -> {
-            managementService.executeCommand(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext context) {
-                    taskService.complete(taskId);
-                    taskService.addUserIdentityLink(taskId, userId, IdentityLinkType.ASSIGNEE);
-                    return null;
-                }
-            });
-        }).isInstanceOf(FlowableException.class).hasMessageContaining("Task is already deleted");
+        assertThatThrownBy(() -> managementService.executeCommand(context -> {
+            taskService.complete(taskId);
+            taskService.addUserIdentityLink(taskId, "user1", IdentityLinkType.ASSIGNEE);
+            return null;
+        }))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Task is already deleted");
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,
