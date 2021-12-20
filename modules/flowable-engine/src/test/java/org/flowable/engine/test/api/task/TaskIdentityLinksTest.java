@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.Arrays;
 import java.util.List;
 
