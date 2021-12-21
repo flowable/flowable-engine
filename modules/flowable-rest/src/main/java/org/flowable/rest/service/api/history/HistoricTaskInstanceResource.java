@@ -65,7 +65,7 @@ public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic task instances could not be found.") })
     @GetMapping(value = "/history/historic-task-instances/{taskId}", produces = "application/json")
     public HistoricTaskInstanceResponse getTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        return restResponseFactory.createHistoricTaskInstanceResponse(getHistoricTaskInstanceFromRequest(taskId));
+        return restResponseFactory.createHistoricTaskInstanceResponse(getHistoricTaskInstanceFromRequestWithAccessCheck(taskId));
     }
 
     @ApiOperation(value = "Delete a historic task instance", tags = { "History Task" }, notes = "")
@@ -74,7 +74,7 @@ public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic task instance could not be found.") })
     @DeleteMapping(value = "/history/historic-task-instances/{taskId}")
     public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithAccessCheck(taskId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricTask(task);
@@ -91,7 +91,7 @@ public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResour
     })
     @GetMapping(value = "/history/historic-task-instances/{taskId}/form", produces = "application/json")
     public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithAccessCheck(taskId);
         if (StringUtils.isEmpty(task.getFormKey())) {
             throw new FlowableIllegalArgumentException("Task has no form defined");
         }

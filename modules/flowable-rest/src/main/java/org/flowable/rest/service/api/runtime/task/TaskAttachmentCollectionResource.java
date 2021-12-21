@@ -65,7 +65,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments", produces = "application/json")
     public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         List<AttachmentResponse> result = new ArrayList<>();
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
 
         for (Attachment attachment : taskService.getTaskAttachments(task.getId())) {
             result.add(restResponseFactory.createAttachmentResponse(attachment));
@@ -95,7 +95,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     public AttachmentResponse createAttachment(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
         AttachmentResponse result = null;
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
         if (request instanceof MultipartHttpServletRequest) {
             result = createBinaryAttachment((MultipartHttpServletRequest) request, task, response);
         } else {

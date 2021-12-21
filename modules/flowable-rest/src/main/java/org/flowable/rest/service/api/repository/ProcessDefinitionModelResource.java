@@ -40,7 +40,7 @@ public class ProcessDefinitionModelResource extends BaseProcessDefinitionResourc
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/model", produces = "application/json")
     public BpmnModel getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
         return repositoryService.getBpmnModel(processDefinition.getId());
     }
 

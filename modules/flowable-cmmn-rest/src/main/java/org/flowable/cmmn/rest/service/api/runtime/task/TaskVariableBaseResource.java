@@ -55,7 +55,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
         
         boolean variableFound = false;
         Object value = null;

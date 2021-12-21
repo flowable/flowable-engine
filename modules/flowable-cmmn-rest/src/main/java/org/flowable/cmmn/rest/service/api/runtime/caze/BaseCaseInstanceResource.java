@@ -152,22 +152,28 @@ public class BaseCaseInstanceResource {
         return responseList;
     }
 
-    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
-        return getCaseInstanceFromRequest(caseInstanceId, true);
+    /**
+     * Returns the {@link CaseInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected CaseInstance getCaseInstanceFromRequestWithAccessCheck(String caseInstanceId) {
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
+        }
+
+        return caseInstance;
     }
 
-    protected CaseInstance getCaseInstanceFromRequestWithoutInterceptor(String caseInstanceId) {
-        return getCaseInstanceFromRequest(caseInstanceId, false);
-    }
-
-    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId, boolean invokeInterceptor) {
+    /**
+     * Returns the {@link CaseInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected CaseInstance getCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
         CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
-
-        if (invokeInterceptor && restApiInterceptor != null) {
-            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
         }
 
         return caseInstance;

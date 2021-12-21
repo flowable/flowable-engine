@@ -62,7 +62,7 @@ public class ProcessInstanceDiagramResource extends BaseProcessInstanceResource 
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/diagram")
     public ResponseEntity<byte[]> getProcessInstanceDiagram(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithAccessCheck(processInstanceId);
 
         ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 

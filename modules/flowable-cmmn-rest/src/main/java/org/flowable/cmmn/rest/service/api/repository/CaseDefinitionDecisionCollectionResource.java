@@ -46,7 +46,7 @@ public class CaseDefinitionDecisionCollectionResource extends BaseCaseDefinition
         @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
         HttpServletRequest request) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
         List<DmnDecision> decisions = repositoryService.getDecisionsForCaseDefinition(caseDefinition.getId());
 
         return restResponseFactory.createDecisionResponseList(decisions, caseDefinitionId);

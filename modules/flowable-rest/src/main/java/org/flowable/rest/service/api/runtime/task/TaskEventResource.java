@@ -49,7 +49,7 @@ public class TaskEventResource extends TaskBaseResource {
     @GetMapping(value = "/runtime/tasks/{taskId}/events/{eventId}", produces = "application/json")
     public EventResponse getEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletRequest request) {
 
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
 
         Event event = taskService.getEvent(eventId);
         if (event == null || !task.getId().equals(event.getTaskId())) {
@@ -68,7 +68,7 @@ public class TaskEventResource extends TaskBaseResource {
     public void deleteEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletResponse response) {
 
         // Check if task exists
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         Event event = taskService.getEvent(eventId);
         if (event == null || event.getTaskId() == null || !event.getTaskId().equals(task.getId())) {

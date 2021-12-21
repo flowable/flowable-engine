@@ -58,7 +58,7 @@ public class HistoricProcessInstanceCommentCollectionResource extends HistoricPr
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", produces = "application/json")
     public List<CommentResponse> getComments(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId);
         return restResponseFactory.createRestCommentList(taskService.getProcessInstanceComments(instance.getId()));
     }
 
@@ -71,7 +71,7 @@ public class HistoricProcessInstanceCommentCollectionResource extends HistoricPr
     @PostMapping(value = "/history/historic-process-instances/{processInstanceId}/comments", produces = "application/json")
     public CommentResponse createComment(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody CommentResponse comment, HttpServletRequest request, HttpServletResponse response) {
 
-        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId);
 
         if (comment.getMessage() == null) {
             throw new FlowableIllegalArgumentException("Comment text is required.");

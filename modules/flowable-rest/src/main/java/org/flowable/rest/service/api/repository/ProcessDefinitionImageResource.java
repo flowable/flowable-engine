@@ -48,7 +48,7 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
         InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
 
         if (imageStream != null) {

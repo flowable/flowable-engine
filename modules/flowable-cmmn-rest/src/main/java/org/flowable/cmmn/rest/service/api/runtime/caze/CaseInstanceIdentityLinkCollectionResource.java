@@ -51,7 +51,8 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceIdentityLinks(caseInstance);
         }
@@ -69,7 +70,7 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a case instance.");

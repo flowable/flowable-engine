@@ -68,7 +68,8 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}", produces = "application/json")
     public HistoricCaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
-        HistoricCaseInstanceResponse caseInstanceResponse = restResponseFactory.createHistoricCaseInstanceResponse(getHistoricCaseInstanceFromRequest(caseInstanceId));
+        HistoricCaseInstanceResponse caseInstanceResponse = restResponseFactory.createHistoricCaseInstanceResponse(
+                getHistoricCaseInstanceFromRequestWithAccessCheck(caseInstanceId));
         
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
         if (caseDefinition != null) {
@@ -85,7 +86,7 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}")
     public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricCase(caseInstance);
         }
@@ -96,7 +97,7 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
     
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
     public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
-        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
 
         return cmmnhistoryService.getStageOverview(caseInstance.getId());
     }

@@ -55,7 +55,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutInterceptor(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
@@ -79,7 +79,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletResponse response) {
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutInterceptor(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 

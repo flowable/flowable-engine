@@ -96,7 +96,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -140,7 +140,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString,
             HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         // Determine scope
         RestVariableScope scope = RestVariableScope.LOCAL;

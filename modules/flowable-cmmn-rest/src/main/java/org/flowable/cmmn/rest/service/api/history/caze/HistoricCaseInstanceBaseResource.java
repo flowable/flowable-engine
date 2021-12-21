@@ -169,16 +169,22 @@ public class HistoricCaseInstanceBaseResource {
         return responseList;
     }
     
-    protected HistoricCaseInstance getHistoricCaseInstanceFromRequest(String caseInstanceId) {
-        HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
-        }
-        
+    protected HistoricCaseInstance getHistoricCaseInstanceFromRequestWithAccessCheck(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryCaseInfoById(caseInstance);
         }
         
+        return caseInstance;
+    }
+
+    protected HistoricCaseInstance getHistoricCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
+        }
+
         return caseInstance;
     }
 

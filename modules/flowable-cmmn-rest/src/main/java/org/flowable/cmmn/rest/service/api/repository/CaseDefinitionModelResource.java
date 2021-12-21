@@ -40,7 +40,7 @@ public class CaseDefinitionModelResource extends BaseCaseDefinitionResource {
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/model", produces = "application/json")
     public CmmnModel getModelResource(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
         return repositoryService.getCmmnModel(caseDefinition.getId());
     }
 

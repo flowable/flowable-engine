@@ -52,7 +52,7 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/comments", produces = "application/json")
     public List<CommentResponse> getComments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
         return restResponseFactory.createRestCommentList(taskService.getTaskComments(task.getId()));
     }
 
@@ -65,7 +65,7 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
     @PostMapping(value = "/runtime/tasks/{taskId}/comments", produces = "application/json")
     public CommentResponse createComment(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody CommentRequest comment, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         if (comment.getMessage() == null) {
             throw new FlowableIllegalArgumentException("Comment text is required.");

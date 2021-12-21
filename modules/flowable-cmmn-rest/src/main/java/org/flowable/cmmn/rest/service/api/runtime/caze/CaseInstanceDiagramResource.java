@@ -61,7 +61,7 @@ public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/diagram")
     public ResponseEntity<byte[]> getCaseInstanceDiagram(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
 
         CaseDefinition caseDef = repositoryService.getCaseDefinition(caseInstance.getCaseDefinitionId());
 

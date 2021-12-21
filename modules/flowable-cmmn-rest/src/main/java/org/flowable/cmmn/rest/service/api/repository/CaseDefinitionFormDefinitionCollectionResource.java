@@ -46,7 +46,7 @@ public class CaseDefinitionFormDefinitionCollectionResource extends BaseCaseDefi
             @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             HttpServletRequest request) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
         List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForCaseDefinition(caseDefinition.getId());
 
         return restResponseFactory.createFormDefinitionResponseList(formDefinitions, caseDefinitionId);

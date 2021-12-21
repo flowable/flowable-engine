@@ -67,7 +67,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
+        CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequestWithAccessCheck(caseInstanceId));
         
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
         if (caseDefinition != null) {
@@ -89,7 +89,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     public CaseInstanceResponse updateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                     @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
 
         if (StringUtils.isNotEmpty(updateRequest.getAction())) {
 
@@ -138,7 +138,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
     public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.terminateCaseInstance(caseInstance);
@@ -155,7 +155,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/delete")
     public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstance(caseInstance);

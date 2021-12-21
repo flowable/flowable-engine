@@ -49,7 +49,7 @@ public class TaskCommentResource extends TaskBaseResource {
     @GetMapping(value = "/runtime/tasks/{taskId}/comments/{commentId}", produces = "application/json")
     public CommentResponse getComment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request) {
 
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || !task.getId().equals(comment.getTaskId())) {
@@ -68,7 +68,7 @@ public class TaskCommentResource extends TaskBaseResource {
     public void deleteComment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletResponse response) {
 
         // Check if task exists
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getTaskId() == null || !comment.getTaskId().equals(task.getId())) {

@@ -48,7 +48,7 @@ public class CaseDefinitionImageResource extends BaseCaseDefinitionResource {
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getImageResource(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
         InputStream imageStream = repositoryService.getCaseDiagram(caseDefinition.getId());
 
         if (imageStream != null) {

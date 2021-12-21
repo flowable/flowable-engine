@@ -66,7 +66,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}", produces = "application/json")
     public CaseDefinitionResponse getCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
 
         return restResponseFactory.createCaseDefinitionResponse(caseDefinition);
     }
@@ -88,7 +88,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             throw new FlowableIllegalArgumentException("No action found in request body.");
         }
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
 
         if (actionRequest.getCategory() != null) {
             // Update of category required
@@ -114,7 +114,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             return null;
         }
         
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithAccessCheck(caseDefinitionId);
         FormInfo formInfo = getStartForm(caseDefinition);
         if (formHandlerRestApiInterceptor != null) {
             return formHandlerRestApiInterceptor.convertStartFormInfo(formInfo, caseDefinition);

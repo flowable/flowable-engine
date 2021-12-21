@@ -54,7 +54,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
@@ -77,7 +77,7 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 

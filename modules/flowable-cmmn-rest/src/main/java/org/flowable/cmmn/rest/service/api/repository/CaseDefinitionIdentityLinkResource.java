@@ -55,7 +55,7 @@ public class CaseDefinitionIdentityLinkResource extends BaseCaseDefinitionResour
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutInterceptor(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
@@ -79,7 +79,7 @@ public class CaseDefinitionIdentityLinkResource extends BaseCaseDefinitionResour
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletResponse response) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutInterceptor(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 

@@ -50,7 +50,7 @@ public class TaskAttachmentResource extends TaskBaseResource {
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}", produces = "application/json")
     public AttachmentResponse getAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletRequest request) {
 
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
@@ -68,7 +68,7 @@ public class TaskAttachmentResource extends TaskBaseResource {
     @DeleteMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}")
     public void deleteAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {

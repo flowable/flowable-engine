@@ -54,7 +54,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
@@ -77,7 +77,7 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutInterceptor(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 

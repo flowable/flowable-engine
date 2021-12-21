@@ -51,7 +51,8 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithAccessCheck(processInstanceId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
         }
@@ -69,7 +70,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutInterceptor(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");

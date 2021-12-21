@@ -60,7 +60,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}", produces = "application/json")
     public CommentResponse getComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request) {
 
-        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId);
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {
@@ -78,7 +78,7 @@ public class HistoricProcessInstanceCommentResource extends HistoricProcessInsta
     public void deleteComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request,
             HttpServletResponse response) {
 
-        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance instance = getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId);
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getProcessInstanceId() == null || !comment.getProcessInstanceId().equals(instance.getId())) {

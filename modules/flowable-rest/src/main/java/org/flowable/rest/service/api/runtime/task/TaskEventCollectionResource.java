@@ -44,7 +44,7 @@ public class TaskEventCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/events", produces = "application/json")
     public List<EventResponse> getEvents(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
         return restResponseFactory.createEventResponseList(taskService.getTaskEvents(task.getId()));
     }
 }

@@ -71,7 +71,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
         Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid task to get the variables for
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
         if (variableScope == null) {
@@ -117,7 +117,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/variables", produces = "application/json", consumes = {"text/plain", "application/json", "multipart/form-data"})
     public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -201,7 +201,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/tasks/{taskId}/variables")
     public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
         Collection<String> currentVariables = taskService.getVariablesLocal(task.getId()).keySet();
         taskService.removeVariablesLocal(task.getId(), currentVariables);
 

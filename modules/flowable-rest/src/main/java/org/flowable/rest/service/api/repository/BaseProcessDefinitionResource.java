@@ -35,27 +35,30 @@ public class BaseProcessDefinitionResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
+     * Returns the {@link ProcessDefinition} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or definition was not found.
      */
-    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
-        return getProcessDefinitionFromRequest(processDefinitionId, true);
+    protected ProcessDefinition getProcessDefinitionFromRequestWithAccessCheck(String processDefinitionId) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessDefinitionById(processDefinition);
+        }
+        
+        return processDefinition;
     }
 
-    protected ProcessDefinition getProcessDefinitionFromRequestWithoutInterceptor(String processDefinitionId) {
-        return getProcessDefinitionFromRequest(processDefinitionId, false);
-    }
-
-    protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId, boolean invokeInterceptor) {
+    /**
+     * Returns the {@link ProcessDefinition} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or definition was not found.
+     */
+    protected ProcessDefinition getProcessDefinitionFromRequestWithoutAccessCheck(String processDefinitionId) {
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
-        
-        if (invokeInterceptor && restApiInterceptor != null) {
-            restApiInterceptor.accessProcessDefinitionById(processDefinition);
-        }
-        
+
         return processDefinition;
     }
 }

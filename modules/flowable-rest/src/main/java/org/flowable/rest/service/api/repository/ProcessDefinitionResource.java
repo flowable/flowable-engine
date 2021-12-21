@@ -77,7 +77,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}", produces = "application/json")
     public ProcessDefinitionResponse getProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId, HttpServletRequest request) {
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
 
         return restResponseFactory.createProcessDefinitionResponse(processDefinition);
     }
@@ -101,7 +101,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             throw new FlowableIllegalArgumentException("No action found in request body.");
         }
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
 
         if (actionRequest.getCategory() != null) {
             // Update of category required
@@ -139,7 +139,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             return null;
         }
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
         FormInfo formInfo = getStartForm(processDefinition);
         if (formHandlerRestApiInterceptor != null) {
             return formHandlerRestApiInterceptor.convertStartFormInfo(formInfo, processDefinition);
@@ -158,7 +158,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void migrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
@@ -177,7 +177,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);

@@ -53,7 +53,7 @@ public class TaskAttachmentContentResource extends TaskBaseResource {
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}/content")
     public ResponseEntity<byte[]> getAttachmentContent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
 
-        HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithAccessCheck(taskId);
         Attachment attachment = taskService.getAttachment(attachmentId);
 
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {

@@ -50,7 +50,8 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, HttpServletRequest request) {
 
-        Task task = getTaskFromRequestWithoutInterceptor(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskIdentityLinks(task);
         }
@@ -67,7 +68,8 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequestWithoutInterceptor(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
         }

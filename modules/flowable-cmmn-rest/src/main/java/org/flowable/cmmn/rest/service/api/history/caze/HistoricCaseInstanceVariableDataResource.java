@@ -90,7 +90,7 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName, HttpServletRequest request) {
-        HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
 
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
                         .caseInstanceId(caseObject.getId())

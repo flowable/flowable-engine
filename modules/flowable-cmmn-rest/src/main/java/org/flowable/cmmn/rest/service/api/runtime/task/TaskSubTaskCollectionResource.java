@@ -43,7 +43,7 @@ public class TaskSubTaskCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/subtasks", produces = "application/json")
     public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
         return restResponseFactory.createTaskResponseList(taskService.getSubTasks(task.getId()));
     }
 }

@@ -53,7 +53,8 @@ public class HistoricProcessInstanceResource extends HistoricProcessInstanceBase
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}", produces = "application/json")
     public HistoricProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        HistoricProcessInstanceResponse processInstanceResponse = restResponseFactory.createHistoricProcessInstanceResponse(getHistoricProcessInstanceFromRequest(processInstanceId));
+        HistoricProcessInstanceResponse processInstanceResponse = restResponseFactory.createHistoricProcessInstanceResponse(
+                getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId));
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
         
@@ -71,7 +72,7 @@ public class HistoricProcessInstanceResource extends HistoricProcessInstanceBase
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @DeleteMapping(value = "/history/historic-process-instances/{processInstanceId}")
     public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
-        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithAccessCheck(processInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricProcess(processInstance);

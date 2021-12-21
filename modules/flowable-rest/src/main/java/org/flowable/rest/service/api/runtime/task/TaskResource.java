@@ -66,7 +66,7 @@ public class TaskResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
     public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        return restResponseFactory.createTaskResponse(getTaskFromRequest(taskId));
+        return restResponseFactory.createTaskResponse(getTaskFromRequestWithAccessCheck(taskId));
     }
 
     @ApiOperation(value = "Update a task", tags = {
@@ -83,7 +83,7 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when updating the task.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
@@ -115,7 +115,7 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.executeTaskAction(task, actionRequest);
@@ -152,7 +152,7 @@ public class TaskResource extends TaskBaseResource {
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
                            @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
-        Task taskToDelete = getTaskFromRequest(taskId);
+        Task taskToDelete = getTaskFromRequestWithAccessCheck(taskId);
         if (taskToDelete.getExecutionId() != null) {
             // Can not delete a task that is part of a process instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a process instance.");
@@ -182,7 +182,7 @@ public class TaskResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json")
     public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithAccessCheck(taskId);
         if (StringUtils.isEmpty(task.getFormKey())) {
             throw new FlowableIllegalArgumentException("Task has no form defined");
         }

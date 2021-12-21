@@ -35,27 +35,30 @@ public class BaseCaseDefinitionResource {
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link CaseDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
+     * Returns the {@link CaseDefinition} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or definition was not found.
      */
-    protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId) {
-        return getCaseDefinitionFromRequest(caseDefinitionId, true);
+    protected CaseDefinition getCaseDefinitionFromRequestWithAccessCheck(String caseDefinitionId) {
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
+        }
+
+        return caseDefinition;
     }
 
-    protected CaseDefinition getCaseDefinitionFromRequestWithoutInterceptor(String caseDefinitionId) {
-        return getCaseDefinitionFromRequest(caseDefinitionId, false);
-    }
-
-    protected CaseDefinition getCaseDefinitionFromRequest(String caseDefinitionId, boolean invokeInterceptor) {
+    /**
+     * Returns the {@link CaseDefinition} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or definition was not found.
+     */
+    protected CaseDefinition getCaseDefinitionFromRequestWithoutAccessCheck(String caseDefinitionId) {
         CaseDefinition caseDefinition = repositoryService.getCaseDefinition(caseDefinitionId);
 
         if (caseDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a case definition with id '" + caseDefinitionId + "'.", CaseDefinition.class);
         }
-        
-        if (invokeInterceptor && restApiInterceptor != null) {
-            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
-        }
-        
+
         return caseDefinition;
     }
 }

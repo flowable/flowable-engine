@@ -54,8 +54,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
 
-        Task task = getTaskFromRequestWithoutInterceptor(taskId);
-
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         validateIdentityLinkArguments(family, identityId, type);
 
         IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
@@ -77,7 +76,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        Task task = getTaskFromRequestWithoutInterceptor(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         validateIdentityLinkArguments(family, identityId, type);
 
