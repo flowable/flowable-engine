@@ -15,12 +15,12 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.5.7</spring.boot.version>
-		<spring.framework.version>5.3.13</spring.framework.version>
-		<spring.security.version>5.5.3</spring.security.version>
+		<spring.framework.version>5.3.14</spring.framework.version>
+		<spring.security.version>5.5.4</spring.security.version>
 		<spring.amqp.version>2.3.12</spring.amqp.version>
 		<spring.kafka.version>2.7.9</spring.kafka.version>
-		<reactor-netty.version>1.0.6</reactor-netty.version>
-		<jackson.version>2.12.5</jackson.version>
+		<reactor-netty.version>1.0.14</reactor-netty.version>
+		<jackson.version>2.12.6</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
