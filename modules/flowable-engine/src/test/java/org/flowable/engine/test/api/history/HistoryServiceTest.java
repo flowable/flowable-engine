@@ -729,9 +729,12 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("rootValue", "test").count()).isEqualTo(1);
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Receive Payment").count()).isEqualTo(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Ship Order").count()).isEqualTo(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue2", "test").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Receive Payment").count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue1", "Receive Payment").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Ship Order").count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue1", "Ship Order").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue2", "test").count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue2", "test").count()).isEqualTo(1);
     }
 
     /**

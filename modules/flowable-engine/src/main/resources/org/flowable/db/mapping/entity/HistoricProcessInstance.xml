@@ -463,6 +463,12 @@
                     from ${prefix}ACT_HI_VARINST V
                     <where>
                         RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                        <if test="!queryVariableValue.local">
+                            and V.PROC_INST_ID_ = V.EXECUTION_ID_
+                        </if>
+                        <if test="queryVariableValue.local">
+                            and V.PROC_INST_ID_ &lt;&gt; V.EXECUTION_ID_
+                        </if>
                         <if test="queryVariableValue.name != null">
                             <!-- Match-all variable-names when name is null -->
                             and V.NAME_= #{queryVariableValue.name}
@@ -596,6 +602,12 @@
                         from ${prefix}ACT_HI_VARINST V
                         <where>
                             RES.PROC_INST_ID_ = PROC_INST_ID_
+                            <if test="!queryVariableValue.local">
+                                and V.PROC_INST_ID_ = V.EXECUTION_ID_
+                            </if>
+                            <if test="queryVariableValue.local">
+                                and V.PROC_INST_ID_ &lt;&gt; V.EXECUTION_ID_
+                            </if>
                             <if test="queryVariableValue.name != null">
                                 <!-- Match-all variable-names when name is null -->
                                 and V.NAME_= #{queryVariableValue.name}
