@@ -53,7 +53,6 @@ public class FlowableUiApplicationWithEnabledJmsKafkaAndRabbitTest {
             .containsExactly(
                 "configurationProperties",
                 "Inlined Test Properties",
-                "test",
                 "servletConfigInitParams",
                 "servletContextInitParams",
                 "systemProperties",
