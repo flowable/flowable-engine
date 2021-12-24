@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="twoTasksParentProcess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstTask" />
+    <userTask id="firstTask" name="First task" />    
+    <sequenceFlow id="flow2" sourceRef="firstTask" targetRef="callActivity" />
+    <callActivity id="callActivity" calledElement="MP" />
+    <sequenceFlow id="flow3" sourceRef="callActivity" targetRef="secondTask" />
+    <userTask id="secondTask" name="Second task" />    
+    <sequenceFlow id="flow4" sourceRef="secondTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <boundaryEvent id="boundaryTimerEvent" attachedToRef="callActivity">
+      <timerEventDefinition>
+        <timeDuration>PT1H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow5" sourceRef="boundaryTimerEvent" targetRef="theEnd" />
+    
+  </process>
+
+</definitions>

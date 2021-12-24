@@ -357,7 +357,16 @@ public abstract class AbstractDynamicStateManager {
             for (ExecutionEntity execution : executionsToMove) {
                 executionIdsNotToDelete.add(execution.getId());
 
-                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                // Don't delete called process when directly migration CallActivity
+                List<String> childExecutionsToKeep = new ArrayList<>();
+                if (execution.getCurrentFlowElement() instanceof CallActivity && moveExecutionContainer.isDirectExecutionMigration()) {
+                    executionEntityManager.collectChildren(execution).stream()
+                            .filter(executionEntity -> !Objects.equals(executionEntity.getProcessDefinitionId(), execution.getProcessDefinitionId()))
+                            .map(ExecutionEntity::getId)
+                            .forEach(childExecutionsToKeep::add);
+                }
+
+                executionEntityManager.deleteChildExecutions(execution, childExecutionsToKeep, null, "Change parent activity to " + flowElementIdsLine, true, null);
                 if (!moveExecutionContainer.isDirectExecutionMigration()) {
                     executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, false, false, true, execution.getCurrentFlowElement());
                 }
@@ -618,7 +627,7 @@ public abstract class AbstractDynamicStateManager {
                         handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId(), commandContext);
                     }
 
-                    if (newFlowElement instanceof CallActivity) {
+                    if (newFlowElement instanceof CallActivity && !moveExecutionEntityContainer.isDirectExecutionMigration()) {
                         processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
@@ -627,6 +636,13 @@ public abstract class AbstractDynamicStateManager {
                                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
                                     newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement),
                                 processEngineConfiguration.getEngineCfgKey());
+                        }
+
+                        //start boundary events of new call activity
+                        CallActivity callActivity = (CallActivity) newFlowElement;
+                        List<BoundaryEvent> boundaryEvents = callActivity.getBoundaryEvents();
+                        if (CollectionUtil.isNotEmpty(boundaryEvents)) {
+                            executeBoundaryEvents(boundaryEvents, newChildExecution);
                         }
                     }
 
