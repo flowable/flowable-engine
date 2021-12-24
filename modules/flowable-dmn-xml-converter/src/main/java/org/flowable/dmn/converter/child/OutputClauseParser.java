@@ -32,8 +32,9 @@ public class OutputClauseParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof DecisionTable))
+        if (!(parentElement instanceof DecisionTable)) {
             return;
+        }
 
         OutputClause output = new OutputClause();
         output.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));

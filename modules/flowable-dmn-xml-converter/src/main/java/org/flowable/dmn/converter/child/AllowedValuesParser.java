@@ -31,8 +31,9 @@ public class AllowedValuesParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof ItemDefinition))
+        if (!(parentElement instanceof ItemDefinition)) {
             return;
+        }
 
         ItemDefinition itemDefinition = (ItemDefinition) parentElement;
         UnaryTests allowedValues = new UnaryTests();

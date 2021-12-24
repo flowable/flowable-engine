@@ -42,11 +42,13 @@ public class PotentialStarterParser implements BpmnXMLConstants {
                     assignmentList.add(assignmentText);
                 }
                 for (String assignmentValue : assignmentList) {
-                    if (assignmentValue == null)
+                    if (assignmentValue == null) {
                         continue;
+                    }
                     assignmentValue = assignmentValue.trim();
-                    if (assignmentValue.length() == 0)
+                    if (assignmentValue.length() == 0) {
                         continue;
+                    }
 
                     String userPrefix = "user(";
                     String groupPrefix = "group(";

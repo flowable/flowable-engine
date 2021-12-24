@@ -32,8 +32,9 @@ public class FormDeployer implements EngineDeployer {
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
-        if (!deployment.isNew())
+        if (!deployment.isNew()) {
             return;
+        }
 
         LOGGER.debug("FormDeployer: processing deployment {}", deployment.getName());
 

@@ -41,8 +41,9 @@ public class FormPropertyParser extends BaseChildElementParser {
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-        if (!accepts(parentElement))
+        if (!accepts(parentElement)) {
             return;
+        }
 
         FormProperty property = new FormProperty();
         BpmnXMLUtil.addXMLLocation(property, xtr);
