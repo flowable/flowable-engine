@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.converter.util.DmnXMLUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnDiDiagram;
 import org.flowable.dmn.model.GraphicInfo;
