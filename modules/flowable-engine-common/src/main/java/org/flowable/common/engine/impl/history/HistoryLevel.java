@@ -23,7 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
  */
 public enum HistoryLevel {
 
-    NONE("none"), ACTIVITY("activity"), AUDIT("audit"), FULL("full");
+    NONE("none"), INSTANCE("instance"), TASK("task"), ACTIVITY("activity"), AUDIT("audit"), FULL("full");
 
     private final String key;
 
@@ -58,8 +58,7 @@ public enum HistoryLevel {
      * Checks if the given level is the same as, or higher in order than the level this method is executed on.
      */
     public boolean isAtLeast(HistoryLevel level) {
-        // Comparing enums actually compares the location of values declared in
-        // the enum
+        // Comparing enums actually compares the location of values declared in the enum
         return this.compareTo(level) >= 0;
     }
 }

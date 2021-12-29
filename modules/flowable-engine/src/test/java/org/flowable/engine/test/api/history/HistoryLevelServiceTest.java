@@ -18,10 +18,12 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -64,6 +66,126 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceProcess.bpmn20.xml" })
+    @Test
+    public void testInstanceHistoryLevel() {
+        // With a clean ProcessEngine, no instances should be available
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        
+        // Complete the task and check if the size is count 1
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        taskService.claim(task.getId(), "test");
+        taskService.setOwner(task.getId(), "test");
+        taskService.setAssignee(task.getId(), "anotherTest");
+        taskService.setPriority(task.getId(), 40);
+        Date dueDateValue = new Date();
+        taskService.setDueDate(task.getId(), dueDateValue);
+        taskService.setVariable(task.getId(), "var1", "test");
+        taskService.setVariableLocal(task.getId(), "localVar1", "test2");
+        taskService.complete(task.getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelTaskProcess.bpmn20.xml" })
+    @Test
+    public void testTaskHistoryLevel() {
+        // With a clean ProcessEngine, no instances should be available
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        
+        // Complete the task and check if the size is count 1
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        taskService.claim(task.getId(), "test");
+        taskService.setOwner(task.getId(), "test");
+        taskService.setAssignee(task.getId(), "anotherTest");
+        taskService.setPriority(task.getId(), 40);
+        Date dueDateValue = new Date();
+        taskService.setDueDate(task.getId(), dueDateValue);
+        taskService.setVariable(task.getId(), "var1", "test");
+        taskService.setVariableLocal(task.getId(), "localVar1", "test2");
+        taskService.complete(task.getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceIncludeTaskProcess.bpmn20.xml" })
+    @Test
+    public void testInstanceWithIncludeTaskHistoryLevel() {
+        // With a clean ProcessEngine, no instances should be available
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        
+        // Complete the task and check if the size is count 1
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historicActivityInstance.getActivityId()).isEqualTo("theTask");
+        assertThat(historicActivityInstance.getStartTime()).isNotNull();
+        assertThat(historicActivityInstance.getEndTime()).isNull();
+
+        taskService.claim(task.getId(), "test");
+        taskService.setOwner(task.getId(), "test");
+        taskService.setAssignee(task.getId(), "anotherTest");
+        taskService.setPriority(task.getId(), 40);
+        Date dueDateValue = new Date();
+        taskService.setDueDate(task.getId(), dueDateValue);
+        taskService.setVariable(task.getId(), "var1", "test");
+        taskService.setVariableLocal(task.getId(), "localVar1", "test2");
+        taskService.complete(task.getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        
+        historicActivityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historicActivityInstance.getActivityId()).isEqualTo("theTask");
+        assertThat(historicActivityInstance.getStartTime()).isNotNull();
+        assertThat(historicActivityInstance.getEndTime()).isNotNull();
+        
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
@@ -227,6 +349,107 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
                 );
 
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/multipleParallelSubProcessesInstanceLevel.bpmn20.xml" })
+    @Test
+    public void testMultipleParallelSubProcessWithInstanceLevelHistory() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", "test2"));
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
+        taskService.complete(task.getId());
+        
+        // tasks in sub process
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
+        taskService.complete(task.getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 10000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("subtask").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("taskAfter").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfter").singleResult();
+        taskService.complete(task.getId());
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/multipleParallelSubProcessesTaskLevel.bpmn20.xml" })
+    @Test
+    public void testMultipleParallelSubProcessWithTaskLevelHistory() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", "test2"));
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskBefore").count()).isEqualTo(1);
+        taskService.complete(task.getId());
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
+        taskService.complete(task.getId());
+        
+        // tasks in sub process
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").singleResult();
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
+        taskService.complete(task.getId());
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 10000, 200);
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("subtask").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("taskAfter").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfter").singleResult();
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfter").count()).isEqualTo(1);
+        taskService.complete(task.getId());
     }
 
 }
