@@ -260,7 +260,94 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             historicTaskService.recordTaskInfoChange(task, updateTime, processEngineConfiguration);
         }
+    }
+    
+    protected boolean hasTaskHistoryLevel(String processDefinitionId) {
+        HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
+        if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
+            HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
+            if (processDefinitionLevel != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Current history level: {}, level required: {}", processDefinitionLevel, HistoryLevel.TASK);
+                }
+                return hasTaskHistoryLevel(processDefinitionLevel);
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, HistoryLevel.TASK);
+                }
+                return hasTaskHistoryLevel(engineHistoryLevel);
+            }
+            
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, HistoryLevel.TASK);
+            }
+            
+            // Comparing enums actually compares the location of values declared in the enum
+            return hasTaskHistoryLevel(engineHistoryLevel);
+        }
+    }
+    
+    protected boolean hasTaskHistoryLevel(HistoryLevel historyLevel) {
+        boolean taskHistoryLevel = false;
+        if (HistoryLevel.TASK.equals(historyLevel)) {
+            taskHistoryLevel = true;
+            
+        } else if (historyLevel.isAtLeast(HistoryLevel.AUDIT)) {
+            taskHistoryLevel = true;
+        }
+        
+        return taskHistoryLevel;
+    }
+    
+    protected boolean hasActivityHistoryLevel(String processDefinitionId, String activityId) {
+        HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
+        if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
+            HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
+            if (processDefinitionLevel != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Current history level: {}, level required: {}", processDefinitionLevel, HistoryLevel.ACTIVITY);
+                }
+                
+                if (processDefinitionLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
+                    return true;
+                
+                } else if (!HistoryLevel.NONE.equals(processDefinitionLevel) && StringUtils.isNotEmpty(activityId)) {
+                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+                    FlowElement flowElement = bpmnModel.getFlowElement(activityId);
+                    
+                    boolean includeInHistory = false;
+                    if (flowElement.getExtensionElements().containsKey("includeInHistory")) {
+                        ExtensionElement historyElement = flowElement.getExtensionElements().get("includeInHistory").iterator().next();
+                        String historyLevelValue = historyElement.getElementText();
+                        includeInHistory = Boolean.valueOf(historyLevelValue);
+                    }
+                    
+                    return includeInHistory;
+                    
+                } else {
+                    return false;
+                }
 
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, HistoryLevel.ACTIVITY);
+                }
+                return hasActivityHistoryLevel(engineHistoryLevel);
+            }
+            
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, HistoryLevel.ACTIVITY);
+            }
+            
+            // Comparing enums actually compares the location of values declared in the enum
+            return hasActivityHistoryLevel(engineHistoryLevel);
+        }
+    }
+    
+    protected boolean hasActivityHistoryLevel(HistoryLevel historyLevel) {
+        return historyLevel.isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
@@ -354,6 +441,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             if (processDefinitionHistoryLevel == null) {
                 processDefinitionHistoryLevel = this.processEngineConfiguration.getHistoryLevel();
             }
+            
         } catch (Exception e) {}
 
         return processDefinitionHistoryLevel;
