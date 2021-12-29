@@ -52,7 +52,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordProcessInstanceStart(ExecutionEntity processInstance) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstance.getProcessDefinitionId())) {
+        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstance.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonProcessInstanceFields(processInstance, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START, data, processInstance.getTenantId());
@@ -61,7 +61,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstance.getProcessDefinitionId())) {
+        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstance.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonProcessInstanceFields(processInstance, data);
             
@@ -75,7 +75,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordProcessInstanceNameChange(ExecutionEntity processInstanceExecution, String newName) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstanceExecution.getProcessDefinitionId())) {
+        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstanceExecution.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstanceExecution.getId());
             putIfNotNull(data, HistoryJsonConstants.NAME, newName);
@@ -107,7 +107,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordActivityStart(ActivityInstance activityInstance) {
-        if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
+        if (activityInstance != null && hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
             if (activityInstance.getActivityId() != null) {
 
                 ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
@@ -122,7 +122,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, executionEntity.getProcessDefinitionId())) {
+        if (hasActivityHistoryLevel(executionEntity.getProcessDefinitionId(), executionEntity.getActivityId())) {
             String activityId = getActivityIdForExecution(executionEntity);
             if (StringUtils.isNotEmpty(activityId)) {
                 ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
@@ -157,7 +157,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
     @Override
     public void recordActivityEnd(ActivityInstance activityInstance) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
+        if (hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
             if (StringUtils.isNotEmpty(activityInstance.getActivityId())) {
                 ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
 
@@ -196,7 +196,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
         } else {
             processDefinitionId = task.getProcessDefinitionId();
         }
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+        if (hasTaskHistoryLevel(processDefinitionId)) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, execution, data);
 
@@ -212,7 +212,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
         } else if (task != null) {
             processDefinitionId = task.getProcessDefinitionId();
         }
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+        if (hasTaskHistoryLevel(processDefinitionId)) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(task, execution, data);
             
@@ -226,7 +226,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     @SuppressWarnings("unchecked")
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity, String runtimeActivityInstanceId, Date changeTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
+        if (hasTaskHistoryLevel(taskEntity.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             addCommonTaskFields(taskEntity, null, data);
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED, data);
@@ -248,7 +248,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
     
     protected void handleTaskAssigneeChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, taskEntity.getProcessDefinitionId())) {
+        if (hasActivityHistoryLevel(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.ASSIGNEE, taskEntity.getAssignee());
 
@@ -271,7 +271,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
                 }
             }
 
-            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
+            if (hasTaskHistoryLevel(taskEntity.getProcessDefinitionId())) {
                 putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
                 putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, changeTime);
                 getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED, data);
@@ -280,7 +280,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
     
     protected void handleTaskOwnerChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, taskEntity.getProcessDefinitionId())) {
+        if (hasTaskHistoryLevel(taskEntity.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.ID, taskEntity.getId());
             putIfNotNull(data, HistoryJsonConstants.OWNER, taskEntity.getOwner());
@@ -495,7 +495,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     @Override
     public void createHistoricActivityInstance(ActivityInstance activityInstance) {
         // create (in the new job) new historic activity instance from runtime activityInstance template
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
+        if (hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
             if (activityInstance.getExecutionId() != null) {
                 ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
                 addCommonActivityInstanceFields(activityInstance, data);
