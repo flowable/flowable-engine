@@ -22,7 +22,7 @@ Info on how to install a Nginx ingress controller can be found here;
 ## Deploy Flowable OSS
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable-oss https://flowable.github.io/helm/
 ```
 ```console
 helm install flowable flowable/flowable \
