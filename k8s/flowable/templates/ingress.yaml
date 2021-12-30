@@ -17,7 +17,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "{{ .Values.ingress.sslRedirect }}"
     {{- if .Values.ingress.clusterIssuer }}
-    cert-manager.io/cluster-issuer: 
+    cert-manager.io/cluster-issuer: "{{ .Values.ingress.clusterIssuer }}"
     {{- end }}
     kubernetes.io/ingress.class: "{{ .Values.ingress.class }}"
 spec:
