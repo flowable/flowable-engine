@@ -46,6 +46,10 @@ public class KeycloakConfiguration implements InitializingBean {
     protected String authenticationPassword;
 
     protected String realm;
+    protected String clientId = "admin-cli";
+    protected String clientSecret;
+    protected String grantType = "password";
+
 
     protected Duration clockSkew = Duration.ofSeconds(60);
     protected Clock clock = Clock.systemUTC();
@@ -55,7 +59,11 @@ public class KeycloakConfiguration implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.hasText(server, "server must be set");
-        Assert.hasText(authenticationPassword, "authenticationPassword must be set");
+        if (isClientCredentials()){
+            Assert.hasText(clientSecret, "clientSecret must be set");
+        } else{
+            Assert.hasText(authenticationPassword, "authenticationPassword must be set");
+        }
         Assert.hasText(realm, "realm must be set");
         if (restTemplate == null) {
             restTemplate = new RestTemplate();
@@ -110,6 +118,30 @@ public class KeycloakConfiguration implements InitializingBean {
     public void setRealm(String realm) {
         Assert.notNull(clock, "realm cannot be null");
         this.realm = realm;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public String getGrantType() {
+        return grantType;
+    }
+
+    public void setGrantType(String grantType) {
+        this.grantType = grantType;
     }
 
     public RestTemplate getRestTemplate() {
@@ -178,11 +210,7 @@ public class KeycloakConfiguration implements InitializingBean {
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
-            tokenRequestBody.add("username", getAuthenticationUser());
-            tokenRequestBody.add("password", getAuthenticationPassword());
-            tokenRequestBody.add("grant_type", "password");
-            tokenRequestBody.add("client_id", "admin-cli");
+            MultiValueMap<String, String> tokenRequestBody = createAccessTokenRequestParameters();
 
             HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenHeaders);
 
@@ -204,10 +232,27 @@ public class KeycloakConfiguration implements InitializingBean {
             }
         }
 
+        private MultiValueMap<String, String> createAccessTokenRequestParameters() {
+            MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
+            tokenRequestBody.add("grant_type", getGrantType());
+            tokenRequestBody.add("client_id", getClientId());
+            if (isClientCredentials()){
+                tokenRequestBody.add("client_secret", getClientSecret());
+            } else {
+                tokenRequestBody.add("username", getAuthenticationUser());
+                tokenRequestBody.add("password", getAuthenticationPassword());
+            }
+            return tokenRequestBody;
+        }
+
         protected boolean hasTokenExpired() {
             return KeycloakConfiguration.this.clock.instant().isAfter(accessToken.getExpiresAt().minus(clockSkew));
         }
 
+    }
+
+    private boolean isClientCredentials() {
+        return "client_credentials".equals(getGrantType());
     }
 
     public static class AccessToken {

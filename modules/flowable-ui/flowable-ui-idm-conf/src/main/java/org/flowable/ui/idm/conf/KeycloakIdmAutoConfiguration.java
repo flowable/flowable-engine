@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.idm.conf;
 
+import java.util.Optional;
+
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableSecurityAutoConfiguration;
@@ -63,8 +65,15 @@ public class KeycloakIdmAutoConfiguration {
         mapper.from(keycloak.getAuthenticationUser()).to(keycloakConfiguration::setAuthenticationUser);
         mapper.from(keycloak.getAuthenticationPassword()).to(keycloakConfiguration::setAuthenticationPassword);
         mapper.from(keycloak.getRealm()).to(keycloakConfiguration::setRealm);
+        mapper.from(keycloak.getClientId()).to(keycloakConfiguration::setClientId);
+        mapper.from(keycloak.getClientSecret()).to(keycloakConfiguration::setClientSecret);
+        mapper.from(extractGrantTypeValueOrNull(keycloak.getGrantType())).to(keycloakConfiguration::setGrantType);
 
         return keycloakConfiguration;
+    }
+
+    private String extractGrantTypeValueOrNull(FlowableIdmAppProperties.GrantType grantType) {
+        return Optional.ofNullable(grantType).map(FlowableIdmAppProperties.GrantType::getValue).orElse(null);
     }
 
     @Bean
