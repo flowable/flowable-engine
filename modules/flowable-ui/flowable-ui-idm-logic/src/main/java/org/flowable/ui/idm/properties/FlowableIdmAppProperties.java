@@ -348,7 +348,7 @@ public class FlowableIdmAppProperties {
 
 
     public enum GrantType {
-        AUTHORIZATION_CODE("authorization_code"), CLIENT_CREDENTIALS ("client_credentials"), PASSWORD ("password");
+        AUTHORIZATION_CODE("authorization_code"), CLIENT_CREDENTIALS("client_credentials"), PASSWORD("password");
 
         private String value;
 

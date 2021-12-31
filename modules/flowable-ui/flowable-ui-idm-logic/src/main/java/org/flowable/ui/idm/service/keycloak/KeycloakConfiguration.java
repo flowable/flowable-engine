@@ -59,9 +59,9 @@ public class KeycloakConfiguration implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.hasText(server, "server must be set");
-        if (isClientCredentials()){
+        if (isClientCredentials()) {
             Assert.hasText(clientSecret, "clientSecret must be set");
-        } else{
+        } else {
             Assert.hasText(authenticationPassword, "authenticationPassword must be set");
         }
         Assert.hasText(realm, "realm must be set");
@@ -236,7 +236,7 @@ public class KeycloakConfiguration implements InitializingBean {
             MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
             tokenRequestBody.add("grant_type", getGrantType());
             tokenRequestBody.add("client_id", getClientId());
-            if (isClientCredentials()){
+            if (isClientCredentials()) {
                 tokenRequestBody.add("client_secret", getClientSecret());
             } else {
                 tokenRequestBody.add("username", getAuthenticationUser());
