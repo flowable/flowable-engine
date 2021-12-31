@@ -35,7 +35,7 @@ Create chart name and version as used by the chart label.
 Template name.
 */}}
 {{- define "flowable.template" -}}
-{{- .Template.Name | replace "flowable/templates/" "" | trimSuffix ".yaml" | trunc 63 -}}
+{{- default .Template.Name .Values.nameOverride | replace "flowable/templates/" "" | trimSuffix ".yaml" | trunc 63 -}}
 {{- end -}}
 
 {{/*
