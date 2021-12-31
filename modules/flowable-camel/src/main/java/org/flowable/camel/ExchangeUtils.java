@@ -107,8 +107,8 @@ public class ExchangeUtils {
         }
 
         Object camelBody = null;
-        if (exchange.hasOut()) {
-            camelBody = exchange.getOut().getBody();
+        if (exchange.getMessage() != null) {
+            camelBody = exchange.getMessage().getBody();
         } else {
             camelBody = exchange.getIn().getBody();
         }

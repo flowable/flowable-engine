@@ -23,7 +23,8 @@
 		<jackson.version>2.13.1</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-		<camel.version>2.25.0</camel.version>
+<!--        <camel.version>2.25.0</camel.version>-->
+        <camel.version>3.0.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
 		<slf4j.version>1.7.32</slf4j.version>
 		<groovy.version>3.0.9</groovy.version>
@@ -1060,6 +1061,26 @@
 			<dependency>
 				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-cdi</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-mock</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-direct</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-seda</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-log</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<dependency>
