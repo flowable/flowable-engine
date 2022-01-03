@@ -91,6 +91,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     @Override
     public boolean isHistoryEnabled() {
         HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
+        
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}", engineHistoryLevel);
         }
@@ -313,17 +314,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                     return true;
                 
                 } else if (!HistoryLevel.NONE.equals(processDefinitionLevel) && StringUtils.isNotEmpty(activityId)) {
-                    BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
-                    FlowElement flowElement = bpmnModel.getFlowElement(activityId);
-                    
-                    boolean includeInHistory = false;
-                    if (flowElement.getExtensionElements().containsKey("includeInHistory")) {
-                        ExtensionElement historyElement = flowElement.getExtensionElements().get("includeInHistory").iterator().next();
-                        String historyLevelValue = historyElement.getElementText();
-                        includeInHistory = Boolean.valueOf(historyLevelValue);
-                    }
-                    
-                    return includeInHistory;
+                    return includeFlowElementInHistory(processDefinitionId, activityId);
                     
                 } else {
                     return false;
@@ -341,13 +332,37 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, HistoryLevel.ACTIVITY);
             }
             
-            // Comparing enums actually compares the location of values declared in the enum
-            return hasActivityHistoryLevel(engineHistoryLevel);
+            if (engineHistoryLevel.isAtLeast(HistoryLevel.ACTIVITY)) {
+                return true;
+            
+            } else if (!HistoryLevel.NONE.equals(engineHistoryLevel) && StringUtils.isNotEmpty(activityId)) {
+                return includeFlowElementInHistory(processDefinitionId, activityId);
+                
+            } else {
+                return false;
+            }
         }
     }
     
     protected boolean hasActivityHistoryLevel(HistoryLevel historyLevel) {
         return historyLevel.isAtLeast(HistoryLevel.ACTIVITY);
+    }
+    
+    protected boolean includeFlowElementInHistory(String processDefinitionId, String activityId) {
+        boolean includeInHistory = false;
+        
+        if (processDefinitionId != null) {
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+            FlowElement flowElement = bpmnModel.getFlowElement(activityId);
+            
+            if (flowElement.getExtensionElements().containsKey("includeInHistory")) {
+                ExtensionElement historyElement = flowElement.getExtensionElements().get("includeInHistory").iterator().next();
+                String historyLevelValue = historyElement.getElementText();
+                includeInHistory = Boolean.valueOf(historyLevelValue);
+            }
+        }
+        
+        return includeInHistory;
     }
 
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
