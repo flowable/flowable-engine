@@ -431,6 +431,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnListenerNotificationHelper listenerNotificationHelper;
 
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
+    protected boolean enableCaseDefinitionHistoryLevel;
 
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -2804,6 +2805,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
+        return this;
+    }
+
+    public boolean isEnableCaseDefinitionHistoryLevel() {
+        return enableCaseDefinitionHistoryLevel;
+    }
+
+    public CmmnEngineConfiguration setEnableCaseDefinitionHistoryLevel(boolean enableCaseDefinitionHistoryLevel) {
+        this.enableCaseDefinitionHistoryLevel = enableCaseDefinitionHistoryLevel;
         return this;
     }
 
