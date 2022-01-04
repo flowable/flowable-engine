@@ -32,9 +32,29 @@
         <artifactId>camel-cdi</artifactId>
       </dependency>
       <dependency>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-direct</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-spring</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-spring-xml</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-seda</artifactId>
+      </dependency>
+      <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>javax.enterprise</groupId>
+          <artifactId>cdi-api</artifactId>
       </dependency>
       <dependency>
           <groupId>org.jboss.arquillian.junit</groupId>
