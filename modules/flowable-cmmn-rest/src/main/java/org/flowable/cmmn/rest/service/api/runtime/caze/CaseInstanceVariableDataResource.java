@@ -48,7 +48,7 @@ public class CaseInstanceVariableDataResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         return getVariableDataByteArray(caseInstance, variableName, response);
     }
 }

@@ -53,7 +53,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         return processCaseVariables(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE);
     }
 
@@ -83,7 +83,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         return createVariable(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE, request, response);
     }
 
@@ -113,7 +113,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data", "text/plain"})
     public Object createExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         return createVariable(caseInstance, CmmnRestResponseFactory.VARIABLE_CASE, request, response);
     }
 
@@ -124,7 +124,7 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables")
     public void deleteLocalVariables(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         deleteAllVariables(caseInstance, response);
     }
 }

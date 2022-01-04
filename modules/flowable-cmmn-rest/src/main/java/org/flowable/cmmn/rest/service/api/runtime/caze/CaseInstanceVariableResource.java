@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,7 +64,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public RestVariable getVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
         return getVariableFromRequest(caseInstance, variableName, false);
     }
 
@@ -89,7 +91,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public RestVariable updateVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -128,11 +130,15 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public void deleteVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         boolean hasVariable = runtimeService.hasVariable(caseInstance.getId(), variableName);
         if (!hasVariable) {
             throw new FlowableObjectNotFoundException("Could not find a variable with name '" + variableName + "'.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceVariables(caseInstance, Collections.singleton(variableName));
         }
         
         runtimeService.removeVariable(caseInstance.getId(), variableName);

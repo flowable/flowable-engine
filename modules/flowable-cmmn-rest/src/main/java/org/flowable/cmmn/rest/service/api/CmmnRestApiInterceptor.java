@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -30,6 +33,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
@@ -73,6 +77,12 @@ public interface CmmnRestApiInterceptor {
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
 
+    void createTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteTaskVariables(Task task, Collection<String> variableNames, RestVariable.RestVariableScope scope);
+
     void accessTaskIdentityLinks(Task task);
 
     void accessTaskIdentityLink(Task task, IdentityLink identityLink);
@@ -94,6 +104,12 @@ public interface CmmnRestApiInterceptor {
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
+
+    void createCaseInstanceVariables(CaseInstance caseInstance, Map<String, Object> variables);
+
+    void updateCaseInstanceVariables(CaseInstance caseInstance, Map<String, Object> variables);
+
+    void deleteCaseInstanceVariables(CaseInstance caseInstance, Collection<String> variableNames);
     
     void accessCaseInstanceIdentityLinks(CaseInstance caseInstance);
 

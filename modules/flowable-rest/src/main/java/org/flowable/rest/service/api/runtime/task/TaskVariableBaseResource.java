@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -219,6 +220,14 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
         if (!isNew && !hasVariable) {
             throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a variable with name: '" + name + "'.", null);
+        }
+
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createTaskVariables(task, Collections.singletonMap(name, value), scope);
+            } else {
+                restApiInterceptor.updateTaskVariables(task, Collections.singletonMap(name, value), scope);
+            }
         }
 
         if (scope == RestVariableScope.LOCAL) {

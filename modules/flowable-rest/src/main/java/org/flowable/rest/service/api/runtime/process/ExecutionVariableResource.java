@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -66,7 +68,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithAccessCheck(executionId);
         return getVariableFromRequest(execution, variableName, scope, false);
     }
 
@@ -94,7 +96,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
     @PutMapping(value = "/runtime/executions/{executionId}/variables/{variableName}", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public RestVariable updateVariable(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -136,7 +138,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletResponse response) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         // Determine scope
         RestVariableScope variableScope = RestVariableScope.LOCAL;
         if (scope != null) {
@@ -146,6 +148,10 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
         if (!hasVariableOnScope(execution, variableName, variableScope)) {
             throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
                     VariableInstanceEntity.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteExecutionVariables(execution, Collections.singleton(variableName), variableScope);
         }
 
         if (variableScope == RestVariableScope.LOCAL) {

@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.service.api;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchQuery;
@@ -48,6 +51,7 @@ import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.form.SubmitFormRequest;
 import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
@@ -93,6 +97,12 @@ public interface BpmnRestApiInterceptor {
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
 
+    void createTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteTaskVariables(Task task, Collection<String> variableNames, RestVariable.RestVariableScope scope);
+
     void accessTaskIdentityLinks(Task task);
 
     void accessTaskIdentityLink(Task task, IdentityLink identityLink);
@@ -106,6 +116,12 @@ public interface BpmnRestApiInterceptor {
     void accessExecutionInfoWithQuery(ExecutionQuery executionQuery, ExecutionQueryRequest request);
     
     void doExecutionActionRequest(ExecutionActionRequest executionActionRequest);
+
+    void createExecutionVariables(Execution execution, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateExecutionVariables(Execution execution, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteExecutionVariables(Execution execution, Collection<String> variableNames, RestVariable.RestVariableScope scope);
     
     void accessProcessInstanceInfoById(ProcessInstance processInstance);
 
@@ -133,6 +149,8 @@ public interface BpmnRestApiInterceptor {
     
     void migrateInstancesOfProcessDefinition(ProcessDefinition processDefinition, String migrationDocument);
     
+    void evaluateProcessInstanceConditionalEvents(ProcessInstance processInstance);
+
     void injectActivity(InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);

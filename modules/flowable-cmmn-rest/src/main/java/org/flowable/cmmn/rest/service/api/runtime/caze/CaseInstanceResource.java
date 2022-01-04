@@ -89,7 +89,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     public CaseInstanceResponse updateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                     @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (StringUtils.isNotEmpty(updateRequest.getAction())) {
 
@@ -138,7 +138,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
     public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.terminateCaseInstance(caseInstance);
@@ -155,7 +155,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/delete")
     public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstance(caseInstance);
@@ -168,11 +168,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
     public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId);
-        }
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessStageOverview(caseInstance);

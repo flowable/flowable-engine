@@ -53,7 +53,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @GetMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithAccessCheck(executionId);
         return processVariables(execution, scope, RestResponseFactory.VARIABLE_EXECUTION);
     }
 
@@ -80,7 +80,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @PutMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         return createExecutionVariable(execution, true, RestResponseFactory.VARIABLE_EXECUTION, request, response);
     }
 
@@ -109,7 +109,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @PostMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         return createExecutionVariable(execution, false, RestResponseFactory.VARIABLE_EXECUTION, request, response);
     }
 
@@ -120,7 +120,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     })
     @DeleteMapping(value = "/runtime/executions/{executionId}/variables")
     public void deleteLocalVariables(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletResponse response) {
-        Execution execution = getExecutionFromRequest(executionId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         deleteAllLocalVariables(execution, response);
     }
 

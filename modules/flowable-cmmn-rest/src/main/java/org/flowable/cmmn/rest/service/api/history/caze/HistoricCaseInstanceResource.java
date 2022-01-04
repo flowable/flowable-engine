@@ -86,7 +86,7 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}")
     public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricCase(caseInstance);
         }

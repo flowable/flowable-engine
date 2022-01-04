@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -27,10 +28,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -43,19 +41,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 /**
  * @author Frederik Heremans
  */
-public class BaseExecutionVariableResource {
+public class BaseExecutionVariableResource extends BaseProcessInstanceResource {
 
     @Autowired
     protected Environment env;
-
-    @Autowired
-    protected RestResponseFactory restResponseFactory;
-
-    @Autowired
-    protected RuntimeService runtimeService;
-    
-    @Autowired(required=false)
-    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected boolean isSerializableVariableAllowed;
 
@@ -206,6 +195,14 @@ public class BaseExecutionVariableResource {
             throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable with name: '" + name + "'.", null);
         }
 
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createExecutionVariables(execution, Collections.singletonMap(name, value), scope);
+            } else {
+                restApiInterceptor.updateExecutionVariables(execution, Collections.singletonMap(name, value), scope);
+            }
+        }
+
         if (scope == RestVariableScope.LOCAL) {
             runtimeService.setVariableLocal(execution.getId(), name, value);
         } else {
@@ -286,12 +283,9 @@ public class BaseExecutionVariableResource {
     /**
      * Get valid execution from request. Throws exception if execution does not exist or if execution id is not provided.
      */
-    protected Execution getExecutionFromRequest(String executionId) {
-        Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
-        if (execution == null) {
-            throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
-        }
-        
+    protected Execution getExecutionFromRequestWithAccessCheck(String executionId) {
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessExecutionInfoById(execution);
         }
@@ -299,14 +293,10 @@ public class BaseExecutionVariableResource {
         return execution;
     }
 
-    protected Execution getProcessInstanceFromRequest(String processInstanceId) {
-        Execution execution = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    protected Execution getExecutionFromRequestWithoutAccessCheck(String executionId) {
+        Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
         if (execution == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceInfoById((ProcessInstance) execution);
+            throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
         }
         
         return execution;

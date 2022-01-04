@@ -117,7 +117,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/variables", produces = "application/json", consumes = {"text/plain", "application/json", "multipart/form-data"})
     public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequestWithAccessCheck(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -175,6 +175,9 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             }
 
             if (!variablesToSet.isEmpty()) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.createTaskVariables(task, variablesToSet, sharedScope);
+                }
                 if (sharedScope == RestVariableScope.LOCAL) {
                     taskService.setVariablesLocal(task.getId(), variablesToSet);
                 } else {
@@ -201,8 +204,11 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     })
     @DeleteMapping(value = "/cmmn-runtime/tasks/{taskId}/variables")
     public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        Task task = getTaskFromRequestWithAccessCheck(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         Collection<String> currentVariables = taskService.getVariablesLocal(task.getId()).keySet();
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskVariables(task, currentVariables, RestVariableScope.LOCAL);
+        }
         taskService.removeVariablesLocal(task.getId(), currentVariables);
 
         response.setStatus(HttpStatus.NO_CONTENT.value());

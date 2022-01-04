@@ -51,7 +51,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequestWithAccessCheck(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);

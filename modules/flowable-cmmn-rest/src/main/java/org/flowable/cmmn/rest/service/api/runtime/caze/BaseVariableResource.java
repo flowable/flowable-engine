@@ -19,6 +19,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -51,19 +50,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Tijs Rademakers
  */
-public class BaseVariableResource {
+public class BaseVariableResource extends BaseCaseInstanceResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
-    
-    @Autowired
-    protected CmmnRuntimeService runtimeService;
-    
-    @Autowired
-    protected CmmnRestResponseFactory restResponseFactory;
-    
-    @Autowired(required=false)
-    protected CmmnRestApiInterceptor restApiInterceptor;
     
     @Autowired
     protected Environment env;
@@ -73,19 +63,6 @@ public class BaseVariableResource {
     @PostConstruct
     protected void postConstruct() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
-    }
-    
-    protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
-        }
-        
-        return caseInstance;
     }
     
     public RestVariable getVariableFromRequest(CaseInstance caseInstance, String variableName, boolean includeBinary) {
@@ -185,6 +162,9 @@ public class BaseVariableResource {
             }
 
             if (!variablesToSet.isEmpty()) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.createCaseInstanceVariables(caseInstance, variablesToSet);
+                }
                 runtimeService.setVariables(caseInstance.getId(), variablesToSet);
             }
         }
@@ -199,6 +179,9 @@ public class BaseVariableResource {
     
     public void deleteAllVariables(CaseInstance caseInstance, HttpServletResponse response) {
         Collection<String> currentVariables = runtimeService.getVariables(caseInstance.getId()).keySet();
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceVariables(caseInstance, currentVariables);
+        }
         runtimeService.removeVariables(caseInstance.getId(), currentVariables);
 
         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -296,6 +279,13 @@ public class BaseVariableResource {
     }
     
     protected void setVariable(CaseInstance caseInstance, String name, Object value, RestVariableScope scope, boolean isNew) {
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createCaseInstanceVariables(caseInstance, Collections.singletonMap(name, value));
+            } else {
+                restApiInterceptor.updateCaseInstanceVariables(caseInstance, Collections.singletonMap(name, value));
+            }
+        }
         runtimeService.setVariable(caseInstance.getId(), name, value);
     }
     

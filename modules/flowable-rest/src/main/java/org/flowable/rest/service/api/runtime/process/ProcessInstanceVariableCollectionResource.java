@@ -56,7 +56,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getProcessInstanceFromRequestWithAccessCheck(processInstanceId);
         return processVariables(execution, scope, RestResponseFactory.VARIABLE_PROCESS);
     }
 
@@ -87,7 +87,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
         return createExecutionVariable(execution, true, RestResponseFactory.VARIABLE_PROCESS, request, response);
     }
 
@@ -118,7 +118,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
         return createExecutionVariable(execution, false, RestResponseFactory.VARIABLE_PROCESS, request, response);
     }
 
@@ -130,7 +130,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     })
     @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/variables")
     public void deleteLocalVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
         deleteAllLocalVariables(execution, response);
     }
 

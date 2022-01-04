@@ -158,7 +158,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void migrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
@@ -177,7 +177,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithAccessCheck(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
