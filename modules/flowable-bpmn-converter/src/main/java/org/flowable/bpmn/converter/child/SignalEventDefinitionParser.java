@@ -33,8 +33,9 @@ public class SignalEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         SignalEventDefinition eventDefinition = new SignalEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);

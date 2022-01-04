@@ -289,7 +289,7 @@ Listed below are the types (case sensitive!) that Flowable uses to refer to data
 
 ## Creating the database tables
 
-Flowable DMM uses [Liquibase](http://www.liquibase.org) for tracking, managing and applying database schema changes.
+Flowable DMN uses [Liquibase](http://www.liquibase.org) for tracking, managing and applying database schema changes.
 
 The easiest way to create the database tables for your database is to:
 

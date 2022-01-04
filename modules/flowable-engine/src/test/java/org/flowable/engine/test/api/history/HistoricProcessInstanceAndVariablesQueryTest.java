@@ -26,6 +26,8 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -199,6 +201,25 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             instanceList = historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables()
                     .orderByProcessInstanceId().asc().listPage(0, 50);
             assertThat(instanceList).hasSize(4);
+        }
+    }
+    
+    @Test
+    public void testQueryOnTaskVariable() {
+        ProcessInstance taskProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess3").singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(taskProcessInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(), "localVar", "test");
+        
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                    .variableValueEquals("anothertest", 123).singleResult();
+            Map<String, Object> variableMap = processInstance.getProcessVariables();
+            assertThat(variableMap).containsExactly(entry("anothertest", 123));
+            
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
         }
     }
 

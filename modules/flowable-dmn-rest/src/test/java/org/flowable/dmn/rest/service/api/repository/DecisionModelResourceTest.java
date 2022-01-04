@@ -54,4 +54,28 @@ public class DecisionModelResourceTest extends BaseSpringDmnRestTestCase {
                         + "   id: 'decisionTable'"
                         + " }");
     }
+
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/decision_service-2.dmn" })
+    public void testGetDecisionServiceModel() throws Exception {
+        DmnDecision decision = dmnRepositoryService.createDecisionQuery().singleResult();
+
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_MODEL, decision.getId()));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+
+        // Check "OK" status
+        JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(resultNode).isNotNull();
+        assertThat(resultNode.get("decisions").size()).isEqualTo(4);
+
+        assertThat(resultNode.get("decisionServices").size()).isEqualTo(1);
+        JsonNode firstDecisionService = resultNode.get("decisionServices").get(0);
+        assertThat(firstDecisionService).isNotNull();
+
+        assertThatJson(firstDecisionService)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   id: 'evaluateMortgageRequestService'"
+                        + " }");
+    }
 }

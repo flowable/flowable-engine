@@ -142,6 +142,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            of the variable, cannot be null.
      */
     HistoricProcessInstanceQuery variableValueEquals(String name, Object value);
+    
+    /**
+     * Only select process instances which had a local variable with the given value when they ended. The type only applies to already ended process instances, otherwise use a
+     * {@link ProcessInstanceQuery} instead! A variable type is determined based on the value, using types configured in {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and
+     * {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            of the variable, cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueEquals(String name, Object value);
 
     /**
      * Only select process instances which had at least one global variable with the given value when they ended. The type only applies to already ended process instances, otherwise use a
@@ -149,7 +159,24 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      */
     HistoricProcessInstanceQuery variableValueEquals(Object value);
+    
+    /**
+     * Only select process instances which had at least one local variable with the given value when they ended. The type only applies to already ended process instances, otherwise use a
+     * {@link ProcessInstanceQuery} instead! A variable type is determined based on the value, using types configured in {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and
+     * {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     */
+    HistoricProcessInstanceQuery localVariableValueEquals(Object value);
 
+    /**
+     * Only select historic process instances which have a global string variable with the given value, case insensitive.
+     * 
+     * @param name
+     *            name of the variable, cannot be null.
+     * @param value
+     *            value of the variable, cannot be null.
+     */
+    HistoricProcessInstanceQuery variableValueEqualsIgnoreCase(String name, String value);
+    
     /**
      * Only select historic process instances which have a local string variable with the given value, case insensitive.
      * 
@@ -158,7 +185,27 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * @param value
      *            value of the variable, cannot be null.
      */
-    HistoricProcessInstanceQuery variableValueEqualsIgnoreCase(String name, String value);
+    HistoricProcessInstanceQuery localVariableValueEqualsIgnoreCase(String name, String value);
+    
+    /**
+     * Only select historic process instances which have a global string variable not matching the given value, case insensitive.
+     * 
+     * @param name
+     *            name of the variable, cannot be null.
+     * @param value
+     *            value of the variable, cannot be null.
+     */
+    HistoricProcessInstanceQuery variableValueNotEqualsIgnoreCase(String name, String value);
+    
+    /**
+     * Only select historic process instances which have a local string variable not matching the given value, case insensitive.
+     * 
+     * @param name
+     *            name of the variable, cannot be null.
+     * @param value
+     *            value of the variable, cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueNotEqualsIgnoreCase(String name, String value);
 
     /**
      * Only select process instances which had a global variable with the given name, but with a different value than the passed value when they ended. Only select process instances which have a
@@ -168,6 +215,15 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            of the variable, cannot be null.
      */
     HistoricProcessInstanceQuery variableValueNotEquals(String name, Object value);
+    
+    /**
+     * Only select process instances which had a local variable with the given name, but with a different value than the passed value when they ended. Only select process instances which have a
+     * variable value greater than the passed value. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            of the variable, cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueNotEquals(String name, Object value);
 
     /**
      * Only select process instances which had a global variable value greater than the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive
@@ -179,6 +235,17 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null.
      */
     HistoricProcessInstanceQuery variableValueGreaterThan(String name, Object value);
+    
+    /**
+     * Only select process instances which had a local variable value greater than the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive
+     * type wrappers) are not supported. Only select process instances which have a variable value greater than the passed value.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueGreaterThan(String name, Object value);
 
     /**
      * Only select process instances which had a global variable value greater than or equal to the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not
@@ -190,6 +257,17 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null.
      */
     HistoricProcessInstanceQuery variableValueGreaterThanOrEqual(String name, Object value);
+    
+    /**
+     * Only select process instances which had a local variable value greater than or equal to the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not
+     * primitive type wrappers) are not supported. Only applies to already ended process instances, otherwise use a {@link ProcessInstanceQuery} instead!
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueGreaterThanOrEqual(String name, Object value);
 
     /**
      * Only select process instances which had a global variable value less than the passed value when the ended. Only applies to already ended process instances, otherwise use a
@@ -201,6 +279,17 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null.
      */
     HistoricProcessInstanceQuery variableValueLessThan(String name, Object value);
+    
+    /**
+     * Only select process instances which had a local variable value less than the passed value when the ended. Only applies to already ended process instances, otherwise use a
+     * {@link ProcessInstanceQuery} instead! Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueLessThan(String name, Object value);
 
     /**
      * Only select process instances which has a global variable value less than or equal to the passed value when they ended. Only applies to already ended process instances, otherwise use a
@@ -212,9 +301,20 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null.
      */
     HistoricProcessInstanceQuery variableValueLessThanOrEqual(String name, Object value);
+    
+    /**
+     * Only select process instances which has a local variable value less than or equal to the passed value when they ended. Only applies to already ended process instances, otherwise use a
+     * {@link ProcessInstanceQuery} instead! Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableValueLessThanOrEqual(String name, Object value);
 
     /**
-     * Only select process instances which had global variable value like the given value when they ended. Only applies to already ended process instances, otherwise use a {@link ProcessInstanceQuery}
+     * Only select process instances which had a global variable value like the given value when they ended. Only applies to already ended process instances, otherwise use a {@link ProcessInstanceQuery}
      * instead! This can be used on string variables only.
      * 
      * @param name
@@ -223,9 +323,20 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     HistoricProcessInstanceQuery variableValueLike(String name, String value);
+    
+    /**
+     * Only select process instances which had a local variable value like the given value when they ended. Only applies to already ended process instances, otherwise use a {@link ProcessInstanceQuery}
+     * instead! This can be used on string variables only.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricProcessInstanceQuery localVariableValueLike(String name, String value);
 
     /**
-     * Only select process instances which had global variable value like (case insensitive) the given value when they ended. Only applies to already ended process instances, otherwise use a
+     * Only select process instances which had a global variable value like (case insensitive) the given value when they ended. Only applies to already ended process instances, otherwise use a
      * {@link ProcessInstanceQuery} instead! This can be used on string variables only.
      * 
      * @param name
@@ -236,7 +347,18 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery variableValueLikeIgnoreCase(String name, String value);
     
     /**
-     * Only select process instances which have a variable with the given name.
+     * Only select process instances which had a local variable value like (case insensitive) the given value when they ended. Only applies to already ended process instances, otherwise use a
+     * {@link ProcessInstanceQuery} instead! This can be used on string variables only.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricProcessInstanceQuery localVariableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select process instances which have a global variable with the given name.
      * 
      * @param name
      *            cannot be null.
@@ -244,12 +366,28 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery variableExists(String name);
     
     /**
-     * Only select process instances which does not have a variable with the given name.
+     * Only select process instances which have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableExists(String name);
+    
+    /**
+     * Only select process instances which does not have a global variable with the given name.
      * 
      * @param name
      *            cannot be null.
      */
     HistoricProcessInstanceQuery variableNotExists(String name);
+    
+    /**
+     * Only select process instances which does not have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery localVariableNotExists(String name);
 
     /**
      * Only select historic process instances that were started before the given date.

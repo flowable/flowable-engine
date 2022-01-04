@@ -15,7 +15,6 @@ package org.flowable.cmmn.test.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -45,7 +44,6 @@ import org.junit.Test;
  */
 public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
 
-    private static final int NR_CASE_INSTANCES = 5;
     private List<String> taskIds = new ArrayList<>();
 
     @Before
@@ -70,7 +68,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueEquals() throws Exception {
+    public void testCaseVariableValueEquals() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
@@ -291,7 +289,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueEquals("booleanVar", false)
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueEquals("dateVar", otherDate.getTime())
@@ -393,7 +391,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .singleResult();
         cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "theValue");
         cmmnTaskService.setVariableLocal(task.getId(), "longVar", 928374L);
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueEquals("longVar", 928374L)
@@ -419,7 +417,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueEqualsOr() throws Exception {
+    public void testCaseVariableValueEqualsOr() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("longVar", 928374L);
@@ -433,7 +431,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
         variables.put("nullVar", null);
 
         // Start case-instance with all types of variables
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -653,7 +651,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testVariableValueEqualsIgnoreCase() throws Exception {
+    public void testVariableValueEqualsIgnoreCase() {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
@@ -734,14 +732,14 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueEqualsIgnoreCase() throws Exception {
+    public void testCaseVariableValueEqualsIgnoreCase() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
         variables.put("upper", "AZERTY");
         variables.put("lower", "azerty");
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -776,7 +774,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueEqualsIgnoreCase("lower", "uiop")
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueEqualsIgnoreCase("mixed", "azerTY")
                 .count()).isEqualTo(1);
@@ -809,12 +807,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueLike() throws Exception {
+    public void testCaseVariableValueLike() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -829,7 +827,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueLike("mixed", "a%")
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueLike("mixed", "Azer%")
                 .count()).isEqualTo(1);
@@ -843,12 +841,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueLikeIgnoreCase() throws Exception {
+    public void testCaseVariableValueLikeIgnoreCase() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("mixed", "AzerTY");
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -863,7 +861,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueLikeIgnoreCase("mixed", "Azz%")
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueLikeIgnoreCase("mixed", "azer%")
                 .count()).isEqualTo(1);
@@ -876,12 +874,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueGreaterThan() throws Exception {
+    public void testCaseVariableValueGreaterThan() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -893,7 +891,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueGreaterThan("number", 10)
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueGreaterThan("number", 5)
                 .count()).isEqualTo(1);
@@ -904,12 +902,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueExistsNotExists() throws Exception {
+    public void testCaseVariableValueExistsNotExists() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -923,12 +921,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueGreaterThanOrEquals() throws Exception {
+    public void testCaseVariableValueGreaterThanOrEquals() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -943,7 +941,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueGreaterThanOrEqual("number", 11)
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueGreaterThanOrEqual("number", 5)
                 .count()).isEqualTo(1);
@@ -956,12 +954,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueLessThan() throws Exception {
+    public void testCaseVariableValueLessThan() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -973,7 +971,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueLessThan("number", 10)
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueLessThan("number", 12)
                 .count()).isEqualTo(1);
@@ -983,12 +981,12 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testCaseVariableValueLessThanOrEquals() throws Exception {
+    public void testCaseVariableValueLessThanOrEquals() {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("number", 10);
 
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .variables(variables)
                 .start();
@@ -1003,7 +1001,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseVariableValueLessThanOrEqual("number", 8)
                 .count()).isZero();
 
-        waitForJobExecutorToProcessAllJobs();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery()
                 .caseVariableValueLessThanOrEqual("number", 12)
                 .count()).isEqualTo(1);
@@ -1404,18 +1402,18 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
      * Test confirming fix for ACT-1731
      */
     @Test
-    public void testIncludeBinaryVariables() throws Exception {
+    public void testIncludeBinaryVariables() {
 
         // Start case with a binary variable
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
-                .variables(Collections.singletonMap("binaryVariable", (Object) "It is I, le binary".getBytes()))
+                .variables(Collections.singletonMap("binaryVariable", "It is I, le binary".getBytes()))
                 .start();
         Task task = cmmnTaskService.createTaskQuery()
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
         assertThat(task).isNotNull();
-        cmmnTaskService.setVariableLocal(task.getId(), "binaryTaskVariable", (Object) "It is I, le binary".getBytes());
+        cmmnTaskService.setVariableLocal(task.getId(), "binaryTaskVariable", "It is I, le binary".getBytes());
 
         // Query task, including caseVariables
         task = cmmnTaskService.createTaskQuery()
@@ -1444,13 +1442,13 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
      * Test confirming fix for ACT-1731
      */
     @Test
-    public void testIncludeBinaryVariablesOr() throws Exception {
+    public void testIncludeBinaryVariablesOr() {
         // Start case with a binary variable
 
         CaseInstance caseInstance = cmmnRuntimeService
                 .createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
-                .variables(Collections.singletonMap("binaryVariable", (Object) "It is I, le binary".getBytes()))
+                .variables(Collections.singletonMap("binaryVariable", "It is I, le binary".getBytes()))
                 .start();
         Task task = cmmnTaskService.createTaskQuery()
                 .or()
@@ -1458,7 +1456,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
         assertThat(task).isNotNull();
-        cmmnTaskService.setVariableLocal(task.getId(), "binaryTaskVariable", (Object) "It is I, le binary".getBytes());
+        cmmnTaskService.setVariableLocal(task.getId(), "binaryTaskVariable", "It is I, le binary".getBytes());
 
         // Query task, including caseVariables
         task = cmmnTaskService.createTaskQuery()
@@ -1738,74 +1736,6 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                 );
     }
 
-    private List<String> generateTestTasks() throws Exception {
-        List<String> ids = new ArrayList<>();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
-        // 6 tasks for kermit
-        cmmnEngineConfiguration.getClock()
-                .setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));
-        for (int i = 0; i < 6; i++) {
-            Task task = cmmnTaskService.newTask();
-            task.setName("testTask");
-            task.setDescription("testTask description");
-            task.setOwner("gonzo");
-            task.setPriority(3);
-            cmmnTaskService.saveTask(task);
-            ids.add(task.getId());
-            cmmnTaskService.addUserIdentityLink(task.getId(), "kermit", IdentityLinkType.CANDIDATE);
-        }
-
-        cmmnEngineConfiguration.getClock()
-                .setCurrentTime(sdf.parse("02/02/2002 02:02:02.000"));
-        // 1 task for gonzo
-        Task task = cmmnTaskService.newTask();
-        task.setName("gonzoTask");
-        task.setDescription("gonzo description");
-        task.setPriority(4);
-        cmmnTaskService.saveTask(task);
-        cmmnTaskService.setAssignee(task.getId(), "gonzo");
-        cmmnTaskService.setVariable(task.getId(), "testVar", "someVariable");
-        ids.add(task.getId());
-
-        cmmnEngineConfiguration.getClock()
-                .setCurrentTime(sdf.parse("03/03/2003 03:03:03.000"));
-        // 2 tasks for management group
-        for (int i = 0; i < 2; i++) {
-            task = cmmnTaskService.newTask();
-            task.setName("managementTask");
-            task.setPriority(10);
-            cmmnTaskService.saveTask(task);
-            cmmnTaskService.addGroupIdentityLink(task.getId(), "management", IdentityLinkType.CANDIDATE);
-            ids.add(task.getId());
-        }
-
-        cmmnEngineConfiguration.getClock()
-                .setCurrentTime(sdf.parse("04/04/2004 04:04:04.000"));
-        // 2 tasks for accountancy group
-        for (int i = 0; i < 2; i++) {
-            task = cmmnTaskService.newTask();
-            task.setName("accountancyTask");
-            task.setDescription("accountancy description");
-            cmmnTaskService.saveTask(task);
-            cmmnTaskService.addGroupIdentityLink(task.getId(), "accountancy", IdentityLinkType.CANDIDATE);
-
-            ids.add(task.getId());
-        }
-
-        cmmnEngineConfiguration.getClock()
-                .setCurrentTime(sdf.parse("05/05/2005 05:05:05.000"));
-        // 1 task assigned to management and accountancy group
-        task = cmmnTaskService.newTask();
-        task.setName("managementAndAccountancyTask");
-        cmmnTaskService.saveTask(task);
-        cmmnTaskService.addGroupIdentityLink(task.getId(), "management", IdentityLinkType.CANDIDATE);
-        cmmnTaskService.addGroupIdentityLink(task.getId(), "accountancy", IdentityLinkType.CANDIDATE);
-        ids.add(task.getId());
-
-        return ids;
-    }
-
     @Test
     public void testOrQueryMultipleVariableValues() {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -1822,7 +1752,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
                     .variables(startMap)
                     .start();
 
-            waitForJobExecutorToProcessAllJobs();
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             HistoricTaskInstanceQuery query0 = cmmnHistoryService.createHistoricTaskInstanceQuery()
                     .includeCaseVariables()
                     .or();
@@ -1839,7 +1769,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
             for (int i = 0; i < 20; i++) {
                 query1 = query1.caseVariableValueEquals("anotherProcessVar", i);
             }
-            waitForJobExecutorToProcessAllJobs();
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             query1 = query1.endOr();
             HistoricTaskInstance task = query1.singleResult();
             assertThat(task.getCaseVariables())
@@ -1854,13 +1784,13 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
     public void testQueryVariableExists() {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
 
-            Map<String, Object> varMap = Collections.singletonMap("caseVar", (Object) "test");
+            Map<String, Object> varMap = Collections.singletonMap("caseVar", "test");
 
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("oneTaskCase")
                     .variables(varMap)
                     .start();
-            waitForJobExecutorToProcessAllJobs();
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             List<HistoricTaskInstance> tasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
@@ -1893,7 +1823,7 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
             assertThat(tasks).hasSize(1);
 
             cmmnRuntimeService.setVariable(caseInstance.getId(), "caseVar2", "test2");
-            waitForJobExecutorToProcessAllJobs();
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             tasks = cmmnHistoryService.createHistoricTaskInstanceQuery()
                     .caseInstanceId(caseInstance.getId())

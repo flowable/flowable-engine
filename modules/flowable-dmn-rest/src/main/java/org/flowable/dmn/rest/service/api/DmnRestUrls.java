@@ -33,6 +33,8 @@ public final class DmnRestUrls {
     public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_AUDITDATA = "auditdata";
     public static final String SEGMENT_DECISION_MODEL = "model";
     public static final String SEGMENT_EXECUTE_RESOURCE = "execute";
+    public static final String SEGMENT_EXECUTE_DECISION_RESOURCE = "execute-decision";
+    public static final String SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE = "execute-decision-service";
     public static final String SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE = "single-result";
 
     /**
@@ -111,7 +113,27 @@ public final class DmnRestUrls {
      * URL template for a decision executor: <i>/dmn-rule/execute/single-result</i>
      */
     public static final String[] URL_RULE_SERVICE_EXECUTE_SINGLE_RESULT = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
-    
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision</i>
+     */
+    public static final String[] URL_RULE_SERVICE_EXECUTE_DECISION = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_DECISION_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision/single-result</i>
+     */
+    public static final String[] URL_RULE_SERVICE_EXECUTE_DECISION_SINGLE_RESULT = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_DECISION_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision-service</i>
+     */
+    public static final String[] URL_RULE_SERVICE_EXECUTE_DECISION_SERVICE = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE};
+
+    /**
+     * URL template for a decision executor: <i>/dmn-decision/execute-decision-service/single-result</i>
+     */
+    public static final String[] URL_RULE_SERVICE_EXECUTE_DECISION_SERVICE_SINGLE_RESULT = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_DECISION_SERVICE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
+
     /**
      * URL template for a historic decision execution collection: <i>/dmn-history/historic-decision-executions</i>
      */

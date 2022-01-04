@@ -32,8 +32,9 @@ public class RequiredAuthorityParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof AuthorityRequirement))
+        if (!(parentElement instanceof AuthorityRequirement)) {
             return;
+        }
 
         DmnElementReference requiredAuthority = new DmnElementReference();
         requiredAuthority.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));
