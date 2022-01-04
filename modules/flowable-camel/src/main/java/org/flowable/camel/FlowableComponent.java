@@ -70,6 +70,7 @@ public class FlowableComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(String s, String s1, Map<String, Object> parameters) throws Exception {
         FlowableEndpoint ae = new FlowableEndpoint(s, getCamelContext());
+        ae.setComponent(this);
         ae.setIdentityService(identityService);
         ae.setRuntimeService(runtimeService);
         ae.setRepositoryService(repositoryService);
