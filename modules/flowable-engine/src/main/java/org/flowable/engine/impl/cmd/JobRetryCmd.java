@@ -71,10 +71,7 @@ public class JobRetryCmd implements Command<Object> {
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
         FlowElement currentFlowElement = executionEntity != null ? executionEntity.getCurrentFlowElement() : null;
 
-        String failedJobRetryTimeCycleValue = null;
-        if (currentFlowElement instanceof ServiceTask) {
-            failedJobRetryTimeCycleValue = ((ServiceTask) currentFlowElement).getFailedJobRetryTimeCycleValue();
-        }
+        String failedJobRetryTimeCycleValue = getFailedJobRetryTimeCycleValue(currentFlowElement);
 
         if (executionEntity != null) {
             executionEntity.setActive(false);
@@ -157,6 +154,13 @@ public class JobRetryCmd implements Command<Object> {
                     processEngineConfiguration.getEngineCfgKey());
         }
 
+        return null;
+    }
+
+    protected static String getFailedJobRetryTimeCycleValue(FlowElement currentFlowElement) {
+        if (currentFlowElement instanceof ServiceTask) {
+            return ((ServiceTask) currentFlowElement).getFailedJobRetryTimeCycleValue();
+        }
         return null;
     }
 
