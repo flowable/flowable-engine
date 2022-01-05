@@ -1,11 +1,13 @@
 apiVersion: v1
 entries:
   flowable:
-  - apiVersion: v2
+  - annotations:
+      artifacthub.io/prerelease: "true"
+    apiVersion: v2
     appVersion: 6.7.2
-    created: "2022-01-05T18:02:23.127923+01:00"
+    created: "2022-01-05T18:25:27.66794+01:00"
     description: A Flowable Helm chart for Kubernetes
-    digest: 38c7817a7246775add219caf7d333fb701bbfa5ac56acd7da8d445466f6f8eb4
+    digest: c54ef89d8bc99ee4a95aebec07c6de95a8e7f7bd570d7d6d5d8c4865dfe745c6
     home: https://flowable.org
     icon: https://flowable.org/docs/img/logo.png
     name: flowable
@@ -77,4 +79,4 @@ entries:
     urls:
     - https://flowable.github.io/helm/flowable-6.5.0.tgz
     version: 6.5.0
-generated: "2022-01-05T18:02:23.123701+01:00"
+generated: "2022-01-05T18:25:27.66593+01:00"
