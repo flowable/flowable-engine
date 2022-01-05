@@ -5,9 +5,9 @@ This is a helm chart for the [Flowable UI apps][flowable].
 ## TL;DR;
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable-oss https://flowable.github.io/helm/
 
-helm install my-flowable flowable/flowable
+helm install my-flowable flowable-oss/flowable
 ```
 
 ## Installing the Chart
@@ -21,16 +21,19 @@ helm install my-flowable ./flowable
 To install the *repo* chart with the release name `my-flowable`:
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable-oss https://flowable.github.io/helm/
 
-helm install my-flowable ./flowable \
+helm install my-flowable flowable-oss/flowable \
     --create-namespace --namespace=flowable \
-    --set host.external=<cluster public ip / hostname> --set ingress.useHost=true \
+    --set host.external=azure-flowable --set ingress.useHost=true \
     --set postgres.storage.storageClassName=default
 ```
 
 This will install Flowable as the *my-flowable* release in the *flowable* namespace.
+
 It will also configure Ingress mapping rules for route on the specified *host*.
+This requires an Ingress controller to be active on the cluster. For more info see the main [README](https://github.com/flowable/flowable-engine/blob/main/k8s/README.md).
+
 The *StorageClassName* will be set to *default*.
 
 ## Uninstalling the Chart
@@ -97,19 +100,17 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `postgres.resources.limits.cpu`               | Kubernetes CPU limit                                                                                                  | `1000m`                       |
 | `postgres.resources.limits.memory`            | Kubernetes memory limit                                                                                               | `1Gi`                         |
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example;
 
 ```console
-helm install my-flowable \
-  --set admin.enabled=false \
-    flowable
+helm install my-flowable flowable-oss/flowable \
+  --set admin.enabled=false
 ```
 
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
+Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example;
 
 ```console
-helm install my-flowable -f values.yaml flowable
+helm install my-flowable flowable-oss/flowable -f values.yaml
 ```
-
 
 [flowable]: https://github.com/flowable/flowable-engine
