@@ -136,7 +136,7 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+      <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids" 
                  open="(" separator="," close=")">

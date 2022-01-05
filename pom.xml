@@ -804,13 +804,10 @@
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
-				<artifactId>drools-core</artifactId>
-				<version>7.6.0.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.drools</groupId>
-				<artifactId>drools-compiler</artifactId>
-				<version>7.6.0.Final</version>
+				<artifactId>drools-bom</artifactId>
+				<version>7.63.0.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mule.modules</groupId>
@@ -842,6 +839,12 @@
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openjdk.nashorn</groupId>
+				<artifactId>nashorn-core</artifactId>
+				<version>15.3</version>
 			</dependency>
 
 			<dependency>

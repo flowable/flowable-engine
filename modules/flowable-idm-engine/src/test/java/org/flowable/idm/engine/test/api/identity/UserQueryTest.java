@@ -16,6 +16,7 @@ package org.flowable.idm.engine.test.api.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -90,6 +91,12 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         assertThatThrownBy(() -> idmIdentityService.createUserQuery().userIds(null).singleResult())
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByIds() {
+        UserQuery query = idmIdentityService.createUserQuery().userIds(Arrays.asList("kermit", "gonzo", "dummy"));
+        verifyQueryResults(query, 2);
     }
 
     @Test
@@ -358,6 +365,25 @@ public class UserQueryTest extends PluggableFlowableIdmTestCase {
 
         assertThatThrownBy(() -> idmIdentityService.createUserQuery().memberOfGroup(null).list())
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByMemberOfGroups() {
+        UserQuery query = idmIdentityService.createUserQuery().memberOfGroups(Arrays.asList("muppets", "dummy"));
+        verifyQueryResults(query, 3);
+
+        query = idmIdentityService.createUserQuery().memberOfGroups(Arrays.asList("frogs", "dummy"));
+        verifyQueryResults(query, 1);
+
+        User result = query.singleResult();
+        assertThat(result.getId()).isEqualTo("kermit");
+    }
+
+    @Test
+    public void testQueryByInvalidMemberOfGroups() {
+        assertThatThrownBy(() -> idmIdentityService.createUserQuery().memberOfGroups(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Provided groupIds is null");
     }
 
     private void verifyQueryResults(UserQuery query, int countExpected) {
