@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "flowable.template" . }}
+  name: {{ .Release.Name }}-{{ include "flowable.template" . }}
   labels:
     {{ include "flowable.defaultlabels" . }}
 spec:
@@ -11,11 +11,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ include "flowable.template" . }}
+      app: {{ .Release.Name }}-{{ include "flowable.template" . }}
   template:
     metadata:
       labels:
-        app: {{ include "flowable.template" . }}
+        app: {{ .Release.Name }}-{{ include "flowable.template" . }}
     spec:
       containers:
       - env:
@@ -26,7 +26,7 @@ spec:
         - name: POSTGRES_USER
           value: {{ .Values.database.username }}
         image: {{ .Values.postgres.image }}
-        name: {{ include "flowable.template" . }}
+        name: {{ .Release.Name }}-{{ include "flowable.template" . }}
         resources:
 {{ toYaml .Values.postgres.resources | indent 10 }}
         livenessProbe:
@@ -51,23 +51,23 @@ spec:
           timeoutSeconds: 1
         ports:
         - containerPort: 5432
-          name: {{ include "flowable.template" . }}
+          name: "jdbc"
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
-          name: {{ include "flowable.template" . }}
+          name: {{ .Release.Name }}-{{ include "flowable.template" . }}
           subPath: data
       restartPolicy: Always
       volumes:
-      - name: {{ include "flowable.template" . }}
+      - name: {{ .Release.Name }}-{{ include "flowable.template" . }}
         persistentVolumeClaim:
-          claimName: {{ include "flowable.template" . }}
+          claimName: {{ .Release.Name }}-{{ include "flowable.template" . }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    service: {{ include "flowable.template" . }}
-  name: {{ include "flowable.template" . }}
+    service: {{ .Release.Name }}-{{ include "flowable.template" . }}
+  name: {{ .Release.Name }}-{{ include "flowable.template" . }}
 spec:
   accessModes:
   - ReadWriteOnce
@@ -79,10 +79,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.postgres.service.name }}
+  name: {{ .Release.Name }}-{{ .Values.postgres.service.name }}
 spec:
   selector:
-    app: {{ include "flowable.template" . }}
+    app: {{ .Release.Name }}-{{ include "flowable.template" . }}
   ports:
   - port: 5432
 {{- end }}
