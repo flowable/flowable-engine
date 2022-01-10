@@ -25,7 +25,7 @@ helm repo add flowable-oss https://flowable.github.io/helm/
 
 helm install my-flowable flowable-oss/flowable \
     --create-namespace --namespace=flowable \
-    --set host.external=azure-flowable --set ingress.useHost=true \
+    --set host.external=<cluster external hostname> --set ingress.useHost=true \
     --set postgres.storage.storageClassName=default
 ```
 
@@ -62,6 +62,7 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `ingress.sslRedirect`                         | Enables SSL redirect                                                                                                  | `false`                       |
 | `ingress.useHost`                             | Enables host based routing using external `host.external` ( this must be a FQDN)                                           | `false`                            |
 | `ingress.class`                               | Ingress class name                  | `nginx`
+| `ingress.clusterIssuer`                               | Ingress cert manager cluster issuer                  | ``
 |<br/>|
 | `ui.enabled`                                | Enables Flowable UI (either enable Flowable UI or Flowable REST)                                                  | `false`                        |
 | `ui.replicas`                               | Number of replicated pods                                                                                             | `1`                           |
