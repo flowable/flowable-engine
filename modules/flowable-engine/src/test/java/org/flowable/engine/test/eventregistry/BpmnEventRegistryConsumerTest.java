@@ -474,6 +474,9 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         // After the instance is started, there should be one additional eventsubscription
         inboundEventChannelAdapter.triggerTestEvent();
+        
+        waitForJobExecutorToProcessAllJobs(10000, 200);
+        
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition1.getId());
 
@@ -506,6 +509,8 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             .containsOnly("My task");
 
         inboundEventChannelAdapter.triggerTestEvent();
+        
+        waitForJobExecutorToProcessAllJobs(10000, 200);
 
         // Ended thanks to boundary event
         assertProcessEnded(processInstance.getId());
@@ -548,6 +553,9 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         // After the instance is started, there should be one additional eventsubscription
         inboundEventChannelAdapter.triggerTestEvent();
+        
+        waitForJobExecutorToProcessAllJobs(10000, 200);
+        
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition1.getId());
 
@@ -580,6 +588,8 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             .containsOnly("My task");
 
         inboundEventChannelAdapter.triggerTestEvent();
+        
+        waitForJobExecutorToProcessAllJobs(10000, 200);
 
         // Ended thanks to boundary event
         assertProcessEnded(processInstance.getId());

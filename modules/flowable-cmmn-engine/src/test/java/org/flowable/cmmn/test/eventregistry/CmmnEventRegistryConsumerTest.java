@@ -430,7 +430,9 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         inboundEventChannelAdapter.triggerTestEvent();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
         assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
-
+        
+        waitForJobExecutorToProcessAllJobs();
+        
         eventSubscriptions = cmmnRuntimeService.createEventSubscriptionQuery().scopeType(ScopeTypes.CMMN).list();
         assertThat(eventSubscriptions)
                 .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId,  EventSubscription::getScopeType, EventSubscription::getScopeId)
@@ -472,13 +474,13 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         autoCleanupDeploymentIds.remove(redeployment.getId());
 
         // Removing the second definition should recreate the one from the first one
-        // There won't be a case instance since we will do cascaded delete of the deployment
         cmmnRepositoryService.deleteDeployment(redeployment.getId(), true);
 
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list())
                 .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId, EventSubscription::getScopeType, EventSubscription::getScopeId)
                 .containsOnly(
-                        tuple("myEvent", caseDefinition.getId(), ScopeTypes.CMMN, null)
+                        tuple("myEvent", caseDefinition.getId(), ScopeTypes.CMMN, null),
+                        tuple("myEvent", caseDefinition.getId(), ScopeTypes.CMMN, caseInstance.getId())
                 );
     }
 
@@ -498,6 +500,9 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
 
         // After the case instance is started, there should be one additional eventsubscription
         inboundEventChannelAdapter.triggerTestEvent();
+        
+        waitForJobExecutorToProcessAllJobs();
+        
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
         assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
 
@@ -551,8 +556,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list())
                 .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId, EventSubscription::getScopeType, EventSubscription::getScopeId)
                 .containsOnly(
-                        tuple("myEvent", caseDefinitionAfterRedeploy.getId(), ScopeTypes.CMMN, null),
-                        tuple("myEvent", caseDefinitionAfterRedeploy.getId(), ScopeTypes.CMMN, caseInstance.getId())
+                        tuple("myEvent", caseDefinitionAfterRedeploy.getId(), ScopeTypes.CMMN, null)
                 );
     }
 
