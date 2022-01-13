@@ -209,8 +209,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         }
     }
     
-    protected boolean hasTaskHistoryLevel(String processDefinitionId, String taskId) {
-        return historyConfigurationSettings.isHistoryEnabledForUserTask(processDefinitionId, taskId);
+    protected boolean hasTaskHistoryLevel(String processDefinitionId, TaskEntity taskEntity) {
+        return historyConfigurationSettings.isHistoryEnabledForUserTask(processDefinitionId, taskEntity);
     }
     
     protected boolean hasActivityHistoryLevel(String processDefinitionId, String activityId) {

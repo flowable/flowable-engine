@@ -12,7 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -47,7 +52,7 @@ public interface CmmnHistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided case instance.
      */
-    boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, String caseInstanceId);
+    boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, CaseInstanceEntity caseInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided activity.
@@ -57,21 +62,21 @@ public interface CmmnHistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided user task.
      */
-    boolean isHistoryEnabledForUserTask(String caseDefinitionId, String taskId);
+    boolean isHistoryEnabledForUserTask(String caseDefinitionId, TaskEntity taskEntity);
 
     /**
      * Returns whether history is enabled for the provided variable instance.
      */
-    boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, String variableInstanceId);
+    boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, VariableInstanceEntity variableInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided identity link.
      */
-    boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, String identityLinkId);
+    boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, IdentityLinkEntity identityLinkEntity);
 
     /**
      * Returns whether history is enabled for the provided entity link.
      */
-    boolean isHistoryEnabledForEntityLink(String caseDefinitionId, String entityLinkId);
+    boolean isHistoryEnabledForEntityLink(String caseDefinitionId, EntityLinkEntity entityLink);
 
 }
