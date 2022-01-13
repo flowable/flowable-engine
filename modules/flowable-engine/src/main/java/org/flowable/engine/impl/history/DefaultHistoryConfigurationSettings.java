@@ -17,11 +17,13 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -42,8 +44,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
         this.processEngineConfiguration = processEngineConfiguration;
     }
 
-    @Override
-    public boolean isEnableProcessDefinitionHistoryLevel() {
+    protected boolean isEnableProcessDefinitionHistoryLevel() {
         return processEngineConfiguration.isEnableProcessDefinitionHistoryLevel();
     }
 
@@ -139,8 +140,13 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForProcessInstance(String processDefinitionId, ExecutionEntity processInstanceExecution) {
-        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processDefinitionId);
+    public boolean isHistoryEnabledForProcessInstance(ExecutionEntity processInstanceExecution) {
+        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstanceExecution.getProcessDefinitionId());
+    }
+
+    @Override
+    public boolean isHistoryEnabledForActivity(ActivityInstance activityInstance) {
+        return isHistoryEnabledForActivity(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId());
     }
 
     @Override
@@ -205,7 +211,23 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(String processDefinitionId, TaskEntity taskEntity) {
+    public boolean isHistoryEnabledForUserTask(TaskEntity taskEntity) {
+        return isHistoryEnabledForUserTask(taskEntity.getProcessDefinitionId(), taskEntity);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForUserTask(ExecutionEntity executionEntity, TaskEntity taskEntity) {
+        String processDefinitionId = null;
+        if (executionEntity != null) {
+            processDefinitionId = executionEntity.getProcessDefinitionId();
+        } else if (taskEntity != null) {
+            processDefinitionId = taskEntity.getProcessDefinitionId();
+        }
+
+        return isHistoryEnabledForUserTask(processDefinitionId, taskEntity);
+    }
+
+    protected boolean isHistoryEnabledForUserTask(String processDefinitionId, TaskEntity taskEntity) {
         HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
         if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
             HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
@@ -244,18 +266,63 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
+    public boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity) {
+        String processDefinitionId = null;
+        if (isEnableProcessDefinitionHistoryLevel() && variableInstanceEntity.getProcessInstanceId() != null) {
+            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
+            processDefinitionId = processInstanceExecution.getProcessDefinitionId();
+        }
+        return isHistoryEnabledForVariableInstance(processDefinitionId, variableInstanceEntity);
+    }
+
+    @Override
     public boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForIdentityLink(String processDefinitionId, IdentityLinkEntity identityLink) {
+    public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLink) {
+        String processDefinitionId = getProcessDefinitionId(identityLink);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
     }
 
+    protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
+        String processDefinitionId = null;
+        if (identityLink.getProcessInstanceId() != null) {
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+        } else if (identityLink.getTaskId() != null) {
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        return processDefinitionId;
+    }
+
     @Override
-    public boolean isHistoryEnabledForEntityLink(String processDefinitionId, EntityLinkEntity entityLink) {
+    public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
+        String processDefinitionId = getProcessDefinitionId(entityLink);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+    }
+
+    protected String getProcessDefinitionId(EntityLinkEntity entityLink) {
+        String processDefinitionId = null;
+        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(entityLink.getScopeId());
+            if (execution != null) {
+                processDefinitionId = execution.getProcessDefinitionId();
+            }
+
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                processDefinitionId = task.getProcessDefinitionId();
+            }
+        }
+        return processDefinitionId;
     }
 
 }

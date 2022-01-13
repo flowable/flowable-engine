@@ -13,6 +13,8 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -30,13 +32,6 @@ public interface CmmnHistoryConfigurationSettings {
     boolean isHistoryEnabled();
 
     /**
-     * Returns whether the case engine configuration has enabled to check
-     * for a history level setting on the case definition that is different
-     * from the global history level.
-     */
-    boolean isEnableCaseDefinitionHistoryLevel();
-
-    /**
      * Returns whether any history should be stored for the given case definition
      * (i.e. the history level is different from {@link HistoryLevel#NONE}.
      */
@@ -44,39 +39,43 @@ public interface CmmnHistoryConfigurationSettings {
 
     /**
      * Returns whether the history level is at least the given level.
-     * If case definitions have more specific settings (see {@link #isEnableCaseDefinitionHistoryLevel()}),
-     * the level will be checked against that before checking the engine configuration.
+     * If case definitions have more specific settings the level will be checked against that before checking the engine configuration.
      */
     boolean isHistoryLevelAtLeast(HistoryLevel level, String caseDefinitionId);
 
     /**
      * Returns whether history is enabled for the provided case instance.
      */
-    boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, CaseInstanceEntity caseInstanceEntity);
+    boolean isHistoryEnabledForCaseInstance(CaseInstanceEntity caseInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided activity.
      */
-    boolean isHistoryEnabledForActivity(String caseDefinitionId, String activityId);
+    boolean isHistoryEnabledForMilestone(MilestoneInstanceEntity milestoneInstanceEntity);
+
+    /**
+     * Returns whether history is enabled for the provided plan item instance.
+     */
+    boolean isHistoryEnabledForPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided user task.
      */
-    boolean isHistoryEnabledForUserTask(String caseDefinitionId, TaskEntity taskEntity);
+    boolean isHistoryEnabledForUserTask(TaskEntity taskEntity);
 
     /**
      * Returns whether history is enabled for the provided variable instance.
      */
-    boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, VariableInstanceEntity variableInstanceEntity);
+    boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided identity link.
      */
-    boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, IdentityLinkEntity identityLinkEntity);
+    boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLinkEntity);
 
     /**
      * Returns whether history is enabled for the provided entity link.
      */
-    boolean isHistoryEnabledForEntityLink(String caseDefinitionId, EntityLinkEntity entityLink);
+    boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink);
 
 }
