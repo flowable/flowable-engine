@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -22,6 +23,10 @@ import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +106,7 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, String caseInstanceId) {
+    public boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, CaseInstanceEntity caseInstanceEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseDefinitionId);
     }
 
@@ -150,7 +155,7 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(String caseDefinitionId, String taskId) {
+    public boolean isHistoryEnabledForUserTask(String caseDefinitionId, TaskEntity taskEntity) {
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
         if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
             HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);
@@ -189,17 +194,17 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, String variableInstanceId) {
+    public boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, VariableInstanceEntity variableInstanceEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, String identityLinkId) {
+    public boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, IdentityLinkEntity identityLinkEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForEntityLink(String caseDefinitionId, String entityLinkId) {
+    public boolean isHistoryEnabledForEntityLink(String caseDefinitionId, EntityLinkEntity entityLink) {
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
     }
 
