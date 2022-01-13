@@ -230,9 +230,11 @@ import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.engine.impl.function.TaskGetFunctionDelegate;
+import org.flowable.engine.impl.history.DefaultHistoryConfigurationSettings;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
+import org.flowable.engine.impl.history.HistoryConfigurationSettings;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -507,6 +509,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
+    protected HistoryConfigurationSettings historyConfigurationSettings;
 
     protected boolean isAsyncHistoryEnabled;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
@@ -1088,6 +1091,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initVariableAggregator();
+        initHistoryConfigurationSettings();
         initHistoryManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
@@ -1391,12 +1395,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // History manager ///////////////////////////////////////////////////////////
 
+    public void initHistoryConfigurationSettings() {
+        if (historyConfigurationSettings == null) {
+            historyConfigurationSettings = new DefaultHistoryConfigurationSettings(this);
+        }
+    }
+
     public void initHistoryManager() {
         if (historyManager == null) {
             if (isAsyncHistoryEnabled) {
-                historyManager = new AsyncHistoryManager(this);
+                historyManager = new AsyncHistoryManager(this, historyConfigurationSettings);
             } else {
-                historyManager = new DefaultHistoryManager(this);
+                historyManager = new DefaultHistoryManager(this, historyConfigurationSettings);
             }
         }
     }
