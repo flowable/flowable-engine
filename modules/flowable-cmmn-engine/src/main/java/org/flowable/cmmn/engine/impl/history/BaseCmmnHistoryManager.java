@@ -83,8 +83,8 @@ public class BaseCmmnHistoryManager {
         return caseDefinitionId;
     }
     
-    protected boolean hasTaskHistoryLevel(String caseDefinitionId, String taskId) {
-        return historyConfigurationSettings.isHistoryEnabledForUserTask(caseDefinitionId, taskId);
+    protected boolean hasTaskHistoryLevel(String caseDefinitionId, TaskEntity taskEntity) {
+        return historyConfigurationSettings.isHistoryEnabledForUserTask(caseDefinitionId, taskEntity);
     }
     
     protected boolean hasActivityHistoryLevel(String caseDefinitionId, String activityId) {
