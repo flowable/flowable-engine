@@ -16,12 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -48,8 +51,7 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
         return cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE;
     }
 
-    @Override
-    public boolean isEnableCaseDefinitionHistoryLevel() {
+    protected boolean isEnableCaseDefinitionHistoryLevel() {
         return cmmnEngineConfiguration.isEnableCaseDefinitionHistoryLevel();
     }
 
@@ -106,12 +108,12 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForCaseInstance(String caseDefinitionId, CaseInstanceEntity caseInstanceEntity) {
+    public boolean isHistoryEnabledForCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+        String caseDefinitionId = caseInstanceEntity.getCaseDefinitionId();
         return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseDefinitionId);
     }
 
-    @Override
-    public boolean isHistoryEnabledForActivity(String caseDefinitionId, String activityId) {
+    protected boolean isHistoryEnabledForActivity(String caseDefinitionId, String activityId) {
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
         if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
             HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);
@@ -155,7 +157,18 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(String caseDefinitionId, TaskEntity taskEntity) {
+    public boolean isHistoryEnabledForMilestone(MilestoneInstanceEntity milestoneInstanceEntity) {
+        return isHistoryEnabledForActivity(milestoneInstanceEntity.getCaseDefinitionId(), milestoneInstanceEntity.getElementId());
+    }
+
+    @Override
+    public boolean isHistoryEnabledForPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        return isHistoryEnabledForActivity(planItemInstanceEntity.getCaseDefinitionId(), planItemInstanceEntity.getPlanItemDefinitionId());
+    }
+
+    @Override
+    public boolean isHistoryEnabledForUserTask(TaskEntity taskEntity) {
+        String caseDefinitionId = taskEntity.getScopeDefinitionId();
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
         if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
             HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);
@@ -194,18 +207,61 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForVariableInstance(String caseDefinitionId, VariableInstanceEntity variableInstanceEntity) {
+    public boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity) {
+        String caseDefinitionId = null;
+        if (isEnableCaseDefinitionHistoryLevel() && variableInstanceEntity.getScopeId() != null) {
+            CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
+            caseDefinitionId = caseInstance.getCaseDefinitionId();
+        }
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForIdentityLink(String caseDefinitionId, IdentityLinkEntity identityLinkEntity) {
+    public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLinkEntity) {
+        String caseDefinitionId = getCaseDefinitionId(identityLinkEntity);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
     }
 
+    protected String getCaseDefinitionId(IdentityLinkEntity identityLink) {
+        String caseDefinitionId = null;
+        if (identityLink.getScopeDefinitionId() != null) {
+            return identityLink.getScopeDefinitionId();
+
+        } else if (identityLink.getScopeId() != null) {
+            CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(identityLink.getScopeId());
+            if (caseInstance != null) {
+                caseDefinitionId = caseInstance.getCaseDefinitionId();
+            }
+        } else if (identityLink.getTaskId() != null) {
+            TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
+            if (task != null) {
+                caseDefinitionId = task.getScopeDefinitionId();
+            }
+        }
+        return caseDefinitionId;
+    }
+
     @Override
-    public boolean isHistoryEnabledForEntityLink(String caseDefinitionId, EntityLinkEntity entityLink) {
+    public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
+        String caseDefinitionId = getCaseDefinitionId(entityLink);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+    }
+
+    protected String getCaseDefinitionId(EntityLinkEntity entityLink) {
+        String caseDefinitionId = null;
+        if (ScopeTypes.CMMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(entityLink.getScopeId());
+            if (caseInstance != null) {
+                caseDefinitionId = caseInstance.getCaseDefinitionId();
+            }
+
+        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
+            TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(entityLink.getScopeId());
+            if (task != null) {
+                caseDefinitionId = task.getScopeDefinitionId();
+            }
+        }
+        return caseDefinitionId;
     }
 
     protected HistoryLevel getCaseDefinitionHistoryLevel(String caseDefinitionId) {

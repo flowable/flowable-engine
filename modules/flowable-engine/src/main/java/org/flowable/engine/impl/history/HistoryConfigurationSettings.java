@@ -14,6 +14,7 @@ package org.flowable.engine.impl.history;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -30,13 +31,6 @@ public interface HistoryConfigurationSettings {
     boolean isHistoryEnabled();
 
     /**
-     * Returns whether the process engine configuration has enabled to check
-     * for a history level setting on the process definition that is different
-     * from the global history level.
-     */
-    boolean isEnableProcessDefinitionHistoryLevel();
-
-    /**
      * Returns whether any history should be stored for the given process definition
      * (i.e. the history level is different from {@link HistoryLevel#NONE}.
      */
@@ -44,15 +38,20 @@ public interface HistoryConfigurationSettings {
 
     /**
      * Returns whether the history level is at least the given level.
-     * If process definitions have more specific settings (see {@link #isEnableProcessDefinitionHistoryLevel()}),
-     * the level will be checked against that before checking the engine configuration.
+     * If process definitions have more specific settings the level will be checked against that before checking the engine configuration.
      */
     boolean isHistoryLevelAtLeast(HistoryLevel level, String processDefinitionId);
 
     /**
      * Returns whether history is enabled for the provided process instance.
      */
-    boolean isHistoryEnabledForProcessInstance(String processDefinitionId, ExecutionEntity processInstanceExecution);
+    boolean isHistoryEnabledForProcessInstance(ExecutionEntity processInstanceExecution);
+
+    /**
+     * Returns whether history is enabled for the provided activity.
+     * This method has an extra activityInstance parameter, for legacy reasons and should only be used in those exceptional situations.
+     */
+    boolean isHistoryEnabledForActivity(ActivityInstance activityInstance);
 
     /**
      * Returns whether history is enabled for the provided activity.
@@ -61,22 +60,35 @@ public interface HistoryConfigurationSettings {
 
     /**
      * Returns whether history is enabled for the provided user task.
+     * This method has an extra processDefinitionId parameter, for legacy reasons and should only be used in those exceptional situations.
      */
-    boolean isHistoryEnabledForUserTask(String processDefinitionId, TaskEntity taskEntity);
+    boolean isHistoryEnabledForUserTask(TaskEntity taskEntity);
+
+    /**
+     * Returns whether history is enabled for the provided user task.
+     * This method has an extra executionEntity parameter, for legacy reasons and should only be used in those exceptional situations.
+     */
+    boolean isHistoryEnabledForUserTask(ExecutionEntity executionEntity, TaskEntity taskEntity);
 
     /**
      * Returns whether history is enabled for the provided variable instance.
+     */
+    boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity);
+
+    /**
+     * Returns whether history is enabled for the provided variable instance.
+     * This method has an extra processDefinitionId parameter, for legacy reasons and should only be used in those exceptional situations.
      */
     boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided identity link.
      */
-    boolean isHistoryEnabledForIdentityLink(String processDefinitionId, IdentityLinkEntity identityLink);
+    boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLink);
 
     /**
      * Returns whether history is enabled for the provided entity link.
      */
-    boolean isHistoryEnabledForEntityLink(String processDefinitionId, EntityLinkEntity entityLink);
+    boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink);
 
 }
