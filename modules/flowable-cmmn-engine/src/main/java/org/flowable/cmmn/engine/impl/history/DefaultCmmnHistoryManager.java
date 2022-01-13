@@ -34,7 +34,6 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
@@ -54,13 +53,13 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements CmmnHistoryManager {
 
-    public DefaultCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        super(cmmnEngineConfiguration);
+    public DefaultCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+        super(cmmnEngineConfiguration, cmmnHistoryConfigurationSettings);
     }
 
     @Override
     public void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseInstanceEntity.getCaseDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForCaseInstance(caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getId())) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create(caseInstanceEntity);
             historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
@@ -69,7 +68,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
 
     @Override
     public void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseInstanceEntity.getCaseDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForCaseInstance(caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getId())) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
@@ -81,7 +80,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
 
     @Override
     public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseInstanceEntity.getCaseDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForCaseInstance(caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getId())) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
@@ -93,7 +92,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     @Override
     public void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey) {
         if (caseInstanceEntity != null) {
-            if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseInstanceEntity.getCaseDefinitionId())) {
+            if (historyConfigurationSettings.isHistoryEnabledForCaseInstance(caseInstanceEntity.getCaseDefinitionId(), caseInstanceEntity.getId())) {
                 HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
                 HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
                 if (historicCaseInstanceEntity != null) {
@@ -105,7 +104,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
 
     @Override
     public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstance) {
-        if (hasActivityHistoryLevel(milestoneInstance.getCaseDefinitionId(), milestoneInstance.getElementId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForActivity(milestoneInstance.getCaseDefinitionId(), milestoneInstance.getElementId())) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
             HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
             historicMilestoneInstanceEntity.setId(milestoneInstance.getId());
@@ -121,7 +120,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
 
     @Override
     public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
-        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+        if (historyConfigurationSettings.isHistoryEnabled()) {
             CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, caseInstanceId);
         }
     }
@@ -130,7 +129,8 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
         String caseDefinitionId = getCaseDefinitionId(identityLink);
         
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId) && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
+        if (historyConfigurationSettings.isHistoryEnabledForIdentityLink(caseDefinitionId, identityLink.getId())
+                && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
             historicIdentityLinkEntity.setId(identityLink.getId());
@@ -150,7 +150,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         String caseDefinitionId = getCaseDefinitionId(identityLink);
         
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForIdentityLink(caseDefinitionId, identityLink.getId())) {
             cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
         }
     }
@@ -159,7 +159,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
         String caseDefinitionId = getCaseDefinitionId(entityLink);
         
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId) && entityLink.getScopeId() != null) {
+        if (historyConfigurationSettings.isHistoryEnabledForEntityLink(caseDefinitionId, entityLink.getId()) && entityLink.getScopeId() != null) {
             HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
             HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
             historicEntityLinkEntity.setId(entityLink.getId());
@@ -184,7 +184,7 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
         String caseDefinitionId = getCaseDefinitionId(entityLink);
         
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForEntityLink(caseDefinitionId, entityLink.getId())) {
             cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
@@ -196,8 +196,8 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
             CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
             caseDefinitionId = caseInstance.getCaseDefinitionId();
         }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId)) {
+
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(caseDefinitionId, variableInstanceEntity.getId())) {
             cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().createAndInsert(variableInstanceEntity, createTime);
         }
     }
@@ -209,8 +209,8 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
             CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
             caseDefinitionId = caseInstance.getCaseDefinitionId();
         }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId)) {
+
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(caseDefinitionId, variableInstanceEntity.getId())) {
             cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
         }
     }
@@ -222,29 +222,29 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
             CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
             caseDefinitionId = caseInstance.getCaseDefinitionId();
         }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId)) {
+
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(caseDefinitionId, variableInstanceEntity.getId())) {
             cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableRemoved(variableInstanceEntity);
         }
     }
 
     @Override
     public void recordTaskCreated(TaskEntity task) {
-        if (hasTaskHistoryLevel(task.getScopeDefinitionId())) {
+        if (hasTaskHistoryLevel(task.getScopeDefinitionId(), task.getId())) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskCreated(task);
         }
     }
 
     @Override
     public void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime) {
-        if (hasTaskHistoryLevel(task.getScopeDefinitionId())) {
+        if (hasTaskHistoryLevel(task.getScopeDefinitionId(), task.getId())) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
         }
     }
 
     @Override
     public void recordTaskInfoChange(TaskEntity task, Date changeTime) {
-        if (hasTaskHistoryLevel(task.getScopeDefinitionId())) {
+        if (hasTaskHistoryLevel(task.getScopeDefinitionId(), task.getId())) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskInfoChange(task, changeTime, cmmnEngineConfiguration);
         }
     }
