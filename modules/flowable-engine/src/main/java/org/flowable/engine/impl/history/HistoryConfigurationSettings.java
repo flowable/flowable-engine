@@ -13,6 +13,11 @@
 package org.flowable.engine.impl.history;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -47,7 +52,7 @@ public interface HistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided process instance.
      */
-    boolean isHistoryEnabledForProcessInstance(String processDefinitionId, String processInstanceId);
+    boolean isHistoryEnabledForProcessInstance(String processDefinitionId, ExecutionEntity processInstanceExecution);
 
     /**
      * Returns whether history is enabled for the provided activity.
@@ -57,21 +62,21 @@ public interface HistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided user task.
      */
-    boolean isHistoryEnabledForUserTask(String processDefinitionId, String taskId);
+    boolean isHistoryEnabledForUserTask(String processDefinitionId, TaskEntity taskEntity);
 
     /**
      * Returns whether history is enabled for the provided variable instance.
      */
-    boolean isHistoryEnabledForVariableInstance(String processDefinitionId, String variableInstanceId);
+    boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity);
 
     /**
      * Returns whether history is enabled for the provided identity link.
      */
-    boolean isHistoryEnabledForIdentityLink(String processDefinitionId, String identityLinkId);
+    boolean isHistoryEnabledForIdentityLink(String processDefinitionId, IdentityLinkEntity identityLink);
 
     /**
      * Returns whether history is enabled for the provided entity link.
      */
-    boolean isHistoryEnabledForEntityLink(String processDefinitionId, String entityLinkId);
+    boolean isHistoryEnabledForEntityLink(String processDefinitionId, EntityLinkEntity entityLink);
 
 }

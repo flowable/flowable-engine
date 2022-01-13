@@ -19,8 +19,13 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +139,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForProcessInstance(String processDefinitionId, String processInstanceId) {
+    public boolean isHistoryEnabledForProcessInstance(String processDefinitionId, ExecutionEntity processInstanceExecution) {
         return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processDefinitionId);
     }
 
@@ -200,7 +205,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(String processDefinitionId, String taskId) {
+    public boolean isHistoryEnabledForUserTask(String processDefinitionId, TaskEntity taskEntity) {
         HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
         if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
             HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
@@ -239,17 +244,17 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForVariableInstance(String processDefinitionId, String variableInstanceId) {
+    public boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForIdentityLink(String processDefinitionId, String identityLinkId) {
+    public boolean isHistoryEnabledForIdentityLink(String processDefinitionId, IdentityLinkEntity identityLink) {
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
     }
 
     @Override
-    public boolean isHistoryEnabledForEntityLink(String processDefinitionId, String entityLinkId) {
+    public boolean isHistoryEnabledForEntityLink(String processDefinitionId, EntityLinkEntity entityLink) {
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
     }
 
