@@ -45,10 +45,6 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     @Override
     public boolean isHistoryEnabled() {
         HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", engineHistoryLevel);
-        }
         return engineHistoryLevel != HistoryLevel.NONE;
     }
 
