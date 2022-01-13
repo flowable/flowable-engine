@@ -18,7 +18,6 @@ import java.util.List;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -30,8 +29,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Event;
-import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
-import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -48,10 +45,6 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         return isHistoryLevelAtLeast(level, null);
-    }
-
-    protected boolean isEnableProcessDefinitionHistoryLevel() {
-        return historyConfigurationSettings.isEnableProcessDefinitionHistoryLevel();
     }
 
     @Override
@@ -208,15 +201,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             historicTaskService.recordTaskInfoChange(task, updateTime, processEngineConfiguration);
         }
     }
-    
-    protected boolean hasTaskHistoryLevel(String processDefinitionId, TaskEntity taskEntity) {
-        return historyConfigurationSettings.isHistoryEnabledForUserTask(processDefinitionId, taskEntity);
-    }
-    
-    protected boolean hasActivityHistoryLevel(String processDefinitionId, String activityId) {
-        return historyConfigurationSettings.isHistoryEnabledForActivity(processDefinitionId, activityId);
-    }
-    
+
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
         List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
         for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
@@ -313,36 +298,4 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         return processDefinitionId;
     }
 
-    protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
-        String processDefinitionId = null;
-        if (identityLink.getProcessInstanceId() != null) {
-            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
-            if (execution != null) {
-                processDefinitionId = execution.getProcessDefinitionId();
-            }
-        } else if (identityLink.getTaskId() != null) {
-            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
-            if (task != null) {
-                processDefinitionId = task.getProcessDefinitionId();
-            }
-        }
-        return processDefinitionId;
-    }
-
-    protected String getProcessDefinitionId(EntityLinkEntity entityLink) {
-        String processDefinitionId = null;
-        if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(entityLink.getScopeId());
-            if (execution != null) {
-                processDefinitionId = execution.getProcessDefinitionId();
-            }
-
-        } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(entityLink.getScopeId());
-            if (task != null) {
-                processDefinitionId = task.getProcessDefinitionId();
-            }
-        }
-        return processDefinitionId;
-    }
 }
