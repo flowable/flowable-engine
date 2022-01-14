@@ -61,15 +61,15 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
 
-    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
+    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryConfigurationSettings historyConfigurationSettings) {
+        super(processEngineConfiguration, historyConfigurationSettings);
     }
 
     // Process related history
 
     @Override
     public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstance.getProcessDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForProcessInstance(processInstance)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
 
             if (historicProcessInstance != null) {
@@ -90,7 +90,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordProcessInstanceNameChange(ExecutionEntity processInstanceExecution, String newName) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstanceExecution.getProcessDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForProcessInstance(processInstanceExecution)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceExecution.getId());
 
             if (historicProcessInstance != null) {
@@ -101,7 +101,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordProcessInstanceStart(ExecutionEntity processInstance) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processInstance.getProcessDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForProcessInstance(processInstance)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().create(processInstance);
 
             // Insert historic process-instance
@@ -120,7 +120,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
-        if (getHistoryManager().isHistoryEnabled(processDefinitionId)) {
+        if (isHistoryEnabled(processDefinitionId)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
@@ -150,7 +150,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId) {
-        if (getHistoryManager().isHistoryEnabled(processDefinitionId)) {
+        if (isHistoryEnabled(processDefinitionId)) {
             List<String> historicProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
             for (String historicProcessInstanceId : historicProcessInstanceIds) {
                 // The tenantId is not important for the DefaultHistoryManager
@@ -163,7 +163,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordActivityStart(ActivityInstance activityInstance) {
-        if (activityInstance != null && hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
+        if (activityInstance != null && historyConfigurationSettings.isHistoryEnabledForActivity(activityInstance)) {
             if (activityInstance.getActivityId() != null) {
                 // Historic activity instance could have been created (but only in cache, never persisted)
                 // for example when submitting form properties
@@ -180,7 +180,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordActivityEnd(ActivityInstance activityInstance) {
-        if (activityInstance != null && hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
+        if (activityInstance != null && historyConfigurationSettings.isHistoryEnabledForActivity(activityInstance)) {
             HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
             if (historicActivityInstance != null) {
                 historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
@@ -201,7 +201,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
-        if (hasActivityHistoryLevel(executionEntity.getProcessDefinitionId(), executionEntity.getActivityId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForActivity(executionEntity.getProcessDefinitionId(), executionEntity.getActivityId())) {
             HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(executionEntity, true);
             if (historicActivityInstance != null) {
                 historicActivityInstance.markEnded(deleteReason, endTime);
@@ -230,14 +230,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
-        String processDefinitionId = null;
-        if (execution != null) {
-            processDefinitionId = execution.getProcessDefinitionId();
-        } else if (task != null) {
-            processDefinitionId = task.getProcessDefinitionId();
-        }
-        
-        if (hasTaskHistoryLevel(processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForUserTask(execution, task)) {
             if (execution != null) {
                 task.setExecutionId(execution.getId());
                 task.setProcessInstanceId(execution.getProcessInstanceId());
@@ -258,13 +251,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime) {
-        String processDefinitionId = null;
-        if (execution != null) {
-            processDefinitionId = execution.getProcessDefinitionId();
-        } else if (task != null) {
-            processDefinitionId = task.getProcessDefinitionId();
-        }
-        if (hasTaskHistoryLevel(processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForUserTask(execution, task)) {
             HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
             if (historicTaskInstance != null) {
                 historicTaskInstance.setLastUpdateTime(endTime);
@@ -275,7 +262,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         boolean assigneeChanged = false;
-        if (hasTaskHistoryLevel(taskEntity.getProcessDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForUserTask(taskEntity)) {
             HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             HistoricTaskInstanceEntity originalHistoricTaskInstanceEntity = historicTaskService.getHistoricTask(taskEntity.getId());
             String originalAssignee = null;
@@ -291,7 +278,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             }
         }
 
-        if (assigneeChanged && hasActivityHistoryLevel(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey())) {
+        if (assigneeChanged && historyConfigurationSettings.isHistoryEnabledForActivity(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey())) {
             if (taskEntity.getExecutionId() != null) {
                 HistoricActivityInstanceEntity historicActivityInstance;
                 if (activityInstanceId != null) {
@@ -312,13 +299,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
-        String processDefinitionId = null;
-        if (isEnableProcessDefinitionHistoryLevel() && variable.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variable.getProcessInstanceId());
-            processDefinitionId = processInstanceExecution.getProcessDefinitionId();
-        }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(variable)) {
             processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().createAndInsert(variable, createTime);
         }
     }
@@ -328,7 +309,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         String activityInstanceId, Date createTime) {
         String processDefinitionId = getProcessDefinitionId(variable, sourceActivityExecution);
 
-        if (isHistoryLevelAtLeast(HistoryLevel.FULL, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(processDefinitionId, variable)
+                && isHistoryLevelAtLeast(HistoryLevel.FULL, processDefinitionId)) {
 
             HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = getHistoricDetailEntityManager().copyAndInsertHistoricDetailVariableInstanceUpdateEntity(variable, createTime);
 
@@ -347,26 +329,14 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
-        String processDefinitionId = null;
-        if (isEnableProcessDefinitionHistoryLevel() && variableInstanceEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
-            processDefinitionId = processInstanceExecution.getProcessDefinitionId();
-        }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(variableInstanceEntity)) {
             processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableUpdate(variableInstanceEntity, updateTime);
         }
     }
 
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity) {
-        String processDefinitionId = null;
-        if (isEnableProcessDefinitionHistoryLevel() && variableInstanceEntity.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
-            processDefinitionId = processInstanceExecution.getProcessDefinitionId();
-        }
-        
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForVariableInstance(variableInstanceEntity)) {
             processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().recordVariableRemoved(variableInstanceEntity);
         }
     }
@@ -384,11 +354,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Identity link related history
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
-        String processDefinitionId = getProcessDefinitionId(identityLink);
-
         // It makes no sense storing historic counterpart for an identity link that is related
         // to a process definition only as this is never kept in history
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId) && (identityLink.getProcessInstanceId() != null || identityLink.getTaskId() != null)) {
+        if (historyConfigurationSettings.isHistoryEnabledForIdentityLink(identityLink)
+                && (identityLink.getProcessInstanceId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkService historicIdentityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
             historicIdentityLinkEntity.setId(identityLink.getId());
@@ -403,9 +372,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
-        String processDefinitionId = getProcessDefinitionId(identityLink);
-
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForIdentityLink(identityLink)) {
             processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLink(identityLink.getId());
         }
     }
@@ -413,9 +380,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     // Entity link related history
     @Override
     public void recordEntityLinkCreated(EntityLinkEntity entityLink) {
-        String processDefinitionId = getProcessDefinitionId(entityLink);
-
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForEntityLink(entityLink)) {
             HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
             HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
             historicEntityLinkEntity.setId(entityLink.getId());
@@ -438,9 +403,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void recordEntityLinkDeleted(EntityLinkEntity entityLink) {
-        String processDefinitionId = getProcessDefinitionId(entityLink);
-
-        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId)) {
+        if (historyConfigurationSettings.isHistoryEnabledForEntityLink(entityLink)) {
             processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().deleteHistoricEntityLink(entityLink.getId());
         }
     }
@@ -506,7 +469,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void updateHistoricActivityInstance(ActivityInstance activityInstance) {
-        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForActivity(activityInstance)) {
             if (activityInstance.getExecutionId() != null) {
                 HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
                 if (historicActivityInstance != null) {
@@ -530,7 +493,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     @Override
     public void createHistoricActivityInstance(ActivityInstance activityInstance) {
-        if (hasActivityHistoryLevel(activityInstance.getProcessDefinitionId(), activityInstance.getActivityId())) {
+        if (historyConfigurationSettings.isHistoryEnabledForActivity(activityInstance)) {
             createNewHistoricActivityInstance(activityInstance);
         }
     }

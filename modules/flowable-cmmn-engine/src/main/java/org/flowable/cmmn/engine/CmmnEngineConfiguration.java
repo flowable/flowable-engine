@@ -85,9 +85,11 @@ import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
+import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.AsyncCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
@@ -402,6 +404,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
+    protected CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings;
     protected ProcessInstanceService processInstanceService;
     protected CmmnDynamicStateManager dynamicStateManager;
     protected CaseInstanceMigrationManager caseInstanceMigrationManager;
@@ -833,6 +836,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceHelper();
         initCandidateManager();
         initVariableAggregator();
+        initHistoryConfigurationSettings();
         initHistoryManager();
         initChangeTenantIdManager();
         initDynamicStateManager();
@@ -1337,12 +1341,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    public void initHistoryConfigurationSettings() {
+        if (cmmnHistoryConfigurationSettings == null) {
+            cmmnHistoryConfigurationSettings = new DefaultCmmnHistoryConfigurationSettings(this);
+        }
+    }
+
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             if (isAsyncHistoryEnabled) {
-                cmmnHistoryManager = new AsyncCmmnHistoryManager(this);
+                cmmnHistoryManager = new AsyncCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
             } else {
-                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
+                cmmnHistoryManager = new DefaultCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
             }
         }
     }

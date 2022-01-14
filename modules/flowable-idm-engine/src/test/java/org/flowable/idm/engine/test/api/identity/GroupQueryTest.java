@@ -90,6 +90,12 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
     }
 
     @Test
+    public void testQueryByIds() {
+        GroupQuery query = idmIdentityService.createGroupQuery().groupIds(Arrays.asList("muppets", "frogs", "dummy"));
+        verifyQueryResults(query, 2);
+    }
+
+    @Test
     public void testQueryByName() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupName("Muppet show characters");
         verifyQueryResults(query, 1);

@@ -158,6 +158,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
             <scope>provided</scope>
@@ -397,6 +402,19 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>java-17+</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjdk.nashorn</groupId>
+                    <artifactId>nashorn-core</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
 
         <profile>
             <id>checkspring</id>

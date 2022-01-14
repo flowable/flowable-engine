@@ -804,13 +804,10 @@
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
-				<artifactId>drools-core</artifactId>
-				<version>7.6.0.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.drools</groupId>
-				<artifactId>drools-compiler</artifactId>
-				<version>7.6.0.Final</version>
+				<artifactId>drools-bom</artifactId>
+				<version>7.63.0.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mule.modules</groupId>
@@ -845,15 +842,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.core</artifactId>
-				<version>6.0.0</version>
-				<scope>provided</scope>
+				<groupId>org.openjdk.nashorn</groupId>
+				<artifactId>nashorn-core</artifactId>
+				<version>15.3</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.compendium</artifactId>
-				<version>5.0.0</version>
+				<artifactId>osgi.core</artifactId>
+				<version>8.0.0</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
