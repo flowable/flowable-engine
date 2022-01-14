@@ -49,18 +49,17 @@ public interface HistoryConfigurationSettings {
 
     /**
      * Returns whether history is enabled for the provided activity.
-     * This method has an extra activityInstance parameter, for legacy reasons and should only be used in those exceptional situations.
      */
     boolean isHistoryEnabledForActivity(ActivityInstance activityInstance);
 
     /**
      * Returns whether history is enabled for the provided activity.
+     * This method has an extra activityInstance parameter, for legacy reasons and should only be used in those exceptional situations.
      */
     boolean isHistoryEnabledForActivity(String processDefinitionId, String activityId);
 
     /**
      * Returns whether history is enabled for the provided user task.
-     * This method has an extra processDefinitionId parameter, for legacy reasons and should only be used in those exceptional situations.
      */
     boolean isHistoryEnabledForUserTask(TaskEntity taskEntity);
 
