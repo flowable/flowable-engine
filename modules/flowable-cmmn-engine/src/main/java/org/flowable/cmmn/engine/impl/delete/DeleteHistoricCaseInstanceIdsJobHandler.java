@@ -71,7 +71,7 @@ public class DeleteHistoricCaseInstanceIdsJobHandler implements JobHandler {
         JsonNode idsToDelete = computeBatchPartResult.path("caseInstanceIdsToDelete");
         Set<String> caseInstanceIdsToDelete = new HashSet<>();
 
-        if (idsToDelete.isArray()) {
+        if (idsToDelete !=null && idsToDelete.isArray()) {
             for (JsonNode idNode : idsToDelete) {
                 caseInstanceIdsToDelete.add(idNode.textValue());
             }

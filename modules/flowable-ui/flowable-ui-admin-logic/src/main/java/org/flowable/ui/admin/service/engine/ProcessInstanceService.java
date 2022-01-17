@@ -267,7 +267,7 @@ public class ProcessInstanceService {
         JsonNode node = clientUtil.executeRequest(get, serverConfig);
 
         List<String> result = new ArrayList<>();
-        if (node.isArray()) {
+        if (node !=null && node.isArray()) {
             ArrayNode data = (ArrayNode) node;
             for (int i = 0; i < data.size(); i++) {
                 if (data.get(i) != null) {

@@ -348,7 +348,7 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
     }
 
     protected void populateOrQueryObjects(JsonNode orQueryObjectsNode, HistoricProcessInstanceQuery query, ProcessEngineConfigurationImpl engineConfiguration) {
-        if (orQueryObjectsNode.isArray()) {
+        if (orQueryObjectsNode !=null && orQueryObjectsNode.isArray()) {
             for (JsonNode orQueryObjectNode : orQueryObjectsNode) {
                 HistoricProcessInstanceQuery orQuery = query.or();
                 populateQuery(orQueryObjectNode, orQuery, engineConfiguration);
@@ -359,7 +359,7 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
 
     protected void populateQueryVariableValues(JsonNode variableValuesNode, HistoricProcessInstanceQuery query,
             ProcessEngineConfigurationImpl engineConfiguration) {
-        if (variableValuesNode.isArray()) {
+        if (variableValuesNode !=null && variableValuesNode.isArray()) {
             for (JsonNode variableValue : variableValuesNode) {
                 String operatorString = variableValue.path("operator").asText(null);
                 if (operatorString == null) {

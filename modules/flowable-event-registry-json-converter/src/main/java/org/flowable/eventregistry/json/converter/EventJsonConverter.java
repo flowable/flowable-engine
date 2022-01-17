@@ -40,7 +40,7 @@ public class EventJsonConverter {
 
             JsonNode payloadNode = modelNode.path("payload");
 
-            if (payloadNode.isArray()) {
+            if (payloadNode !=null && payloadNode.isArray()) {
                 for (JsonNode node : payloadNode) {
                     String name = node.path("name").asText(null);
                     String type = node.path("type").asText(null);
@@ -54,7 +54,7 @@ public class EventJsonConverter {
             }
 
             JsonNode correlationParameters = modelNode.path("correlationParameters");
-            if (correlationParameters.isArray()) {
+            if (correlationParameters !=null && correlationParameters.isArray()) {
                 for (JsonNode correlationPayloadNode : correlationParameters) {
                     String name = correlationPayloadNode.path("name").asText(null);
                     String type = correlationPayloadNode.path("type").asText(null);

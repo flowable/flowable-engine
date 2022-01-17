@@ -70,7 +70,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
         JsonNode idsToDelete = computeBatchPartResult.path("processInstanceIdsToDelete");
         Set<String> processInstanceIdsToDelete = new HashSet<>();
 
-        if (idsToDelete.isArray()) {
+        if (idsToDelete !=null && idsToDelete.isArray()) {
             for (JsonNode idNode : idsToDelete) {
                 processInstanceIdsToDelete.add(idNode.textValue());
             }

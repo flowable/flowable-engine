@@ -329,7 +329,7 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
     }
 
     protected void populateOrQueryObjects(JsonNode orQueryObjectsNode, HistoricCaseInstanceQuery query, CmmnEngineConfiguration engineConfiguration) {
-        if (orQueryObjectsNode.isArray()) {
+        if (orQueryObjectsNode !=null && orQueryObjectsNode.isArray()) {
             for (JsonNode orQueryObjectNode : orQueryObjectsNode) {
                 HistoricCaseInstanceQuery orQuery = query.or();
                 populateQuery(orQueryObjectNode, orQuery, engineConfiguration);
@@ -340,7 +340,7 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
 
     protected void populateQueryVariableValues(JsonNode variableValuesNode, HistoricCaseInstanceQuery query,
             CmmnEngineConfiguration engineConfiguration) {
-        if (variableValuesNode.isArray()) {
+        if (variableValuesNode !=null && variableValuesNode.isArray()) {
             for (JsonNode variableValue : variableValuesNode) {
                 String operatorString = variableValue.path("operator").asText(null);
                 if (operatorString == null) {
