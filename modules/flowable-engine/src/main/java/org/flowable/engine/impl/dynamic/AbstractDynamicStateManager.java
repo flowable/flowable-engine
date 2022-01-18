@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
@@ -34,6 +35,7 @@ import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Gateway;
@@ -932,8 +934,24 @@ public abstract class AbstractDynamicStateManager {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())) {
+                
+                boolean hasEventRegistryBoundaryEvent = false;
+                if (!boundaryEvent.getExtensionElements().isEmpty()) {
+                    List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+                    if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                        String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                        if (StringUtils.isNotEmpty(eventTypeValue)) {
+                            hasEventRegistryBoundaryEvent = true;
+                        }
+                    }
+                }
+                
+                if (!hasEventRegistryBoundaryEvent) {
+                    continue;
+                }
+                
+            } else if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
                 continue;
             }
 
