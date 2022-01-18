@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -79,7 +80,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                 }
                 
             } else {
-                List<ExtensionElement> eventTypeElements = element.getExtensionElements().get("eventType");
+                List<ExtensionElement> eventTypeElements = element.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
                 if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
                     String eventType = eventTypeElements.get(0).getElementText();
                     if (StringUtils.isNotEmpty(eventType)) {
