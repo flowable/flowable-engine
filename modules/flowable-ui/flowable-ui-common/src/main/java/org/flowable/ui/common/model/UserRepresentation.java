@@ -93,10 +93,11 @@ public class UserRepresentation extends AbstractRepresentation {
     }
 
     public void setTenantId(String tenantId) {
-        if (tenantId == null || tenantId.isEmpty())
+        if (tenantId == null || tenantId.isEmpty()) {
             this.tenantId = null;
-        else
+        } else {
             this.tenantId = tenantId;
+        }
     }
     
     public List<GroupRepresentation> getGroups() {
