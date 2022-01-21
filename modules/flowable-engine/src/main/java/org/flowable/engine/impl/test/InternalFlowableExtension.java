@@ -26,7 +26,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.DefaultHistoryConfigurationSettings;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -121,8 +120,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
             if (isAsyncHistoryEnabled) {
                 processEngineConfiguration.setAsyncHistoryEnabled(false);
                 asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-                processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration,
-                        new DefaultHistoryConfigurationSettings(processEngineConfiguration)));
+                processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
             }
 
             String annotationDeploymentKey = context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY;
