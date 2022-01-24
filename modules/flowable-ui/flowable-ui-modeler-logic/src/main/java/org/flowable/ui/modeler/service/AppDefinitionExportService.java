@@ -96,6 +96,8 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             ConverterContext converterContext = new ConverterContext(modelService, objectMapper);
 
             List<AppModelDefinition> modelDefinitions = appDefinition.getDefinition().getModels();
+            //get BPMN names that are added to app
+            List<String> exportedBpmnNames = modelDefinitions.stream().map(x->x.getName()).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(modelDefinitions)) {
                 createBpmnZipEntries(modelDefinitions, zipOutputStream, converterContext);
             }
@@ -106,8 +108,11 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
             }
 
             Collection<Model> allProcessModels = converterContext.getAllProcessModels();
-            if (allProcessModels != null) {
-                createBpmnZipEntries(allProcessModels, zipOutputStream, converterContext);
+            //filter out BPMN names that were added to app directly
+            List<Model> unprocessedBpmnModels = allProcessModels.stream()
+                    .filter(x -> !exportedBpmnNames.contains(x.getName())).collect(Collectors.toList());
+            if (unprocessedBpmnModels != null) {
+                createBpmnZipEntries(unprocessedBpmnModels, zipOutputStream, converterContext);
             }
 
             Collection<Model> allCaseModels = converterContext.getAllCaseModels();
