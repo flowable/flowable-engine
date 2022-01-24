@@ -42,6 +42,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -179,7 +180,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
     protected void doMigrateCaseInstance(CaseInstanceEntity caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, CommandContext commandContext) {
         LOGGER.debug("Start migration of case instance with Id:'{}' to case definition identified by {}", caseInstance.getId(), printCaseDefinitionIdentifierMessage(document));
-        ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = prepareChangeStateBuilder(caseInstance, caseDefinitionToMigrateTo, document);
+        ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = prepareChangeStateBuilder(caseInstance, caseDefinitionToMigrateTo, document, commandContext);
 
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
         caseInstance.setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
@@ -214,11 +215,21 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
     }
 
     protected ChangePlanItemStateBuilderImpl prepareChangeStateBuilder(CaseInstance caseInstance, CaseDefinition caseDefinitionToMigrateTo, 
-            CaseInstanceMigrationDocument document) {
+            CaseInstanceMigrationDocument document, CommandContext commandContext) {
         
         String destinationTenantId = caseDefinitionToMigrateTo.getTenantId();
         if (!Objects.equals(caseInstance.getTenantId(), destinationTenantId)) {
-            throw new FlowableException("Tenant mismatch between Case Instance ('" + caseInstance.getTenantId() + "') and Case Definition ('" + destinationTenantId + "') to migrate to");
+            
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            if (cmmnEngineConfiguration.isFallbackToDefaultTenant() && cmmnEngineConfiguration.getDefaultTenantProvider() != null) {
+                
+                if (!Objects.equals(destinationTenantId, cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(caseInstance.getId(), ScopeTypes.CMMN, caseDefinitionToMigrateTo.getKey()))) {
+                    throw new FlowableException("Tenant mismatch between Case Instance ('" + caseInstance.getTenantId() + "') and Case Definition ('" + destinationTenantId + "') to migrate to");
+                }
+            
+            } else {
+                throw new FlowableException("Tenant mismatch between Case Instance ('" + caseInstance.getTenantId() + "') and Case Definition ('" + destinationTenantId + "') to migrate to");
+            }
         }
 
         String caseInstanceId = caseInstance.getId();
