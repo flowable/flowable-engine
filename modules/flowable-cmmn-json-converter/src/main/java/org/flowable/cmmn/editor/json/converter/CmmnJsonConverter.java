@@ -202,7 +202,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         
         String eventType = caseModel.getStartEventType();
         if (StringUtils.isNotEmpty(eventType)) {
-            propertiesNode.put(PROPERTY_EVENT_TYPE, eventType);
+            propertiesNode.put(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType);
+            setPropertyValue(START_EVENT_CORRELATION_CONFIGURATION,getExtensionValue(START_EVENT_CORRELATION_CONFIGURATION, caseModel), propertiesNode);
             
             setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", caseModel), propertiesNode);
             CmmnModelJsonConverterUtil.addEventOutParameters(caseModel.getExtensionElements().get("eventOutParameter"), propertiesNode, objectMapper);
@@ -406,6 +407,10 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, caseModel);
             }
         }
+
+
+        String startEventCorrelationConfiguration = CmmnJsonConverterUtil.getPropertyValueAsString(START_EVENT_CORRELATION_CONFIGURATION, modelNode);
+        addFlowableExtensionElementWithValue(START_EVENT_CORRELATION_CONFIGURATION, startEventCorrelationConfiguration, caseModel);
 
         JsonNode planModelShape = shapesArrayNode.get(0);
 

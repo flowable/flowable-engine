@@ -205,15 +205,16 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION = "availablecondition";
 
-    String PROPERTY_EVENT_TYPE = "eventType";
-    
     String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
-
+    /**
+     * Defines which event should create case. Use instead of PROPERTY_EVENT_TYPE="eventType"
+     */
     String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
     String PROPERTY_EVENT_REGISTRY_EVENT_NAME = "eventname";
     String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
     String PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS = "eventoutparameters";
     String PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS = "eventcorrelationparameters";
+    String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     String PROPERTY_EVENT_REGISTRY_CHANNEL_KEY = "channelkey";
     String PROPERTY_EVENT_REGISTRY_CHANNEL_NAME = "channelname";
     String PROPERTY_EVENT_REGISTRY_CHANNEL_TYPE = "channeltype";
