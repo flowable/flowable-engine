@@ -486,8 +486,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected void addFormProperties(List<FormProperty> formProperties, ObjectNode propertiesNode) {
-        if (CollectionUtils.isEmpty(formProperties))
+        if (CollectionUtils.isEmpty(formProperties)) {
             return;
+        }
 
         ObjectNode formPropertiesNode = objectMapper.createObjectNode();
         ArrayNode propertiesArrayNode = objectMapper.createArrayNode();

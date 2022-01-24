@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -728,10 +727,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream()
                 .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
                         identityLink.getUserId() != null).collect(Collectors.toList());
-        List<String> linkValues = new ArrayList<>();
-        for (HistoricIdentityLink candidateLink : historicCandidateUserLinks) {
-            linkValues.add(candidateLink.getUserId());
-        }
+
         assertThat(extractProperty("userId").from(historicCandidateUserLinks))
                 .containsExactlyInAnyOrder("johnDoe", "janeDoe");
 

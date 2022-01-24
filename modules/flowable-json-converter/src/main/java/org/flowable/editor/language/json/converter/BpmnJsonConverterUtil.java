@@ -376,8 +376,9 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
     }
 
     protected static void parseMessages(JsonNode messagesNode, BpmnModel element) {
-        if (messagesNode == null)
+        if (messagesNode == null) {
             return;
+        }
 
         for (JsonNode messageNode : messagesNode) {
 
@@ -403,8 +404,9 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
     }
 
     public static void parseEventListeners(JsonNode listenersNode, Process process) {
-        if (listenersNode == null)
+        if (listenersNode == null) {
             return;
+        }
         listenersNode = validateIfNodeIsTextual(listenersNode);
         for (JsonNode listenerNode : listenersNode) {
             JsonNode eventsNode = listenerNode.get(PROPERTY_EVENTLISTENER_EVENTS);
@@ -422,8 +424,9 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                     }
                 }
 
-                if (eventsBuilder.length() == 0)
+                if (eventsBuilder.length() == 0) {
                     continue;
+                }
 
                 listener.setEvents(eventsBuilder.toString());
 

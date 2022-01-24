@@ -17,7 +17,6 @@ import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonU
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
-import org.flowable.engine.impl.history.HistoryConfigurationSettings;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -34,9 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager {
 
-    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration,
-                                       HistoryConfigurationSettings historyConfigurationSettings) {
-        super(processEngineConfiguration, historyConfigurationSettings);
+    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
 
     protected void addCommonProcessInstanceFields(ExecutionEntity processInstance, ObjectNode data) {
