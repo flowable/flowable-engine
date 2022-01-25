@@ -502,10 +502,10 @@
                   <if test="involvedUser != null">
                     I.USER_ID_ = #{involvedUser}
                   </if>
-                  <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+                  <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; !involvedGroups.empty">
                     or
                   </if>
-                  <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+                  <if test="involvedGroups != null &amp;&amp; !involvedGroups.empty">
                     (
                     <foreach item="involvedGroupListItem" index="groupIndex" collection="safeInvolvedGroups">
                         <if test="groupIndex &gt; 0">

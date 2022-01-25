@@ -213,7 +213,7 @@
             <if test="parameter.scopeId != null">
                 AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.scopeIds != null and !parameter.scopeIds.isEmpty()">
+            <if test="parameter.scopeIds != null and !parameter.scopeIds.empty">
                 AND SCOPE_ID_ in
                 <foreach collection="parameter.scopeIds" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -222,7 +222,7 @@
             <if test="parameter.subScopeId != null">
                 AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.subScopeIds != null and !parameter.subScopeIds.isEmpty()">
+            <if test="parameter.subScopeIds != null and !parameter.subScopeIds.empty">
                 AND SUB_SCOPE_ID_ in
                 <foreach collection="parameter.subScopeIds" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -234,7 +234,7 @@
             <if test="parameter.scopeType != null">
                 AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.isEmpty()">
+            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.empty">
                 AND SCOPE_TYPE_ in
                 <foreach collection="parameter.scopeTypes" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -243,7 +243,7 @@
             <if test="parameter.name != null">
                 AND NAME_ = #{parameter.name, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.names != null and !parameter.names.isEmpty()">
+            <if test="parameter.names != null and !parameter.names.empty">
                 AND (
                 <foreach collection="parameter.names" item="item" separator=" or ">
                     NAME_= #{item, jdbcType=VARCHAR}

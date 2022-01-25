@@ -25,4 +25,17 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>java17+</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <properties>
+                <!-- Spring Boot 1.5.x does not work on Java 17 -->
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

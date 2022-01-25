@@ -241,9 +241,11 @@ import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.engine.impl.function.TaskGetFunctionDelegate;
+import org.flowable.engine.impl.history.DefaultHistoryConfigurationSettings;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
+import org.flowable.engine.impl.history.HistoryConfigurationSettings;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -366,8 +368,8 @@ import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
-import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
+import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -522,6 +524,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
+    protected HistoryConfigurationSettings historyConfigurationSettings;
 
     protected boolean isAsyncHistoryEnabled;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
@@ -1002,6 +1005,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initVariableAggregator();
+        initHistoryConfigurationSettings();
         initHistoryManager();
         initChangeTenantIdManager();
         initDynamicStateManager();
@@ -1306,6 +1310,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     // History manager ///////////////////////////////////////////////////////////
+
+    public void initHistoryConfigurationSettings() {
+        if (historyConfigurationSettings == null) {
+            historyConfigurationSettings = new DefaultHistoryConfigurationSettings(this);
+        }
+    }
 
     public void initHistoryManager() {
         if (historyManager == null) {
@@ -4317,6 +4327,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setHistoryManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
+        return this;
+    }
+
+    public HistoryConfigurationSettings getHistoryConfigurationSettings() {
+        return historyConfigurationSettings;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryConfigurationSettings(HistoryConfigurationSettings historyConfigurationSettings) {
+        this.historyConfigurationSettings = historyConfigurationSettings;
         return this;
     }
 

@@ -122,7 +122,7 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+      <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids"
                  open="(" separator="," close=")">
@@ -177,7 +177,7 @@
       <if test="groupId != null">
         and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId})
       </if>
-      <if test="groupIds != null &amp;&amp; groupIds.size() &gt; 0">
+      <if test="groupIds != null &amp;&amp; !groupIds.empty">
         and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ in  
             <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
       </if>

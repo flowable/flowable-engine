@@ -113,7 +113,7 @@
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+      <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and RES.ID_ IN
         <foreach item="deploymentId" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">

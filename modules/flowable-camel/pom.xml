@@ -25,6 +25,18 @@
       <artifactId>camel-spring</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-spring-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core-languages</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-bean</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
@@ -88,6 +100,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-mock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-direct</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-seda</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-log</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <scope>test</scope>
@@ -102,5 +130,21 @@
       org.flowable.camel
     </flowable.artifact>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>java-17+</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.openjdk.nashorn</groupId>
+          <artifactId>nashorn-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
 </project>

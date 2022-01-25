@@ -40,7 +40,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  *	import javax.inject.Named;
  *	
  *	import org.apache.camel.CamelContext;
- *	import org.apache.camel.impl.DefaultCamelContext;
+ *	import org.apache.camel.support.DefaultCamelContext;
  *	
  *	public class CdiCamelContextFactory {
  *	
