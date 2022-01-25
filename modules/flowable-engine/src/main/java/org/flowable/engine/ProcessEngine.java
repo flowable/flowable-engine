@@ -40,7 +40,7 @@ public interface ProcessEngine extends Engine {
     String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * Starts the executors (async and async history), if they are configured to be auto-activated.
+     * Starts the execuctors (async and async history), if they are configured to be auto-activated.
      */
     void startExecutors();
 
