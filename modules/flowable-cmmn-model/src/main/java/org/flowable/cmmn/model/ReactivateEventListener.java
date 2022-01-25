@@ -13,11 +13,11 @@
 package org.flowable.cmmn.model;
 
 /**
- * The reactivation listener is a very specific user event listener available on a historic case instance in order to reactivate it again.
+ * The reactivation listener is a very specific event listener available on a historic case instance in order to reactivate it again.
  *
  * @author Micha Kiener
  */
-public class ReactivateEventListener extends UserEventListener {
+public class ReactivateEventListener extends GenericEventListener {
 
     /**
      * The optional, default reactivation rule to be considered, if a plan item does not specify an explicit one, if this one is not provided either, such

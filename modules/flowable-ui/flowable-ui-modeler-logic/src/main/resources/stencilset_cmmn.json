@@ -1152,6 +1152,16 @@
         "description" : "CMMN.PROPERTYPACKAGES.AVAILABLECONDITIONPACKAGE.AVAILABLECONDITION.DESCRIPTION",
         "popular" : true
       }]
+    }, {
+      "name" : "reactivaterulepackage",
+      "properties" : [ {
+        "id" : "reactivatableenabled",
+        "type" : "Boolean",
+        "title" : "CMMN.PROPERTYPACKAGES.REACTIVATERULEPACKAGE.REACTIVATABLEENABLED.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.REACTIVATERULEPACKAGE.REACTIVATABLEENABLED.DESCRIPTION",
+        "popular" : true
+      } ]
     }
   ],
   "stencils" : [ {
@@ -1584,7 +1594,8 @@
         "eventregistrychanneldestinationpackage", 
         "eventregistrykeydetectionfixedvaluepackage", 
         "eventregistrykeydetectionjsonfieldpackage", 
-        "eventregistrykeydetectionjsonpointerpackage"],
+        "eventregistrykeydetectionjsonpointerpackage",
+        "reactivaterulepackage"],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
     }, {

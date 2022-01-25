@@ -89,6 +89,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         GenericEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        ReactivateEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         UserEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         VariableEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);

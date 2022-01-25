@@ -238,4 +238,6 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_MILESTONE_VARIABLE = "milestonevariable";
 
+    String PROPERTY_IS_REACTIVATABLE = "reactivatableenabled";
+
 }

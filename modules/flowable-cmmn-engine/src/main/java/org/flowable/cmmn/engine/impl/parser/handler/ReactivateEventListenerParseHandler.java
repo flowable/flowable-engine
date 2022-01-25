@@ -39,8 +39,8 @@ public class ReactivateEventListenerParseHandler extends AbstractPlanItemParseHa
 
     @Override
     protected void executePlanItemParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, PlanItem planItem, ReactivateEventListener reactivateEventListener) {
-        // the behavior is the same as with the user event listener
-        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createUserEventListenerActivityBehavior(planItem, reactivateEventListener));
+        // the behavior is the same as with the generic event listener
+        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createGenericEventListenerActivityBehavior(planItem, reactivateEventListener));
 
         // if we are parsing a reactivation listener, we automatically set the parent completion rule to ignore as the listener does not have an impact on
         // parent completion at all as it is used when the case is completed to only mark the case eligible for reactivation
