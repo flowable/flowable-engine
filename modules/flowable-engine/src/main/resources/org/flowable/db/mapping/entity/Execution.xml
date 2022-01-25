@@ -659,7 +659,7 @@
       <if test="processDefinitionId != null">
         and P.ID_ = #{processDefinitionId}
       </if>
-      <if test="processDefinitionIds != null and !processDefinitionIds.isEmpty()">
+      <if test="processDefinitionIds != null and !processDefinitionIds.empty">
         and P.ID_ in
         <foreach item="item" index="index" collection="processDefinitionIds" open="(" separator="," close=")">
           #{item}
@@ -668,7 +668,7 @@
       <if test="processDefinitionKey != null">
         and P.KEY_ = #{processDefinitionKey}
       </if>
-      <if test="processDefinitionKeys != null and !processDefinitionKeys.isEmpty()">
+      <if test="processDefinitionKeys != null and !processDefinitionKeys.empty">
         and P.KEY_ in
         <foreach item="item" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
           #{item}
@@ -695,7 +695,7 @@
       <if test="rootProcessInstanceId != null">
         and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId}
       </if>
-      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+      <if test="processInstanceIds != null and !processInstanceIds.empty">
         and RES.PROC_INST_ID_ in
         <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
           #{item}
@@ -752,7 +752,7 @@
       <if test="deploymentId != null">
         and P.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+      <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and P.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds"
                  open="(" separator="," close=")">
@@ -976,7 +976,7 @@
           <if test="orQueryObject.processDefinitionId != null">
             P.ID_ = #{orQueryObject.processDefinitionId}
           </if>
-          <if test="orQueryObject.processDefinitionIds != null and !orQueryObject.processDefinitionIds.isEmpty()">
+          <if test="orQueryObject.processDefinitionIds != null and !orQueryObject.processDefinitionIds.empty">
             or P.ID_ in
             <foreach item="item" index="index" collection="orQueryObject.processDefinitionIds" open="(" separator="," close=")">
               #{item}
@@ -985,7 +985,7 @@
           <if test="orQueryObject.processDefinitionKey != null">
             or P.KEY_ = #{orQueryObject.processDefinitionKey}
           </if>
-          <if test="orQueryObject.processDefinitionKeys != null and !orQueryObject.processDefinitionKeys.isEmpty()">
+          <if test="orQueryObject.processDefinitionKeys != null and !orQueryObject.processDefinitionKeys.empty">
             or P.KEY_ in
             <foreach item="item" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
               #{item}
@@ -1009,7 +1009,7 @@
           <if test="orQueryObject.processInstanceId != null">
             or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
           </if>
-          <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.isEmpty()">
+          <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.empty">
             or RES.PROC_INST_ID_ in
             <foreach item="item" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
               #{item}
@@ -1033,7 +1033,7 @@
           <if test="orQueryObject.deploymentId != null">
             or P.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
           </if>
-          <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
+          <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
             or P.DEPLOYMENT_ID_ IN
             <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
                      open="(" separator="," close=")">

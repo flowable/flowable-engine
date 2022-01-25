@@ -216,10 +216,6 @@ public class CallActivityTest extends ResourceFlowableTestCase {
             .name("childProcessDeployment")
             .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
-        Map<String, Object> persistentVariables = new HashMap<>();
-        persistentVariables.put("persistentVar1", "hello world");
-        persistentVariables.put("persistentVar2", 123456);
-
         ProcessInstance mainProcessInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("mainProcess")
             .variable("persistentVar1", "hello world")

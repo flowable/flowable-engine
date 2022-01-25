@@ -109,7 +109,7 @@
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+      <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and RES.ID_ IN
         <foreach item="deploymentId" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
@@ -155,7 +155,7 @@
       <if test="parentDeploymentIdLike != null">
         and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}${wildcardEscapeClause}
       </if>
-      <if test="parentDeploymentIds != null &amp;&amp; parentDeploymentIds.size() &gt; 0">
+      <if test="parentDeploymentIds != null &amp;&amp; !parentDeploymentIds.empty">
         and RES.PARENT_DEPLOYMENT_ID_ IN
         <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
                  open="(" separator="," close=")">

@@ -132,7 +132,6 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.apache.aries.blueprint").artifactId("org.apache.aries.blueprint.core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries.proxy").artifactId("org.apache.aries.proxy").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries").artifactId("org.apache.aries.util").versionAsInProject(),
-                mavenBundle().groupId("org.osgi").artifactId("org.osgi.enterprise").versionAsInProject(),
                 bundle("reference:file:target/classes"));
 
         Option[] optionArray = OptionUtils.combine(coreBundles, CoreOptions.junitBundles(),

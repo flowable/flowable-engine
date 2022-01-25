@@ -484,14 +484,14 @@
       <if test="nameLikeIgnoreCase != null">
         and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
-      <if test="nameList != null &amp;&amp; nameList.size() &gt; 0">
+      <if test="nameList != null &amp;&amp; !nameList.empty">
         and RES.NAME_ IN
         <foreach item="name" index="index" collection="nameList"
                  open="(" separator="," close=")">
           #{name}
         </foreach>
       </if>
-      <if test="nameListIgnoreCase != null &amp;&amp; nameListIgnoreCase.size() &gt; 0">
+      <if test="nameListIgnoreCase != null &amp;&amp; !nameListIgnoreCase.empty">
         and lower(RES.NAME_) IN
         <foreach item="name" index="index" collection="nameListIgnoreCase"
                  open="(" separator="," close=")">
@@ -525,7 +525,7 @@
       <if test="assigneeLikeIgnoreCase != null">
         and lower(RES.ASSIGNEE_) like #{assigneeLikeIgnoreCase}${wildcardEscapeClause}
       </if>
-      <if test="assigneeIds != null &amp;&amp; assigneeIds.size() &gt; 0">
+      <if test="assigneeIds != null &amp;&amp; !assigneeIds.empty">
         and RES.ASSIGNEE_ IN
         <foreach item="assigneeId" index="index" collection="assigneeIds"
                  open="(" separator="," close=")">
@@ -556,7 +556,7 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
-      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() &gt; 0">
+      <if test="processInstanceIds != null &amp;&amp; !processInstanceIds.empty">
         and RES.PROC_INST_ID_ IN
         <foreach item="processInstance" index="index" collection="processInstanceIds"
                  open="(" separator="," close=")">
@@ -630,7 +630,7 @@
       <if test="keyLike != null">
         and RES.TASK_DEF_KEY_ like #{keyLike}
       </if>
-      <if test="keys != null and !keys.isEmpty()">
+      <if test="keys != null and !keys.empty">
           and RES.TASK_DEF_KEY_ in
           <foreach item="item" index="index" collection="keys" open="(" separator="," close=")">
               #{item}
@@ -642,7 +642,7 @@
       <if test="taskDefinitionId != null">
         and RES.TASK_DEF_ID_ = #{taskDefinitionId}
       </if>
-      <if test="processDefinitionKey != null || processDefinitionKeyLike != null ||  processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; processCategoryInList.size() &gt; 0) || (processCategoryNotInList != null &amp;&amp; processCategoryNotInList.size() &gt; 0) || (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.size() &gt; 0) || deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
+      <if test="processDefinitionKey != null || processDefinitionKeyLike != null ||  processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; !processCategoryInList.empty) || (processCategoryNotInList != null &amp;&amp; !processCategoryNotInList.empty) || (processDefinitionKeys != null &amp;&amp; !processDefinitionKeys.empty) || deploymentId != null || (deploymentIds != null &amp;&amp; !deploymentIds.empty)">
         and exists (
             select 1
             from ${prefix}ACT_RE_PROCDEF D
@@ -657,7 +657,7 @@
                 <if test="processDefinitionKeyLikeIgnoreCase != null">
                     and lower(D.KEY_) like #{processDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
                 </if>
-                <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.size() &gt; 0">
+                <if test="processDefinitionKeys != null &amp;&amp; !processDefinitionKeys.empty">
                     and D.KEY_ in
                     <foreach item="item" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
                         #{item}
@@ -669,14 +669,14 @@
                 <if test="processDefinitionNameLike != null">
                     and D.NAME_ like #{processDefinitionNameLike}${wildcardEscapeClause}
                 </if>
-                <if test="processCategoryInList != null &amp;&amp; processCategoryInList.size() &gt; 0">
+                <if test="processCategoryInList != null &amp;&amp; !processCategoryInList.empty">
                     and D.CATEGORY_ IN
                     <foreach item="processCategory" index="index" collection="processCategoryInList"
                              open="(" separator="," close=")">
                         #{processCategory}
                     </foreach>
                 </if>
-                <if test="processCategoryNotInList != null &amp;&amp; processCategoryNotInList.size() &gt; 0">
+                <if test="processCategoryNotInList != null &amp;&amp; !processCategoryNotInList.empty">
                     and D.CATEGORY_ NOT IN
                     <foreach item="processCategory" index="index" collection="processCategoryNotInList"
                              open="(" separator="," close=")">
@@ -686,7 +686,7 @@
                 <if test="deploymentId != null">
                     and D.DEPLOYMENT_ID_ = #{deploymentId}
                 </if>
-                <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+                <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
                     and D.DEPLOYMENT_ID_ IN
                     <foreach item="deployment" index="index" collection="deploymentIds"
                              open="(" separator="," close=")">
@@ -696,7 +696,7 @@
             </where>
           )
       </if>
-      <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0) || cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0)">
+      <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; !caseDefinitionKeys.empty) || cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; !cmmnDeploymentIds.empty)">
           and exists (
             select 1
             from ${prefix}ACT_CMMN_CASEDEF CD
@@ -711,7 +711,7 @@
                 <if test="caseDefinitionKeyLikeIgnoreCase != null">
                     and lower(CD.KEY_) like #{caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
                 </if>
-                <if test="caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0">
+                <if test="caseDefinitionKeys != null &amp;&amp; !caseDefinitionKeys.empty">
                     and CD.KEY_ in
                     <foreach item="item" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
                         #{item}
@@ -720,7 +720,7 @@
                 <if test="cmmnDeploymentId != null">
                     and CD.DEPLOYMENT_ID_ = #{cmmnDeploymentId}
                 </if>
-                <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0">
+                <if test="cmmnDeploymentIds != null &amp;&amp; !cmmnDeploymentIds.empty">
                     and CD.DEPLOYMENT_ID_ IN
                     <foreach item="deployment" index="index" collection="cmmnDeploymentIds"
                              open="(" separator="," close=")">
@@ -767,10 +767,10 @@
               <if test="candidateUser != null">
                 LINK.USER_ID_ = #{candidateUser}
               </if>
-              <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
+              <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; !candidateGroups.empty">
                 or
               </if>
-              <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
+              <if test="candidateGroups != null &amp;&amp; !candidateGroups.empty">
                 (
                 <foreach item="candidateGroupListItem" index="groupIndex" collection="safeCandidateGroups">
                     <if test="groupIndex &gt; 0">
@@ -990,7 +990,7 @@
               </if>
                 exists(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_
                 and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{userIdForCandidateAndAssignee}
-                <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
+                <if test="candidateGroups != null &amp;&amp; !candidateGroups.empty">
                     or (
                     <foreach item="candidateGroupListItem" index="groupIndex" collection="safeCandidateGroups">
                         <if test="groupIndex &gt; 0">
@@ -1023,14 +1023,14 @@
             <if test="orQueryObject.nameLikeIgnoreCase != null">
               or lower(RES.NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
             </if>
-            <if test="orQueryObject.nameList != null &amp;&amp; orQueryObject.nameList.size() &gt; 0">
+            <if test="orQueryObject.nameList != null &amp;&amp; !orQueryObject.nameList.empty">
               or RES.NAME_ IN
               <foreach item="name" index="index" collection="orQueryObject.nameList"
                       open="(" separator="," close=")">
                 #{name}
               </foreach>
             </if>
-            <if test="orQueryObject.nameListIgnoreCase != null &amp;&amp; orQueryObject.nameListIgnoreCase.size() &gt; 0">
+            <if test="orQueryObject.nameListIgnoreCase != null &amp;&amp; !orQueryObject.nameListIgnoreCase.empty">
               or lower(RES.NAME_) IN
               <foreach item="name" index="index" collection="orQueryObject.nameListIgnoreCase"
                        open="(" separator="," close=")">
@@ -1064,7 +1064,7 @@
             <if test="orQueryObject.assigneeLikeIgnoreCase != null">
               or lower(RES.ASSIGNEE_) like #{orQueryObject.assigneeLikeIgnoreCase}${wildcardEscapeClause}
             </if>
-            <if test="orQueryObject.assigneeIds != null &amp;&amp; orQueryObject.assigneeIds.size() &gt; 0">
+            <if test="orQueryObject.assigneeIds != null &amp;&amp; !orQueryObject.assigneeIds.empty">
 		      or RES.ASSIGNEE_ IN
 		      <foreach item="assigneeId" index="index" collection="orQueryObject.assigneeIds"
 		               open="(" separator="," close=")">
@@ -1095,7 +1095,7 @@
             <if test="orQueryObject.processInstanceId != null">
               or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
             </if>
-            <if test="orQueryObject.processInstanceIds != null &amp;&amp; orQueryObject.processInstanceIds.size() &gt; 0">
+            <if test="orQueryObject.processInstanceIds != null &amp;&amp; !orQueryObject.processInstanceIds.empty">
               or RES.PROC_INST_ID_ IN
               <foreach item="processInstance" index="index" collection="orQueryObject.processInstanceIds"
                        open="(" separator="," close=")">
@@ -1169,7 +1169,7 @@
             <if test="orQueryObject.keyLike != null">
               or RES.TASK_DEF_KEY_ like #{orQueryObject.keyLike}${wildcardEscapeClause}
             </if>
-            <if test="orQueryObject.keys != null and !orQueryObject.keys.isEmpty()">
+            <if test="orQueryObject.keys != null and !orQueryObject.keys.empty">
                 or RES.TASK_DEF_KEY_ in
                 <foreach item="item" index="index" collection="orQueryObject.keys" open="(" separator="," close=")">
                     #{item}
@@ -1181,7 +1181,7 @@
             <if test="orQueryObject.taskDefinitionId != null">
               or RES.TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
             </if>
-            <if test="orQueryObject.processDefinitionKey != null || orQueryObject.processDefinitionKeyLike != null || orQueryObject.processDefinitionKeyLikeIgnoreCase != null || orQueryObject.processDefinitionName != null || orQueryObject.processDefinitionNameLike != null || (orQueryObject.processCategoryInList != null &amp;&amp; orQueryObject.processCategoryInList.size() &gt; 0) || (orQueryObject.processCategoryNotInList != null &amp;&amp; orQueryObject.processCategoryNotInList.size() &gt; 0) || (orQueryObject.processDefinitionKeys != null &amp;&amp; orQueryObject.processDefinitionKeys.size() &gt; 0) || orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
+            <if test="orQueryObject.processDefinitionKey != null || orQueryObject.processDefinitionKeyLike != null || orQueryObject.processDefinitionKeyLikeIgnoreCase != null || orQueryObject.processDefinitionName != null || orQueryObject.processDefinitionNameLike != null || (orQueryObject.processCategoryInList != null &amp;&amp; !orQueryObject.processCategoryInList.empty) || (orQueryObject.processCategoryNotInList != null &amp;&amp; !orQueryObject.processCategoryNotInList.empty) || (orQueryObject.processDefinitionKeys != null &amp;&amp; !orQueryObject.processDefinitionKeys.empty) || orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty)">
                 or exists (
                     select 1
                     from ${prefix}ACT_RE_PROCDEF D
@@ -1196,7 +1196,7 @@
                         <if test="orQueryObject.processDefinitionKeyLikeIgnoreCase != null">
                             or lower(D.KEY_) like #{orQueryObject.processDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
                         </if>
-                        <if test="orQueryObject.processDefinitionKeys != null &amp;&amp; orQueryObject.processDefinitionKeys.size() &gt; 0">
+                        <if test="orQueryObject.processDefinitionKeys != null &amp;&amp; !orQueryObject.processDefinitionKeys.empty">
                             or D.KEY_ in
                             <foreach item="item" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
                                 #{item}
@@ -1208,14 +1208,14 @@
                         <if test="orQueryObject.processDefinitionNameLike != null">
                             or D.NAME_ like #{orQueryObject.processDefinitionNameLike}${wildcardEscapeClause}
                         </if>
-                        <if test="orQueryObject.processCategoryInList != null &amp;&amp; orQueryObject.processCategoryInList.size() &gt; 0">
+                        <if test="orQueryObject.processCategoryInList != null &amp;&amp; !orQueryObject.processCategoryInList.empty">
                             or D.CATEGORY_ IN
                             <foreach item="processCategory" index="index" collection="orQueryObject.processCategoryInList"
                                      open="(" separator="," close=")">
                                 #{processCategory}
                             </foreach>
                         </if>
-                        <if test="orQueryObject.processCategoryNotInList != null &amp;&amp; orQueryObject.processCategoryNotInList.size() &gt; 0">
+                        <if test="orQueryObject.processCategoryNotInList != null &amp;&amp; !orQueryObject.processCategoryNotInList.empty">
                             or D.CATEGORY_ NOT IN
                             <foreach item="processCategory" index="index" collection="orQueryObject.processCategoryNotInList"
                                      open="(" separator="," close=")">
@@ -1225,7 +1225,7 @@
                         <if test="orQueryObject.deploymentId != null">
                             or D.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
                         </if>
-                        <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
+                        <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
                             or D.DEPLOYMENT_ID_ IN
                             <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
                                      open="(" separator="," close=")">
@@ -1235,7 +1235,7 @@
                     </trim>
                 )
             </if>
-            <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0) || orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
+            <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty) || orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; !orQueryObject.cmmnDeploymentIds.empty)">
                 or exists (
                     select 1
                     from ${prefix}ACT_CMMN_CASEDEF CD
@@ -1250,7 +1250,7 @@
                         <if test="orQueryObject.caseDefinitionKeyLikeIgnoreCase != null">
                             or lower(CD.KEY_) like #{orQueryObject.caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
                         </if>
-                        <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0">
+                        <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty">
                             or CD.KEY_ in
                             <foreach item="item" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
                                 #{item}
@@ -1259,7 +1259,7 @@
                         <if test="orQueryObject.cmmnDeploymentId != null">
                             or CD.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId}
                         </if>
-                        <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0">
+                        <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; !orQueryObject.cmmnDeploymentIds.empty">
                             or CD.DEPLOYMENT_ID_ IN
                             <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds"
                                      open="(" separator="," close=")">
@@ -1305,10 +1305,10 @@
                     <if test="orQueryObject.candidateUser != null">
                       LINK.USER_ID_ = #{orQueryObject.candidateUser}
                     </if>
-                    <if test="orQueryObject.candidateUser != null &amp;&amp; orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
+                    <if test="orQueryObject.candidateUser != null &amp;&amp; orQueryObject.candidateGroups != null &amp;&amp; !orQueryObject.candidateGroups.empty">
                       or
                     </if>
-                    <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
+                    <if test="orQueryObject.candidateGroups != null &amp;&amp; !orQueryObject.candidateGroups.empty">
                         (
                         <foreach item="candidateGroupListItem" index="groupIndex" collection="orQueryObject.safeCandidateGroups">
                             <if test="groupIndex &gt; 0">
@@ -1532,7 +1532,7 @@
                     </if>
                     exists(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_
                     and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{orQueryObject.userIdForCandidateAndAssignee}
-                    <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
+                    <if test="orQueryObject.candidateGroups != null &amp;&amp; !orQueryObject.candidateGroups.empty">
                         or (
                         <foreach item="candidateGroupListItem" index="groupIndex" collection="orQueryObject.safeCandidateGroups">
                             <if test="groupIndex &gt; 0">

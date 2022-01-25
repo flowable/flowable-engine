@@ -13,12 +13,12 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
@@ -160,31 +160,16 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         assertThat(pagePlanItemInstance).isNotNull();
 
         List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
-        assertThat(identityLinks).hasSize(5);
 
-        List<IdentityLink> assigneeLink = identityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.ASSIGNEE))
-                .collect(Collectors.toList());
-        assertThat(assigneeLink)
-                .extracting(IdentityLink::getUserId)
-                .containsExactly("johndoe");
-
-        List<IdentityLink> ownerLink = identityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.OWNER))
-                .collect(Collectors.toList());
-        assertThat(ownerLink)
-                .extracting(IdentityLink::getUserId)
-                .containsExactly("janedoe");
-
-        List<IdentityLink> candidateUserLinks = identityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                identityLink.getUserId() != null).collect(Collectors.toList());
-        assertThat(candidateUserLinks)
-                .extracting(IdentityLink::getUserId)
-                .containsExactlyInAnyOrder("johndoe", "janedoe");
-
-        List<IdentityLink> groupLink = identityLinks.stream().filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                identityLink.getGroupId() != null).collect(Collectors.toList());
-        assertThat(groupLink)
-                .extracting(IdentityLink::getGroupId)
-                .containsExactly("sales");
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.ASSIGNEE, "johndoe", null),
+                        tuple(IdentityLinkType.OWNER, "janedoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "johndoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "janedoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "sales")
+                );
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
@@ -195,8 +180,7 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe2").singleResult();
         assertThat(planItemInstance).isNull();
 
-        List<String> groups = new ArrayList<>();
-        groups.add("sales");
+        List<String> groups = Collections.singletonList("sales");
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(groups).singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
@@ -206,8 +190,7 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("nonexisting").involvedGroups(groups).singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
-        List<String> nonMatchingGroups = new ArrayList<>();
-        nonMatchingGroups.add("management");
+        List<String> nonMatchingGroups = Collections.singletonList("management");
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(nonMatchingGroups).singleResult();
         assertThat(planItemInstance).isNull();
 
@@ -259,34 +242,43 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
             List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
-            assertThat(historicIdentityLinks).hasSize(5);
+            assertThat(historicIdentityLinks)
+                    .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple(IdentityLinkType.ASSIGNEE, "johndoe", null),
+                            tuple(IdentityLinkType.OWNER, "janedoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "johndoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "janedoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, null, "sales")
+                    );
 
-            List<HistoricIdentityLink> historicAssigneeLink = historicIdentityLinks.stream()
-                .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.ASSIGNEE)).collect(Collectors.toList());
-            assertThat(historicAssigneeLink)
-                .extracting(HistoricIdentityLink::getUserId)
-                .containsExactly("johndoe");
+            HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("johndoe").singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
 
-            List<HistoricIdentityLink> historicOwnerLink = historicIdentityLinks.stream()
-                .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.OWNER)).collect(Collectors.toList());
-            assertThat(historicOwnerLink)
-                .extracting(HistoricIdentityLink::getUserId)
-                .containsExactly("janedoe");
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("janedoe").singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
 
-            List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream()
-                .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                    identityLink.getUserId() != null).collect(Collectors.toList());
-            assertThat(historicCandidateUserLinks)
-                .extracting(HistoricIdentityLink::getUserId)
-                .containsExactlyInAnyOrder("johndoe", "janedoe");
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("johndoe2").singleResult();
+            assertThat(historicPlanItemInstance).isNull();
 
-            List<HistoricIdentityLink> historicGroupLink = historicIdentityLinks.stream()
-                .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                    identityLink.getGroupId() != null).collect(Collectors.toList());
-            assertThat(historicGroupLink)
-                .extracting(HistoricIdentityLink::getGroupId)
-                .containsExactly("sales");
-            
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(groups).singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
+
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(groups).singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
+
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("nonexisting").involvedGroups(groups).singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
+
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(nonMatchingGroups).singleResult();
+            assertThat(historicPlanItemInstance).isNull();
+
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("nonexisting").involvedGroups(nonMatchingGroups).singleResult();
+            assertThat(historicPlanItemInstance).isNull();
+
+            historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(nonMatchingGroups).singleResult();
+            assertThat(historicPlanItemInstance.getName()).isEqualTo("Case Page Task One");
+
             testGroups.remove("sales");
             HistoricPlanItemInstanceQuery historicPlanItemInstanceQuery = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(testGroups);
             assertThat(historicPlanItemInstanceQuery.count()).isEqualTo(0);

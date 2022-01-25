@@ -15,19 +15,19 @@ There are several ways to expose the deployed Flowable UI service on the Kuberne
 For convenience the Flowable Helm chart includes *ingress rules* that can be used to configure an *Ingress controller*. For this the *Ingress controller* must be present and configured on the cluster.
 By default an Ingress with the annotation `kubernetes.io/ingress.class: "nginx"` will located. This class is configurable.
 
-Info on how to install a Nginx ingress controller can be found here; 
+Info on how to install the *ingress-nginx* controller can be found here; 
 [Ingress-Nginx](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx).
 
 
 ## Deploy Flowable OSS
 
 ```console
-helm repo add flowable https://flowable.org/helm/
+helm repo add flowable-oss https://flowable.github.io/helm/
 ```
 ```console
-helm install flowable flowable/flowable \
+helm install flowable flowable-oss/flowable \
     --create-namespace --namespace=flowable \
-    --set host.external=<cluster public ip / hostname> --set ingress.useHost=true \
+    --set host.external=<cluster external hostname> --set ingress.useHost=true \
     --set postgres.storage.storageClassName=default
 ```
 
