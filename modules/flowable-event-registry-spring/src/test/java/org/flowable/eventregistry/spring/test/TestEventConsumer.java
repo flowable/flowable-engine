@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.flowable.eventregistry.api.EventConsumerInfo;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -33,8 +35,11 @@ public class TestEventConsumer implements EventRegistryEventConsumer {
     }
 
     @Override
-    public void eventReceived(EventRegistryEvent event) {
+    public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
         events.add(event);
+        EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
+        eventRegistryProcessingInfo.addEventConsumerInfo(new EventConsumerInfo());
+        return eventRegistryProcessingInfo;
     }
 
     public List<EventRegistryEvent> getEvents() {

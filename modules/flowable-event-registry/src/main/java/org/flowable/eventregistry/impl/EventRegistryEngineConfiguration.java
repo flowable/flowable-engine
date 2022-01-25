@@ -37,6 +37,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventProcessor;
+import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
@@ -156,6 +157,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected long eventRegistryChangeDetectionDelayInMs = 60000L;
     protected EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager;
     protected EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor;
+    
+    protected EventRegistryNonMatchingEventConsumer nonMatchingEventConsumer;
 
     protected boolean enableEventRegistryChangeDetectionAfterEngineCreate = true;
 
@@ -700,6 +703,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     }
     public EventRegistryEngineConfiguration setEventRegistryChangeDetectionExecutor(EventRegistryChangeDetectionExecutor eventRegistryChangeDetectionExecutor) {
         this.eventRegistryChangeDetectionExecutor = eventRegistryChangeDetectionExecutor;
+        return this;
+    }
+
+    public EventRegistryNonMatchingEventConsumer getNonMatchingEventConsumer() {
+        return nonMatchingEventConsumer;
+    }
+
+    public EventRegistryEngineConfiguration setNonMatchingEventConsumer(EventRegistryNonMatchingEventConsumer nonMatchingEventConsumer) {
+        this.nonMatchingEventConsumer = nonMatchingEventConsumer;
         return this;
     }
 
