@@ -27,6 +27,8 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.eventregistry.api.EventConsumerInfo;
+import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
@@ -58,24 +60,30 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     }
 
     @Override
-    protected void eventReceived(EventInstance eventInstance) {
+    protected EventRegistryProcessingInfo eventReceived(EventInstance eventInstance) {
 
         // Fetching the event subscriptions happens in one transaction,
         // executing them one per subscription. There is no overarching transaction.
         // The reason for this is that the handling of one event subscription
         // should not influence (i.e. roll back) the handling of another.
+        
+        EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
 
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.CMMN, eventInstance, correlationKeys);
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys);
+            EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getSubScopeId(), 
+                    eventSubscription.getScopeDefinitionId(), ScopeTypes.CMMN);
+            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
+            eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
         }
 
+        return eventRegistryProcessingInfo;
     }
 
     protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
-            EventInstance eventInstance, Collection<CorrelationKey> correlationKeys) {
+            EventInstance eventInstance, Collection<CorrelationKey> correlationKeys, EventConsumerInfo eventConsumerInfo) {
 
         if (eventSubscription.getSubScopeId() != null) {
 
@@ -121,6 +129,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                     if (caseInstanceCount > 0) {
                         // Returning, no new instance should be started
+                        eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                         return;
                     }

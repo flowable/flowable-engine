@@ -12,12 +12,7 @@
  */
 package org.flowable.eventregistry.api;
 
-/**
- * @author Joram Barrez
- */
-public interface EventRegistryEventConsumer {
+public interface EventRegistryNonMatchingEventConsumer {
 
-    EventRegistryProcessingInfo eventReceived(EventRegistryEvent event);
-    
-    String getConsumerKey();
+    void handleNonMatchingEvent(EventRegistryEvent event, EventRegistryProcessingInfo eventRegistryProcessingInfo);
 }
