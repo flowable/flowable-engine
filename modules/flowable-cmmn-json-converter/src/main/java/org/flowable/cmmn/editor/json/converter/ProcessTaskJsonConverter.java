@@ -66,7 +66,7 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
             propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, processTask.getProcessInstanceIdVariableName());
         }
 
-        String processRef = processTask.getProcessRef();
+        String processRef = StringUtils.isNotEmpty(processTask.getProcessRef()) ? processTask.getProcessRef() : processTask.getProcessRefExpression() ;
         if (StringUtils.isNotEmpty(processRef)) {
 
             ObjectNode processReferenceNode = objectMapper.createObjectNode();
@@ -79,8 +79,9 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
                 processReferenceNode.put("name", modelInfo.get("name"));
 
             } else {
+                // if process model is not resolved, then set process key as display value to understand in UI that value is set
+                processReferenceNode.put("name", processRef);
                 converterContext.registerUnresolvedProcessModelReferenceForCaseModel(processRef, cmmnModel);
-
             }
         }
         
@@ -114,6 +115,9 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
             }
 
             task.setProcessRef(processModelKey);
+        } else if (processModelReferenceNode != null && processModelReferenceNode.has("key") && !processModelReferenceNode.get("key").isNull()) {
+            // if previously set process definition is not available or cannot be resolved, originally set process ref should be set so that process ref would not be dropped during export
+            task.setProcessRef(processModelReferenceNode.get("key").asText());
         }
 
         JsonNode processTaskInParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_IN_PARAMETERS, elementNode);
