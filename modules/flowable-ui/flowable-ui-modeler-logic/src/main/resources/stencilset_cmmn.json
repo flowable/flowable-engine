@@ -1152,6 +1152,16 @@
         "description" : "CMMN.PROPERTYPACKAGES.AVAILABLECONDITIONPACKAGE.AVAILABLECONDITION.DESCRIPTION",
         "popular" : true
       }]
+    }, {
+      "name" : "eventregistrycorrelationconfigurationpackage",
+      "properties" : [ {
+        "id" : "correcalationparamsasuniquereference",
+        "type" : "Boolean",
+        "title" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYCORRELATIONCONFIGURATIONPACKAGE.CORRELATIONPARAMSASUNIQUEREFERENCE.TITLE",
+        "value" : "",
+        "description" : "CMMN.PROPERTYPACKAGES.EVENTREGISTRYCORRELATIONCONFIGURATIONPACKAGE.CORRELATIONPARAMSASUNIQUEREFERENCE.DESCRIPTION",
+        "popular" : true
+      }]
     }
   ],
   "stencils" : [ {
@@ -1164,7 +1174,7 @@
     "groups" : [ "CMMN.STENCILS.GROUPS.DIAGRAM" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage"],
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrycorrelationconfigurationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {

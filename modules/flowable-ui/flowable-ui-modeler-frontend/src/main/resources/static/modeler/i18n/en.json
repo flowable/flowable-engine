@@ -1901,6 +1901,12 @@
             "TITLE" : "Store result variable transiently",
             "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
           }
+        },
+        "EVENTREGISTRYCORRELATIONCONFIGURATIONPACKAGE" : {
+          "CORRELATIONPARAMSASUNIQUEREFERENCE" : {
+            "TITLE" : "Use correlation parameters as reference",
+            "DESCRIPTION" : "Flag that marks that start event correlation parameters will be stored as unique reference id for the case."
+          }
         }
       },
       "STENCILS" : {

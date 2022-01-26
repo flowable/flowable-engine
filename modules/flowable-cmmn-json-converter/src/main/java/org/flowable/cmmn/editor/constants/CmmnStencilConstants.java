@@ -214,6 +214,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_REGISTRY_IN_PARAMETERS = "eventinparameters";
     String PROPERTY_EVENT_REGISTRY_OUT_PARAMETERS = "eventoutparameters";
     String PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS = "eventcorrelationparameters";
+    String PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS_AS_REFERENCE = "correcalationparamsasuniquereference";
     String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     String PROPERTY_EVENT_REGISTRY_CHANNEL_KEY = "channelkey";
     String PROPERTY_EVENT_REGISTRY_CHANNEL_NAME = "channelname";

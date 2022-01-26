@@ -203,11 +203,14 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         String eventType = caseModel.getStartEventType();
         if (StringUtils.isNotEmpty(eventType)) {
             propertiesNode.put(PROPERTY_EVENT_REGISTRY_EVENT_KEY, eventType);
-            setPropertyValue(START_EVENT_CORRELATION_CONFIGURATION,getExtensionValue(START_EVENT_CORRELATION_CONFIGURATION, caseModel), propertiesNode);
             
             setPropertyValue(PROPERTY_EVENT_REGISTRY_EVENT_NAME, getExtensionValue("eventName", caseModel), propertiesNode);
             CmmnModelJsonConverterUtil.addEventOutParameters(caseModel.getExtensionElements().get("eventOutParameter"), propertiesNode, objectMapper);
             CmmnModelJsonConverterUtil.addEventCorrelationParameters(caseModel.getExtensionElements().get("eventCorrelationParameter"), propertiesNode, objectMapper);
+            if (StringUtils.isNotEmpty(getExtensionValue(START_EVENT_CORRELATION_CONFIGURATION, caseModel)) && "storeAsUniqueReferenceId".equals(
+                    getExtensionValue(START_EVENT_CORRELATION_CONFIGURATION, caseModel))) {
+                propertiesNode.put(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS_AS_REFERENCE, true);
+            }
             
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, getExtensionValue("channelKey", caseModel), propertiesNode);
             setPropertyValue(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, getExtensionValue("channelName", caseModel), propertiesNode);
@@ -385,6 +388,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             addFlowableExtensionElementWithValue("eventName", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_NAME, modelNode), caseModel);
             CmmnModelJsonConverterUtil.convertJsonToOutParameters(modelNode, caseModel);
             CmmnModelJsonConverterUtil.convertJsonToCorrelationParameters(modelNode, "eventCorrelationParameter", caseModel);
+            if (CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_EVENT_REGISTRY_CORRELATION_PARAMETERS_AS_REFERENCE, modelNode)) {
+                addFlowableExtensionElementWithValue(START_EVENT_CORRELATION_CONFIGURATION, "storeAsUniqueReferenceId", caseModel);
+            }
             
             addFlowableExtensionElementWithValue("channelKey", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_KEY, modelNode), caseModel);
             addFlowableExtensionElementWithValue("channelName", CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_CHANNEL_NAME, modelNode), caseModel);
@@ -407,10 +413,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 addFlowableExtensionElementWithValue("keyDetectionValue", jsonPointer, caseModel);
             }
         }
-
-
-        String startEventCorrelationConfiguration = CmmnJsonConverterUtil.getPropertyValueAsString(START_EVENT_CORRELATION_CONFIGURATION, modelNode);
-        addFlowableExtensionElementWithValue(START_EVENT_CORRELATION_CONFIGURATION, startEventCorrelationConfiguration, caseModel);
 
         JsonNode planModelShape = shapesArrayNode.get(0);
 
