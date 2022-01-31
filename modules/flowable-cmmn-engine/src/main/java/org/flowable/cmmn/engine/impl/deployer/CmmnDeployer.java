@@ -36,16 +36,20 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -303,24 +307,33 @@ public class CmmnDeployer implements EngineDeployer {
     }
 
     protected void addAuthorizationsFromIterator(List<String> expressions,
-                    CaseDefinitionEntity caseDefinition, String expressionType) {
+            CaseDefinitionEntity caseDefinition, String expressionType) {
 
         if (expressions != null) {
             IdentityLinkService identityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService();
-            for (String expression : expressions) {
-                IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
-                identityLink.setScopeDefinitionId(caseDefinition.getId());
-                identityLink.setScopeType(ScopeTypes.CMMN);
-                if ("user".equals(expressionType)) {
-                    identityLink.setUserId(expression);
-                } else if ("group".equals(expressionType)) {
-                    identityLink.setGroupId(expression);
+            ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+
+            for (String expressionStr : expressions) {
+                Expression expression = expressionManager.createExpression(expressionStr);
+                Object value = expression.getValue(NoExecutionVariableScope.getSharedInstance());
+
+                if (value != null) {
+                    Collection<String> candidates = CandidateUtil.extractCandidates(value);
+                    for (String candidate : candidates) {
+                        IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
+                        identityLink.setScopeDefinitionId(caseDefinition.getId());
+                        identityLink.setScopeType(ScopeTypes.CMMN);
+                        if ("user".equals(expressionType)) {
+                            identityLink.setUserId(candidate);
+                        } else if ("group".equals(expressionType)) {
+                            identityLink.setGroupId(candidate);
+                        }
+                        identityLink.setType(IdentityLinkType.CANDIDATE);
+                        identityLinkService.insertIdentityLink(identityLink);
+                    }
                 }
-                identityLink.setType(IdentityLinkType.CANDIDATE);
-                identityLinkService.insertIdentityLink(identityLink);
             }
         }
-
     }
 
     public IdGenerator getIdGenerator() {
