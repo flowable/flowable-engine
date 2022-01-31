@@ -377,4 +377,39 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment
+    public void testExpressionsInCandidateStarters() throws Exception {
+
+        setUpUsersAndGroups();
+
+        try {
+            //test simple expression e.g. "${"user1"}"
+            ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExpressionProcess1").singleResult();
+            assertThat(latestProcessDef).isNotNull();
+            List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId, IdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple("user1", null),
+                            tuple(null, "group3")
+                    );
+
+            //test comma-seperated candidates inside expression e.g. "${"user1,user2"}"
+            latestProcessDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExpressionProcess2").singleResult();
+            assertThat(latestProcessDef).isNotNull();
+            links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
+            assertThat(links)
+                    .extracting(IdentityLink::getUserId, IdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple("user1", null),
+                            tuple("user2", null),
+                            tuple(null, "group2"),
+                            tuple(null, "group3")
+                    );
+        } finally {
+            tearDownUsersAndGroups();
+        }
+    }
+
 }

@@ -314,4 +314,36 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    @CmmnDeployment
+    public void testExpressionsInCandidateStarters() throws Exception {
+
+        setupUsersAndGroups();
+
+        try {
+            //test simple expression e.g. "${"user1"}"
+            CaseDefinition latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("expressionCase1").singleResult();
+            assertThat(latestCaseDef).isNotNull();
+            List<IdentityLink> links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
+            assertThat(links).hasSize(2);
+            assertThat(extractProperty("groupId").from(links))
+                    .contains("group3");
+            assertThat(extractProperty("userId").from(links))
+                    .contains("user1");
+
+            //test comma-seperated candidates inside expression e.g. "${"user1,user2"}"
+            latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("expressionCase2").singleResult();
+            assertThat(latestCaseDef).isNotNull();
+            links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
+            assertThat(links).hasSize(4);
+            assertThat(extractProperty("groupId").from(links))
+                    .contains("group2", "group3");
+            assertThat(extractProperty("userId").from(links))
+                    .contains("user1", "user2");
+        } finally {
+            tearDownUsersAndGroups();
+            Authentication.setAuthenticatedUserId(null);
+        }
+    }
+
 }
