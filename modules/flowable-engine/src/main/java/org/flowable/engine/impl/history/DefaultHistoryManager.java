@@ -295,10 +295,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
-
     @Override
-    public void recordHistoricTaskDeleted(String taskId){
-        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
+    public void recordHistoricTaskDeleted(String taskId) {
+        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
+                .getHistoricTask(taskId);
 
         if (historicTaskInstance != null && hasTaskHistoryLevel(historicTaskInstance.getProcessDefinitionId())) {
             TaskHelper.deleteHistoricTask(taskId);

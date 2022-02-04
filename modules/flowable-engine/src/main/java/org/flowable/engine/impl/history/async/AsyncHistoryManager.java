@@ -281,8 +281,9 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordHistoricTaskDeleted(String taskId){
-        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
+    public void recordHistoricTaskDeleted(String taskId) {
+        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
+                .getHistoricTask(taskId);
 
         if (historicTaskInstance != null && hasTaskHistoryLevel(historicTaskInstance.getProcessDefinitionId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
