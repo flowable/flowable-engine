@@ -28,6 +28,7 @@ import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePr
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -35,6 +36,7 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -276,6 +278,18 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED, data);
+        }
+    }
+
+    @Override
+    public void recordHistoricTaskDeleted(String taskId){
+        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
+
+        if (historicTaskInstance != null && hasTaskHistoryLevel(historicTaskInstance.getProcessDefinitionId())) {
+            ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, HistoryJsonConstants.ID, taskId);
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_DELETED, data);
         }
     }
 

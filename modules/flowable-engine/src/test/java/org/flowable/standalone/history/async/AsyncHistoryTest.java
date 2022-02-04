@@ -302,6 +302,21 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     }
 
     @Test
+    public void testDeleteHistoricTask() {
+        Task task = taskService.createTaskBuilder().id("task1").create();
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNotNull();
+        historyService.deleteHistoricTaskInstance("task1");
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNull();
+    }
+
+    @Test
     public void testTaskAssigneeChange() {
         Task task = startOneTaskprocess();
 

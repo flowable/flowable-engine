@@ -18,7 +18,7 @@ import java.io.Serializable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -38,8 +38,8 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");
         }
-        
-        TaskHelper.deleteHistoricTask(taskId);
+
+        CommandContextUtil.getHistoryManager(commandContext).recordHistoricTaskDeleted(taskId);
         
         return null;
     }

@@ -123,6 +123,8 @@ public interface HistoryManager {
      */
     void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime);
 
+    void recordHistoricTaskDeleted(String taskId);
+
     /**
      * Record a variable has been created, if audit history is enabled.
      */

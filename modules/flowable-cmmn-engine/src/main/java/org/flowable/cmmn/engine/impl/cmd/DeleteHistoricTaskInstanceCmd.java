@@ -41,9 +41,8 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");
         }
-        
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        TaskHelper.deleteHistoricTask(taskId, cmmnEngineConfiguration);
+
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordHistoricTaskDeleted(taskId);
         
         return null;
     }

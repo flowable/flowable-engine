@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.Date;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -64,6 +65,8 @@ public interface CmmnHistoryManager {
     void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime);
 
     void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
+
+    void recordHistoricTaskDeleted(String taskId);
 
     void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity);
 

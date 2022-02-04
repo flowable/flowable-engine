@@ -447,6 +447,23 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
     }
 
     @Test
+    public void testDeleteHistoricTask() {
+        Task task = cmmnTaskService.createTaskBuilder().id("task1").create();
+        cmmnTaskService.complete(task.getId());
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNotNull();
+        cmmnHistoryService.deleteHistoricTaskInstance("task1");
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNull();
+    }
+
+
+
+    @Test
     @CmmnDeployment
     public void testMilestoneReached() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();

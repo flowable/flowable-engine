@@ -181,6 +181,13 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
+    public void recordHistoricTaskDeleted(String taskId){
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.recordHistoricTaskDeleted(taskId);
+        }
+    }
+
+    @Override
     public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.recordVariableCreate(variable, createTime);

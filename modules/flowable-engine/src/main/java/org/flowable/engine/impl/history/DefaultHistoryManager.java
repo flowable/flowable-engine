@@ -33,6 +33,7 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
@@ -292,6 +293,16 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                     historicActivityInstance.setAssignee(taskEntity.getAssignee());
                 }
             }
+        }
+    }
+
+
+    @Override
+    public void recordHistoricTaskDeleted(String taskId){
+        HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
+
+        if (historicTaskInstance != null && hasTaskHistoryLevel(historicTaskInstance.getProcessDefinitionId())) {
+            TaskHelper.deleteHistoricTask(taskId);
         }
     }
 
