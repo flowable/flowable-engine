@@ -123,6 +123,9 @@ public interface HistoryManager {
      */
     void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime);
 
+    /**
+     * Record historic task deleted, if audit history is enabled.
+     */
     void recordHistoricTaskDeleted(String taskId);
 
     /**

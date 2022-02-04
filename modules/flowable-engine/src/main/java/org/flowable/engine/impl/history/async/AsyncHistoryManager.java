@@ -285,7 +285,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
         HistoricTaskInstanceEntity historicTaskInstance = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
                 .getHistoricTask(taskId);
 
-        if (historicTaskInstance != null && hasTaskHistoryLevel(historicTaskInstance.getProcessDefinitionId())) {
+        if (historicTaskInstance != null && getHistoryConfigurationSettings().isHistoryEnabledForHistoricTask(historicTaskInstance)) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
             putIfNotNull(data, HistoryJsonConstants.ID, taskId);
 

@@ -28,6 +28,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -168,7 +169,16 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
 
     @Override
     public boolean isHistoryEnabledForUserTask(TaskEntity taskEntity) {
-        String caseDefinitionId = taskEntity.getScopeDefinitionId();
+        return isHistoryEnabledForUserTask(taskEntity.getProcessDefinitionId());
+    }
+
+
+    @Override
+    public boolean isHistoryEnabledForHistoricTask(HistoricTaskInstanceEntity taskEntity) {
+        return isHistoryEnabledForUserTask(taskEntity.getProcessDefinitionId());
+    }
+
+    protected boolean isHistoryEnabledForUserTask(String caseDefinitionId) {
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
         if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
             HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);

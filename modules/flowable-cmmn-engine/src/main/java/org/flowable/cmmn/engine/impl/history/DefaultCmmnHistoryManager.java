@@ -260,7 +260,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricTaskDeleted(String taskId) {
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        HistoricTaskInstanceEntity historicTaskInstance = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
+                .getHistoricTask(taskId);
+
+        if (getHistoryConfigurationSettings().isHistoryEnabledForHistoricTask(historicTaskInstance)) {
             TaskHelper.deleteHistoricTask(taskId, cmmnEngineConfiguration);
         }
     }
