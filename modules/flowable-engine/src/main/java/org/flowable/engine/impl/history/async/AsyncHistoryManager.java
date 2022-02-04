@@ -28,7 +28,6 @@ import org.flowable.engine.impl.history.async.json.transformer.ProcessInstancePr
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;

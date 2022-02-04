@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
