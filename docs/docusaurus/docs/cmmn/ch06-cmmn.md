@@ -680,9 +680,9 @@ A script task is visualized as a *task* with a script icon in the top left corne
 Do note that the Groovy scripting engine is bundled with the groovy-jsr223 JAR. As such, one must add the following dependency:
 
     <dependency>
-        <groupId>org.codehaus.groovy</groupId>
+        <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-jsr223</artifactId>
-        <version>2.x.x<version>
+        <version>4.x.x<version>
     </dependency>
 
 All case variables that are accessible through the PlanItem instance that arrives in the script task can be used within the script. In the example below, the script variable *'inputArray'* is in fact a case variable (an array of integers).
