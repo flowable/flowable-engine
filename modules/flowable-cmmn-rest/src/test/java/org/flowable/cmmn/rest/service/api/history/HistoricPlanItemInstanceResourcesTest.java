@@ -112,7 +112,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         closeResponse(response);
         assertThat(jsonResponse.get("data")).isNotNull();
         jsonData = jsonResponse.get("data");
-        assertThat(jsonData).hasSize(5);
+        assertThat(jsonData).hasSize(3);
         StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED));
     }
 
@@ -452,7 +452,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("data")).hasSize(4);
+        assertThat(responseNode.get("data")).hasSize(3);
 
         List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
@@ -578,7 +578,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("data")).hasSize(4);
+        assertThat(responseNode.get("data")).hasSize(3);
 
         List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.COMPLETED).list();

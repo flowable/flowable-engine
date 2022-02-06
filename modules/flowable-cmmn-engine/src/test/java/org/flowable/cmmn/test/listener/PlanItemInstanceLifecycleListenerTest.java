@@ -18,9 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.junit.After;
@@ -287,6 +290,120 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         assertEvent(events.get(0), "Stage two", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(1), "M1", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(2), "C", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/PlanItemInstanceLifecycleListenerTest.testUserEventListenerRepetition.cmmn")
+    public void testEnterUserEventListenerRepetition() {
+        setTestLifeCycleListener(null, new TestEnterUserEventListener());
+
+        // Start case instance
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepetition").start();
+        
+        List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(1);
+        
+        UserEventListenerInstance userEventListenrInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(2);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(3);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/PlanItemInstanceLifecycleListenerTest.testUserEventListenerRepetitionWithCondition.cmmn")
+    public void testEnterUserEventListenerRepetitionWithCondition() {
+        TestLeaveUserEventListener testLeaveUserEventListener = new TestLeaveUserEventListener();
+        setTestLifeCycleListener(null, testLeaveUserEventListener);
+        setTestLifeCycleListener(null, new TestEnterUserEventListener());
+
+        // Start case instance
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetition")
+                .variable("continueRepeat", true)
+                .start();
+        
+        List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(1);
+        
+        UserEventListenerInstance userEventListenrInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(2);
+        
+        List<TestLifeCycleEvent> leaveEvents = testLeaveUserEventListener.getEvents();
+        assertThat(leaveEvents).hasSize(1);
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "continueRepeat", false);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(3);
+        
+        leaveEvents = testLeaveUserEventListener.getEvents();
+        assertThat(leaveEvents).hasSize(3);
+        
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerRepetition() {
+        setTestLifeCycleListener(null, new TestLeaveUserEventListener());
+
+        // Start case instance
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepetition").start();
+        
+        assertThat(testLifeCycleListener.getEvents()).isEmpty();
+
+        UserEventListenerInstance userEventListenrInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+
+        List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(1);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(2);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(3);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testUserEventListenerRepetitionWithCondition() {
+        setTestLifeCycleListener(null, new TestLeaveUserEventListener());
+
+        // Start case instance
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetition")
+                .variable("continueRepeat", true)
+                .start();
+        
+        assertThat(testLifeCycleListener.getEvents()).isEmpty();
+
+        UserEventListenerInstance userEventListenrInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+
+        List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(1);
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "continueRepeat", false);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
+        events = testLifeCycleListener.getEvents();
+        assertThat(events).hasSize(3);
+        
+        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {

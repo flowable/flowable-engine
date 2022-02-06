@@ -245,6 +245,19 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricActivitiesDeleteReason(pi, null, "preTerminateEnd");
         assertHistoricActivitiesDeleteReason(subProcessInstance, DeleteReason.TERMINATE_END_EVENT, "task");
     }
+    
+    @Test
+    @Deployment
+    public void testTerminateInEventSubProcess() throws Exception {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminate");
+
+        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("task").singleResult();
+        assertThat(task).isNotNull();
+        
+        runtimeService.signalEventReceived("signal");
+
+        assertProcessEnded(pi.getId());
+    }
 
     @Test
     @Deployment(resources = {

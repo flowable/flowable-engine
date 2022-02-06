@@ -28,6 +28,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
@@ -98,6 +99,7 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
                 .batchType(Batch.HISTORIC_CASE_DELETE_TYPE)
                 .tenantId(tenantId)
                 .searchKey(batchName)
+                .searchKey2(Authentication.getAuthenticatedUserId())
                 .status(DeleteCaseInstanceBatchConstants.STATUS_IN_PROGRESS)
                 .batchDocumentJson(batchConfiguration.toString())
                 .create();

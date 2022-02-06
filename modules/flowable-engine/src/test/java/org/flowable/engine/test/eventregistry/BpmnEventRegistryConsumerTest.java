@@ -358,6 +358,62 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
                 entry("payload1", "Hello World")
             );
     }
+    
+    @Test
+    @Deployment
+    public void testProcessStartWithEventSubProcess() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+        assertThat(processDefinition).isNotNull();
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+            .processDefinitionId(processDefinition.getId())
+            .scopeType(ScopeTypes.BPMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+        inboundEventChannelAdapter.triggerTestEvent("myVar1");
+        
+        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(1);
+        String processInstanceId = runtimeService.createProcessInstanceQuery().singleResult().getId();
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isEqualTo(1);
+        
+        List<EventSubscription> eventSubProcessEventSubscriptions = runtimeService.createEventSubscriptionQuery()
+            .processInstanceId(processInstanceId)
+            .scopeType(ScopeTypes.BPMN)
+            .list();
+        
+        assertThat(eventSubProcessEventSubscriptions.size()).isEqualTo(2);
+        
+        for (EventSubscription subProcessEventSubscription : eventSubProcessEventSubscriptions) {
+            assertThat(subProcessEventSubscription.getEventType()).isEqualTo("myEvent");
+        }
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar2");
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").count()).isZero();
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar1");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").singleResult();
+        assertThat(task).isNotNull();
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isEqualTo(1);
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar1Interrupting");
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isZero();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").count()).isZero();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1Interrupting").singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+    }
 
     @Test
     @Deployment

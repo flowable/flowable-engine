@@ -65,6 +65,7 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractNeedsProce
             historicProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
             historicProcessInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
             historicProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
+            historicProcessInstance.setBusinessStatus(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_STATUS));
             historicProcessInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             historicProcessInstance.setProcessDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_KEY));
             historicProcessInstance.setProcessDefinitionName(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_NAME));

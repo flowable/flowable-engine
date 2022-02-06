@@ -1,0 +1,7 @@
+{
+  "key": "jmsOutbound",
+  "channelType": "outbound",
+  "type": "jms",
+  "destination": "order",
+  "serializerType": "json"
+}

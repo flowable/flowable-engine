@@ -56,6 +56,8 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "An indication if the historic case instance variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.\n", paramType = "query"),
+            @ApiImplicitParam(name = "withoutCaseInstanceParentId", dataType = "boolean", value = "If true, only returns instances without a parent set. If false, the withoutCaseInstanceParentId parameter is ignored.\n", paramType = "query"),
+            @ApiImplicitParam(name = "withoutCaseInstanceCallbackId", dataType = "boolean", value = "If true, only returns instances without a callbackId set. If false, the withoutCaseInstanceCallbackId parameter is ignored.\n", paramType = "query")
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic case instances could be queried."),
@@ -124,7 +126,12 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.get("withoutTenantId") != null) {
             queryRequest.setWithoutTenantId(Boolean.valueOf(allRequestParams.get("withoutTenantId")));
         }
-
+        if (allRequestParams.get("withoutCaseInstanceParentId") != null) {
+            queryRequest.setWithoutCaseInstanceParentId(Boolean.valueOf(allRequestParams.get("withoutCaseInstanceParentId")));
+        }
+        if (allRequestParams.get("withoutCaseInstanceCallbackId") != null) {
+            queryRequest.setWithoutCaseInstanceCallbackId(Boolean.valueOf(allRequestParams.get("withoutCaseInstanceCallbackId")));
+        }
         return getQueryResponse(queryRequest, allRequestParams);
     }
 }

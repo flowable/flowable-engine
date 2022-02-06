@@ -49,6 +49,8 @@ public class FlowableUiApplicationWithEnabledJmsTest {
             .containsExactly(
                 "configurationProperties",
                 "Inlined Test Properties",
+                "servletConfigInitParams",
+                "servletContextInitParams",
                 "systemProperties",
                 "systemEnvironment",
                 "random",

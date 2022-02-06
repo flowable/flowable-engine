@@ -13,79 +13,13 @@
 
 package org.flowable.job.api;
 
-import java.util.Date;
-
-import org.flowable.common.engine.api.query.Query;
-
 /**
  * Allows programmatic querying of {@link Job}s.
  *
  * @author Joram Barrez
  * @author Falko Menge
  */
-public interface JobQuery extends Query<JobQuery, Job> {
-
-    /** Only select jobs with the given id */
-    JobQuery jobId(String jobId);
-
-    /** Only select jobs which exist for the given process instance. **/
-    JobQuery processInstanceId(String processInstanceId);
-    
-    /** Only select jobs without a process instance id value. **/
-    JobQuery withoutProcessInstanceId();
-
-    /** Only select jobs which exist for the given execution */
-    JobQuery executionId(String executionId);
-
-    /** Select jobs which have given job handler type */
-    JobQuery handlerType(String handlerType);
-
-    /** Only select jobs which exist for the given process definition id */
-    JobQuery processDefinitionId(String processDefinitionId);
-    
-    /** Only select jobs which exist for the given category */
-    JobQuery category(String category);
-    
-    /** Only select jobs like for the given category value */
-    JobQuery categoryLike(String categoryLike);
-    
-    /** Only select jobs which exist for the given element id */
-    JobQuery elementId(String elementId);
-    
-    /** Only select jobs which exist for the given element name */
-    JobQuery elementName(String elementName);
-    
-    /** Only select tasks for the given scope identifier. */
-    JobQuery scopeId(String scopeId);
-    
-    /** Only select jobs without a scope id value. **/
-    JobQuery withoutScopeId();
-
-    /** Only select tasks for the given sub scope identifier. */
-    JobQuery subScopeId(String subScopeId);
-    
-    /** Only select tasks for the given scope type. */
-    JobQuery scopeType(String scopeType);
-
-    /**
-     * Only return jobs that do not have a scope type.
-     */
-    JobQuery withoutScopeType();
-    
-    /** Only select tasks for the given scope definition identifier. */
-    JobQuery scopeDefinitionId(String scopeDefinitionId);
-    
-    /** Only select jobs for the given case instance. */
-    JobQuery caseInstanceId(String caseInstanceId);
-    
-    /** Only select jobs for the given case definition. */
-    JobQuery caseDefinitionId(String caseDefinitionId);
-    
-    /** Only select jobs for the given plan item instance.  */
-    JobQuery planItemInstanceId(String planItemInstanceId);
-    
-    /** Only select jobs with the given correlationId. */
-    JobQuery correlationId(String correlationId);
+public interface JobQuery extends BaseJobQuery<JobQuery, Job> {
 
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}
@@ -96,33 +30,6 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * Only select jobs that are messages. Cannot be used together with {@link #timers()}
      */
     JobQuery messages();
-
-    /** Only select jobs where the duedate is lower than the given date. */
-    JobQuery duedateLowerThan(Date date);
-
-    /** Only select jobs where the duedate is higher then the given date. */
-    JobQuery duedateHigherThan(Date date);
-
-    /** Only select jobs that failed due to an exception. */
-    JobQuery withException();
-
-    /** Only select jobs that failed due to an exception with the given message. */
-    JobQuery exceptionMessage(String exceptionMessage);
-
-    /**
-     * Only select jobs that have the given tenant id.
-     */
-    JobQuery jobTenantId(String tenantId);
-
-    /**
-     * Only select jobs with a tenant id like the given one.
-     */
-    JobQuery jobTenantIdLike(String tenantIdLike);
-
-    /**
-     * Only select jobs that do not have a tenant id.
-     */
-    JobQuery jobWithoutTenantId();
 
     /**
      * Only return jobs with the given lock owner.
@@ -139,40 +46,4 @@ public interface JobQuery extends Query<JobQuery, Job> {
      */
     JobQuery unlocked();
 
-    // sorting //////////////////////////////////////////
-
-    /**
-     * Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByJobId();
-
-    /**
-     * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByJobDuedate();
-
-    /**
-     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByJobCreateTime();
-
-    /**
-     * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByJobRetries();
-
-    /**
-     * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByProcessInstanceId();
-
-    /**
-     * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByExecutionId();
-
-    /**
-     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    JobQuery orderByTenantId();
 }

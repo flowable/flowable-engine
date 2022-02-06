@@ -186,7 +186,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and change state activity was executed."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
-    @PostMapping(value = "/runtime/case-instances/{caseInstanceId}/change-state", produces = "application/json")
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/change-state", produces = "application/json")
     public void changePlanItemState(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
             @RequestBody ChangePlanItemStateRequest planItemStateRequest, HttpServletRequest request) {
         
@@ -221,7 +221,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 409, message = "Indicates the requested case instance action cannot be executed since the case-instance is already activated/suspended."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
-    @PostMapping(value = "/runtime/case-instances/{caseInstanceId}/migrate", produces = "application/json")
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/migrate", produces = "application/json")
     public void migrateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                                        @RequestBody String migrationDocumentJson, HttpServletRequest request) {
 

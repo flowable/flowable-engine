@@ -99,6 +99,7 @@ public class HistoricDataEngineDeleteTest {
                     .status(DeleteCaseInstanceBatchConstants.STATUS_IN_PROGRESS)
                     .batchDocumentJson("Batch document")
                     .create();
+            batchesToRemove.add(processBatch.getId());
 
             cmmnManagementService.createBatchPartBuilder(processBatch)
                     .type("test")

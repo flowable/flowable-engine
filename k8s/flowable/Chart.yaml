@@ -1,7 +1,16 @@
 apiVersion: v2
 name: flowable
-version: 6.7.0
+version: 6.7.3-snapshot.2
 description: A Flowable Helm chart for Kubernetes
-appVersion: 6.7.0
+appVersion: 6.7.2
 home: https://flowable.org
 icon: https://flowable.org/docs/img/logo.png
+sources: 
+  - https://github.com/flowable/flowable-engine/
+keywords:
+  - flowable
+  - BPMN
+  - CMMN
+  - DMN
+annotations:
+  artifacthub.io/prerelease: "true"

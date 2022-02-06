@@ -126,8 +126,9 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
         for (String resourceName : resources.keySet()) {
             EngineResource savedResource = savedResources.get(resourceName);
 
-            if (savedResource == null)
+            if (savedResource == null) {
                 return true;
+            }
 
             if (!savedResource.isGenerated()) {
                 EngineResource resource = resources.get(resourceName);

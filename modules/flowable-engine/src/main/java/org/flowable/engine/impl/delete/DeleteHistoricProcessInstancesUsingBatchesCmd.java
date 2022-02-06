@@ -22,6 +22,7 @@ import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ManagementService;
@@ -97,6 +98,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
                 .batchType(Batch.HISTORIC_PROCESS_DELETE_TYPE)
                 .tenantId(tenantId)
                 .searchKey(batchName)
+                .searchKey2(Authentication.getAuthenticatedUserId())
                 .status(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS)
                 .batchDocumentJson(batchConfiguration.toString())
                 .create();

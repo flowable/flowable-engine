@@ -59,6 +59,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String businessKey;
+    protected String businessStatus;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
@@ -111,6 +112,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.extraFormInfo = processInstanceBuilder.getExtraFormInfo();
         this.extraFormOutcome = processInstanceBuilder.getExtraFormOutcome();
         this.fallbackToDefaultTenant = processInstanceBuilder.isFallbackToDefaultTenant();
+        this.businessStatus = processInstanceBuilder.getBusinessStatus();
     }
 
     @Override
@@ -234,7 +236,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     }
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
-        return processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName,
+        return processInstanceHelper.createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName,
             overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
             callbackId, callbackType, referenceId, referenceType, stageInstanceId, true);
     }

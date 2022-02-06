@@ -1,6 +1,6 @@
 {
     "key": "two",
-    "name": "My event",
+    "name": "My second event",
     "correlationParameters": [
         {
             "name": "customerId",

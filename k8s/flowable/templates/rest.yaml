@@ -2,29 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "flowable.template" . }}
+  name: {{ .Release.Name }}-{{ include "flowable.template" . }}
   labels:
     {{ include "flowable.defaultlabels" . }}
 spec:
   replicas: {{ .Values.rest.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "flowable.template" . }}
+      app.kubernetes.io/name: {{ .Release.Name }}-{{ include "flowable.template" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "flowable.template" . }}
+        app.kubernetes.io/name: {{ .Release.Name }}-{{ include "flowable.template" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       initContainers:
       {{- if .Values.postgres.enabled }}
       - name: check-db-ready
         image: postgres:9.6.5
-        command: ['sh', '-c', 'until pg_isready -h {{ .Values.postgres.service.name }} -p 5432; do echo waiting for database; sleep 2; done;']
+        command: ['sh', '-c', 'until pg_isready -h {{ .Release.Name }}-{{ .Values.postgres.service.name }} -p 5432; do echo waiting for database; sleep 2; done;']
       {{- end }}
       containers:
-      - name: {{ include "flowable.template" . }}
+      - name: {{ .Release.Name }}-{{ include "flowable.template" . }}
         image: "{{ .Values.rest.image.repository }}:{{ .Values.rest.image.tag }}"
         imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
         ports:
@@ -56,7 +56,7 @@ spec:
           failureThreshold: 10
         envFrom:
         - configMapRef:
-            name: {{ include "flowable.template" . }}-configmap
+            name: {{ .Release.Name }}-{{ include "flowable.template" . }}-configmap
         volumeMounts:
         resources:
 {{ toYaml .Values.rest.resources | indent 10 }}
@@ -85,13 +85,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.rest.service.name }}
+  name: {{ .Release.Name }}-{{ .Values.rest.service.name }}
   labels:
     {{ include "flowable.defaultlabels" . }}
 spec:
   clusterIP: None
   selector:
-    app.kubernetes.io/name: {{ include "flowable.template" . }}
+    app.kubernetes.io/name: {{ .Release.Name }}-{{ include "flowable.template" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
   - name: http
@@ -102,7 +102,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "flowable.template" . }}-configmap
+  name: {{ .Release.Name }}-{{ include "flowable.template" . }}-configmap
 data:
   JAVA_OPTS: "{{ .Values.rest.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
   SERVER_SERVLET_CONTEXT_PATH: {{ .Values.rest.contextPath | quote }}
@@ -112,7 +112,7 @@ data:
   SPRING_DATASOURCE_URL: {{ .Values.database.datasourceUrl | quote }}
   {{- else if .Values.postgres.enabled }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
-  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.postgres.service.name }}:5432/{{ .Values.database.name }}
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Release.Name }}-{{ .Values.postgres.service.name }}:5432/{{ .Values.database.name }}
   {{- else if .Values.cloudSql.enabled }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
   SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/{{ .Values.database.name }}

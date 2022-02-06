@@ -47,7 +47,9 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private List<QueryVariable> variables;
     private String tenantId;
     private Boolean withoutTenantId;
-
+    private Boolean withoutCaseInstanceParentId;
+    private Boolean withoutCaseInstanceCallbackId;
+    
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
@@ -200,5 +202,21 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
     }
-
+    
+    public Boolean getWithoutCaseInstanceParentId() {
+        return withoutCaseInstanceParentId;
+    }
+    
+    public void setWithoutCaseInstanceParentId(Boolean withoutCaseInstanceParentId) {
+        this.withoutCaseInstanceParentId = withoutCaseInstanceParentId;
+    }
+    
+    public Boolean getWithoutCaseInstanceCallbackId() {
+        return withoutCaseInstanceCallbackId;
+    }
+    
+    public void setWithoutCaseInstanceCallbackId(Boolean withoutCaseInstanceCallbackId) {
+        this.withoutCaseInstanceCallbackId = withoutCaseInstanceCallbackId;
+    }
+    
 }

@@ -115,7 +115,7 @@
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
-      <if test="tenantIds != null and !tenantIds.isEmpty()">
+      <if test="tenantIds != null and !tenantIds.empty">
         and RES.TENANT_ID_ in
         <foreach item="item" index="index" collection="tenantIds" open="(" separator="," close=")">
             #{item}
@@ -127,7 +127,7 @@
       <if test="configuration != null">
           and RES.CONFIGURATION_ = #{configuration}
       </if>
-      <if test="configurations != null and !configurations.isEmpty()">
+      <if test="configurations != null and !configurations.empty">
           and RES.CONFIGURATION_ in
           <foreach item="item" index="index" collection="configurations" open="(" separator="," close=")">
               #{item}
@@ -193,7 +193,7 @@
               <if test="orQueryObject.tenantId != null">
                   or RES.TENANT_ID_ = #{orQueryObject.tenantId}
               </if>
-              <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.isEmpty()">
+              <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.empty">
                   or RES.TENANT_ID_ in
                   <foreach item="item" index="index" collection="orQueryObject.tenantIds" open="(" separator="," close=")">
                       #{item}
@@ -205,7 +205,7 @@
               <if test="orQueryObject.configuration != null">
                   or RES.CONFIGURATION_ = #{orQueryObject.configuration}
               </if>
-              <if test="orQueryObject.configurations != null and !orQueryObject.configurations.isEmpty()">
+              <if test="orQueryObject.configurations != null and !orQueryObject.configurations.empty">
                   or RES.CONFIGURATION_ in
                   <foreach item="item" index="index" collection="orQueryObject.configurations" open="(" separator="," close=")">
                       #{item}

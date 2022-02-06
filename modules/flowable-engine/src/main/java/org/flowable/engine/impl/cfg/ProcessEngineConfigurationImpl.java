@@ -218,8 +218,8 @@ import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.JsonVariableAggregator;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceIdsJobHandler;
-import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsJobHandler;
 import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceStatusJobHandler;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsJobHandler;
 import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsStatusJobHandler;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
@@ -241,9 +241,11 @@ import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
 import org.flowable.engine.impl.function.TaskGetFunctionDelegate;
+import org.flowable.engine.impl.history.DefaultHistoryConfigurationSettings;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
+import org.flowable.engine.impl.history.HistoryConfigurationSettings;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -366,6 +368,7 @@ import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
+import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
@@ -521,6 +524,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
+    protected HistoryConfigurationSettings historyConfigurationSettings;
 
     protected boolean isAsyncHistoryEnabled;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
@@ -754,6 +758,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
 
+    protected List<ProcessInstanceMigrationCallback> processInstanceMigrationCallbacks;
+    
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
      * <p>
@@ -999,6 +1005,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initVariableAggregator();
+        initHistoryConfigurationSettings();
         initHistoryManager();
         initChangeTenantIdManager();
         initDynamicStateManager();
@@ -1304,12 +1311,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // History manager ///////////////////////////////////////////////////////////
 
+    public void initHistoryConfigurationSettings() {
+        if (historyConfigurationSettings == null) {
+            historyConfigurationSettings = new DefaultHistoryConfigurationSettings(this);
+        }
+    }
+
     public void initHistoryManager() {
         if (historyManager == null) {
             if (isAsyncHistoryEnabled) {
-                historyManager = new AsyncHistoryManager(this);
+                historyManager = new AsyncHistoryManager(this, historyConfigurationSettings);
             } else {
-                historyManager = new DefaultHistoryManager(this);
+                historyManager = new DefaultHistoryManager(this, historyConfigurationSettings);
             }
         }
     }
@@ -4492,6 +4505,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceStateChangedCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks) {
         this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
+        return this;
+    }
+    
+    public List<ProcessInstanceMigrationCallback> getProcessInstanceMigrationCallbacks() {
+        return processInstanceMigrationCallbacks;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceMigrationCallbacks(List<ProcessInstanceMigrationCallback> processInstanceMigrationCallbacks) {
+        this.processInstanceMigrationCallbacks = processInstanceMigrationCallbacks;
         return this;
     }
 

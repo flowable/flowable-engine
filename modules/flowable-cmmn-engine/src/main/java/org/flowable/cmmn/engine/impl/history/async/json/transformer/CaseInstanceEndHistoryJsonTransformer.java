@@ -52,6 +52,7 @@ public class CaseInstanceEndHistoryJsonTransformer extends AbstractNeedsHistoric
                historicCaseInstanceEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
                historicCaseInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));
                historicCaseInstanceEntity.setBusinessKey(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_BUSINESS_KEY));
+               historicCaseInstanceEntity.setBusinessStatus(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_BUSINESS_STATUS));
                historicCaseInstanceEntity.setParentId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_PARENT_ID));
                historicCaseInstanceEntity.setCaseDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID));
                historicCaseInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));

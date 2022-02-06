@@ -140,11 +140,17 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}
       </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
       <if test="keyLike != null">
         and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="keyLikeIgnoreCase != null">
+        and lower(RES.KEY_) like lower(#{keyLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}
@@ -170,7 +176,7 @@
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null and !deploymentIds.isEmpty()">
+      <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
         <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
           #{item}

@@ -1,4 +1,5 @@
 {
+    "name": "One Channel",
     "key": "one",
     "channelType": "inbound",
     "type": "jms",

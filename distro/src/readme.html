@@ -28,6 +28,18 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.7.1</h3>
+
+<ul>
+	<li>A case and process instance has support for a business status value, similar to a business key.</li>
+	<li>Added support for deleting historic case and process instances and their related data using batches and batch parts.</li>
+	<li>Fixed issue with the global lock mechanism when running a cluster of Flowable instances.</li>
+	<li>Fixed issue with transient variables made persistent when passing all variables to a sub process instance with a call activity task.</li>
+	<li>Added support for querying tasks, jobs and event subscriptions without the BPMN or CMMN entities. By using withoutProcessInstanceId on the task query for example you
+	can make sure that only CMMN tasks and standalone tasks are returned without the BPMN tasks.</li>
+	<li>Added MariaDB to the Flowable QA databases in Github Actions.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.7.0</h3>
 
 <ul>

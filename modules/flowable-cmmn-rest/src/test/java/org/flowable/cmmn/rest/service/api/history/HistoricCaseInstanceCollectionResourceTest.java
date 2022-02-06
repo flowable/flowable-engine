@@ -304,6 +304,70 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testWithoutParentIDWithoutCallbackId() throws IOException {
+        CaseInstance parentInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withoutBoth")
+                .start();
+
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withParentId").parentId(parentInstance.getId())
+                .start();
+
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withCallBackId").callbackId("testID")
+                .start();
+
+        // Do the actual call
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceParentId=true"), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { name: 'withoutBoth' },"
+                        + "    { name: 'withCallBackId' }"
+                        + "  ]"
+                        + "}");
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceCallbackId=true"),
+                HttpStatus.SC_OK);
+
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { name: 'withoutBoth' },"
+                        + "    { name: 'withParentId' }"
+                        + "  ]"
+                        + "}");
+
+        response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?withoutCaseInstanceParentId=false&withoutCaseInstanceCallbackId=false"),
+                HttpStatus.SC_OK);
+        
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { name: 'withoutBoth' },"
+                        + "    { name: 'withParentId' },"
+                        + "    { name: 'withCallBackId' }"
+                        + "  ]"
+                        + "}");
+
+    }
+
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables)
             throws IOException {
 
@@ -330,6 +394,5 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
             assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
         }
-
     }
 }

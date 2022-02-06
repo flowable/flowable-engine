@@ -13,84 +13,22 @@
 
 package org.flowable.job.api;
 
-import java.util.Date;
-
-import org.flowable.common.engine.api.query.Query;
-
 /**
  * Allows programmatic querying of {@link Job}s.
  *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
-
-    /** Only select jobs with the given id */
-    SuspendedJobQuery jobId(String jobId);
-
-    /** Only select jobs which exist for the given process instance. **/
-    SuspendedJobQuery processInstanceId(String processInstanceId);
-    
-    /** Only select jobs without a process instance id value. **/
-    SuspendedJobQuery withoutProcessInstanceId();
-
-    /** Only select jobs which exist for the given execution */
-    SuspendedJobQuery executionId(String executionId);
-
-    /** Select jobs which have given job handler type */
-    SuspendedJobQuery handlerType(String handlerType);
-
-    /** Only select jobs which exist for the given process definition id */
-    SuspendedJobQuery processDefinitionId(String processDefinitionid);
-    
-    /** Only select jobs which exist for the given category */
-    SuspendedJobQuery category(String category);
-    
-    /** Only select jobs like for the given category value */
-    SuspendedJobQuery categoryLike(String categoryLike);
-    
-    /** Only select jobs which exist for the given element id */
-    SuspendedJobQuery elementId(String elementId);
-    
-    /** Only select jobs which exist for the given element name */
-    SuspendedJobQuery elementName(String elementName);
-    
-    /** Only select jobs for the given scope identifier. */
-    SuspendedJobQuery scopeId(String scopeId);
-    
-    /** Only select jobs without a scope id value. **/
-    SuspendedJobQuery withoutScopeId();
-
-    /** Only select jobs for the given sub scope identifier. */
-    SuspendedJobQuery subScopeId(String subScopeId);
-    
-    /** Only select jobs for the given scope type. */
-    SuspendedJobQuery scopeType(String scopeType);
+public interface SuspendedJobQuery extends BaseJobQuery<SuspendedJobQuery, Job> {
 
     /**
-     * Only select jobs that do not have a scope type.
+     * Only select jobs which have retries left
      */
-    SuspendedJobQuery withoutScopeType();
-    
-    /** Only select jobs for the given scope definition identifier. */
-    SuspendedJobQuery scopeDefinitionId(String scopeDefinitionId);
-    
-    /** Only select jobs for the given case instance. */
-    SuspendedJobQuery caseInstanceId(String caseInstanceId);
-    
-    /** Only select jobs for the given case definition. */
-    SuspendedJobQuery caseDefinitionId(String caseDefinitionId);
-    
-    /** Only select jobs for the given plan item instance.  */
-    SuspendedJobQuery planItemInstanceId(String planItemInstanceId);
-
-    /** Only select jobs with the given correlationId.  */
-    SuspendedJobQuery correlationId(String correlationId);
-
-    /** Only select jobs which have retries left */
     SuspendedJobQuery withRetriesLeft();
 
-    /** Only select jobs which have no retries left */
+    /**
+     * Only select jobs which have no retries left
+     */
     SuspendedJobQuery noRetriesLeft();
 
     /**
@@ -112,69 +50,5 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
      * Only select external worker jobs. Cannot be used together with {@link #timers()} or {@link #messages()}
      */
     SuspendedJobQuery externalWorkers();
-
-    /** Only select jobs where the duedate is lower than the given date. */
-    SuspendedJobQuery duedateLowerThan(Date date);
-
-    /** Only select jobs where the duedate is higher then the given date. */
-    SuspendedJobQuery duedateHigherThan(Date date);
-
-    /** Only select jobs that failed due to an exception. */
-    SuspendedJobQuery withException();
-
-    /** Only select jobs that failed due to an exception with the given message. */
-    SuspendedJobQuery exceptionMessage(String exceptionMessage);
-
-    /**
-     * Only select jobs that have the given tenant id.
-     */
-    SuspendedJobQuery jobTenantId(String tenantId);
-
-    /**
-     * Only select jobs with a tenant id like the given one.
-     */
-    SuspendedJobQuery jobTenantIdLike(String tenantIdLike);
-
-    /**
-     * Only select jobs that do not have a tenant id.
-     */
-    SuspendedJobQuery jobWithoutTenantId();
-
-    // sorting //////////////////////////////////////////
-
-    /**
-     * Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByJobId();
-
-    /**
-     * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByJobDuedate();
-
-    /**
-     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByJobCreateTime();
-
-    /**
-     * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByJobRetries();
-
-    /**
-     * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByProcessInstanceId();
-
-    /**
-     * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByExecutionId();
-
-    /**
-     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    SuspendedJobQuery orderByTenantId();
 
 }

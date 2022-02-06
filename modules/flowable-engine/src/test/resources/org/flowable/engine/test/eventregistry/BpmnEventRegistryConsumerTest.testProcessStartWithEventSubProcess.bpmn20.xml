@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+  
+  <process id="process">
+  
+    <startEvent id="theStart">
+        <extensionElements>
+            <flowable:eventType>myEvent</flowable:eventType>
+        </extensionElements>
+    </startEvent>
+    
+    <sequenceFlow sourceRef="theStart" targetRef="task" />
+    
+    <userTask id="task" />
+  	
+  	<sequenceFlow sourceRef="task" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+    <subProcess id="eventSubProcess" triggeredByEvent="true">
+        <startEvent id="subProcessStart" isInterrupting="false">
+            <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+                <flowable:eventCorrelationParameter name="customerId" value="myVar1" />
+            </extensionElements>
+        </startEvent>
+        
+        <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask1" />
+    
+        <userTask id="subProcessTask1" />
+        
+    </subProcess>
+    
+    <subProcess id="eventSubProcessInterrupting" triggeredByEvent="true">
+        <startEvent id="subProcessStartInterrupting" isInterrupting="true">
+            <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+                <flowable:eventCorrelationParameter name="customerId" value="myVar1Interrupting" />
+            </extensionElements>
+        </startEvent>
+        
+        <sequenceFlow sourceRef="subProcessStartInterrupting" targetRef="subProcessTask1Interrupting" />
+    
+        <userTask id="subProcessTask1Interrupting" />
+        
+    </subProcess>
+    
+  </process>
+
+</definitions>

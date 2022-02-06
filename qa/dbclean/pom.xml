@@ -8,13 +8,13 @@
   <artifactId>flowable-dbclean</artifactId>
 
   <packaging>pom</packaging>
-  <version>6.7.1-SNAPSHOT</version>
+  <version>6.7.3-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.2.132</version>
+      <version>1.4.200</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>

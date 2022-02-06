@@ -11,7 +11,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.7.1-SNAPSHOT</version>
+    <version>6.7.3-SNAPSHOT</version>
   </parent>
 
 
@@ -102,5 +102,21 @@
       org.flowable.camel
     </flowable.artifact>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>java-17+</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.openjdk.nashorn</groupId>
+          <artifactId>nashorn-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
 </project>

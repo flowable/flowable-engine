@@ -110,8 +110,9 @@ public class ExecuteDecisionServiceOperation extends DmnOperation {
 
         // We reuse the algorithm on all adjacent nodes to the current node
         for (InformationRequirement requiredDecision : decisions.get(decisionId).getRequiredDecisions()) {
-            if (!visited.get(requiredDecision.getRequiredDecision().getParsedId()))
+            if (!visited.get(requiredDecision.getRequiredDecision().getParsedId())) {
                 executeSort(decisions, requiredDecision.getRequiredDecision().getParsedId(), visited, order);
+            }
         }
 
         // Put the current node in the array

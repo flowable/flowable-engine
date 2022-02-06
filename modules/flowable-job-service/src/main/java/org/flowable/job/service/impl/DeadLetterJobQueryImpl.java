@@ -14,6 +14,7 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String handlerType;
+    protected Collection<String> handlerTypes;
     protected String processDefinitionId;
     protected String category;
     protected String categoryLike;
@@ -251,6 +253,15 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
         this.handlerType = handlerType;
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery handlerTypes(Collection<String> handlerTypes) {
+        if (handlerTypes == null) {
+            throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
+        }
+        this.handlerTypes = handlerTypes;
         return this;
     }
 

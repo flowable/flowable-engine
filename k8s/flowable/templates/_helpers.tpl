@@ -65,7 +65,7 @@ Template default Ingress rules
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.ui.service.name }}
+            name: {{ .Release.Name }}-{{ .Values.ui.service.name }}
             port:
               number: 8080
     {{- end }}
@@ -74,7 +74,7 @@ Template default Ingress rules
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.rest.service.name }}
+            name: {{ .Release.Name }}-{{ .Values.rest.service.name }}
             port:
               number: 8080
     {{- end }}

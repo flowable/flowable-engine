@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -81,6 +83,25 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
         assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentId(null))
                 .isInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByDeploymentIds() {
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentOneId, deploymentTwoId, "dummy"));
+        assertThat(query.list()).hasSize(2);
+        assertThat(query.count()).isEqualTo(2);
+    }
+
+    @Test
+    public void testQueryByInvalidDeploymentIds() {
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentIds(Arrays.asList("dummy", "invalid"));
+        assertThat(query.singleResult()).isNull();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
+
+        assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentIds(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Deployment ids is null");
     }
 
     @Test
@@ -204,6 +225,57 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         // paging
         assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
         assertThat(repositoryService.createNativeDeploymentQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(1);
+    }
+
+    @Test
+    public void testQueryByParentDeploymentId() {
+        String deploymentId = repositoryService.createDeployment()
+                .name("With parent deployment")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .parentDeploymentId("parent1")
+                .deploy()
+                .getId();
+        deploymentIdsForAutoCleanup.add(deploymentId);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").singleResult()).isNotNull();
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").singleResult().getId()).isEqualTo(deploymentId);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testQueryByInvalidParentDeploymentId() {
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").singleResult()).isNull();
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").count()).isZero();
+    }
+
+    @Test
+    public void testQueryByParentDeploymentIds() {
+        String deploymentId = repositoryService.createDeployment()
+                .name("With parent deployment")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .parentDeploymentId("parent1")
+                .deploy()
+                .getId();
+        deploymentIdsForAutoCleanup.add(deploymentId);
+
+        String otherDeploymentId = repositoryService.createDeployment()
+                .name("With other parent deployment")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .parentDeploymentId("parent2")
+                .deploy()
+                .getId();
+        deploymentIdsForAutoCleanup.add(otherDeploymentId);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "parent2", "dummy")).list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "dummy")).singleResult()).isNotNull();
+    }
+
+    @Test
+    public void testQueryByInvalidParentDeploymentIds() {
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Collections.singletonList("invalid")).singleResult()).isNull();
+        assertThatThrownBy(() -> repositoryService.createDeploymentQuery().parentDeploymentIds(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("parentDeploymentIds is null");
     }
 
 }

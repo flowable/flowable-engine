@@ -608,6 +608,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return variableValueEquals(variableName, variableValue, false);
         }
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableName, variableValue, true);
+            return this;
+        } else {
+            return variableValueEquals(variableName, variableValue, true);
+        }
+    }
 
     @Override
     public HistoricProcessInstanceQuery variableValueNotEquals(String variableName, Object variableValue) {
@@ -616,6 +626,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return this;
         } else {
             return variableValueNotEquals(variableName, variableValue, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueNotEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, true);
+            return this;
+        } else {
+            return variableValueNotEquals(variableName, variableValue, true);
         }
     }
 
@@ -628,6 +648,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return variableValueEquals(variableValue, false);
         }
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueEquals(Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableValue, true);
+            return this;
+        } else {
+            return variableValueEquals(variableValue, true);
+        }
+    }
 
     @Override
     public HistoricProcessInstanceQuery variableValueEqualsIgnoreCase(String name, String value) {
@@ -636,6 +666,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return this;
         } else {
             return variableValueEqualsIgnoreCase(name, value, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueEqualsIgnoreCase(name, value, true);
         }
     }
 
@@ -650,12 +690,32 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
     
     @Override
+    public HistoricProcessInstanceQuery localVariableValueNotEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueNotEqualsIgnoreCase(name, value, true);
+        }
+    }
+    
+    @Override
     public HistoricProcessInstanceQuery variableValueLikeIgnoreCase(String name, String value) {
         if (inOrStatement) {
             currentOrQueryObject.variableValueLikeIgnoreCase(name, value, false);
             return this;
         } else {
             return variableValueLikeIgnoreCase(name, value, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueLikeIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueLikeIgnoreCase(name, value, true);
         }
     }
 
@@ -668,6 +728,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return variableValueGreaterThan(name, value, false);
         }
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueGreaterThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThan(name, value, true);
+            return this;
+        } else {
+            return variableValueGreaterThan(name, value, true);
+        }
+    }
 
     @Override
     public HistoricProcessInstanceQuery variableValueGreaterThanOrEqual(String name, Object value) {
@@ -676,6 +746,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return this;
         } else {
             return variableValueGreaterThanOrEqual(name, value, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueGreaterThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, true);
+            return this;
+        } else {
+            return variableValueGreaterThanOrEqual(name, value, true);
         }
     }
 
@@ -688,6 +768,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return variableValueLessThan(name, value, false);
         }
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueLessThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThan(name, value, true);
+            return this;
+        } else {
+            return variableValueLessThan(name, value, true);
+        }
+    }
 
     @Override
     public HistoricProcessInstanceQuery variableValueLessThanOrEqual(String name, Object value) {
@@ -698,6 +788,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return variableValueLessThanOrEqual(name, value, false);
         }
     }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueLessThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThanOrEqual(name, value, true);
+            return this;
+        } else {
+            return variableValueLessThanOrEqual(name, value, true);
+        }
+    }
 
     @Override
     public HistoricProcessInstanceQuery variableValueLike(String name, String value) {
@@ -706,6 +806,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             return this;
         } else {
             return variableValueLike(name, value, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableValueLike(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLike(name, value, true);
+            return this;
+        } else {
+            return variableValueLike(name, value, true);
         }
     }
 
@@ -720,12 +830,32 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
     
     @Override
+    public HistoricProcessInstanceQuery localVariableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, true);
+            return this;
+        } else {
+            return variableExists(name, true);
+        }
+    }
+    
+    @Override
     public HistoricProcessInstanceQuery variableNotExists(String name) {
         if (inOrStatement) {
             currentOrQueryObject.variableNotExists(name, false);
             return this;
         } else {
             return variableNotExists(name, false);
+        }
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery localVariableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, true);
+            return this;
+        } else {
+            return variableNotExists(name, true);
         }
     }
     

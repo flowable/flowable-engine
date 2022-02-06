@@ -35,6 +35,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
+    protected String businessStatus;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -92,6 +93,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
     
+    @Override
+    public ProcessInstanceBuilder businessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+        return this;
+    }
+
     @Override
     public ProcessInstanceBuilder callbackId(String callbackId) {
         this.callbackId = callbackId;
@@ -266,6 +273,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return businessKey;
     }
     
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
     public String getCallbackId() {
         return callbackId;
     }

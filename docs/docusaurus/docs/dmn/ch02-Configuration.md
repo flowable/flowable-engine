@@ -11,7 +11,7 @@ The Flowable DMN engine is configured through an XML file named flowable.dmn.cfg
 
 The easiest way to obtain a DmnEngine, is to use the org.flowable.dmn.engine.DmnEngines class:
 
-    DmnEngine dmnEngine = DMNEngines.getDefaultDmnEngine()
+    DmnEngine dmnEngine = DmnEngines.getDefaultDmnEngine()
 
 This will look for a flowable.dmn.cfg.xml file on the classpath and construct an engine based on the configuration in that file. The following snippet shows an example configuration. The following sections will give a detailed overview of the configuration properties.
 
@@ -289,7 +289,7 @@ Listed below are the types (case sensitive!) that Flowable uses to refer to data
 
 ## Creating the database tables
 
-Flowable DMM uses [Liquibase](http://www.liquibase.org) for tracking, managing and applying database schema changes.
+Flowable DMN uses [Liquibase](http://www.liquibase.org) for tracking, managing and applying database schema changes.
 
 The easiest way to create the database tables for your database is to:
 
