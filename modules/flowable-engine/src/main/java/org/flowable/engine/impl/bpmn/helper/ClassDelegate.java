@@ -215,19 +215,18 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance();
         }
-
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             try {
                 ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+                if (triggerable) {
+                    leave(execution);
+                }
             } catch (BpmnError error) {
                 ErrorPropagation.propagateError(error, execution);
             } catch (RuntimeException e) {
                 if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
                     throw e;
                 }
-            }
-            if (triggerable) {
-                leave(execution);
             }
         } else {
             throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance");

@@ -61,6 +61,16 @@ public class TriggerableServiceTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    void classDelegateTriggerExceptionWithoutWaitStateInCatch() {
+        String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
+        runtimeService.trigger(execution.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processId).count()).isZero();
+    }
+
+    @Test
+    @Deployment
     public void testDelegateExpression() {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("triggerableServiceTask", new TriggerableServiceTask());
