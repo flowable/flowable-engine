@@ -14,8 +14,10 @@ package org.flowable.dmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,18 +121,32 @@ public class DmnTaskTest {
     @Deployment(resources = {
             "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
             "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
-    void withRuleOrderAndBackwardsCompatibilityFlag_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
-        processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(false);
-        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("oneDecisionTaskProcess")
-                .variable("testInput", "second")
-                .start();
-        Map<String, Object> processVariables = processInstance.getProcessVariables();
-        Object resultObject = processVariables.get("DecisionTable");
-        assertThat(resultObject).isNull();
-        assertThat(processVariables).containsEntry("testOutput", 2.0);
+    void withRuleOrder_ensureOnlyOneRowIsHit_withoutArrays() {
+        executeWithoutArrays(() -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("testInput", "second")
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            assertThat(processVariables.get("testOutput")).isEqualTo(2.0);
+        });
+    }
 
-        processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(true);
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
+    void withRuleOrderAndBackwardsCompatibilityFlag_ensureListOfItemIsReturnedEvenIfOnlyOneRowIsHit() {
+        executeWithoutArrays(() -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("testInput", "second")
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            Object resultObject = processVariables.get("DecisionTable");
+            assertThat(resultObject).isNull();
+            assertThat(processVariables).containsEntry("testOutput", 2.0);
+        });
     }
 
     @Test
@@ -185,6 +201,21 @@ public class DmnTaskTest {
     @Deployment(resources = {
             "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
             "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
+    void collectHitPolicyNoAggregatorUseArrays_NoneHit_withoutArrays() {
+        executeWithoutArrays( () -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("inputVariable1", 35)
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            assertThat(processVariables.get("DecisionTable")).isNull();
+        });
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.collectHitPolicyNoAggregator.dmn"})
     void collectHitPolicyNoAggregatorUseArrays_NoneHit() {
         ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("oneDecisionTaskProcess")
@@ -211,6 +242,21 @@ public class DmnTaskTest {
         assertThat(resultObject).isInstanceOf(ArrayNode.class);
         ArrayNode result = (ArrayNode) resultObject;
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.ruleOrder.dmn"})
+    void withRuleOrder_ensureNoRowIsHit_withoutArrays() {
+        executeWithoutArrays(() -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionTaskProcess")
+                    .variable("testInput", "fourth")
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            assertThat(processVariables).containsExactlyEntriesOf(Collections.singletonMap("testInput", "fourth"));
+        });
     }
 
     @Test
@@ -465,4 +511,12 @@ public class DmnTaskTest {
         assertThat(result).isEqualTo("1000");
     }
 
+    protected void executeWithoutArrays(Runnable runnable) {
+        processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(false);
+        try {
+            runnable.run();
+        } finally {
+            processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(true);
+        }
+    }
 }
