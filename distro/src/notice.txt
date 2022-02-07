@@ -133,21 +133,21 @@ org.liquibase                   liquibase-core              4.5.0           Apac
 org.mybatis                     mybatis                     3.5.7           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.6           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
-org.slf4j                       jcl-over-slf4j              1.7.32          MIT License
-org.slf4j                       slf4j-api                   1.7.32          MIT License
-org.slf4j                       slf4j-log4j12               1.7.32          MIT License
-org.springframework             spring-beans                5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-context              5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-context-support      5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-tx                   5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-web                  5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-aop                  5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-expression           5.3.14          The Apache Software License, Version 2.0
-org.springframework             spring-orm                  5.3.14          The Apache Software License, Version 2.0
+org.slf4j                       jcl-over-slf4j              1.7.33          MIT License
+org.slf4j                       slf4j-api                   1.7.33          MIT License
+org.slf4j                       slf4j-log4j12               1.7.33          MIT License
+org.springframework             spring-beans                5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-context              5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-context-support      5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-tx                   5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-web                  5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-aop                  5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-expression           5.3.15          The Apache Software License, Version 2.0
+org.springframework             spring-orm                  5.3.15          The Apache Software License, Version 2.0
 org.springframework.security    spring-security-config      5.6.1           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-core        5.6.1           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-crypto      5.6.1           The Apache Software License, Version 2.0

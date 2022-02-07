@@ -3242,7 +3242,7 @@ If you do not give a specific behavior, then org.flowable.camel.impl.CamelBehavi
 
     @Override
     public void configure() throws Exception {
-      from("flowable:PingPongProcess:ping").transform().simple("${property.input} World");
+      from("flowable:PingPongProcess:ping").transform().simple("${exchangeProperty.input} World");
     }
 
 In this route, the string "world" is concatenated to the end of the property named "input" and the result will be set in the message body. It’s accessible by checking the "camelBody" variable in the Java service task and copied to "outputMap". Now that the example with its default behavior works, let’s see what the other possibilities are. In starting every Camel route, the Process Instance ID will be copied into a Camel property with the specific name of "PROCESS\_ID\_PROPERTY". It’s later used for correlating the process instance and Camel route. Also, it can be exploited in the Camel route.

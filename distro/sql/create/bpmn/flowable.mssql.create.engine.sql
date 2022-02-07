@@ -337,10 +337,10 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.7.2.0', 1);
+values ('schema.version', '6.7.2.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.7.2.0)', 1);
+values ('schema.history', 'create(6.7.2.1)', 1);
 
 create table ACT_HI_PROCINST (
     ID_ nvarchar(64) not null,

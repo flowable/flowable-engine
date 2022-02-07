@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.history.BaseCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -46,11 +45,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Filip Hrisafov
  */
-public abstract class AbstractAsyncCmmnHistoryManager extends BaseCmmnHistoryManager implements CmmnHistoryManager {
+public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryManager {
 
-    public AbstractAsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration,
-            CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
-        super(cmmnEngineConfiguration, cmmnHistoryConfigurationSettings);
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+
+    public AbstractAsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
+
+    protected CmmnHistoryConfigurationSettings getHistoryConfigurationSettings() {
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings();
     }
 
     protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, ObjectNode data) {

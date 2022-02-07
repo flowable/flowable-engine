@@ -22,4 +22,4 @@ create index ACT_IDX_ENT_LNK_REF_SCOPE on ACT_RU_ENTITYLINK(REF_SCOPE_ID_, REF_S
 create index ACT_IDX_ENT_LNK_ROOT_SCOPE on ACT_RU_ENTITYLINK(ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, LINK_TYPE_);
 create index ACT_IDX_ENT_LNK_SCOPE_DEF on ACT_RU_ENTITYLINK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_, LINK_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('entitylink.schema.version', '6.7.2.0', 1);
+insert into ACT_GE_PROPERTY values ('entitylink.schema.version', '6.7.2.1', 1);

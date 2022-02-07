@@ -542,9 +542,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
     protected List<ChangeActivityStateBuilderImpl> prepareChangeStateBuilders(ExecutionEntity processInstanceExecution, ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
-        //Check processDefinition tenant
+        // Check processDefinition tenant
         String procDefTenantId = procDefToMigrateTo.getTenantId();
-        if (!isSameTenant(processInstanceExecution.getTenantId(), procDefTenantId)) {
+        if (!isSameOrDefaultTenant(processInstanceExecution.getTenantId(), procDefToMigrateTo.getKey(), 
+                procDefTenantId, CommandContextUtil.getProcessEngineConfiguration(commandContext))) {
+            
             throw new FlowableException("Tenant mismatch between Process Instance ('" + processInstanceExecution.getTenantId() + "') and Process Definition ('" + procDefTenantId + "') to migrate to");
         }
 
@@ -553,7 +555,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         mainProcessChangeActivityStateBuilder.processInstanceId(processInstanceExecution.getId());
         changeActivityStateBuilders.add(mainProcessChangeActivityStateBuilder);
 
-        //Current executions to migrate...
+        // Current executions to migrate...
         Map<String, List<ExecutionEntity>> filteredExecutionsByActivityId = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceExecution.getId())
             .stream()
             .filter(executionEntity -> executionEntity.getCurrentActivityId() != null)
@@ -571,7 +573,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         Set<String> mappedFromActivities = mainProcessActivityMappingByFromActivityId.keySet();
 
-        //Partition the executions by Explicitly mapped or not
+        // Partition the executions by Explicitly mapped or not
         Map<Boolean, List<String>> partitionedExecutionActivityIds = filteredExecutionsByActivityId.keySet()
             .stream()
             .collect(Collectors.partitioningBy(mappedFromActivities::contains));
@@ -581,13 +583,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         BpmnModel newModel = ProcessDefinitionUtil.getBpmnModel(procDefToMigrateTo.getId());
         BpmnModel currentModel = ProcessDefinitionUtil.getBpmnModel(processInstanceExecution.getProcessDefinitionId());
 
-        //Auto Mapping
+        // Auto Mapping
         LOGGER.debug("Process AutoMapping for '{}' activity executions", executionActivityIdsToAutoMap.size());
         for (String executionActivityId : executionActivityIdsToAutoMap) {
             FlowElement currentModelFlowElement = currentModel.getFlowElement(executionActivityId);
 
             if (currentModelFlowElement instanceof CallActivity) {
-                //Check that all or none of the call activity child activities executions are explicitly mapped
+                // Check that all or none of the call activity child activities executions are explicitly mapped
                 boolean runningChildrenNotFullyMapped = false;
                 if (subProcessActivityMappingsByCallActivityIdAndFromActivityId.containsKey(executionActivityId)) {
                     Set<String> mappedSubProcessActivityIds = subProcessActivityMappingsByCallActivityIdAndFromActivityId.get(executionActivityId).keySet();
@@ -751,11 +753,18 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         return changeActivityStateBuilders;
     }
 
-    protected boolean isSameTenant(String tenantId1, String tenantId2) {
-
-        if (tenantId1 != null && tenantId2 != null) {
-            return tenantId1.equals(tenantId2);
-        } else if (tenantId1 == null && tenantId2 == null) {
+    protected boolean isSameOrDefaultTenant(String processInstanceTenantId, String processDefinitionKey, 
+            String processDefinitionTenantId, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        
+        if (processInstanceTenantId != null && processDefinitionTenantId != null) {
+            boolean tenantIdsEqual = processInstanceTenantId.equals(processDefinitionTenantId);
+            if (!tenantIdsEqual && processEngineConfiguration.isFallbackToDefaultTenant() && processEngineConfiguration.getDefaultTenantProvider() != null) {
+                return processDefinitionTenantId.equals(processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(processInstanceTenantId, ScopeTypes.BPMN, processDefinitionKey));
+            }
+            
+            return tenantIdsEqual;
+            
+        } else if (processInstanceTenantId == null && processDefinitionTenantId == null) {
             return true;
         }
         return false;

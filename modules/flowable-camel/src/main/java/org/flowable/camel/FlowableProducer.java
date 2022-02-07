@@ -15,7 +15,7 @@ package org.flowable.camel;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;

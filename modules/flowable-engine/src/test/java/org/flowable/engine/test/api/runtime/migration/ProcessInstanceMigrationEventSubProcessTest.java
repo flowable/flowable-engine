@@ -122,7 +122,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
 
         assertProcessEnded(processInstance.getId());
     }
-
+    
     @Test
     public void testMigrateSimpleActivityToActivityInsideMessageEventSubProcessInNewDefinition() {
         ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",

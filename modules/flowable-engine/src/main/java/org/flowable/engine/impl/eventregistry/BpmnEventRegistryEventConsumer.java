@@ -31,6 +31,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.eventregistry.api.EventConsumerInfo;
+import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
@@ -59,23 +61,30 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     }
     
     @Override
-    protected void eventReceived(EventInstance eventInstance) {
+    protected EventRegistryProcessingInfo eventReceived(EventInstance eventInstance) {
 
         // Fetching the event subscriptions happens in one transaction,
         // executing them one per subscription. There is no overarching transaction.
         // The reason for this is that the handling of one event subscription
         // should not influence (i.e. roll back) the handling of another.
 
+        EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
+        
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.BPMN, eventInstance, correlationKeys);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            handleEventSubscription(runtimeService, eventSubscription, eventInstance, correlationKeys);
+            EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getExecutionId(), 
+                    eventSubscription.getProcessDefinitionId(), ScopeTypes.BPMN);
+            handleEventSubscription(runtimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
+            eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
         }
+        
+        return eventRegistryProcessingInfo;
     }
 
     protected void handleEventSubscription(RuntimeService runtimeService, EventSubscription eventSubscription,
-            EventInstance eventInstance, Collection<CorrelationKey> correlationKeys) {
+            EventInstance eventInstance, Collection<CorrelationKey> correlationKeys, EventConsumerInfo eventConsumerInfo) {
 
         if (eventSubscription.getExecutionId() != null) {
 
@@ -120,6 +129,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                     if (processInstanceCount > 0) {
                         // Returning, no new instance should be started
+                        eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
                         return;
                     }

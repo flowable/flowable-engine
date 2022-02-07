@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
-import org.apache.camel.impl.DefaultComponent;
-import org.apache.camel.util.IntrospectionSupport;
+import org.apache.camel.support.DefaultComponent;
+import org.apache.camel.support.IntrospectionSupport;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
@@ -70,6 +70,7 @@ public class FlowableComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(String s, String s1, Map<String, Object> parameters) throws Exception {
         FlowableEndpoint ae = new FlowableEndpoint(s, getCamelContext());
+        ae.setComponent(this);
         ae.setIdentityService(identityService);
         ae.setRuntimeService(runtimeService);
         ae.setRepositoryService(repositoryService);
