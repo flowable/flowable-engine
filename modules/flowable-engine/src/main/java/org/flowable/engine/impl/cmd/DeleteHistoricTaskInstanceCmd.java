@@ -15,10 +15,15 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 /**
  * @author Tom Baeyens
@@ -39,7 +44,17 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).recordHistoricTaskDeleted(taskId);
+        // Check if task is completed
+        HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+
+        if (historicTaskInstance == null) {
+            throw new FlowableObjectNotFoundException("No historic task instance found with id: " + taskId, HistoricTaskInstance.class);
+        }
+        if (historicTaskInstance.getEndTime() == null) {
+            throw new FlowableException("task does not have an endTime, cannot delete historic task instance: " + taskId);
+        }
+
+        CommandContextUtil.getHistoryManager(commandContext).recordHistoricTaskDeleted(historicTaskInstance);
         
         return null;
     }

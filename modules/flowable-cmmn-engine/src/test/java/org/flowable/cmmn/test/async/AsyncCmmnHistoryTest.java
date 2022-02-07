@@ -461,8 +461,6 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNull();
     }
 
-
-
     @Test
     @CmmnDeployment
     public void testMilestoneReached() {

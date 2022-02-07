@@ -18,8 +18,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -62,12 +61,7 @@ public interface CmmnHistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided user task.
      */
-    boolean isHistoryEnabledForUserTask(TaskEntity taskEntity);
-
-    /**
-     * Returns whether history is enabled for the provided historic task.
-     */
-    boolean isHistoryEnabledForHistoricTask(HistoricTaskInstanceEntity taskEntity);
+    boolean isHistoryEnabledForUserTask(TaskInfo taskInfo);
 
     /**
      * Returns whether history is enabled for the provided variable instance.

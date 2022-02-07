@@ -22,6 +22,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.TaskHelper;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskDeletedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {

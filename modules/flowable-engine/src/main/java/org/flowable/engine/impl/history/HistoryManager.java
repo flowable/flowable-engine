@@ -25,6 +25,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -126,7 +127,7 @@ public interface HistoryManager {
     /**
      * Record historic task deleted, if audit history is enabled.
      */
-    void recordHistoricTaskDeleted(String taskId);
+    void recordHistoricTaskDeleted(HistoricTaskInstance task);
 
     /**
      * Record a variable has been created, if audit history is enabled.

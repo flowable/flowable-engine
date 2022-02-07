@@ -26,7 +26,7 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class TaskDeletedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer{
+public class TaskDeletedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
 
     public TaskDeletedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -39,7 +39,7 @@ public class TaskDeletedHistoryJsonTransformer extends AbstractTaskHistoryJsonTr
 
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        return true;
+        return getHistoricTaskEntity(historicalData, commandContext) != null;
     }
 
     @Override

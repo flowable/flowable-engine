@@ -20,6 +20,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -65,7 +66,7 @@ public interface CmmnHistoryManager {
 
     void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
-    void recordHistoricTaskDeleted(String taskId);
+    void recordHistoricTaskDeleted(HistoricTaskInstance task);
 
     void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity);
 
