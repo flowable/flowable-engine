@@ -27,6 +27,7 @@ import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
@@ -366,6 +367,24 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 }
             }
         }
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeleteHistoricInstancesUsingBatchWithAuthenticatedUser() {
+        Authentication.setAuthenticatedUserId("test-user");
+
+        String batchId = historyService.createHistoricProcessInstanceQuery()
+                .processDefinitionKey("dummy")
+                .deleteInParallelUsingBatch(5, "Test Deletion");
+        batchesToRemove.add(batchId);
+
+        Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+        assertThat(batch).isNotNull();
+        assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
+        assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+        assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
+        assertThat(batch.getBatchSearchKey2()).isEqualTo("test-user");
     }
 
     @Test
@@ -720,6 +739,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getCompleteTime()).isNull();
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion Uneven");
+            assertThat(batch.getBatchSearchKey2()).isNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
                     .isEqualTo("{"
                             + "  numberOfInstances: 10,"
@@ -863,6 +883,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThat(batch.getBatchSearchKey()).isEqualTo("Test Deletion");
+            assertThat(batch.getBatchSearchKey2()).isNull();
             assertThat(batch.getCompleteTime()).isNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
                     .isEqualTo("{"
@@ -1067,6 +1088,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
                 assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
                 assertThat(batch.getBatchSearchKey()).isEqualTo("Flowable BPMN History Cleanup");
+                assertThat(batch.getBatchSearchKey2()).isNull();
                 assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
                         .isEqualTo("{"
                                 + "  numberOfInstances: 10,"

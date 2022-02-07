@@ -71,7 +71,7 @@
       <if test="groupId != null">
         and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ = #{groupId})
       </if>
-      <if test="groupIds != null &amp;&amp; groupIds.size() > 0">
+      <if test="groupIds != null &amp;&amp; !groupIds.empty">
         and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ in  
             <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
       </if>

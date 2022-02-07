@@ -8,33 +8,33 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>6.7.1-SNAPSHOT</version>
+	<version>6.7.3-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.5.6</spring.boot.version>
-		<spring.framework.version>5.3.12</spring.framework.version>
-		<spring.security.version>5.5.3</spring.security.version>
-		<spring.amqp.version>2.3.11</spring.amqp.version>
-		<spring.kafka.version>2.7.8</spring.kafka.version>
-		<reactor-netty.version>1.0.6</reactor-netty.version>
-		<jackson.version>2.12.5</jackson.version>
+		<spring.boot.version>2.6.3</spring.boot.version>
+		<spring.framework.version>5.3.15</spring.framework.version>
+		<spring.security.version>5.6.1</spring.security.version>
+		<spring.amqp.version>2.4.2</spring.amqp.version>
+		<spring.kafka.version>2.8.1</spring.kafka.version>
+		<reactor-netty.version>1.0.14</reactor-netty.version>
+		<jackson.version>2.13.1</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-		<camel.version>2.25.0</camel.version>
+        <camel.version>3.14.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.33</slf4j.version>
 		<groovy.version>3.0.9</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.7.2</junit.jupiter.version>
+		<junit.jupiter.version>5.8.2</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.12.2</mockito.version>
+		<mockito.version>4.0.0</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
@@ -132,7 +132,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
-				<version>4.4.14</version>
+				<version>4.4.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -184,6 +184,11 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+				<groupId>javax.enterprise</groupId>
+				<artifactId>cdi-api</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-annotations</artifactId>
 				<version>1.6.2</version>
@@ -227,12 +232,12 @@
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
 				<artifactId>mariadb-java-client</artifactId>
-				<version>2.7.4</version>
+				<version>2.7.5</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.6.0</version>
+				<version>11.5.7.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -790,7 +795,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.32.Final</version>
+				<version>5.6.4.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -804,13 +809,10 @@
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
-				<artifactId>drools-core</artifactId>
-				<version>7.6.0.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.drools</groupId>
-				<artifactId>drools-compiler</artifactId>
-				<version>7.6.0.Final</version>
+				<artifactId>drools-bom</artifactId>
+				<version>7.63.0.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mule.modules</groupId>
@@ -845,21 +847,21 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.core</artifactId>
-				<version>6.0.0</version>
-				<scope>provided</scope>
+				<groupId>org.openjdk.nashorn</groupId>
+				<artifactId>nashorn-core</artifactId>
+				<version>15.3</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.compendium</artifactId>
-				<version>5.0.0</version>
+				<artifactId>osgi.core</artifactId>
+				<version>8.0.0</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>org.apache.felix.fileinstall</artifactId>
-				<version>3.6.4</version>
+				<version>3.6.6</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
@@ -993,7 +995,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>4.3.5</version>
+				<version>4.5.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>javax.xml.bind</groupId>
@@ -1010,12 +1012,12 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.2.22</version>
+				<version>42.3.2</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.12.1</version>
+				<version>2.12.2</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
@@ -1054,12 +1056,47 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-spring-xml</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-core-languages</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-bean</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-mvel</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-cdi</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-mock</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-direct</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-seda</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-log</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<dependency>
@@ -1218,7 +1255,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.1.2</version>
+					<version>3.2.2</version>
 					<configuration>
 						<archive>
 							<manifest>

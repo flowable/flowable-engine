@@ -56,6 +56,12 @@ public interface EventDefinitionQuery extends Query<EventDefinitionQuery, EventD
     EventDefinitionQuery eventDefinitionNameLike(String eventDefinitionNameLike);
 
     /**
+     * Only select event definitions where the name matches the given parameter (case-insensitive).
+     * The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    EventDefinitionQuery eventDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase);
+
+    /**
      * Only select event definitions that are deployed in a deployment with the given deployment id
      */
     EventDefinitionQuery deploymentId(String deploymentId);
@@ -79,6 +85,12 @@ public interface EventDefinitionQuery extends Query<EventDefinitionQuery, EventD
      * Only select event definitions where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
      */
     EventDefinitionQuery eventDefinitionKeyLike(String eventDefinitionKeyLike);
+
+    /**
+     * Only select event definitions where the key matches the given parameter (case-insensitive).
+     * The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    EventDefinitionQuery eventDefinitionKeyLikeIgnoreCase(String keyLikeIgnoreCase);
     
     /**
      * Only select event definitions with a certain version. Particularly useful when used in combination with {@link #eventDefinitionKey(String)}

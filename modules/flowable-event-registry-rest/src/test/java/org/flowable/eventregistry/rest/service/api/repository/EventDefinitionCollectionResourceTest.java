@@ -71,12 +71,20 @@ public class EventDefinitionCollectionResourceTest extends BaseSpringRestTestCas
             url = baseUrl + "?nameLike=" + encode("My order%");
             assertResultsPresentInDataResponse(url, orderEventDef.getId(), orderEventDef2.getId());
 
+            // Test nameLikeIgnorecase filtering
+            url = baseUrl + "?nameLikeIgnoreCase=" + encode("my order%");
+            assertResultsPresentInDataResponse(url, orderEventDef.getId(), orderEventDef2.getId());
+
             // Test key filtering
             url = baseUrl + "?key=myOrderEvent";
             assertResultsPresentInDataResponse(url, orderEventDef.getId(), orderEventDef2.getId());
 
             // Test keyLike filtering
             url = baseUrl + "?keyLike=" + encode("myOrder%");
+            assertResultsPresentInDataResponse(url, orderEventDef.getId(), orderEventDef2.getId());
+
+            // Test keyLikeIgnoreCase filtering
+            url = baseUrl + "?keyLikeIgnoreCase=" + encode("myorder%");
             assertResultsPresentInDataResponse(url, orderEventDef.getId(), orderEventDef2.getId());
 
             // Test resourceName filtering

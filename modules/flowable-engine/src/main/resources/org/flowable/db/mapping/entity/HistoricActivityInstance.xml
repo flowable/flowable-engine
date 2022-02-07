@@ -305,7 +305,7 @@
       <if test="activityType != null">
         and ${queryTablePrefix}ACT_TYPE_ = #{activityType}
       </if>
-      <if test="activityTypes != null and !activityTypes.isEmpty()">
+      <if test="activityTypes != null and !activityTypes.empty">
         and ${queryTablePrefix}ACT_TYPE_ in
          <foreach item="item" index="index" collection="activityTypes" open="(" separator="," close=")">
               #{item}
@@ -329,7 +329,7 @@
       <if test="tenantId != null">
         and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
       </if>
-      <if test="tenantIds != null &amp;&amp; !tenantIds.isEmpty()">
+      <if test="tenantIds != null &amp;&amp; !tenantIds.empty">
         and ${queryTablePrefix}TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
             #{tenantId}

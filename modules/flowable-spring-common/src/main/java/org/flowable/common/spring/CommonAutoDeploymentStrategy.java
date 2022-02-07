@@ -15,6 +15,7 @@ package org.flowable.common.spring;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.lock.LockManager;
@@ -78,12 +79,18 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
     @Override
     public void deployResources(String deploymentNameHint, Resource[] resources, E engine) {
         if (isUseLockForDeployments()) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Deploying resources {} using a lock for engine {} deployment name hint {}", Arrays.toString(resources), engine, deploymentNameHint);
+            }
             LockManager deploymentLockManager = getLockManager(engine, deploymentNameHint);
             deploymentLockManager.waitForLockRunAndRelease(getDeploymentLockWaitTime(), () -> {
                 deployResourcesInternal(deploymentNameHint, resources, engine);
                 return null;
             });
         } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("Deploying resources {} for engine {} deployment name hint {}", Arrays.toString(resources), engine, deploymentNameHint);
+            }
             deployResourcesInternal(deploymentNameHint, resources, engine);
         }
     }

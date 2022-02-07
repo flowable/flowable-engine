@@ -14,6 +14,7 @@
 package org.flowable.cmmn.test.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,13 @@ import java.util.stream.Collectors;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMappingBuilder;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -726,6 +730,235 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .extracting(PlanItemInstance::getPlanItemDefinitionId)
                 .containsExactlyInAnyOrder("expandedStage1", "expandedStage2", "expandedStage3", "humanTask1",
                         "humanTask4", "userEventListener1", "userEventListener2");
+    }
+    
+    @Test
+    void testMultiTenantCaseInstanceMigrationWithDefaultTenantDefinition() {
+        DefaultTenantProvider originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantProvider();
+        cmmnEngineConfiguration.setDefaultTenantValue("default");
+        cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            // Arrange
+            CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/one-task.cmmn.xml")
+                    .tenantId("default")
+                    .deploy();
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testCase")
+                    .tenantId("tenant1")
+                    .start();
+            
+            deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/two-task.cmmn.xml")
+                    .tenantId("default")
+                    .deploy();
+            
+            CaseDefinition destinationDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    
+            // Act
+            cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                    .migrateToCaseDefinition(destinationDefinition.getId())
+                    .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"))
+                    .migrate(caseInstance.getId());
+    
+            // Assert
+            CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Two Task Test Case");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .list();
+            assertThat(planItemInstances).hasSize(2);
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getCaseDefinitionId)
+                    .containsOnly(destinationDefinition.getId());
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Task 1", "Task 2");
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getState)
+                    .containsOnly(PlanItemInstanceState.ACTIVE);
+            
+            List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(tasks).hasSize(2);
+            for (Task task : tasks) {
+                assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                cmmnTaskService.complete(task.getId());
+            }
+            
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                    .isEqualTo(destinationDefinition.getId());
+    
+                List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItemInstances).hasSize(2);
+                for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                    assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+    
+                List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+                assertThat(historicTasks).hasSize(2);
+                for (HistoricTaskInstance historicTask : historicTasks) {
+                    assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+            }
+            
+        } finally {
+            cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
+    void testMultiTenantCaseInstanceMigrationWithTargetDefaultTenantDefinition() {
+        DefaultTenantProvider originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantProvider();
+        cmmnEngineConfiguration.setDefaultTenantValue("default");
+        cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            // Arrange
+            CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/one-task.cmmn.xml")
+                    .tenantId("tenant1")
+                    .deploy();
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testCase")
+                    .tenantId("tenant1")
+                    .start();
+            
+            deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/two-task.cmmn.xml")
+                    .tenantId("default")
+                    .deploy();
+            
+            CaseDefinition destinationDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    
+            // Act
+            cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                    .migrateToCaseDefinition(destinationDefinition.getId())
+                    .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"))
+                    .migrate(caseInstance.getId());
+    
+            // Assert
+            CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Two Task Test Case");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(1);
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .list();
+            assertThat(planItemInstances).hasSize(2);
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getCaseDefinitionId)
+                    .containsOnly(destinationDefinition.getId());
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Task 1", "Task 2");
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getState)
+                    .containsOnly(PlanItemInstanceState.ACTIVE);
+            
+            List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(tasks).hasSize(2);
+            for (Task task : tasks) {
+                assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                cmmnTaskService.complete(task.getId());
+            }
+            
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                    .isEqualTo(destinationDefinition.getId());
+    
+                List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItemInstances).hasSize(2);
+                for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                    assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+    
+                List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+                assertThat(historicTasks).hasSize(2);
+                for (HistoricTaskInstance historicTask : historicTasks) {
+                    assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+            }
+            
+        } finally {
+            cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
+    void testMultiTenantCaseInstanceMigrationWithDefaultTenantDefinitionFailsWithNoFallback() {
+        DefaultTenantProvider originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantProvider();
+        cmmnEngineConfiguration.setDefaultTenantValue("default");
+        
+        try {
+            // Arrange
+            CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/one-task.cmmn.xml")
+                    .tenantId("tenant1")
+                    .deploy();
+            
+            CaseDefinition sourceDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testCase")
+                    .tenantId("tenant1")
+                    .start();
+            
+            deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/two-task.cmmn.xml")
+                    .tenantId("default")
+                    .deploy();
+            
+            CaseDefinition destinationDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    
+            assertThatThrownBy(() -> {
+                cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                    .migrateToCaseDefinition(destinationDefinition.getId())
+                    .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"))
+                    .migrate(caseInstance.getId());
+            }).isInstanceOf(FlowableException.class).hasMessage("Tenant mismatch between Case Instance ('tenant1') and Case Definition ('default') to migrate to");
+            
+            CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(sourceDefinition.getId());
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("One Task Test Case");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(1);
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(sourceDefinition.getDeploymentId());
+            
+        } finally {
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
     }
 
     // with sentries

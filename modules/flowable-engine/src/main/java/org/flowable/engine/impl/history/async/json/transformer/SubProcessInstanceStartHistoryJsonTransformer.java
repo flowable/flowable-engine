@@ -68,6 +68,7 @@ public class SubProcessInstanceStartHistoryJsonTransformer extends AbstractHisto
             subProcessInstance.setId(id);
             subProcessInstance.setProcessInstanceId(processInstanceId);
             subProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
+            subProcessInstance.setBusinessStatus(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_STATUS));
             subProcessInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             subProcessInstance.setProcessDefinitionKey(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_KEY));
             subProcessInstance.setProcessDefinitionName(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_NAME));

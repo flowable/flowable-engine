@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+        xmlns:flowable="http://flowable.org/bpmn" 
+        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+        xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+        xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+        typeLanguage="http://www.w3.org/2001/XMLSchema" 
+        expressionLanguage="http://www.w3.org/1999/XPath" 
+        targetNamespace="http://www.flowable.org/processdef">
+  
+  <signal id="signal" name="signal" />
+        
+  <process id="terminate" isExecutable="true">
+    <startEvent id="startEvent1"/>
+    <userTask id="task" />
+    <sequenceFlow sourceRef="startEvent1" targetRef="task"/>
+    <endEvent id="endEvent"/>
+    <sequenceFlow sourceRef="task" targetRef="endEvent"/>
+    
+    <subProcess id="eventSubProcess" triggeredByEvent="true">
+        <startEvent id="subProcessStart" isInterrupting="false">
+            <signalEventDefinition signalRef="signal" />
+        </startEvent>
+        
+        <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessEndEvent" />
+    
+        <endEvent id="subProcessEndEvent">
+            <terminateEventDefinition flowable:terminateAll="true" />
+        </endEvent>
+        
+    </subProcess>
+    
+  </process>
+</definitions>

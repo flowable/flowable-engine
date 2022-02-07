@@ -49,6 +49,8 @@ public class FlowableUiApplicationWithEnabledRabbitTest {
             .containsExactly(
                 "configurationProperties",
                 "Inlined Test Properties",
+                "servletConfigInitParams",
+                "servletContextInitParams",
                 "systemProperties",
                 "systemEnvironment",
                 "random",

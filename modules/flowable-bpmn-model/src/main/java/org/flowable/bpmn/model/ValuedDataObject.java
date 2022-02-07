@@ -52,19 +52,24 @@ public abstract class ValuedDataObject extends DataObject {
     
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ValuedDataObject otherObject = (ValuedDataObject) o;
 
-        if (!otherObject.getItemSubjectRef().getStructureRef().equals(this.itemSubjectRef.getStructureRef()))
+        if (!otherObject.getItemSubjectRef().getStructureRef().equals(this.itemSubjectRef.getStructureRef())) {
             return false;
-        if (!otherObject.getId().equals(this.id))
+        }
+        if (!otherObject.getId().equals(this.id)) {
             return false;
-        if (!otherObject.getName().equals(this.name))
+        }
+        if (!otherObject.getName().equals(this.name)) {
             return false;
+        }
         return otherObject.getValue().equals(this.value.toString());
     }
 }

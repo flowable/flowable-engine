@@ -44,18 +44,20 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         Map<String, Object> variables = new HashMap<>();
         variables.put("inputVariable1", 1);
         variables.put("inputVariable2", "test");
-        dmnRuleService.createExecuteDecisionBuilder().decisionKey("decision").variables(variables).activityId("test1").instanceId("instance1").executeWithSingleResult();
-        
+        dmnRuleService.createExecuteDecisionBuilder().decisionKey("decision").variables(variables).activityId("test1").instanceId("instance1")
+                .executeWithSingleResult();
+
         String executionId1 = dmnHistoryService.createHistoricDecisionExecutionQuery().activityId("test1").singleResult().getId();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, executionId1));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, executionId1));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertThat(content).isNotNull();
-        
+
         JsonNode auditNode = new ObjectMapper().readTree(content);
         assertThatJson(auditNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
@@ -65,8 +67,40 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
                         + " }");
     }
 
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/decision_service-2.dmn" })
+    public void testGetHistoricDecisionServiceExecutionAuditData() throws Exception {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("housePrice", 300000D);
+        variables.put("age", 42D);
+        variables.put("region", "CITY_CENTRE");
+        variables.put("doctorVisit", false);
+        variables.put("hospitalVisit", false);
+        dmnRuleService.createExecuteDecisionBuilder().decisionKey("evaluateMortgageRequestService").variables(variables).activityId("test1")
+                .instanceId("instance1").executeWithSingleResult();
+
+        String executionId1 = dmnHistoryService.createHistoricDecisionExecutionQuery().activityId("test1").singleResult().getId();
+
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, executionId1));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+
+        // Check "OK" status
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+        closeResponse(response);
+        assertThat(content).isNotNull();
+
+        JsonNode auditNode = new ObjectMapper().readTree(content);
+        assertThatJson(auditNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   decisionKey: 'evaluateMortgageRequestService',"
+                        + "   decisionName: 'Evaluate Mortgage Request Service'"
+                        + " }");
+    }
+
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, "unexisting"));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         try (InputStream contentStream = response.getEntity().getContent()) {
             JsonNode errorNode = objectMapper.readTree(contentStream);

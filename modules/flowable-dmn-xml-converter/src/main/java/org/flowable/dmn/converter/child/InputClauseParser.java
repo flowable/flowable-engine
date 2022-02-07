@@ -32,8 +32,9 @@ public class InputClauseParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof DecisionTable))
+        if (!(parentElement instanceof DecisionTable)) {
             return;
+        }
 
         InputClause input = new InputClause();
         input.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));

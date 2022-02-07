@@ -13,6 +13,7 @@
 package org.flowable.camel;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.spring.SpringCamelContext;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
@@ -60,10 +61,10 @@ public abstract class SpringCamelBehavior extends CamelBehavior {
 
                     // Get the CamelContext object and set the super's member variable.
                     Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
-                    if (!(ctx instanceof CamelContext)) {
+                    if (!(ctx instanceof SpringCamelContext)) {
                         throw new FlowableException("Could not find CamelContext named " + camelContextValue + ".");
                     }
-                    camelContextObj = (CamelContext) ctx;
+                    camelContextObj = (SpringCamelContext) ctx;
 
                 } catch (Exception e) {
                     throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Camel module.", e);

@@ -37,6 +37,8 @@ public class FlowableRestApplicationTest {
             .containsExactly(
                 "configurationProperties",
                 "Inlined Test Properties",
+                "servletConfigInitParams",
+                "servletContextInitParams",
                 "systemProperties",
                 "systemEnvironment",
                 "random",

@@ -324,4 +324,82 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                     + "  }"
                     + "]");
     }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testQueryCaseInstancesByWithoutParentId() throws Exception {
+        HashMap<String, Object> caseVariables = new HashMap<>();
+        CaseInstance parentInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withoutBoth")
+                .start();
+        
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withParentId").parentId(parentInstance.getId())
+                .start();
+        
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withCallBackId").callbackId("testID")
+                .start();
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutCaseInstanceParentId", "true");
+        
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { name: 'withoutBoth' },"
+                        + "    { name: 'withCallBackId' }"
+                        + "  ]"
+                        + "}");
+        
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testQueryCaseInstancesByWithoutCallbackId() throws Exception {
+        HashMap<String, Object> caseVariables = new HashMap<>();
+        CaseInstance parentInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withoutBoth")
+                .start();
+        
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withParentId").parentId(parentInstance.getId())
+                .start();
+        
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("withCallBackId").callbackId("testID")
+                .start();
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutCaseInstanceCallbackId", "true");
+        
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { name: 'withoutBoth' },"
+                        + "    { name: 'withParentId' }"
+                        + "  ]"
+                        + "}");
+        
+    }
 }

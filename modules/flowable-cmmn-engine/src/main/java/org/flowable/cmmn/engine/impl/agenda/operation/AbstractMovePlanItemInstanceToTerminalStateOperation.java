@@ -169,18 +169,19 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         if (planItem != null && planItemDefinition instanceof EventListener && !(planItemDefinition instanceof TimerEventListener) && 
                 !(planItemDefinition instanceof ReactivateEventListener)) {
             
-            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem)) ||
-                    !hasRepetitionRule(planItem)) {
+            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem)) || !hasRepetitionRule(planItem)) {
                 
                 List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndPlanItemId(
                         planItemInstanceEntity.getCaseInstanceId(), planItem.getId());
                 for (PlanItemInstanceEntity planItemInstanceEntry : planItemInstances) {
-                    if (!planItemInstanceEntry.getId().equals(planItemInstanceEntity.getId())) {
-                        
+                    if (!PlanItemInstanceState.isInTerminalState(planItemInstanceEntry)) {
                         planItemInstanceEntry.setState(PlanItemInstanceState.COMPLETED);
                         planItemInstanceEntry.setEndedTime(getCurrentTime(commandContext));
                         planItemInstanceEntry.setCompletedTime(planItemInstanceEntry.getEndedTime());
                         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntry);
+                        
+                        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
+                                commandContext, planItemInstanceEntry, PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.COMPLETED);
                         
                         if (planItemDefinition instanceof GenericEventListener) {
                             GenericEventListener genericEventListener = (GenericEventListener) planItemDefinition;
@@ -189,7 +190,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                                 EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
                                 String eventDefinitionKey = resolveEventDefinitionKey(genericEventListener.getEventType(), planItemInstanceEntry,
                                         cmmnEngineConfiguration);
-
+    
                                 List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntry.getId());
                                 for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                                     if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
@@ -205,10 +206,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
                             }
                         }
-                        
-                        cmmnEngineConfiguration.getPlanItemInstanceEntityManager().delete(planItemInstanceEntry.getId());
                     }
-                }  
+                }
             }
         }
     }

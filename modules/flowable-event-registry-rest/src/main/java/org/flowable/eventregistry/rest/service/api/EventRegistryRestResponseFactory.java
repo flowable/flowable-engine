@@ -157,6 +157,8 @@ public class EventRegistryRestResponseFactory {
         response.setVersion(channelDefinition.getVersion());
         response.setCategory(channelDefinition.getCategory());
         response.setName(channelDefinition.getName());
+        response.setType(channelDefinition.getType());
+        response.setImplementation(channelDefinition.getImplementation());
         response.setCreateTime(channelDefinition.getCreateTime());
         response.setDescription(channelDefinition.getDescription());
         response.setTenantId(channelDefinition.getTenantId());

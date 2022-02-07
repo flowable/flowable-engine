@@ -13,11 +13,15 @@
 package org.flowable.app.engine.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +83,22 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
+    }
+
+    @Test
+    public void testQueryByDeploymentIds() {
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).list()).hasSize(2);
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId2, "dummy")).singleResult()).isNotNull();
+    }
+
+    @Test
+    public void testQueryByInvalidDeploymentIds() {
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).singleResult()).isNull();
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).list()).isEmpty();
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).count()).isZero();
+        assertThatThrownBy(() -> appRepositoryService.createDeploymentQuery().deploymentIds(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Deployment ids is null");
     }
     
     @Test

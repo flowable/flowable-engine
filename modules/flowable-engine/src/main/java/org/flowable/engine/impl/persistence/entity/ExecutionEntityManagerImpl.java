@@ -237,9 +237,8 @@ public class ExecutionEntityManagerImpl
     // CREATE METHODS
 
     @Override
-    public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, 
-            String businessKey, String processInstanceName,
-            String callbackId, String callbackType, String referenceId, String referenceType,
+    public ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId, String businessKey,
+            String businessStatus, String processInstanceName, String callbackId, String callbackType, String referenceId, String referenceType,
             String propagatedStageInstanceId, String tenantId, String initiatorVariableName, String startActivityId) {
 
         ExecutionEntity processInstanceExecution = dataManager.create();
@@ -258,6 +257,7 @@ public class ExecutionEntityManagerImpl
         processInstanceExecution.setProcessDefinitionVersion(processDefinition.getVersion());
         processInstanceExecution.setDeploymentId(processDefinition.getDeploymentId());
         processInstanceExecution.setBusinessKey(businessKey);
+        processInstanceExecution.setBusinessStatus(businessStatus);
         processInstanceExecution.setName(processInstanceName);
         
         // Callbacks

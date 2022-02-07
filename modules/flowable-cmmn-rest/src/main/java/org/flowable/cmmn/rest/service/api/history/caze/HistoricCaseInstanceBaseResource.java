@@ -127,6 +127,14 @@ public class HistoricCaseInstanceBaseResource {
             query.caseInstanceWithoutTenantId();
         }
         
+        if (Boolean.TRUE.equals(queryRequest.getWithoutCaseInstanceParentId())) {
+            query.withoutCaseInstanceParent();
+        }
+        
+        if (Boolean.TRUE.equals(queryRequest.getWithoutCaseInstanceCallbackId())) {
+            query.withoutCaseInstanceCallbackId();
+        }
+        
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryCaseInfoWithQuery(query, queryRequest);
         }

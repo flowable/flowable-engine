@@ -40,6 +40,18 @@ public interface ChannelDefinition {
     /** description of this channel definition **/
     String getDescription();
 
+    /**
+     * The type of the channel.
+     * e.g.inbound, outbound
+     */
+    String getType();
+
+    /**
+     * The implementation type of the channel.
+     * e.g. jms, kafka, rabbit
+     */
+    String getImplementation();
+
     /** name of {@link EventRepositoryService#getResourceAsStream(String, String) the resource} of this channel definition. */
     String getResourceName();
 

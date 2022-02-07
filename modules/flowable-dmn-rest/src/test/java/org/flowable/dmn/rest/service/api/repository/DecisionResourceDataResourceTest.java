@@ -32,7 +32,6 @@ public class DecisionResourceDataResourceTest extends BaseSpringDmnRestTestCase 
 
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionResource() throws Exception {
-
         DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
 
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_RESOURCE_CONTENT, definition.getId()));
@@ -44,9 +43,22 @@ public class DecisionResourceDataResourceTest extends BaseSpringDmnRestTestCase 
         assertThat(content).contains("Full Decision");
     }
 
-    public void testGetDecisionResourceForUnexistingDecisionTable() throws Exception {
+    public void testGetDecisionResourceForUnexistingDecision() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
+    }
+
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/decision_service-1.dmn" })
+    public void testGetDecisionServiceResource() throws Exception {
+        DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
+
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_RESOURCE_CONTENT, definition.getId()));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+
+        // Check "OK" status
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+        closeResponse(response);
+        assertThat(content).contains("Decision Service One");
     }
 }

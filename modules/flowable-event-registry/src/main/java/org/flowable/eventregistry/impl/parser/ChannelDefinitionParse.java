@@ -80,6 +80,8 @@ public class ChannelDefinitionParse {
                 channelDefinitionEntity.setCategory(channelModel.getCategory());
                 channelDefinitionEntity.setName(channelModel.getName());
                 channelDefinitionEntity.setDescription(channelModel.getDescription());
+                channelDefinitionEntity.setType(channelModel.getChannelType());
+                channelDefinitionEntity.setImplementation(channelModel.getType());
                 channelDefinitionEntity.setResourceName(name);
                 channelDefinitionEntity.setDeploymentId(deployment.getId());
                 channelDefinitions.add(channelDefinitionEntity);

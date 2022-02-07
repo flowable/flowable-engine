@@ -155,6 +155,11 @@ public class Flowable5TaskWrapper implements Task {
     }
 
     @Override
+    public Map<String, Object> getCaseVariables() {
+        return null;
+    }
+
+    @Override
     public List<? extends IdentityLinkInfo> getIdentityLinks() {
         return null;
     }

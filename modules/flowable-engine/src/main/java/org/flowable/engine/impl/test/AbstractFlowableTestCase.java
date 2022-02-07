@@ -400,6 +400,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     
     protected void deleteDeployments() {
         boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
+
         HistoryManager asyncHistoryManager = null;
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
