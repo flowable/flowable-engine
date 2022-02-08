@@ -180,7 +180,6 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 // Clean adhoc-tasks even if test fails
                 List<Task> tasks = taskService.createTaskQuery().list();
                 for (Task task : tasks) {
-                    taskService.complete(task.getId());
                     taskService.deleteTask(task.getId(), true);
                 }
 

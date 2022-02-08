@@ -163,6 +163,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 Task task = taskService.newTask();
                 taskService.saveTask(task);
                 String taskId = task.getId();
+                taskService.complete(taskId);
 
                 // Execute the request
                 HttpDelete httpDelete = new HttpDelete(
