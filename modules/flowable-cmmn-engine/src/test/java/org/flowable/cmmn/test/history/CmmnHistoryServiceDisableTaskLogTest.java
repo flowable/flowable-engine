@@ -48,6 +48,7 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
                 assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
             }
             cmmnTaskService.complete(task.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
