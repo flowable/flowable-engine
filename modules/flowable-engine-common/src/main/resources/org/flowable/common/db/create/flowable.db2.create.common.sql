@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.7.2.0', 1);
+values ('common.schema.version', '6.7.2.1', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);

@@ -14,13 +14,17 @@
 package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
 /**
@@ -55,6 +59,26 @@ public class VariableInstanceEntityManagerImpl
     @Override
     public InternalVariableInstanceQuery createInternalVariableInstanceQuery() {
         return new InternalVariableInstanceQueryImpl(dataManager);
+    }
+    
+    @Override
+    public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return dataManager.findVariableInstanceCountByQueryCriteria(variableInstanceQuery);
+    }
+
+    @Override
+    public List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return dataManager.findVariableInstancesByQueryCriteria(variableInstanceQuery);
+    }
+    
+    @Override
+    public List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return dataManager.findVariableInstancesByNativeQuery(parameterMap);
+    }
+
+    @Override
+    public long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
+        return dataManager.findVariableInstanceCountByNativeQuery(parameterMap);
     }
 
     @Override

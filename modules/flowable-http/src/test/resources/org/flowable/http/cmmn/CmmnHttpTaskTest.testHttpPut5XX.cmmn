@@ -29,7 +29,7 @@
                         <flowable:expression><![CDATA[Content-Type: text/plain
 X-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f
 host:localhost:7000
-Test:]]></flowable:expression>
+Test: test]]></flowable:expression>
                     </flowable:field>
                     <flowable:field name="requestBody">
                         <flowable:expression><![CDATA[test]]></flowable:expression>

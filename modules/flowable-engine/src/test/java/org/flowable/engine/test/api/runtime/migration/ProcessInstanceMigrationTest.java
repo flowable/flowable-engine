@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.runtime.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
@@ -25,9 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -3325,6 +3328,209 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         }
 
         assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMultiTenantProcessInstanceMigrationWithDefaultTenantDefinition() {
+        DefaultTenantProvider originalDefaultTenantValue = processEngineConfiguration.getDefaultTenantProvider();
+        processEngineConfiguration.setDefaultTenantValue("default");
+        processEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            // Deploy first version of the process
+            Deployment deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                    .tenantId("default")
+                    .deploy();
+            
+            ProcessDefinition version1ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            // Start and instance of the recent first version of the process for migration and one for reference
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("MP", "tenant1");
+    
+            // Deploy second version of the process in default tenant
+            deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                    .tenantId("default")
+                    .deploy();
+                
+            ProcessDefinition version2ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey("MP")
+                    .list();
+    
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getId)
+                    .containsExactlyInAnyOrder(version1ProcessDef.getId(), version2ProcessDef.getId());
+    
+            ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
+                    .migrateToProcessDefinition(version2ProcessDef.getId())
+                    .validateMigration(processInstance.getId());
+    
+            assertThat(validationResult.isMigrationValid()).isTrue();
+    
+            // Migrate process
+            ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                    .migrateToProcessDefinition(version2ProcessDef.getId());
+            ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+            assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+    
+            processInstanceMigrationBuilder.migrate(processInstance.getId());
+    
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSize(2); //includes root execution
+            executions.stream()
+                    .map(e -> (ExecutionEntity) e)
+                    .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
+    
+            List<Task> tasks = taskService.createTaskQuery().list();
+            assertThat(tasks)
+                    .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                    .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id")); //AutoMapped by Id
+    
+            // The first process version only had one activity, there should be a second activity in the process now
+            taskService.complete(tasks.get(0).getId());
+            tasks = taskService.createTaskQuery().list();
+            assertThat(tasks)
+                    .extracting(Task::getTaskDefinitionKey)
+                    .containsExactly("userTask2Id");
+            taskService.complete(tasks.get(0).getId());
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            processEngineConfiguration.setFallbackToDefaultTenant(false);
+            processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
+    public void testMultiTenantProcessInstanceMigrationWithTargetDefaultTenantDefinition() {
+        DefaultTenantProvider originalDefaultTenantValue = processEngineConfiguration.getDefaultTenantProvider();
+        processEngineConfiguration.setDefaultTenantValue("default");
+        processEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            // Deploy first version of the process
+            Deployment deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                    .tenantId("tenant1")
+                    .deploy();
+            
+            ProcessDefinition version1ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            // Start and instance of the recent first version of the process for migration and one for reference
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("MP", "tenant1");
+    
+            // Deploy second version of the process in default tenant
+            deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                    .tenantId("default")
+                    .deploy();
+                
+            ProcessDefinition version2ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey("MP")
+                    .list();
+    
+            assertThat(processDefinitions)
+                    .extracting(ProcessDefinition::getId)
+                    .containsExactlyInAnyOrder(version1ProcessDef.getId(), version2ProcessDef.getId());
+    
+            ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
+                    .migrateToProcessDefinition(version2ProcessDef.getId())
+                    .validateMigration(processInstance.getId());
+    
+            assertThat(validationResult.isMigrationValid()).isTrue();
+    
+            // Migrate process
+            ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                    .migrateToProcessDefinition(version2ProcessDef.getId());
+            ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+            assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+    
+            processInstanceMigrationBuilder.migrate(processInstance.getId());
+    
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSize(2); //includes root execution
+            executions.stream()
+                    .map(e -> (ExecutionEntity) e)
+                    .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
+    
+            List<Task> tasks = taskService.createTaskQuery().list();
+            assertThat(tasks)
+                    .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                    .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id")); //AutoMapped by Id
+    
+            // The first process version only had one activity, there should be a second activity in the process now
+            taskService.complete(tasks.get(0).getId());
+            tasks = taskService.createTaskQuery().list();
+            assertThat(tasks)
+                    .extracting(Task::getTaskDefinitionKey)
+                    .containsExactly("userTask2Id");
+            taskService.complete(tasks.get(0).getId());
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            processEngineConfiguration.setFallbackToDefaultTenant(false);
+            processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
+    public void testMultiTenantProcessInstanceMigrationWithDefaultTenantDefinitionFailsWithNoFallback() {
+        DefaultTenantProvider originalDefaultTenantValue = processEngineConfiguration.getDefaultTenantProvider();
+        processEngineConfiguration.setDefaultTenantValue("default");
+        
+        try {
+            // Deploy first version of the process
+            Deployment deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                    .tenantId("tenant1")
+                    .deploy();
+            
+            ProcessDefinition version1ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            // Start and instance of the recent first version of the process for migration and one for reference
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("MP", "tenant1");
+    
+            // Deploy second version of the process in default tenant
+            deployment = repositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml")
+                    .tenantId("default")
+                    .deploy();
+                
+            ProcessDefinition version2ProcessDef = repositoryService.createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId()).singleResult();
+    
+            ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                    .migrateToProcessDefinition(version2ProcessDef.getId());
+            
+            assertThatThrownBy(() -> {
+                processInstanceMigrationBuilder.migrate(processInstance.getId());
+            }).isInstanceOf(FlowableException.class).hasMessage("Tenant mismatch between Process Instance ('tenant1') and Process Definition ('default') to migrate to");
+    
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSize(2); //includes root execution
+            executions.stream()
+                    .map(e -> (ExecutionEntity) e)
+                    .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+            
+        } finally {
+            processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
     }
 
     @Test

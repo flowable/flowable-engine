@@ -50,9 +50,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.DefaultHistoryConfigurationSettings;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
-import org.flowable.engine.impl.history.HistoryConfigurationSettings;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -403,14 +401,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected void deleteDeployments() {
         boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
 
-        HistoryConfigurationSettings historyConfigurationSettings
-                = new DefaultHistoryConfigurationSettings(processEngineConfiguration);
-
         HistoryManager asyncHistoryManager = null;
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, historyConfigurationSettings));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
@@ -429,8 +424,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration,
-                    new DefaultHistoryConfigurationSettings(processEngineConfiguration)));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         repositoryService.deleteDeployment(deploymentId, true);

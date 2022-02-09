@@ -20,6 +20,7 @@ import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -72,8 +73,21 @@ public class DefaultEventRegistry implements EventRegistry {
     @Override
     public void sendEventToConsumers(EventRegistryEvent eventRegistryEvent) {
         Collection<EventRegistryEventConsumer> engineEventRegistryEventConsumers = engineConfiguration.getEventRegistryEventConsumers().values();
+        EventRegistryProcessingInfo eventRegistryProcessingInfo = null;
         for (EventRegistryEventConsumer eventConsumer : engineEventRegistryEventConsumers) {
-            eventConsumer.eventReceived(eventRegistryEvent);
+            EventRegistryProcessingInfo processingInfo = eventConsumer.eventReceived(eventRegistryEvent);
+            if (processingInfo != null && processingInfo.getEventConsumerInfos() != null && !processingInfo.getEventConsumerInfos().isEmpty()) {
+                if (eventRegistryProcessingInfo == null) {
+                    eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
+                }
+                eventRegistryProcessingInfo.setEventConsumerInfos(processingInfo.getEventConsumerInfos());
+            }
+        }
+        
+        if ((eventRegistryProcessingInfo == null || !eventRegistryProcessingInfo.eventHandled()) && 
+                engineConfiguration.getNonMatchingEventConsumer() != null) {
+            
+            engineConfiguration.getNonMatchingEventConsumer().handleNonMatchingEvent(eventRegistryEvent, eventRegistryProcessingInfo);
         }
     }
 

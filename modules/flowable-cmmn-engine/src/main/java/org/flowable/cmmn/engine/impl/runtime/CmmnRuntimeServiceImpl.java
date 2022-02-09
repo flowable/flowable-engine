@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
+import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.ChangePlanItemStateCmd;
@@ -259,6 +260,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames) {
         commandExecutor.execute(new RemoveLocalVariablesCmd(planItemInstanceId, variableNames));
+    }
+    
+    @Override
+    public VariableInstanceQuery createVariableInstanceQuery() {
+        return new CmmnVariableInstanceQueryImpl(commandExecutor, configuration);
     }
 
     @Override

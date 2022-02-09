@@ -325,8 +325,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         if (model.getPools().size() > 0 && poolHasDI) {
             for (Pool pool : model.getPools()) {
                 GraphicInfo poolGraphicInfo = model.getGraphicInfo(pool.getId());
-                if (poolGraphicInfo == null)
+                if (poolGraphicInfo == null) {
                     continue;
+                }
                 ObjectNode poolNode = BpmnJsonConverterUtil.createChildShape(pool.getId(), STENCIL_POOL, poolGraphicInfo.getX() + poolGraphicInfo.getWidth(),
                         poolGraphicInfo.getY() + poolGraphicInfo.getHeight(), poolGraphicInfo.getX(), poolGraphicInfo.getY());
                 shapesArrayNode.add(poolNode);
@@ -352,8 +353,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     Map<String, ArrayNode> laneMap = new HashMap<>();
                     for (Lane lane : process.getLanes()) {
                         GraphicInfo laneGraphicInfo = model.getGraphicInfo(lane.getId());
-                        if (laneGraphicInfo == null)
+                        if (laneGraphicInfo == null) {
                             continue;
+                        }
                         ObjectNode laneNode = BpmnJsonConverterUtil.createChildShape(lane.getId(), STENCIL_LANE, laneGraphicInfo.getX() + laneGraphicInfo.getWidth() - poolGraphicInfo.getX(),
                                 laneGraphicInfo.getY() + laneGraphicInfo.getHeight() - poolGraphicInfo.getY(), laneGraphicInfo.getX() - poolGraphicInfo.getX(), laneGraphicInfo.getY() - poolGraphicInfo.getY());
                         laneShapesArrayNode.add(laneNode);

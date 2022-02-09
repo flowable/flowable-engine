@@ -2,8 +2,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti DB Clean</name>
-  <description>Activiti DB Clean</description>
+  <name>Flowable DB Clean</name>
+  <description>Flowable DB Clean</description>
   <groupId>org.flowable</groupId>
   <artifactId>flowable-dbclean</artifactId>
   <packaging>pom</packaging>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
+      <version>8.0.19</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.jtds</groupId>

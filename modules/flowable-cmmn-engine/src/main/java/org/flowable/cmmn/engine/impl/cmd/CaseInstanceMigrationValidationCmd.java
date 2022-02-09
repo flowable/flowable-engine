@@ -58,7 +58,7 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
         if (caseInstanceMigrationDocument == null) {
             throw new FlowableException("Must specify a case instance migration document to migrate");
         }
-        this.caseDefinitionId = null;
+        this.caseDefinitionId = caseDefinitionId;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }

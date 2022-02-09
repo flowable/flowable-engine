@@ -37,4 +37,4 @@ alter table FLW_RU_BATCH_PART
     foreign key (BATCH_ID_)
     references FLW_RU_BATCH (ID_);
 
-insert into ACT_GE_PROPERTY values ('batch.schema.version', '6.7.2.0', 1);
+insert into ACT_GE_PROPERTY values ('batch.schema.version', '6.7.2.1', 1);

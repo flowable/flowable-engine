@@ -119,6 +119,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceTerminatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
@@ -1350,9 +1351,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             if (isAsyncHistoryEnabled) {
-                cmmnHistoryManager = new AsyncCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
+                cmmnHistoryManager = new AsyncCmmnHistoryManager(this);
             } else {
-                cmmnHistoryManager = new DefaultCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
+                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
             }
         }
     }
@@ -1752,6 +1753,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskDeletedHistoryJsonTransformer(this));
         
         historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
         historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
@@ -2401,6 +2403,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnHistoryManager(CmmnHistoryManager cmmnHistoryManager) {
         this.cmmnHistoryManager = cmmnHistoryManager;
+        return this;
+    }
+
+    public CmmnHistoryConfigurationSettings getCmmnHistoryConfigurationSettings() {
+        return cmmnHistoryConfigurationSettings;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryConfigurationSettings(CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+        this.cmmnHistoryConfigurationSettings = cmmnHistoryConfigurationSettings;
         return this;
     }
 

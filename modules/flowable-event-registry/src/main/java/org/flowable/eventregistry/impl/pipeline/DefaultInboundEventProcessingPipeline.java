@@ -26,7 +26,6 @@ import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
-import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -70,7 +69,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         }
 
         EventModel eventModel = multiTenant ? eventRepositoryService.getEventModelByKey(eventKey, tenantId) : eventRepositoryService.getEventModelByKey(eventKey);
-        ChannelModel channelModel = multiTenant ? eventRepositoryService.getChannelModelByKey(channelKey, tenantId) : eventRepositoryService.getChannelModelByKey(channelKey);
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventModel.getKey(),
@@ -108,9 +106,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     public InboundEventKeyDetector<T> getInboundEventKeyDetector() {
         return inboundEventKeyDetector;
     }
+    
     public void setInboundEventKeyDetector(InboundEventKeyDetector<T> inboundEventKeyDetector) {
         this.inboundEventKeyDetector = inboundEventKeyDetector;
     }
+    
     public InboundEventTenantDetector<T> getInboundEventTenantDetector() {
         return inboundEventTenantDetector;
     }

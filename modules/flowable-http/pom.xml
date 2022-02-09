@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.14.v20151106</jetty.version>
+        <jetty.version>9.4.44.v20210927</jetty.version>
         <flowable.osgi.import.pkg>*</flowable.osgi.import.pkg>
         <flowable.artifact>
             org.flowable.http

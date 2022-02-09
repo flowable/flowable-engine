@@ -197,6 +197,13 @@ function _drawServiceTask(element, isMigrationModelElement, currentPaper)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
+function _drawSendEventServiceTask(element, isMigrationModelElement, currentPaper)
+{
+    _drawTask(element, currentPaper);
+    _drawSendTaskIcon(currentPaper, element.x - 4, element.y - 4, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
+}
+
 function _drawHttpServiceTask(element, isMigrationModelElement, currentPaper)
 {
     _drawTask(element, currentPaper);

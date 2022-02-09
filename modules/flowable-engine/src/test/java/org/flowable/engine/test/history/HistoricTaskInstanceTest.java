@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -128,10 +129,23 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testDeleteHistoricTaskInstance() throws Exception {
-        // deleting unexisting historic task instance should be silently ignored
-        historyService.deleteHistoricTaskInstance("unexistingId");
-        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+    public void testDeleteUnexistingHistoricTaskInstance() throws Exception {
+        assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("unexistingId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
+    }
+
+    @Test
+    public void testDeleteNonCompletedHistoricTaskInstance() throws Exception {
+        Task task = taskService.createTaskBuilder().id("task1").create();
+
+        assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("task1"))
+                .isExactlyInstanceOf(FlowableException.class);
+
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        historyService.deleteHistoricTaskInstance("task1");
     }
 
     @Test
