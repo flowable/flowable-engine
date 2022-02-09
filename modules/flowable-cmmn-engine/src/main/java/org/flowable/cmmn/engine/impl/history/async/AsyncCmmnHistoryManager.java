@@ -32,6 +32,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -272,6 +273,16 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_UPDATE_TIME, endTime);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_REMOVED, data, task.getTenantId());
+        }
+    }
+
+    @Override
+    public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
+        if (task != null && getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, task.getId());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_TASK_DELETED, data);
         }
     }
     

@@ -295,6 +295,13 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
     }
 
+    @Override
+    public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
+        if (task != null && getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+            TaskHelper.deleteHistoricTask(task.getId());
+        }
+    }
+
     // Variables related history
 
     @Override

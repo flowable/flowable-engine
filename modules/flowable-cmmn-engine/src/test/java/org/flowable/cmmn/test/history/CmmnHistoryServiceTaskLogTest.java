@@ -62,9 +62,6 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     }
 
     protected void deleteTaskWithLogEntries(String taskId) {
-        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            cmmnHistoryService.deleteHistoricTaskInstance(taskId);
-        }
         cmmnTaskService.deleteTask(taskId, true);
     }
 

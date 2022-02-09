@@ -34,6 +34,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession.AsyncHistorySessionData;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -276,6 +277,16 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID, activityInstanceId);
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED, data);
+        }
+    }
+
+    @Override
+    public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
+        if (task != null && getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+            ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, HistoryJsonConstants.ID, task.getId());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_TASK_DELETED, data);
         }
     }
 

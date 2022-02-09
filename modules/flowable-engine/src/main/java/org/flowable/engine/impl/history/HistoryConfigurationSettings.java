@@ -17,6 +17,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -61,7 +62,7 @@ public interface HistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for the provided user task.
      */
-    boolean isHistoryEnabledForUserTask(TaskEntity taskEntity);
+    boolean isHistoryEnabledForUserTask(TaskInfo taskInfo);
 
     /**
      * Returns whether history is enabled for the provided user task.
