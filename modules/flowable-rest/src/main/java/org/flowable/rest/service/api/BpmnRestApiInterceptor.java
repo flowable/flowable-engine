@@ -56,6 +56,7 @@ import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryReques
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
 import org.flowable.rest.service.api.repository.ModelRequest;
+import org.flowable.rest.service.api.runtime.VariableInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionActionRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionChangeActivityStateRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionQueryRequest;
@@ -74,6 +75,8 @@ import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.runtime.VariableInstanceQuery;
 
 public interface BpmnRestApiInterceptor {
 
@@ -106,6 +109,10 @@ public interface BpmnRestApiInterceptor {
     void updateProcessInstance(ProcessInstance processInstance, ProcessInstanceUpdateRequest updateRequest);
 
     void deleteProcessInstance(ProcessInstance processInstance);
+    
+    void accessVariableInfoById(VariableInstance variableInstance);
+    
+    void accessVariableInfoWithQuery(VariableInstanceQuery variableInstanceQuery, VariableInstanceQueryRequest request);
     
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);
     

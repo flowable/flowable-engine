@@ -39,6 +39,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 /**
@@ -64,6 +65,11 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "test")).isEqualTo("test2");
+        
+        assertThat(cmmnRuntimeService.createVariableInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .variableName("javaDelegate")
+                .singleResult().getValue()).isEqualTo("executed");
 
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
@@ -189,6 +195,14 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVersion")).isEqualTo("1");
         assertThat(cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "resultVersion").getTypeName()).isEqualTo("string");
 
+        VariableInstance variableInstance = cmmnRuntimeService.createVariableInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .variableName("resultVersion")
+                .singleResult();
+        
+        assertThat(variableInstance.getValue()).isEqualTo("1");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
+        
         // Triggering the task should start the child case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();

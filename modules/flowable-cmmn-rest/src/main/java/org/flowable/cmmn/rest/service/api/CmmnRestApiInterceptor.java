@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
@@ -42,6 +43,7 @@ import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQuery
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
+import org.flowable.cmmn.rest.service.api.runtime.variable.VariableInstanceQueryRequest;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
@@ -56,6 +58,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 public interface CmmnRestApiInterceptor {
 
@@ -90,6 +93,10 @@ public interface CmmnRestApiInterceptor {
     void accessPlanItemInstanceInfoWithQuery(PlanItemInstanceQuery planItemInstanceQuery, PlanItemInstanceQueryRequest request);
     
     void doPlanItemInstanceAction(PlanItemInstance planItemInstance, RestActionRequest actionRequest);
+    
+    void accessVariableInfoById(VariableInstance variableInstance);
+    
+    void accessVariableInfoWithQuery(VariableInstanceQuery variableInstanceQuery, VariableInstanceQueryRequest request);
     
     void accessCaseDefinitionById(CaseDefinition caseDefinition);
     

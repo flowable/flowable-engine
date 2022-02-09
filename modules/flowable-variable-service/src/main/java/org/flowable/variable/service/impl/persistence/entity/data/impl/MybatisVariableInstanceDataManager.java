@@ -21,8 +21,10 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
@@ -78,6 +80,28 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     @Override
     public VariableInstanceEntity findVariablesInstanceByQuery(InternalVariableInstanceQueryImpl internalVariableInstanceQuery) {
         return getEntity("selectVariablesByQuery", internalVariableInstanceQuery, internalVariableInstanceQuery, true);
+    }
+    
+    @Override
+    public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {
+        return getDbSqlSession().selectListWithRawParameter("selectVariableInstanceByNativeQuery", parameterMap);
+    }
+
+    @Override
+    public long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
+        return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByNativeQuery", parameterMap);
     }
 
     @Override
