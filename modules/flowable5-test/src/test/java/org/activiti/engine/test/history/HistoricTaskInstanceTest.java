@@ -112,17 +112,6 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
     }
 
-    public void testDeleteNonCompletedHistoricTaskInstance() throws Exception {
-        taskService.createTaskBuilder().id("task1").create();
-
-        assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("task1"))
-                .isExactlyInstanceOf(FlowableException.class);
-
-        taskService.complete("task1");
-
-        historyService.deleteHistoricTaskInstance("task1");
-    }
-
     @Deployment
     public void testHistoricTaskInstanceQuery() throws Exception {
         Clock clock = processEngineConfiguration.getClock();
