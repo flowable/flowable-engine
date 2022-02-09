@@ -53,7 +53,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-jsr223</artifactId>
 			<scope>provided</scope>
 		</dependency>

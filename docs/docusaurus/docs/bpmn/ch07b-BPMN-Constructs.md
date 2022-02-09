@@ -1682,9 +1682,9 @@ The value of the **scriptFormat** attribute must be a name that is compatible wi
 Do note that the Groovy scripting engine is bundled with the groovy-jsr223 jar. As such, one must add the following dependency:
 
     <dependency>
-        <groupId>org.codehaus.groovy</groupId>
+        <groupId>org.apache.groovy</groupId>
         <artifactId>groovy-jsr223</artifactId>
-        <version>2.x.x<version>
+        <version>4.x.x<version>
     </dependency>
 
 #### Variables in scripts
