@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -248,6 +249,13 @@ public class DefaultCmmnHistoryManager extends BaseCmmnHistoryManager implements
     public void recordTaskInfoChange(TaskEntity task, Date changeTime) {
         if (historyConfigurationSettings.isHistoryEnabledForUserTask(task)) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskInfoChange(task, changeTime, cmmnEngineConfiguration);
+        }
+    }
+
+    @Override
+    public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
+        if (task != null && historyConfigurationSettings.isHistoryEnabledForUserTask(task)) {
+            TaskHelper.deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
         }
     }
 

@@ -270,6 +270,7 @@ import org.flowable.engine.impl.history.async.json.transformer.SetProcessDefinit
 import org.flowable.engine.impl.history.async.json.transformer.SubProcessInstanceStartHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskAssigneeChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
+import org.flowable.engine.impl.history.async.json.transformer.TaskDeletedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskOwnerChangedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChangedHistoryJsonTransformer;
@@ -2144,6 +2145,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskDeletedHistoryJsonTransformer(this));
 
         historyJsonTransformers.add(new TaskPropertyChangedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskAssigneeChangedHistoryJsonTransformer(this));

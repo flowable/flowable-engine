@@ -34,6 +34,7 @@ public interface HistoryJsonConstants {
             HistoryJsonConstants.TYPE_TASK_OWNER_CHANGED,
             HistoryJsonConstants.TYPE_TASK_PROPERTY_CHANGED,
             HistoryJsonConstants.TYPE_TASK_ENDED,
+            HistoryJsonConstants.TYPE_TASK_DELETED,
             HistoryJsonConstants.TYPE_VARIABLE_CREATED,
             HistoryJsonConstants.TYPE_VARIABLE_UPDATED,
             HistoryJsonConstants.TYPE_VARIABLE_REMOVED,
@@ -67,6 +68,7 @@ public interface HistoryJsonConstants {
     String TYPE_TASK_OWNER_CHANGED = "task-owner-changed";
     String TYPE_TASK_PROPERTY_CHANGED = "task-property-changed";
     String TYPE_TASK_ENDED = "task-ended";
+    String TYPE_TASK_DELETED = "task-deleted";
     String TYPE_VARIABLE_CREATED = "variable-created";
     String TYPE_VARIABLE_UPDATED = "variable-updated";
     String TYPE_VARIABLE_REMOVED = "variable-removed";
