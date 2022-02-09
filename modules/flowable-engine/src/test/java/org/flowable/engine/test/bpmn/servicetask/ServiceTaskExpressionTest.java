@@ -21,6 +21,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.Test;
 
 public class ServiceTaskExpressionTest extends PluggableFlowableTestCase {
@@ -38,6 +39,9 @@ public class ServiceTaskExpressionTest extends PluggableFlowableTestCase {
 
         assertThat(runtimeService.getVariable(processId, "resultVersion")).isEqualTo("1");
         assertThat(runtimeService.getVariableInstance(processId, "resultVersion").getTypeName()).isEqualTo("string");
+        VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().processInstanceId(processId).variableName("resultVersion").singleResult();
+        assertThat(variableInstance.getValue()).isEqualTo("1");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processId).variableName("resultVersion").singleResult();

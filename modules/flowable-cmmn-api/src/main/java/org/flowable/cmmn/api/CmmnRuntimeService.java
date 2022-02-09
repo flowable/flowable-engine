@@ -25,6 +25,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
+import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
@@ -183,6 +184,8 @@ public interface CmmnRuntimeService {
     void removeLocalVariable(String planItemInstanceId, String variableName);
     
     void removeLocalVariables(String planItemInstanceId, Collection<String> variableNames);
+    
+    VariableInstanceQuery createVariableInstanceQuery();
 
     /**
      * Set or change the name of the case instance.

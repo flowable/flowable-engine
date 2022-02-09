@@ -97,6 +97,7 @@ import org.flowable.rest.service.api.repository.DeploymentResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ModelResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
+import org.flowable.rest.service.api.runtime.VariableInstanceResponse;
 import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -105,6 +106,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -123,10 +125,11 @@ public class RestResponseFactory {
     public static final int VARIABLE_TASK = 1;
     public static final int VARIABLE_EXECUTION = 2;
     public static final int VARIABLE_PROCESS = 3;
-    public static final int VARIABLE_HISTORY_TASK = 4;
-    public static final int VARIABLE_HISTORY_PROCESS = 5;
-    public static final int VARIABLE_HISTORY_VARINSTANCE = 6;
-    public static final int VARIABLE_HISTORY_DETAIL = 7;
+    public static final int VARIABLE_VARINSTANCE = 4;
+    public static final int VARIABLE_HISTORY_TASK = 5;
+    public static final int VARIABLE_HISTORY_PROCESS = 6;
+    public static final int VARIABLE_HISTORY_VARINSTANCE = 7;
+    public static final int VARIABLE_HISTORY_DETAIL = 8;
 
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
@@ -331,6 +334,8 @@ public class RestResponseFactory {
                     restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, id, name));
                 } else if (variableType == VARIABLE_PROCESS) {
                     restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, id, name));
+                } else if (variableType == VARIABLE_VARINSTANCE) {
+                    restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_VARIABLE_INSTANCE_DATA, id));
                 } else if (variableType == VARIABLE_HISTORY_TASK) {
                     restVar.setValueUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, id, name));
                 } else if (variableType == VARIABLE_HISTORY_PROCESS) {
@@ -673,6 +678,31 @@ public class RestResponseFactory {
         if (execution.getProcessInstanceId() != null) {
             result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, execution.getProcessInstanceId()));
         }
+        return result;
+    }
+    
+    public List<VariableInstanceResponse> createVariableInstanceResponseList(List<VariableInstance> variableInstances) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<VariableInstanceResponse> responseList = new ArrayList<>(variableInstances.size());
+        for (VariableInstance instance : variableInstances) {
+            responseList.add(createVariableInstanceResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public VariableInstanceResponse createVariableInstanceResponse(VariableInstance variableInstance) {
+        return createVariableInstanceResponse(variableInstance, createUrlBuilder());
+    }
+
+    public VariableInstanceResponse createVariableInstanceResponse(VariableInstance variableInstance, RestUrlBuilder urlBuilder) {
+        VariableInstanceResponse result = new VariableInstanceResponse();
+        result.setId(variableInstance.getId());
+        result.setProcessInstanceId(variableInstance.getProcessInstanceId());
+        if (variableInstance.getProcessInstanceId() != null) {
+            result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, variableInstance.getProcessInstanceId()));
+        }
+        result.setTaskId(variableInstance.getTaskId());
+        result.setVariable(createRestVariable(variableInstance.getName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
         return result;
     }
 
