@@ -193,7 +193,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
                     .containsExactly(40);
 
             // Cleanup
-            historyService.deleteHistoricTaskInstance(task.getId());
+            taskService.deleteTask(task.getId(),true);
             managementService.executeCommand(commandContext -> {
                 processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(task.getId());
                 return null;

@@ -119,8 +119,7 @@ public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
                 listener.clearEventsReceived();
 
                 // Delete task and historic task
-                taskService.deleteTask(task.getId());
-                historyService.deleteHistoricTaskInstance(task.getId());
+                taskService.deleteTask(task.getId(), true);
 
                 assertEquals(1, listener.getEventsReceived().size());
                 FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
@@ -133,8 +132,7 @@ public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
 
             } finally {
                 if (task != null && task.getId() != null) {
-                    taskService.deleteTask(task.getId());
-                    historyService.deleteHistoricTaskInstance(task.getId());
+                    taskService.deleteTask(task.getId(), true);
                 }
             }
         }

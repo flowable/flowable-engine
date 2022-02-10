@@ -137,6 +137,8 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     public void testDeleteNonCompletedHistoricTaskInstance() throws Exception {
         Task task = taskService.createTaskBuilder().id("task1").create();
 
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
         assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("task1"))
                 .isExactlyInstanceOf(FlowableException.class);
 
@@ -144,7 +146,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
 
-        historyService.deleteHistoricTaskInstance("task1");
+        taskService.deleteTask(task.getId(), true);
     }
 
     @Test
