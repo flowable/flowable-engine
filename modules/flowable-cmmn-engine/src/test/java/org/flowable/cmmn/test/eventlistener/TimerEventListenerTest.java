@@ -13,12 +13,14 @@
 package org.flowable.cmmn.test.eventlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -476,6 +478,233 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         assertThat(task.getName()).isEqualTo("A");
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimer() {
+
+        Date startTime = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(startTime);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repeatingTimer").start();
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                        .containsExactly(
+                                tuple("A", PlanItemInstanceState.AVAILABLE),
+                                tuple("Human task", PlanItemInstanceState.ACTIVE),
+                                tuple("Timer", PlanItemInstanceState.AVAILABLE)
+                                );
+
+        // Repeat is set to 20S
+        Date newTime = new Date(startTime.getTime() + 30_000);
+        cmmnEngineConfiguration.getClock().setCurrentTime(newTime);
+
+        Job job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+        cmmnManagementService.executeJob(job.getId());
+
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("A", PlanItemInstanceState.ACTIVE),
+                        tuple("A", PlanItemInstanceState.WAITING_FOR_REPETITION),
+                        tuple("Human task", PlanItemInstanceState.ACTIVE),
+                        tuple("Timer", PlanItemInstanceState.AVAILABLE),
+                        tuple("Timer", PlanItemInstanceState.COMPLETED)
+                );
+
+        job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+        cmmnManagementService.executeJob(job.getId());
+
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("A", PlanItemInstanceState.ACTIVE),
+                        tuple("A", PlanItemInstanceState.ACTIVE),
+                        tuple("A", PlanItemInstanceState.WAITING_FOR_REPETITION),
+                        tuple("Human task", PlanItemInstanceState.ACTIVE),
+                        tuple("Timer", PlanItemInstanceState.AVAILABLE),
+                        tuple("Timer", PlanItemInstanceState.COMPLETED),
+                        tuple("Timer", PlanItemInstanceState.COMPLETED)
+                );
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithAvailableCondition() {
+        Date time = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(time);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repeatingTimer").start();
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactly(
+                        tuple("A", PlanItemInstanceState.AVAILABLE),
+                        tuple("Human task", PlanItemInstanceState.ACTIVE),
+                        tuple("Timer", PlanItemInstanceState.AVAILABLE)
+                );
+
+
+        for (int i = 1; i < 9; i++) {
+
+            // Repeat is set to 20S
+            Date newTime = new Date(time.getTime() + 30_000);
+            cmmnEngineConfiguration.getClock().setCurrentTime(newTime);
+            time = newTime;
+
+            Job job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+            cmmnManagementService.executeJob(job.getId());
+
+            assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+            Tuple[] expectedTuples = new Tuple[3 + (i * 2)];
+            expectedTuples[0] = tuple("A", PlanItemInstanceState.WAITING_FOR_REPETITION);
+            expectedTuples[1] = tuple("Human task", PlanItemInstanceState.ACTIVE);
+            expectedTuples[2] = tuple("Timer", PlanItemInstanceState.AVAILABLE);
+            int currentIndex = 2;
+            for (int j = 0; j < i; j++) {
+                expectedTuples[++currentIndex] = tuple("A", PlanItemInstanceState.ACTIVE);
+                expectedTuples[++currentIndex] = tuple("Timer", PlanItemInstanceState.COMPLETED);
+            }
+
+            planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(expectedTuples);
+        }
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithChangingAvailableCondition() {
+        Date time = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(time);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("timerActive", false)
+                .caseDefinitionKey("repeatingTimer")
+                .start();
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+
+        for (int i = 1; i < 12; i++) {
+
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", true);
+            assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+            // Repeat is set to 20S
+            Date newTime = new Date(time.getTime() + 30_000);
+            cmmnEngineConfiguration.getClock().setCurrentTime(newTime);
+            time = newTime;
+
+            Job job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+            cmmnManagementService.executeJob(job.getId());
+
+            assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
+            Tuple[] expectedTuples = new Tuple[3 + (i * 2)];
+            expectedTuples[0] = tuple("A", PlanItemInstanceState.WAITING_FOR_REPETITION);
+            expectedTuples[1] = tuple("Human task", PlanItemInstanceState.ACTIVE);
+            expectedTuples[2] = tuple("Timer", PlanItemInstanceState.AVAILABLE);
+            int currentIndex = 2;
+            for (int j = 0; j < i; j++) {
+                expectedTuples[++currentIndex] = tuple("A", PlanItemInstanceState.ACTIVE);
+                expectedTuples[++currentIndex] = tuple("Timer", PlanItemInstanceState.COMPLETED);
+            }
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().includeEnded().orderByName().asc().list();
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(expectedTuples);
+
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", false);
+            assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testLimitedRepeatingTimerWithAvailableCondition() {
+
+        // The repeat is limited to 4 times here
+
+        Date time = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(time);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repeatingTimer").start();
+
+        int nrOfTimerJobsExecuted = 0;
+        for (int i = 0; i < 10; i++) {
+
+            // Repeat is set to 20S
+            Date newTime = new Date(time.getTime() + 21_000);
+            cmmnEngineConfiguration.getClock().setCurrentTime(newTime);
+            time = newTime;
+
+            if (cmmnManagementService.createTimerJobQuery().count() > 0) {
+                Job job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+                cmmnManagementService.executeJob(job.getId());
+
+                nrOfTimerJobsExecuted++;
+            }
+        }
+
+        assertThat(nrOfTimerJobsExecuted).isEqualTo(4);
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testLimitedRepeatingTimerWithChangingAvailableCondition() {
+
+        // The repeat is limited to 4 times here
+
+        Date time = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(time);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("timerActive", true)
+                .caseDefinitionKey("repeatingTimer")
+                .start();
+
+        int nrOfTimerJobsExecuted = 0;
+        for (int i = 0; i < 10; i++) {
+
+            // Repeat is set to 20S
+            Date newTime = new Date(time.getTime() + 21_000);
+            cmmnEngineConfiguration.getClock().setCurrentTime(newTime);
+            time = newTime;
+
+            // When the availableCondition is true again, the repetition starts form the beginning
+            if (i == 2) {
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", false);
+            } else if (i == 4) {
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", true);
+            }
+
+            if (cmmnManagementService.createTimerJobQuery().count() > 0) {
+                Job job = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().singleResult().getId());
+                cmmnManagementService.executeJob(job.getId());
+
+                nrOfTimerJobsExecuted++;
+            }
+
+        }
+
+        assertThat(nrOfTimerJobsExecuted).isEqualTo(6); // should 2 from first part and then 4, because it continued until the 4 times were used up
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", true);
+        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
     }
 
 }
