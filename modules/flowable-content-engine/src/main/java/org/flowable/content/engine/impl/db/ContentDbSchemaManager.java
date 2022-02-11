@@ -15,6 +15,7 @@ package org.flowable.content.engine.impl.db;
 import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
 import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
 import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 
@@ -33,5 +34,36 @@ public class ContentDbSchemaManager extends LiquibaseBasedSchemaManager {
 
     public void initSchema() {
         initSchema(CommandContextUtil.getContentEngineConfiguration().getDatabaseSchemaUpdate());
+    }
+
+    @Override
+    public void schemaCreate() {
+        getCommonSchemaManager().schemaCreate();
+        super.schemaCreate();
+    }
+
+    @Override
+        public void schemaDrop() {
+        try {
+            super.schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping content engine tables", e);
+        }
+
+        try {
+            getCommonSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping common tables", e);
+        }
+    }
+
+    @Override
+    public String schemaUpdate() {
+        getCommonSchemaManager().schemaUpdate();
+        return super.schemaUpdate();
+    }
+
+    protected SchemaManager getCommonSchemaManager() {
+        return CommandContextUtil.getContentEngineConfiguration().getCommonSchemaManager();
     }
 }

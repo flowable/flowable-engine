@@ -43,6 +43,7 @@ public class PropertyAccessJPAEntity {
         this.id = id;
     }
 
+    @Column(name = "VALUE_")
     public String getValue() {
         return value;
     }
