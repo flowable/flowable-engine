@@ -100,7 +100,7 @@ com.fasterxml.jackson.core      jackson-annotations         2.13.1          The 
 com.fasterxml.jackson.core      jackson-core                2.13.1          The Apache Software License, Version 2.0
 com.fasterxml.jackson.core      jackson-databind            2.13.1          The Apache Software License, Version 2.0
 com.fasterxml.jackson.datatype  jackson-datatype-joda       2.13.1          The Apache Software License, Version 2.0
-com.google.guava                guava                       30.1-jre        The Apache Software License, Version 2.0
+com.google.guava                guava                       31.0.1-jre      The Apache Software License, Version 2.0
 com.h2database                  h2                          1.4.200         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
@@ -119,7 +119,7 @@ io.swagger                      swagger-annotations         1.6.2           Apac
 io.swagger                      swagger-models              1.6.2           Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-joda-time                       joda-time                   2.10.10         Apache 2
+joda-time                       joda-time                   2.10.13         Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
 org.apache.commons              commons-lang3               3.12.0          The Apache Software License, Version 2.0

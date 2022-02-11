@@ -86,6 +86,11 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     }
 
     protected void handleCreateTransition(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+
+        if (timerJobForPlanItemInstanceExists(commandContext, planItemInstance)) {
+            return;
+        }
+
         Object timerValue = resolveTimerExpression(commandContext, planItemInstance);
 
         Date timerDueDate = null;
@@ -138,6 +143,21 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
 
         scheduleTimerJob(commandContext, planItemInstance, timerValue, timerDueDate, isRepeating);
+    }
+
+    protected boolean timerJobForPlanItemInstanceExists(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+
+        // For the same plan item, only one timer job can ever be active at any given time.
+        // Since the DefaultJobManager creates a new timer job on repeat, we need to make sure
+        // we're not creating duplicate timers on the create or initiate transition (which does need to happen on the first repeat).
+        //
+        // The alternative implementation would be to move the repeating timer creation to the onStateTransition on occur,
+        // but this would also require similar logic to look up the previous timer job, as the previous repeat value is needed to calculate the next.
+
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        List<TimerJobEntity> jobsByScopeIdAndSubScopeId = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager()
+                .findJobsByScopeIdAndSubScopeId(planItemInstance.getCaseInstanceId(), planItemInstance.getId());
+        return jobsByScopeIdAndSubScopeId != null && !jobsByScopeIdAndSubScopeId.isEmpty();
     }
 
     protected void scheduleTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,

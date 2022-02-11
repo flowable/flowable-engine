@@ -844,10 +844,10 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertThat(task).isNull();
 
-        managementService.executeCommand(commandContext -> {
-            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
-            return null;
-        });
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertThat(historicTaskInstance).isNull();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -867,10 +867,10 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertThat(task).isNull();
 
-        managementService.executeCommand(commandContext -> {
-            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
-            return null;
-        });
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertThat(historicTaskInstance).isNull();
+        }
     }
 
     @Test

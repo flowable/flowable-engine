@@ -19,11 +19,13 @@ import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.IterableAssert;
+import org.assertj.core.api.AbstractCollectionAssert;
+import org.assertj.core.api.ObjectAssert;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
@@ -91,8 +93,8 @@ public class EventRegistryAutoConfigurationTest {
             assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
             assertAllServicesPresent(context, eventRegistryEngine);
 
-            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
+            AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                channelModelProcessorAssert = assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(4);
@@ -145,8 +147,8 @@ public class EventRegistryAutoConfigurationTest {
 
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
-            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
+            AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                channelModelProcessorAssert = assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(4);
@@ -205,8 +207,8 @@ public class EventRegistryAutoConfigurationTest {
 
             assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration()).as("Event registry Configuration")
                 .isEqualTo(eventRegistryEngineConfiguration);
-            IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
+            AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                channelModelProcessorAssert = assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
             channelModelProcessorAssert
                 .hasSize(4);
@@ -261,8 +263,8 @@ public class EventRegistryAutoConfigurationTest {
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
 
-                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelModelProcessors());
+                AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                    channelModelProcessorAssert = assertThat(eventRegistryEngineConfiguration.getChannelModelProcessors());
 
                 channelModelProcessorAssert
                     .hasSize(5);
@@ -302,8 +304,8 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelModelProcessors())
+                AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                    channelModelProcessorAssert = assertThat(eventRegistryEngineConfiguration.getChannelModelProcessors())
                     .hasSize(5);
 
                 channelModelProcessorAssert
@@ -339,8 +341,8 @@ public class EventRegistryAutoConfigurationTest {
                 EventRegistryEngine eventRegistryEngine = context.getBean(EventRegistryEngine.class);
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
-                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
+                AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                    channelModelProcessorAssert = assertThat(eventRegistryEngine.getEventRegistryEngineConfiguration().getChannelModelProcessors());
 
                 channelModelProcessorAssert
                     .hasSize(5);
@@ -388,8 +390,8 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelModelProcessors());
+                AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                    channelModelProcessorAssert = assertThat(eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
                     .hasSize(7)
                     .contains(
@@ -439,8 +441,8 @@ public class EventRegistryAutoConfigurationTest {
                 assertThat(eventRegistryEngine).as("Event registry engine").isNotNull();
 
                 EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-                IterableAssert<ChannelModelProcessor> channelModelProcessorAssert = assertThat(
-                    eventRegistryEngineConfiguration.getChannelModelProcessors());
+                AbstractCollectionAssert<?, Collection<? extends ChannelModelProcessor>, ChannelModelProcessor, ObjectAssert<ChannelModelProcessor>>
+                    channelModelProcessorAssert = assertThat(eventRegistryEngineConfiguration.getChannelModelProcessors());
                 channelModelProcessorAssert
                     .hasSize(8);
 
@@ -456,7 +458,7 @@ public class EventRegistryAutoConfigurationTest {
                     .element(2)
                     .isEqualTo(context.getBean("jmsChannelDefinitionProcessor", ChannelModelProcessor.class));
 
-            channelModelProcessorAssert
+               channelModelProcessorAssert
                     .element(3)
                     .isEqualTo(context.getBean("kafkaChannelDefinitionProcessor", ChannelModelProcessor.class));
 

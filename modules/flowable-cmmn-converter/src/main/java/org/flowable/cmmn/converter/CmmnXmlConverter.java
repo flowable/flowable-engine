@@ -595,6 +595,13 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 criterion.setSentry(sentry);
                 planItem.addEntryCriterion(criterion);
             }
+
+            PlanItemControl itemControl = planItem.getItemControl();
+            if (itemControl != null) {
+                // A timer event should never be repeatable, as that's controlled by the timer expression
+                itemControl.setRepetitionRule(null);
+            }
+
         } else if (planItemDefinition instanceof CasePageTask) {
             // check, if the parent completion rule is set and if not, set it to the default value for a case page which is always ignore
             if (planItem.getItemControl() == null) {
