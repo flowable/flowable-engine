@@ -1,18 +1,16 @@
 [[chapter_ldap]]
 
-== LDAP integration
+== 集成LDAP
 
-Companies often already have a user and group store in the form of an LDAP system. Flowable offers an out-of-the-box solution for easily configuring how Flowable should connect with an LDAP system.
+很多公司使用LDAP（Lightweight Directory Access Protocol，轻量级目录访问协议）系统管理用户与组。Flowable提供了一个开箱即用的解决方案，简单配置即可将Flowable与LDAP系统连接起来。
 
-In earlier versions, it was already possible to integrate LDAP, but since then, the configuration has been simplified a lot. However, the 'old' way of configuring LDAP still works. More specifically, the simplified configuration is just a wrapper on top of the 'old' infrastructure.
-
+早期版本就可以集成LDAP。之后大幅简化了配置，但“老”的LDAP配置方式仍然可用。实际上，简化配置只是对“老”框架进行的包装。
 
 [[ldap_usage]]
 
+=== 使用
 
-=== Usage
-
-To add the LDAP integration code to your project, simply add the following dependency to your pom.xml:
+在pom.xml中添加下列依赖，为项目中添加LDAP集成代码：
 
 [source,xml,linenums]
 ----
@@ -27,22 +25,21 @@ To add the LDAP integration code to your project, simply add the following depen
 [[ldap_usecases]]
 
 
-=== Use cases
+=== 用途
 
-The LDAP integration has currently two main use cases:
+目前LDAP集成有两大作用：
 
-* Allow for authentication through the IdentityService. This could be useful when doing everything through the IdentityService.
-* Fetching the groups of a user. This is important when for example querying tasks to see which tasks a certain user can see (i.e. tasks with a candidate group).
-
+* 通过IdentityService进行认证。用于由IdentityService处理所有认证业务的场景。
+* 获取一个组中的用户。比如，用于查询某用户作为候选组的任务。
 
 [[ldap_configuration]]
 
+=== 配置
 
-=== Configuration
 
-Integrating the LDAP system with Flowable is done by injecting an instance of +org.flowable.ldap.LDAPConfigurator+ in the +idmProcessEngineConfigurator+ section of the process engine configuration. This class is highly extensible: methods can be easily overridden and many dependent beans are pluggable if the default implementation would not fit the use case.
+在流程引擎配置的++idmProcessEngineConfigurator++小节添加++org.flowable.ldap.LDAPConfigurator++的实现，进行Flowable与LDAP系统的集成配置。这是个高度可扩展的类：如果默认实现不能满足使用场景，可以轻松地覆盖方法，许多依赖的bean也是可插拔的。
 
-This is an example configuration (note: of course, when creating the engine programmatically this is completely similar). Don't worry about all the properties for now, we'll look at them in detail in a next section.
+这是一个示例配置（在代码方式创建引擎时完全类似）。目前不需要太关注这些参数，我们会在下一章节详细介绍。
 
 [source,xml,linenums]
 ----
@@ -54,13 +51,13 @@ This is an example configuration (note: of course, when creating the engine prog
         <property name="ldapConfiguration">
 		  <bean class="org.flowable.ldap.LDAPConfiguration">
          
-            <!-- Server connection params -->
+            <!-- 服务器连接参数 -->
             <property name="server" value="ldap://localhost" />
             <property name="port" value="33389" />
             <property name="user" value="uid=admin, ou=users, o=flowable" />
             <property name="password" value="pass" />
 
-            <!-- Query params -->
+            <!-- 查询参数 -->
             <property name="baseDn" value="o=flowable" />
             <property name="queryUserByUserId" value="(&(objectClass=inetOrgPerson)(uid={0}))" />
             <property name="queryUserByFullNameLike" value="(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
@@ -68,7 +65,7 @@ This is an example configuration (note: of course, when creating the engine prog
             <property name="queryGroupsForUser" value="(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
             <property name="queryAllGroups" value="(objectClass=groupOfUniqueNames)" />
 
-            <!-- Attribute config -->
+            <!-- 属性配置 -->
             <property name="userIdAttribute" value="uid" />
             <property name="userFirstNameAttribute" value="cn" />
             <property name="userLastNameAttribute" value="sn" />
@@ -87,125 +84,71 @@ This is an example configuration (note: of course, when creating the engine prog
 [[ldap_properties]]
 
 
-=== Properties
+=== 参数
+
+++org.flowable.ldap.LDAPConfiguration++使用下列参数：
 
 
-Following properties can be set on ++org.flowable.ldap.LDAPConfiguration++:
-
-            .LDAP configuration properties
+.LDAP配置参数
 [options="header"]
 |===============
-|Property name|Description|Type|Default value
-|server|The server on which the LDAP system can be reached. For example 'ldap://localhost:33389'|String|
-|port|The port on which the LDAP system is running|int|
-|user|The user id that is used to connect to the LDAP system|String|
-|password|The password that is used to connect to the LDAP system|String|
-|initialContextFactory|The InitialContextFactory name used to connect to the LDAP system|String|com.sun.jndi.ldap.LdapCtxFactory
-|securityAuthentication|The value that is used for the 'java.naming.security.authentication' property used to connect to the LDAP system|String|simple
-|customConnectionParameters|Allows to set all LDAP connection parameters which do not have a dedicated setter.
-                            See for example http://docs.oracle.com/javase/tutorial/jndi/ldap/jndi.html for custom
-                            properties. Such properties are for example to configure connection pooling, specific
-                            security settings, etc. All the provided parameters will be provided when creating a
-                            connection to the LDAP system.|Map<String, String>|
-|baseDn|The base 'distinguished name' (DN) from which the searches for users and groups are started|String|
-|userBaseDn|The base 'distinguished name' (DN) from which the searches for users are started. If not provided, baseDn (see above) will be used|String|
-|groupBaseDn|The base 'distinguished name' (DN) from which the searches for groups are started. If not provided, baseDn (see above) will be used|String|
-|searchTimeLimit|The timeout that is used when doing a search in LDAP in milliseconds|long|one hour
-|queryUserByUserId|
-                            The query that is executed when searching for a user by userId.
-                            For example: (&(objectClass=inetOrgPerson)(uid={0}))
-                            Here, all the objects in LDAP with the class 'inetOrgPerson'
-                            and who have the matching 'uid' attribute value will be returned.
-                            As shown in the example, the user id is injected by using
-                            {0}. If setting the query alone is insufficient for your specific
-                            LDAP setup, you can alternatively plug in a different
-                            LDAPQueryBuilder, which allows for more customization than only the  query.
-                            |string|
-|queryUserByFullNameLike|
-                            The query that is executed when searching for a user by full name.
-                            For example: (& (objectClass=inetOrgPerson) (|({0}=*{1}*)({2}=*{3}*)) )
-                            Here, all the objects in LDAP with the class 'inetOrgPerson'
-                            and who have the matching first name and last name values will be returned.
-                            Note that {0} injects the firstNameAttribute (as defined above), {1} and {3} the search text
-                            and {2} the lastNameAttribute. If setting the query alone is insufficient for your specific
-                            LDAP setup, you can alternatively plug in a different
-                            LDAPQueryBuilder, which allows for more customization than only the  query.
-                            |string|
-|queryAllUsers|
-                            The query that is executed when searching on users without a filter.
-                            For example: (objectClass=inetOrgPerson)
-                            Here, all the objects in LDAP with the class 'inetOrgPerson' will be returned.
-                            |string|
-|queryGroupsForUser|The query that is executed when searching for the groups of a specific user.
-                            For example: (&(objectClass=groupOfUniqueNames)(uniqueMember={0}))
-                            Here, all the objects in LDAP with the class 'groupOfUniqueNames'
-                            and where the provided DN (matching a DN for a user) is a 'uniqueMember' are returned.
-                            As shown in the example, the user id is injected by using {0}
-                            If setting the query alone is insufficient for your specific
-                            LDAP setup, you can alternatively plug in a different
-                            LDAPQueryBuilder, which allows for more customization than only the  query.|string|
-|queryAllGroups|
-                            The query that is executed when searching on groups without a filter.
-                            For example: (objectClass=groupOfUniqueNames)
-                            Here, all the objects in LDAP with the class 'groupOfUniqueNames' will be returned.
-                            |string|
-|userIdAttribute|Name of the attribute that matches the user id.
-                            This property is used when looking for a User object
-                            and the mapping between the LDAP object and the Flowable User object
-                            is done.|string|
-|userFirstNameAttribute|Name of the attribute that matches the user first name.
-                            This property is used when looking for a User object
-                            and the mapping between the LDAP object and the Flowable User object is done.|string|
-|userLastNameAttribute|Name of the attribute that matches the user last name.
-                            This property is used when looking for a User object
-                            and the mapping between the LDAP object and the Flowable User object is done.|string|
-|groupIdAttribute|Name of the attribute that matches the group id.
-                            This property is used when looking for a Group object
-                            and the mapping between the LDAP object and the Flowable Group object is done.|string|
-|groupNameAttribute|Name of the attribute that matches the group name.
-                            This property is used when looking for a Group object
-                            and the mapping between the LDAP object and the Flowable Group object is done.|String|
-|groupTypeAttribute|Name of the attribute that matches the group type.
-                            This property is used when looking for a Group object
-                            and the mapping between the LDAP object and the Flowable Group object
-                            is done.|String|
+|参数名|描述|类型|默认值
+|server|LDAP系统的服务器。例如__ldap://localhost:33389__|String|
+|port|LDAP系统的端口|int|
+|user|LDAP系统的用户id|String|
+|password|LDAP系统的密码|String|
+|initialContextFactory|连接LDAP所用的InitialContextFactory|String|com.sun.jndi.ldap.LdapCtxFactory
+|securityAuthentication|连接LDAP系统所用的__java.naming.security.authentication__|String|simple
+|customConnectionParameters|用于设置没有配置setter的LDAP连接参数。例如 http://docs.oracle.com/javase/tutorial/jndi/ldap/jndi.html 中的自定义参数，用于配置连接池、安全等。连接LDAP系统时会使用这些参数。|Map<String, String>|
+|baseDn|查询用户及组的基础__标识名__（__distinguished name, DN__）|String|
+|userBaseDn|查询用户的基础__标识名__。不设置则使用baseDn（见上）|String|
+|groupBaseDn|查询组的基础__标识名__。不设置则使用baseDn（见上）|String|
+|searchTimeLimit|查询LDAP的超时时间，以毫秒计|long|一小时
+|queryUserByUserId|通过ID查询用户所用的语句。
+ 比如：`(&(objectClass=inetOrgPerson)(uid={0}))`
+ 返回LDAP中所有__inetOrgPerson__类、__uid__属性值匹配的对象。
+ 上例中，使用{@link java.text.MessageFormat}即__{0}__注入用户ID。
+ 如果不能通过简单的语句进行查询，可以改用 `org.flowable.ldap.LDAPQueryBuilder` ，进行定制化查询。|string|
+|queryUserByFullNameLike|通过全名查询用户所用的语句。
+ 比如：`(&(objectClass=inetOrgPerson)(\|({0}=**{1}**)({2}={3})))`
+ 返回LDAP中所有__inetOrgPerson__类、姓或名匹配的对象。
+ 注入到表达式中的值：{0} : 名字属性名 {1} : 查询文本 {2} : 姓属性名 {3} : 查询文本
+ 如果不能通过简单的语句进行查询，可以改用 `org.flowable.ldap.LDAPQueryBuilder`，进行定制化查询。|string|
+|queryAllUsers|不使用过滤条件，查询所有用户所用的语句。
+ 比如：`(objectClass=inetOrgPerson)`
+ 返回LDAP中所有__groupOfUniqueNames__类的对象。|string|
+|queryGroupsForUser|查询给定用户所在组所用的语句。
+ 比如：`(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))`
+ 返回LDAP中所有__groupOfUniqueNames__类、DN为__uniqueMember__的对象。
+ 上例中，使用{@link java.text.MessageFormat}即__{0}__注入用户ID。
+ 如果不能通过简单的语句进行查询，可以改用 `org.flowable.ldap.LDAPQueryBuilder` ，进行定制化查询。|string|
+|queryAllGroups|查询所有组所用的语句。
+ 比如：`(objectClass=groupOfUniqueNames)`
+ 返回LDAP中所有__groupOfUniqueNames__的对象。|string|
+|userIdAttribute|代表用户ID的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
+|userFirstNameAttribute|代表用户名字的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
+|userLastNameAttribute|代表用户姓的LDAP属性名。用于查询并将LDAP用户对象映射至Flowable用户对象。|string|
+|groupIdAttribute|代表用户组ID的LDAP属性名。用于查询并将LDAP用户组对象映射至Flowable用户组对象。|string|
+|groupNameAttribute|代表用户组名称的LDAP属性名。用于查询并将LDAP用户组对象映射至Flowable用户组对象。|String|
+|groupTypeAttribute|代表用户组类型的LDAP属性名。用于查询并将LDAP用户组对象映射至Flowable用户组对象|String|
 
 |===============
 
+下面的参数用于修改默认行为及缓存组：
 
-Following properties are when one wants to customize default behavior or introduced group caching:
-
-.Advanced properties
+.高级参数
 [options="header"]
 |===============
-|Property name|Description|Type|Default value
-|ldapUserManagerFactory|Set a custom implementation of the LDAPUserManagerFactory if the default implementation is not suitable.|instance of LDAPUserManagerFactory|
-|ldapGroupManagerFactory|Set a custom implementation of the LDAPGroupManagerFactory if the default implementation is not suitable.|instance of LDAPGroupManagerFactory|
-|ldapMemberShipManagerFactory|Set a custom implementation of the LDAPMembershipManagerFactory if the default implementation is not suitable.
-                            Note that this is very unlikely, as membership are managed in the LDAP system itself normally.|An instance of LDAPMembershipManagerFactory|
-|ldapQueryBuilder|Set a custom query builder if the default implementation is not suitable.
-                            The LDAPQueryBuilder instance is used when the LDAPUserManager or
-                            LDAPGroupManage} does an actual query against the LDAP system.
-                            The default implementation uses the properties as set on this instance
-                            such as queryGroupsForUser and queryUserById|An instance of org.flowable.ldap.LDAPQueryBuilder|
-|groupCacheSize| Allows to set the size of the group cache.
-                            This is an LRU cache that caches groups for users and thus
-                            avoids hitting the LDAP system each time the groups of
-                            a user needs to be known.
-
-                            The cache will not be instantiated if the value is less than zero.
-                            By default set to -1, so no caching is done.
-                            |int|-1
-|groupCacheExpirationTime|Sets the expiration time of the group cache in milliseconds.
-                            When groups for a specific user are fetched, and if the group cache exists,
-                            the groups will be stored in this cache for the time set in this property.
-                            I.e. when the groups were fetched at 00:00 and the expiration time is 30 minutes,
-                            any fetch of the groups for that user after 00:30 will not come from the cache, but do
-                            a fetch again from the LDAP system. Likewise, everything group fetch for that user done
-                            between 00:00 - 00:30 will come from the cache.|long|one hour
+|参数名|描述|类型|默认值
+|ldapUserManagerFactory|如果默认实现不符合要求，可以设置一个自定义的LDAPUserManagerFactory实现。|LDAPUserManagerFactory的实例|
+|ldapGroupManagerFactory|如果默认实现不符合要求，可以设置一个自定义的LDAPGroupManagerFactory实现。|LDAPGroupManagerFactory的实例|
+|ldapMemberShipManagerFactory|如果默认实现不符合要求，可以设置一个自定义的LDAPMembershipManagerFactory实现。请注意很少出现这种情况，一般都使用LDAP系统管理成员信息。|LDAPMembershipManagerFactory的实例|
+|ldapQueryBuilder|如果默认实现不符合要求，可以设置一个自定义的查询构建器。使用LDAPUserManager或LDAPGroupManage进行LDAP查询时，会使用LDAPQueryBuilder的实例。默认会使用在本实例中设置的参数，例如queryGroupsForUser与queryUserById|org.flowable.ldap.LDAPQueryBuilder的实例|
+|groupCacheSize|设置用户组缓存的尺寸。
+这是用户所在组的LRU缓存。避免每次需要查询用户所在组时都访问LDAP系统。
+若值小于0，则不会启用缓存。默认值为-1，所以不会进行缓存。|int|-1
+|groupCacheExpirationTime|设置用户组缓存的过期时间，以毫秒计。如果设置了用户组缓存，在查询了用户所在组后，会缓存用户组关系，持续本参数设置的时间。也就是说，如果在00:00进行了用户所在组查询，过期时间为30分钟，则在00:00 - 00:30间会使用该惠存，00:30之后进行的查询不会使用该缓存，而是会重新查询LDAP系统。|long|一个小时
 
 |===============
 
-
-Note when using Active Directory: people have reported that for Active Directory, the 'InitialDirContext' needs to be set to Context.REFERRAL. This can be passed through the customConnectionParameters map as described above.
-        
+使用活动目录（Active Directory）时请注意：用户报告在使用活动目录时，需要将__InitialDirContext__设置为Context.REFERRAL。可以通过customConnectionParameters map设置这个参数。

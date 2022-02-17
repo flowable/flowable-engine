@@ -1,36 +1,37 @@
 
 == JPA
+（Java Persistence API Java持久化API）
 
-You can use JPA-Entities as process variables, allowing you to:
+可以使用JPA实体作为流程变量，这样可以：
 
-* Updating existing JPA-entities based on process variables that can be filled in on a form in a userTask or generated in a serviceTask.
-* Reusing existing domain model without having to write explicit services to fetch the entities and update the values
-* Make decisions (gateways) based on properties of existing entities.
+* 使用流程变量更新已有的JPA实体。流程变量可以在用户任务的表单中填写，或者通过服务任务生成。
+* 重用已有的领域模型，而不需要写专门的服务用于读取与更新实体。
+* 基于已有实体做决策（网关）。
 * ...
 
+[[_requirements]]
+=== 需求
 
-=== Requirements
+只支持完全满足下列条件的实体：
 
-Only entities that comply with the following are supported:
-
-* Entities should be configured using JPA-annotations, we support both field and property-access. Mapped super classes can also be used.
-* Entity should have a primary key annotated with +@Id+, compound primary keys are not supported (++@EmbeddedId++ and ++@IdClass++). The Id field/property can be of any type supported in the JPA-spec: Primitive types and their wrappers (excluding boolean), ++String++, ++BigInteger++, ++BigDecimal++, ++java.util.Date++ and ++java.sql.Date++.
+* 实体需要使用JPA注解配置，字段与参数访问器都可以。也可以使用映射的父类。
+* 实体需要有使用++@Id++注解的主键，不支持复合主键（++@EmbeddedId++与++@IdClass++）。Id字段/参数可以是任何JPA规范支持的类型：原生类型与其包装器（除了boolean）、++String++、++BigInteger++、++BigDecimal++、++java.util.Date++与++java.sql.Date++。
 
 [[jpaconfiguration]]
 
 
-=== Configuration
+=== 配置
 
-To be able to use JPA-entities, the engine must have a reference to an +EntityManagerFactory+. This can be done by configuring a reference or by supplying a persistence-unit name. JPA-entities used as variables will be detected automatically and will be handled accordingly.
+引擎必须引用++EntityManagerFactory++才能使用JPA实体，可以配置引用，或者配置持久化单元名（Persistence Unit Name）。引擎会自动检测用作变量的JPA实体，并按需处理。
 
-The example configuration below uses the jpaPersistenceUnitName:
+下面的示例配置使用jpaPersistenceUnitName：
 
 [source,xml,linenums]
 ----
 <bean id="processEngineConfiguration"
   class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
-<!-- Database configurations -->
+<!-- 数据库配置 -->
 <property name="databaseSchemaUpdate" value="true" />
 <property name="jdbcUrl" value="jdbc:h2:mem:JpaVariableTest;DB_CLOSE_DELAY=1000" />
 
@@ -38,15 +39,15 @@ The example configuration below uses the jpaPersistenceUnitName:
 <property name="jpaHandleTransaction" value="true" />
 <property name="jpaCloseEntityManager" value="true" />
 
-<!-- job executor configurations -->
+<!-- 作业执行器配置 -->
 <property name="asyncExecutorActivate" value="false" />
 
-<!-- mail server configurations -->
+<!-- 邮件服务器配置 -->
 <property name="mailServerPort" value="5025" />
 </bean>
 ----
 
-The next example configuration below provides a +EntityManagerFactory+ which we define ourselves (in this case, an open-jpa entity manager). Note that the snippet only contains the beans that are relevant for the example, the others are omitted. Full working example with open-jpa entity manager can be found in the flowable-spring-examples (++/flowable-spring/src/test/java/org/flowable/spring/test/jpa/JPASpringTest.java++)
+下面的示例配置使用自定义的++EntityManagerFactory++（open-jpa实体管理器）。请注意这段代码只包含了与本例相关的bean，而省略了其他的bean。使用open-jpa实体管理器的完整可用示例，可以在flowable-spring-examples (++/flowable-spring/src/test/java/org/flowable/spring/test/jpa/JPASpringTest.java++)中找到。
 
 [source,xml,linenums]
 ----
@@ -70,7 +71,7 @@ The next example configuration below provides a +EntityManagerFactory+ which we 
 </bean>
 ----
 
-The same configurations can also be done when building an engine programmatically, example:
+也可以使用相同的配置，以编程方式构建引擎。例如：
 
 [source,java,linenums]
 ----
@@ -80,22 +81,27 @@ ProcessEngine processEngine = ProcessEngineConfiguration
     .buildProcessEngine();
 ----
 
-Configuration properties:
+配置参数：
 
-* ++jpaPersistenceUnitName++: The name of the persistence-unit to use. (Make sure the persistence-unit is available on the classpath. According to the spec, the default location is ++/META-INF/persistence.xml++). Use either +jpaEntityManagerFactory+ or +jpaPersistenceUnitName+.
-* ++jpaEntityManagerFactory++: An reference to a bean implementing +javax.persistence.EntityManagerFactory+ that will be used to load the Entities and flushing the updates. Use either _jpaEntityManagerFactory_ or _jpaPersistenceUnitName_.
-* ++jpaHandleTransaction++: Flag indicating that the engine should begin and commit/rollback the transaction on the used _EntityManager_ instances. Set to false when _Java Transaction API (JTA)_ is used.
-* ++jpaCloseEntityManager++: Flag indicating that the engine should close the +EntityManager+ instance that was obtained from the +EntityManagerFactory+. Set to false when the _EntityManager_ is container-managed (e.g. when using an Extended Persistence Context which isn't scoped to a single transaction').
+* ++jpaPersistenceUnitName++：要使用的持久化单元的名字。（需要确保该持久化单元在classpath中可用。根据规范，默认位置为++/META-INF/persistence.xml++）。++jpaEntityManagerFactory++与++jpaPersistenceUnitName++二选一。
 
-=== Usage
+* ++jpaEntityManagerFactory++：用于载入实体及刷入更新的，实现++javax.persistence.EntityManagerFactory++的bean。__jpaEntityManagerFactory__与__jpaPersistenceUnitName__二选一。
 
-==== Simple Example
+* ++jpaHandleTransaction++：标示是否需要由引擎负责开启及提交/回滚__EntityManager__上的事务。当使用__Java Transaction API (JTA)__时，需设置为false。
 
-Examples for using JPA variables can be found in JPAVariableTest in the Flowable source code. We'll explain +JPAVariableTest.testUpdateJPAEntityValues+ step by step.
+* ++jpaCloseEntityManager++：标示是否需要由引擎负责关闭从++EntityManagerFactory++获取的++EntityManager++实例。当__EntityManager__由容器管理时（例如，使用扩展持久化上下文 Extended Persistence Context，而不将实体范围限制为单一事务时）需设置为false。
 
-First of all, we create an _EntityManagerFactory_ for our persistence-unit, which is based on +META-INF/persistence.xml+. This contains classes which should be included in the persistence unit and some vendor-specific configuration.
+[[_usage]]
+=== 使用
 
-We are using a simple entity in the test, having an id and +String+ value property, which is also persisted. Before running the test, we create an entity and save this.
+[[_simple_example]]
+==== 简单示例
+
+可以在Flowable源代码的JPAVariableTest中找到使用JPA变量的例子。下面逐步解释++JPAVariableTest.testUpdateJPAEntityValues++。
+
+首先，基于++META-INF/persistence.xml++为持久化单元创建__EntityManagerFactory__。包括需要包含在持久化单元内的类及一些（数据库）厂商特定配置。
+
+在这个测试里使用的是简单实体，包括id以及一个++String++值参数。在运行测试前，先创建一个实体并保存。
 
 [source,java,linenums]
 ----
@@ -109,7 +115,7 @@ public class FieldAccessJPAEntity {
   private String value;
 
   public FieldAccessJPAEntity() {
-    // Empty constructor needed for JPA
+    // JPA需要的空构造方法
   }
 
   public Long getId() {
@@ -130,7 +136,7 @@ public class FieldAccessJPAEntity {
 }
 ----
 
-We start a new process instance, adding the entity as a variable. As with other variables, they are stored in the persistent storage of the engine. When the variable is requested the next time, it will be loaded from the +EntityManager+ based on the class and Id stored.
+启动一个新的流程实例，将这个实体加入变量。与其他变量一样，它们都会在引擎中持久化存储。当下一次请求这个变量时，将会根据类及Id，从++EntityManager++载入。
 
 [source,java,linenums]
 ----
@@ -141,7 +147,7 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
     "UpdateJPAValuesProcess", variables);
 ----
 
-The first node in our process definition contains a +serviceTask+ that will invoke the method +setValue+ on +entityToUpdate+, which resolves to the JPA variable we set earlier when starting the process instance and will be loaded from the +EntityManager+ associated with the current engine's context.
+流程定义的第一个节点是++服务任务++，将调用++entityToUpdate++上的++setValue++方法。++entityToUpdate++将解析为之前启动流程实例时设置的JPA变量，并使用当前引擎的上下文中关联的++EntityManager++载入。
 
 [source,xml,linenums]
 ----
@@ -149,19 +155,21 @@ The first node in our process definition contains a +serviceTask+ that will invo
   flowable:expression="${entityToUpdate.setValue('updatedValue')}" />
 ----
 
-When the service-task is finished, the process instance waits in a userTask defined in the process definition, which allows us to inspect the process instance. At this point, the +EntityManager+ has been flushed and the changes to the entity have been pushed to the database. When we get the value of the variable +entityToUpdate+, it's loaded again and we get the entity with its +value+ property set to +updatedValue+.
+当服务任务完成时，流程实例在流程定义中的用户任务处等待，以便我们可以查看流程实例。在这时，++EntityManager++已经刷入，对实体的修改也已经存入数据库。当获取++entityToUpdate++变量的值时，将重新载入实体。所以可以得到++value++参数设置为++updatedValue++的实体。
+
 
 [source,java,linenums]
 ----
-// Servicetask in process 'UpdateJPAValuesProcess' should have set value on entityToUpdate.
+// 流程'UpdateJPAValuesProcess'中的服务任务已经设置了entityToUpdate的值。
 Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
 assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
 assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
 ----
 
-==== Query JPA process variables
+[[_query_jpa_process_variables]]
+==== 查询JPA流程变量
 
-You can query for ++ProcessInstance++s and ++Execution++s that have a certain JPA-entity as variable value. *Note that only +variableValueEquals(name, entity)+ is supported for JPA-Entities on +ProcessInstanceQuery+ and +ExecutionQuery+*. Methods +variableValueNotEquals+, +variableValueGreaterThan+, +variableValueGreaterThanOrEqual+, +variableValueLessThan+ and +variableValueLessThanOrEqual+ are unsupported and will throw an +FlowableException+ when a JPA-Entity is passed as value.
+可以查询以特定JPA实体作为变量值的++流程实例++与++执行++。**请注意++ProcessInstanceQuery++与++ExecutionQuery++中，只有++variableValueEquals(name, entity)++方法支持JPA实体查询**。而++variableValueNotEquals++、++variableValueGreaterThan++、++variableValueGreaterThanOrEqual++、++variableValueLessThan++与++variableValueLessThanOrEqual++等方法都不支持JPA，并会在值传递为JPA实体时，抛出++FlowableException++。
 
 [source,java,linenums]
 ----
@@ -169,19 +177,19 @@ You can query for ++ProcessInstance++s and ++Execution++s that have a certain JP
     .variableValueEquals("entityToQuery", entityToQuery).singleResult();
 ----
 
-==== Advanced example using Spring beans and JPA
+[[_advanced_example_using_spring_beans_and_jpa]]
+==== 使用Spring bean与JPA的高级示例
 
+可以在++flowable-spring-examples++中找到高级用法的示例——++JPASpringTest++。它描述了一个简单的用例：
 
-A more advanced example, +JPASpringTest+, can be found in +flowable-spring-examples+. It describes the following simple use case:
+* 使用一个已有的Spring bean及已定义的JPA实体，用于存储贷款申请。
+* Flowable通过该bean获取该实体，并将其用作流程中的变量。流程定义如下步骤：
+** 使用++LoanRequestBean++，并使用启动流程时（从启动表单）接收的变量创建LoanRequest（贷款申请）实体的服务任务。使用++flowable:resultVariable++将表达式结果，即所创建的实体存储为流程变量。
+** 经理用于审核并批准/驳回申请的用户任务，并将审核结论存储为boolean变量++approvedByManager++。
+** 更新贷款申请实体的服务任务，使实体与流程同步。
+** 使用一个排他网关，依据++approved++实体参数的值选择下一步采用哪条路径：若申请被批准，结束流程；否则，生成一个额外任务（Send rejection letter 发送拒信），以便客户可以收到拒信得到通知。
 
-* An existing Spring-bean which uses JPA entities already exists which allows for Loan Requests to be stored.
-* Using Flowable, we can use the existing entities, obtained through the existing bean, and use them as variable in our process. Process is defined in the following steps:
-** Service task that creates a new LoanRequest, using the existing +LoanRequestBean+ using variables received when starting the process (e.g. could come from a start form). The created entity is stored as a variable, using +flowable:resultVariable+ which stores the expression result as a variable.
-** UserTask that allows a manager to review the request and approve/disapprove, which is stored as a boolean variable +approvedByManager+
-** ServiceTask that updates the loan request entity so the entity is in sync with the process.
-** Depending on the value of the entity property +approved+, an exclusive gateway is used to make a decision about what path to take next: When the request is approved, process ends, otherwise, an extra task will become available (Send rejection letter), so the customer can be notified manually by a rejection letter.
-
-Please note that the process doesn't contain any forms, since it is only used in a unit test.
+请注意这个流程只用于单元测试，而不包含任何表单。
 
 image::images/jpa.spring.example.process.png[align="center"]
 
@@ -228,5 +236,4 @@ image::images/jpa.spring.example.process.png[align="center"]
 </definitions>
 ----
 
-
-Although the example above is quite simple, it shows the power of using JPA combined with Spring and parametrized method-expressions. The process requires no custom java-code at all (except for the Spring-bean off course) and speeds up development drastically.
+尽管上面的例子很简单，但也展示了JPA与Spring结合，以及带参数方法表达式的威力。这个流程本身完全不需要写Java代码（当然还是需要写Spring bean），大幅加速了开发。

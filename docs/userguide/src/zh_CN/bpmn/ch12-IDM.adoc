@@ -1,26 +1,27 @@
 [[IDM]]
 
-== Identity management
-（开源版与商业版逻辑不一样 盘古BPM）
-从Flowable V6开始，身份管理（IDM）组件已经从Flowable engine模块中提取出来，逻辑转移到几个单独的模块：Flowable IDM api、Flowable IDM engine、Flowable IDM spring和Flowable IDM engine configurator。分离IDM逻辑的主要原因是它不是Flowable引擎的核心，在很多情况下，当Flowable引擎嵌入到应用程序中时，标识逻辑不被使用或不需要。
-默认情况下，IDM引擎在可流动引擎启动时初始化并启动。这将导致在FlowableV5中执行和可用相同的标识逻辑。idm引擎管理自己的数据库架构和以下实体：
-* User and UserEntity, the user information.
-* Group and GroupEntity, the group information.
-* MembershipEntity, the memberships of users in groups
-* Privilege and PrivilegeEntity, a privilege definition (for example used for controlling access to the UI apps, such as the Flowable Modeler and Flowable Task app)
-* PrivilegeMappingEntity, linking a user and/or group to a privilege
-* Token and TokenEntity, an authentication token used by the UI apps  
+== 身份管理
 
-由于数据库包含过去和正在进行的实例的历史实体，因此您可能需要考虑查询这些表，以尽量减少对运行时流程实例数据的访问，从而保持运行时执行的性能。
+从Flowable V6起，身份管理（IDM IDentity Management）组件从Flowable引擎模块中抽出，并将其逻辑移至几个不同的模块：flowable-idm-api、flowable-idm-engine、flowable-idm-spring及flowable-idm-engine-configurator。分离IDM主要是因为它并不是Flowable引擎的核心，并且在很多将Flowable引擎嵌入应用的用例中，并不使用或需要这部分身份管理逻辑。
 
-[[IDM engine configuration]]
+默认情况下，IDM引擎在Flowable引擎启动时初始化并启动。这样身份管理逻辑在Flowable V5中也可以使用。IDM引擎管理自己的数据库表结构及下列实体：
 
+* User与UserEntity，用户信息。
+* Group与GroupEntity，组信息。
+* MembershipEntity，组中的用户成员。
+* Privilege与PrivilegeEntity，权限定义（例如在Flowable Modeler与Flowable Task应用中，用于控制应用界面的访问）。
+* PrivilegeMappingEntity，将用户及/或组与权限关联。
+* Token与TokenEntity，应用界面程序使用的认证令牌。
 
-=== IDM engine configuration
+历史与当前进行中的流程实例都在数据库中保存历史实体，因此可以选择直接查询历史表，以减少对运行时流程实例数据的访问，并提高运行时执行的性能。
 
-默认情况下，可流动发动机以+org.flowable.idm.engine.configurator.IdmEngineConfigurator+. 此配置程序使用与可流动流程引擎配置相同的数据源配置。使用标识组件不需要额外的配置，因为它是在Flowable v5中配置的。
+[[_idm_engine_configuration]]
 
-当流程引擎中不需要标识逻辑时，可以在流程引擎配置中禁用IDM引擎。
+=== 配置IDM引擎
+
+默认情况下，IDM引擎使用++org.flowable.engine.impl.cfg.IdmEngineConfigurator++启动。这个配置器使用Flowable流程引擎配置中相同的数据源配置。这样使用身份管理就不需要进行额外的配置，就像在Flowable V5中一样。
+
+如果Flowable引擎不需要身份管理，可以在流程引擎配置中禁用IDM引擎。
 
 [source,xml,linenums]
 ----
@@ -30,10 +31,10 @@
 </bean>
 ----
 
-这意味着不能使用任何用户和组查询，并且不能为用户检索任务查询中的候选组。
+这意味着不能使用用户与组进行查询，也不能在任务查询中，按用户查询其所在的候选组。
 
+默认情况下，用户的密码以明文保存在IDM数据库表中。可以在流程引擎配置中定义一个加密算法，以确保密码加密。
 
-默认情况下，用户密码将以纯文本形式保存在IDM数据库表中。为了确保密码已编码，您可以在流程引擎配置中定义密码编码器。
 [source,xml,linenums]
 ----
 <bean id="bCryptEncoder"
@@ -49,10 +50,9 @@
 </bean>
 ----
 
-在本例中，使用了ShaPasswordEncoder，但也可以使用org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder 例如。不使用弹簧时，也可以使用org.flowable.idm.engine.impl.authentication.ApacheDigester 对密码进行编码。
-默认的IDM引擎配置器也可以被重写，以自定义方式初始化IDM引擎。LDAPConfigurator就是一个很好的例子
+这里使用的是ShaPasswordEncoder，但也可以使用其他的加密算法，如org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder，不使用Spring的话也可以改用org.flowable.idm.engine.impl.authentication.ApacheDigester。
 
-重写默认IDM引擎以使用LDAP服务器而不是默认IDM数据库表的实现。process engine配置的+idmProcessEngineConfigurator+属性可用于设置自定义配置程序，如LDAPConfigurator
+也可以覆盖默认的IDM引擎配置器，使用自定义方式初始化IDM引擎。LDAPConfigurator的实现就是一个很好的例子。它覆盖了默认的IDM引擎，使用LDAP服务代替了默认的IDM数据库表。流程引擎配置的++idmProcessEngineConfigurator++参数用于设置自定义的配置器，如LDAPConfigurator
 
 [source,xml,linenums]
 ----
@@ -61,19 +61,19 @@
     <property name="idmProcessEngineConfigurator">
       <bean class="org.flowable.ldap.LDAPConfigurator">
 
-        <!-- Server connection params -->
+        <!-- 服务器连接参数 -->
         <property name="server" value="ldap://localhost" />
         <property name="port" value="33389" />
         <property name="user" value="uid=admin, ou=users, o=flowable" />
         <property name="password" value="pass" />
 
-        <!-- Query params -->
+        <!-- 查询参数 -->
         <property name="baseDn" value="o=flowable" />
         <property name="queryUserByUserId" value="(&(objectClass=inetOrgPerson)(uid={0}))" />
         <property name="queryUserByFullNameLike" value="(&(objectClass=inetOrgPerson)(|({0}=*{1}*)({2}=*{3}*)))" />
         <property name="queryGroupsForUser" value="(&(objectClass=groupOfUniqueNames)(uniqueMember={0}))" />
 
-        <!-- Attribute config -->
+        <!-- 配置参数 -->
         <property name="userIdAttribute" value="uid" />
         <property name="userFirstNameAttribute" value="cn" />
         <property name="userLastNameAttribute" value="sn" />
