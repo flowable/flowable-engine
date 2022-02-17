@@ -106,7 +106,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BpmnXMLConverter.class);
 
-    protected static final String BPMN_XSD = "org/flowable/impl/bpmn/parser/BPMN20.xsd";
+    protected static String BPMN_XSD = "org/flowable/impl/bpmn/parser/BPMN20.xsd";
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseBpmnXMLConverter> convertersToBpmnMap = new HashMap<>();
@@ -136,6 +136,12 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
     protected ResourceParser resourceParser = new ResourceParser();
     protected SignalParser signalParser = new SignalParser();
     protected SubProcessParser subProcessParser = new SubProcessParser();
+
+    public BpmnXMLConverter() {
+    }
+    public BpmnXMLConverter(String xsd) {
+        BPMN_XSD=xsd;
+    }
 
     static {
         // events
