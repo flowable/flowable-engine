@@ -85,7 +85,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
                 }
 
                 if (failedNodes != null && !failedNodes.isEmpty()) {
-                    List<HistoryJobEntity> newHistoryJobs = getAsyncHistoryListener()
+                    List<HistoryJobEntity> newHistoryJobs = getAsyncHistoryListener(commandContext)
                             .historyDataGenerated(jobServiceConfiguration, failedNodes);
 
                     StringWriter stringWriter = new StringWriter();
