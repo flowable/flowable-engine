@@ -77,14 +77,15 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
                         }
                         failedNodes.add((ObjectNode) jsonNode);
 
-                        exception = new FlowableException("Failed to process async history json. See suppressed exceptions.");
+                        if (exception == null) {
+                            exception = new FlowableException("Failed to process async history json. See suppressed exceptions.");
+                        }
                         exception.addSuppressed(ex);
                     }
                 }
 
                 if (failedNodes != null && !failedNodes.isEmpty()) {
-                    AsyncHistorySession historySession = commandContext.getSession(AsyncHistorySession.class);
-                    List<HistoryJobEntity> newHistoryJobs = historySession.getAsyncHistoryListener()
+                    List<HistoryJobEntity> newHistoryJobs = getAsyncHistoryListener()
                             .historyDataGenerated(jobServiceConfiguration, failedNodes);
 
                     StringWriter stringWriter = new StringWriter();
@@ -126,6 +127,10 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
 
             }
         }
+    }
+
+    protected AsyncHistoryListener getAsyncHistoryListener(CommandContext commandContext) {
+        return commandContext.getSession(AsyncHistorySession.class).getAsyncHistoryListener();
     }
 
     protected byte[] getJobBytes(HistoryJobEntity job) {
