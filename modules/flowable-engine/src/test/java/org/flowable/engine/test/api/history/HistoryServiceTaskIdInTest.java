@@ -12,6 +12,9 @@
  */
 
 package org.flowable.engine.test.api.history;
+import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Collections;
+import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -20,10 +23,9 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+
+
 
 /**
  * @author pangubpm
@@ -32,7 +34,7 @@ public class HistoryServiceTaskIdInTest extends PluggableFlowableTestCase {
 
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
     public void testTaskServiceTaskIdInQuery() {
         String processDefinitionKey = "oneTaskProcess";
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
@@ -42,8 +44,9 @@ public class HistoryServiceTaskIdInTest extends PluggableFlowableTestCase {
         assertThat(list).hasSize(1);
 
     }
+
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
     public void testHistoryServiceTaskIdInQuery() {
         String processDefinitionKey = "oneTaskProcess";
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
