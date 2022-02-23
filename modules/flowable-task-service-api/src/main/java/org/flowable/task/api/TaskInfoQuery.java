@@ -33,6 +33,14 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      */
     T taskId(String taskId);
 
+    /**
+     * Only select tasks with an id that is in the given list
+     *
+     * @throws FlowableIllegalArgumentException
+     *             When passed id list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    T taskIds(Collection<String> taskIds);
+
     /** Only select tasks with the given name */
     T taskName(String name);
 

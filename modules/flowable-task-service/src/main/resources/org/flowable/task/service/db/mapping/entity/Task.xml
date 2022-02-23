@@ -1037,6 +1037,13 @@
             <if test="orQueryObject.taskId != null">
               RES.ID_ = #{orQueryObject.taskId}
             </if>
+            <if test="orQueryObject.taskIds != null &amp;&amp; !orQueryObject.taskIds.empty">
+                or RES.ID_ IN
+                <foreach item="taskId" index="index" collection="orQueryObject.taskIds"
+                         open="(" separator="," close=")">
+                    #{taskId}
+                </foreach>
+            </if>
             <if test="orQueryObject.name != null">
               or RES.NAME_ = #{orQueryObject.name}
             </if>

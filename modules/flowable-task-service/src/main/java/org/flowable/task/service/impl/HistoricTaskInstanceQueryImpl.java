@@ -84,6 +84,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Collection<String> caseDefinitionKeys;
     protected String taskId;
+    protected Collection<String> taskIds;
     protected String taskName;
     protected String taskNameLike;
     protected String taskNameLikeIgnoreCase;
@@ -669,6 +670,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.taskId = taskId;
         } else {
             this.taskId = taskId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskIds(Collection<String> taskIds) {
+        if (taskIds == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.taskIds = taskIds;
+        } else {
+            this.taskIds = taskIds;
         }
         return this;
     }
@@ -2297,6 +2314,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Collection<String> getTaskIds() {
+        return taskIds;
     }
 
     @Override

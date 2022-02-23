@@ -2123,6 +2123,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return taskId;
     }
 
+    public Collection<String> getTaskIds() {
+        return taskIds;
+    }
+
     @Override
     public String getId() {
         return taskId;
