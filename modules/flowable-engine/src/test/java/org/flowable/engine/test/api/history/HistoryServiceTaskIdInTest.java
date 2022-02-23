@@ -25,18 +25,13 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
-
-
-
-
 /**
  * @author pangubpm
  */
 public class HistoryServiceTaskIdInTest extends PluggableFlowableTestCase {
 
-
     @Test
-    @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTaskServiceTaskIdInQuery() {
         String processDefinitionKey = "oneTaskProcess";
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
@@ -48,7 +43,7 @@ public class HistoryServiceTaskIdInTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = {"org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoryServiceTaskIdInQuery() {
         String processDefinitionKey = "oneTaskProcess";
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
