@@ -64,6 +64,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Collection<String> deploymentIds;
     protected String cmmnDeploymentId;
     protected Collection<String> cmmnDeploymentIds;
+    protected Collection<String> taskIdList;
     protected String processInstanceId;
     protected Collection<String> processInstanceIds;
     protected boolean withoutProcessInstanceId;
@@ -704,6 +705,24 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         } else {
             this.taskNameList = taskNameList;
         }
+        return this;
+    }
+
+    /**
+     * Only select tasks with a id that is in the given list
+     *
+     * @param taskIdList
+     * @throws FlowableIllegalArgumentException When passed name list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    @Override
+    public HistoricTaskInstanceQuery taskIdIn(Collection<String> taskIdList) {
+        if (taskIdList == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIdList.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+        this.taskIdList=taskIdList;
         return this;
     }
 

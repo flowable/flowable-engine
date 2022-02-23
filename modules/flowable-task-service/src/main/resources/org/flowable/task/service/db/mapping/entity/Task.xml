@@ -491,6 +491,13 @@
           #{name}
         </foreach>
       </if>
+      <if test="taskIdList != null &amp;&amp; !taskIdList.empty">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="taskIdList"
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
       <if test="nameListIgnoreCase != null &amp;&amp; !nameListIgnoreCase.empty">
         and lower(RES.NAME_) IN
         <foreach item="name" index="index" collection="nameListIgnoreCase"

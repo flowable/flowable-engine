@@ -45,6 +45,14 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T taskNameIn(Collection<String> nameList);
 
     /**
+     * Only select tasks with a id that is in the given list
+     *
+     * @throws FlowableIllegalArgumentException
+     *             When passed name list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    T taskIdIn(Collection<String> taskIdList);
+
+    /**
      * Only select tasks with a name that is in the given list
      * 
      * This method, unlike the {@link #taskNameIn(Collection)} method will not take in account the upper/lower case: both the input parameters as the column value are lowercased when the query is executed.
