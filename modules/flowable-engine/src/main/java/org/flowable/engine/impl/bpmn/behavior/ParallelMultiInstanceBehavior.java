@@ -63,6 +63,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
         if (nrOfInstances < 0) {
             throw new FlowableIllegalArgumentException("Invalid number of instances: must be non-negative integer value" + ", but was " + nrOfInstances);
+        } else if (nrOfInstances == 0) {
+            // This is the same logic as with the Sequential multi instance behaviour.
+            // Variables will not be created
+            return nrOfInstances;
         }
 
         setLoopVariable(multiInstanceRootExecution, NUMBER_OF_INSTANCES, nrOfInstances);
