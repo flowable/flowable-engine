@@ -81,6 +81,11 @@ public class ParallelMultiInstanceLoopVariableType implements VariableType {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         ExecutionEntity multiInstanceRootExecution = executionEntityManager.findById(multiInstanceRootId);
+        if (multiInstanceRootExecution == null) {
+            // We used to have a bug where we would create this variable type for a parallel multi instance with no instances.
+            // Therefore, if the multi instance root execution is null it means that we have no active, nor completed instances.
+            return 0;
+        }
         List<? extends ExecutionEntity> childExecutions = multiInstanceRootExecution.getExecutions();
         int nrOfActiveInstances = (int) childExecutions.stream().filter(execution -> execution.isActive()
             && !(execution.getCurrentFlowElement() instanceof BoundaryEvent)).count();
