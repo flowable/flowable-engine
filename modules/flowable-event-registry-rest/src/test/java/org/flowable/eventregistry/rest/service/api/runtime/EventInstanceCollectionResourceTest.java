@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
@@ -71,5 +72,51 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         
         task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+    }
+
+    @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml" })
+    @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent2.event" })
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel" })
+    public void testSendEventWithMultipleEventDefinitions() throws Exception {
+        EventDeployment deployment2 = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
+                .deploy();
+
+        ProcessInstance processInstance = processRuntimeService.startProcessInstanceByKey("process", Collections.singletonMap("customerIdVar", "123"));
+        Task task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        // first send event that doesn't match process boundary event
+        requestNode.put("eventDefinitionKey", "myEvent");
+        requestNode.put("channelDefinitionKey", "myChannel");
+        ObjectNode payloadNode = requestNode.putObject("eventPayload");
+        payloadNode.put("customerId", "notExisting");
+        payloadNode.put("productNumber", "p456");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+
+        // now send event with matching correlation value
+        requestNode.put("eventDefinitionKey", "myEvent");
+        payloadNode = requestNode.putObject("eventPayload");
+        payloadNode.put("customerId", "123");
+        payloadNode.put("productNumber", "p456");
+
+        httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+
+        repositoryService.deleteDeployment(deployment2.getId());
     }
 }
