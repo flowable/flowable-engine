@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.ReactivateEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SendEventActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SignalEventListenerActivityBehaviour;
@@ -43,6 +44,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
@@ -101,5 +103,7 @@ public interface CmmnActivityBehaviorFactory {
     EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener);
     
     VariableEventListenerActivityBehaviour createVariableEventListenerActivityBehaviour(PlanItem planItem, VariableEventListener variableEventListener);
+    
+    ReactivateEventListenerActivityBehaviour createReactivateEventListenerActivityBehavior(PlanItem planItem, ReactivateEventListener reactivateEventListener);
 
 }

@@ -38,6 +38,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TIMER_EVENT_LISTENER = "TimerEventListener";
     String STENCIL_USER_EVENT_LISTENER = "UserEventListener";
     String STENCIL_VARIABLE_EVENT_LISTENER = "VariableEventListener";
+    String STENCIL_REACTIVATE_EVENT_LISTENER = "ReactivateEventListener";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";
@@ -237,7 +238,5 @@ public interface CmmnStencilConstants {
     String PROPERTY_EVENT_REGISTRY_CORRELATIONVALUE = "value";
 
     String PROPERTY_MILESTONE_VARIABLE = "milestonevariable";
-
-    String PROPERTY_IS_REACTIVATABLE = "reactivatableenabled";
 
 }

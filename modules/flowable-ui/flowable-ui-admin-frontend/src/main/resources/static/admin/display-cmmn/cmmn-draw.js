@@ -207,6 +207,12 @@ function _drawVariableEventListener(element, isMigrationModelElement, currentPap
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
+function _drawReactivateEventListener(element, isMigrationModelElement, currentPaper)
+{
+    _drawEventListener(element, isMigrationModelElement, currentPaper);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
+}
+
 function _drawGenericEventListener(element, isMigrationModelElement, currentPaper)
 {
     _drawEventListener(element, isMigrationModelElement, currentPaper);

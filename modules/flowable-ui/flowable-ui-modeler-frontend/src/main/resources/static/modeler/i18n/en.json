@@ -1901,12 +1901,6 @@
             "TITLE" : "Store result variable transiently",
             "DESCRIPTION" : "Flag that marks that the result of the expression will not be persisted at the end of the database transaction."
           }
-        },
-        "REACTIVATERULEPACKAGE" : {
-          "REACTIVATABLEENABLED" : {
-            "TITLE" : "Reactivatable",
-            "DESCRIPTION" : "Flag indicating if it is reactivation listener. False by default."
-          }
         }
       },
       "STENCILS" : {
@@ -1981,6 +1975,10 @@
         "EVENTLISTENER" : {
           "TITLE" : "Event listener",
           "DESCRIPTION" : "A generic eventlistener"
+        },
+        "REACTIVATEEVENTLISTENER" : {
+          "TITLE" : "Reactivate Event listener",
+          "DESCRIPTION" : "A listener for case reactivation"
         },
         "TIMEREVENTLISTENER" : {
           "TITLE" : "Timer event listener",

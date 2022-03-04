@@ -33,8 +33,12 @@ public class GenericEventListenerJsonConverter extends AbstractEventListenerJson
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
                                  Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-        // configuration for convertersToCmmnMap is handled by ReactivateEventListenerJsonConverter as generic and reactivate event listeners sharing the same stencilId
+        fillJsonTypes(convertersToCmmnMap);
         fillCmmnTypes(convertersToJsonMap);
+    }
+
+    public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
+        convertersToBpmnMap.put(STENCIL_GENERIC_EVENT_LISTENER, GenericEventListenerJsonConverter.class);
     }
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {

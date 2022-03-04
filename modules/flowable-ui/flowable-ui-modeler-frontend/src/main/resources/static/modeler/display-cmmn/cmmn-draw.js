@@ -219,6 +219,12 @@ function _drawVariableEventListener(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawReactivateEventListener(element)
+{
+    _drawEventListener(element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawGenericEventListener(element)
 {
     _drawEventListener(element);

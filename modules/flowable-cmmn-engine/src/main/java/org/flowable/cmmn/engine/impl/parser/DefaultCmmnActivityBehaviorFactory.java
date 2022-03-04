@@ -27,6 +27,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.ReactivateEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SendEventActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SignalEventListenerActivityBehaviour;
@@ -48,6 +49,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
@@ -131,7 +133,12 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     public UserEventListenerActivityBehaviour createUserEventListenerActivityBehavior(PlanItem planItem, UserEventListener userEventListener) {
         return new UserEventListenerActivityBehaviour(userEventListener);
     }
-    
+
+    @Override
+    public ReactivateEventListenerActivityBehaviour createReactivateEventListenerActivityBehavior(PlanItem planItem, ReactivateEventListener reactivateEventListener) {
+        return new ReactivateEventListenerActivityBehaviour();
+    }
+
     @Override
     public SignalEventListenerActivityBehaviour createSignalEventListenerActivityBehavior(PlanItem planItem, SignalEventListener signalEventListener) {
         return new SignalEventListenerActivityBehaviour(signalEventListener);

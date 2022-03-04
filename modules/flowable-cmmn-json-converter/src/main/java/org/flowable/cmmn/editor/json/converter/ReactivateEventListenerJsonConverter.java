@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author aplatakis
  */
-public class ReactivateEventListenerJsonConverter extends GenericEventListenerJsonConverter {
+public class ReactivateEventListenerJsonConverter extends AbstractEventListenerJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -37,7 +37,7 @@ public class ReactivateEventListenerJsonConverter extends GenericEventListenerJs
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap) {
-        convertersToCmmnMap.put(CmmnStencilConstants.STENCIL_GENERIC_EVENT_LISTENER, ReactivateEventListenerJsonConverter.class);
+        convertersToCmmnMap.put(CmmnStencilConstants.STENCIL_REACTIVATE_EVENT_LISTENER, ReactivateEventListenerJsonConverter.class);
     }
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -54,7 +54,6 @@ public class ReactivateEventListenerJsonConverter extends GenericEventListenerJs
         ReactivateEventListener reactivateEventListener = (ReactivateEventListener) ((PlanItem) baseElement).getPlanItemDefinition();
         if (StringUtils.isNotEmpty(reactivateEventListener.getEventType())) {
             propertiesNode.put(CmmnStencilConstants.PROPERTY_EVENT_REGISTRY_EVENT_KEY, reactivateEventListener.getEventType());
-            propertiesNode.put(CmmnStencilConstants.PROPERTY_IS_REACTIVATABLE, true);
         }
     }
 
@@ -64,9 +63,6 @@ public class ReactivateEventListenerJsonConverter extends GenericEventListenerJs
      */
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
             Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
-        if (!CmmnJsonConverterUtil.getPropertyValueAsBoolean(CmmnStencilConstants.PROPERTY_IS_REACTIVATABLE, elementNode)) {
-            return super.convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel, converterContext, cmmnModelIdHelper);
-        }
 
         ReactivateEventListener reactivateEventListener = new ReactivateEventListener();
         this.convertCommonJsonToElement(elementNode, reactivateEventListener);
@@ -76,6 +72,11 @@ public class ReactivateEventListenerJsonConverter extends GenericEventListenerJs
         }
 
         return reactivateEventListener;
+    }
+
+    @Override
+    protected String getStencilId(BaseElement baseElement) {
+        return CmmnStencilConstants.STENCIL_REACTIVATE_EVENT_LISTENER;
     }
 
 }
