@@ -59,7 +59,6 @@ public class ReactivateEventListenerJsonConverter extends AbstractEventListenerJ
 
     /**
      * {@inheritDoc}
-     * Reactivate event listener is mapped to the same stencilId as generic event listener so to convert to correct element reactivate specific properties are checked
      */
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
             Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
