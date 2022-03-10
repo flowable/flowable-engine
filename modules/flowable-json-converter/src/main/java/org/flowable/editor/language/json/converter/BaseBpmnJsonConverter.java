@@ -765,17 +765,18 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 ErrorEventDefinition errorDefinition = (ErrorEventDefinition) eventDefinition;
                 if (StringUtils.isNotEmpty(errorDefinition.getErrorCode())) {
                     propertiesNode.put(PROPERTY_ERRORREF, errorDefinition.getErrorCode());
-                    if (StringUtils.isNotEmpty(errorDefinition.getErrorVariableName())) {
-                        propertiesNode.put(PROPERTY_ERROR_VARIABLE_NAME, errorDefinition.getErrorVariableName());
-                    }
-                    
-                    if (errorDefinition.getErrorVariableTransient() != null) {
-                        propertiesNode.put(PROPERTY_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient());
-                    }
-                    
-                    if (errorDefinition.getErrorVariableLocalScope() != null) {
-                        propertiesNode.put(PROPERTY_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope());
-                    }
+                }
+
+                if (StringUtils.isNotEmpty(errorDefinition.getErrorVariableName())) {
+                    propertiesNode.put(PROPERTY_ERROR_VARIABLE_NAME, errorDefinition.getErrorVariableName());
+                }
+
+                if (errorDefinition.getErrorVariableTransient() != null) {
+                    propertiesNode.put(PROPERTY_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient());
+                }
+
+                if (errorDefinition.getErrorVariableLocalScope() != null) {
+                    propertiesNode.put(PROPERTY_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope());
                 }
 
             } else if (eventDefinition instanceof SignalEventDefinition) {
