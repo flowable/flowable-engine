@@ -23,12 +23,14 @@ import org.flowable.eventregistry.spring.test.FlowableEventSpringExtension;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * @author Filip Hrisafov
  */
 @SpringJUnitConfig(classes = EventRegistryRabbitConfiguration.class)
 @ExtendWith(FlowableEventSpringExtension.class)
+@Testcontainers(disabledWithoutDocker = true)
 @Tag("docker")
 @Tag("rabbit")
 @Documented
