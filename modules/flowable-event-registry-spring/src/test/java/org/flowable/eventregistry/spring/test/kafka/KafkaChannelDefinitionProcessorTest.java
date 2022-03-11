@@ -607,6 +607,61 @@ class KafkaChannelDefinitionProcessorTest {
         }
     }
 
+    @Test
+    void kafkaOutboundChannelShouldResolveTopicFromExpressionUsingEnvironmentAsBean() {
+        createTopic("demo-test-expression-customer-environment");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testExpressionBean", "testClientExpressionBean")) {
+            consumer.subscribe(Collections.singleton("demo-test-expression-customer-environment"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("demo-#{environment.getProperty('application.test.kafka-topic')}-environment")
+                    .recordKey("customer")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("demo-test-expression-customer-environment", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("customer");
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
     protected void createTopic(String topicName) {
 
         CreateTopicsResult topicsResult = adminClient.createTopics(Collections.singleton(new NewTopic(topicName, 1, (short) 1)));
