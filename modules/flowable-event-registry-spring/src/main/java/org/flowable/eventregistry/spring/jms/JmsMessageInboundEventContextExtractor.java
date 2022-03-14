@@ -12,8 +12,8 @@
  */
 package org.flowable.eventregistry.spring.jms;
 
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.jms.Message;
@@ -31,9 +31,9 @@ public class JmsMessageInboundEventContextExtractor implements InboundEventConte
         
         try {
             Message message = (Message) event;
-            Iterator<String> headerNameIterator = message.getPropertyNames().asIterator();
-            while (headerNameIterator.hasNext()) {
-                String headerName = headerNameIterator.next();
+            Enumeration<String> headerNames = message.getPropertyNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
                 contextInfo.put(headerName, message.getObjectProperty(headerName));
             }
             

@@ -767,7 +767,7 @@ class KafkaChannelDefinitionProcessorTest {
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
 
-            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
