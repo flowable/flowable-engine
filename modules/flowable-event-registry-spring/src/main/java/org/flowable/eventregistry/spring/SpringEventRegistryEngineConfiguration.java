@@ -27,6 +27,7 @@ import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.EventRegistryEngines;
@@ -34,7 +35,13 @@ import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfigur
 import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.eventregistry.spring.jms.JmsMessageInboundEventContextExtractor;
+import org.flowable.eventregistry.spring.jms.JmsMessageToJsonDeserializer;
+import org.flowable.eventregistry.spring.kafka.KafkaConsumerRecordInboundEventContextExtractor;
+import org.flowable.eventregistry.spring.kafka.KafkaConsumerRecordToJsonDeserializer;
 import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
+import org.flowable.eventregistry.spring.rabbit.RabbitMessageInboundEventContextExtractor;
+import org.flowable.eventregistry.spring.rabbit.RabbitMessageToJsonDeserializer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -66,6 +73,17 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
+        
+        addInboundContextExtractor(ChannelProcessingPipelineManager.CHANNEL_JMS_TYPE, new JmsMessageInboundEventContextExtractor());
+        addInboundContextExtractor(ChannelProcessingPipelineManager.CHANNEL_RABBIT_TYPE, new RabbitMessageInboundEventContextExtractor());
+        addInboundContextExtractor(ChannelProcessingPipelineManager.CHANNEL_KAFKA_TYPE, new KafkaConsumerRecordInboundEventContextExtractor());
+        
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_JMS_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new JmsMessageToJsonDeserializer());
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_RABBIT_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new RabbitMessageToJsonDeserializer());
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_KAFKA_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new KafkaConsumerRecordToJsonDeserializer());
     }
 
     @Override

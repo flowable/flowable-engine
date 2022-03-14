@@ -20,7 +20,7 @@ import org.springframework.kafka.listener.MessageListener;
 /**
  * @author Filip Hrisafov
  */
-public class KafkaChannelMessageListenerAdapter implements MessageListener<String, String> {
+public class KafkaChannelMessageListenerAdapter implements MessageListener<Object, Object> {
 
     protected EventRegistry eventRegistry;
     protected InboundChannelModel inboundChannelModel;
@@ -31,8 +31,8 @@ public class KafkaChannelMessageListenerAdapter implements MessageListener<Strin
     }
 
     @Override
-    public void onMessage(ConsumerRecord<String, String> data) {
-        eventRegistry.eventReceived(inboundChannelModel, data.value());
+    public void onMessage(ConsumerRecord<Object, Object> data) {
+        eventRegistry.eventReceived(inboundChannelModel, data);
     }
 
     public EventRegistry getEventRegistry() {

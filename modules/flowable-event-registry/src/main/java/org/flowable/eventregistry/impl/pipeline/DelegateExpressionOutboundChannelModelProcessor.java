@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
@@ -43,7 +44,8 @@ public class DelegateExpressionOutboundChannelModelProcessor implements ChannelM
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, EventRepositoryService eventRepositoryService,
-        boolean fallbackToDefaultTenant) {
+            ChannelProcessingPipelineManager eventSerializerManager, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof DelegateExpressionOutboundChannelModel) {
             registerChannelModel((DelegateExpressionOutboundChannelModel) channelModel);
         }

@@ -30,6 +30,7 @@ public class EventModel {
 
     protected String key;
     protected String name;
+    protected Map<String, EventHeader> headers = new LinkedHashMap<>();
     protected Map<String, EventPayload> payload = new LinkedHashMap<>();
 
     public String getKey() {
@@ -54,6 +55,31 @@ public class EventModel {
                 .stream()
                 .filter(EventPayload::isCorrelationParameter)
                 .collect(Collectors.toList());
+    }
+    
+    public EventHeader getHeader(String name) {
+        return headers.get(name);
+    }
+
+    @JsonGetter
+    public Collection<EventHeader> getHeaders() {
+        return headers.values();
+    }
+
+    @JsonSetter
+    public void setHeaders(Collection<EventHeader> headers) {
+        for (EventHeader eventHeader : headers) {
+            this.headers.put(eventHeader.getName(), eventHeader);
+        }
+    }
+    
+    public void addHeader(String name, String type) {
+        EventHeader eventHeader = headers.get(name);
+        if (eventHeader != null) {
+            eventHeader.setType(type);
+        } else {
+            headers.put(name, new EventHeader(name, type));
+        }
     }
 
     public EventPayload getPayload(String name) {

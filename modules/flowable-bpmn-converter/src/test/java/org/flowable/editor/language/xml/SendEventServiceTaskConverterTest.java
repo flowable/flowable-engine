@@ -38,6 +38,11 @@ class SendEventServiceTaskConverterTest {
                     assertThat(sendEventServiceTask.isTriggerable()).isTrue();
                     assertThat(sendEventServiceTask.getTriggerEventType()).isEqualTo("triggerMyEvent");
                     assertThat(sendEventServiceTask.isSendSynchronously()).isFalse();
+                    assertThat(sendEventServiceTask.getHeaderInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getTarget)
+                            .containsExactly(
+                                    tuple("${myHeader}", "headerProp")
+                            );
                     assertThat(sendEventServiceTask.getEventInParameters())
                             .extracting(IOParameter::getSource, IOParameter::getTarget)
                             .containsExactly(

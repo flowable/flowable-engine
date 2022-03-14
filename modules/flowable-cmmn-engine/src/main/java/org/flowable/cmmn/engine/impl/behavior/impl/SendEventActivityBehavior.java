@@ -34,6 +34,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
@@ -62,9 +63,12 @@ public class SendEventActivityBehavior extends TaskActivityBehavior{
         boolean sendOnSystemChannel = isSendOnSystemChannel(planItemInstanceEntity);
         List<ChannelModel> channelModels = getChannelModels(commandContext, planItemInstanceEntity, sendOnSystemChannel);
 
+        Collection<EventHeaderInstance> eventHeaderInstances = EventInstanceCmmnUtil
+                .createEventHeaderInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
         Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceCmmnUtil
             .createEventPayloadInstances(planItemInstanceEntity, CommandContextUtil.getExpressionManager(commandContext), serviceTask, eventModel);
-        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventPayloadInstances, planItemInstanceEntity.getTenantId());
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventHeaderInstances, 
+                eventPayloadInstances, planItemInstanceEntity.getTenantId());
 
         if (!channelModels.isEmpty()) {
             eventRegistry.sendEventOutbound(eventInstance, channelModels);

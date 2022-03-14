@@ -8,8 +8,10 @@
       <extensionElements>
         <flowable:eventType>myEvent</flowable:eventType>
         <flowable:triggerEventType>triggerMyEvent</flowable:triggerEventType>
+        <flowable:headerInParameter source="${myHeader}" target="headerProp" />
         <flowable:eventInParameter source="${myVariable}" target="customerId" />
         <flowable:eventInParameter source="anotherProperty" target="anotherCustomerId" targetType="string"/>
+        <flowable:headerOutParameter source="headerProperty" target="headerVariable" />
         <flowable:eventOutParameter source="eventProperty" sourceType="integer" target="newVariable" />
         <flowable:triggerEventCorrelationParameter name="customerId" value="${customerIdVar}" />
         <flowable:triggerEventCorrelationParameter name="orderId" value="${orderIdVar}" />

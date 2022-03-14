@@ -66,7 +66,7 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void eventReceived(InboundChannelModel channelModel, String event) {
+    public void eventReceived(InboundChannelModel channelModel, Object event) {
         inboundEventProcessor.eventReceived(channelModel, event);
     }
     

@@ -113,9 +113,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
             } else {
                 objectNode.putNull(payloadInstance.getDefinitionName());
-
             }
-
         }
 
         try {

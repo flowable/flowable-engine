@@ -165,7 +165,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
         ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
-        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), "testTenantId");
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), Collections.emptyList(), "testTenantId");
         eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance, Collections.singleton(channelModel));
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);
@@ -198,7 +198,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         EventModel eventModel = eventRegistryEngine.getEventRepositoryService().getEventModelByKey("testKey", "testTenantId");
         ChannelModel channelModel = eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("customTestOutboundChannel");
 
-        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), "testTenantId");
+        EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), Collections.emptyList(), Collections.emptyList(), "testTenantId");
         eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance, Collections.singleton(channelModel));
 
         assertThat(testOutboundChannelAdapter.counter.get()).isEqualTo(1);
@@ -229,9 +229,9 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public String deserialize(String rawEvent) {
+        public String deserialize(Object rawEvent) {
             counter.incrementAndGet();
-            return rawEvent;
+            return rawEvent.toString();
         }
 
     }
@@ -297,7 +297,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public void sendEvent(String rawEvent) {
+        public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
             counter.incrementAndGet();
         }
 
@@ -320,7 +320,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventRegistryEvent> run(String channelKey, String rawEvent) {
+        public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
             counter.incrementAndGet();
             return Collections.emptyList();
         }

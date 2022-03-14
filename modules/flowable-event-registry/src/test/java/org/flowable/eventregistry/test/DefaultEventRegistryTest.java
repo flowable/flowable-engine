@@ -269,9 +269,9 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<Customer>() {
 
             @Override
-            public Customer deserialize(String rawEvent) {
+            public Customer deserialize(Object rawEvent) {
                 try {
-                    return new ObjectMapper().readValue(rawEvent, Customer.class);
+                    return new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }

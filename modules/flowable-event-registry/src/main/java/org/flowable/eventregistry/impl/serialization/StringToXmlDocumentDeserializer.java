@@ -29,11 +29,11 @@ import org.w3c.dom.Document;
 public class StringToXmlDocumentDeserializer implements InboundEventDeserializer<Document> {
 
     @Override
-    public Document deserialize(String rawEvent) {
+    public Document deserialize(Object rawEvent) {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            try (InputStream inputStream = new ByteArrayInputStream(rawEvent.getBytes(StandardCharsets.UTF_8))) {
+            try (InputStream inputStream = new ByteArrayInputStream(convertEventToBytes(rawEvent))) {
                 return documentBuilder.parse(inputStream);
             }
         } catch (Exception e) {
@@ -41,4 +41,8 @@ public class StringToXmlDocumentDeserializer implements InboundEventDeserializer
         }
     }
 
+    public byte[] convertEventToBytes(Object rawEvent) {
+        return rawEvent.toString().getBytes(StandardCharsets.UTF_8);
+    }
+    
 }

@@ -21,7 +21,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
@@ -29,6 +31,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
@@ -382,6 +385,126 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("customer", "fozzie")
             );
     }
+    
+    @Test
+    void eventWithSimpleHeader() {
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .header("testStringHeader", EventPayloadTypes.STRING)
+            .deploy();
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test-customer")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}", messageProcessor -> {
+                
+            messageProcessor.setStringProperty("testStringHeader", "123");
+            return messageProcessor;
+        });
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(kermitEvent).isNotNull();
+        assertThat(kermitEvent.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+        assertThat(kermitEvent.getHeaderInstances())
+            .extracting(EventHeaderInstance::getDefinitionName, EventHeaderInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("testStringHeader", "123")
+            );
+    }
+    
+    @Test
+    void eventWithMultipleHeaders() {
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .header("testStringHeader", EventPayloadTypes.STRING)
+            .header("testLongHeader", EventPayloadTypes.LONG)
+            .header("testIntHeader", EventPayloadTypes.INTEGER)
+            .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
+            .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
+            .header("testCustomerHeader", "custom")
+            .deploy();
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test-customer")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+        
+        Map<String, String> customerObj = new HashMap<>();
+        customerObj.put("name", "John Doe");
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}", messageProcessor -> {
+                
+            messageProcessor.setStringProperty("testStringHeader", "123");
+            messageProcessor.setLongProperty("testLongHeader", 123l);
+            messageProcessor.setIntProperty("testIntHeader", 123);
+            messageProcessor.setBooleanProperty("testBooleanHeader", true);
+            messageProcessor.setDoubleProperty("testDoubleHeader", 12.3);
+            messageProcessor.setObjectProperty("testCustomerHeader", customerObj);
+            return messageProcessor;
+        });
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(kermitEvent).isNotNull();
+        assertThat(kermitEvent.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+        assertThat(kermitEvent.getHeaderInstances())
+            .extracting(EventHeaderInstance::getDefinitionName, EventHeaderInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("testStringHeader", "123"),
+                tuple("testLongHeader", 123l),
+                tuple("testIntHeader", 123),
+                tuple("testBooleanHeader", true),
+                tuple("testDoubleHeader", 12.3),
+                tuple("testCustomerHeader", customerObj)
+            );
+    }
 
     @Test
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() {
@@ -405,7 +528,7 @@ class JmsChannelDefinitionProcessorTest {
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -432,7 +555,7 @@ class JmsChannelDefinitionProcessorTest {
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+            EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
             eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -470,7 +593,7 @@ class JmsChannelDefinitionProcessorTest {
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -507,7 +630,7 @@ class JmsChannelDefinitionProcessorTest {
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -544,7 +667,7 @@ class JmsChannelDefinitionProcessorTest {
         Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
         payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
-        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+        EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
 
         eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -558,4 +681,5 @@ class JmsChannelDefinitionProcessorTest {
                         + "  name: 'Kermit the Frog'"
                         + "}");
     }
+    
 }

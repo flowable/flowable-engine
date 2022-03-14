@@ -1,0 +1,24 @@
+{
+    "key": "one",
+    "name": "My first Event",
+    "headers": [
+        {
+            "name": "headerProperty1",
+            "type": "string"
+        },
+        {
+            "name": "headerProperty2",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "payload1",
+            "type": "string"
+        },
+        {
+            "name": "payload2",
+            "type": "integer"
+        }
+    ]
+}

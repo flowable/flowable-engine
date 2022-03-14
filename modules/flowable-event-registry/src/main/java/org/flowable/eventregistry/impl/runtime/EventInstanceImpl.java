@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.runtime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -26,18 +27,21 @@ public class EventInstanceImpl implements EventInstance {
 
     protected String eventKey;
     protected Collection<EventPayloadInstance> payloadInstances;
+    protected Collection<EventHeaderInstance> headerInstances;
     protected Collection<EventPayloadInstance> correlationPayloadInstances;
     protected String tenantId;
 
-    public EventInstanceImpl(String eventKey,
+    public EventInstanceImpl(String eventKey, Collection<EventHeaderInstance> headerInstances,
             Collection<EventPayloadInstance> payloadInstances) {
-        this(eventKey, payloadInstances, EventRegistryEngineConfiguration.NO_TENANT_ID);
+        
+        this(eventKey, headerInstances, payloadInstances, EventRegistryEngineConfiguration.NO_TENANT_ID);
     }
 
-    public EventInstanceImpl(String eventKey,
-            Collection<EventPayloadInstance> payloadInstances,
-            String tenantId) {
+    public EventInstanceImpl(String eventKey, Collection<EventHeaderInstance> headerInstances,
+            Collection<EventPayloadInstance> payloadInstances, String tenantId) {
+        
         this.eventKey = eventKey;
+        this.headerInstances = headerInstances;
         this.payloadInstances = payloadInstances;
         this.correlationPayloadInstances = this.payloadInstances.stream()
                 .filter(eventPayloadInstance -> eventPayloadInstance.getEventPayloadDefinition().isCorrelationParameter())
@@ -54,13 +58,22 @@ public class EventInstanceImpl implements EventInstance {
         this.eventKey = eventKey;
     }
 
-    @Override
+    
     public Collection<EventPayloadInstance> getPayloadInstances() {
         return payloadInstances;
     }
 
     public void setPayloadInstances(Collection<EventPayloadInstance> payloadInstances) {
         this.payloadInstances = payloadInstances;
+    }
+    
+    @Override
+    public Collection<EventHeaderInstance> getHeaderInstances() {
+        return headerInstances;
+    }
+
+    public void setHeaderInstances(Collection<EventHeaderInstance> headerInstances) {
+        this.headerInstances = headerInstances;
     }
 
     @Override

@@ -51,6 +51,12 @@ public interface EventModelBuilder {
      * Set the parent deployment id for the event deployment.
      */
     EventModelBuilder parentDeploymentId(String parentDeploymentId);
+    
+    /**
+     * Defines one header element of an event definition.
+     * An header elements is data that can be used for example as metadata for an event.
+     */
+    EventModelBuilder header(String name, String type);
 
     /**
      * Defines one payload element of an event definition.
