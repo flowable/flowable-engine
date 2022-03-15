@@ -91,18 +91,8 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-        
-        List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
-        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-            if ("variable".equals(eventSubscription.getEventType()) && variableName.equals(eventSubscription.getEventName())) {
-                eventSubscriptionService.deleteEventSubscription(eventSubscription);
-            }
-        }
-        
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
-        if (repetitionRule != null) {
+        if (repetitionRule != null && ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity())) {
             PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
             eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
@@ -113,6 +103,16 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
                     commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
             
         } else {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            
+            List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
+            for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                if ("variable".equals(eventSubscription.getEventType()) && variableName.equals(eventSubscription.getEventName())) {
+                    eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                }
+            }
+            
             CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
