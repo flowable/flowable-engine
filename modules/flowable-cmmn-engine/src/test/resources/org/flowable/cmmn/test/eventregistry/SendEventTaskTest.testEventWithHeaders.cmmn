@@ -15,9 +15,9 @@
                 <extensionElements>
                     <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
                     <flowable:channelKey>out-channel</flowable:channelKey>
-                    <flowable:headerInParameter source="test" target="headerProperty1"></flowable:eventInParameter>
-                    <flowable:headerInParameter source="${myHeaderValue}" target="headerProperty2"></flowable:eventInParameter>
-                    <flowable:eventInParameter source="${myVariable}" target="customerId"></flowable:eventInParameter>
+                    <flowable:headerInParameter source="test" target="headerProperty1" />
+                    <flowable:headerInParameter source="${myHeaderValue}" target="headerProperty2" />
+                    <flowable:eventInParameter source="${myVariable}" target="customerId" />
                 </extensionElements>
             </task>
             <humanTask id="humanTask1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false" />
