@@ -197,5 +197,122 @@ public class VariableEventListenerTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testRepeatingVariableEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").start();
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isZero();
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+
+        // create variable triggers the variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+
+        // update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "updated test");
+        
+        // variable event listener should be completed and a new repetition variable listener should be created
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(2);
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "var1")).isEqualTo("updated test");
+
+        // another update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "another update test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(3);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "var1")).isEqualTo("another update test");
+        
+        assertCaseInstanceNotEnded(caseInstance);
+        cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list().forEach(t -> cmmnTaskService.complete(t.getId()));
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingVariableEventListenerWithCondition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").start();
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isZero();
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+
+        // create variable triggers the variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+
+        // update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "updated test");
+        
+        // variable event listener should be completed and a new repetition variable listener should be created
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(2);
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "var1")).isEqualTo("updated test");
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "continue", false);
+
+        // another update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "another update test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(2);
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isZero();
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isZero();
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "var1")).isEqualTo("another update test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(2);
+        
+        assertCaseInstanceNotEnded(caseInstance);
+        cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list().forEach(t -> cmmnTaskService.complete(t.getId()));
+        assertCaseInstanceEnded(caseInstance);
+    }
 }
 
