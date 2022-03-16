@@ -246,6 +246,61 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    void kafkaTopicIsCorrectlyResolvedFromExpressionUsingCustomBean() throws Exception {
+        createTopic("inbound-custom-bean-customer");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("newCustomerChannel")
+            .resourceName("customer.channel")
+            .kafkaChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        kafkaTemplate.send("inbound-custom-bean-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}")
+            .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
     void eventShouldBeReceivedWhenChannelModelIsDeployed() throws Exception {
         createTopic("test-new-customer");
         
@@ -773,6 +828,61 @@ class KafkaChannelDefinitionProcessorTest {
             assertThat(records).isEmpty();
             consumer.commitSync();
             consumer.seekToBeginning(Collections.singleton(new TopicPartition("demo-test-expression-customer-environment", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("customer");
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldResolveTopicFromExpressionUsingCustomBean() {
+        createTopic("outbound-test-custom-bean-customer");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testExpressionBean", "testClientExpressionBean")) {
+            consumer.subscribe(Collections.singleton("outbound-test-custom-bean-customer"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("outbound-#{customPropertiesBean.getProperty('test-custom-bean-customer')}")
+                    .recordKey("customer")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", Collections.emptyList(), payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-test-custom-bean-customer", 0)));
 
             eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
