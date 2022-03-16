@@ -196,6 +196,159 @@ class RabbitChannelDefinitionProcessorTest {
     }
 
     @Test
+    void rabbitQueueIsCorrectlyResolvedFromExpressionUsingEnvironmentAsBean() {
+        rabbitAdmin.declareQueue(new Queue("test-expression-customer-environment"));
+        queuesToDelete.add("test-expression-customer-environment");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .rabbitChannelAdapter("#{environment.getProperty('application.test.rabbit-queue')}-environment")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        rabbitTemplate.convertAndSend("test-expression-customer-environment", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void rabbitQueueIsCorrectlyResolvedFromExpressionUsingCustomBean() {
+        rabbitAdmin.declareQueue(new Queue("inbound-custom-bean-customer"));
+        queuesToDelete.add("inbound-custom-bean-customer");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .rabbitChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        rabbitTemplate.convertAndSend("inbound-custom-bean-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void rabbitQueueIsCorrectlyResolvedFromExpressionUsingCombinationForProperty() {
+        rabbitAdmin.declareQueue(new Queue("combination-test-expression-customer"));
+        queuesToDelete.add("combination-test-expression-customer");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .rabbitChannelAdapter("combination-${application.test.rabbit-queue}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        rabbitTemplate.convertAndSend("combination-test-expression-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
     void eventShouldBeReceivedAfterChannelDefinitionIsRegistered() {
         rabbitAdmin.declareQueue(new Queue("test-customer"));
         queuesToDelete.add("test-customer");
@@ -533,6 +686,44 @@ class RabbitChannelDefinitionProcessorTest {
         eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
         Object message = rabbitTemplate.receiveAndConvert("test-expression-customer-environment", 10_000);
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+                .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
+    }
+
+    @Test
+    void rabbitOutboundChannelShouldResolveRoutingKeyFromExpressionUsingCustomBean() {
+        rabbitAdmin.declareQueue(new Queue("outbound-custom-bean-customer"));
+        queuesToDelete.add("outbound-custom-bean-customer");
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outboundCustomer.channel")
+                .rabbitChannelAdapter("outbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
+
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+        Object message = rabbitTemplate.receiveAndConvert("outbound-custom-bean-customer", 10_000);
         assertThat(message).isNotNull();
         assertThatJson(message)
                 .isEqualTo("{"

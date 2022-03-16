@@ -176,6 +176,150 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("customer", "kermit")
             );
     }
+
+    @Test
+    void jmsDestinationIsCorrectlyResolvedFromExpressionUsingEnvironmentAsBean() {
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test.#{environment.getProperty('application.test.jms-queue')}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        jmsTemplate.convertAndSend("test.test-expression-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void jmsDestinationIsCorrectlyResolvedFromExpressionUsingCustomBean() {
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        jmsTemplate.convertAndSend("inbound-custom-bean-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void jmsDestinationIsCorrectlyResolvedFromExpressionUsingCombinationForProperty() {
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test-combination.${application.test.jms-queue}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        jmsTemplate.convertAndSend("test-combination.test-expression-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
     
     @Test
     void eventShouldBeReceivedWhenChannelModelIsDeployed() {
@@ -462,4 +606,42 @@ class JmsChannelDefinitionProcessorTest {
                         + "  name: 'Kermit the Frog'"
                         + "}");
     }
+
+    @Test
+    void jmsOutboundChannelShouldResolveDestinationFromExpressionUsingCustomBean() {
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createOutboundChannelModelBuilder()
+                .key("outboundCustomer")
+                .resourceName("outbound.channel")
+                .jmsChannelAdapter("outbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+                .eventProcessingPipeline()
+                .jsonSerializer()
+                .deploy();
+
+        ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+        Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+        payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+        EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+        eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+        Object message = await("receive message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("outbound-custom-bean-customer"), Objects::nonNull);
+        assertThat(message).isNotNull();
+        assertThatJson(message)
+                .isEqualTo("{"
+                        + "  customer: 'kermit',"
+                        + "  name: 'Kermit the Frog'"
+                        + "}");
+    }
+
 }
