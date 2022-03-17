@@ -2154,6 +2154,32 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment
+    public void testMultiInstanceSubprocessWithoutInnerEndEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testMi")
+                .variable("iterations", 15)
+                .variable("counter", 0)
+                .start();
+
+        // The service task should have been executed 15 times
+        assertThat(((Number) runtimeService.getVariable(processInstance.getId(), "counter")).intValue()).isEqualTo(15);
+    }
+
+    @Test
+    @Deployment
+    public void testMultipleMultiInstanceSubprocessWithoutInnerEndEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testMi")
+                .variable("iterations", 5)
+                .variable("counter", 0)
+                .start();
+
+        // The service task should have been executed 5 x 4 times
+        assertThat(((Number) runtimeService.getVariable(processInstance.getId(), "counter")).intValue()).isEqualTo(20);
+    }
+
     protected void resetTestCounts() {
         TestStartExecutionListener.countWithLoopCounter.set(0);
         TestStartExecutionListener.countWithoutLoopCounter.set(0);
