@@ -101,11 +101,8 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof KafkaInboundChannelModel) {
-            KafkaInboundChannelModel kafkaChannelModel = (KafkaInboundChannelModel) channelModel;
             logger.info("Starting to register inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
-
-            KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelModel, tenantId, eventRegistry);
-            registerEndpoint(endpoint, null);
+            processInboundDefinition((KafkaInboundChannelModel) channelModel, tenantId, eventRegistry);
             logger.info("Finished registering inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             
         } else if (channelModel instanceof KafkaOutboundChannelModel) {
@@ -113,6 +110,12 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             processOutboundDefinition((KafkaOutboundChannelModel) channelModel);
             logger.info("Finished registering outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         }
+    }
+
+    protected KafkaListenerEndpoint processInboundDefinition(KafkaInboundChannelModel kafkaChannelModel, String tenantId, EventRegistry eventRegistry) {
+        KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelModel, tenantId, eventRegistry);
+        registerEndpoint(endpoint, null);
+        return endpoint;
     }
 
     protected KafkaListenerEndpoint createKafkaListenerEndpoint(KafkaInboundChannelModel channelModel, String tenantId, EventRegistry eventRegistry) {
@@ -253,6 +256,13 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             }
         }
 
+        unregisterEndpoint(endpointId);
+
+        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
+    }
+
+    protected void unregisterEndpoint(String endpointId) {
+        // KafkaListenerEndpointRegistry#getListenerContainers returns an unmodifiable copy, so let's use reflection to remove one item
         Field listenerContainersField = ReflectionUtils.findField(endpointRegistry.getClass(), "listenerContainers");
         if (listenerContainersField != null) {
             listenerContainersField.setAccessible(true);
@@ -265,8 +275,6 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         } else {
             throw new IllegalStateException("Endpoint registry " + endpointRegistry + " does not have listenerContainers field");
         }
-
-        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
     }
 
     /**

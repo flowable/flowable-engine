@@ -95,11 +95,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
             boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof JmsInboundChannelModel) {
-            JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;
             logger.info("Starting to register inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
-
-            JmsListenerEndpoint endpoint = createJmsListenerEndpoint(jmsChannelModel, tenantId, eventRegistry);
-            registerEndpoint(endpoint, null);
+            processInboundDefinition(tenantId, eventRegistry, (JmsInboundChannelModel) channelModel);
             logger.info("Finished registering inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             
         } else if (channelModel instanceof JmsOutboundChannelModel) {
@@ -107,6 +104,12 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
             processOutboundDefinition((JmsOutboundChannelModel) channelModel);
             logger.info("Finished registering outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         }
+    }
+
+    protected JmsListenerEndpoint processInboundDefinition(String tenantId, EventRegistry eventRegistry, JmsInboundChannelModel jmsChannelModel) {
+        JmsListenerEndpoint endpoint = createJmsListenerEndpoint(jmsChannelModel, tenantId, eventRegistry);
+        registerEndpoint(endpoint, null);
+        return endpoint;
     }
 
     protected JmsListenerEndpoint createJmsListenerEndpoint(JmsInboundChannelModel jmsChannelModel, String tenantId, EventRegistry eventRegistry) {
@@ -175,6 +178,13 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
             }
         }
 
+        unregisterEndpoint(endpointId);
+
+        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
+    }
+
+    protected void unregisterEndpoint(String endpointId) {
+        // JmsListenerEndpointRegistry#getListenerContainers returns an unmodifiable copy, so let's use reflection to remove one item
         Field listenerContainersField = ReflectionUtils.findField(endpointRegistry.getClass(), "listenerContainers");
         if (listenerContainersField != null) {
             listenerContainersField.setAccessible(true);
@@ -186,8 +196,6 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
         } else {
             throw new IllegalStateException("Endpoint registry " + endpointRegistry + " does not have listenerContainers field");
         }
-
-        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
     }
 
     /**

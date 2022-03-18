@@ -1,0 +1,8 @@
+{
+    "name": "Two Outbound",
+    "key": "two-outbound",
+    "channelType": "outbound",
+    "type": "jms",
+    "destination": "EXT_QUEUE_OUT",
+    "serializerType": "json"
+}

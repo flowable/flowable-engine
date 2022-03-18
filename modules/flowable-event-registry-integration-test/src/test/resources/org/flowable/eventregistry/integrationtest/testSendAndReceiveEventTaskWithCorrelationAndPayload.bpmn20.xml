@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <process id="process">
+
+        <startEvent id="theStart">
+            <extensionElements>
+                <flowable:eventType>one</flowable:eventType>
+                <flowable:startEventCorrelationConfiguration>startNewInstance</flowable:startEventCorrelationConfiguration>
+                <flowable:eventOutParameter source="headerProperty1" target="customerIdVar"/>
+                <flowable:eventOutParameter source="headerProperty2" target="headerValue2"/>
+                <flowable:eventOutParameter source="payload1" target="value1" />
+                <flowable:eventOutParameter source="payload2" target="value2" />
+                <flowable:channelKey>one</flowable:channelKey>
+            </extensionElements>
+        </startEvent>
+
+        <sequenceFlow sourceRef="theStart" targetRef="sendAndReceiveEventTask"/>
+
+        <serviceTask id="sendAndReceiveEventTask" name="Send and receive event task" flowable:type="send-event" flowable:triggerable="true">
+            <extensionElements>
+                <flowable:eventType>one</flowable:eventType>
+                <flowable:eventInParameter source="${customerIdVar}" target="headerProperty1" />
+                <flowable:eventInParameter source="${headerValue2}" target="headerProperty2" />
+                <flowable:eventInParameter source="${value1}" target="payload1" />
+                <flowable:eventInParameter source="${value2}" target="payload2" />
+                <flowable:channelKey>two-outbound</flowable:channelKey>
+                <flowable:triggerEventType>one</flowable:triggerEventType>
+                <flowable:triggerEventCorrelationParameter name="headerProperty1" value="${customerIdVar}"/>
+                <flowable:eventOutParameter source="headerProperty1" target="headerValue1"/>
+                <flowable:eventOutParameter source="headerProperty2" target="headerValue2"/>
+                <flowable:eventOutParameter source="payload1" target="value1" />
+                <flowable:eventOutParameter source="payload2" target="value2" />
+                <flowable:triggerChannelKey>two</flowable:triggerChannelKey>
+            </extensionElements>
+        </serviceTask>
+
+        <sequenceFlow sourceRef="sendAndReceiveEventTask" targetRef="taskAfterEvents"/>
+
+        <userTask id="taskAfterEvents"/>
+
+        <sequenceFlow sourceRef="taskAfterEvents" targetRef="theEnd"/>
+        
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

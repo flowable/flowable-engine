@@ -107,15 +107,19 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
         if (channelModel instanceof RabbitInboundChannelModel) {
             RabbitInboundChannelModel rabbitChannelDefinition = (RabbitInboundChannelModel) channelModel;
             logger.info("Starting to register inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
-
-            RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, tenantId, eventRegistry);
-            registerEndpoint(endpoint, null);
+            processInboundDefinition(rabbitChannelDefinition, tenantId, eventRegistry);
             logger.info("Finished registering inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         } else if (channelModel instanceof RabbitOutboundChannelModel) {
             logger.info("Starting to register outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             processOutboundDefinition((RabbitOutboundChannelModel) channelModel);
             logger.info("Finished registering outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         }
+    }
+
+    protected RabbitListenerEndpoint processInboundDefinition(RabbitInboundChannelModel rabbitChannelDefinition, String tenantId, EventRegistry eventRegistry) {
+        RabbitListenerEndpoint endpoint = createRabbitListenerEndpoint(rabbitChannelDefinition, tenantId, eventRegistry);
+        registerEndpoint(endpoint, null);
+        return endpoint;
     }
 
     protected RabbitListenerEndpoint createRabbitListenerEndpoint(RabbitInboundChannelModel channelModel, String tenantId, EventRegistry eventRegistry) {
@@ -294,6 +298,13 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
             }
         }
 
+        unregisterEndpoint(endpointId);
+
+        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
+    }
+
+    protected void unregisterEndpoint(String endpointId) {
+        // RabbitListenerEndpointRegistry#getListenerContainers returns an unmodifiable copy, so let's use reflection to remove one item
         Field listenerContainersField = ReflectionUtils.findField(endpointRegistry.getClass(), "listenerContainers");
         if (listenerContainersField != null) {
             listenerContainersField.setAccessible(true);
@@ -306,8 +317,6 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
         } else {
             throw new IllegalStateException("Endpoint registry " + endpointRegistry + " does not have listenerContainers field");
         }
-
-        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
     }
 
     /**
