@@ -1,17 +1,17 @@
 {
     "key": "one",
     "name": "My first Event",
-    "headers": [
-        {
+    "payload": [
+    	{
             "name": "headerProperty1",
-            "type": "string"
+            "type": "string",
+            "header": true
         },
         {
             "name": "headerProperty2",
-            "type": "string"
-        }
-    ],
-    "payload": [
+            "type": "string",
+            "header": true
+        },
         {
             "name": "payload1",
             "type": "string"

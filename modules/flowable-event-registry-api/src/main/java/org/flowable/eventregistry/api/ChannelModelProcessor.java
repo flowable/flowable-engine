@@ -14,6 +14,8 @@ package org.flowable.eventregistry.api;
 
 import org.flowable.eventregistry.model.ChannelModel;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -22,7 +24,8 @@ public interface ChannelModelProcessor {
     boolean canProcess(ChannelModel channelModel);
 
     void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, boolean fallbackToDefaultTenant);
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            ObjectMapper objectMapper, boolean fallbackToDefaultTenant);
 
     void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService);
 

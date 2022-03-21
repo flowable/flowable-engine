@@ -326,8 +326,6 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_COMPENSATE_WAITFORCOMPLETION = "waitForCompletion";
 
     public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
-    public static final String ELEMENT_HEADER_IN_PARAMETER = "headerInParameter";
-    public static final String ELEMENT_HEADER_OUT_PARAMETER = "headerOutParameter";
     public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
     

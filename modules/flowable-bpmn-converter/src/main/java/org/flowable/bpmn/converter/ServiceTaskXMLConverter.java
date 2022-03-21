@@ -24,8 +24,6 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.EventInParameterParser;
 import org.flowable.bpmn.converter.child.EventOutParameterParser;
-import org.flowable.bpmn.converter.child.HeaderInParameterParser;
-import org.flowable.bpmn.converter.child.HeaderOutParameterParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
@@ -60,12 +58,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         caseServiceChildParserMap.put(outParameterParser.getElementName(), outParameterParser);
 
         // Send event service
-        HeaderInParameterParser headerInParameterParser = new HeaderInParameterParser();
-        sendEventServiceChildParserMap.put(headerInParameterParser.getElementName(), headerInParameterParser);
         EventInParameterParser eventInParameterParser = new EventInParameterParser();
         sendEventServiceChildParserMap.put(eventInParameterParser.getElementName(), eventInParameterParser);
-        HeaderOutParameterParser headerOutParameterParser = new HeaderOutParameterParser();
-        sendEventServiceChildParserMap.put(headerOutParameterParser.getElementName(), headerOutParameterParser);
         EventOutParameterParser eventOutParameterParser = new EventOutParameterParser();
         sendEventServiceChildParserMap.put(eventOutParameterParser.getElementName(), eventOutParameterParser);
     }
@@ -329,9 +323,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             xtw.writeEndElement();
         }
         
-        BpmnXMLUtil.writeIOParameters(ELEMENT_HEADER_IN_PARAMETER, sendEventServiceTask.getHeaderInParameters(), didWriteExtensionStartElement, xtw);
         BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_IN_PARAMETER, sendEventServiceTask.getEventInParameters(), didWriteExtensionStartElement, xtw);
-        BpmnXMLUtil.writeIOParameters(ELEMENT_HEADER_OUT_PARAMETER, sendEventServiceTask.getHeaderOutParameters(), didWriteExtensionStartElement, xtw);
         BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_OUT_PARAMETER, sendEventServiceTask.getEventOutParameters(), didWriteExtensionStartElement, xtw);
 
         return didWriteExtensionStartElement;

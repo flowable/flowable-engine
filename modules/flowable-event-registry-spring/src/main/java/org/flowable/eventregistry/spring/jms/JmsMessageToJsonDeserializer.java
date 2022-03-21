@@ -12,28 +12,61 @@
  */
 package org.flowable.eventregistry.spring.jms;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
+import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JmsMessageToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
+    public JmsMessageToJsonDeserializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    
     @Override
-    public JsonNode deserialize(Object rawEvent) {
+    public FlowableEventInfo<JsonNode> deserialize(Object rawEvent) {
+        Map<String, Object> headers = retrieveHeaders(rawEvent);
+        
         try {
-            return objectMapper.readTree(convertEventToString(rawEvent));
+            JsonNode eventNode = objectMapper.readTree(convertEventToString(rawEvent));
+            return new FlowableEventInfoImpl<>(headers, eventNode);
+            
         } catch (Exception e) {
             throw new FlowableException("Could not deserialize event to json", e);
         }
     }
     
-    public String convertEventToString(Object rawEvent) throws Exception {
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> retrieveHeaders(Object rawEvent) {
+        try {
+            Map<String, Object> headers = new HashMap<>();
+            Message message = (Message) rawEvent;
+            Enumeration<String> headerNames = message.getPropertyNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                headers.put(headerName, message.getObjectProperty(headerName));
+            }
+            
+            return headers;
+            
+        } catch (Exception e) {
+            throw new FlowableException("Could not get header information", e);
+        }
+    }
+    
+    protected String convertEventToString(Object rawEvent) throws Exception {
         TextMessage textMessage = (TextMessage) rawEvent;
         return textMessage.getText();
     }

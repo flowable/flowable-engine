@@ -12,28 +12,62 @@
  */
 package org.flowable.eventregistry.spring.kafka;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
+import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaConsumerRecordToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
+    
+    public KafkaConsumerRecordToJsonDeserializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
     
     @Override
-    public JsonNode deserialize(Object rawEvent) {
+    public FlowableEventInfo<JsonNode> deserialize(Object rawEvent) {
+        Map<String, Object> headers = retrieveHeaders(rawEvent);
         try {
-            return objectMapper.readTree(convertEventToString(rawEvent));
+            JsonNode eventNode = objectMapper.readTree(convertEventToString(rawEvent));
+            return new FlowableEventInfoImpl<>(headers, eventNode);
+            
         } catch (Exception e) {
             throw new FlowableException("Could not deserialize event to json", e);
         }
     }
     
     @SuppressWarnings("unchecked")
-    public String convertEventToString(Object rawEvent) throws Exception {
+    protected Map<String, Object> retrieveHeaders(Object rawEvent) {
+        try {
+            Map<String, Object> headers = new HashMap<>();
+            ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
+            Headers consumerRecordHeaders = consumerRecord.headers();
+            Iterator<Header> itConsumerRecordHeader = consumerRecordHeaders.iterator();
+            while (itConsumerRecordHeader.hasNext()) {
+                Header consumerRecordHeader = itConsumerRecordHeader.next();
+                headers.put(consumerRecordHeader.key(), consumerRecordHeader.value());
+            }
+            
+            return headers;
+            
+        } catch (Exception e) {
+            throw new FlowableException("Could not get header information", e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected String convertEventToString(Object rawEvent) throws Exception {
         ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
         return consumerRecord.value().toString();
     }

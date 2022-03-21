@@ -34,7 +34,7 @@ public interface EventInstance {
 
     Collection<EventPayloadInstance> getPayloadInstances();
     
-    Collection<EventHeaderInstance> getHeaderInstances();
+    Collection<EventPayloadInstance> getHeaderInstances();
 
     Collection<EventPayloadInstance> getCorrelationParameterInstances();
 

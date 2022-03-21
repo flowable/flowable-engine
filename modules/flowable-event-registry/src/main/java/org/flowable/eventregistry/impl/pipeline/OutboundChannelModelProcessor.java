@@ -29,6 +29,8 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -41,7 +43,8 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof OutboundChannelModel) {
             registerChannelModel((OutboundChannelModel) channelModel);

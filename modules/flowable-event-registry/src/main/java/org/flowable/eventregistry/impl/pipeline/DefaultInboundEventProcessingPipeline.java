@@ -13,20 +13,17 @@
 package org.flowable.eventregistry.impl.pipeline;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.api.InboundEventContextExtractor;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
-import org.flowable.eventregistry.api.InboundEventHeaderInstanceExtractor;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
@@ -39,36 +36,30 @@ import org.flowable.eventregistry.model.EventModel;
 public class DefaultInboundEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
 
     protected EventRepositoryService eventRepositoryService;
-    protected InboundEventContextExtractor inboundEventContextExtractor;
     protected InboundEventDeserializer<T> inboundEventDeserializer;
     protected InboundEventKeyDetector<T> inboundEventKeyDetector;
     protected InboundEventTenantDetector<T> inboundEventTenantDetector;
     protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
-    protected InboundEventHeaderInstanceExtractor inboundEventHeaderInstanceExtractor;
     protected InboundEventTransformer inboundEventTransformer;
 
     public DefaultInboundEventProcessingPipeline(EventRepositoryService eventRepositoryService,
-            InboundEventContextExtractor inboundEventContextExtractor,
             InboundEventDeserializer<T> inboundEventDeserializer,
             InboundEventKeyDetector<T> inboundEventKeyDetector,
             InboundEventTenantDetector<T> inboundEventTenantDetector,
             InboundEventPayloadExtractor<T> inboundEventPayloadExtractor,
-            InboundEventHeaderInstanceExtractor inboundEventHeaderInstanceExtractor,
             InboundEventTransformer inboundEventTransformer) {
         
-        this.inboundEventContextExtractor = inboundEventContextExtractor;
         this.eventRepositoryService = eventRepositoryService;
         this.inboundEventDeserializer = inboundEventDeserializer;
         this.inboundEventKeyDetector = inboundEventKeyDetector;
         this.inboundEventTenantDetector = inboundEventTenantDetector;
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
-        this.inboundEventHeaderInstanceExtractor = inboundEventHeaderInstanceExtractor;
         this.inboundEventTransformer = inboundEventTransformer;
     }
 
     @Override
     public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
-        T event = deserialize(rawEvent);
+        FlowableEventInfo<T> event = deserialize(rawEvent);
         
         String eventKey = detectEventDefinitionKey(event);
 
@@ -81,14 +72,8 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
         EventModel eventModel = multiTenant ? eventRepositoryService.getEventModelByKey(eventKey, tenantId) : eventRepositoryService.getEventModelByKey(eventKey);
         
-        Map<String, Object> contextInfo = null;
-        if (inboundEventContextExtractor != null) {
-            contextInfo = inboundEventContextExtractor.extractContextInfo(rawEvent, eventModel);
-        }
-        
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventModel.getKey(),
-            extractHeaders(eventModel, contextInfo),
             extractPayload(eventModel, event),
             tenantId
         );
@@ -96,25 +81,16 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         return transform(eventInstance);
     }
 
-    public T deserialize(Object rawEvent) {
+    public FlowableEventInfo<T> deserialize(Object rawEvent) {
         return inboundEventDeserializer.deserialize(rawEvent);
     }
 
-    public String detectEventDefinitionKey(T event) {
+    public String detectEventDefinitionKey(FlowableEventInfo<T> event) {
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
     }
 
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<T> event) {
         return inboundEventPayloadExtractor.extractPayload(eventDefinition, event);
-    }
-    
-    public Collection<EventHeaderInstance> extractHeaders(EventModel eventDefinition, Map<String, Object> contextInfo) {
-        Collection<EventHeaderInstance> eventHeaderInstances = null;
-        if (inboundEventHeaderInstanceExtractor != null) {
-            eventHeaderInstances = inboundEventHeaderInstanceExtractor.extractHeaderInstances(eventDefinition, contextInfo);
-        }
-        
-        return eventHeaderInstances;
     }
 
     public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {
@@ -151,14 +127,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     
     public void setInboundEventPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor) {
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
-    }
-    
-    public InboundEventHeaderInstanceExtractor getInboundEventHeaderInstanceExtractor() {
-        return inboundEventHeaderInstanceExtractor;
-    }
-
-    public void setInboundEventHeaderInstanceExtractor(InboundEventHeaderInstanceExtractor inboundEventHeaderInstanceExtractor) {
-        this.inboundEventHeaderInstanceExtractor = inboundEventHeaderInstanceExtractor;
     }
 
     public InboundEventTransformer getInboundEventTransformer() {

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,12 +28,9 @@ import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.runtime.EventHeaderInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
-import org.flowable.eventregistry.model.EventHeader;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -47,26 +43,12 @@ public class EventInstanceBpmnUtil {
      * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope}).
      */
     public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
-        Map<String, EventHeaderInstance> headerInstances = new HashMap<>();
-        if (eventInstance.getHeaderInstances() != null) {
-            headerInstances = eventInstance.getHeaderInstances()
-                    .stream()
-                    .collect(Collectors.toMap(EventHeaderInstance::getDefinitionName, Function.identity()));
-        }
-        
         Map<String, EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances()
                 .stream()
                 .collect(Collectors.toMap(EventPayloadInstance::getDefinitionName, Function.identity()));
         
         if (baseElement instanceof SendEventServiceTask) {
             SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
-            if (!eventServiceTask.getHeaderOutParameters().isEmpty()) {
-                for (IOParameter parameter : eventServiceTask.getHeaderOutParameters()) {
-                    setHeaderParameterVariable(parameter.getSource(), parameter.getTarget(), 
-                            parameter.isTransient(), headerInstances, variableScope);
-                }
-            }
-            
             if (!eventServiceTask.getEventOutParameters().isEmpty()) {
                 for (IOParameter parameter : eventServiceTask.getEventOutParameters()) {
                     setEventParameterVariable(parameter.getSource(), parameter.getTarget(), 
@@ -75,17 +57,6 @@ public class EventInstanceBpmnUtil {
             }
             
         } else {
-            List<ExtensionElement> headerParameters = baseElement.getExtensionElements()
-                    .getOrDefault(BpmnXMLConstants.ELEMENT_HEADER_OUT_PARAMETER, Collections.emptyList());
-            if (!headerParameters.isEmpty()) {
-                for (ExtensionElement headerParameter : headerParameters) {
-                    String headerSourceName = headerParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                    String variableName = headerParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                    boolean isTransient = Boolean.parseBoolean(headerParameter.getAttributeValue(null, "transient"));
-                    setHeaderParameterVariable(headerSourceName, variableName, isTransient, headerInstances, variableScope);
-                }
-            }
-            
             List<ExtensionElement> outParameters = baseElement.getExtensionElements()
                     .getOrDefault(BpmnXMLConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
             if (!outParameters.isEmpty()) {
@@ -97,57 +68,6 @@ public class EventInstanceBpmnUtil {
                 }
             }
         }
-    }
-    
-    /**
-     * Reads the 'in header parameters' and converts them to {@link EventHeaderInstance} instances.
-     *
-     * Typically used when needing to create {@link EventInstance}'s and populate the payload.
-     */
-    public static Collection<EventHeaderInstance> createEventHeaderInstances(VariableScope variableScope, ExpressionManager expressionManager,
-            BaseElement baseElement, EventModel eventDefinition) {
-
-        List<EventHeaderInstance> eventHeaderInstances = new ArrayList<>();
-        if (baseElement instanceof SendEventServiceTask) {
-            SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
-            if (!eventServiceTask.getHeaderInParameters().isEmpty()) {
-                for (IOParameter parameter : eventServiceTask.getHeaderInParameters()) {
-                    String sourceValue = null;
-                    if (StringUtils.isNotEmpty(parameter.getSourceExpression())) {
-                        sourceValue = parameter.getSourceExpression();
-                    } else {
-                        sourceValue = parameter.getSource();
-                    }
-                    addEventHeaderInstance(eventHeaderInstances, sourceValue, parameter.getTarget(), 
-                                    variableScope, expressionManager, eventDefinition);
-                }
-            }
-            
-        } else {
-            List<ExtensionElement> inParameters = baseElement.getExtensionElements()
-                .getOrDefault(BpmnXMLConstants.ELEMENT_HEADER_IN_PARAMETER, Collections.emptyList());
-    
-            if (!inParameters.isEmpty()) {
-    
-                for (ExtensionElement inParameter : inParameters) {
-    
-                    String sourceExpression = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
-                    String source = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                    String target = inParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                    
-                    String sourceValue = null;
-                    if (StringUtils.isNotEmpty(sourceExpression)) {
-                        sourceValue = sourceExpression;
-                    } else {
-                        sourceValue = source;
-                    }
-    
-                    addEventHeaderInstance(eventHeaderInstances, sourceValue, target, variableScope, expressionManager, eventDefinition);
-                }
-            }
-        }
-
-        return eventHeaderInstances;
     }
 
     /**
@@ -201,20 +121,6 @@ public class EventInstanceBpmnUtil {
         return eventPayloadInstances;
     }
     
-    protected static void setHeaderParameterVariable(String source, String target, boolean isTransient, 
-            Map<String, EventHeaderInstance> headerInstances, VariableScope variableScope) {
-
-        EventHeaderInstance headerInstance = headerInstances.get(source);
-        if (StringUtils.isNotEmpty(target)) {
-            Object value = headerInstance != null ? headerInstance.getValue() : null;
-            if (Boolean.TRUE.equals(isTransient)) {
-                variableScope.setTransientVariable(target, value);
-            } else {
-                variableScope.setVariable(target, value);
-            }
-        }
-    }
-    
     protected static void setEventParameterVariable(String source, String target, boolean isTransient, 
                     Map<String, EventPayloadInstance> payloadInstances, VariableScope variableScope) {
         
@@ -226,19 +132,6 @@ public class EventInstanceBpmnUtil {
             } else {
                 variableScope.setVariable(target, value);
             }
-        }
-    }
-    
-    protected static void addEventHeaderInstance(List<EventHeaderInstance> eventHeaderInstances, String source, String target, 
-            VariableScope variableScope, ExpressionManager expressionManager, EventModel eventDefinition) {
-
-        EventHeader eventHeaderDefinition = eventDefinition.getHeader(target);
-        if (eventHeaderDefinition != null) {
-        
-            Expression sourceExpression = expressionManager.createExpression(source);
-            Object value = sourceExpression.getValue(variableScope);
-        
-            eventHeaderInstances.add(new EventHeaderInstanceImpl(eventHeaderDefinition, value));
         }
     }
     

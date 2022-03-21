@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,12 +26,9 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.runtime.EventHeaderInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
-import org.flowable.eventregistry.model.EventHeader;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -48,33 +44,6 @@ public class EventInstanceCmmnUtil {
      * Typically used when mapping incoming event payload into a runtime instance.
      */
     public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
-        List<ExtensionElement> headerParameters = baseElement.getExtensionElements()
-                .getOrDefault(CmmnXmlConstants.ELEMENT_HEADER_OUT_PARAMETER, Collections.emptyList());
-        if (!headerParameters.isEmpty()) {
-            Map<String, EventHeaderInstance> headerInstances = new HashMap<>();
-            if (eventInstance.getHeaderInstances() != null) {
-                headerInstances = eventInstance.getHeaderInstances()
-                        .stream()
-                        .collect(Collectors.toMap(EventHeaderInstance::getDefinitionName, Function.identity()));
-            }
-            
-            for (ExtensionElement headerParameter : headerParameters) {
-                String headerSourceName = headerParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                String variableName = headerParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                boolean isTransient = Boolean.parseBoolean(headerParameter.getAttributeValue(null, "transient"));
-                
-                EventHeaderInstance headerInstance = headerInstances.get(headerSourceName);
-                if (StringUtils.isNotEmpty(variableName)) {
-                    Object value = headerInstance != null ? headerInstance.getValue() : null;
-                    if (Boolean.TRUE.equals(isTransient)) {
-                        variableScope.setTransientVariable(variableName, value);
-                    } else {
-                        variableScope.setVariable(variableName, value);
-                    }
-                }
-            }
-        }
-        
         List<ExtensionElement> outParameters = baseElement.getExtensionElements()
             .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
         if (!outParameters.isEmpty()) {
@@ -97,40 +66,6 @@ public class EventInstanceCmmnUtil {
                 }
             }
         }
-    }
-    
-    /**
-     * Reads the 'header in parameters' and converts them to {@link EventHeaderInstance} instances.
-     *
-     * Typically used when needing to create {@link EventInstance}'s and populate the headers.
-     */
-    public static Collection<EventHeaderInstance> createEventHeaderInstances(VariableScope variableScope, ExpressionManager expressionManager,
-            BaseElement baseElement, EventModel eventDefinition) {
-
-        List<EventHeaderInstance> eventHeaderInstances = new ArrayList<>();
-        List<ExtensionElement> inParameters = baseElement.getExtensionElements()
-            .getOrDefault(CmmnXmlConstants.ELEMENT_HEADER_IN_PARAMETER, Collections.emptyList());
-
-        if (!inParameters.isEmpty()) {
-
-            for (ExtensionElement inParameter : inParameters) {
-
-                String source = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
-                String target = inParameter.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-
-                EventHeader eventHeaderDefinition = eventDefinition.getHeader(target);
-                if (eventHeaderDefinition != null) {
-
-                    Expression sourceExpression = expressionManager.createExpression(source);
-                    Object value = sourceExpression.getValue(variableScope);
-
-                    eventHeaderInstances.add(new EventHeaderInstanceImpl(eventHeaderDefinition, value));
-                }
-
-            }
-        }
-
-        return eventHeaderInstances;
     }
 
     /**

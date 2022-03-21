@@ -15,10 +15,14 @@ package org.flowable.eventregistry.spring.rabbit;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
+import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
@@ -28,9 +32,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class RabbitMessageToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
     protected Collection<String> stringContentTypes;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
-    public RabbitMessageToJsonDeserializer() {
+    public RabbitMessageToJsonDeserializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         this.stringContentTypes = new HashSet<>();
         this.stringContentTypes.add(MessageProperties.CONTENT_TYPE_JSON);
         this.stringContentTypes.add(MessageProperties.CONTENT_TYPE_JSON_ALT);
@@ -39,12 +44,28 @@ public class RabbitMessageToJsonDeserializer implements InboundEventDeserializer
     }
     
     @Override
-    public JsonNode deserialize(Object rawEvent) {
+    public FlowableEventInfo<JsonNode> deserialize(Object rawEvent) {
+        Map<String, Object> headers = retrieveHeaders(rawEvent);
+        
         try {
-            return objectMapper.readTree(convertEventToString(rawEvent));
+            JsonNode eventNode = objectMapper.readTree(convertEventToString(rawEvent));
+            return new FlowableEventInfoImpl<>(headers, eventNode);
+            
         } catch (Exception e) {
             throw new FlowableException("Could not deserialize event to json", e);
         }
+    }
+    
+    protected Map<String, Object> retrieveHeaders(Object rawEvent) {
+        Map<String, Object> headers = new HashMap<>();
+        
+        Message message = (Message) rawEvent;
+        Map<String, Object> headerMap = message.getMessageProperties().getHeaders();
+        for (String headerName : headerMap.keySet()) {
+            headers.put(headerName, headerMap.get(headerName));
+        }
+        
+        return headers;
     }
     
     public String convertEventToString(Object rawEvent) throws Exception {

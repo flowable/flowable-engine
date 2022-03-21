@@ -21,7 +21,6 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.model.EventModelBuilder;
 import org.flowable.eventregistry.impl.EventRepositoryServiceImpl;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
-import org.flowable.eventregistry.model.EventHeader;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 
@@ -40,7 +39,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     protected String deploymentTenantId;
 
     protected String key;
-    protected Map<String, EventHeader> eventHeaderDefinitions = new LinkedHashMap<>();
     protected Map<String, EventPayload> eventPayloadDefinitions = new LinkedHashMap<>();
 
     public EventModelBuilderImpl(EventRepositoryServiceImpl eventRepository, EventJsonConverter eventJsonConverter) {
@@ -86,7 +84,13 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     
     @Override
     public EventModelBuilder header(String name, String type) {
-        eventHeaderDefinitions.put(name, new EventHeader(name, type));
+        eventPayloadDefinitions.put(name, EventPayload.header(name, type));
+        return this;
+    }
+    
+    @Override
+    public EventModelBuilder headerWithCorrelation(String name, String type) {
+        eventPayloadDefinitions.put(name, EventPayload.headerWithCorrelation(name, type));
         return this;
     }
     
@@ -133,7 +137,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
             throw new FlowableIllegalArgumentException("An event definition key is mandatory");
         }
 
-        eventModel.setHeaders(eventHeaderDefinitions.values());
         eventModel.setPayload(eventPayloadDefinitions.values());
 
         return eventModel;

@@ -5,7 +5,7 @@
         <extensionElements>
             <flowable:eventType>one</flowable:eventType>
             <flowable:channelKey>one</flowable:channelKey>
-            <flowable:headerOutParameter source="headerProperty1" target="headerVar1" />
+            <flowable:eventOutParameter source="headerProperty1" target="headerVar1" />
             <flowable:eventOutParameter source="payload1" target="variable1" />
             <flowable:eventOutParameter source="payload2" target="variable2" />
         </extensionElements>

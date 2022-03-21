@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -33,10 +34,10 @@ public class XpathBasedInboundEventKeyDetector implements InboundEventKeyDetecto
     }
 
     @Override
-    public String detectEventDefinitionKey(Document document) {
+    public String detectEventDefinitionKey(FlowableEventInfo<Document> document) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Node result = (Node) xPath.compile(xpathExpression).evaluate(document, XPathConstants.NODE);
+            Node result = (Node) xPath.compile(xpathExpression).evaluate(document.getPayload(), XPathConstants.NODE);
             return result.getTextContent();
         } catch (Exception e) {
             throw new FlowableException("Could not evaluate xpath expression ", e);

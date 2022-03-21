@@ -15,8 +15,8 @@
                 <extensionElements>
                     <flowable:eventType>one</flowable:eventType>
                     <flowable:channelKey>one-outbound</flowable:channelKey>
-                    <flowable:headerInParameter source="test" target="headerProperty1" />
-                    <flowable:headerInParameter source="${myHeaderValue}" target="headerProperty2" />
+                    <flowable:eventInParameter source="test" target="headerProperty1" />
+                    <flowable:eventInParameter source="${myHeaderValue}" target="headerProperty2" />
                     <flowable:eventInParameter source="${myVariable}" target="payload1" />
                 </extensionElements>
             </task>

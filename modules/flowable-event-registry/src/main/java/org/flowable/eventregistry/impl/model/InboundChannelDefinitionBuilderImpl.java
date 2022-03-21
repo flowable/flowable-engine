@@ -15,7 +15,6 @@ package org.flowable.eventregistry.impl.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.model.InboundChannelModelBuilder;
@@ -320,16 +319,6 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
             this.channelDefinitionBuilder = channelDefinitionBuilder;
         }
         
-        @Override
-        public InboundEventProcessingPipelineBuilder inboundEventContextExtractor(String delegateExpression) {
-            if (this.channelModel == null) {
-                throw new FlowableException("channel adapter needs to be configured before setting the context extractor");
-            }
-            
-            this.channelModel.setContextExtractorDelegateExpression(delegateExpression);
-            return this;
-        }
-
         @Override
         public InboundEventKeyJsonDetectorBuilder jsonDeserializer() {
             channelModel.setDeserializerType("json");

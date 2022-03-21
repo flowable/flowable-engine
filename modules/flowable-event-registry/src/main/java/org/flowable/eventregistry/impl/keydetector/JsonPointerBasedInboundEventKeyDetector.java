@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl.keydetector;
 
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,19 +29,20 @@ public class JsonPointerBasedInboundEventKeyDetector implements InboundEventKeyD
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonPointerBasedInboundEventKeyDetector.class);
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
     protected String jsonPointerValue;
     protected JsonPointer jsonPointerExpression;
 
-    public JsonPointerBasedInboundEventKeyDetector(String jsonPointerExpression) {
+    public JsonPointerBasedInboundEventKeyDetector(String jsonPointerExpression, ObjectMapper objectMapper) {
         this.jsonPointerValue = jsonPointerExpression;
         this.jsonPointerExpression = JsonPointer.compile(jsonPointerExpression);
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public String detectEventDefinitionKey(JsonNode event) {
-        JsonNode result = event.at(jsonPointerExpression);
+    public String detectEventDefinitionKey(FlowableEventInfo<JsonNode> event) {
+        JsonNode result = event.getPayload().at(jsonPointerExpression);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
             LOGGER.warn("JsonPointer expression {} did not detect event key", jsonPointerExpression);

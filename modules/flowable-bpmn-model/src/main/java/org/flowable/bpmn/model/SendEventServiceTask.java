@@ -23,9 +23,7 @@ public class SendEventServiceTask extends ServiceTask {
     protected String eventType;
     protected String triggerEventType;
     protected boolean sendSynchronously;
-    protected List<IOParameter> headerInParameters = new ArrayList<>();
     protected List<IOParameter> eventInParameters = new ArrayList<>();
-    protected List<IOParameter> headerOutParameters = new ArrayList<>();
     protected List<IOParameter> eventOutParameters = new ArrayList<>();
 
     public String getEventType() {
@@ -52,14 +50,6 @@ public class SendEventServiceTask extends ServiceTask {
         this.sendSynchronously = sendSynchronously;
     }
 
-    public List<IOParameter> getHeaderInParameters() {
-        return headerInParameters;
-    }
-
-    public void setHeaderInParameters(List<IOParameter> headerInParameters) {
-        this.headerInParameters = headerInParameters;
-    }
-
     public List<IOParameter> getEventInParameters() {
         return eventInParameters;
     }
@@ -68,14 +58,6 @@ public class SendEventServiceTask extends ServiceTask {
         this.eventInParameters = eventInParameters;
     }
     
-    public List<IOParameter> getHeaderOutParameters() {
-        return headerOutParameters;
-    }
-
-    public void setHeaderOutParameters(List<IOParameter> headerOutParameters) {
-        this.headerOutParameters = headerOutParameters;
-    }
-
     public List<IOParameter> getEventOutParameters() {
         return eventOutParameters;
     }
@@ -97,13 +79,6 @@ public class SendEventServiceTask extends ServiceTask {
         setTriggerEventType(otherElement.getTriggerEventType());
         setSendSynchronously(otherElement.isSendSynchronously());
         
-        headerInParameters = new ArrayList<>();
-        if (otherElement.getHeaderInParameters() != null && !otherElement.getHeaderInParameters().isEmpty()) {
-            for (IOParameter parameter : otherElement.getHeaderInParameters()) {
-                headerInParameters.add(parameter.clone());
-            }
-        }
-        
         eventInParameters = new ArrayList<>();
         if (otherElement.getEventInParameters() != null && !otherElement.getEventInParameters().isEmpty()) {
             for (IOParameter parameter : otherElement.getEventInParameters()) {
@@ -111,13 +86,6 @@ public class SendEventServiceTask extends ServiceTask {
             }
         }
         
-        headerOutParameters = new ArrayList<>();
-        if (otherElement.getHeaderOutParameters() != null && !otherElement.getHeaderOutParameters().isEmpty()) {
-            for (IOParameter parameter : otherElement.getHeaderOutParameters()) {
-                headerOutParameters.add(parameter.clone());
-            }
-        }
-
         eventOutParameters = new ArrayList<>();
         if (otherElement.getEventOutParameters() != null && !otherElement.getEventOutParameters().isEmpty()) {
             for (IOParameter parameter : otherElement.getEventOutParameters()) {

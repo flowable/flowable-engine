@@ -43,7 +43,6 @@ import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
@@ -90,14 +89,12 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             jobService.scheduleAsyncJob(job);
 
         } else {
-            Collection<EventHeaderInstance> eventHeaderInstances = EventInstanceBpmnUtil.createEventHeaderInstances(executionEntity, 
-                    processEngineConfiguration.getExpressionManager(), execution.getCurrentFlowElement(), eventModel);
             Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
                     processEngineConfiguration.getExpressionManager(), execution.getCurrentFlowElement(), eventModel);
 
             boolean sendOnSystemChannel = isSendOnSystemChannel(execution);
             List<ChannelModel> channelModels = getChannelModels(commandContext, execution, sendOnSystemChannel);
-            EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventHeaderInstances, eventPayloadInstances, execution.getTenantId());
+            EventInstanceImpl eventInstance = new EventInstanceImpl(eventModel.getKey(), eventPayloadInstances, execution.getTenantId());
             if (!channelModels.isEmpty()) {
                 eventRegistry.sendEventOutbound(eventInstance, channelModels);
             }

@@ -20,8 +20,8 @@
                 <flowable:eventType>myEvent</flowable:eventType>
                 <flowable:channelKey>out-channel</flowable:channelKey>
                 <flowable:sendSynchronously>true</flowable:sendSynchronously>
-                <flowable:headerInParameter source="test" target="headerProperty1"/>
-                <flowable:headerInParameter source="${headerValue}" target="headerProperty2"/>
+                <flowable:eventInParameter source="test" target="headerProperty1"/>
+                <flowable:eventInParameter source="${headerValue}" target="headerProperty2"/>
                 <flowable:eventInParameter source="test" target="eventProperty"/>
             </extensionElements>
         </serviceTask>

@@ -14,7 +14,6 @@ package org.flowable.eventregistry.json.converter;
 
 import java.util.Collection;
 
-import org.flowable.eventregistry.model.EventHeader;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 
@@ -39,22 +38,18 @@ public class EventJsonConverter {
             eventModel.setKey(modelNode.path("key").asText(null));
             eventModel.setName(modelNode.path("name").asText(null));
             
-            JsonNode headersNode = modelNode.path("headers");
-
-            if (headersNode.isArray()) {
-                for (JsonNode node : headersNode) {
-                    String name = node.path("name").asText(null);
-                    String type = node.path("type").asText(null);
-                    eventModel.addHeader(name, type);
-                }
-            }
-
             JsonNode payloadNode = modelNode.path("payload");
 
             if (payloadNode.isArray()) {
                 for (JsonNode node : payloadNode) {
                     String name = node.path("name").asText(null);
                     String type = node.path("type").asText(null);
+                    
+                    boolean header = node.path("header").asBoolean(false);
+                    if (header) {
+                        eventModel.addHeader(name, type);
+                    }
+                    
                     boolean correlationParameter = node.path("correlationParameter").asBoolean(false);
                     if (correlationParameter) {
                         eventModel.addCorrelation(name, type);
@@ -90,21 +85,6 @@ public class EventJsonConverter {
             modelNode.put("name", definition.getName());
         }
         
-        Collection<EventHeader> headers = definition.getHeaders();
-        if (!headers.isEmpty()) {
-            ArrayNode headersNode = modelNode.putArray("headers");
-            for (EventHeader eventHeader : headers) {
-                ObjectNode eventHeaderNode = headersNode.addObject();
-                if (eventHeader.getName() != null) {
-                    eventHeaderNode.put("name", eventHeader.getName());
-                }
-
-                if (eventHeader.getType() != null) {
-                    eventHeaderNode.put("type", eventHeader.getType());
-                }
-            }
-        }
-
         Collection<EventPayload> payload = definition.getPayload();
         if (!payload.isEmpty()) {
             ArrayNode payloadNode = modelNode.putArray("payload");
@@ -116,6 +96,10 @@ public class EventJsonConverter {
 
                 if (eventPayload.getType() != null) {
                     eventPayloadNode.put("type", eventPayload.getType());
+                }
+                
+                if (eventPayload.isHeader()) {
+                    eventPayloadNode.put("header", true);
                 }
 
                 if (eventPayload.isCorrelationParameter()) {

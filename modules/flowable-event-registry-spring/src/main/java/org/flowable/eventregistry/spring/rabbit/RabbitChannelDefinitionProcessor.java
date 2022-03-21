@@ -61,6 +61,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -94,7 +96,8 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof RabbitInboundChannelModel) {
             RabbitInboundChannelModel rabbitChannelDefinition = (RabbitInboundChannelModel) channelModel;

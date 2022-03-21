@@ -49,6 +49,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -85,7 +87,7 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            boolean fallbackToDefaultTenant) {
+            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof JmsInboundChannelModel) {
             JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;

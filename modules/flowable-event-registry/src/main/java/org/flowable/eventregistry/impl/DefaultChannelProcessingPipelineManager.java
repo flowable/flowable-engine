@@ -16,24 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
-import org.flowable.eventregistry.api.InboundEventContextExtractor;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 
 public class DefaultChannelProcessingPipelineManager implements ChannelProcessingPipelineManager {
 
-    protected Map<String, InboundEventContextExtractor> eventContextExtractorMap = new HashMap<>();
     protected Map<String, Map<String, InboundEventDeserializer<?>>> eventDeserializerMap = new HashMap<>();
 
-    @Override
-    public InboundEventContextExtractor getInboundEventContextExtractor(String channelType) {
-        return eventContextExtractorMap.get(channelType);
-    }
-    
-    @Override
-    public void registerInboundEventContextExtractor(String channelType, InboundEventContextExtractor inboundEventContextExtractor) {
-        eventContextExtractorMap.put(channelType, inboundEventContextExtractor);
-    }
-    
     @Override
     public InboundEventDeserializer<?> getInboundEventDeserializer(String channelType, String deserializerType) {
         Map<String, InboundEventDeserializer<?>> channelDeserializerMap = eventDeserializerMap.get(channelType);

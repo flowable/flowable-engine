@@ -17,12 +17,10 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -34,10 +32,7 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.InboundEventContextExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.model.EventHeader;
-import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
@@ -46,7 +41,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -63,8 +57,6 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
             .correlationParameter("orderId", EventPayloadTypes.STRING)
-            .header("headerProperty1", EventPayloadTypes.STRING)
-            .header("headerProperty2", EventPayloadTypes.INTEGER)
             .payload("payload1", EventPayloadTypes.STRING)
             .payload("payload2", EventPayloadTypes.INTEGER)
             .deploy();
@@ -74,13 +66,11 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
         beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
-        beans.put("textContextExtractor", new TestContextExtractor());
 
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
             .resourceName("testChannel.channel")
             .channelAdapter("${inboundEventChannelAdapter}")
-            .inboundEventContextExtractor("${textContextExtractor}")
             .jsonDeserializer()
             .detectEventKeyUsingJsonField("type")
             .jsonFieldsMapDirectlyToPayload()
@@ -366,32 +356,6 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             .containsOnly(
                 entry("customerIdVar", "payloadStartCustomer"),
                 entry("payload1", "Hello World")
-            );
-    }
-    
-    @Test
-    @Deployment
-    public void testProcessStartWithHeaders() {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
-        assertThat(processDefinition).isNotNull();
-
-        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
-            .processDefinitionId(processDefinition.getId())
-            .scopeType(ScopeTypes.BPMN)
-            .singleResult();
-        assertThat(eventSubscription).isNotNull();
-        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
-
-        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
-        
-        inboundEventChannelAdapter.triggerTestEventWithHeaders("payloadStartCustomer", "testHeader", 1234);
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
-        assertThat(runtimeService.getVariables(processInstance.getId()))
-            .containsOnly(
-                entry("customerIdVar", "payloadStartCustomer"),
-                entry("payload1", "Hello World"),
-                entry("myHeaderValue1", "testHeader"),
-                entry("myHeaderValue2", 1234)
             );
     }
     
@@ -800,18 +764,6 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             triggerTestEvent(customerId, null);
         }
         
-        public void triggerTestEventWithHeaders(String customerId, String headerValue1, Integer headerValue2) {
-            ObjectNode eventNode = createTestEventNode(customerId, null);
-            ObjectNode headersNode = eventNode.putObject("headers");
-            headersNode.put("headerProperty1", headerValue1);
-            headersNode.put("headerProperty2", headerValue2);
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         public void triggerOrderTestEvent(String orderId) {
             triggerTestEvent(null, orderId);
         }
@@ -841,36 +793,5 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             return json;
         }
 
-    }
-
-    protected class TestContextExtractor implements InboundEventContextExtractor {
-
-        @Override
-        public Map<String, Object> extractContextInfo(Object event, EventModel eventModel) {
-            Map<String, Object> contextInfoMap = new HashMap<>();
-            try {
-                JsonNode eventNode = getEventRegistryEngineConfiguration().getObjectMapper().readTree(event.toString());
-                JsonNode headersNode = eventNode.get("headers");
-                if (headersNode != null) {
-                    Iterator<String> itHeader = headersNode.fieldNames();
-                    while (itHeader.hasNext()) {
-                        String headerKey = itHeader.next();
-                        EventHeader eventHeaderDef = eventModel.getHeader(headerKey);
-                        if (eventHeaderDef != null) {
-                            if (EventPayloadTypes.INTEGER.equals(eventHeaderDef.getType())) {
-                                contextInfoMap.put(headerKey, headersNode.get(headerKey).asInt());
-                            } else {
-                                contextInfoMap.put(headerKey, headersNode.get(headerKey).asText());
-                            }
-                        }
-                    }
-                }
-                
-            } catch (Exception e) {
-                throw new FlowableException("Error reading event json", e);
-            }
-            
-            return contextInfoMap;
-        }
     }
 }

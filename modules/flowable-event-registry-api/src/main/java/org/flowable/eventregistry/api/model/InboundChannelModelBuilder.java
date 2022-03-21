@@ -14,7 +14,6 @@ package org.flowable.eventregistry.api.model;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.InboundEventContextExtractor;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
@@ -204,11 +203,6 @@ public interface InboundChannelModelBuilder {
      * Builder for the 'processing pipeline' part of the {@link InboundChannelModel}.
      */
     interface InboundEventProcessingPipelineBuilder {
-        
-        /**
-         * Sets a custom {@link InboundEventContextExtractor} via a delegate expression.
-         */
-        InboundEventProcessingPipelineBuilder inboundEventContextExtractor(String delegateExpression);
 
         /**
          * Deserializes the event to JSON.

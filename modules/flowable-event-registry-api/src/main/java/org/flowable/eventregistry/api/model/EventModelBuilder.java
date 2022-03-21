@@ -57,6 +57,12 @@ public interface EventModelBuilder {
      * An header elements is data that can be used for example as metadata for an event.
      */
     EventModelBuilder header(String name, String type);
+    
+    /**
+     * Defines one header element with correlation for an event definition.
+     * An header elements is data that can be used for example as metadata for an event.
+     */
+    EventModelBuilder headerWithCorrelation(String name, String type);
 
     /**
      * Defines one payload element of an event definition.

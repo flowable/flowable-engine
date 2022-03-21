@@ -21,10 +21,6 @@ public interface ChannelProcessingPipelineManager {
     
     final String DESERIALIZER_JSON_TYPE = "deserializerjson";
     final String DESERIALIZER_XML_TYPE = "deserializerxml";
-    
-    InboundEventContextExtractor getInboundEventContextExtractor(String channelType);
-    
-    void registerInboundEventContextExtractor(String channelType, InboundEventContextExtractor inboundEventContextExtractor);
 
     InboundEventDeserializer<?> getInboundEventDeserializer(String channelType, String deserializerType);
     

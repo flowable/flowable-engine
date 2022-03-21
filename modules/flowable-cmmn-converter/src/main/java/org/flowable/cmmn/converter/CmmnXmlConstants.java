@@ -209,8 +209,6 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_EVENT_TYPE = "eventType";
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
-    String ELEMENT_HEADER_IN_PARAMETER = "headerInParameter";
-    String ELEMENT_HEADER_OUT_PARAMETER = "headerOutParameter";
     String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
     String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";

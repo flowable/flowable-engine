@@ -40,7 +40,6 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.api.InboundEventContextExtractor;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
@@ -159,7 +158,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected OutboundEventProcessor systemOutboundEventProcessor;
     
     protected ChannelProcessingPipelineManager eventSerializerManager;
-    protected Map<String, InboundEventContextExtractor> inboundContextExtractors;
     protected Map<String, InboundEventDeserializer<?>> defaultEventDeserializers;
     protected Map<String, Map<String, InboundEventDeserializer<?>>> channelEventDeserializers;
 
@@ -556,12 +554,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
             this.eventSerializerManager = new DefaultChannelProcessingPipelineManager();
         }
         
-        if (inboundContextExtractors != null) {
-            for (String channelType : inboundContextExtractors.keySet()) {
-                this.eventSerializerManager.registerInboundEventContextExtractor(channelType, inboundContextExtractors.get(channelType));
-            }
-        }
-        
         initDefaultEventDeserializers();
         
         for (String deserializerType : defaultEventDeserializers.keySet()) {
@@ -813,23 +805,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setEventSerializerManager(ChannelProcessingPipelineManager eventSerializerManager) {
         this.eventSerializerManager = eventSerializerManager;
-        return this;
-    }
-
-    public Map<String, InboundEventContextExtractor> getInboundContextExtractors() {
-        return inboundContextExtractors;
-    }
-    
-    public void addInboundContextExtractor(String channelType, InboundEventContextExtractor inboundContextExtractor) {
-        if (inboundContextExtractors == null) {
-            inboundContextExtractors = new HashMap<>();
-        }
-        
-        inboundContextExtractors.put(channelType, inboundContextExtractor);
-    }
-
-    public EventRegistryEngineConfiguration setInboundContextExtractors(Map<String, InboundEventContextExtractor> inboundContextExtractors) {
-        this.inboundContextExtractors = inboundContextExtractors;
         return this;
     }
 

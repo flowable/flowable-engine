@@ -21,8 +21,8 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
-import org.flowable.eventregistry.api.runtime.EventHeaderInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
@@ -50,7 +50,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
             OutboundChannelModel outboundChannelModel = (OutboundChannelModel) channelModel;
 
             Map<String, Object> headerMap = new HashMap<>();
-            for (EventHeaderInstance headerInstance : eventInstance.getHeaderInstances()) {
+            for (EventPayloadInstance headerInstance : eventInstance.getHeaderInstances()) {
                 headerMap.put(headerInstance.getDefinitionName(), headerInstance.getValue());
             }
             
