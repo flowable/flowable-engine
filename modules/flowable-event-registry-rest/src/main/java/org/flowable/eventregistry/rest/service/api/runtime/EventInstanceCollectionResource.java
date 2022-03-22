@@ -86,7 +86,7 @@ public class EventInstanceCollectionResource {
                 eventDefinitionQuery.tenantId(request.getTenantId());
             }
             
-            eventDefinition = eventDefinitionQuery.singleResult();
+            eventDefinition = eventDefinitionQuery.latestVersion().singleResult();
         }
         
         if (eventDefinition == null) {

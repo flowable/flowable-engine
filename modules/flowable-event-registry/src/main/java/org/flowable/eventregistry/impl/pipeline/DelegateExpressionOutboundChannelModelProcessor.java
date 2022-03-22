@@ -19,11 +19,14 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -31,9 +34,11 @@ import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
 public class DelegateExpressionOutboundChannelModelProcessor implements ChannelModelProcessor {
 
     protected HasExpressionManagerEngineConfiguration engineConfiguration;
+    protected ObjectMapper objectMapper;
 
-    public DelegateExpressionOutboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration) {
+    public DelegateExpressionOutboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration, ObjectMapper objectMapper) {
         this.engineConfiguration = engineConfiguration;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -43,7 +48,8 @@ public class DelegateExpressionOutboundChannelModelProcessor implements ChannelM
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, EventRepositoryService eventRepositoryService,
-        boolean fallbackToDefaultTenant) {
+            ChannelProcessingPipelineManager eventSerializerManager, boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof DelegateExpressionOutboundChannelModel) {
             registerChannelModel((DelegateExpressionOutboundChannelModel) channelModel);
         }

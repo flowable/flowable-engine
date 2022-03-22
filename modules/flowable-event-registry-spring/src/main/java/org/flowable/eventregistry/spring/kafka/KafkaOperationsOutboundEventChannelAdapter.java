@@ -12,8 +12,15 @@
  */
 package org.flowable.eventregistry.spring.kafka;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.springframework.kafka.core.KafkaOperations;
@@ -34,9 +41,19 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
     }
 
     @Override
-    public void sendEvent(String rawEvent) {
+    public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
         try {
-            kafkaOperations.send(topic, key, rawEvent).get();
+            List<Header> headers = new ArrayList<>();
+            for (String headerKey : headerMap.keySet()) {
+                Object headerValue = headerMap.get(headerKey);
+                if (headerValue != null) {
+                    headers.add(new RecordHeader(headerKey, headerValue.toString().getBytes(StandardCharsets.UTF_8)));
+                }
+            }
+
+            ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, null, key, rawEvent, headers);
+            kafkaOperations.send(producerRecord).get();
+            
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FlowableException("Sending the event was interrupted", e);
@@ -48,5 +65,4 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
             }
         }
     }
-
 }

@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
@@ -57,8 +58,9 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     }
 
     @Override
-    public Collection<EventRegistryEvent> run(String channelKey, String rawEvent) {
-        T event = deserialize(rawEvent);
+    public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
+        FlowableEventInfo<T> event = deserialize(rawEvent);
+        
         String eventKey = detectEventDefinitionKey(event);
 
         boolean multiTenant = false;
@@ -79,15 +81,15 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         return transform(eventInstance);
     }
 
-    public T deserialize(String rawEvent) {
+    public FlowableEventInfo<T> deserialize(Object rawEvent) {
         return inboundEventDeserializer.deserialize(rawEvent);
     }
 
-    public String detectEventDefinitionKey(T event) {
+    public String detectEventDefinitionKey(FlowableEventInfo<T> event) {
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
     }
 
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<T> event) {
         return inboundEventPayloadExtractor.extractPayload(eventDefinition, event);
     }
 
@@ -126,7 +128,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     public void setInboundEventPayloadExtractor(InboundEventPayloadExtractor<T> inboundEventPayloadExtractor) {
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
     }
-    
+
     public InboundEventTransformer getInboundEventTransformer() {
         return inboundEventTransformer;
     }

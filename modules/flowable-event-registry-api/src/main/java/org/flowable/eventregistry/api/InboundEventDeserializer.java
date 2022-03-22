@@ -21,6 +21,5 @@ public interface InboundEventDeserializer<T> {
     /**
      * The actual deserialization.
      */
-    T deserialize(String rawEvent);
-
+    FlowableEventInfo<T> deserialize(Object rawEvent);
 }

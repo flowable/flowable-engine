@@ -30,13 +30,16 @@ import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
+import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
+import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
@@ -269,9 +272,10 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<Customer>() {
 
             @Override
-            public Customer deserialize(String rawEvent) {
+            public FlowableEventInfo<Customer> deserialize(Object rawEvent) {
                 try {
-                    return new ObjectMapper().readValue(rawEvent, Customer.class);
+                    Customer customer = new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
+                    return new FlowableEventInfoImpl<>(null, customer);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
@@ -279,22 +283,30 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
         });
 
-        inboundEventProcessingPipeline.setInboundEventKeyDetector(Customer::getType);
+        inboundEventProcessingPipeline.setInboundEventKeyDetector(new InboundEventKeyDetector<Customer> () {
+            
+            @Override
+            public String detectEventDefinitionKey(FlowableEventInfo<Customer> event) {
+                return event.getPayload().getType();
+            }
+        });
+        
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<Customer>() {
 
             @Override
-            public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Customer event) {
+            public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<Customer> event) {
                 Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
                 for (EventPayload eventPayloadDefinition : eventDefinition.getPayload()) {
+                    Customer customer = event.getPayload();
                     switch (eventPayloadDefinition.getName()) {
                         case "payload1":
-                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, event.getPayload1()));
+                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, customer.getPayload1()));
                             break;
                         case "payload2":
-                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, event.getPayload2()));
+                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, customer.getPayload2()));
                             break;
                         case "customerId":
-                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, event.getCustomerId()));
+                            payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, customer.getCustomerId()));
                             break;
                     }
                 }

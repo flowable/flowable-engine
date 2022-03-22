@@ -318,7 +318,7 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
             this.eventRepository = eventRepository;
             this.channelDefinitionBuilder = channelDefinitionBuilder;
         }
-
+        
         @Override
         public InboundEventKeyJsonDetectorBuilder jsonDeserializer() {
             channelModel.setDeserializerType("json");

@@ -33,8 +33,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     }
 
     @Override
-    public void eventReceived(InboundChannelModel channelModel, String event) {
-
+    public void eventReceived(InboundChannelModel channelModel, Object event) {
         InboundEventProcessingPipeline inboundEventProcessingPipeline = (InboundEventProcessingPipeline) channelModel.getInboundEventProcessingPipeline();
         Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelModel.getKey(), event);
 

@@ -40,7 +40,7 @@ public class GenericEventListenerActivityBehaviour extends CoreCmmnTriggerableAc
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
-        if (repetitionRule != null) {
+        if (repetitionRule != null && ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity())) {
             PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
             eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);

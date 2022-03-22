@@ -81,7 +81,19 @@ public class EventModelBuilderImpl implements EventModelBuilder {
         this.deploymentTenantId = deploymentTenantId;
         return this;
     }
-
+    
+    @Override
+    public EventModelBuilder header(String name, String type) {
+        eventPayloadDefinitions.put(name, EventPayload.header(name, type));
+        return this;
+    }
+    
+    @Override
+    public EventModelBuilder headerWithCorrelation(String name, String type) {
+        eventPayloadDefinitions.put(name, EventPayload.headerWithCorrelation(name, type));
+        return this;
+    }
+    
     @Override
     public EventModelBuilder correlationParameter(String name, String type) {
         eventPayloadDefinitions.put(name, EventPayload.correlation(name, type));

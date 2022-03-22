@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.jms.MessageListener;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
@@ -48,6 +49,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -73,8 +76,13 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
     protected boolean contextRefreshed;
+    protected ObjectMapper objectMapper;
 
     protected StringValueResolver embeddedValueResolver;
+    
+    public JmsChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -83,7 +91,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof JmsInboundChannelModel) {
             JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;

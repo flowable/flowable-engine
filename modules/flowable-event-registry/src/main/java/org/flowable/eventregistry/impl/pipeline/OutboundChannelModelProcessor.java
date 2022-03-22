@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
@@ -28,10 +29,18 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
 public class OutboundChannelModelProcessor implements ChannelModelProcessor {
+    
+    protected ObjectMapper objectMapper;
+    
+    public OutboundChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -40,12 +49,12 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof OutboundChannelModel) {
             registerChannelModel((OutboundChannelModel) channelModel);
         }
-
     }
 
     protected void registerChannelModel(OutboundChannelModel inboundChannelModel) {
@@ -65,8 +74,8 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
                 
             } else if ("expression".equals(inboundChannelModel.getSerializerType())) {
                 if (StringUtils.isNotEmpty(inboundChannelModel.getSerializerDelegateExpression())) {
-                    OutboundEventSerializer outboundEventSerializer = resolveExpression(inboundChannelModel.getSerializerDelegateExpression(),
-                        OutboundEventSerializer.class);
+                    OutboundEventSerializer outboundEventSerializer = resolveExpression(
+                            inboundChannelModel.getSerializerDelegateExpression(), OutboundEventSerializer.class);
                     eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(outboundEventSerializer);
                 } else {
                     throw new FlowableException(

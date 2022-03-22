@@ -42,12 +42,14 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * @author Filip Hrisafov
  */
 @Tag("docker")
 @Tag("rabbit")
+@Testcontainers(disabledWithoutDocker = true)
 public class RabbitChannelRebootEngineTest {
 
     @Test

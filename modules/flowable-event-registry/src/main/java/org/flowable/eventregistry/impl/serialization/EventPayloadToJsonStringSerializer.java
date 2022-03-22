@@ -42,6 +42,10 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
         Collection<EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances();
         for (EventPayloadInstance payloadInstance : payloadInstances) {
+            
+            if (payloadInstance.getEventPayloadDefinition().isHeader()) {
+                continue;
+            }
 
             String definitionType = payloadInstance.getDefinitionType();
             Object payloadInstanceValue = payloadInstance.getValue();
@@ -113,9 +117,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
             } else {
                 objectNode.putNull(payloadInstance.getDefinitionName());
-
             }
-
         }
 
         try {

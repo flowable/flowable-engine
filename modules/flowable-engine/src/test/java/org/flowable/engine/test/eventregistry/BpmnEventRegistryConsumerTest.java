@@ -64,8 +64,8 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
     
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+        Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
+        beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
@@ -744,6 +744,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected ObjectMapper objectMapper = new ObjectMapper();
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -762,14 +763,21 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         public void triggerTestEvent(String customerId) {
             triggerTestEvent(customerId, null);
         }
-
+        
         public void triggerOrderTestEvent(String orderId) {
             triggerTestEvent(null, orderId);
         }
 
         public void triggerTestEvent(String customerId, String orderId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
+            ObjectNode eventNode = createTestEventNode(customerId, orderId);
+            try {
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        protected ObjectNode createTestEventNode(String customerId, String orderId) {
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "myEvent");
             if (customerId != null) {
@@ -781,15 +789,9 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             }
             json.put("payload1", "Hello World");
             json.put("payload2", new Random().nextInt());
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            
+            return json;
         }
 
     }
-
-
-
 }

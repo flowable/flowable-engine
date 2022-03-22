@@ -35,5 +35,5 @@ jobs:
         # If installing the JDK is in a different step then wrong java would be used
         run: |
           . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw verify -Pdistro,errorLogging,includeDockerTests ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+          ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true

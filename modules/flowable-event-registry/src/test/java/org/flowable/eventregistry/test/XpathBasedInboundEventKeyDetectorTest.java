@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.junit.jupiter.api.Test;
@@ -27,30 +28,30 @@ class XpathBasedInboundEventKeyDetectorTest {
 
     @Test
     void testDetectEventDefinitionKey() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
 
         String xPath = "/data/eventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);
-        String eventDefinitionKey = detector.detectEventDefinitionKey(xmlDocument);
+        String eventDefinitionKey = detector.detectEventDefinitionKey(eventInfo);
         assertThat(eventDefinitionKey).isEqualTo("event-01");
     }
 
     @Test
     void testDetectEventDefinitionKeyWrongXpath() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
 
         String xPath = "/data/wrongEventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);
-        assertThatThrownBy(() -> detector.detectEventDefinitionKey(xmlDocument)).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> detector.detectEventDefinitionKey(eventInfo)).isInstanceOf(FlowableException.class);
     }
 
     @Test
     void testDetectEventDefinitionKeyMissingDefinitionKeyInXml() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
 
         String xPath = "/data/eventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);
-        assertThatThrownBy(() -> detector.detectEventDefinitionKey(xmlDocument)).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> detector.detectEventDefinitionKey(eventInfo)).isInstanceOf(FlowableException.class);
     }
 
 }

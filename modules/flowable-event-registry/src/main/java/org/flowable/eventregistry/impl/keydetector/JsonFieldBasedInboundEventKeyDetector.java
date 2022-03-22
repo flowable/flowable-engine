@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl.keydetector;
 
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,8 +30,8 @@ public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDet
     }
 
     @Override
-    public String detectEventDefinitionKey(JsonNode event) {
-        return event.path(field).asText();
+    public String detectEventDefinitionKey(FlowableEventInfo<JsonNode> event) {
+        return event.getPayload().path(field).asText();
     }
     
     public String getJsonField() {

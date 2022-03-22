@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
@@ -32,8 +33,6 @@ import org.flowable.eventregistry.impl.keydetector.JsonPointerBasedInboundEventK
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
-import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
-import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
@@ -46,11 +45,18 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
  */
 public class InboundChannelModelProcessor implements ChannelModelProcessor {
+    
+    protected ObjectMapper objectMapper;
+    
+    public InboundChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -59,15 +65,19 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof InboundChannelModel) {
-            registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, fallbackToDefaultTenant);
+            registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, eventSerializerManager, 
+                    objectMapper, fallbackToDefaultTenant);
         }
 
     }
 
-    protected void registerChannelModel(InboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+    protected void registerChannelModel(InboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService, 
+            ChannelProcessingPipelineManager eventSerializerManager, ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+        
         if (inboundChannelModel.getInboundEventProcessingPipeline() == null) {
 
             InboundEventProcessingPipeline eventProcessingPipeline;
@@ -75,13 +85,14 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             if (StringUtils.isNotEmpty(inboundChannelModel.getPipelineDelegateExpression())) {
                 eventProcessingPipeline = resolveExpression(inboundChannelModel.getPipelineDelegateExpression(), InboundEventProcessingPipeline.class);
             } else if ("json".equals(inboundChannelModel.getDeserializerType())) {
-                eventProcessingPipeline = createJsonEventProcessingPipeline(inboundChannelModel, eventRepositoryService);
+                eventProcessingPipeline = createJsonEventProcessingPipeline(inboundChannelModel, eventRepositoryService, 
+                        eventSerializerManager, objectMapper);
 
             } else if ("xml".equals(inboundChannelModel.getDeserializerType())) {
-                eventProcessingPipeline = createXmlEventProcessingPipeline(inboundChannelModel, eventRepositoryService);
+                eventProcessingPipeline = createXmlEventProcessingPipeline(inboundChannelModel, eventRepositoryService, eventSerializerManager);
 
             } else if ("expression".equals(inboundChannelModel.getDeserializerType())) {
-                eventProcessingPipeline = createExpressionEventProcessingPipeline(inboundChannelModel, eventRepositoryService);
+                eventProcessingPipeline = createExpressionEventProcessingPipeline(inboundChannelModel, eventRepositoryService, objectMapper);
 
             } else {
                 eventProcessingPipeline = null;
@@ -94,11 +105,13 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         }
     }
 
-    protected InboundEventProcessingPipeline createJsonEventProcessingPipeline(InboundChannelModel channelModel,
-        EventRepositoryService eventRepositoryService) {
+    protected InboundEventProcessingPipeline createJsonEventProcessingPipeline(InboundChannelModel channelModel, 
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager,
+            ObjectMapper objectMapper) {
+        
         InboundEventDeserializer<JsonNode> eventDeserializer;
         if (StringUtils.isEmpty(channelModel.getDeserializerDelegateExpression())) {
-            eventDeserializer = new StringToJsonDeserializer();
+            eventDeserializer = (InboundEventDeserializer<JsonNode>) eventSerializerManager.getInboundEventDeserializer(channelModel.getType(), ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE);
         } else {
             //noinspection unchecked
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
@@ -133,7 +146,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
             eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonPointerExpression())) {
-            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression());
+            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression(), objectMapper);
         } else if (StringUtils.isNotEmpty(keyDetection.getDelegateExpression())) {
             //noinspection unchecked
             eventKeyDetector = resolveExpression(keyDetection.getDelegateExpression(), InboundEventKeyDetector.class);
@@ -160,13 +173,15 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         }
 
         return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer,
-            eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+                eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
     }
 
-    protected InboundEventProcessingPipeline createXmlEventProcessingPipeline(InboundChannelModel channelModel, EventRepositoryService eventRepositoryService) {
+    protected InboundEventProcessingPipeline createXmlEventProcessingPipeline(InboundChannelModel channelModel, 
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager) {
+        
         InboundEventDeserializer<Document> eventDeserializer;
         if (StringUtils.isEmpty(channelModel.getDeserializerDelegateExpression())) {
-            eventDeserializer = new StringToXmlDocumentDeserializer();
+            eventDeserializer = (InboundEventDeserializer<Document>) eventSerializerManager.getInboundEventDeserializer(channelModel.getType(), ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE);
         } else {
             //noinspection unchecked
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
@@ -181,7 +196,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             //noinspection unchecked
             eventPayloadExtractor = resolveExpression(channelModel.getPayloadExtractorDelegateExpression(), InboundEventPayloadExtractor.class);
         }
-
+        
         InboundEventTransformer eventTransformer;
         if (StringUtils.isEmpty(channelModel.getEventTransformerDelegateExpression())) {
             eventTransformer = new DefaultInboundEventTransformer();
@@ -230,7 +245,8 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
     }
 
     protected InboundEventProcessingPipeline createExpressionEventProcessingPipeline(InboundChannelModel channelModel,
-        EventRepositoryService eventRepositoryService) {
+            EventRepositoryService eventRepositoryService, ObjectMapper objectMapper) {
+        
         InboundEventDeserializer<?> eventDeserializer;
         if (StringUtils.isNotEmpty(channelModel.getDeserializerDelegateExpression())) {
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
@@ -272,7 +288,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
             eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonPointerExpression())) {
-            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression());
+            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression(), objectMapper);
         } else if (StringUtils.isNotEmpty(keyDetection.getXmlXPathExpression())) {
             eventKeyDetector = new XpathBasedInboundEventKeyDetector(keyDetection.getXmlXPathExpression());
         } else {

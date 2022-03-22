@@ -1,0 +1,8 @@
+{
+    "name": "One Outbound",
+    "key": "one-outbound",
+    "channelType": "outbound",
+    "type": "jms",
+    "destination": "test-outbound-queue",
+    "serializerType": "xml"
+}

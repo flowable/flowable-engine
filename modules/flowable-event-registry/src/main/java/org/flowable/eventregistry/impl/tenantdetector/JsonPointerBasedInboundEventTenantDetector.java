@@ -12,13 +12,13 @@
  */
 package org.flowable.eventregistry.impl.tenantdetector;
 
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -27,8 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JsonPointerBasedInboundEventTenantDetector implements InboundEventTenantDetector<JsonNode> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonPointerBasedInboundEventTenantDetector.class);
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected String jsonPointerExpression;
     protected JsonPointer jsonPointer;
@@ -39,8 +37,8 @@ public class JsonPointerBasedInboundEventTenantDetector implements InboundEventT
     }
 
     @Override
-    public String detectTenantId(JsonNode event) {
-        JsonNode result = event.at(jsonPointer);
+    public String detectTenantId(FlowableEventInfo<JsonNode> event) {
+        JsonNode result = event.getPayload().at(jsonPointer);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
             LOGGER.warn("JsonPointer expression {} did not detect event tenant", jsonPointer);

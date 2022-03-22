@@ -53,12 +53,14 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * @author Filip Hrisafov
  */
 @Tag("docker")
 @Tag("kafka")
+@Testcontainers(disabledWithoutDocker = true)
 public class KafkaChannelRebootEngineTest {
 
     @Test

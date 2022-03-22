@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.model.ChannelModel;
@@ -60,6 +61,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -80,12 +83,17 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
     protected boolean contextRefreshed;
+    protected ObjectMapper objectMapper;
 
     protected BeanExpressionResolver resolver = new StandardBeanExpressionResolver();
 
     protected StringValueResolver embeddedValueResolver;
     protected BeanExpressionContext expressionContext;
 
+    public RabbitChannelDefinitionProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    
     @Override
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof RabbitInboundChannelModel || channelModel instanceof RabbitOutboundChannelModel;
@@ -93,7 +101,8 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-                    EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof RabbitInboundChannelModel) {
             RabbitInboundChannelModel rabbitChannelDefinition = (RabbitInboundChannelModel) channelModel;

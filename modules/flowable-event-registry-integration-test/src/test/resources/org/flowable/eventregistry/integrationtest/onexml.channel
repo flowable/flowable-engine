@@ -1,0 +1,11 @@
+{
+    "name": "One Channel",
+    "key": "one",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "test-queue",
+    "deserializerType": "xml",
+    "channelEventKeyDetection": {
+        "fixedValue": "one"
+    }
+}

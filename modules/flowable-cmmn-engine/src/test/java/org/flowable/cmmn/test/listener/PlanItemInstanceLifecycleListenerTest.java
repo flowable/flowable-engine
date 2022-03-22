@@ -345,10 +345,10 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
         
         events = testLifeCycleListener.getEvents();
-        assertThat(events).hasSize(3);
+        assertThat(events).hasSize(2);
         
         leaveEvents = testLeaveUserEventListener.getEvents();
-        assertThat(leaveEvents).hasSize(3);
+        assertThat(leaveEvents).hasSize(2);
         
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
@@ -401,7 +401,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         
         cmmnRuntimeService.triggerPlanItemInstance(userEventListenrInstance.getId());
         events = testLifeCycleListener.getEvents();
-        assertThat(events).hasSize(3);
+        assertThat(events).hasSize(2);
         
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
