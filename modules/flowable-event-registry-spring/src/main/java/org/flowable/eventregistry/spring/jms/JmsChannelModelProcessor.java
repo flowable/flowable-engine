@@ -76,8 +76,13 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
     protected boolean contextRefreshed;
+    protected ObjectMapper objectMapper;
 
     protected StringValueResolver embeddedValueResolver;
+    
+    public JmsChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -87,7 +92,7 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof JmsInboundChannelModel) {
             JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;

@@ -34,9 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DelegateExpressionInboundChannelModelProcessor implements ChannelModelProcessor {
 
     protected HasExpressionManagerEngineConfiguration engineConfiguration;
+    protected ObjectMapper objectMapper;
 
-    public DelegateExpressionInboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration) {
+    public DelegateExpressionInboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration, ObjectMapper objectMapper) {
         this.engineConfiguration = engineConfiguration;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -47,7 +49,7 @@ public class DelegateExpressionInboundChannelModelProcessor implements ChannelMo
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof DelegateExpressionInboundChannelModel) {
             registerChannelModel((DelegateExpressionInboundChannelModel) channelModel, eventRegistry);

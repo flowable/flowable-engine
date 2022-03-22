@@ -35,6 +35,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filip Hrisafov
  */
 public class OutboundChannelModelProcessor implements ChannelModelProcessor {
+    
+    protected ObjectMapper objectMapper;
+    
+    public OutboundChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -44,12 +50,11 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof OutboundChannelModel) {
             registerChannelModel((OutboundChannelModel) channelModel);
         }
-
     }
 
     protected void registerChannelModel(OutboundChannelModel inboundChannelModel) {

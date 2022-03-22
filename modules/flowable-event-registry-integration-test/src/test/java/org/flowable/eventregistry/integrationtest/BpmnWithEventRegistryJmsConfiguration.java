@@ -31,9 +31,9 @@ import org.springframework.jms.core.JmsTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@Import(CmmnWithEventRegistryTestConfiguration.class)
+@Import(BpmnWithEventRegistryTestConfiguration.class)
 @EnableJms
-public class CmmnWithEventRegistryJmsConfiguration {
+public class BpmnWithEventRegistryJmsConfiguration {
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ConnectionFactory connectionFactory) {

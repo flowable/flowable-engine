@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
-@JmsEventTest
+@CmmnJmsEventTest
 @TestPropertySource(properties = {
         "application.test.jms-queue=test-queue"
 })
@@ -127,6 +127,82 @@ public class CaseWithEventRegistryTest {
                 .isEqualTo("{"
                     + "  payload1: 'Some value'"
                     + "}");
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
+            "org/flowable/eventregistry/integrationtest/one.event",
+            "org/flowable/eventregistry/integrationtest/onexml.channel"})
+    public void testStartCaseWithXmlEvent() {
+        try {
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(0);
+            
+            jmsTemplate.convertAndSend("test-queue", "<?xml version=\"1.0\" encoding=\"utf-8\"?><root>"
+                + "<payload1>kermit</payload1>"
+                + "<payload2>123</payload2>"
+                + "</root>", messageProcessor -> {
+                    
+                messageProcessor.setStringProperty("headerProperty1", "headertest");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(1));
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").singleResult();
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "headerVar1")).isEqualTo("headertest");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable1")).isEqualTo("kermit");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable2")).isEqualTo(123);
+            
+            jmsTemplate.convertAndSend("test-queue", "<root><payload1>fozzie</payload1>"
+                    + "<payload2>456</payload2></root>");
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(2));
+            
+            CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent")
+                    .variableValueEquals("variable1", "fozzie").singleResult();
+            assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable1")).isEqualTo("fozzie");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable2")).isEqualTo(456);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/testSendEventTask.cmmn",
+            "org/flowable/eventregistry/integrationtest/one.event",
+            "org/flowable/eventregistry/integrationtest/onexml-outbound.channel"})
+    public void testSendXmlEventTask() throws Exception {
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSendEvent")
+                    .variable("myHeaderValue", "Some header value")
+                    .variable("myVariable", "Some value")
+                    .start();
+            
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+            
+            Message message = jmsTemplate.receive("test-outbound-queue");
+            assertThat(message.getStringProperty("headerProperty1")).isEqualTo("test");
+            assertThat(message.getStringProperty("headerProperty2")).isEqualTo("Some header value");
+            TextMessage textMessage = (TextMessage) message;
+            assertThat(textMessage.getText()).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><one><payload1>Some value</payload1></one>");
 
         } finally {
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();

@@ -99,7 +99,7 @@ public class CachingAndArtifactsManager {
                 channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRepositoryService());
                 channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRegistry(),
                         eventRegistryEngineConfiguration.getEventRepositoryService(), eventRegistryEngineConfiguration.getEventSerializerManager(),
-                        eventRegistryEngineConfiguration.getObjectMapper(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
             }
         }
     }

@@ -580,10 +580,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     }
 
     public void initChannelDefinitionProcessors() {
-        channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this));
-        channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this));
-        channelModelProcessors.add(new InboundChannelModelProcessor());
-        channelModelProcessors.add(new OutboundChannelModelProcessor());
+        channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this, objectMapper));
+        channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this, objectMapper));
+        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper));
+        channelModelProcessors.add(new OutboundChannelModelProcessor(objectMapper));
     }
 
     public void initChangeDetectionManager() {

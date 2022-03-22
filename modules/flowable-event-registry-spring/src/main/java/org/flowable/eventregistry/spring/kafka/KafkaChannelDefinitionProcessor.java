@@ -79,11 +79,16 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
     protected boolean contextRefreshed;
+    protected ObjectMapper objectMapper;
 
     protected BeanExpressionResolver resolver = new StandardBeanExpressionResolver();
 
     protected StringValueResolver embeddedValueResolver;
     protected BeanExpressionContext expressionContext;
+    
+    public KafkaChannelDefinitionProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -93,7 +98,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof KafkaInboundChannelModel) {
             KafkaInboundChannelModel kafkaChannelModel = (KafkaInboundChannelModel) channelModel;

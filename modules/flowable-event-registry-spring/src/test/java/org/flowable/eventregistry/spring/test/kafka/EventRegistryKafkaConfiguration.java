@@ -40,6 +40,8 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.LoggingProducerListener;
 import org.testcontainers.containers.KafkaContainer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -89,8 +91,10 @@ public class EventRegistryKafkaConfiguration {
     }
 
     @Bean
-    public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry, KafkaOperations<Object, Object> kafkaOperations) {
-        KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor();
+    public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry, 
+            KafkaOperations<Object, Object> kafkaOperations, ObjectMapper objectMapper) {
+        
+        KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor(objectMapper);
         kafkaChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
         kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
         return kafkaChannelDefinitionProcessor;

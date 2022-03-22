@@ -19,19 +19,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
+import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-/**
- * @author Filip Hrisafov
- */
-@SpringJUnitConfig(classes = CmmnWithEventRegistryJmsConfiguration.class)
-@ExtendWith(FlowableCmmnSpringExtension.class)
+@SpringJUnitConfig(classes = BpmnWithEventRegistryJmsConfiguration.class)
+@ExtendWith(FlowableSpringExtension.class)
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface JmsEventTest {
+public @interface BpmnJmsEventTest {
 
 }

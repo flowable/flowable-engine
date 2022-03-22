@@ -33,7 +33,6 @@ import org.flowable.eventregistry.impl.keydetector.JsonPointerBasedInboundEventK
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
-import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
@@ -52,6 +51,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filip Hrisafov
  */
 public class InboundChannelModelProcessor implements ChannelModelProcessor {
+    
+    protected ObjectMapper objectMapper;
+    
+    public InboundChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -61,7 +66,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof InboundChannelModel) {
             registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, eventSerializerManager, 
@@ -176,7 +181,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         
         InboundEventDeserializer<Document> eventDeserializer;
         if (StringUtils.isEmpty(channelModel.getDeserializerDelegateExpression())) {
-            eventDeserializer = new StringToXmlDocumentDeserializer();
+            eventDeserializer = (InboundEventDeserializer<Document>) eventSerializerManager.getInboundEventDeserializer(channelModel.getType(), ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE);
         } else {
             //noinspection unchecked
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);

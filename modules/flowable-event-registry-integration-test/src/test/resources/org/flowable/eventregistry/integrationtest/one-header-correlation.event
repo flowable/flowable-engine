@@ -1,0 +1,25 @@
+{
+    "key": "one",
+    "name": "My first Event",
+    "payload": [
+    	{
+            "name": "headerProperty1",
+            "type": "string",
+            "header": true,
+            "correlationParameter": true
+        },
+        {
+            "name": "headerProperty2",
+            "type": "string",
+            "header": true
+        },
+        {
+            "name": "payload1",
+            "type": "string"
+        },
+        {
+            "name": "payload2",
+            "type": "integer"
+        }
+    ]
+}

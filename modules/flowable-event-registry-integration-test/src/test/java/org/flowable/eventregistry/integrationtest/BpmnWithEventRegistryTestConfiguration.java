@@ -10,18 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.spring.test.jms;
+package org.flowable.eventregistry.integrationtest;
 
 import java.sql.Driver;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
-import org.flowable.eventregistry.api.EventRegistry;
-import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.impl.EventRegistryEngine;
-import org.flowable.eventregistry.spring.EventRegistryFactoryBean;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
+import org.flowable.spring.ProcessEngineFactoryBean;
+import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,11 +34,10 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-/**
- * @author Filip Hrisafov
- */
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration(proxyBeanMethods = false)
-public class CmmnWithEventRegistryTestConfiguration {
+public class BpmnWithEventRegistryTestConfiguration {
 
     @Bean
     public DataSource dataSource(
@@ -56,7 +59,31 @@ public class CmmnWithEventRegistryTestConfiguration {
         return new DataSourceTransactionManager(dataSource);
     }
     
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+    
+    @Bean
+    public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringEventRegistryConfigurator eventRegistryConfigurator) {
+        
+        SpringProcessEngineConfiguration engineConfiguration = new SpringProcessEngineConfiguration();
+        engineConfiguration.setDataSource(dataSource);
+        engineConfiguration.setTransactionManager(transactionManager);
+        engineConfiguration.setDatabaseSchemaUpdate(SpringEventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        engineConfiguration.setEventRegistryConfigurator(eventRegistryConfigurator);
 
+        return engineConfiguration;
+    }
+    
+    @Bean
+    public SpringEventRegistryConfigurator eventRegistryConfigurator(EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
+        SpringEventRegistryConfigurator eventRegistryConfigurator = new SpringEventRegistryConfigurator();
+        eventRegistryConfigurator.setEventEngineConfiguration(eventRegistryEngineConfiguration);
+        return eventRegistryConfigurator;
+    }
+    
     @Bean
     public SpringEventRegistryEngineConfiguration eventRegistryEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
                     ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors) {
@@ -73,21 +100,25 @@ public class CmmnWithEventRegistryTestConfiguration {
         return engineConfiguration;
     }
 
-    @Bean("eventRegistryEngine")
-    public EventRegistryFactoryBean eventRegistryFactoryBean(SpringEventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
-        EventRegistryFactoryBean factoryBean = new EventRegistryFactoryBean();
-        factoryBean.setEventEngineConfiguration(eventRegistryEngineConfiguration);
+    @Bean("processEngine")
+    public ProcessEngineFactoryBean processEngineFactoryBean(SpringProcessEngineConfiguration processEngineConfiguration) {
+        ProcessEngineFactoryBean factoryBean = new ProcessEngineFactoryBean();
+        factoryBean.setProcessEngineConfiguration(processEngineConfiguration);
         return factoryBean;
     }
 
     @Bean
-    public EventRegistry eventRegistry(EventRegistryEngine eventRegistryEngine) {
-        return eventRegistryEngine.getEventRegistry();
+    public RepositoryService repositoryService(ProcessEngine processEngine) {
+        return processEngine.getRepositoryService();
     }
 
     @Bean
-    public EventRepositoryService eventRepositoryService(EventRegistryEngine eventRegistryEngine) {
-        return eventRegistryEngine.getEventRepositoryService();
+    public RuntimeService runtimeService(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
     }
-
+    
+    @Bean
+    public TaskService taskService(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
+    }
 }

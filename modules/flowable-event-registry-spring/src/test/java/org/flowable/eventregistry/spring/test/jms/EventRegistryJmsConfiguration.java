@@ -29,6 +29,8 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -77,8 +79,10 @@ public class EventRegistryJmsConfiguration {
     }
 
     @Bean
-    public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
-        JmsChannelModelProcessor jmsChannelDeployer = new JmsChannelModelProcessor();
+    public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, 
+            JmsOperations jmsOperations, ObjectMapper objectMapper) {
+        
+        JmsChannelModelProcessor jmsChannelDeployer = new JmsChannelModelProcessor(objectMapper);
         jmsChannelDeployer.setEndpointRegistry(endpointRegistry);
         jmsChannelDeployer.setJmsOperations(jmsOperations);
 

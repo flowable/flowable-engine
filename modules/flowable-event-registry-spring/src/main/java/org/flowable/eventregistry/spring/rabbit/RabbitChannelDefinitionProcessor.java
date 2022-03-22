@@ -83,12 +83,17 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
     protected boolean contextRefreshed;
+    protected ObjectMapper objectMapper;
 
     protected BeanExpressionResolver resolver = new StandardBeanExpressionResolver();
 
     protected StringValueResolver embeddedValueResolver;
     protected BeanExpressionContext expressionContext;
 
+    public RabbitChannelDefinitionProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    
     @Override
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof RabbitInboundChannelModel || channelModel instanceof RabbitOutboundChannelModel;
@@ -97,7 +102,7 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
-            ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+            boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof RabbitInboundChannelModel) {
             RabbitInboundChannelModel rabbitChannelDefinition = (RabbitInboundChannelModel) channelModel;

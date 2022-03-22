@@ -36,9 +36,12 @@ import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStr
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.jms.JmsMessageToJsonDeserializer;
+import org.flowable.eventregistry.spring.jms.JmsMessageToXmlDeserializer;
 import org.flowable.eventregistry.spring.kafka.KafkaConsumerRecordToJsonDeserializer;
+import org.flowable.eventregistry.spring.kafka.KafkaConsumerRecordToXmlDeserializer;
 import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.spring.rabbit.RabbitMessageToJsonDeserializer;
+import org.flowable.eventregistry.spring.rabbit.RabbitMessageToXmlDeserializer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -76,10 +79,16 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     public void initEventSerializerManager() {
         addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_JMS_TYPE, 
                 ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new JmsMessageToJsonDeserializer(objectMapper));
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_JMS_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE, new JmsMessageToXmlDeserializer(objectMapper));
         addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_RABBIT_TYPE, 
                 ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new RabbitMessageToJsonDeserializer(objectMapper));
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_RABBIT_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE, new RabbitMessageToXmlDeserializer(objectMapper));
         addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_KAFKA_TYPE, 
                 ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new KafkaConsumerRecordToJsonDeserializer(objectMapper));
+        addChannelEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_KAFKA_TYPE, 
+                ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE, new KafkaConsumerRecordToXmlDeserializer(objectMapper));
         
         super.initEventSerializerManager();
     }
