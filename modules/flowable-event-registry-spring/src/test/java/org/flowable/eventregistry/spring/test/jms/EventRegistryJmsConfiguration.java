@@ -52,6 +52,11 @@ public class EventRegistryJmsConfiguration {
 
         return factory;
     }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @Bean
     public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
