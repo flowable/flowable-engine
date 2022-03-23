@@ -45,6 +45,11 @@ public class EventRegistryRabbitConfiguration {
         factory.setConnectionFactory(connectionFactory);
         return factory;
     }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {

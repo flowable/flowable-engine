@@ -24,6 +24,7 @@ import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.rest.TestInboundEventChannelAdapter;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.idm.api.IdmIdentityService;
@@ -165,6 +166,11 @@ public class EngineConfiguration {
     @Bean
     public IdmIdentityService idmIdentityService(ProcessEngine processEngine) {
         return getIdmEngineConfiguration(processEngine).getIdmIdentityService();
+    }
+    
+    @Bean(name = "testInboundEventChannelAdapter")
+    public TestInboundEventChannelAdapter testInboundEventChannelAdapter() {
+        return new TestInboundEventChannelAdapter();
     }
     
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(ProcessEngine processEngine) {

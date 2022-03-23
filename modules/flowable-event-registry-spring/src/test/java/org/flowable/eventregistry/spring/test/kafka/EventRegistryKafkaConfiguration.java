@@ -59,6 +59,11 @@ public class EventRegistryKafkaConfiguration {
         containerProperties.setMissingTopicsFatal(true);
         return factory;
     }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @Bean
     public ConsumerFactory<?, ?> kafkaConsumerFactory(KafkaContainer kafkaContainer) {

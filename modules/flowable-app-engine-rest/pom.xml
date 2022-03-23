@@ -17,7 +17,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.44.v20210927</jetty.version>
+        <jetty.version>9.4.45.v20220203</jetty.version>
         <flowable.artifact>
             org.flowable.app.rest
         </flowable.artifact>
