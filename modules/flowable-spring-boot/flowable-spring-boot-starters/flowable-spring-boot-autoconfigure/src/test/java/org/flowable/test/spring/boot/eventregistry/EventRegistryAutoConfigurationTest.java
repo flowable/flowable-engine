@@ -56,6 +56,7 @@ import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguratio
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
@@ -76,7 +77,8 @@ public class EventRegistryAutoConfigurationTest {
             DataSourceAutoConfiguration.class,
             DataSourceTransactionManagerAutoConfiguration.class,
             EventRegistryServicesAutoConfiguration.class,
-            EventRegistryAutoConfiguration.class
+            EventRegistryAutoConfiguration.class,
+            JacksonAutoConfiguration.class
         ))
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
 
