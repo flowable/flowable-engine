@@ -28,25 +28,20 @@ import org.junit.Test;
 
 /**
  * @author David Lamas
- * @author Micha Kiener
  */
 public class TaskAssignedEventTest extends FlowableCmmnTestCase {
-    protected CustomEventListener taskAssignedListener;
-    protected CustomEventListener taskCompletedListener;
+    protected CustomEventListener taskListener;
 
     @Before
     public void setUp() {
-        taskAssignedListener = new CustomEventListener();
-        taskCompletedListener = new CustomEventListener();
-        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskAssignedListener, FlowableEngineEventType.TASK_ASSIGNED);
-        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskCompletedListener, FlowableEngineEventType.TASK_COMPLETED);
+        taskListener = new CustomEventListener();
+        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_ASSIGNED);
     }
 
     @After
     public void tearDown() {
-        if (taskAssignedListener != null) {
-            cmmnEngineConfiguration.getEventDispatcher().removeEventListener(taskAssignedListener);
-            cmmnEngineConfiguration.getEventDispatcher().removeEventListener(taskCompletedListener);
+        if (taskListener != null) {
+            cmmnEngineConfiguration.getEventDispatcher().removeEventListener(taskListener);
         }
     }
 
@@ -64,10 +59,10 @@ public class TaskAssignedEventTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(task.getAssignee()).isNotNull();
-        assertThat(taskAssignedListener.caughtEvent).isNotNull()
+        assertThat(taskListener.caughtEvent).isNotNull()
                 .isInstanceOf(FlowableEntityEventImpl.class);
 
-        FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) taskAssignedListener.caughtEvent;
+        FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) taskListener.caughtEvent;
         assertThat(caughtEvent.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(caughtEvent.getScopeDefinitionId()).isEqualTo(caseInstance.getCaseDefinitionId());
         assertThat(caughtEvent.getSubScopeId()).isEqualTo(task.getId());
@@ -77,24 +72,6 @@ public class TaskAssignedEventTest extends FlowableCmmnTestCase {
                 .isNotNull()
                 .isInstanceOf(Task.class);
         Task taskEntity = (Task) caughtEvent.getEntity();
-        assertThat(taskEntity.getId()).isEqualTo(task.getId());
-        assertThat(taskEntity.getAssignee()).isEqualTo(task.getAssignee());
-
-        // now complete the task and check, if the complete task event was thrown
-        cmmnTaskService.complete(task.getId());
-        assertThat(taskCompletedListener.caughtEvent).isNotNull()
-                .isInstanceOf(FlowableEntityEventImpl.class);
-
-        caughtEvent = (FlowableEntityEventImpl) taskCompletedListener.caughtEvent;
-        assertThat(caughtEvent.getScopeId()).isEqualTo(caseInstance.getId());
-        assertThat(caughtEvent.getScopeDefinitionId()).isEqualTo(caseInstance.getCaseDefinitionId());
-        assertThat(caughtEvent.getSubScopeId()).isEqualTo(task.getId());
-        assertThat(caughtEvent.getScopeType()).isEqualTo(task.getScopeType());
-
-        assertThat(caughtEvent.getEntity())
-                .isNotNull()
-                .isInstanceOf(Task.class);
-        taskEntity = (Task) caughtEvent.getEntity();
         assertThat(taskEntity.getId()).isEqualTo(task.getId());
         assertThat(taskEntity.getAssignee()).isEqualTo(task.getAssignee());
     }
