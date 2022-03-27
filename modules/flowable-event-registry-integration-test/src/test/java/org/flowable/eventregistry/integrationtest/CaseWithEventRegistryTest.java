@@ -29,13 +29,17 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventDeployment;
+import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @CmmnJmsEventTest
 @TestPropertySource(properties = {
@@ -96,6 +100,43 @@ public class CaseWithEventRegistryTest {
                     .variableValueEquals("variable1", "fozzie").singleResult();
             assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable1")).isEqualTo("fozzie");
             assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable2")).isEqualTo(456);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
+            "org/flowable/eventregistry/integrationtest/one.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testStartCaseWithEventDirectlyOnChannel() {
+        try {
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(0);
+            
+            InboundChannelModel channelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("one");
+            ObjectNode eventNode = getEventRegistryEngineConfiguration().getObjectMapper().createObjectNode();
+            eventNode.put("payload1", "fozzie");
+            eventNode.put("payload2", 456);
+            getEventRegistry().eventReceived(channelModel, eventNode.toString());
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").singleResult();
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "headerVar1")).isNull();
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable1")).isEqualTo("fozzie");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable2")).isEqualTo(456);
+            
+            eventNode = getEventRegistryEngineConfiguration().getObjectMapper().createObjectNode();
+            eventNode.put("payload1", "johndoe");
+            eventNode.put("payload2", 999);
+            getEventRegistry().eventReceived(channelModel, eventNode.toString());
+            
+            CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent")
+                    .variableValueEquals("variable1", "johndoe").singleResult();
+            assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable1")).isEqualTo("johndoe");
+            assertThat(cmmnRuntimeService.getVariable(caseInstance2.getId(), "variable2")).isEqualTo(999);
 
         } finally {
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
@@ -213,8 +254,14 @@ public class CaseWithEventRegistryTest {
     }
     
     protected EventRepositoryService getEventRepositoryService() {
-        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) 
-                cmmnEngine.getCmmnEngineConfiguration().getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        return eventRegistryEngineConfiguration.getEventRepositoryService();
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+    
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+    
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration().getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 }

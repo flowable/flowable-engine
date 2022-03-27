@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.rabbit;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,18 +67,25 @@ public class RabbitMessageToXmlDeserializer implements InboundEventDeserializer<
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         Map<String, Object> headers = new HashMap<>();
         
-        Message message = (Message) rawEvent;
-        Map<String, Object> headerMap = message.getMessageProperties().getHeaders();
-        for (String headerName : headerMap.keySet()) {
-            headers.put(headerName, headerMap.get(headerName));
+        if (rawEvent instanceof Message) {
+            Message message = (Message) rawEvent;
+            Map<String, Object> headerMap = message.getMessageProperties().getHeaders();
+            for (String headerName : headerMap.keySet()) {
+                headers.put(headerName, headerMap.get(headerName));
+            }
         }
         
         return headers;
     }
     
     protected byte[] convertEventToBytes(Object rawEvent) throws Exception {
-        Message message = (Message) rawEvent;
-        return message.getBody();
+        if (rawEvent instanceof Message) {
+            Message message = (Message) rawEvent;
+            return message.getBody();
+            
+        } else {
+            return rawEvent.toString().getBytes(StandardCharsets.UTF_8);
+        }
     }
 
     public Collection<String> getStringContentTypes() {

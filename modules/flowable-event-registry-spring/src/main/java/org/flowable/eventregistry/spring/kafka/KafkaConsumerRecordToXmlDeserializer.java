@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.jms.TextMessage;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -62,12 +61,14 @@ public class KafkaConsumerRecordToXmlDeserializer implements InboundEventDeseria
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         try {
             Map<String, Object> headers = new HashMap<>();
-            ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
-            Headers consumerRecordHeaders = consumerRecord.headers();
-            Iterator<Header> itConsumerRecordHeader = consumerRecordHeaders.iterator();
-            while (itConsumerRecordHeader.hasNext()) {
-                Header consumerRecordHeader = itConsumerRecordHeader.next();
-                headers.put(consumerRecordHeader.key(), consumerRecordHeader.value());
+            if (rawEvent instanceof ConsumerRecord) {
+                ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
+                Headers consumerRecordHeaders = consumerRecord.headers();
+                Iterator<Header> itConsumerRecordHeader = consumerRecordHeaders.iterator();
+                while (itConsumerRecordHeader.hasNext()) {
+                    Header consumerRecordHeader = itConsumerRecordHeader.next();
+                    headers.put(consumerRecordHeader.key(), consumerRecordHeader.value());
+                }
             }
             
             return headers;
@@ -77,8 +78,13 @@ public class KafkaConsumerRecordToXmlDeserializer implements InboundEventDeseria
         }
     }
     
+    @SuppressWarnings("unchecked")
     protected byte[] convertEventToBytes(Object rawEvent) throws Exception {
-        TextMessage textMessage = (TextMessage) rawEvent;
-        return textMessage.getText().getBytes(StandardCharsets.UTF_8);
+        if (rawEvent instanceof ConsumerRecord) {
+            ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
+            return consumerRecord.value().toString().getBytes(StandardCharsets.UTF_8);
+        } else {
+            return rawEvent.toString().getBytes(StandardCharsets.UTF_8);
+        }
     }
 }
