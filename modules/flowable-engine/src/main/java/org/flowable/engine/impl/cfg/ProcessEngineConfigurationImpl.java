@@ -5235,7 +5235,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     @Deprecated
     public ProcessEngineConfigurationImpl setAsyncHistoryExecutorAsyncJobLockTimeInMillis(int asyncHistoryExecutorAsyncJobLockTimeInMillis) {
-        getOrCreateAsyncHistoryExecutorConfiguration().setAsyncJobLockTime(Duration.ofMillis(asyncExecutorSecondsToWaitOnShutdown));
+        getOrCreateAsyncHistoryExecutorConfiguration().setAsyncJobLockTime(Duration.ofMillis(asyncHistoryExecutorAsyncJobLockTimeInMillis));
         return this;
     }
 
