@@ -30,18 +30,18 @@ import org.junit.Test;
  * @author David Lamas
  */
 public class TaskAssignedEventTest extends FlowableCmmnTestCase {
-    protected CustomEventListener listener;
+    protected CustomEventListener taskListener;
 
     @Before
     public void setUp() {
-        listener = new CustomEventListener();
-        cmmnEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
+        taskListener = new CustomEventListener();
+        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_ASSIGNED);
     }
 
     @After
     public void tearDown() {
-        if (listener != null) {
-            cmmnEngineConfiguration.getEventDispatcher().removeEventListener(listener);
+        if (taskListener != null) {
+            cmmnEngineConfiguration.getEventDispatcher().removeEventListener(taskListener);
         }
     }
 
@@ -59,10 +59,10 @@ public class TaskAssignedEventTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(task.getAssignee()).isNotNull();
-        assertThat(listener.caughtEvent).isNotNull()
+        assertThat(taskListener.caughtEvent).isNotNull()
                 .isInstanceOf(FlowableEntityEventImpl.class);
 
-        FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) listener.caughtEvent;
+        FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) taskListener.caughtEvent;
         assertThat(caughtEvent.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(caughtEvent.getScopeDefinitionId()).isEqualTo(caseInstance.getCaseDefinitionId());
         assertThat(caughtEvent.getSubScopeId()).isEqualTo(task.getId());

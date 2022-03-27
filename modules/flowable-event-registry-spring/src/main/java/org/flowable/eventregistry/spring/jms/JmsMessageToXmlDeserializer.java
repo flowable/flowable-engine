@@ -61,11 +61,13 @@ public class JmsMessageToXmlDeserializer implements InboundEventDeserializer<Doc
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         try {
             Map<String, Object> headers = new HashMap<>();
-            Message message = (Message) rawEvent;
-            Enumeration<String> headerNames = message.getPropertyNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                headers.put(headerName, message.getObjectProperty(headerName));
+            if (rawEvent instanceof Message) {
+                Message message = (Message) rawEvent;
+                Enumeration<String> headerNames = message.getPropertyNames();
+                while (headerNames.hasMoreElements()) {
+                    String headerName = headerNames.nextElement();
+                    headers.put(headerName, message.getObjectProperty(headerName));
+                }
             }
             
             return headers;
@@ -76,8 +78,12 @@ public class JmsMessageToXmlDeserializer implements InboundEventDeserializer<Doc
     }
     
     protected byte[] convertEventToBytes(Object rawEvent) throws Exception {
-        TextMessage textMessage = (TextMessage) rawEvent;
-        return textMessage.getText().getBytes(StandardCharsets.UTF_8);
+        if (rawEvent instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) rawEvent;
+            return textMessage.getText().getBytes(StandardCharsets.UTF_8);
+        } else {
+            return rawEvent.toString().getBytes(StandardCharsets.UTF_8);
+        }
     }
 
 }

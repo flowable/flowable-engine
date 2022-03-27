@@ -59,29 +59,36 @@ public class RabbitMessageToJsonDeserializer implements InboundEventDeserializer
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         Map<String, Object> headers = new HashMap<>();
         
-        Message message = (Message) rawEvent;
-        Map<String, Object> headerMap = message.getMessageProperties().getHeaders();
-        for (String headerName : headerMap.keySet()) {
-            headers.put(headerName, headerMap.get(headerName));
+        if (rawEvent instanceof Message) {
+            Message message = (Message) rawEvent;
+            Map<String, Object> headerMap = message.getMessageProperties().getHeaders();
+            for (String headerName : headerMap.keySet()) {
+                headers.put(headerName, headerMap.get(headerName));
+            }
         }
         
         return headers;
     }
     
     public String convertEventToString(Object rawEvent) throws Exception {
-        Message message = (Message) rawEvent;
-        
-        byte[] body = message.getBody();
-        MessageProperties messageProperties = message.getMessageProperties();
-        String contentType = messageProperties != null ? messageProperties.getContentType() : null;
-        
-        String bodyContent = null;
-        if (stringContentTypes.contains(contentType)) {
-            bodyContent = new String(body, StandardCharsets.UTF_8);
+        if (rawEvent instanceof Message) {
+            Message message = (Message) rawEvent;
+            
+            byte[] body = message.getBody();
+            MessageProperties messageProperties = message.getMessageProperties();
+            String contentType = messageProperties != null ? messageProperties.getContentType() : null;
+            
+            String bodyContent = null;
+            if (stringContentTypes.contains(contentType)) {
+                bodyContent = new String(body, StandardCharsets.UTF_8);
+            } else {
+                bodyContent = Base64.getEncoder().encodeToString(body);
+            }
+            return bodyContent;
+            
         } else {
-            bodyContent = Base64.getEncoder().encodeToString(body);
+            return rawEvent.toString();
         }
-        return bodyContent;
     }
 
     public Collection<String> getStringContentTypes() {

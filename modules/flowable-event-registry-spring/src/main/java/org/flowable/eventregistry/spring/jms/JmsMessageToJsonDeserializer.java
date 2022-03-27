@@ -52,11 +52,13 @@ public class JmsMessageToJsonDeserializer implements InboundEventDeserializer<Js
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         try {
             Map<String, Object> headers = new HashMap<>();
-            Message message = (Message) rawEvent;
-            Enumeration<String> headerNames = message.getPropertyNames();
-            while (headerNames.hasMoreElements()) {
-                String headerName = headerNames.nextElement();
-                headers.put(headerName, message.getObjectProperty(headerName));
+            if (rawEvent instanceof Message) {
+                Message message = (Message) rawEvent;
+                Enumeration<String> headerNames = message.getPropertyNames();
+                while (headerNames.hasMoreElements()) {
+                    String headerName = headerNames.nextElement();
+                    headers.put(headerName, message.getObjectProperty(headerName));
+                }
             }
             
             return headers;
@@ -67,8 +69,12 @@ public class JmsMessageToJsonDeserializer implements InboundEventDeserializer<Js
     }
     
     protected String convertEventToString(Object rawEvent) throws Exception {
-        TextMessage textMessage = (TextMessage) rawEvent;
-        return textMessage.getText();
+        if (rawEvent instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) rawEvent;
+            return textMessage.getText();
+        } else {
+            return rawEvent.toString();
+        }
     }
 
 }

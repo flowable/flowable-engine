@@ -51,12 +51,14 @@ public class KafkaConsumerRecordToJsonDeserializer implements InboundEventDeseri
     protected Map<String, Object> retrieveHeaders(Object rawEvent) {
         try {
             Map<String, Object> headers = new HashMap<>();
-            ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
-            Headers consumerRecordHeaders = consumerRecord.headers();
-            Iterator<Header> itConsumerRecordHeader = consumerRecordHeaders.iterator();
-            while (itConsumerRecordHeader.hasNext()) {
-                Header consumerRecordHeader = itConsumerRecordHeader.next();
-                headers.put(consumerRecordHeader.key(), consumerRecordHeader.value());
+            if (rawEvent instanceof ConsumerRecord) {
+                ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
+                Headers consumerRecordHeaders = consumerRecord.headers();
+                Iterator<Header> itConsumerRecordHeader = consumerRecordHeaders.iterator();
+                while (itConsumerRecordHeader.hasNext()) {
+                    Header consumerRecordHeader = itConsumerRecordHeader.next();
+                    headers.put(consumerRecordHeader.key(), consumerRecordHeader.value());
+                }
             }
             
             return headers;
@@ -68,7 +70,11 @@ public class KafkaConsumerRecordToJsonDeserializer implements InboundEventDeseri
     
     @SuppressWarnings("unchecked")
     protected String convertEventToString(Object rawEvent) throws Exception {
-        ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
-        return consumerRecord.value().toString();
+        if (rawEvent instanceof ConsumerRecord) {
+            ConsumerRecord<Object, Object> consumerRecord = (ConsumerRecord<Object, Object>) rawEvent;
+            return consumerRecord.value().toString();
+        } else {
+            return rawEvent.toString();
+        }
     }
 }
