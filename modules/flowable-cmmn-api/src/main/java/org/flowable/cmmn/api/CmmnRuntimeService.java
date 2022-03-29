@@ -26,7 +26,13 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.form.api.FormInfo;
@@ -339,4 +345,41 @@ public interface CmmnRuntimeService {
      */
     void updateBusinessStatus(String caseInstanceId, String businessStatus);
 
+    /**
+     * Adds an event-listener which will be notified of ALL events by the dispatcher.
+     *
+     * @param listenerToAdd
+     *     the listener to add
+     */
+    void addEventListener(FlowableEventListener listenerToAdd);
+
+    /**
+     * Adds an event-listener which will only be notified when an event occurs, which type is in the given types.
+     *
+     * @param listenerToAdd
+     *     the listener to add
+     * @param types
+     *     types of events the listener should be notified for
+     */
+    void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types);
+
+    /**
+     * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
+     *
+     * @param listenerToRemove
+     *     listener to remove
+     */
+    void removeEventListener(FlowableEventListener listenerToRemove);
+
+    /**
+     * Dispatches the given event to any listeners that are registered.
+     *
+     * @param event
+     *     event to dispatch.
+     * @throws FlowableException
+     *     if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
+     * @throws FlowableIllegalArgumentException
+     *     when the given event is not suitable for dispatching.
+     */
+    void dispatchEvent(FlowableEvent event);
 }
