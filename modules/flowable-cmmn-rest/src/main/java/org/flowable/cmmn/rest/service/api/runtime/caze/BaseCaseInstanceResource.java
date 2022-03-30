@@ -81,14 +81,56 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseDefinitionCategory() != null) {
             query.caseDefinitionCategory(queryRequest.getCaseDefinitionCategory());
         }
+        if (queryRequest.getCaseDefinitionName() != null) {
+            query.caseDefinitionName(queryRequest.getCaseDefinitionName());
+        }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
+        }
+        if (queryRequest.getCaseInstanceBusinessKey() != null) {
+            query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
+        }
+        if (queryRequest.getCaseInstanceBusinessStatus() != null) {
+            query.caseInstanceBusinessStatus(queryRequest.getCaseInstanceBusinessStatus());
         }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
         }
         if (queryRequest.getCaseInstanceParentId() != null) {
             query.caseInstanceParentId(queryRequest.getCaseInstanceParentId());
+        }
+        if (queryRequest.getCaseInstanceState() != null) {
+            query.caseInstanceState(queryRequest.getCaseInstanceState());
+        }
+        if (queryRequest.getCaseInstanceStartedBy() != null) {
+            query.caseInstanceStartedBy(queryRequest.getCaseInstanceStartedBy());
+        }
+        if (queryRequest.getCaseInstanceStartedBefore() != null) {
+            query.caseInstanceStartedBefore(queryRequest.getCaseInstanceStartedBefore());
+        }
+        if (queryRequest.getCaseInstanceStartedAfter() != null) {
+            query.caseInstanceStartedAfter(queryRequest.getCaseInstanceStartedAfter());
+        }
+        if (queryRequest.getCaseInstanceCallbackId() != null) {
+            query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
+        }
+        if (queryRequest.getCaseInstanceCallbackType() != null) {
+            query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
+        }
+        if (queryRequest.getCaseInstanceReferenceId() != null) {
+            query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
+        }
+        if (queryRequest.getCaseInstanceReferenceType() != null) {
+            query.caseInstanceReferenceType(queryRequest.getCaseInstanceReferenceType());
+        }
+        if (queryRequest.getCaseInstanceLastReactivatedBy() != null) {
+            query.caseInstanceLastReactivatedBy(queryRequest.getCaseInstanceLastReactivatedBy());
+        }
+        if (queryRequest.getCaseInstanceLastReactivatedBefore() != null) {
+            query.caseInstanceLastReactivatedBefore(queryRequest.getCaseInstanceLastReactivatedBefore());
+        }
+        if (queryRequest.getCaseInstanceLastReactivatedAfter() != null) {
+            query.caseInstanceLastReactivatedAfter(queryRequest.getCaseInstanceLastReactivatedAfter());
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {

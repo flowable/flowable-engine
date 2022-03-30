@@ -27,6 +27,7 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,8 +65,21 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
-            @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given businessKey.", paramType = "query"),
-            @ApiImplicitParam(name = "superCaseInstanceId", dataType = "string", value = "Only return case instances which have the given super case instance id (for cases that have a case tasks).", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "parentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return case instances started by the given user.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return case instances started before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return case instances started after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "state", dataType = "string", value = "Only return case instances with the given state.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return case instances which have the given callback id.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return case instances which have the given callback type.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return case instances which have the given reference id.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return case instances which have the given reference type.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return case instances last reactived by the given user.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedBefore", dataType = "string", format = "date-time", value = "Only return case instances last reactivated before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "Indication to include case variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return case instances with the given tenantId.", paramType = "query"),
@@ -97,13 +111,65 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("caseDefinitionCategory")) {
             queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
         }
+        
+        if (allRequestParams.containsKey("caseDefinitionName")) {
+            queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
 
         if (allRequestParams.containsKey("businessKey")) {
-            queryRequest.setCaseBusinessKey(allRequestParams.get("businessKey"));
+            queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatus")) {
+            queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
         }
 
         if (allRequestParams.containsKey("caseInstanceParentId")) {
             queryRequest.setCaseInstanceParentId(allRequestParams.get("caseInstanceParentId"));
+        }
+        
+        if (allRequestParams.containsKey("state")) {
+            queryRequest.setCaseInstanceState(allRequestParams.get("state"));
+        }
+        
+        if (allRequestParams.containsKey("startedBy")) {
+            queryRequest.setCaseInstanceStartedBy(allRequestParams.get("startedBy"));
+        }
+        
+        if (allRequestParams.containsKey("startedBefore")) {
+            queryRequest.setCaseInstanceStartedBefore(RequestUtil.getDate(allRequestParams, "startedBefore"));
+        }
+        
+        if (allRequestParams.containsKey("startedAfter")) {
+            queryRequest.setCaseInstanceStartedAfter(RequestUtil.getDate(allRequestParams, "startedAfter"));
+        }
+        
+        if (allRequestParams.containsKey("callbackId")) {
+            queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
+        }
+        
+        if (allRequestParams.containsKey("callbackType")) {
+            queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
+        }
+        
+        if (allRequestParams.containsKey("referenceId")) {
+            queryRequest.setCaseInstanceReferenceId(allRequestParams.get("referenceId"));
+        }
+        
+        if (allRequestParams.containsKey("referenceType")) {
+            queryRequest.setCaseInstanceReferenceType(allRequestParams.get("referenceType"));
+        }
+        
+        if (allRequestParams.containsKey("lastReactivatedBy")) {
+            queryRequest.setCaseInstanceLastReactivatedBy(allRequestParams.get("lastReactivatedBy"));
+        }
+        
+        if (allRequestParams.containsKey("lastReactivatedBefore")) {
+            queryRequest.setCaseInstanceLastReactivatedBefore(RequestUtil.getDate(allRequestParams, "lastReactivatedBefore"));
+        }
+        
+        if (allRequestParams.containsKey("lastReactivatedAfter")) {
+            queryRequest.setCaseInstanceLastReactivatedAfter(RequestUtil.getDate(allRequestParams, "lastReactivatedAfter"));
         }
 
         if (allRequestParams.containsKey("includeCaseVariables")) {

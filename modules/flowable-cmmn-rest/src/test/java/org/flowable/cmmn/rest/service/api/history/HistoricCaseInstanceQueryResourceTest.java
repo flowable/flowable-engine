@@ -15,6 +15,8 @@ package org.flowable.cmmn.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.apache.http.HttpStatus;
@@ -50,18 +52,78 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         caseVariables.put("intVar", 67890);
         caseVariables.put("booleanVar", false);
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+        identityService.setAuthenticatedUserId("kermit");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .variables(caseVariables)
+                .start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         caseVariables.put("oneVar", "test");
 
-        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+        identityService.setAuthenticatedUserId("fozzie");
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("anotherBusinessKey")
+                .businessStatus("anotherBusinessStatus")
+                .variables(caseVariables)
+                .start();
+        
+        identityService.setAuthenticatedUserId(null);
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
 
-        // Process variables
         ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceBusinessKey", "myBusinessKey");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceBusinessKey", "none");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceBusinessStatus", "myBusinessStatus");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceBusinessStatus", "none");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceState", "active");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance2.getId());
+        
+        requestNode.put("caseInstanceState", "completed");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("startedBy", "kermit");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("startedBy", "fozzie");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance2.getId());
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar futureCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        Calendar historicCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("startedBefore", getISODateString(futureCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId(), caseInstance2.getId());
+        
+        requestNode.put("startedBefore", getISODateString(historicCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("startedAfter", getISODateString(historicCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId(), caseInstance2.getId());
+        
+        requestNode.put("startedAfter", getISODateString(futureCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        // Case variables
+        requestNode = objectMapper.createObjectNode();
         ArrayNode variableArray = objectMapper.createArrayNode();
         ObjectNode variableNode = objectMapper.createObjectNode();
         variableArray.add(variableNode);

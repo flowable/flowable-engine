@@ -16,6 +16,8 @@ package org.flowable.cmmn.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.apache.http.HttpStatus;
@@ -53,12 +55,64 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         caseVariables.put("intVar", 67890);
         caseVariables.put("booleanVar", false);
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+        identityService.setAuthenticatedUserId("kermit");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .variables(caseVariables).start();
+        identityService.setAuthenticatedUserId(null);
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
 
-        // Process variables
         ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceBusinessKey", "myBusinessKey");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceBusinessKey", "none");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceBusinessStatus", "myBusinessStatus");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceBusinessStatus", "none");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceState", "active");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceState", "completed");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceStartedBy", "kermit");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceStartedBy", "fozzie");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar futureCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        Calendar historicCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceStartedBefore", getISODateString(futureCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceStartedBefore", getISODateString(historicCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceStartedAfter", getISODateString(historicCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+        
+        requestNode.put("caseInstanceStartedAfter", getISODateString(futureCal.getTime()));
+        assertResultsPresentInPostDataResponse(url, requestNode);
+        
+        // Case variables
+        requestNode = objectMapper.createObjectNode();
         ArrayNode variableArray = objectMapper.createArrayNode();
         ObjectNode variableNode = objectMapper.createObjectNode();
         variableArray.add(variableNode);
