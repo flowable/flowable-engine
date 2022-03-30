@@ -389,6 +389,9 @@
             <if test="startedBy != null">
                 and RES.START_USER_ID_ = #{startedBy}
             </if>
+            <if test="state != null">
+                and RES.STATE_ = #{state}
+            </if>
             <if test="lastReactivatedBefore != null">
                 and RES.LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
             </if>
@@ -606,6 +609,9 @@
                     </if>
                     <if test="orQueryObject.startedBy != null">
                         or RES.START_USER_ID_ = #{orQueryObject.startedBy}
+                    </if>
+                    <if test="orQueryObject.state != null">
+                        or RES.STATE_ = #{orQueryObject.state}
                     </if>
                     <if test="orQueryObject.lastReactivatedBefore != null">
                         or RES.LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}

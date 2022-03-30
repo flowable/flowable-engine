@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -488,6 +489,94 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .singleResult().getId())
                     .isEqualTo(caseInstance.getId());
             }
+        } finally {
+            Authentication.setAuthenticatedUserId(authenticatedUserId);
+        }
+    }
+    
+    @Test
+    public void getCaseInstanceByState() {
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("kermit");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.ACTIVE).count()).isEqualTo(2);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").state(CaseInstanceState.ACTIVE).list().get(0).getId()).isEqualTo(caseInstance.getId());
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").state(CaseInstanceState.ACTIVE).singleResult().getId()).isEqualTo(caseInstance.getId());
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.ACTIVE)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(2);
+                
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.COMPLETED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isZero();
+            }
+            
+            cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
+            
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.COMPLETED).count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.COMPLETED).list().get(0).getId()).isEqualTo(caseInstance.getId());
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.COMPLETED).singleResult().getId()).isEqualTo(caseInstance.getId());
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.COMPLETED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+                
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.TERMINATED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isZero();
+            }
+            
+            CaseInstance secondCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+            
+            cmmnRuntimeService.terminateCaseInstance(secondCaseInstance.getId());
+            
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.TERMINATED).count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.TERMINATED).list().get(0).getId()).isEqualTo(secondCaseInstance.getId());
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().state(CaseInstanceState.TERMINATED).singleResult().getId()).isEqualTo(secondCaseInstance.getId());
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.TERMINATED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+                
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .state(CaseInstanceState.SUSPENDED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isZero();
+            }
+            
         } finally {
             Authentication.setAuthenticatedUserId(authenticatedUserId);
         }

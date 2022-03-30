@@ -37,6 +37,7 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceStartedBefore(Date beforeTime);
     CaseInstanceQuery caseInstanceStartedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceStartedBy(String userId);
+    CaseInstanceQuery caseInstanceState(String state);
     CaseInstanceQuery caseInstanceLastReactivatedBefore(Date beforeTime);
     CaseInstanceQuery caseInstanceLastReactivatedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceLastReactivatedBy(String userId);

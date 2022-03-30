@@ -42,9 +42,12 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
-            @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The process definition key of the historic case instance.", paramType = "query"),
-            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The process definition id of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The case definition key of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return historic case instances with the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return historic case instances with the given case definition name.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic case instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "finishedAfter", dataType = "string", format="date-time",  value = "Return only historic case instances that were finished after this date.", paramType = "query"),
@@ -52,6 +55,14 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format="date-time", value = "Return only historic case instances that were started after this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic case instances that were started before this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic case instances that were started by this user.", paramType = "query"),
+            @ApiImplicitParam(name = "state", dataType = "string", value = "Only return historic case instances with the given state.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return historic case instances which have the given callback id.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return historic case instances which have the given callback type.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return historic case instances which have the given reference id.", paramType = "query"),
+            @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return historic case instances which have the given reference type.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return historic case instances last reactived by the given user.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedBefore", dataType = "string", format = "date-time", value = "Only return historic case instances last reactivated before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return historic case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return historic case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "An indication if the historic case instance variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
@@ -76,13 +87,45 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.get("caseDefinitionId") != null) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
         }
+        
+        if (allRequestParams.get("caseDefinitionCategory") != null) {
+            queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
+        }
+        
+        if (allRequestParams.get("caseDefinitionName") != null) {
+            queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
 
         if (allRequestParams.get("businessKey") != null) {
-            queryRequest.setCaseBusinessKey(allRequestParams.get("businessKey"));
+            queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
+        }
+        
+        if (allRequestParams.get("businessStatus") != null) {
+            queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
         }
 
         if (allRequestParams.get("involvedUser") != null) {
             queryRequest.setInvolvedUser(allRequestParams.get("involvedUser"));
+        }
+        
+        if (allRequestParams.get("state") != null) {
+            queryRequest.setCaseInstanceState(allRequestParams.get("state"));
+        }
+        
+        if (allRequestParams.get("callbackId") != null) {
+            queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
+        }
+        
+        if (allRequestParams.get("callbackType") != null) {
+            queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
+        }
+        
+        if (allRequestParams.get("referenceId") != null) {
+            queryRequest.setCaseInstanceReferenceId(allRequestParams.get("referenceId"));
+        }
+        
+        if (allRequestParams.get("referenceType") != null) {
+            queryRequest.setCaseInstanceReferenceType(allRequestParams.get("referenceType"));
         }
 
         if (allRequestParams.get("finished") != null) {
@@ -111,6 +154,18 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("startedBy") != null) {
             queryRequest.setStartedBy(allRequestParams.get("startedBy"));
+        }
+        
+        if (allRequestParams.get("lastReactivatedAfter") != null) {
+            queryRequest.setLastReactivatedAfter(RequestUtil.getDate(allRequestParams, "lastReactivatedAfter"));
+        }
+
+        if (allRequestParams.get("lastReactivatedBefore") != null) {
+            queryRequest.setLastReactivatedBefore(RequestUtil.getDate(allRequestParams, "lastReactivatedBefore"));
+        }
+
+        if (allRequestParams.get("lastReactivatedBy") != null) {
+            queryRequest.setLastReactivatedBy(allRequestParams.get("lastReactivatedBy"));
         }
 
         if (allRequestParams.get("includeCaseVariables") != null) {

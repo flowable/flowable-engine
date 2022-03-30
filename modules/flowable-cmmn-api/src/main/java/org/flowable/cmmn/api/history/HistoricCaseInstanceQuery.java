@@ -132,6 +132,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that are started by the provided user identifier.
      */
     HistoricCaseInstanceQuery startedBy(String userId);
+    
+    /**
+     * Only select historic case instances that have a state that is equal to the provided value.
+     */
+    HistoricCaseInstanceQuery state(String state);
 
     /**
      * Only select historic case instance that are reactivated before the provided date time.

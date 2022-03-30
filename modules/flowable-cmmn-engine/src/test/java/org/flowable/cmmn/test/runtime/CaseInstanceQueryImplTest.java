@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -366,6 +367,38 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionId("undefined")
                     .endOr()
                     .singleResult().getId()).isEqualTo(caseInstance.getId());
+        } finally {
+            Authentication.setAuthenticatedUserId(authenticatedUserId);
+        }
+    }
+    
+    @Test
+    public void getCaseInstanceByState() {
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("kermit");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceState(CaseInstanceState.ACTIVE).count()).isEqualTo(2);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").caseInstanceState(CaseInstanceState.ACTIVE).list().get(0).getId()).isEqualTo(caseInstance.getId());
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").caseInstanceState(CaseInstanceState.ACTIVE).singleResult().getId()).isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .or()
+                    .caseInstanceState(CaseInstanceState.ACTIVE)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count()).isEqualTo(2);
+            
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .or()
+                    .caseInstanceState(CaseInstanceState.COMPLETED)
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count()).isZero();
+            
         } finally {
             Authentication.setAuthenticatedUserId(authenticatedUserId);
         }

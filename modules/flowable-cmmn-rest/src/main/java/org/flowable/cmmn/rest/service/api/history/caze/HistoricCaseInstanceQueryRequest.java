@@ -30,10 +30,19 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
 
     private String caseInstanceId;
     private List<String> caseInstanceIds;
-    private String caseBusinessKey;
     private String caseDefinitionId;
     private String caseDefinitionKey;
-    private Boolean excludeSubprocesses;
+    private String caseDefinitionCategory;
+    private String caseDefinitionName;
+    private String caseBusinessKey;
+    private String caseInstanceBusinessKey;
+    private String caseInstanceBusinessStatus;
+    private String caseInstanceParentId;
+    private String caseInstanceState;
+    private String caseInstanceCallbackId;
+    private String caseInstanceCallbackType;
+    private String caseInstanceReferenceId;
+    private String caseInstanceReferenceType;
     private Boolean finished;
     private String involvedUser;
     private Date finishedAfter;
@@ -41,6 +50,9 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String lastReactivatedBy;
+    private Date lastReactivatedBefore;
+    private Date lastReactivatedAfter;
     private String activePlanItemDefinitionId;
     private Set<String> activePlanItemDefinitionIds;
     private Boolean includeCaseVariables;
@@ -64,14 +76,6 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
         this.caseInstanceIds = caseInstanceIds;
     }
 
-    public String getCaseBusinessKey() {
-        return caseBusinessKey;
-    }
-
-    public void setCaseBusinessKey(String caseBusinessKey) {
-        this.caseBusinessKey = caseBusinessKey;
-    }
-
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
@@ -87,13 +91,93 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     public void setCaseDefinitionKey(String caseDefinitionKey) {
         this.caseDefinitionKey = caseDefinitionKey;
     }
-
-    public Boolean getExcludeSubprocesses() {
-        return excludeSubprocesses;
+    
+    public String getCaseDefinitionCategory() {
+        return caseDefinitionCategory;
     }
 
-    public void setExcludeSubprocesses(Boolean excludeSubprocesses) {
-        this.excludeSubprocesses = excludeSubprocesses;
+    public void setCaseDefinitionCategory(String caseDefinitionCategory) {
+        this.caseDefinitionCategory = caseDefinitionCategory;
+    }
+
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    public String getCaseBusinessKey() {
+        return caseBusinessKey;
+    }
+
+    public void setCaseBusinessKey(String caseBusinessKey) {
+        this.caseBusinessKey = caseBusinessKey;
+    }
+    
+    public String getCaseInstanceBusinessKey() {
+        return caseInstanceBusinessKey;
+    }
+
+    public void setCaseInstanceBusinessKey(String caseInstanceBusinessKey) {
+        this.caseInstanceBusinessKey = caseInstanceBusinessKey;
+    }
+
+    public String getCaseInstanceBusinessStatus() {
+        return caseInstanceBusinessStatus;
+    }
+
+    public void setCaseInstanceBusinessStatus(String caseInstanceBusinessStatus) {
+        this.caseInstanceBusinessStatus = caseInstanceBusinessStatus;
+    }
+
+    public String getCaseInstanceParentId() {
+        return caseInstanceParentId;
+    }
+
+    public void setCaseInstanceParentId(String caseInstanceParentId) {
+        this.caseInstanceParentId = caseInstanceParentId;
+    }
+
+    public String getCaseInstanceState() {
+        return caseInstanceState;
+    }
+
+    public void setCaseInstanceState(String caseInstanceState) {
+        this.caseInstanceState = caseInstanceState;
+    }
+
+    public String getCaseInstanceCallbackId() {
+        return caseInstanceCallbackId;
+    }
+
+    public void setCaseInstanceCallbackId(String caseInstanceCallbackId) {
+        this.caseInstanceCallbackId = caseInstanceCallbackId;
+    }
+
+    public String getCaseInstanceCallbackType() {
+        return caseInstanceCallbackType;
+    }
+
+    public void setCaseInstanceCallbackType(String caseInstanceCallbackType) {
+        this.caseInstanceCallbackType = caseInstanceCallbackType;
+    }
+
+    public String getCaseInstanceReferenceId() {
+        return caseInstanceReferenceId;
+    }
+
+    public void setCaseInstanceReferenceId(String caseInstanceReferenceId) {
+        this.caseInstanceReferenceId = caseInstanceReferenceId;
+    }
+
+    public String getCaseInstanceReferenceType() {
+        return caseInstanceReferenceType;
+    }
+
+    public void setCaseInstanceReferenceType(String caseInstanceReferenceType) {
+        this.caseInstanceReferenceType = caseInstanceReferenceType;
     }
 
     public Boolean getFinished() {
@@ -152,6 +236,30 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
         this.startedBy = startedBy;
     }
     
+    public String getLastReactivatedBy() {
+        return lastReactivatedBy;
+    }
+
+    public void setLastReactivatedBy(String lastReactivatedBy) {
+        this.lastReactivatedBy = lastReactivatedBy;
+    }
+
+    public Date getLastReactivatedBefore() {
+        return lastReactivatedBefore;
+    }
+
+    public void setLastReactivatedBefore(Date lastReactivatedBefore) {
+        this.lastReactivatedBefore = lastReactivatedBefore;
+    }
+
+    public Date getLastReactivatedAfter() {
+        return lastReactivatedAfter;
+    }
+
+    public void setLastReactivatedAfter(Date lastReactivatedAfter) {
+        this.lastReactivatedAfter = lastReactivatedAfter;
+    }
+
     public String getActivePlanItemDefinitionId() {
         return activePlanItemDefinitionId;
     }
