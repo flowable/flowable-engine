@@ -616,6 +616,9 @@
         <if test="startedBy != null">
             and ${queryTablePrefix}START_USER_ID_ = #{startedBy}
         </if>
+        <if test="state != null">
+            and ${queryTablePrefix}STATE_ = #{state}
+        </if>
         <if test="lastReactivatedBefore != null">
             and ${queryTablePrefix}LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
         </if>
@@ -738,6 +741,9 @@
         </if>
         <if test="orQueryObject.startedBy != null">
             or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy}
+        </if>
+        <if test="orQueryObject.state != null">
+            or ${queryTablePrefix}STATE_ = #{orQueryObject.state}
         </if>
         <if test="orQueryObject.lastReactivatedBefore != null">
             or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}

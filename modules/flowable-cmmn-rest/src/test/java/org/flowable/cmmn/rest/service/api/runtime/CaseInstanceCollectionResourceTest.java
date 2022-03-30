@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -63,39 +64,91 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstances() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+        identityService.setAuthenticatedUserId("kermit");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .start();
+        identityService.setAuthenticatedUserId(null);
         String id = caseInstance.getId();
 
         // Test without any parameters
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
         assertResultsPresentInDataResponse(url, id);
 
-        // Process instance id
+        // Case instance id
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=" + id;
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=anotherId";
         assertResultsPresentInDataResponse(url);
 
-        // Process instance business key
+        // Case instance business key
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=myBusinessKey";
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=anotherBusinessKey";
         assertResultsPresentInDataResponse(url);
+        
+        // Case instance business status
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessStatus=myBusinessStatus";
+        assertResultsPresentInDataResponse(url, id);
 
-        // Process definition key
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessStatus=anotherBusinessStatus";
+        assertResultsPresentInDataResponse(url);
+        
+        // Case instance started by
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBy=kermit";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBy=fozzie";
+        assertResultsPresentInDataResponse(url);
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar futureCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        Calendar historicCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        
+        // Case instance started before
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBefore=" + getISODateString(futureCal.getTime());
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBefore=" + getISODateString(historicCal.getTime());;
+        assertResultsPresentInDataResponse(url);
+        
+        // Case instance started after
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(historicCal.getTime());;
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(futureCal.getTime());;
+        assertResultsPresentInDataResponse(url);
+        
+        // Case instance state
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?state=active";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?state=completed";
+        assertResultsPresentInDataResponse(url);
+
+        // Case definition key
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=oneHumanTaskCase";
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionKey=caseTwo";
         assertResultsPresentInDataResponse(url);
 
-        // Process definition id
+        // Case definition id
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionId=anotherId";
+        assertResultsPresentInDataResponse(url);
+        
+        // Case definition name
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionName=" + encode(caseInstance.getCaseDefinitionName());
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionName=anotherName";
         assertResultsPresentInDataResponse(url);
     }
 

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,13 +65,25 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         caseVariables.put("intVar", 67890);
         caseVariables.put("booleanVar", false);
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+        identityService.setAuthenticatedUserId("kermit");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .variables(caseVariables).start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
+        identityService.setAuthenticatedUserId("fozzie");
         startTime.add(Calendar.DAY_OF_YEAR, 1);
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
-        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("anotherBusinessKey")
+                .businessStatus("anotherBusinessStatus")
+                .start();
+        
+        identityService.setAuthenticatedUserId(null);
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES);
 
@@ -84,6 +97,30 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         assertResultsPresentInDataResponse(url + "?caseDefinitionKey=oneHumanTaskCase", caseInstance.getId(), caseInstance2.getId());
 
+        assertResultsPresentInDataResponse(url + "?caseDefinitionName=" + encode("One Human Task Case"), caseInstance.getId(), caseInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?businessKey=myBusinessKey", caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?businessKey=none");
+        
+        assertResultsPresentInDataResponse(url + "?businessStatus=anotherBusinessStatus", caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?businessStatus=none");
+        
+        assertResultsPresentInDataResponse(url + "?state=active", caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?state=none");
+        
+        assertResultsPresentInDataResponse(url + "?startedBy=kermit", caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?startedBy=none");
+        
+        Calendar todayCal = new GregorianCalendar();
+        Calendar futureCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        Calendar historicCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) - 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));
+        
+        assertResultsPresentInDataResponse(url + "?startedBefore=" + getISODateString(futureCal.getTime()), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?startedBefore=" + getISODateString(historicCal.getTime()));
+        
+        assertResultsPresentInDataResponse(url + "?startedAfter=" + getISODateString(historicCal.getTime()), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?startedAfter=" + getISODateString(futureCal.getTime()));
+        
         assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=false&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(),
                 new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=true&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), caseVariables);

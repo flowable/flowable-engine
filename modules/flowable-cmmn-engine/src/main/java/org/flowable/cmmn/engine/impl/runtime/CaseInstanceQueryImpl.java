@@ -58,6 +58,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected Date startedBefore;
     protected Date startedAfter;
     protected String startedBy;
+    protected String state;
     protected Date lastReactivatedBefore;
     protected Date lastReactivatedAfter;
     protected String lastReactivatedBy;
@@ -291,6 +292,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.startedBy = userId;
         } else {
             this.startedBy = userId;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceState(String state) {
+        if (state == null) {
+            throw new FlowableIllegalArgumentException("state is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
         }
         return this;
     }
@@ -855,6 +869,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getStartedBy() {
         return startedBy;
+    }
+
+    public String getState() {
+        return state;
     }
 
     public String getCallbackId() {
