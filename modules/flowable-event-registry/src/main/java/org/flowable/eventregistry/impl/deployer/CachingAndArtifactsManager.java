@@ -89,6 +89,14 @@ public class CachingAndArtifactsManager {
                 inboundEventChannelAdapter.setEventRegistry(eventRegistryEngineConfiguration.getEventRegistry());
                 inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
             }
+            
+            if (eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().isChannelModelAlreadyRegistered(inboundChannelModel)) {
+                // inbound channel model is already registered, returning to prevent the same listener from getting registered again
+                return;
+                
+            } else {
+                eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().registerChannelModel(inboundChannelModel);
+            }
 
         } else if (!(channelModel instanceof OutboundChannelModel)) {
             throw new FlowableIllegalArgumentException("Unrecognized ChannelModel class : " + channelModel.getClass());

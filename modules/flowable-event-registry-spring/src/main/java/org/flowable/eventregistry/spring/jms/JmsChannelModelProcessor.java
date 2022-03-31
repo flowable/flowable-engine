@@ -147,7 +147,7 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     @Override
     public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
         logger.info("Starting to unregister channel {} in tenant {}", channelModel.getKey(), tenantId);
-        String endpointId = getEndpointId(channelModel,tenantId);
+        String endpointId = getEndpointId(channelModel, tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228

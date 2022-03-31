@@ -110,4 +110,28 @@ public class InboundChannelModel extends ChannelModel {
         this.inboundEventChannelAdapter = inboundEventChannelAdapter;
     }
 
+    @JsonIgnore
+    public String getChannelModelHashKey() {
+        StringBuilder keyDetectionStringBuilder = new StringBuilder();
+        if (channelEventKeyDetection != null) {
+            keyDetectionStringBuilder.append(channelEventKeyDetection.getDelegateExpression())
+                    .append(channelEventKeyDetection.getFixedValue())
+                    .append(channelEventKeyDetection.getJsonField())
+                    .append(channelEventKeyDetection.getJsonPointerExpression())
+                    .append(channelEventKeyDetection.getXmlXPathExpression());
+        }
+        
+        StringBuilder tenantIdDetectionStringBuilder = new StringBuilder();
+        if (channelEventTenantIdDetection != null) {
+            tenantIdDetectionStringBuilder.append(channelEventTenantIdDetection.getDelegateExpression())
+                    .append(channelEventTenantIdDetection.getFixedValue())
+                    .append(channelEventTenantIdDetection.getJsonPointerExpression())
+                    .append(channelEventTenantIdDetection.getxPathExpression());
+        }
+        
+        return new StringBuilder().append(type).append(deserializerType).append(deserializerDelegateExpression)
+                .append(payloadExtractorDelegateExpression).append(eventTransformerDelegateExpression)
+                .append(pipelineDelegateExpression).append(keyDetectionStringBuilder.toString())
+                .append(tenantIdDetectionStringBuilder.toString()).toString();
+    }
 }
