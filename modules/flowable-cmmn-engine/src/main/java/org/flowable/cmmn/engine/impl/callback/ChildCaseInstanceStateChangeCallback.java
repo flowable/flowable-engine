@@ -48,18 +48,20 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
 
                 } else if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())) {
 
-                    // Only relevant when it's termination through an exit sentry.
-                    // For a manual termination, the state is simply changed and no additional logic (e.g. out parameter mapping) needs to be done.
-
                     if (callbackData.getAdditionalData() != null && callbackData.getAdditionalData().containsKey(CallbackConstants.MANUAL_TERMINATION)) {
 
                         boolean manualTermination = (Boolean) callbackData.getAdditionalData().get(CallbackConstants.MANUAL_TERMINATION);
-                        if (!manualTermination) {
+                        if (manualTermination) {
+                            // For a manual termination, the state is simply changed and no additional logic (e.g. out parameter mapping) needs to be done.
+                            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity,
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_TYPE),
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_EVENT_TYPE));
+                        } else {
+                            // a termination through an exit sentry needs to go beyond than just change the state
                             CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity,
                                 (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_CRITERION_ID),
                                 (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_TYPE),
                                 (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_EVENT_TYPE));
-
                         }
 
                     }
