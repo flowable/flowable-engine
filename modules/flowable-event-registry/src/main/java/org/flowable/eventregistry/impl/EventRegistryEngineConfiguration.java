@@ -36,6 +36,7 @@ import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
@@ -47,6 +48,7 @@ import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.eventregistry.impl.deployer.ChannelDefinitionDeploymentHelper;
+import org.flowable.eventregistry.impl.deployer.DefaultInboundChannelModelCacheManager;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeployer;
 import org.flowable.eventregistry.impl.deployer.EventDefinitionDeploymentHelper;
 import org.flowable.eventregistry.impl.deployer.ParsedDeploymentBuilderFactory;
@@ -137,6 +139,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected List<Deployer> customPostDeployers;
     protected List<Deployer> deployers;
     protected EventDeploymentManager deploymentManager;
+    protected InboundChannelModelCacheManager inboundChannelModelCacheManager;
 
     protected int eventDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache;
@@ -248,6 +251,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initSystemOutboundEventProcessor();
         initChannelDefinitionProcessors();
         initDeployers();
+        initInboundChannelModelCacheManager();
         initChangeDetectionManager();
         initChangeDetectionExecutor();
     }
@@ -505,6 +509,12 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         }
     }
     
+    public void initInboundChannelModelCacheManager() {
+        if (inboundChannelModelCacheManager == null) {
+            inboundChannelModelCacheManager = new DefaultInboundChannelModelCacheManager();
+        }
+    }
+    
     public void initEventRegistry() {
         if (this.eventRegistry == null) {
             this.eventRegistry = new DefaultEventRegistry(this);
@@ -730,6 +740,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
     
+    public InboundChannelModelCacheManager getInboundChannelModelCacheManager() {
+        return inboundChannelModelCacheManager;
+    }
+
+    public EventRegistryEngineConfiguration setInboundChannelModelCacheManager(InboundChannelModelCacheManager inboundChannelModelCacheManager) {
+        this.inboundChannelModelCacheManager = inboundChannelModelCacheManager;
+        return this;
+    }
+
     public Collection<ChannelModelProcessor> getChannelModelProcessors() {
         return channelModelProcessors;
     }

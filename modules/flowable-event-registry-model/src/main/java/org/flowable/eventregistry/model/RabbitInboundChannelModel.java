@@ -92,4 +92,18 @@ public class RabbitInboundChannelModel extends InboundChannelModel {
     public void setAckMode(String ackMode) {
         this.ackMode = ackMode;
     }
+    
+    @Override
+    public String getChannelModelHashKey() {
+        StringBuilder queueStringBuilder = new StringBuilder();
+        if (queues != null) {
+            for (String queue : queues) {
+                queueStringBuilder.append(queue);
+            }
+        }
+        
+        return new StringBuilder(super.getChannelModelHashKey()).append(queueStringBuilder.toString()).append(exclusive)
+                .append(priority).append(admin).append(concurrency)
+                .append(executor).append(ackMode).toString();
+    }
 }
