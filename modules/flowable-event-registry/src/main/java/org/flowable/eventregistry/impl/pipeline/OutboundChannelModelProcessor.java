@@ -57,29 +57,30 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
         }
     }
 
-    protected void registerChannelModel(OutboundChannelModel inboundChannelModel) {
-        if (inboundChannelModel.getOutboundEventProcessingPipeline() == null) {
+    protected void registerChannelModel(OutboundChannelModel outboundChannelModel) {
+        if (outboundChannelModel.getOutboundEventProcessingPipeline() == null) {
 
             OutboundEventProcessingPipeline eventProcessingPipeline;
 
-            if (StringUtils.isNotEmpty(inboundChannelModel.getPipelineDelegateExpression())) {
-                eventProcessingPipeline = resolveExpression(inboundChannelModel.getPipelineDelegateExpression(), OutboundEventProcessingPipeline.class);
-            } else if ("json".equals(inboundChannelModel.getSerializerType())) {
+            if (StringUtils.isNotEmpty(outboundChannelModel.getPipelineDelegateExpression())) {
+                eventProcessingPipeline = resolveExpression(outboundChannelModel.getPipelineDelegateExpression(), OutboundEventProcessingPipeline.class);
+                
+            } else if ("json".equals(outboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
                 eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
-            } else if ("xml".equals(inboundChannelModel.getSerializerType())) {
+            } else if ("xml".equals(outboundChannelModel.getSerializerType())) {
                 OutboundEventSerializer eventSerializer = new EventPayloadToXmlStringSerializer();
                 eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
-            } else if ("expression".equals(inboundChannelModel.getSerializerType())) {
-                if (StringUtils.isNotEmpty(inboundChannelModel.getSerializerDelegateExpression())) {
+            } else if ("expression".equals(outboundChannelModel.getSerializerType())) {
+                if (StringUtils.isNotEmpty(outboundChannelModel.getSerializerDelegateExpression())) {
                     OutboundEventSerializer outboundEventSerializer = resolveExpression(
-                            inboundChannelModel.getSerializerDelegateExpression(), OutboundEventSerializer.class);
+                            outboundChannelModel.getSerializerDelegateExpression(), OutboundEventSerializer.class);
                     eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(outboundEventSerializer);
                 } else {
                     throw new FlowableException(
-                        "The channel key " + inboundChannelModel.getKey()
+                        "The channel key " + outboundChannelModel.getKey()
                             + " is using expression deserialization, but pipelineDelegateExpression was not set.");
                 }
             }  else {
@@ -87,7 +88,7 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
             }
 
             if (eventProcessingPipeline != null) {
-                inboundChannelModel.setOutboundEventProcessingPipeline(eventProcessingPipeline);
+                outboundChannelModel.setOutboundEventProcessingPipeline(eventProcessingPipeline);
             }
 
         }
