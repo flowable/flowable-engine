@@ -176,8 +176,15 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         // Need to be set before planning the complete operation
         handleOutParameters(commandContext, planItemInstance);
 
-        // Triggering the plan item (as opposed to a regular complete) terminates the case instance
-        CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        // load the case instance referenced by this case task plan item to check its current state
+        CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getReferenceId());
+
+        // Triggering the plan item from a regular case complete (e.g. the referenced case did complete and hence is triggering its plan item
+        // to complete as well) must not terminate the referenced case as it is already completed
+        if (caseInstance.getState().equals(CaseInstanceState.ACTIVE)) {
+            // Triggering the plan item (as opposed to a regular complete of the referenced case) manually terminates the case instance
+            CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
 
@@ -187,22 +194,20 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
             if (PlanItemTransition.EXIT.equals(transition)) {
 
-                // Typically this happens when terminating through an exit sentry
+                // Typically, this happens when terminating through an exit sentry
                 // There is out parameter handling, consistent with the case task in BPMN
 
                 handleOutParameters(commandContext, (PlanItemInstanceEntity) planItemInstance);
                 CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
-
             }
 
             if (PlanItemTransition.TERMINATE.equals(transition)) {
 
-                // Typically this happens when terminating a case instance through the API
+                // Typically, this happens when terminating a case instance through the API
                 // The plan item will be deleted by the regular TerminatePlanItemOperation
                 // There is no out parameter handling as the case instance is forced terminated.
 
                 CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
-
             }
         }
     }
