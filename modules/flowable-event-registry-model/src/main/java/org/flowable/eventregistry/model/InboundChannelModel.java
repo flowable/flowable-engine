@@ -128,6 +128,7 @@ public class InboundChannelModel extends ChannelModel {
         this.inboundEventChannelAdapter = inboundEventChannelAdapter;
     }
 
+    @JsonIgnore
     public String getChannelModelHashKey() {
         StringBuilder keyDetectionStringBuilder = new StringBuilder();
         if (channelEventKeyDetection != null) {
