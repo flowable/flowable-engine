@@ -467,6 +467,74 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             });
         }
     }
+    
+    @Test
+    public void verifyMTInboundChannelCacheWithCustomProcessor() {
+        List<ChannelModelProcessor> channelModelProcessors = (List<ChannelModelProcessor>) eventEngineConfiguration.getChannelModelProcessors();
+        TestChannelModelProcessor testChannelModelProcessor = new TestChannelModelProcessor(eventEngineConfiguration.getObjectMapper());
+        for (int i = 0; i < channelModelProcessors.size(); i++) {
+            ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
+            if (channelModelProcessor instanceof InboundChannelModelProcessor) {
+                channelModelProcessors.set(i, testChannelModelProcessor);
+            }
+        }
+        
+        eventEngineConfiguration.getInboundChannelModelCacheManager().cleanChannelModels();
+        
+        try {
+            repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel")
+                    .tenantId("tenantA")
+                    .deploy();
+            
+            assertThat(testChannelModelProcessor.registerChannelModelHashKeys).hasSize(1);
+            assertThat(testChannelModelProcessor.unregisterChannelModelHashKeys).hasSize(1);
+            
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").list()).hasSize(1);
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").latestVersion().singleResult().getVersion()).isEqualTo(1);
+            
+            repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel")
+                    .tenantId("tenantA")
+                    .deploy();
+            
+            assertThat(testChannelModelProcessor.registerChannelModelHashKeys).hasSize(1);
+            assertThat(testChannelModelProcessor.unregisterChannelModelHashKeys).hasSize(1);
+            
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").list()).hasSize(2);
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").latestVersion().singleResult().getVersion()).isEqualTo(2);
+            
+            repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel.channel")
+                    .tenantId("tenantB")
+                    .deploy();
+    
+            assertThat(testChannelModelProcessor.registerChannelModelHashKeys).hasSize(2);
+            assertThat(testChannelModelProcessor.unregisterChannelModelHashKeys).hasSize(2);
+            
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantB").list()).hasSize(1);
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantB").latestVersion().singleResult().getVersion()).isEqualTo(1);
+            
+            repositoryService.createDeployment().addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
+                    .tenantId("tenantA")
+                    .deploy();
+            
+            assertThat(testChannelModelProcessor.registerChannelModelHashKeys).hasSize(3);
+            assertThat(testChannelModelProcessor.unregisterChannelModelHashKeys).hasSize(3);
+            
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").list()).hasSize(3);
+            assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").tenantId("tenantA").latestVersion().singleResult().getVersion()).isEqualTo(3);
+            
+        } finally {
+            for (int i = 0; i < channelModelProcessors.size(); i++) {
+                ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
+                if (channelModelProcessor instanceof TestChannelModelProcessor) {
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
+                }
+            }
+            
+            repositoryService.createDeploymentQuery().list().forEach(deployment -> {
+                repositoryService.deleteDeployment(deployment.getId());
+            });
+        }
+    }
 
     @Test
     public void deployNewChannelVersion() {
@@ -589,18 +657,18 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         protected List<String> alreadyRegisteredInvocations = new ArrayList<>();
 
         @Override
-        public boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel) {
+        public boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
             alreadyRegisteredInvocations.add(channelModel.getChannelModelHashKey());
             return false;
         }
 
         @Override
-        public void registerChannelModel(InboundChannelModel channelModel) {
+        public void registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
             
         }
 
         @Override
-        public void unregisterChannelModel(InboundChannelModel channelModel) {
+        public void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
             
         }
 

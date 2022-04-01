@@ -16,11 +16,11 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 
 public interface InboundChannelModelCacheManager {
 
-    boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel);
+    boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
-    void registerChannelModel(InboundChannelModel channelModel);
+    void registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
-    void unregisterChannelModel(InboundChannelModel channelModel);
+    void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
     void cleanChannelModels();
 }
