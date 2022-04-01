@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         cmmnRuntimeService.terminateCaseInstance(childCaseId);
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.TERMINATED);
+        assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());
@@ -86,7 +85,7 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Case Task"));
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.TERMINATED);
+        assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());
@@ -117,7 +116,7 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "The Task"));
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.COMPLETED);
+        assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.COMPLETED);
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());
