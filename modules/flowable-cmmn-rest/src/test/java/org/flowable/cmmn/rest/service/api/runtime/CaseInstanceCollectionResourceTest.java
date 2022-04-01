@@ -68,7 +68,6 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("myBusinessKey")
-                .businessStatus("myBusinessStatus")
                 .start();
         identityService.setAuthenticatedUserId(null);
         String id = caseInstance.getId();
@@ -89,13 +88,6 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessKey=anotherBusinessKey";
-        assertResultsPresentInDataResponse(url);
-        
-        // Case instance business status
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessStatus=myBusinessStatus";
-        assertResultsPresentInDataResponse(url, id);
-
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?businessStatus=anotherBusinessStatus";
         assertResultsPresentInDataResponse(url);
         
         // Case instance started by

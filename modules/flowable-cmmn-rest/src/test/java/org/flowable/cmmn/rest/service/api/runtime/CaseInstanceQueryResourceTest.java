@@ -59,7 +59,6 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("myBusinessKey")
-                .businessStatus("myBusinessStatus")
                 .variables(caseVariables).start();
         identityService.setAuthenticatedUserId(null);
 
@@ -70,13 +69,6 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
         
         requestNode.put("caseInstanceBusinessKey", "none");
-        assertResultsPresentInPostDataResponse(url, requestNode);
-        
-        requestNode = objectMapper.createObjectNode();
-        requestNode.put("caseInstanceBusinessStatus", "myBusinessStatus");
-        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
-        
-        requestNode.put("caseInstanceBusinessStatus", "none");
         assertResultsPresentInPostDataResponse(url, requestNode);
         
         requestNode = objectMapper.createObjectNode();

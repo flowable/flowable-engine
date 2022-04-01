@@ -47,7 +47,6 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return historic case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return historic case instances with the given case definition name.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic case instance.", paramType = "query"),
-            @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic case instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "finishedAfter", dataType = "string", format="date-time",  value = "Return only historic case instances that were finished after this date.", paramType = "query"),
@@ -100,10 +99,6 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
         }
         
-        if (allRequestParams.get("businessStatus") != null) {
-            queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
-        }
-
         if (allRequestParams.get("involvedUser") != null) {
             queryRequest.setInvolvedUser(allRequestParams.get("involvedUser"));
         }

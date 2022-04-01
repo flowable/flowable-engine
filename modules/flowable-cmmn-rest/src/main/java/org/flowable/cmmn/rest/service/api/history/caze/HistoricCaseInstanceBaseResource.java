@@ -92,9 +92,6 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }
-        if (queryRequest.getCaseInstanceBusinessStatus() != null) {
-            query.caseInstanceBusinessStatus(queryRequest.getCaseInstanceBusinessStatus());
-        }
         if (queryRequest.getCaseInstanceParentId() != null) {
             query.caseInstanceParentId(queryRequest.getCaseInstanceParentId());
         }

@@ -67,7 +67,6 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return case instances with the given case definition name.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
-            @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
             @ApiImplicitParam(name = "parentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return case instances started by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return case instances started before the given date.", paramType = "query"),
@@ -118,10 +117,6 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("businessKey")) {
             queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
-        }
-        
-        if (allRequestParams.containsKey("businessStatus")) {
-            queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
         }
 
         if (allRequestParams.containsKey("caseInstanceParentId")) {

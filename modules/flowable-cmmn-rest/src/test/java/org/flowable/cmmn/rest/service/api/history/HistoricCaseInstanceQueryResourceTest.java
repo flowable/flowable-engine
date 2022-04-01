@@ -56,7 +56,6 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("myBusinessKey")
-                .businessStatus("myBusinessStatus")
                 .variables(caseVariables)
                 .start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -68,7 +67,6 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("anotherBusinessKey")
-                .businessStatus("anotherBusinessStatus")
                 .variables(caseVariables)
                 .start();
         
@@ -81,13 +79,6 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
         
         requestNode.put("caseInstanceBusinessKey", "none");
-        assertResultsPresentInPostDataResponse(url, requestNode);
-        
-        requestNode = objectMapper.createObjectNode();
-        requestNode.put("caseInstanceBusinessStatus", "myBusinessStatus");
-        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
-        
-        requestNode.put("caseInstanceBusinessStatus", "none");
         assertResultsPresentInPostDataResponse(url, requestNode);
         
         requestNode = objectMapper.createObjectNode();

@@ -90,9 +90,6 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }
-        if (queryRequest.getCaseInstanceBusinessStatus() != null) {
-            query.caseInstanceBusinessStatus(queryRequest.getCaseInstanceBusinessStatus());
-        }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
         }

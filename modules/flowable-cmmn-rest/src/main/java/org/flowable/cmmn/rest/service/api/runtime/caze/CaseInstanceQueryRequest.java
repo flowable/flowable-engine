@@ -35,7 +35,6 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseDefinitionName;
     private String caseBusinessKey;
     private String caseInstanceBusinessKey;
-    private String caseInstanceBusinessStatus;
     private String caseInstanceParentId;
     private String caseInstanceStartedBy;
     private Date caseInstanceStartedBefore;
@@ -111,14 +110,6 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceBusinessKey(String caseInstanceBusinessKey) {
         this.caseInstanceBusinessKey = caseInstanceBusinessKey;
-    }
-
-    public String getCaseInstanceBusinessStatus() {
-        return caseInstanceBusinessStatus;
-    }
-
-    public void setCaseInstanceBusinessStatus(String caseInstanceBusinessStatus) {
-        this.caseInstanceBusinessStatus = caseInstanceBusinessStatus;
     }
 
     public String getCaseInstanceStartedBy() {

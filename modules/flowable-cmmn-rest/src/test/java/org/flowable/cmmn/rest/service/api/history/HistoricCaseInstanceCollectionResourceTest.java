@@ -69,7 +69,6 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("myBusinessKey")
-                .businessStatus("myBusinessStatus")
                 .variables(caseVariables).start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -80,7 +79,6 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("anotherBusinessKey")
-                .businessStatus("anotherBusinessStatus")
                 .start();
         
         identityService.setAuthenticatedUserId(null);
@@ -101,9 +99,6 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         
         assertResultsPresentInDataResponse(url + "?businessKey=myBusinessKey", caseInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=none");
-        
-        assertResultsPresentInDataResponse(url + "?businessStatus=anotherBusinessStatus", caseInstance2.getId());
-        assertResultsPresentInDataResponse(url + "?businessStatus=none");
         
         assertResultsPresentInDataResponse(url + "?state=active", caseInstance2.getId());
         assertResultsPresentInDataResponse(url + "?state=none");
