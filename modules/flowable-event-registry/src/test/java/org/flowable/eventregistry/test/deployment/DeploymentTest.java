@@ -471,7 +471,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
     @Test
     public void verifyMTInboundChannelCacheWithCustomProcessor() {
         List<ChannelModelProcessor> channelModelProcessors = (List<ChannelModelProcessor>) eventEngineConfiguration.getChannelModelProcessors();
-        TestChannelModelProcessor testChannelModelProcessor = new TestChannelModelProcessor(eventEngineConfiguration.getObjectMapper());
+        TestChannelModelProcessor testChannelModelProcessor = new TestChannelModelProcessor();
         for (int i = 0; i < channelModelProcessors.size(); i++) {
             ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
             if (channelModelProcessor instanceof InboundChannelModelProcessor) {
@@ -526,7 +526,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor());
                 }
             }
             
