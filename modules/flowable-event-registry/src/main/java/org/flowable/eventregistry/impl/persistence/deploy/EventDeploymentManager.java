@@ -247,7 +247,7 @@ public class EventDeploymentManager {
             for (ChannelModelProcessor channelModelProcessor : engineConfig.getChannelModelProcessors()) {
                 if (channelModelProcessor.canProcess(channelModel)) {
                     if (channelModel instanceof InboundChannelModel) {
-                        engineConfig.getInboundChannelModelCacheManager().unregisterChannelModel((InboundChannelModel) channelModel);
+                        engineConfig.getInboundChannelModelCacheManager().unregisterChannelModel((InboundChannelModel) channelModel, channelDefinition);
                     }
                     channelModelProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), engineConfig.getEventRepositoryService());
                 }

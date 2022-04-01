@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.deployer;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.model.InboundChannelModel;
 
@@ -23,18 +24,18 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
     protected Set<String> channelHashKeySet = new HashSet<>();
     
     @Override
-    public boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel) {
-        return channelHashKeySet.contains(channelModel.getChannelModelHashKey());
+    public boolean isChannelModelAlreadyRegistered(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
+        return channelHashKeySet.contains(channelModel.getChannelModelHashKey() + channelDefinition.getTenantId());
     }
 
     @Override
-    public void registerChannelModel(InboundChannelModel channelModel) {
-        channelHashKeySet.add(channelModel.getChannelModelHashKey());
+    public void registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
+        channelHashKeySet.add(channelModel.getChannelModelHashKey() + channelDefinition.getTenantId());
     }
 
     @Override
-    public void unregisterChannelModel(InboundChannelModel channelModel) {
-        channelHashKeySet.remove(channelModel.getChannelModelHashKey());
+    public void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
+        channelHashKeySet.remove(channelModel.getChannelModelHashKey() + channelDefinition.getTenantId());
     }
 
     @Override
