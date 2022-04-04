@@ -22,6 +22,7 @@ import java.util.HashMap;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -111,6 +113,18 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
                 CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId, null, null);
             }
         }
+    }
+
+    /**
+     * Overwritten in order to send a case end / terminate event through the case engine dispatcher.
+     */
+    @Override
+    protected void invokePostLifecycleListeners() {
+        super.invokePostLifecycleListeners();
+
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher()
+            .dispatchEvent(FlowableCmmnEventBuilder.createCaseEndedEvent(caseInstanceEntity, CaseInstanceState.TERMINATED),
+                EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
     }
     
     @Override
