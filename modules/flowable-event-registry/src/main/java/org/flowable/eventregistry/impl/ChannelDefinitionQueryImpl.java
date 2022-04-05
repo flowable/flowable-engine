@@ -38,17 +38,22 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
     protected String categoryNotEquals;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
     protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
+    protected String keyLikeIgnoreCase;
     protected Integer version;
     protected Integer versionGt;
     protected Integer versionGte;
     protected Integer versionLt;
     protected Integer versionLte;
     protected boolean latest;
+    protected boolean onlyInbound;
+    protected boolean onlyOutbound;
+    protected String implementation;
     protected Date createTime;
     protected Date createTimeAfter;
     protected Date createTimeBefore;
@@ -127,6 +132,15 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
     }
 
     @Override
+    public ChannelDefinitionQueryImpl channelDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("nameLikeIgnoreCase is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
+        return this;
+    }
+
+    @Override
     public ChannelDefinitionQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("id is null");
@@ -171,6 +185,15 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
         return this;
     }
     
+    @Override
+    public ChannelDefinitionQuery channelDefinitionKeyLikeIgnoreCase(String keyLikeIgnoreCase) {
+        if (keyLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("keyLikeIgnoreCase is null");
+        }
+        this.keyLikeIgnoreCase = keyLikeIgnoreCase;
+        return this;
+    }
+
     @Override
     public ChannelDefinitionQueryImpl channelVersion(Integer version) {
         checkVersion(version);
@@ -220,6 +243,33 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
         return this;
     }
     
+    @Override
+    public ChannelDefinitionQuery onlyInbound() {
+        if (onlyOutbound) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyInbound() with onlyOutbound() in the same query");
+        }
+        this.onlyInbound = true;
+        return this;
+    }
+
+    @Override
+    public ChannelDefinitionQuery onlyOutbound() {
+        if (onlyInbound) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyOutbound() with onlyInbound() in the same query");
+        }
+        this.onlyOutbound = true;
+        return this;
+    }
+
+    @Override
+    public ChannelDefinitionQuery implementation(String implementation) {
+        if (implementation == null) {
+            throw new FlowableIllegalArgumentException("implementation is null");
+        }
+        this.implementation = implementation;
+        return this;
+    }
+
     @Override
     public ChannelDefinitionQueryImpl channelCreateTime(Date createTime) {
         this.createTime = createTime;
@@ -359,12 +409,20 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
         return nameLike;
     }
 
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
     public String getKey() {
         return key;
     }
 
     public String getKeyLike() {
         return keyLike;
+    }
+
+    public String getKeyLikeIgnoreCase() {
+        return keyLikeIgnoreCase;
     }
 
     public String getCategory() {
@@ -397,6 +455,18 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
 
     public boolean isLatest() {
         return latest;
+    }
+
+    public boolean isOnlyInbound() {
+        return onlyInbound;
+    }
+
+    public boolean isOnlyOutbound() {
+        return onlyOutbound;
+    }
+
+    public String getImplementation() {
+        return implementation;
     }
 
     public Date getCreateTime() {

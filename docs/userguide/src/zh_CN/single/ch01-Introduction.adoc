@@ -5,18 +5,18 @@ include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.flowable]
 include::../base/header-Introduction.adoc[]
 
 
-=== Architecture Overview
+=== 架构
 
 *TBD*
 
-=== Supported Platform
+=== 支持平台
 
 *TBD*
 
-=== History
+=== 历史
 
 *TBD*
 
-=== What's new
+=== 新特性
 
 *TBD*

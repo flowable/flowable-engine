@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" targetNamespace="Examples">
+
+	<process id="ExpressionProcess1" name="ExpressionProcess1" flowable:candidateStarterUsers="${&quot;user1&quot;}" flowable:candidateStarterGroups="${&quot;group3&quot;}">
+		<startEvent id="start1" />
+		<sequenceFlow id="flow11" sourceRef="start1" targetRef="end1" />
+		<endEvent id="end1" />
+	</process>
+
+	<process id="ExpressionProcess2" name="ExpressionProcess2" flowable:candidateStarterUsers="${&quot;user1,user2&quot;}" flowable:candidateStarterGroups="${&quot;group2, group3&quot;}">
+		<startEvent id="start2" />
+		<sequenceFlow id="flow12" sourceRef="start2" targetRef="end2" />
+		<endEvent id="end2" />
+	</process>
+
+</definitions>

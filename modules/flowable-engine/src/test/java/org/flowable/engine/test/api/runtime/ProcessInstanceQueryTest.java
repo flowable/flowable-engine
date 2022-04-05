@@ -420,8 +420,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByDeploymentIdIn() {
-        List<String> deploymentIds = new ArrayList<>();
-        deploymentIds.add(deployment.getId());
+        List<String> deploymentIds = Collections.singletonList(deployment.getId());
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().deploymentIdIn(deploymentIds).list();
         assertThat(instances).hasSize(PROCESS_DEPLOY_COUNT);
 
@@ -438,6 +437,15 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 );
 
         assertThat(runtimeService.createProcessInstanceQuery().deploymentIdIn(deploymentIds).count()).isEqualTo(PROCESS_DEPLOY_COUNT);
+
+        assertThat(runtimeService.createProcessInstanceQuery().deploymentIdIn(Collections.singletonList("dummy")).list()).isEmpty();
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or()
+                .processInstanceId("invalid")
+                .deploymentIdIn(deploymentIds)
+                .endOr()
+                .count()).isEqualTo(PROCESS_DEPLOY_COUNT);
     }
 
     @Test

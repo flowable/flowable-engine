@@ -234,8 +234,10 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean("jmsChannelDefinitionProcessor")
         @ConditionalOnMissingBean(name = "jmsChannelDefinitionProcessor")
-        public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, JmsOperations jmsOperations) {
-            JmsChannelModelProcessor jmsChannelDefinitionProcessor = new JmsChannelModelProcessor();
+        public JmsChannelModelProcessor jmsChannelDefinitionProcessor(JmsListenerEndpointRegistry endpointRegistry, 
+                JmsOperations jmsOperations, ObjectMapper objectMapper) {
+            
+            JmsChannelModelProcessor jmsChannelDefinitionProcessor = new JmsChannelModelProcessor(objectMapper);
             jmsChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
             jmsChannelDefinitionProcessor.setJmsOperations(jmsOperations);
 
@@ -249,8 +251,10 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         @Bean("rabbitChannelDefinitionProcessor")
         @ConditionalOnMissingBean(name = "rabbitChannelDefinitionProcessor")
-        public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, RabbitOperations rabbitOperations) {
-            RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor();
+        public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, 
+                RabbitOperations rabbitOperations, ObjectMapper objectMapper) {
+            
+            RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor(objectMapper);
             rabbitChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
             rabbitChannelDefinitionProcessor.setRabbitOperations(rabbitOperations);
 
@@ -265,8 +269,9 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         @Bean("kafkaChannelDefinitionProcessor")
         @ConditionalOnMissingBean(name = "kafkaChannelDefinitionProcessor")
         public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry,
-            KafkaOperations<Object, Object> kafkaOperations) {
-            KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor();
+                KafkaOperations<Object, Object> kafkaOperations, ObjectMapper objectMapper) {
+            
+            KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor(objectMapper);
             kafkaChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
             kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
 

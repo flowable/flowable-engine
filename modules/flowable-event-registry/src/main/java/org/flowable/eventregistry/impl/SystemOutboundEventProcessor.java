@@ -37,7 +37,7 @@ public class SystemOutboundEventProcessor<T> implements OutboundEventProcessor {
     @Override
     public void sendEvent(EventInstance eventInstance, Collection<ChannelModel> channelModels) {
         T rawEvent = outboundEventProcessingPipeline.run(eventInstance);
-        outboundEventChannelAdapter.sendEvent(rawEvent);
+        outboundEventChannelAdapter.sendEvent(rawEvent, null);
     }
 
     public OutboundEventChannelAdapter<T> getOutboundEventChannelAdapter() {

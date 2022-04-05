@@ -23,6 +23,6 @@ import org.flowable.eventregistry.model.EventModel;
  */
 public interface InboundEventPayloadExtractor<T> {
 
-    Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event);
+    Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<T> event);
 
 }

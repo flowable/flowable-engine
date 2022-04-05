@@ -27,6 +27,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
@@ -462,7 +463,22 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
-                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                if (this.getProcessInstanceId() != null && this.getProcessInstanceId()
+                        .equals(variableInstance.getProcessInstanceId()) && variableInstance.getTaskId() == null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
+                if (TaskVariableUtils.isCaseRelated(variableInstance) && variableInstance.getScopeId().equals(this.getScopeId())
+                        && variableInstance.getTaskId() == null){
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }

@@ -11,12 +11,12 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.7.2-SNAPSHOT</version>
+        <version>6.7.3-SNAPSHOT</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.43.v20210629</jetty.version>
+        <jetty.version>9.4.45.v20220203</jetty.version>
         <flowable.artifact>
             org.flowable.eventregistry.rest
         </flowable.artifact>

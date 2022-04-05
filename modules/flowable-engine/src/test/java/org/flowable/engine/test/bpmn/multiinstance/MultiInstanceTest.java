@@ -15,6 +15,8 @@ package org.flowable.engine.test.bpmn.multiinstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1621,68 +1623,129 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialSubprocessEmptyCollection.bpmn20.xml" })
     public void testSequentialSubprocessEmptyCollection() {
-        Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialSubProcessEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialSubProcessEmptyCollection")
+                .transientVariable("collection", Collections.emptyList())
+                .start();
         assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
+        assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                .isEmpty();
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialEmptyCollection.bpmn20.xml" })
     public void testSequentialEmptyCollection() {
-        Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialEmptyCollection")
+                .transientVariable("collection", Collections.emptyList())
+                .start();
         assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .isEmpty();
+        }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialEmptyCollection.bpmn20.xml" })
     public void testSequentialEmptyCollectionWithNonEmptyCollection() {
-        Collection<String> collection = Collections.singleton("Test");
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialEmptyCollection")
+                .transientVariable("collection", Collections.singleton("Test"))
+                .start();
         assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
+        assertThat(runtimeService.getVariables(processInstance.getId())).isEmpty();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", 0), // On the child execution
+                            tuple("nrOfInstances", 1), // On the MI Root Execution
+                            tuple("nrOfActiveInstances", 1), // On the MI Root Execution
+                            tuple("nrOfCompletedInstances", 0) // On the MI Root Execution
+                    );
+        }
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", 0), // On the child execution
+                            tuple("nrOfInstances", 1), // On the MI Root Execution
+                            tuple("nrOfActiveInstances", 1), // On the MI Root Execution
+                            tuple("nrOfCompletedInstances", 1) // On the MI Root Execution
+                    );
+        }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelEmptyCollection.bpmn20.xml" })
     public void testParalellEmptyCollection() throws Exception {
-        Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testParalellEmptyCollection")
+                .transientVariable("collection", Collections.emptyList())
+                .start();
         assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .isEmpty();
+        }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelEmptyCollection.bpmn20.xml" })
     public void testParalellEmptyCollectionWithNonEmptyCollection() {
-        Collection<String> collection = Collections.singleton("Test");
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testParalellEmptyCollection")
+                .variable("collection", Collections.singleton("Test"))
+                .start();
         assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("collection", Collections.singleton("Test"))
+                );
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("collection", Collections.singleton("Test")),
+                            tuple("loopCounter", 0), // On the child execution
+                            tuple("nrOfInstances", 1), // On the MI Root Execution
+                            tuple("nrOfActiveInstances", 1), // On the MI Root Execution
+                            tuple("nrOfCompletedInstances", 0) // On the MI Root Execution
+                    );
+        }
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("collection", Collections.singleton("Test")), // Process Instance
+                            tuple("loopCounter", 0), // On the child execution
+                            tuple("nrOfInstances", 1), // On the MI Root Execution
+                            tuple("nrOfActiveInstances", 0), // On the MI Root Execution
+                            tuple("nrOfCompletedInstances", 1) // On the MI Root Execution
+                    );
+        }
     }
 
     @Test
@@ -1716,12 +1779,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnParallelUserTask() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            Map<String, Object> vars = new HashMap<>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi", vars);
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("parallelUserTaskMi")
+                    .transientVariable("messages", Collections.emptyList())
+                    .start();
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count()).isEqualTo(1L);
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .isEmpty();
         }
     }
 
@@ -1740,12 +1807,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnSequentialEmbeddedSubprocess() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            Map<String, Object> vars = new HashMap<>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            runtimeService.startProcessInstanceByKey("sequentialMiSubprocess", vars);
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("sequentialMiSubprocess")
+                    .transientVariable("messages", Collections.emptyList())
+                    .start();
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1L);
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .isEmpty();
         }
     }
 
@@ -1753,13 +1824,17 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnParallelEmbeddedSubprocess() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            Map<String, Object> vars = new HashMap<>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            runtimeService.startProcessInstanceByKey("parallelMiSubprocess", vars);
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("parallelMiSubprocess")
+                    .transientVariable("messages", Collections.emptyList())
+                    .start();
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1L);
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .isEmpty();
         }
     }
 

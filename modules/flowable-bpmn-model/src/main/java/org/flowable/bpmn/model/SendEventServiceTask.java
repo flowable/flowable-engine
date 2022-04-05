@@ -57,7 +57,7 @@ public class SendEventServiceTask extends ServiceTask {
     public void setEventInParameters(List<IOParameter> eventInParameters) {
         this.eventInParameters = eventInParameters;
     }
-
+    
     public List<IOParameter> getEventOutParameters() {
         return eventOutParameters;
     }
@@ -85,7 +85,7 @@ public class SendEventServiceTask extends ServiceTask {
                 eventInParameters.add(parameter.clone());
             }
         }
-
+        
         eventOutParameters = new ArrayList<>();
         if (otherElement.getEventOutParameters() != null && !otherElement.getEventOutParameters().isEmpty()) {
             for (IOParameter parameter : otherElement.getEventOutParameters()) {

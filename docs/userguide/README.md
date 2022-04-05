@@ -34,17 +34,17 @@ All generated files will be available in the root project **target** folder.
 **From scripts folder**
 
 Go to the [scripts Folder](/scripts)
-* Call the generate-all.sh [bpmn|cmmn|dmn|form|single] to generate for a single project both html & pdf version
+* Call the generate-all.sh [bpmn|cmmn|dmn|form|single] to generate for a single project both html & pdf version.
 ```bash 
 # Genate BPMN documentation in html & pdf format
 > ./generate-all.sh bpmn
 ```
-* Call the generate-html.sh [bpmn|cmmn|dmn|form|single] to generate html
+* Call the generate-html.sh [bpmn|cmmn|dmn|form|single] to generate html.
 ```bash 
 # Genate Form documentation in html format
 > ./generate-html.sh form
 ```
-* Call the generate-pdf.sh [bpmn|cmmn|dmn|form|single] to generate pdf
+* Call the generate-pdf.sh [bpmn|cmmn|dmn|form|single] to generate pdf.
 ```bash 
 # Genate DMN documentation in pdf format
 > ./generate-pdf.sh dmn

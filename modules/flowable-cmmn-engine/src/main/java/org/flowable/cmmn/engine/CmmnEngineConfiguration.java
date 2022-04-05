@@ -85,9 +85,11 @@ import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
+import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.AsyncCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
@@ -117,6 +119,7 @@ import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInst
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceTerminatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskDeletedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
@@ -402,6 +405,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
+    protected CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings;
     protected ProcessInstanceService processInstanceService;
     protected CmmnDynamicStateManager dynamicStateManager;
     protected CaseInstanceMigrationManager caseInstanceMigrationManager;
@@ -440,6 +444,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnListenerNotificationHelper listenerNotificationHelper;
 
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
+    protected boolean enableCaseDefinitionHistoryLevel;
 
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
@@ -832,6 +837,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceHelper();
         initCandidateManager();
         initVariableAggregator();
+        initHistoryConfigurationSettings();
         initHistoryManager();
         initChangeTenantIdManager();
         initDynamicStateManager();
@@ -1336,6 +1342,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    public void initHistoryConfigurationSettings() {
+        if (cmmnHistoryConfigurationSettings == null) {
+            cmmnHistoryConfigurationSettings = new DefaultCmmnHistoryConfigurationSettings(this);
+        }
+    }
+
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             if (isAsyncHistoryEnabled) {
@@ -1741,6 +1753,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
         historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new TaskDeletedHistoryJsonTransformer(this));
         
         historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
         historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
@@ -2393,6 +2406,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CmmnHistoryConfigurationSettings getCmmnHistoryConfigurationSettings() {
+        return cmmnHistoryConfigurationSettings;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryConfigurationSettings(CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+        this.cmmnHistoryConfigurationSettings = cmmnHistoryConfigurationSettings;
+        return this;
+    }
+
     public CmmnDynamicStateManager getDynamicStateManager() {
         return dynamicStateManager;
     }
@@ -2698,6 +2720,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
+        return this;
+    }
+
+    public boolean isEnableCaseDefinitionHistoryLevel() {
+        return enableCaseDefinitionHistoryLevel;
+    }
+
+    public CmmnEngineConfiguration setEnableCaseDefinitionHistoryLevel(boolean enableCaseDefinitionHistoryLevel) {
+        this.enableCaseDefinitionHistoryLevel = enableCaseDefinitionHistoryLevel;
         return this;
     }
 

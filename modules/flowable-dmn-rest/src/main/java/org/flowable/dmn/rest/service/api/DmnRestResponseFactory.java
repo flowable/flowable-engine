@@ -29,6 +29,8 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
@@ -149,6 +151,54 @@ public class DmnRestResponseFactory {
 
         response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
 
+        return response;
+    }
+
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(DecisionExecutionAuditContainer decisionExecutionAuditContainer) {
+        return createDmnRuleServiceResponse(decisionExecutionAuditContainer, createUrlBuilder());
+    }
+
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer){
+        return createDmnRuleServiceResponse(decisionServiceExecutionAuditContainer, createUrlBuilder());
+    }
+
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer, DmnRestUrlBuilder urlBuilder){
+        DmnRuleServiceResponse response = new DmnRuleServiceResponse();
+
+        Map<String, List<Map<String, Object>>> executionResults = decisionServiceExecutionAuditContainer.getDecisionServiceResult();
+
+        if (executionResults != null && !executionResults.isEmpty()) {
+            for (String decisionName : executionResults.keySet()) {
+                for (Map<String, Object> executionResult : executionResults.get(decisionName)) {
+                    List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                    for (String variableName : executionResult.keySet()) {
+                        ruleResults.add(createRestVariable(variableName, executionResult.get(variableName), false));
+                    }
+                    response.addResultVariables(ruleResults);
+                }
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+
+        return response;
+    }
+
+    public DmnRuleServiceResponse createDmnRuleServiceResponse(DecisionExecutionAuditContainer decisionExecutionAuditContainer, DmnRestUrlBuilder urlBuilder){
+        DmnRuleServiceResponse response = new DmnRuleServiceResponse();
+
+        List<Map<String, Object>> executionResults = decisionExecutionAuditContainer.getDecisionResult();
+        if (executionResults != null && !executionResults.isEmpty()) {
+            for (Map<String, Object> executionResult : executionResults) {
+                List<EngineRestVariable> ruleResults = new ArrayList<>(executionResult.size());
+                for (String name : executionResult.keySet()) {
+                    ruleResults.add(createRestVariable(name, executionResult.get(name), false));
+                }
+                response.addResultVariables(ruleResults);
+            }
+        }
+
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
         return response;
     }
     

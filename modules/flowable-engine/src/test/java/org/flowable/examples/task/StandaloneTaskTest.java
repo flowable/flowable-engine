@@ -26,6 +26,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -170,12 +171,19 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("finishedAmount", 0);
             taskService.setVariables(task.getId(), taskVariables);
+            
+            List<VariableInstance> varList = runtimeService.createVariableInstanceQuery().taskId(task.getId()).list();
+            assertThat(varList)
+                .extracting(VariableInstance::getValue)
+                .containsExactly(0);
+            
+            assertThat(runtimeService.createVariableInstanceQuery().taskId(task.getId()).variableName("finishedAmount").singleResult().getValue()).isEqualTo(0);
 
             // 3. complete this task with a new variable
             Map<String, Object> finishVariables = new HashMap<>();
             finishVariables.put("finishedAmount", 40);
             taskService.complete(task.getId(), finishVariables);
-
+            
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             // 4. get completed variable
@@ -185,7 +193,7 @@ public class StandaloneTaskTest extends PluggableFlowableTestCase {
                     .containsExactly(40);
 
             // Cleanup
-            historyService.deleteHistoricTaskInstance(task.getId());
+            taskService.deleteTask(task.getId(),true);
             managementService.executeCommand(commandContext -> {
                 processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(task.getId());
                 return null;

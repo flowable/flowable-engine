@@ -18,15 +18,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -127,10 +128,25 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testDeleteHistoricTaskInstance() throws Exception {
-        // deleting unexisting historic task instance should be silently ignored
-        historyService.deleteHistoricTaskInstance("unexistingId");
-        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+    public void testDeleteUnexistingHistoricTaskInstance() throws Exception {
+        assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("unexistingId"))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class);
+    }
+
+    @Test
+    public void testDeleteNonCompletedHistoricTaskInstance() throws Exception {
+        Task task = taskService.createTaskBuilder().id("task1").create();
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        assertThatThrownBy(() -> historyService.deleteHistoricTaskInstance("task1"))
+                .isExactlyInstanceOf(FlowableException.class);
+
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        taskService.deleteTask(task.getId(), true);
     }
 
     @Test
@@ -205,11 +221,11 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().processDefinitionKey("unexistingdefinitionkey").count()).isZero();
 
         // Process definition key in
-        List<String> includeIds = new ArrayList<>();
+        List<String> includeIds = Collections.emptyList();
         assertThat(historyService.createHistoricTaskInstanceQuery().processDefinitionKeyIn(includeIds).count()).isEqualTo(1);
-        includeIds.add("unexistingProcessDefinition");
+        includeIds = Collections.singletonList("unexistingProcessDefinition");
         assertThat(historyService.createHistoricTaskInstanceQuery().processDefinitionKeyIn(includeIds).count()).isZero();
-        includeIds.add("HistoricTaskQueryTest");
+        includeIds = Arrays.asList("unexistingProcessDefinition", "HistoricTaskQueryTest");
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(includeIds).count()).isEqualTo(1);
 
         // Form key
@@ -554,24 +570,18 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskName("unexistingname").endOr().count()).isZero();
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameLike("Clean u%").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameLike("%unexistingname%").endOr().count()).isZero();
-        final List<String> taskNameList = new ArrayList<>(1);
-        taskNameList.add("Clean up");
+        List<String> taskNameList = Collections.singletonList("Clean up");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameIn(taskNameList).endOr().count()).isEqualTo(1);
-        taskNameList.clear();
-        taskNameList.add("unexistingname");
+        taskNameList = Collections.singletonList("unexistingname");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameIn(taskNameList).endOr().count()).isZero();
-        taskNameList.clear();
-        taskNameList.add("clean up");
+        taskNameList = Collections.singletonList("clean up");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameInIgnoreCase(taskNameList).endOr().count()).isEqualTo(1);
-        taskNameList.clear();
-        taskNameList.add("unexistingname");
+        taskNameList = Collections.singletonList("unexistingname");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameInIgnoreCase(taskNameList).endOr().count()).isZero();
 
-        taskNameList.clear();
-        taskNameList.add("clean up");
+        taskNameList = Collections.singletonList("clean up");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskName("Clean up").endOr().or().taskNameInIgnoreCase(taskNameList).endOr().count()).isEqualTo(1);
-        taskNameList.clear();
-        taskNameList.add("unexistingname");
+        taskNameList = Collections.singletonList("unexistingname");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskName("Clean up").endOr().or().taskNameInIgnoreCase(taskNameList).endOr().count()).isZero();
 
         // Description
@@ -621,13 +631,12 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         // Process definition key in
-        List<String> includeIds = new ArrayList<>();
+        List<String> includeIds = Collections.emptyList();
         assertThat(historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").processDefinitionKeyIn(includeIds).endOr().count()).isZero();
-        includeIds.add("unexistingProcessDefinition");
+        includeIds = Collections.singletonList("unexistingProcessDefinition");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").processDefinitionKeyIn(includeIds).endOr().count()).isZero();
-        includeIds.add("unexistingProcessDefinition");
         assertThat(historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("HistoricTaskQueryTest").processDefinitionKeyIn(includeIds).endOr().count()).isEqualTo(1);
-        includeIds.add("HistoricTaskQueryTest");
+        includeIds = Arrays.asList("unexistingProcessDefinition", "HistoricTaskQueryTest");
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").processDefinitionKeyIn(includeIds).endOr().count()).isEqualTo(1);
 
         // Assignee

@@ -37,13 +37,19 @@ public class EventJsonConverter {
 
             eventModel.setKey(modelNode.path("key").asText(null));
             eventModel.setName(modelNode.path("name").asText(null));
-
+            
             JsonNode payloadNode = modelNode.path("payload");
 
             if (payloadNode.isArray()) {
                 for (JsonNode node : payloadNode) {
                     String name = node.path("name").asText(null);
                     String type = node.path("type").asText(null);
+                    
+                    boolean header = node.path("header").asBoolean(false);
+                    if (header) {
+                        eventModel.addHeader(name, type);
+                    }
+                    
                     boolean correlationParameter = node.path("correlationParameter").asBoolean(false);
                     if (correlationParameter) {
                         eventModel.addCorrelation(name, type);
@@ -78,7 +84,7 @@ public class EventJsonConverter {
         if (definition.getName() != null) {
             modelNode.put("name", definition.getName());
         }
-
+        
         Collection<EventPayload> payload = definition.getPayload();
         if (!payload.isEmpty()) {
             ArrayNode payloadNode = modelNode.putArray("payload");
@@ -90,6 +96,10 @@ public class EventJsonConverter {
 
                 if (eventPayload.getType() != null) {
                     eventPayloadNode.put("type", eventPayload.getType());
+                }
+                
+                if (eventPayload.isHeader()) {
+                    eventPayloadNode.put("header", true);
                 }
 
                 if (eventPayload.isCorrelationParameter()) {

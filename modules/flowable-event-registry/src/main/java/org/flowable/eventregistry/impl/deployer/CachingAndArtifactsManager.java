@@ -89,6 +89,14 @@ public class CachingAndArtifactsManager {
                 inboundEventChannelAdapter.setEventRegistry(eventRegistryEngineConfiguration.getEventRegistry());
                 inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
             }
+            
+            if (eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().isChannelModelAlreadyRegistered(inboundChannelModel, channelDefinition)) {
+                // inbound channel model is already registered, returning to prevent the same listener from getting registered again
+                return;
+                
+            } else {
+                eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().registerChannelModel(inboundChannelModel, channelDefinition);
+            }
 
         } else if (!(channelModel instanceof OutboundChannelModel)) {
             throw new FlowableIllegalArgumentException("Unrecognized ChannelModel class : " + channelModel.getClass());
@@ -98,7 +106,8 @@ public class CachingAndArtifactsManager {
             if (channelDefinitionProcessor.canProcess(channelModel)) {
                 channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRepositoryService());
                 channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRegistry(),
-                                eventRegistryEngineConfiguration.getEventRepositoryService(), eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+                        eventRegistryEngineConfiguration.getEventRepositoryService(), eventRegistryEngineConfiguration.getEventSerializerManager(),
+                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
             }
         }
     }

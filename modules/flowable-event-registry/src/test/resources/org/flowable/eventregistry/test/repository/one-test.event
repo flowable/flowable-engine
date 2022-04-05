@@ -1,0 +1,20 @@
+{
+    "key": "one-test",
+    "name": "My first Test Event",
+    "correlationParameters": [
+        {
+            "name": "customerId",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "payload1",
+            "type": "string"
+        },
+        {
+            "name": "payload2",
+            "type": "integer"
+        }
+    ]
+}

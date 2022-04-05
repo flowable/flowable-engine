@@ -212,8 +212,8 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
     @Test
     @Deployment
     public void testSimpleStraightThroughProcess() {
-        String processInstanceId = runtimeService
-                .startProcessInstanceByKey("testSimpleStraightThroughProcess", CollectionUtil.singletonMap("counter", 0)).getId();
+        String processInstanceId = runtimeService.startProcessInstanceByKey("testSimpleStraightThroughProcess", 
+                CollectionUtil.singletonMap("counter", 0)).getId();
 
         final List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
         assertThat(jobs.size()).isPositive();
@@ -223,6 +223,69 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         // 203 -> (start, 1) + -->(1) + (service task, 50) + -->(50) + (gateway, 50), + <--(49) + -->(1) + (end, 1)
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count()).isEqualTo(203);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/standalone/history/async/testSTPWithInstanceLevel.bpmn" })
+    public void testSTPWithInstanceLevel() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("test", CollectionUtil.singletonMap("counter", 0)).getId();
+
+        final List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
+        assertThat(jobs.size()).isPositive();
+
+        waitForHistoryJobExecutorToProcessAllJobs(10000L, 200L);
+        assertThat(managementService.createHistoryJobQuery().singleResult()).isNull();
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult()).isNotNull();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/standalone/history/async/testProcessWithTaskLevel.bpmn" })
+    public void testProcessWithTaskLevel() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("test", CollectionUtil.singletonMap("counter", 0)).getId();
+
+        List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
+        assertThat(jobs.size()).isPositive();
+
+        waitForHistoryJobExecutorToProcessAllJobs(10000L, 200L);
+        assertThat(managementService.createHistoryJobQuery().singleResult()).isNull();
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult()).isNotNull();
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        taskService.complete(task.getId());
+        
+        jobs = managementService.createHistoryJobQuery().list();
+        assertThat(jobs.size()).isPositive();
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000L, 200L);
+        assertThat(managementService.createHistoryJobQuery().singleResult()).isNull();
+        
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult()).isNotNull();
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/standalone/history/async/testSTPWithCustomHistoryLevel.bpmn" })
+    public void testSTPWithCustomHistoryLevel() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey("test", CollectionUtil.singletonMap("counter", 0)).getId();
+
+        final List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
+        assertThat(jobs.size()).isPositive();
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+        assertThat(managementService.createHistoryJobQuery().singleResult()).isNull();
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult()).isNotNull();
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).count()).isEqualTo(10);
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
     }
 
     @Test
@@ -236,6 +299,21 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertThat(task.getId()).isEqualTo("task1");
 
         taskService.deleteTask(task.getId(), true);
+    }
+
+    @Test
+    public void testDeleteHistoricTask() {
+        Task task = taskService.createTaskBuilder().id("task1").create();
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNotNull();
+        historyService.deleteHistoricTaskInstance("task1");
+
+        waitForHistoryJobExecutorToProcessAllJobs(70000L, 200L);
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskId("task1").singleResult()).isNull();
     }
 
     @Test

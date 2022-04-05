@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.impl.pipeline;
 
+import java.util.Map;
+
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -29,7 +31,7 @@ public class InMemoryOutboundEventChannelAdapter implements OutboundEventChannel
     }
 
     @Override
-    public void sendEvent(EventInstance rawEvent) {
+    public void sendEvent(EventInstance rawEvent, Map<String, Object> headerMap) {
         eventRegistry.sendEventToConsumers(new FlowableEventRegistryEvent(rawEvent));
     }
 }

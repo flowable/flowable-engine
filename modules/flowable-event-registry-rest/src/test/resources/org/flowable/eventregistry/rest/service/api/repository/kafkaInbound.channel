@@ -1,0 +1,12 @@
+{
+    "key": "kafkaInbound",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "order"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "type"
+    }
+}

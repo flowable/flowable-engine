@@ -17,7 +17,7 @@ package org.flowable.eventregistry.api;
  */
 public interface EventRegistryEventConsumer {
 
-    void eventReceived(EventRegistryEvent event);
+    EventRegistryProcessingInfo eventReceived(EventRegistryEvent event);
     
     String getConsumerKey();
 }

@@ -213,7 +213,7 @@
             <if test="parameter.scopeId != null">
                 AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.scopeIds != null and !parameter.scopeIds.isEmpty()">
+            <if test="parameter.scopeIds != null and !parameter.scopeIds.empty">
                 AND SCOPE_ID_ in
                 <foreach collection="parameter.scopeIds" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -222,7 +222,7 @@
             <if test="parameter.subScopeId != null">
                 AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.subScopeIds != null and !parameter.subScopeIds.isEmpty()">
+            <if test="parameter.subScopeIds != null and !parameter.subScopeIds.empty">
                 AND SUB_SCOPE_ID_ in
                 <foreach collection="parameter.subScopeIds" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -234,7 +234,7 @@
             <if test="parameter.scopeType != null">
                 AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.isEmpty()">
+            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.empty">
                 AND SCOPE_TYPE_ in
                 <foreach collection="parameter.scopeTypes" item="item" open="(" separator="," close=")">
                     #{item, jdbcType=VARCHAR}
@@ -243,7 +243,7 @@
             <if test="parameter.name != null">
                 AND NAME_ = #{parameter.name, jdbcType=VARCHAR}
             </if>
-            <if test="parameter.names != null and !parameter.names.isEmpty()">
+            <if test="parameter.names != null and !parameter.names.empty">
                 AND (
                 <foreach collection="parameter.names" item="item" separator=" or ">
                     NAME_= #{item, jdbcType=VARCHAR}
@@ -251,6 +251,154 @@
                 )
             </if>
         </where>
+    </select>
+    
+    <select id="selectVariableInstanceByQueryCriteria" parameterType="org.flowable.variable.service.impl.VariableInstanceQueryImpl"
+        resultMap="variableInstanceResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectVariableInstanceByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <select id="selectVariableInstanceCountByQueryCriteria" parameterType="org.flowable.variable.service.impl.VariableInstanceQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectVariableInstanceByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectVariableInstanceByQueryCriteriaSql">
+        from ${prefix}ACT_RU_VARIABLE RES
+        <where>
+            <if test="id != null">
+                RES.ID_ = #{id}
+            </if>
+            <if test="processInstanceId != null">
+                and RES.PROC_INST_ID_ = #{processInstanceId}
+            </if>
+            <if test="executionId != null">
+                and RES.EXECUTION_ID_ = #{executionId}
+            </if>
+            <if test="executionIds != null and !executionIds.empty">
+                and RES.EXECUTION_ID_ in
+                <foreach item="item" index="index" collection="executionIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="taskId != null">
+                and RES.TASK_ID_ = #{taskId}
+            </if>
+            <if test="taskIds != null and !taskIds.empty">
+                and RES.TASK_ID_ in
+                <foreach item="item" index="index" collection="taskIds" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="excludeTaskRelated">
+                and RES.TASK_ID_ is NULL
+            </if>
+            <if test="scopeId != null">
+                and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="subScopeId != null">
+                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
+            </if>
+            <if test="variableName != null">
+                and RES.NAME_ = #{variableName}
+            </if>
+            <if test="variableNameLike != null">
+                and RES.NAME_ like #{variableNameLike}${wildcardEscapeClause}
+            </if>
+
+            <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
+            <if test="queryVariableValue != null">
+                <if test="queryVariableValue.needsTypeCheck()">
+                    and RES.TYPE_ = #{queryVariableValue.type}
+                </if>
+                <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                    and (RES.TEXT_
+                    <choose>
+                        <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                        <otherwise>
+                            <include refid="executionVariableOperator" />
+                        </otherwise>
+                    </choose>
+                    #{queryVariableValue.textValue}
+                    <choose>
+                        <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                    </choose>
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.TEXT_ is null
+                    </if>
+                    )
+                </if>
+                <if test="queryVariableValue.textValue2 != null">
+                    and RES.TEXT2_
+                    <choose>
+                        <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                        <otherwise>
+                            <include refid="executionVariableOperator" />
+                        </otherwise>
+                    </choose>
+                    #{queryVariableValue.textValue2}
+                    <choose>
+                        <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                    </choose>
+                </if>
+                <if test="queryVariableValue.longValue != null">
+                    and (RES.LONG_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.longValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.LONG_ is null
+                    </if>
+                    )
+                </if>
+                <if test="queryVariableValue.doubleValue != null">
+                    and (RES.DOUBLE_
+                    <include refid="executionVariableOperator" />
+                    #{queryVariableValue.doubleValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.DOUBLE_ is null
+                    </if>
+                    )
+                </if>
+                <!-- Null variable type -->
+                <if
+                    test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                    <choose>
+                        <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                            and (RES.TEXT_ is not null or RES.TEXT2_ is not null or RES.LONG_ is not null or RES.DOUBLE_ is not null or RES.BYTEARRAY_ID_ is not null)
+                        </when>
+                        <otherwise>
+                            and RES.TEXT_ is null and RES.TEXT2_ is null and RES.LONG_ is null and RES.DOUBLE_ is null and RES.BYTEARRAY_ID_ is null
+                        </otherwise>
+                    </choose>
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <sql id="executionVariableOperator">
+        <choose>
+            <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+            <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+            <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+            <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+            <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+        </choose>
+    </sql>
+    
+    <select id="selectVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
+        <include refid="org.flowable.common.engine.db.selectByNativeQuery" />
+    </select>
+
+    <select id="selectVariableInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+        ${sql}
     </select>
     
 </mapper>

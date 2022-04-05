@@ -144,6 +144,11 @@ public interface TaskInfo {
     Map<String, Object> getProcessVariables();
 
     /**
+     * Returns the case variables if requested in the task query
+     */
+    Map<String, Object> getCaseVariables();
+
+    /**
      * Returns the identity links.
      */
     List<? extends IdentityLinkInfo> getIdentityLinks();

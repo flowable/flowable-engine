@@ -2459,14 +2459,14 @@ image::images/bpmn.scripttask.png[align="center"]
 
 **scriptFormat**属性的值，必须是兼容link:$$http://jcp.org/en/jsr/detail?id=223$$[JSR-223]（Java平台脚本）的名字。默认情况下，JavaScript包含在每一个JDK中，因此不需要添加任何JAR文件。如果想使用其它（兼容JSR-223的）脚本引擎，则需要在classpath中添加相应的jar，并使用适当的名字。例如，Flowable单元测试经常使用Groovy，因为其语法与Java十分相似。
 
-请注意Groovy脚本引擎与groovy-jsr223 JAR捆绑在一起。在Groovy 3.0版本以前，脚本引擎是Groovy JAR的一部分。因此，必须添加如下依赖：
+请注意Groovy脚本引擎与groovy-jsr223 JAR捆绑在一起。在Groovy 4.0版本以前，脚本引擎是Groovy JAR的一部分。因此，必须添加如下依赖：
 
 [source,xml,linenums]
 ----
 <dependency>
-    <groupId>org.codehaus.groovy</groupId>
+    <groupId>org.apache.groovy</groupId>
     <artifactId>groovy-jsr223</artifactId>
-    <version>3.x.x<version>
+    <version>4.x.x<version>
 </dependency>
 ----
 

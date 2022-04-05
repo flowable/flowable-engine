@@ -11,7 +11,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.7.2-SNAPSHOT</version>
+		<version>6.7.3-SNAPSHOT</version>
 	</parent>
 
 
@@ -60,16 +60,19 @@
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
 					<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+					<version>1.0.0.Final</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
 					<groupId>org.jboss.weld</groupId>
-					<artifactId>weld-core</artifactId>
+					<artifactId>weld-core-impl</artifactId>
+					<version>3.1.8.Final</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
-					<groupId>org.jboss.weld</groupId>
-					<artifactId>weld-api</artifactId>
+					<groupId>org.jboss.weld.module</groupId>
+					<artifactId>weld-web</artifactId>
+					<version>3.1.8.Final</version>
 					<scope>test</scope>
 				</dependency>
 				<dependency>
@@ -80,19 +83,20 @@
 				</dependency>
 			</dependencies>
 
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>org.jboss.weld</groupId>
-						<artifactId>weld-core-bom</artifactId>
-						<version>1.1.33.Final</version>
-						<type>pom</type>
-						<scope>import</scope>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
 	</profiles>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<version>1.6.0.Final</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -120,17 +124,22 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-6.0</artifactId>
-			<version>2.0.0.Final</version>
-			<type>pom</type>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>xalan</artifactId>
-					<groupId>org.apache.xalan</groupId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.enterprise</groupId>
+			<artifactId>jakarta.enterprise.cdi-api</artifactId>
+			<version>2.0.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+			<version>1.3.3</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

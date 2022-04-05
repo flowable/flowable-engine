@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
@@ -34,6 +35,7 @@ import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Gateway;
@@ -357,7 +359,16 @@ public abstract class AbstractDynamicStateManager {
             for (ExecutionEntity execution : executionsToMove) {
                 executionIdsNotToDelete.add(execution.getId());
 
-                executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
+                // Don't delete called process when directly migration CallActivity
+                List<String> childExecutionsToKeep = new ArrayList<>();
+                if (execution.getCurrentFlowElement() instanceof CallActivity && moveExecutionContainer.isDirectExecutionMigration()) {
+                    executionEntityManager.collectChildren(execution).stream()
+                            .filter(executionEntity -> !Objects.equals(executionEntity.getProcessDefinitionId(), execution.getProcessDefinitionId()))
+                            .map(ExecutionEntity::getId)
+                            .forEach(childExecutionsToKeep::add);
+                }
+
+                executionEntityManager.deleteChildExecutions(execution, childExecutionsToKeep, null, "Change parent activity to " + flowElementIdsLine, true, null);
                 if (!moveExecutionContainer.isDirectExecutionMigration()) {
                     executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, false, false, true, execution.getCurrentFlowElement());
                 }
@@ -618,7 +629,7 @@ public abstract class AbstractDynamicStateManager {
                         handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId(), commandContext);
                     }
 
-                    if (newFlowElement instanceof CallActivity) {
+                    if (newFlowElement instanceof CallActivity && !moveExecutionEntityContainer.isDirectExecutionMigration()) {
                         processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
 
                         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
@@ -627,6 +638,13 @@ public abstract class AbstractDynamicStateManager {
                                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
                                     newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement),
                                 processEngineConfiguration.getEngineCfgKey());
+                        }
+
+                        //start boundary events of new call activity
+                        CallActivity callActivity = (CallActivity) newFlowElement;
+                        List<BoundaryEvent> boundaryEvents = callActivity.getBoundaryEvents();
+                        if (CollectionUtil.isNotEmpty(boundaryEvents)) {
+                            executeBoundaryEvents(boundaryEvents, newChildExecution);
                         }
                     }
 
@@ -916,8 +934,24 @@ public abstract class AbstractDynamicStateManager {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())) {
+                
+                boolean hasEventRegistryBoundaryEvent = false;
+                if (!boundaryEvent.getExtensionElements().isEmpty()) {
+                    List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+                    if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                        String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                        if (StringUtils.isNotEmpty(eventTypeValue)) {
+                            hasEventRegistryBoundaryEvent = true;
+                        }
+                    }
+                }
+                
+                if (!hasEventRegistryBoundaryEvent) {
+                    continue;
+                }
+                
+            } else if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
                 continue;
             }
 

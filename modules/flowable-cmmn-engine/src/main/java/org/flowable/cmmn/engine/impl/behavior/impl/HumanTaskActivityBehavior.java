@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
@@ -52,8 +52,6 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -321,7 +319,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             for (String candidateUser : candidateUsers) {
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(planItemInstanceEntity);
-                Collection<String> candidates = extractCandidates(value);
+                Collection<String> candidates = CandidateUtil.extractCandidates(value);
                 List<IdentityLinkEntity> identityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
                         .getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates);
 
@@ -352,7 +350,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             for (String candidateGroup : candidateGroups) {
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(planItemInstanceEntity);
-                Collection<String> candidates = extractCandidates(value);
+                Collection<String> candidates = CandidateUtil.extractCandidates(value);
                 List<IdentityLinkEntity> identityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
                         .getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates);
 
@@ -369,26 +367,6 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                             allIdentityLinkEntities, taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
                 }
             }
-        }
-    }
-
-    protected Collection<String> extractCandidates(Object value) {
-        if (value instanceof String) {
-            return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
-
-        } else if (value instanceof Collection) {
-            return (Collection<String>) value;
-
-        } else if (value instanceof ArrayNode) {
-            ArrayNode valueArrayNode = (ArrayNode) value;
-            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
-            for (JsonNode node : valueArrayNode) {
-                candidates.add(node.asText());
-            }
-
-            return candidates;
-        } else {
-            throw new FlowableException("Expression did not resolve to a string, collection of strings or an array node");
         }
     }
 

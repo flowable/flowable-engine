@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [1.8, 11, 13, 14]
+        java: [1.8, 11, 13, 17]
     steps:
     - uses: actions/checkout@v2-beta
       with:
@@ -32,4 +32,4 @@ jobs:
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
     - name: Test
-      run: ./mvnw verify -Pdistro,ui,errorLogging,includeDockerTests ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+      run: ./mvnw verify -Pdistro,ui,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false

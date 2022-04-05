@@ -41,14 +41,18 @@ class SendEventServiceTaskConverterTest {
                     assertThat(sendEventServiceTask.getEventInParameters())
                             .extracting(IOParameter::getSource, IOParameter::getTarget)
                             .containsExactly(
+                                    tuple("${myHeader}", "headerProp"),
                                     tuple("${myVariable}", "customerId"),
                                     tuple("anotherProperty", "anotherCustomerId")
                             );
-                    assertThat(sendEventServiceTask.getEventInParameters().get(1).getAttributeValue(null, "targetType")).isEqualTo("string");
+                    assertThat(sendEventServiceTask.getEventInParameters().get(2).getAttributeValue(null, "targetType")).isEqualTo("string");
                     assertThat(sendEventServiceTask.getEventOutParameters())
                             .extracting(IOParameter::getSource, IOParameter::getTarget)
-                            .containsExactly(tuple("eventProperty", "newVariable"));
-                    assertThat(sendEventServiceTask.getEventOutParameters().get(0).getAttributeValue(null, "sourceType")).isEqualTo("integer");
+                            .containsExactly(
+                                    tuple("headerProperty", "headerVariable"),
+                                    tuple("eventProperty", "newVariable")
+                            );
+                    assertThat(sendEventServiceTask.getEventOutParameters().get(1).getAttributeValue(null, "sourceType")).isEqualTo("integer");
 
                     List<ExtensionElement> correlationParameters = flowElement.getExtensionElements()
                             .get(ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER);

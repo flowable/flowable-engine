@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.7.2-SNAPSHOT</version>
+		<version>6.7.3-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -46,7 +46,7 @@
       		<scope>provided</scope>
     	</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
+			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-jsr223</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -59,6 +59,11 @@
 			<groupId>org.drools</groupId>
 			<artifactId>drools-compiler</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-mvel</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.persistence</groupId>

@@ -25,6 +25,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -177,6 +178,13 @@ public class CompositeHistoryManager implements HistoryManager {
     public void recordTaskInfoChange(TaskEntity taskEntity, String activityInstanceId, Date changeTime) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.recordTaskInfoChange(taskEntity, activityInstanceId, changeTime);
+        }
+    }
+
+    @Override
+    public void recordHistoricTaskDeleted(HistoricTaskInstance task){
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.recordHistoricTaskDeleted(task);
         }
     }
 

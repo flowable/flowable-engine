@@ -26,19 +26,20 @@ public class EventInstanceImpl implements EventInstance {
 
     protected String eventKey;
     protected Collection<EventPayloadInstance> payloadInstances;
+    protected Collection<EventPayloadInstance> headerInstances;
     protected Collection<EventPayloadInstance> correlationPayloadInstances;
     protected String tenantId;
 
-    public EventInstanceImpl(String eventKey,
-            Collection<EventPayloadInstance> payloadInstances) {
+    public EventInstanceImpl(String eventKey, Collection<EventPayloadInstance> payloadInstances) {
         this(eventKey, payloadInstances, EventRegistryEngineConfiguration.NO_TENANT_ID);
     }
 
-    public EventInstanceImpl(String eventKey,
-            Collection<EventPayloadInstance> payloadInstances,
-            String tenantId) {
+    public EventInstanceImpl(String eventKey, Collection<EventPayloadInstance> payloadInstances, String tenantId) {  
         this.eventKey = eventKey;
         this.payloadInstances = payloadInstances;
+        this.headerInstances = this.payloadInstances.stream()
+                .filter(eventPayloadInstance -> eventPayloadInstance.getEventPayloadDefinition().isHeader())
+                .collect(Collectors.toList());
         this.correlationPayloadInstances = this.payloadInstances.stream()
                 .filter(eventPayloadInstance -> eventPayloadInstance.getEventPayloadDefinition().isCorrelationParameter())
                 .collect(Collectors.toList());
@@ -61,6 +62,15 @@ public class EventInstanceImpl implements EventInstance {
 
     public void setPayloadInstances(Collection<EventPayloadInstance> payloadInstances) {
         this.payloadInstances = payloadInstances;
+    }
+    
+    @Override
+    public Collection<EventPayloadInstance> getHeaderInstances() {
+        return headerInstances;
+    }
+
+    public void setHeaderInstances(Collection<EventPayloadInstance> headerInstances) {
+        this.headerInstances = headerInstances;
     }
 
     @Override

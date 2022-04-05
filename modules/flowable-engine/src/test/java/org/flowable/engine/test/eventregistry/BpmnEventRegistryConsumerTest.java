@@ -64,8 +64,8 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
     
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
+        Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
+        beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("test-channel")
@@ -357,6 +357,62 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
                 entry("customerIdVar", "payloadStartCustomer"),
                 entry("payload1", "Hello World")
             );
+    }
+    
+    @Test
+    @Deployment
+    public void testProcessStartWithEventSubProcess() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+        assertThat(processDefinition).isNotNull();
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+            .processDefinitionId(processDefinition.getId())
+            .scopeType(ScopeTypes.BPMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+        inboundEventChannelAdapter.triggerTestEvent("myVar1");
+        
+        assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(1);
+        String processInstanceId = runtimeService.createProcessInstanceQuery().singleResult().getId();
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isEqualTo(1);
+        
+        List<EventSubscription> eventSubProcessEventSubscriptions = runtimeService.createEventSubscriptionQuery()
+            .processInstanceId(processInstanceId)
+            .scopeType(ScopeTypes.BPMN)
+            .list();
+        
+        assertThat(eventSubProcessEventSubscriptions.size()).isEqualTo(2);
+        
+        for (EventSubscription subProcessEventSubscription : eventSubProcessEventSubscriptions) {
+            assertThat(subProcessEventSubscription.getEventType()).isEqualTo("myEvent");
+        }
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar2");
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").count()).isZero();
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar1");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").singleResult();
+        assertThat(task).isNotNull();
+        
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isEqualTo(1);
+        
+        inboundEventChannelAdapter.triggerTestEvent("myVar1Interrupting");
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("task").count()).isZero();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1").count()).isZero();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey("subProcessTask1Interrupting").singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count()).isZero();
     }
 
     @Test
@@ -688,6 +744,7 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected ObjectMapper objectMapper = new ObjectMapper();
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -706,14 +763,21 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         public void triggerTestEvent(String customerId) {
             triggerTestEvent(customerId, null);
         }
-
+        
         public void triggerOrderTestEvent(String orderId) {
             triggerTestEvent(null, orderId);
         }
 
         public void triggerTestEvent(String customerId, String orderId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
+            ObjectNode eventNode = createTestEventNode(customerId, orderId);
+            try {
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        protected ObjectNode createTestEventNode(String customerId, String orderId) {
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "myEvent");
             if (customerId != null) {
@@ -725,15 +789,9 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             }
             json.put("payload1", "Hello World");
             json.put("payload2", new Random().nextInt());
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            
+            return json;
         }
 
     }
-
-
-
 }

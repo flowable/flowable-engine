@@ -1,4 +1,4 @@
-== Concepts
+== 概念
 
 include::../bpmn/ch07a-BPMN-Introduction.adoc[leveloffset=+1,tags=bpmn20.introduction]
 

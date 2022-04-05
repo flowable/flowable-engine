@@ -127,8 +127,8 @@ public class AppDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryByInvalidDeploymentIds() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
-        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isZero();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(Collections.singleton("invalid")).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(Collections.singleton("invalid")).count()).isZero();
     }
 
     @Test

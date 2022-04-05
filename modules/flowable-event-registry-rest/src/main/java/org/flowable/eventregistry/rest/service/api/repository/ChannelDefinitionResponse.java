@@ -31,6 +31,8 @@ public class ChannelDefinitionResponse {
     protected String key;
     protected int version;
     protected String name;
+    protected String type;
+    protected String implementation;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date createTime;
     protected String description;
@@ -85,7 +87,25 @@ public class ChannelDefinitionResponse {
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    @ApiModelProperty(example = "inbound", allowableValues = "inbound,outbound")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @ApiModelProperty(example = "kafka")
+    public String getImplementation() {
+        return implementation;
+    }
+
+    public void setImplementation(String implementation) {
+        this.implementation = implementation;
+    }
+
     @ApiModelProperty(example = "2010-10-13T14:54:26.750+02:00")
     public Date getCreateTime() {
         return createTime;

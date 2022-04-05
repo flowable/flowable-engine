@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.junit.jupiter.api.Test;
@@ -27,30 +28,30 @@ class XpathBasedInboundEventTenantDetectorTest {
 
     @Test
     void testDetectTenantId() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
 
         String xPath = "/data/tenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);
-        String tenantId = detector.detectTenantId(xmlDocument);
+        String tenantId = detector.detectTenantId(eventInfo);
         assertThat(tenantId).isEqualTo("01");
     }
 
     @Test
     void testDetectTenantIdWrongXpath() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
 
         String xPath = "/data/wrongTenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);
-        assertThatThrownBy(() -> detector.detectTenantId(xmlDocument)).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> detector.detectTenantId(eventInfo)).isInstanceOf(FlowableException.class);
     }
 
     @Test
     void testDetectTenantIdMissingTenantIdInXml() {
-        Document xmlDocument = deserializer.deserialize("<data><name>Doe</name></data>");
+        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
 
         String xPath = "/data/tenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);
-        assertThatThrownBy(() -> detector.detectTenantId(xmlDocument)).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> detector.detectTenantId(eventInfo)).isInstanceOf(FlowableException.class);
     }
 
 }

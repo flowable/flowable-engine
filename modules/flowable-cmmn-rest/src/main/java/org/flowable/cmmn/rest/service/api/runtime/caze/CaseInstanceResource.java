@@ -78,7 +78,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         return caseInstanceResponse;
     }
     
-    @ApiOperation(value = "Update case instance properties or execute an action on a case instance (body needs to contain an 'action' property for the latter).", tags = { "Plan Item Instances" }, notes = "")
+    @ApiOperation(value = "Update case instance properties or execute an action on a case instance (body needs to contain an 'action' property for the latter).", tags = { "Case Instances" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the action/update is performed."),
             @ApiResponse(code = 204, message = "Indicates the case was found, the change was performed and it caused the case instance to end."),

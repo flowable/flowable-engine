@@ -31,6 +31,7 @@ import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityManager;
 import org.flowable.eventregistry.impl.persistence.entity.EventResourceEntity;
 import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
  * @author Tijs Rademakers
@@ -245,6 +246,9 @@ public class EventDeploymentManager {
             ChannelModel channelModel = cacheEntry.getChannelModel();
             for (ChannelModelProcessor channelModelProcessor : engineConfig.getChannelModelProcessors()) {
                 if (channelModelProcessor.canProcess(channelModel)) {
+                    if (channelModel instanceof InboundChannelModel) {
+                        engineConfig.getInboundChannelModelCacheManager().unregisterChannelModel((InboundChannelModel) channelModel, channelDefinition);
+                    }
                     channelModelProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), engineConfig.getEventRepositoryService());
                 }
             }

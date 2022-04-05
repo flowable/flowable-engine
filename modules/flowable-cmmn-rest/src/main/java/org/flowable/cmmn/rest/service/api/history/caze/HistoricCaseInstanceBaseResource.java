@@ -80,8 +80,38 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }
+        if (queryRequest.getCaseDefinitionCategory() != null) {
+            query.caseDefinitionCategory(queryRequest.getCaseDefinitionCategory());
+        }
+        if (queryRequest.getCaseDefinitionName() != null) {
+            query.caseDefinitionName(queryRequest.getCaseDefinitionName());
+        }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
+        }
+        if (queryRequest.getCaseInstanceBusinessKey() != null) {
+            query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
+        }
+        if (queryRequest.getCaseInstanceBusinessStatus() != null) {
+            query.caseInstanceBusinessStatus(queryRequest.getCaseInstanceBusinessStatus());
+        }
+        if (queryRequest.getCaseInstanceParentId() != null) {
+            query.caseInstanceParentId(queryRequest.getCaseInstanceParentId());
+        }
+        if (queryRequest.getCaseInstanceState() != null) {
+            query.state(queryRequest.getCaseInstanceState());
+        }
+        if (queryRequest.getCaseInstanceCallbackId() != null) {
+            query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
+        }
+        if (queryRequest.getCaseInstanceCallbackType() != null) {
+            query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
+        }
+        if (queryRequest.getCaseInstanceReferenceId() != null) {
+            query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
+        }
+        if (queryRequest.getCaseInstanceReferenceType() != null) {
+            query.caseInstanceReferenceType(queryRequest.getCaseInstanceReferenceType());
         }
         if (queryRequest.getFinishedAfter() != null) {
             query.finishedAfter(queryRequest.getFinishedAfter());
@@ -97,6 +127,15 @@ public class HistoricCaseInstanceBaseResource {
         }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
+        }
+        if (queryRequest.getLastReactivatedAfter() != null) {
+            query.lastReactivatedAfter(queryRequest.getLastReactivatedAfter());
+        }
+        if (queryRequest.getLastReactivatedBefore() != null) {
+            query.lastReactivatedBefore(queryRequest.getLastReactivatedBefore());
+        }
+        if (queryRequest.getLastReactivatedBy() != null) {
+            query.lastReactivatedBy(queryRequest.getLastReactivatedBy());
         }
         if (queryRequest.getFinished() != null) {
             if (queryRequest.getFinished()) {

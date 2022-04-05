@@ -21,8 +21,10 @@ public class InboundChannelModel extends ChannelModel {
 
     protected String deserializerType;
 
+    protected String contextExtractorDelegateExpression;
     protected String deserializerDelegateExpression;
     protected String payloadExtractorDelegateExpression;
+    protected String headerExtractorDelegateExpression;
     protected String eventTransformerDelegateExpression;
     protected String pipelineDelegateExpression;
     protected ChannelEventKeyDetection channelEventKeyDetection;
@@ -46,6 +48,14 @@ public class InboundChannelModel extends ChannelModel {
         this.deserializerType = deserializerType;
     }
 
+    public String getContextExtractorDelegateExpression() {
+        return contextExtractorDelegateExpression;
+    }
+
+    public void setContextExtractorDelegateExpression(String contextExtractorDelegateExpression) {
+        this.contextExtractorDelegateExpression = contextExtractorDelegateExpression;
+    }
+
     public String getDeserializerDelegateExpression() {
         return deserializerDelegateExpression;
     }
@@ -60,6 +70,14 @@ public class InboundChannelModel extends ChannelModel {
 
     public void setPayloadExtractorDelegateExpression(String payloadExtractorDelegateExpression) {
         this.payloadExtractorDelegateExpression = payloadExtractorDelegateExpression;
+    }
+    
+    public String getHeaderExtractorDelegateExpression() {
+        return headerExtractorDelegateExpression;
+    }
+
+    public void setHeaderExtractorDelegateExpression(String headerExtractorDelegateExpression) {
+        this.headerExtractorDelegateExpression = headerExtractorDelegateExpression;
     }
 
     public String getEventTransformerDelegateExpression() {
@@ -110,4 +128,29 @@ public class InboundChannelModel extends ChannelModel {
         this.inboundEventChannelAdapter = inboundEventChannelAdapter;
     }
 
+    @JsonIgnore
+    public String getChannelModelHashKey() {
+        StringBuilder keyDetectionStringBuilder = new StringBuilder();
+        if (channelEventKeyDetection != null) {
+            keyDetectionStringBuilder.append(channelEventKeyDetection.getDelegateExpression())
+                    .append(channelEventKeyDetection.getFixedValue())
+                    .append(channelEventKeyDetection.getJsonField())
+                    .append(channelEventKeyDetection.getJsonPointerExpression())
+                    .append(channelEventKeyDetection.getXmlXPathExpression());
+        }
+        
+        StringBuilder tenantIdDetectionStringBuilder = new StringBuilder();
+        if (channelEventTenantIdDetection != null) {
+            tenantIdDetectionStringBuilder.append(channelEventTenantIdDetection.getDelegateExpression())
+                    .append(channelEventTenantIdDetection.getFixedValue())
+                    .append(channelEventTenantIdDetection.getJsonPointerExpression())
+                    .append(channelEventTenantIdDetection.getxPathExpression());
+        }
+        
+        return new StringBuilder().append(type).append(deserializerType).append(contextExtractorDelegateExpression)
+                .append(deserializerDelegateExpression).append(payloadExtractorDelegateExpression)
+                .append(headerExtractorDelegateExpression).append(eventTransformerDelegateExpression)
+                .append(pipelineDelegateExpression).append(keyDetectionStringBuilder.toString())
+                .append(tenantIdDetectionStringBuilder.toString()).toString();
+    }
 }

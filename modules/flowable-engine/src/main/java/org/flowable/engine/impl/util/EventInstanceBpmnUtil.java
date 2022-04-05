@@ -51,7 +51,8 @@ public class EventInstanceBpmnUtil {
             SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
             if (!eventServiceTask.getEventOutParameters().isEmpty()) {
                 for (IOParameter parameter : eventServiceTask.getEventOutParameters()) {
-                    setEventParameterVariable(parameter.getSource(), parameter.getTarget(), parameter.isTransient(), payloadInstances, variableScope);
+                    setEventParameterVariable(parameter.getSource(), parameter.getTarget(), 
+                            parameter.isTransient(), payloadInstances, variableScope);
                 }
             }
             

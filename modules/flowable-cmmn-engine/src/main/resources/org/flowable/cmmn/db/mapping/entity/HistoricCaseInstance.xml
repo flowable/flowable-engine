@@ -323,7 +323,7 @@
             <if test="deploymentId != null">
                 and CASE_DEF.DEPLOYMENT_ID_ = #{deploymentId}
             </if>
-            <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+            <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
                 and CASE_DEF.DEPLOYMENT_ID_ IN
                 <foreach item="deploymentId" index="index" collection="deploymentIds"
                          open="(" separator="," close=")">
@@ -432,7 +432,7 @@
                     <if test="orQueryObject.caseDefinitionKey != null">
                         or CASE_DEF.KEY_ = #{orQueryObject.caseDefinitionKey}
                     </if>
-                    <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0">
+                    <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty">
                         or CASE_DEF.KEY_ IN
                         <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
                             #{caseDefinitionKey}
@@ -450,7 +450,7 @@
                     <if test="orQueryObject.deploymentId != null">
                         or CASE_DEF.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
                     </if>
-                    <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
+                    <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
                         or CASE_DEF.DEPLOYMENT_ID_ IN
                         <foreach item="deploymentId" index="index" collection="orQueryObject.deploymentIds"
                                  open="(" separator="," close=")">
@@ -564,7 +564,7 @@
         <if test="caseInstanceId != null">
             ${queryTablePrefix}ID_ = #{caseInstanceId}
         </if>
-        <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
+        <if test="caseInstanceIds != null &amp;&amp; !caseInstanceIds.empty">
             and ${queryTablePrefix}ID_ IN
             <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
                      open="(" separator="," close=")">
@@ -615,6 +615,9 @@
         </if>
         <if test="startedBy != null">
             and ${queryTablePrefix}START_USER_ID_ = #{startedBy}
+        </if>
+        <if test="state != null">
+            and ${queryTablePrefix}STATE_ = #{state}
         </if>
         <if test="lastReactivatedBefore != null">
             and ${queryTablePrefix}LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
@@ -690,7 +693,7 @@
         <if test="orQueryObject.caseInstanceId != null">
             ${queryTablePrefix}ID_ = #{orQueryObject.caseInstanceId}
         </if>
-        <if test="orQueryObject.caseInstanceIds != null &amp;&amp; orQueryObject.caseInstanceIds.size() &gt; 0">
+        <if test="orQueryObject.caseInstanceIds != null &amp;&amp; !orQueryObject.caseInstanceIds.empty">
             or ${queryTablePrefix}ID_ IN
             <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds"
                      open="(" separator="," close=")">
@@ -738,6 +741,9 @@
         </if>
         <if test="orQueryObject.startedBy != null">
             or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy}
+        </if>
+        <if test="orQueryObject.state != null">
+            or ${queryTablePrefix}STATE_ = #{orQueryObject.state}
         </if>
         <if test="orQueryObject.lastReactivatedBefore != null">
             or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}

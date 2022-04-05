@@ -40,6 +40,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_CASE_INSTANCE_RESOURCE = "case-instances";
     public static final String SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE = "plan-item-instances";
     public static final String SEGMENT_VARIABLES = "variables";
+    public static final String SEGMENT_VARIABLE_INSTANCE_RESOURCE = "variable-instances";
     public static final String SEGMENT_EVENT_SUBSCRIPTIONS = "event-subscriptions";
     public static final String SEGMENT_SUBTASKS = "subtasks";
     public static final String SEGMENT_IDENTITYLINKS = "identitylinks";
@@ -283,6 +284,16 @@ public final class CmmnRestUrls {
     public static final String[] URL_PLAN_ITEM_INSTANCE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}" };
     
     /**
+     * URL template for variable instance query: <i>cmmn-runtime/variable-instances</i>
+     */
+    public static final String[] URL_VARIABLE_INSTANCES = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_VARIABLE_INSTANCE_RESOURCE };
+
+    /**
+     * URL template for a single variable instance data: <i>cmmn-runtime/variable-instances/{0:varInstanceId}/data</i>
+     */
+    public static final String[] URL_VARIABLE_INSTANCE_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_VARIABLE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLE_DATA };
+    
+    /**
      * URL template for a single job: <i>cmmn-management/jobs/{0:jobId}</i>
      */
     public static final String[] URL_JOB = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_JOBS, "{0}" };
@@ -423,6 +434,11 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_HISTORIC_VARIABLE_INSTANCE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_VARIABLE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLE_DATA };
 
+    /**
+     * URL template for variable instance query: <i>query/variable-instances</i>
+     */
+    public static final String[] URL_VARIABLE_INSTANCE_QUERY = { SEGMENT_QUERY_RESOURCES, SEGMENT_VARIABLE_INSTANCE_RESOURCE };
+    
     /**
      * URL template for a single historic milestone instance: <i>cmmn-history/historic-milestone-instances/{0:milestoneId}</i>
      */

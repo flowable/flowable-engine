@@ -21,6 +21,7 @@ import org.flowable.task.api.Task;
 
 /**
  * @author Filip Hrisafov
+ * @author Micha Kiener
  */
 public class FlowableCmmnEventBuilder {
 
@@ -30,6 +31,17 @@ public class FlowableCmmnEventBuilder {
 
     public static FlowableEntityEvent createTaskAssignedEvent(Task task) {
         FlowableEntityEventImpl event = new FlowableEntityEventImpl(task, FlowableEngineEventType.TASK_ASSIGNED);
+
+        event.setScopeId(task.getScopeId());
+        event.setScopeDefinitionId(task.getScopeDefinitionId());
+        event.setScopeType(task.getScopeType());
+        event.setSubScopeId(task.getId());
+
+        return event;
+    }
+
+    public static FlowableEntityEvent createTaskCompletedEvent(Task task) {
+        FlowableEntityEventImpl event = new FlowableEntityEventImpl(task, FlowableEngineEventType.TASK_COMPLETED);
 
         event.setScopeId(task.getScopeId());
         event.setScopeDefinitionId(task.getScopeDefinitionId());

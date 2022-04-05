@@ -55,6 +55,12 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
     ChannelDefinitionQuery channelDefinitionNameLike(String channelDefinitionNameLike);
 
     /**
+     * Only select channel definitions where the name matches the given parameter (case-insensitive).
+     * The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    ChannelDefinitionQuery channelDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase);
+
+    /**
      * Only select channel definitions that are deployed in a deployment with the given deployment id
      */
     ChannelDefinitionQuery deploymentId(String deploymentId);
@@ -78,6 +84,12 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
      * Only select channel definitions where the key matches the given parameter. The syntax that should be used is the same as in SQL, eg. %test%
      */
     ChannelDefinitionQuery channelDefinitionKeyLike(String channelDefinitionKeyLike);
+
+    /**
+     * Only select channel definitions where the key matches the given parameter (case-insensitive).
+     * The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    ChannelDefinitionQuery channelDefinitionKeyLikeIgnoreCase(String keyLikeIgnoreCase);
     
     /**
      * Only select channel definitions with a certain version. Particularly useful when used in combination with {@link #channelDefinitionKey(String)}
@@ -113,6 +125,22 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
      *             if used in combination with {{@link #channelVersion(Integer)} or {@link #deploymentId(String)}
      */
     ChannelDefinitionQuery latestVersion();
+
+    /**
+     * Only select the inbound channel definitions.
+     */
+    ChannelDefinitionQuery onlyInbound();
+
+    /**
+     * Only select the outbound channel definitions.
+     */
+    ChannelDefinitionQuery onlyOutbound();
+
+    /**
+     * Only select the channel definitions with the given implementation.
+     * e.g. jms, rabbit.
+     */
+    ChannelDefinitionQuery implementation(String implementation);
     
     /**
      * Only select channel definitions where the create time is equal to a certain date.

@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -43,6 +43,8 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         getEventRepositoryService().createEventModelBuilder()
                 .key("testEvent")
                 .resourceName("testEvent.event")
+                .header("headerProperty1", EventPayloadTypes.STRING)
+                .header("headerProperty2", EventPayloadTypes.STRING)
                 .payload("customerId", EventPayloadTypes.STRING)
                 .deploy();
     }
@@ -74,7 +76,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleSendEvent() throws Exception {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testSendEvent")
                 .variable("myVariable", "Hello World!")
                 .start();
@@ -85,16 +87,36 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testEventWithHeaders() throws Exception {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testSendEvent")
+                .variable("myHeaderValue", "My header value")
+                .variable("myVariable", "Hello World!")
+                .start();
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+        assertThat(jsonNode).hasSize(1);
+        assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
+        
+        Map<String, Object> headerMap = outboundEventChannelAdapter.headers.get(0);
+        assertThat(headerMap.get("headerProperty1")).isEqualTo("test");
+        assertThat(headerMap.get("headerProperty2")).isEqualTo("My header value");
+    }
 
     public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
+        public List<Map<String, Object>> headers = new ArrayList<>();
 
         @Override
-        public void sendEvent(String rawEvent) {
+        public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
             receivedEvents.add(rawEvent);
+            headers.add(headerMap);
         }
-
     }
-
 }

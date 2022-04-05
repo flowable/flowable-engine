@@ -89,4 +89,9 @@ public class EventRegistryEngineTestConfiguration {
         return eventRegistryEngine.getEventRepositoryService();
     }
 
+    @Bean
+    public CustomPropertiesBean customPropertiesBean() {
+        return new CustomPropertiesBean();
+    }
+
 }

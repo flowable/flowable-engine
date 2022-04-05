@@ -71,7 +71,7 @@ public interface InboundChannelModelBuilder {
      * Set the parent deployment id for the channel deployment.
      */
     InboundChannelModelBuilder parentDeploymentId(String parentDeploymentId);
-
+    
     /**
      * Sets a custom {@link InboundEventChannelAdapter} via a delegate expression.
      */

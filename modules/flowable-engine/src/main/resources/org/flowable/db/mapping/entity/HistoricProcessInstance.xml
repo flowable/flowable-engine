@@ -418,7 +418,7 @@
       <if test="processDefinitionKey != null">
         and DEF.KEY_ = #{processDefinitionKey}
       </if>
-      <if test="processDefinitionKeyIn != null &amp;&amp; processDefinitionKeyIn.size() &gt; 0">
+      <if test="processDefinitionKeyIn != null &amp;&amp; !processDefinitionKeyIn.empty">
         and DEF.KEY_ IN
         <foreach item="definition" index="index" collection="processDefinitionKeyIn"
                  open="(" separator="," close=")">
@@ -437,7 +437,7 @@
       <if test="deploymentId != null">
         and DEF.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+      <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and DEF.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
@@ -463,6 +463,12 @@
                     from ${prefix}ACT_HI_VARINST V
                     <where>
                         RES.PROC_INST_ID_ = V.PROC_INST_ID_
+                        <if test="!queryVariableValue.local">
+                            and V.PROC_INST_ID_ = V.EXECUTION_ID_
+                        </if>
+                        <if test="queryVariableValue.local">
+                            and V.PROC_INST_ID_ &lt;&gt; V.EXECUTION_ID_
+                        </if>
                         <if test="queryVariableValue.name != null">
                             <!-- Match-all variable-names when name is null -->
                             and V.NAME_= #{queryVariableValue.name}
@@ -546,7 +552,7 @@
           <if test="orQueryObject.processDefinitionKey != null">
             or DEF.KEY_ = #{orQueryObject.processDefinitionKey}
           </if>
-          <if test="orQueryObject.processDefinitionKeyIn != null &amp;&amp; orQueryObject.processDefinitionKeyIn.size() &gt; 0">
+          <if test="orQueryObject.processDefinitionKeyIn != null &amp;&amp; !orQueryObject.processDefinitionKeyIn.empty">
             or DEF.KEY_ IN
             <foreach item="definition" index="index" collection="orQueryObject.processDefinitionKeyIn"
                      open="(" separator="," close=")">
@@ -565,7 +571,7 @@
           <if test="orQueryObject.deploymentId != null">
             or DEF.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
           </if>
-          <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
+          <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
             or DEF.DEPLOYMENT_ID_ IN
             <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds" 
                      open="(" separator="," close=")">
@@ -596,6 +602,12 @@
                         from ${prefix}ACT_HI_VARINST V
                         <where>
                             RES.PROC_INST_ID_ = PROC_INST_ID_
+                            <if test="!queryVariableValue.local">
+                                and V.PROC_INST_ID_ = V.EXECUTION_ID_
+                            </if>
+                            <if test="queryVariableValue.local">
+                                and V.PROC_INST_ID_ &lt;&gt; V.EXECUTION_ID_
+                            </if>
                             <if test="queryVariableValue.name != null">
                                 <!-- Match-all variable-names when name is null -->
                                 and V.NAME_= #{queryVariableValue.name}
@@ -690,7 +702,7 @@
     <if test="processInstanceId != null">
         ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
       </if>
-      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+      <if test="processInstanceIds != null and !processInstanceIds.empty">
         and ${queryTablePrefix}PROC_INST_ID_ in
         <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
           #{item}
@@ -821,7 +833,7 @@
       <if test="orQueryObject.processInstanceId != null">
         ${queryTablePrefix}PROC_INST_ID_ = #{orQueryObject.processInstanceId}
       </if>
-      <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.isEmpty()">
+      <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.empty">
         or ${queryTablePrefix}PROC_INST_ID_ in
         <foreach item="item" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
           #{item}

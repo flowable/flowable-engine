@@ -14,9 +14,12 @@ package org.flowable.variable.service.impl.persistence.entity.data;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -27,7 +30,15 @@ public interface VariableInstanceDataManager extends DataManager<VariableInstanc
     List<VariableInstanceEntity> findVariablesInstancesByQuery(InternalVariableInstanceQueryImpl internalVariableInstanceQuery);
 
     VariableInstanceEntity findVariablesInstanceByQuery(InternalVariableInstanceQueryImpl internalVariableInstanceQuery);
+    
+    long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
 
+    List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
+
+    List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap);
+
+    long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
     void deleteVariablesByTaskId(String taskId);
     
     void deleteVariablesByExecutionId(String executionId);

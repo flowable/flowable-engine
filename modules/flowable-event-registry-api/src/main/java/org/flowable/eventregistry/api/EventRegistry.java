@@ -69,7 +69,7 @@ public interface EventRegistry {
     /**
      * Events received in adapters should call this method to process events.
      */
-    void eventReceived(InboundChannelModel channelModel, String event);
+    void eventReceived(InboundChannelModel channelModel, Object event);
     
     /**
      * Send an event to all the registered event consumers.

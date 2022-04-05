@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -50,6 +51,10 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
 
     public AbstractAsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
+
+    protected CmmnHistoryConfigurationSettings getHistoryConfigurationSettings() {
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings();
     }
 
     protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, ObjectNode data) {

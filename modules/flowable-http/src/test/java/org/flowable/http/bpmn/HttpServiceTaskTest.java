@@ -434,8 +434,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
                 .contains(
                         entry("Content-Type", "text/plain"),
                         entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
-                        entry("Host", "localhost:7000"),
-                        entry("Test", null)
+                        entry("Host", "localhost:7000")
                 );
 
         // Request assertions

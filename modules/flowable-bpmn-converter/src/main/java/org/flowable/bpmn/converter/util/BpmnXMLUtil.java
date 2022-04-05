@@ -212,6 +212,97 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
         return attributeValue;
     }
+    
+    public static IOParameter parseInIOParameter(XMLStreamReader xtr) {
+        IOParameter parameter = null;
+        String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
+        String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
+
+            parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
+
+            parameter.setTarget(target);
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
+        }
+        
+        return parameter;
+    }
+    
+    public static IOParameter parseOutIOParameter(XMLStreamReader xtr) {
+        IOParameter parameter = null;
+        String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
+        String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
+        String targetExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && 
+                        (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
+
+            parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
+
+            if (StringUtils.isNotEmpty(targetExpression)) {
+                parameter.setTargetExpression(targetExpression);
+            } else {
+                parameter.setTarget(target);
+            }
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
+
+            String transientString = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+            if ("true".equalsIgnoreCase(transientString)) {
+                parameter.setTransient(true);
+            }
+        }
+        
+        return parameter;
+    }
 
     public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(value) && !"null".equalsIgnoreCase(value)) {

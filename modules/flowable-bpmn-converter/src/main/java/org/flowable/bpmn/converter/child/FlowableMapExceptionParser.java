@@ -34,8 +34,9 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Activity))
+        if (!(parentElement instanceof Activity)) {
             return;
+        }
 
         String errorCode = xtr.getAttributeValue(null, MAP_EXCEPTION_ERRORCODE);
         String andChildren = xtr.getAttributeValue(null, MAP_EXCEPTION_ANDCHILDREN);

@@ -15,7 +15,6 @@ package org.flowable.eventregistry.spring.jms;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -36,12 +35,7 @@ public class JmsChannelMessageListenerAdapter extends AbstractAdaptableMessageLi
 
     @Override
     public void onMessage(Message message, Session session) throws JMSException {
-        if (message instanceof TextMessage) {
-            eventRegistry.eventReceived(inboundChannelModel, ((TextMessage) message).getText());
-        } else {
-            //TODO what about other message types
-            throw new UnsupportedOperationException("Can only received TextMessage. Received: " + message);
-        }
+        eventRegistry.eventReceived(inboundChannelModel, message);
     }
 
     public EventRegistry getEventRegistry() {

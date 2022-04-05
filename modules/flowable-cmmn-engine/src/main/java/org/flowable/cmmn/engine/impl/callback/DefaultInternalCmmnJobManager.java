@@ -23,6 +23,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
@@ -128,8 +130,9 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
             }
 
             // Create new plan item instance based on the data of the original one
+            PlanItem planItem = planItemInstanceEntity.getPlanItem();
             PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceEntityBuilder()
-                .planItem(planItemInstanceEntity.getPlanItem())
+                .planItem(planItem)
                 .caseDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
                 .caseInstanceId(planItemInstanceEntity.getCaseInstanceId())
                 .stagePlanItemInstance(stagePlanItem)
@@ -137,7 +140,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
                 .addToParent(true)
                 .create();
 
-            // The plan item instance state needs to be set to available manually. 
+            // The plan item instance state needs to be set to available manually.
             // Leaving it to empty will automatically make it available it and execute the behavior,
             // creating a duplicate timer. The job server logic will take care of scheduling the repeating timer.
             String oldState = newPlanItemInstanceEntity.getState();
@@ -152,6 +155,12 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
 
             // Switch job references to new plan item instance
             timerJobEntity.setSubScopeId(newPlanItemInstanceEntity.getId());
+
+            if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof TimerEventListener) {
+               TimerEventListener timerEventListener = (TimerEventListener) planItem.getPlanItemDefinition();
+                timerJobEntity.setElementId(timerEventListener.getId());
+                timerJobEntity.setElementName(timerEventListener.getName());
+            }
         }
     }
 }

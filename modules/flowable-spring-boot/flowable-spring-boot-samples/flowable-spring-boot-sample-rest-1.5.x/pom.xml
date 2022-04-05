@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-samples</artifactId>
-        <version>6.7.2-SNAPSHOT</version>
+        <version>6.7.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-sample-rest-1.5.x</artifactId>
@@ -24,5 +24,18 @@
             <artifactId>flowable-spring-boot-starter-rest</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>java17+</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <properties>
+                <!-- Spring Boot 1.5.x does not work on Java 17 -->
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

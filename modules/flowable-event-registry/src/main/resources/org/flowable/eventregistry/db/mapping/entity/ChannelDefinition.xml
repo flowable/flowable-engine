@@ -7,22 +7,24 @@
   <!-- DEFINITION INSERT -->
 
   <insert id="insertChannelDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
-    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_,
     	CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER}, 
+            #{type, jdbcType=VARCHAR},
+            #{implementation, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
-            #{createTime, jdbcType=TIMESTAMP}, 
+            #{createTime, jdbcType=TIMESTAMP},
             #{resourceName, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertChannelDefinition" parameterType="java.util.List">
-    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values 
     <foreach collection="list" item="channelDefinition" index="index" separator=",">
         (#{channelDefinition.id, jdbcType=VARCHAR},
@@ -30,6 +32,8 @@
          #{channelDefinition.name, jdbcType=VARCHAR},
          #{channelDefinition.key, jdbcType=VARCHAR}, 
          #{channelDefinition.version, jdbcType=INTEGER},
+         #{channelDefinition.type, jdbcType=VARCHAR},
+         #{channelDefinition.implementation, jdbcType=VARCHAR},
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
          #{channelDefinition.resourceName, jdbcType=VARCHAR},
@@ -41,12 +45,14 @@
   <insert id="bulkInsertChannelDefinition" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
     <foreach collection="list" item="channelDefinition" index="index">
-        INTO ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
+        INTO ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES
         (#{channelDefinition.id, jdbcType=VARCHAR},
          #{channelDefinition.category, jdbcType=VARCHAR},
          #{channelDefinition.name, jdbcType=VARCHAR},
          #{channelDefinition.key, jdbcType=VARCHAR}, 
          #{channelDefinition.version, jdbcType=INTEGER},
+         #{channelDefinition.type, jdbcType=VARCHAR},
+         #{channelDefinition.implementation, jdbcType=VARCHAR},
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
          #{channelDefinition.resourceName, jdbcType=VARCHAR},
@@ -73,6 +79,16 @@
       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateChannelDefinitionTypeAndImplementationById" parameterType="java.util.Map">
+    update ${prefix}FLW_CHANNEL_DEFINITION
+    <set>
+      TYPE_ = #{type, jdbcType=VARCHAR},
+      IMPLEMENTATION_ = #{implementation, jdbcType=VARCHAR},
+    </set>
+    where
+      ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
   <!-- DEFINITION DELETE -->
 
   <delete id="deleteChannelDefinitionsByDeploymentId" parameterType="string">
@@ -87,6 +103,8 @@
     <result property="name" column="NAME_" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
+    <result property="implementation" column="IMPLEMENTATION_" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
@@ -144,11 +162,17 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}
       </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
       <if test="keyLike != null">
         and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="keyLikeIgnoreCase != null">
+        and lower(RES.KEY_) like lower(#{keyLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}
@@ -164,6 +188,15 @@
       </if>
       <if test="versionLte != null">
         and RES.VERSION_ &lt;= #{versionLte}
+      </if>
+      <if test="onlyInbound">
+        and RES.TYPE_ = 'inbound'
+      </if>
+      <if test="onlyOutbound">
+        and RES.TYPE_ = 'outbound'
+      </if>
+      <if test="implementation != null">
+        and RES.IMPLEMENTATION_ = #{implementation}
       </if>
       <if test="createTime != null">
         and RES.CREATE_TIME = #{createTime}
@@ -183,7 +216,7 @@
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null and !deploymentIds.isEmpty()">
+      <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
         <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
           #{item}

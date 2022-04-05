@@ -167,6 +167,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 Task task = taskService.newTask();
                 taskService.saveTask(task);
                 String taskId = task.getId();
+                taskService.complete(taskId);
 
                 // Execute the request
                 HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, taskId));
@@ -200,6 +201,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();
+            taskService.complete(task.getId());
 
             HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, task.getId()));
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));

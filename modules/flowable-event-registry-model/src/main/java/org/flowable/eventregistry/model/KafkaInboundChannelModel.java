@@ -119,4 +119,29 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
             this.value = value;
         }
     }
+    
+    @Override
+    public String getChannelModelHashKey() {
+        StringBuilder topicStringBuilder = new StringBuilder();
+        if (topics != null && !topics.isEmpty()) {
+            for (String topic : topics) {
+                topicStringBuilder.append(topic);
+            }
+        } else {
+            topicStringBuilder.append("notopics");
+        }
+        
+        StringBuilder customPropertyStringBuilder = new StringBuilder();
+        if (customProperties != null && !customProperties.isEmpty()) {
+            for (CustomProperty customProperty : customProperties) {
+                customPropertyStringBuilder.append(customProperty.getName()).append(customProperty.getValue());
+            }
+        } else {
+            customPropertyStringBuilder.append("nocustomproperties");
+        }
+        
+        return new StringBuilder(super.getChannelModelHashKey()).append(groupId).append(topicStringBuilder.toString())
+                .append(topicPattern).append(clientIdPrefix).append(concurrency)
+                .append(customPropertyStringBuilder.toString()).toString();
+    }
 }

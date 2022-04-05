@@ -73,8 +73,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
 
-        // Request all variables (no scope provides) which include global an
-        // local
+        // Request all variables (no scope provides) which include global an local
         CloseableHttpResponse response = executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId())),
                 HttpStatus.SC_OK);

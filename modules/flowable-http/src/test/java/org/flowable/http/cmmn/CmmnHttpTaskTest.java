@@ -258,7 +258,7 @@ public class CmmnHttpTaskTest {
                         entry("httpPostRequestMethod", "PUT"),
                         entry("httpPostRequestUrl", "https://localhost:9799/api?code=500"),
                         entry("httpPostRequestHeaders",
-                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"),
+                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest: test"),
                         entry("httpPostRequestBody", "test"),
                         entry("httpPostResponseStatusCode", 500),
                         entry("httpPostResponseReason", "Server Error")
@@ -270,7 +270,7 @@ public class CmmnHttpTaskTest {
                         entry("Content-Type", "text/plain"),
                         entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
                         entry("Host", "localhost:7000"),
-                        entry("Test", null)
+                        entry("Test", "test")
                 );
     }
 
@@ -282,7 +282,7 @@ public class CmmnHttpTaskTest {
         Map<String, Object> variables = new HashMap<>();
         variables.put("method", "PUT");
         variables.put("url", "https://localhost:9799/api?code=500");
-        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:");
+        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest: test");
         variables.put("body", "test");
         variables.put("timeout", 2000);
         variables.put("ignore", true);
@@ -303,7 +303,7 @@ public class CmmnHttpTaskTest {
                         entry("httpPostRequestMethod", "PUT"),
                         entry("httpPostRequestUrl", "https://localhost:9799/api?code=500"),
                         entry("httpPostRequestHeaders",
-                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:"),
+                                "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest: test"),
                         entry("httpPostRequestBody", "test"),
                         entry("httpPostResponseStatusCode", 500),
                         entry("httpPostResponseReason", "Server Error")
@@ -315,7 +315,7 @@ public class CmmnHttpTaskTest {
                         entry("Content-Type", "text/plain"),
                         entry("X-Request-ID", "623b94fc-14b8-4ee6-aed7-b16b9321e29f"),
                         entry("Host", "localhost:7000"),
-                        entry("Test", null)
+                        entry("Test", "test")
                 );
     }
 

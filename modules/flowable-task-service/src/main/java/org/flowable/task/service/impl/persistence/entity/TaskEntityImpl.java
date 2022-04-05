@@ -40,6 +40,7 @@ import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -785,7 +786,22 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
-                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                if (this.getProcessInstanceId() != null && this.getProcessInstanceId()
+                        .equals(variableInstance.getProcessInstanceId()) && variableInstance.getTaskId() == null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (VariableInstanceEntity variableInstance : queryVariables) {
+                if (TaskVariableUtils.isCaseRelated(variableInstance) && variableInstance.getScopeId().equals(this.getScopeId())
+                        && variableInstance.getTaskId() == null) {
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }

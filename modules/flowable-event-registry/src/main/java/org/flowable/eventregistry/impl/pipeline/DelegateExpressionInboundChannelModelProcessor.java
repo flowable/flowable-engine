@@ -19,11 +19,14 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionInboundChannelModel;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -31,9 +34,11 @@ import org.flowable.eventregistry.model.DelegateExpressionInboundChannelModel;
 public class DelegateExpressionInboundChannelModelProcessor implements ChannelModelProcessor {
 
     protected HasExpressionManagerEngineConfiguration engineConfiguration;
+    protected ObjectMapper objectMapper;
 
-    public DelegateExpressionInboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration) {
+    public DelegateExpressionInboundChannelModelProcessor(HasExpressionManagerEngineConfiguration engineConfiguration, ObjectMapper objectMapper) {
         this.engineConfiguration = engineConfiguration;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -42,8 +47,10 @@ public class DelegateExpressionInboundChannelModelProcessor implements ChannelMo
     }
 
     @Override
-    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, EventRepositoryService eventRepositoryService,
-        boolean fallbackToDefaultTenant) {
+    public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
+            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            boolean fallbackToDefaultTenant) {
+        
         if (channelModel instanceof DelegateExpressionInboundChannelModel) {
             registerChannelModel((DelegateExpressionInboundChannelModel) channelModel, eventRegistry);
         }

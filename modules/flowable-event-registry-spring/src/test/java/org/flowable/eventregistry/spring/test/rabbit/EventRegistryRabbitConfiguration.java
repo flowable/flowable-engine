@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.RabbitMQContainer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -42,6 +44,11 @@ public class EventRegistryRabbitConfiguration {
 
         factory.setConnectionFactory(connectionFactory);
         return factory;
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean
@@ -61,8 +68,10 @@ public class EventRegistryRabbitConfiguration {
     }
 
     @Bean
-    public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, RabbitOperations rabbitOperations) {
-        RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor();
+    public RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor(RabbitListenerEndpointRegistry endpointRegistry, 
+            RabbitOperations rabbitOperations, ObjectMapper objectMapper) {
+        
+        RabbitChannelDefinitionProcessor rabbitChannelDefinitionProcessor = new RabbitChannelDefinitionProcessor(objectMapper);
         rabbitChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
         rabbitChannelDefinitionProcessor.setRabbitOperations(rabbitOperations);
         return rabbitChannelDefinitionProcessor;
