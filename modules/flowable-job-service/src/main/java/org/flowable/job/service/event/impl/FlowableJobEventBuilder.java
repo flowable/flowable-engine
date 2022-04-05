@@ -67,8 +67,13 @@ public class FlowableJobEventBuilder {
             if (persistedObject instanceof Job) {
                 Job jobObject = (Job) persistedObject;
                 if (jobObject.getScopeType() == null) {
-                    event.setExecutionId(jobObject.getExecutionId());
-                    event.setProcessInstanceId(jobObject.getProcessInstanceId());
+                    if ("async-complete-call-actiivty".equals(jobObject.getJobHandlerType())) {
+                        event.setExecutionId(jobObject.getJobHandlerConfiguration());
+                        event.setProcessInstanceId(jobObject.getJobHandlerConfiguration());
+                    } else {
+                        event.setExecutionId(jobObject.getExecutionId());
+                        event.setProcessInstanceId(jobObject.getProcessInstanceId());
+                    }
                     event.setProcessDefinitionId(jobObject.getProcessDefinitionId());
                 } else {
                     event.setScopeType(jobObject.getScopeType());

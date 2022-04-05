@@ -735,6 +735,14 @@ public class DefaultJobManager implements JobManager {
     protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job, boolean lockJob) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
+        if (job instanceof DeadLetterJobEntity && "async-complete-call-actiivty".equals(job.getJobHandlerType())) {
+            String[] jobHandlerConfiguration = job.getJobHandlerConfiguration().split("::");
+            if (jobHandlerConfiguration.length == 2) {
+                executableJob.setProcessInstanceId(jobHandlerConfiguration[0]);
+                executableJob.setExecutionId(jobHandlerConfiguration[1]);
+                executableJob.setJobHandlerConfiguration(job.getExecutionId());
+            }
+        }
 
         if (lockJob) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
@@ -765,6 +773,11 @@ public class DefaultJobManager implements JobManager {
     public DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
+        if ("async-complete-call-actiivty".equals(otherJob.getJobHandlerType())) {
+            deadLetterJob.setExecutionId(otherJob.getJobHandlerConfiguration());
+            deadLetterJob.setProcessInstanceId(otherJob.getJobHandlerConfiguration());
+            deadLetterJob.setJobHandlerConfiguration(otherJob.getProcessInstanceId() + "::" + otherJob.getExecutionId());
+        }
         sendMoveToDeadletterEvent(otherJob);
         return deadLetterJob;
     }
