@@ -29,13 +29,13 @@ import org.junit.Test;
 /**
  * @author Micha Kiener
  */
-public class TaskCompletedEventTest  extends FlowableCmmnTestCase {
+public class TaskCreatedEventTest extends FlowableCmmnTestCase {
     protected CustomEventListener taskListener;
 
     @Before
     public void setUp() {
         taskListener = new CustomEventListener();
-        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_COMPLETED);
+        cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_CREATED);
     }
 
     @After
@@ -48,6 +48,7 @@ public class TaskCompletedEventTest  extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
     public void testCaseInstanceEvents() {
+        // start the case which will also need to throw the task started event
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
                 .businessKey("business key")
@@ -58,12 +59,8 @@ public class TaskCompletedEventTest  extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .singleResult();
 
-        // complete the task and check, if the complete task event was thrown
-        cmmnTaskService.complete(task.getId());
-        assertThat(taskListener.caughtEvent).isNotNull()
-                .isInstanceOf(FlowableEntityEventImpl.class);
-
         FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) taskListener.caughtEvent;
+        assertThat(caughtEvent.getType()).isEqualTo(FlowableEngineEventType.TASK_CREATED);
         assertThat(caughtEvent.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(caughtEvent.getScopeDefinitionId()).isEqualTo(caseInstance.getCaseDefinitionId());
         assertThat(caughtEvent.getSubScopeId()).isEqualTo(task.getId());

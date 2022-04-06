@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.event;
 
 import org.flowable.cmmn.api.event.FlowableCaseEndedEvent;
+import org.flowable.cmmn.api.event.FlowableCaseEndedEvent;
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -32,6 +33,17 @@ public class FlowableCmmnEventBuilder {
 
     public static FlowableCaseEndedEvent createCaseEndedEvent(CaseInstance caseInstance, String endingState) {
         return new FlowableCaseEndedEventImpl(caseInstance, endingState);
+    }
+
+    public static FlowableEntityEvent createTaskCreatedEvent(Task task) {
+        FlowableEntityEventImpl event = new FlowableEntityEventImpl(task, FlowableEngineEventType.TASK_CREATED);
+
+        event.setScopeId(task.getScopeId());
+        event.setScopeDefinitionId(task.getScopeDefinitionId());
+        event.setScopeType(task.getScopeType());
+        event.setSubScopeId(task.getId());
+
+        return event;
     }
 
     public static FlowableEntityEvent createTaskAssignedEvent(Task task) {
