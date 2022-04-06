@@ -14,11 +14,13 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -56,7 +58,19 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
             CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
         }
     }
-    
+
+    /**
+     * Overwritten in order to send a case end / completion event through the case engine dispatcher.
+     */
+    @Override
+    protected void invokePostLifecycleListeners() {
+        super.invokePostLifecycleListeners();
+
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher()
+            .dispatchEvent(FlowableCmmnEventBuilder.createCaseEndedEvent(caseInstanceEntity, CaseInstanceState.COMPLETED),
+                EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+
     @Override
     public String getDeleteReason() {
         return "cmmn-state-transition-complete-case";

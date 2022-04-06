@@ -349,6 +349,12 @@ public enum FlowableEngineEventType implements FlowableEventType {
     CASE_STARTED,
 
     /**
+     * A case instance has been ended by either completing or terminating it.
+     * The event is being dispatched after the lifecycle listeners have been invoked, but before the end state will be set on the case instance.
+     */
+    CASE_ENDED,
+
+    /**
      * A change tenant id was executed.
      */
     CHANGE_TENANT_ID,
