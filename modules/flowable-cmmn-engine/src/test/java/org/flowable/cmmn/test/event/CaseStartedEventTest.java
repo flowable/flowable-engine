@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author Filip Hrisafov
  */
-public class CaseInstanceEventsTest extends FlowableCmmnTestCase {
+public class CaseStartedEventTest extends FlowableCmmnTestCase {
 
     protected TestEventListener listener;
 

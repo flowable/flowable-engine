@@ -35,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @BpmnJmsEventTest
 @TestPropertySource(properties = {
         "application.test.jms-queue=test-queue"
@@ -139,6 +141,44 @@ public class ProcessWithEventRegistryTest {
             assertThat(runtimeService.getVariable(anotherProcessInstance.getId(), "headerValue2")).isEqualTo("header2");
             assertThat(runtimeService.getVariable(anotherProcessInstance.getId(), "value1")).isEqualTo("fozzie");
             assertThat(runtimeService.getVariable(anotherProcessInstance.getId(), "value2")).isEqualTo(456);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndFullPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-fullpayload.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testFullPayloadEvent() {
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+            
+            jmsTemplate.convertAndSend("test-queue", "{"
+                + "    \"payload1\": \"kermit\","
+                + "    \"payload2\": 123"
+                + "}", messageProcessor -> {
+                    
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> {
+                    assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+                });
+            
+            ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
+            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();

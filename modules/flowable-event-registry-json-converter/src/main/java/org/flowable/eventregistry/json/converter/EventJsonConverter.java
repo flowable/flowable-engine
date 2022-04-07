@@ -67,8 +67,11 @@ public class EventJsonConverter {
                     eventModel.addCorrelation(name, type);
                 }
             }
+            
+            eventModel.setFullPayloadPropertyName(modelNode.path("fullPayloadPropertyName").asText(null));
 
             return eventModel;
+            
         } catch (Exception e) {
             throw new FlowableEventJsonException("Error reading event json", e);
         }
@@ -106,6 +109,10 @@ public class EventJsonConverter {
                     eventPayloadNode.put("correlationParameter", true);
                 }
             }
+        }
+        
+        if (definition.getFullPayloadPropertyName() != null) {
+            modelNode.put("fullPayloadPropertyName", definition.getFullPayloadPropertyName());
         }
 
         try {

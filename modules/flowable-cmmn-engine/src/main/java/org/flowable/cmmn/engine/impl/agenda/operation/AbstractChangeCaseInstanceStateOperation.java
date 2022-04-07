@@ -41,11 +41,29 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
         String oldState = caseInstanceEntity.getState();
         String newState = getNewState();
         if (!Objects.equals(oldState, newState)) {
+            invokePreLifecycleListeners();
             CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, caseInstanceEntity.getState(), newState);
+            invokePostLifecycleListeners();
             caseInstanceEntity.setState(newState);
 
             internalExecute();
         }
+    }
+
+    /**
+     * Internal hook to be implemented to invoke any listeners BEFORE the lifecycle listeners are being invoked and before the new state is set
+     * on the case instance.
+     */
+    protected void invokePreLifecycleListeners() {
+
+    }
+
+    /**
+     * Internal hook to be implemented to invoke any listeners AFTER the lifecycle listeners are being invoked and before the new state is set
+     * on the case instance.
+     */
+    protected void invokePostLifecycleListeners() {
+
     }
 
     public void preRunCheck() {
