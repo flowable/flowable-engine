@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -53,6 +54,8 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Joram Barrez
@@ -121,6 +124,85 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                         tuple("payload1", EventPayloadTypes.STRING, "Hello World"),
                         tuple("payload2", EventPayloadTypes.INTEGER, 123)
                 );
+    }
+    
+    @Test
+    public void testFullPayloadPropertyName() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannel();
+
+        repositoryService.createEventModelBuilder()
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .fullPayloadPropertyName("fullPayload")
+                .deploy();
+
+        inboundEventChannelAdapter.triggerTestEvent();
+
+        assertThat(testEventConsumer.eventsReceived).hasSize(1);
+        FlowableEventRegistryEvent eventRegistryEvent = (FlowableEventRegistryEvent) testEventConsumer.eventsReceived.get(0);
+
+        EventInstance eventInstance = eventRegistryEvent.getEventInstance();
+        assertThat(eventInstance.getEventKey()).isEqualTo("myEvent");
+
+        assertThat(eventInstance.getPayloadInstances()).hasSize(1);
+        EventPayloadInstance payloadInstance = eventInstance.getPayloadInstances().iterator().next();
+        assertThatJson(payloadInstance.getValue())
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                    + "    type: 'myEvent',"
+                    + "    customerId: 'test',"
+                    + "    payload1: 'Hello World',"
+                    + "    payload2: 123"
+                    + "}");
+    }
+    
+    @Test
+    public void testFullPayloadPropertyNameWithCorrelationAndPayload() {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannel();
+
+        repositoryService.createEventModelBuilder()
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .correlationParameter("customerId", EventPayloadTypes.STRING)
+                .payload("payload1", EventPayloadTypes.STRING)
+                .fullPayloadPropertyName("fullPayload")
+                .deploy();
+
+        inboundEventChannelAdapter.triggerTestEvent();
+
+        assertThat(testEventConsumer.eventsReceived).hasSize(1);
+        FlowableEventRegistryEvent eventRegistryEvent = (FlowableEventRegistryEvent) testEventConsumer.eventsReceived.get(0);
+
+        EventInstance eventInstance = eventRegistryEvent.getEventInstance();
+        assertThat(eventInstance.getEventKey()).isEqualTo("myEvent");
+
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getValue)
+            .containsOnly("test");
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getDefinitionType, EventPayloadInstance::getValue)
+            .contains(
+                    tuple("customerId", EventPayloadTypes.STRING, "test"),
+                    tuple("payload1", EventPayloadTypes.STRING, "Hello World")
+            );
+        
+        EventPayloadInstance payloadInstance = null;
+        
+        for (EventPayloadInstance eventPayloadInstance : eventInstance.getPayloadInstances()) {
+            if ("fullPayload".equalsIgnoreCase(eventPayloadInstance.getDefinitionName())) {
+                payloadInstance = eventPayloadInstance;
+            }
+        }
+        
+        assertThat(payloadInstance).isNotNull();
+        assertThatJson(payloadInstance.getValue())
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo("{"
+                    + "    type: 'myEvent',"
+                    + "    customerId: 'test',"
+                    + "    payload1: 'Hello World',"
+                    + "    payload2: 123"
+                    + "}");
     }
 
     @Test

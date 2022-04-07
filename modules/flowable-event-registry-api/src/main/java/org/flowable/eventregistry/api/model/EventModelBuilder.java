@@ -83,6 +83,11 @@ public interface EventModelBuilder {
     EventModelBuilder correlationParameter(String name, String type);
     
     /**
+     * Defines the property name for the full payload.
+     */
+    EventModelBuilder fullPayloadPropertyName(String name);
+    
+    /**
      * Creates a new event model, but does not deploy it to the Event registry engine.
      */
     EventModel createEventModel();

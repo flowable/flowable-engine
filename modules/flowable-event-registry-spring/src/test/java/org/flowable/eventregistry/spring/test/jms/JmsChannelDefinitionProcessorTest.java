@@ -544,6 +544,51 @@ class JmsChannelDefinitionProcessorTest {
             );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
     }
+    
+    @Test
+    void eventWithFullPayloadProperty() {
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .fullPayloadPropertyName("myFullPayload")
+            .deploy();
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test-customer")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\","
+                + "    \"age\": 45"
+                + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(kermitEvent).isNotNull();
+        assertThat(kermitEvent.getPayloadInstances()).hasSize(1);
+        assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+        
+        assertThatJson(kermitEvent.getPayloadInstances().iterator().next().getValue())
+            .isEqualTo("{"
+                    + "    eventKey: 'test',"
+                    + "    name: 'Kermit the Frog',"
+                    + "    age: 45"
+                    + "}");
+    }
 
     @Test
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() {
