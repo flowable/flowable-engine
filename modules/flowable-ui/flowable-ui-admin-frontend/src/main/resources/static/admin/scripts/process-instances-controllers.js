@@ -16,8 +16,8 @@
 
 /* Controllers */
 
-flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', 'gridConstants',
-    function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, gridConstants) {
+flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http','$route', '$timeout', '$location', '$modal', '$translate', '$q', 'gridConstants',
+    function ($rootScope, $scope, $http, $route, $timeout, $location, $modal, $translate, $q, gridConstants) {
 
 		$rootScope.navigation = {main: 'process-engine', sub: 'instances'};
 
@@ -280,4 +280,92 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
             $scope.filter.refresh();
         });
 
-    }]);
+        // Dialogs
+        $scope.deleteProcessInstances = function () {
+            var action = "delete";
+
+            var modalInstance = $modal.open({
+                templateUrl: 'views/process-instances-delete-popup.html',
+                controller: 'DeleteProcessesModalInstanceCtrl',
+                resolve: {
+                    processes: function () {
+                        return $scope.gridInstances.selectedItems;
+                    },
+                    action: function () {
+                        return action;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (deleteProcessInstances) {
+                if (deleteProcessInstances) {
+                    $scope.addAlert($translate.instant('ALERT.PROCESS-INSTANCES.DELETED', $scope.gridInstances.selectedItems.length), 'info');
+                    $route.reload();
+                }
+            });
+        };
+}]);
+
+flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'processes', 'action', function ($rootScope, $scope, $modalInstance, $http, processes, action) {
+
+    $scope.processes = processes;
+    $scope.action = action;
+    $scope.status = {
+                        loading: false,
+                        successfullyTerminated: [],
+                        successfullyDeleted: [],
+                        failed: []
+                    };
+    $scope.model = {};
+
+    $scope.ok = async function () {
+        $scope.status.loading = true;
+        var dataForPost = {action: "terminate", deleteReason: $translate.instant('PROCESS-INSTANCES.POPUP.DELETE.DELETE-REASON')};
+
+        // terminate
+        var terminatedPromises = Promise.all(
+            $scope.processes.map( async process => {
+                await $http({
+                    method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances/' + process.id,
+                    data: dataForPost
+                }).success(function (data, status, headers, config) {
+                    $scope.status.successfullyTerminated.push(process);
+                }).error(function (data, status, headers, config) {
+                    $scope.status.failed.push(process);
+                });
+            })
+        )
+        await terminatedPromises;
+
+        // delete all succesfully terminated
+        dataForPost.action = "delete"
+        var deletedPromises = Promise.all(
+            $scope.status.successfullyTerminated.map(async process => {
+                await $http({
+                    method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances/' + process.id,
+                    data: dataForPost
+                }).success(function (data, status, headers, config) {
+                    $scope.status.successfullyDeleted.push(process);
+                }).error(function (data, status, headers, config) {
+                    $scope.status.failed.push(process)
+                });
+            })
+        )
+        await deletedPromises;
+        $scope.status.loading = false
+
+        if($scope.status.failed.length > 0){
+            $modalInstance.close(false);
+        }
+        else{
+            $modalInstance.close(true);
+        }
+    };
+
+    $scope.cancel = function () {
+        if (!$scope.status.loading) {
+            $modalInstance.dismiss('cancel');
+        }
+    };
+}]);
