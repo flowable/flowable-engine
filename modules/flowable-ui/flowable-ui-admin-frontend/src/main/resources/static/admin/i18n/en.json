@@ -274,7 +274,8 @@
                 "TITLE": "Delete process instance(s)",
                 "MESSAGE-DELETE":"Are you sure you want to delete {{total}} process instances",
                 "CONFIRM-DELETE": "Delete process instance(s)",
-                "DELETE-REASON": "Terminated and removed in bulk"
+                "DELETE-REASON": "Terminated and removed in bulk",
+                "DELETE-FAILED": "Termination or removal of process instances failed"
             }
         }
     },

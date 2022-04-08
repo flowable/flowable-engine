@@ -110,7 +110,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 	    }
 
 	    $scope.processInstanceSelected = function(id) {
-			if(!id) return;
+            if(!id) return;
 
             $location.path('/process-instance/' + id);
       };
@@ -307,17 +307,23 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
 }]);
 
 flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
-    ['$rootScope', '$scope', '$modalInstance', '$http', 'processes', 'action', function ($rootScope, $scope, $modalInstance, $http, processes, action) {
+    ['$rootScope', '$scope', '$modalInstance', '$http', '$translate', '$window', 'processes', 'action',
+    function ($rootScope, $scope, $modalInstance, $http, $translate, $window, processes, action) {
 
     $scope.processes = processes;
     $scope.action = action;
     $scope.status = {
                         loading: false,
+                        progress: 0,
                         successfullyTerminated: [],
                         successfullyDeleted: [],
                         failed: []
                     };
     $scope.model = {};
+    $scope.openInNewWindow = function(absUrl, id) {
+        var url = absUrl + id;
+        $window.open(url, "_blank");
+    }
 
     $scope.ok = async function () {
         $scope.status.loading = true;
@@ -347,18 +353,19 @@ flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
                     data: dataForPost
                 }).success(function (data, status, headers, config) {
                     $scope.status.successfullyDeleted.push(process);
+                    $scope.status.progress = parseInt(
+                                                (parseInt($scope.status.successfullyDeleted.length) /
+                                                parseInt($scope.processes.length) * 100).toFixed(0)
+                                            );
                 }).error(function (data, status, headers, config) {
-                    $scope.status.failed.push(process)
+                    $scope.status.failed.push(process);
                 });
             })
         )
         await deletedPromises;
-        $scope.status.loading = false
+        $scope.status.loading = false;
 
-        if($scope.status.failed.length > 0){
-            $modalInstance.close(false);
-        }
-        else{
+        if($scope.status.failed.length == 0){
             $modalInstance.close(true);
         }
     };

@@ -7,7 +7,15 @@
 	</div>
 </div>
 <div class="modal-body">
-	<p>{{'PROCESS-INSTANCES.POPUP.DELETE.MESSAGE-DELETE' | translate:{total: processes.length} }}</p>
+	<p ng-show="status.failed == 0">{{'PROCESS-INSTANCES.POPUP.DELETE.MESSAGE-DELETE' | translate:{total: processes.length} }}</p>
+	<progressbar value="status.progress" ng-show="status.failed == 0"></progressbar>
+
+	<p ng-show="status.failed.length > 0">{{'PROCESS-INSTANCES.POPUP.DELETE.DELETE-FAILED' | translate }}</p>
+	<ol ng-show="status.failed.length > 0">
+		<li ng-repeat="failedProcess in status.failed">
+			<a role="link" ng-click="openInNewWindow('#/process-instance/', failedProcess.id)">{{failedProcess.processDefinition.key}} ({{failedProcess.id}})</a>
+		</li>
+	</ol>
 </div>
 
 <div class="modal-footer-wrapper">
