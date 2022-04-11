@@ -56,6 +56,11 @@ public class EventJsonConverter {
                     } else {
                         eventModel.addPayload(name, type);
                     }
+                    
+                    boolean isFullPayload = node.path("isFullPayload").asBoolean(false);
+                    if (isFullPayload) {
+                        eventModel.addFullPayload(name);
+                    }
                 }
             }
 
@@ -67,8 +72,6 @@ public class EventJsonConverter {
                     eventModel.addCorrelation(name, type);
                 }
             }
-            
-            eventModel.setFullPayloadPropertyName(modelNode.path("fullPayloadPropertyName").asText(null));
 
             return eventModel;
             
@@ -101,18 +104,18 @@ public class EventJsonConverter {
                     eventPayloadNode.put("type", eventPayload.getType());
                 }
                 
-                if (eventPayload.isHeader()) {
+                if (eventPayload.isHeader() && !eventPayload.isFullPayload()) {
                     eventPayloadNode.put("header", true);
                 }
 
-                if (eventPayload.isCorrelationParameter()) {
+                if (eventPayload.isCorrelationParameter() && !eventPayload.isFullPayload()) {
                     eventPayloadNode.put("correlationParameter", true);
                 }
+                
+                if (eventPayload.isFullPayload()) {
+                    eventPayloadNode.put("isFullPayload", true);
+                }
             }
-        }
-        
-        if (definition.getFullPayloadPropertyName() != null) {
-            modelNode.put("fullPayloadPropertyName", definition.getFullPayloadPropertyName());
         }
 
         try {

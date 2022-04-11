@@ -108,8 +108,8 @@ public class EventModelBuilderImpl implements EventModelBuilder {
     }
     
     @Override
-    public EventModelBuilder fullPayloadPropertyName(String name) {
-        this.fullPayloadPropertyName = name;
+    public EventModelBuilder fullPayload(String name) {
+        eventPayloadDefinitions.put(name, EventPayload.fullPayload(name));
         return this;
     }
 
@@ -145,7 +145,6 @@ public class EventModelBuilderImpl implements EventModelBuilder {
         }
 
         eventModel.setPayload(eventPayloadDefinitions.values());
-        eventModel.setFullPayloadPropertyName(fullPayloadPropertyName);
 
         return eventModel;
     }

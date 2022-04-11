@@ -85,7 +85,7 @@ public interface EventModelBuilder {
     /**
      * Defines the property name for the full payload.
      */
-    EventModelBuilder fullPayloadPropertyName(String name);
+    EventModelBuilder fullPayload(String name);
     
     /**
      * Creates a new event model, but does not deploy it to the Event registry engine.

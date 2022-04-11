@@ -16,13 +16,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,21 +43,19 @@ public class XmlElementsToMapPayloadExtractor extends BaseMapPayloadExtractor<Do
                 .collect(Collectors.toList());
         
         Collection<EventPayloadInstance> payloadInstances = eventModel.getPayload().stream()
-            .filter(parameterDefinition -> getChildNode(event.getPayload(), parameterDefinition.getName()) != null)
+            .filter(parameterDefinition -> parameterDefinition.isFullPayload() || getChildNode(event.getPayload(), parameterDefinition.getName()) != null)
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event.getPayload(), 
-                    payloadDefinition.getName(), payloadDefinition.getType())))
+                    payloadDefinition.getName(), payloadDefinition.getType(), payloadDefinition.isFullPayload())))
             .collect(Collectors.toList());
-        
-        if (StringUtils.isNotEmpty(eventModel.getFullPayloadPropertyName())) {
-            EventPayload fullEventPayloadDefinition = new EventPayload(eventModel.getFullPayloadPropertyName(), EventPayloadTypes.JSON);
-            payloadInstances.add(new EventPayloadInstanceImpl(fullEventPayloadDefinition, event.getPayload()));
-        }
         
         payloadInstances.addAll(headerInstances);
         return payloadInstances;
     }
 
-    protected Object getPayloadValue(Document document, String definitionName, String definitionType) {
+    protected Object getPayloadValue(Document document, String definitionName, String definitionType, boolean isFullPayload) {
+        if (isFullPayload) {
+            return document;
+        }
 
         Node childNode = getChildNode(document, definitionName);
         if (childNode != null) {
