@@ -1,13 +1,16 @@
 {
     "key": "one",
     "name": "My first Event",
-    "fullPayloadPropertyName": "fullPayload",
     "payload": [
     	{
             "name": "headerProperty1",
             "type": "string",
             "header": true,
             "correlationParameter": true
+        },
+        {
+            "name": "fullPayload",
+            "isFullPayload": true
         }
     ]
 }

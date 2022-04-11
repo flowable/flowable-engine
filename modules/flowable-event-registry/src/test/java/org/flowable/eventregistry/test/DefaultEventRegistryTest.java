@@ -133,7 +133,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         repositoryService.createEventModelBuilder()
                 .key("myEvent")
                 .resourceName("myEvent.event")
-                .fullPayloadPropertyName("fullPayload")
+                .fullPayload("fullPayload")
                 .deploy();
 
         inboundEventChannelAdapter.triggerTestEvent();
@@ -165,7 +165,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 .resourceName("myEvent.event")
                 .correlationParameter("customerId", EventPayloadTypes.STRING)
                 .payload("payload1", EventPayloadTypes.STRING)
-                .fullPayloadPropertyName("fullPayload")
+                .fullPayload("fullPayload")
                 .deploy();
 
         inboundEventChannelAdapter.triggerTestEvent();

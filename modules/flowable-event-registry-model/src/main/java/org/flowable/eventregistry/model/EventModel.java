@@ -31,7 +31,6 @@ public class EventModel {
     protected String key;
     protected String name;
     protected Map<String, EventPayload> payload = new LinkedHashMap<>();
-    protected String fullPayloadPropertyName;
 
     public String getKey() {
         return key;
@@ -107,12 +106,15 @@ public class EventModel {
             payload.put(name, EventPayload.correlation(name, type));
         }
     }
-
-    public String getFullPayloadPropertyName() {
-        return fullPayloadPropertyName;
-    }
-
-    public void setFullPayloadPropertyName(String fullPayloadPropertyName) {
-        this.fullPayloadPropertyName = fullPayloadPropertyName;
+    
+    public void addFullPayload(String name) {
+        EventPayload eventPayload = payload.get(name);
+        if (eventPayload != null) {
+            eventPayload.setFullPayload(true);
+            eventPayload.setCorrelationParameter(false);
+            eventPayload.setHeader(false);
+        } else {
+            payload.put(name, EventPayload.fullPayload(name));
+        }
     }
 }

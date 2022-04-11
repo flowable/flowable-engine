@@ -550,7 +550,7 @@ class JmsChannelDefinitionProcessorTest {
         eventRepositoryService.createEventModelBuilder()
             .resourceName("testEvent.event")
             .key("test")
-            .fullPayloadPropertyName("myFullPayload")
+            .fullPayload("myFullPayload")
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()

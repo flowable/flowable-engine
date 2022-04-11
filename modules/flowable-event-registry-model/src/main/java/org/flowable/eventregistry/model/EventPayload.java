@@ -26,6 +26,7 @@ public class EventPayload {
     protected String type;
     protected boolean header;
     protected boolean correlationParameter;
+    protected boolean isFullPayload;
     
     public EventPayload() {}
 
@@ -87,6 +88,22 @@ public class EventPayload {
         return payload;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isFullPayload() {
+        return isFullPayload;
+    }
+
+    public void setFullPayload(boolean isFullPayload) {
+        this.isFullPayload = isFullPayload;
+    }
+    
+    public static EventPayload fullPayload(String name) {
+        EventPayload payload = new EventPayload();
+        payload.name = name;
+        payload.setFullPayload(true);
+        return payload;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -96,7 +113,8 @@ public class EventPayload {
             return false;
         }
         EventPayload that = (EventPayload) o;
-        return Objects.equals(name, that.name) && Objects.equals(type, that.type) && correlationParameter == that.correlationParameter;
+        return Objects.equals(name, that.name) && Objects.equals(type, that.type) && correlationParameter == that.correlationParameter
+                && header == that.header && isFullPayload == that.isFullPayload;
     }
 
     @Override
