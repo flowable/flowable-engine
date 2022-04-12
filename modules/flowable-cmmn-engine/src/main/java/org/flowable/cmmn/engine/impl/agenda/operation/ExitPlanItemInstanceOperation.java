@@ -20,14 +20,19 @@ import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
 
+import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
+import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -118,6 +123,17 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
             // regardless of the exit event type, we need to exit the child plan items as well (we don't propagate the exit event type though, children are
             // always exited, not completed)
             exitChildPlanItemInstances(PlanItemTransition.EXIT, exitCriterionId, exitEventType);
+
+            // create stage ended with terminate or complete state event
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                String endingState = FlowableCaseStageEndedEvent.ENDING_STATE_TERMINATED;
+                if (Criterion.EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
+                    endingState = FlowableCaseStageEndedEvent.ENDING_STATE_COMPLETED;
+                }
+                eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createStageEndedEvent(getCaseInstance(), planItemInstanceEntity, endingState),
+                    EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
 
         planItemInstanceEntity.setExitCriterionId(exitCriterionId);

@@ -57,6 +57,21 @@ public abstract class CmmnOperation implements Runnable {
      */
     public abstract String getCaseInstanceId();
 
+    /**
+     * Returns the case instance entity using the entity manager by getting the case instance id through {@link #getCaseInstanceId()} and returning
+     * the case instance entity accordingly. If there is no id provided, this method will return null, but not throw an exception.
+     *
+     * @return the case instance entity according the case instance id involved in this operation or null, if there is none involved
+     */
+    protected CaseInstanceEntity getCaseInstance() {
+        String caseId = getCaseInstanceId();
+        if (caseId == null) {
+            return null;
+        }
+
+        return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseId);
+    }
+
     protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof Stage) {
@@ -104,7 +119,7 @@ public abstract class CmmnOperation implements Runnable {
                         stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
                 }
 
-            } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment){
+            } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment) {
                 // Some plan items (plan fragments) exist as plan item, but not as plan item instance
                 PlanFragment planFragment = (PlanFragment) planItem.getPlanItemDefinition();
                 List<PlanItem> planFragmentPlanItems = planFragment.getDirectChildPlanItemsWithLifecycleEnabled();
