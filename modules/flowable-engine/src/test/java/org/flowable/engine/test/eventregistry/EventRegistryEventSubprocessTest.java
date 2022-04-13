@@ -24,8 +24,10 @@ import java.util.Random;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -355,6 +357,29 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
                 );
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/EventRegistryEventSubprocessTest.EventRegistryEventSubprocessAndCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml"
+    })
+    public void testInterruptSubprocessOfCallActivity() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "gonzo");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EventRegistryEventSubprocessProcessAndCallActivity", variableMap);
+
+        // Trigger event subprocess
+        inboundEventChannelAdapter.triggerTestEvent("gonzo");
+
+        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThat(parentProcess.getEndTime()).isNotNull();
+
+        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+        assertThat(throwProcess).isNotNull();
+        assertThat(throwProcess.getEndTime()).isNotNull();
+        assertThat(throwProcess.getEndActivityId()).isEqualTo("eventProcessStart");
+    }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());

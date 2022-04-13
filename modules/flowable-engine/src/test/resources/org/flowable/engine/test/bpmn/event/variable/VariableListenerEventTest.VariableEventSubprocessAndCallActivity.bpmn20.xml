@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <message id="myMessage" name="myMessage"></message>
+  <process id="VariableEventSubprocessProcess" name="VariableEventSubprocessProcess" isExecutable="true">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:language><![CDATA[English]]></design:language>
+      <design:creationdate><![CDATA[2022-04-13T15:07:39.763Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2022-04-13T15:34:30.267Z]]></design:modificationdate>
+    </extensionElements>
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </startEvent>
+    <callActivity id="callActivity1" name="Call activity" calledElement="startToEnd" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="callActivity1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow2" sourceRef="callActivity1" targetRef="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <subProcess id="eventSubprocess1" name="subProcess" triggeredByEvent="true">
+      <extensionElements>
+        <design:stencilid><![CDATA[EventSubprocess]]></design:stencilid>
+      </extensionElements>
+      <endEvent id="endNoneEvent2">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        </extensionElements>
+      </endEvent>
+      <startEvent id="startVariableListenerEvent1" isInterrupting="true">
+        <extensionElements>
+          <flowable:variableListenerEventDefinition variableName="myVar" variableChangeType="all"></flowable:variableListenerEventDefinition>
+          <design:stencilid><![CDATA[StartVariableListenerEvent]]></design:stencilid>
+        </extensionElements>
+      </startEvent>
+      <sequenceFlow id="sequenceFlow3" sourceRef="startVariableListenerEvent1" targetRef="endNoneEvent2">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+  </process>
+</definitions>

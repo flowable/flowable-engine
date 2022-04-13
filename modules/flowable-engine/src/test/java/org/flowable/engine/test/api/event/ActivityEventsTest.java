@@ -32,6 +32,7 @@ import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
+import org.flowable.engine.delegate.event.impl.FlowableActivityCancelledEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableActivityEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableSignalEventImpl;
 import org.flowable.engine.event.EventLogEntry;
@@ -372,7 +373,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Only a message events should be present, no signal-event, since the event-subprocess is
         // not signaled, but executed instead
-        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived()).hasSize(3);
 
         // A message waiting event is expected
         assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableMessageEvent.class);
@@ -395,6 +396,12 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertThat(messageEvent.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
         assertThat(messageEvent.getMessageName()).isEqualTo("messageName");
         assertThat(messageEvent.getMessageData()).isNull();
+
+        // A message received event is expected
+        assertThat(listener.getEventsReceived().get(2)).isInstanceOf(FlowableActivityCancelledEventImpl.class);
+        FlowableActivityCancelledEventImpl activityEvent = (FlowableActivityCancelledEventImpl) listener.getEventsReceived().get(2);
+        assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(activityEvent.getActivityId()).isEqualTo("shipOrder");
 
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED);
