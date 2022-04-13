@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="Examples" xmlns:tns="Examples">
+
+	<process id="EventRegistryEventSubprocessProcessAndCallActivity">
+
+		<startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+		</startEvent>
+		<callActivity id="callActivity1" name="Call activity" calledElement="startToEnd" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+		</callActivity>
+		<sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="callActivity1">
+		</sequenceFlow>
+		<endEvent id="endNoneEvent1">
+		</endEvent>
+		<sequenceFlow id="sequenceFlow2" sourceRef="callActivity1" targetRef="endNoneEvent1">
+		</sequenceFlow>
+
+		<subProcess id="eventRegistryEventSubProcess" triggeredByEvent="true">
+			<startEvent id="eventProcessStart" isInterrupting="true">
+				<extensionElements>
+                    <flowable:eventType>myEvent</flowable:eventType>
+                    <flowable:eventCorrelationParameter name="customerId" value="${customerIdVar}" />
+                </extensionElements>
+			</startEvent>
+			<sequenceFlow id="eventFlow1" sourceRef="eventProcessStart" targetRef="eventSubProcessEnd" />
+			<endEvent id="eventSubProcessEnd" />
+		</subProcess>
+
+	</process>
+
+</definitions>

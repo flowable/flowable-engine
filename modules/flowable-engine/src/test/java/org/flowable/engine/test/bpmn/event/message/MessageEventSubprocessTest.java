@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -27,6 +28,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
@@ -663,6 +665,29 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         }
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.MessageEventSubprocessAndCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml"
+    })
+    public void testInterruptSubprocessOfCallActivity() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MessageEventSubprocessProcessAndCallActivity");
+
+        // Trigger event subprocess
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("myMessage").singleResult();
+        runtimeService.messageEventReceived("myMessage", execution.getId());
+
+        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThat(parentProcess.getEndTime()).isNotNull();
+
+        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+        assertThat(throwProcess).isNotNull();
+        assertThat(throwProcess.getEndTime()).isNotNull();
+        assertThat(throwProcess.getEndActivityId()).isEqualTo("startMessageEvent1");
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

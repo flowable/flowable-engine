@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -518,5 +519,30 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
                     tuple("endEvent", "eventSubProcessEnd")
                 );
         }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.TimerEventSubprocessAndCallAvtivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml"
+    })
+    public void testInterruptSubprocessOfCallActivity() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TimerEventSubprocessProcessAndCallActivity");
+
+        // Trigger the Event sub process
+        Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        managementService.moveTimerToExecutableJob(job.getId());
+        managementService.executeJob(job.getId());
+
+        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThat(parentProcess.getEndTime()).isNotNull();
+
+        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+        assertThat(throwProcess).isNotNull();
+        assertThat(throwProcess.getEndTime()).isNotNull();
+        assertThat(throwProcess.getEndActivityId()).isEqualTo("startTimerEvent1");
     }
 }

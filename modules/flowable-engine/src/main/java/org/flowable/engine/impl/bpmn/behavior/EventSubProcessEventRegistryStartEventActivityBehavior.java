@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -83,13 +84,15 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
 
         if (startEvent.isInterrupting()) {
             List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionEntity.getParent());
+            Collection<String> executionIdsNotToDelete = new ArrayList<>();
             for (int i = childExecutions.size() - 1; i >= 0; i--) {
                 ExecutionEntity childExecutionEntity = childExecutions.get(i);
-                if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(executionEntity.getId())) {
-                    executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
-                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", false);
+                if (childExecutionEntity.isEnded() || childExecutionEntity.getId().equals(executionEntity.getId())) {
+                    executionIdsNotToDelete.add(childExecutionEntity.getId());
                 }
             }
+            executionEntityManager.deleteChildExecutions(executionEntity.getParent(), executionIdsNotToDelete, null,
+                    DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", true, executionEntity.getCurrentFlowElement());
 
             EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
