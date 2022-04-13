@@ -13,13 +13,16 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -41,6 +44,13 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
             .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         planItemInstanceEntity.setStage(true);
+
+        // create case stage started event
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createStageStartedEvent(getCaseInstance(), planItemInstanceEntity),
+                EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        }
 
         Case caseModel = CaseDefinitionUtil.getCase(planItemInstanceEntity.getCaseDefinitionId());
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceEntityManager()

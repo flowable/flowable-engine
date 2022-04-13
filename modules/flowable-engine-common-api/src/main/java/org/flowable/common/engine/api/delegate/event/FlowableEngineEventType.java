@@ -355,6 +355,18 @@ public enum FlowableEngineEventType implements FlowableEventType {
     CASE_ENDED,
 
     /**
+     * A stage instance (plan item) has been started (went into active state, not to be confused with the creation of the stage plan item).
+     * The event is being dispatched after the lifecycle listeners have been invoked.
+     */
+    STAGE_STARTED,
+
+    /**
+     * A stage instance (plan item) has been ended (either through completion, manual termination or an exit).
+     * The event is being dispatched after the lifecycle listeners have been invoked.
+     */
+    STAGE_ENDED,
+
+    /**
      * A change tenant id was executed.
      */
     CHANGE_TENANT_ID,
