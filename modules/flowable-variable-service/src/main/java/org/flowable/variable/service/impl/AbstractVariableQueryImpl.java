@@ -66,7 +66,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueEquals(String name, Object value, String scopeType) {
+    protected T scopedVariableValueEquals(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.EQUALS, scopeType, false);
         return (T) this;
     }
@@ -82,7 +82,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueEquals(Object value, String scopeType) {
+    protected T scopedVariableValueEquals(Object value, String scopeType) {
         queryVariableValues.add(new QueryVariableValue(null, value, QueryOperator.EQUALS, false, scopeType));
         return (T) this;
     }
@@ -101,7 +101,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueEqualsIgnoreCase(String name, String value, String scopeType) {
+    protected T scopedVariableValueEqualsIgnoreCase(String name, String value, String scopeType) {
         if (value == null) {
             throw new FlowableIllegalArgumentException("value is null");
         }
@@ -123,7 +123,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueNotEqualsIgnoreCase(String name, String value, String scopeType) {
+    protected T scopedVariableValueNotEqualsIgnoreCase(String name, String value, String scopeType) {
         if (value == null) {
             throw new FlowableIllegalArgumentException("value is null");
         }
@@ -142,7 +142,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueNotEquals(String name, Object value, String scopeType) {
+    protected T scopedVariableValueNotEquals(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.NOT_EQUALS, scopeType, false);
         return (T) this;
     }
@@ -158,7 +158,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueGreaterThan(String name, Object value, String scopeType) {
+    protected T scopedVariableValueGreaterThan(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.GREATER_THAN, scopeType, false);
         return (T) this;
     }
@@ -174,7 +174,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueGreaterThanOrEqual(String name, Object value, String scopeType) {
+    protected T scopedVariableValueGreaterThanOrEqual(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.GREATER_THAN_OR_EQUAL, scopeType, false);
         return (T) this;
     }
@@ -190,7 +190,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueLessThan(String name, Object value, String scopeType) {
+    protected T scopedVariableValueLessThan(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.LESS_THAN, scopeType, false);
         return (T) this;
     }
@@ -206,7 +206,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueLessThanOrEqual(String name, Object value, String scopeType) {
+    protected T scopedVariableValueLessThanOrEqual(String name, Object value, String scopeType) {
         addVariable(name, value, QueryOperator.LESS_THAN_OR_EQUAL, scopeType, false);
         return (T) this;
     }
@@ -226,7 +226,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableValueLike(String name, String value, String scopeType) {
+    protected T scopedVariableValueLike(String name, String value, String scopeType) {
         addVariable(name, value, QueryOperator.LIKE, scopeType, false);
         return (T) this;
     }
@@ -241,7 +241,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
     
     @SuppressWarnings("unchecked")
-    protected T variableValueLikeIgnoreCase(String name, String value, String scopeType) {
+    protected T scopedVariableValueLikeIgnoreCase(String name, String value, String scopeType) {
         if (value == null) {
             throw new FlowableIllegalArgumentException("value is null");
         }
@@ -260,7 +260,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
     
     @SuppressWarnings("unchecked")
-    protected T variableExists(String name, String scopeType) {
+    protected T scopedVariableExists(String name, String scopeType) {
         addVariable(name, null, QueryOperator.EXISTS, scopeType, false);
         return (T) this;
     }
@@ -276,7 +276,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected T variableNotExists(String name, String scopeType) {
+    protected T scopedVariableNotExists(String name, String scopeType) {
         addVariable(name, null, QueryOperator.NOT_EXISTS, scopeType, false);
         return (T) this;
     }

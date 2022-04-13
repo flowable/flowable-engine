@@ -1274,9 +1274,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueEquals(String variableName, Object variableValue) {
         if (orActive) {
-            currentOrQueryObject.variableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
-            this.variableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
+            this.scopedVariableValueEquals(variableName, variableValue, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1284,9 +1284,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueEquals(Object variableValue) {
         if (orActive) {
-            currentOrQueryObject.variableValueEquals(variableValue, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueEquals(variableValue, ScopeTypes.CMMN);
         } else {
-            variableValueEquals(variableValue, ScopeTypes.CMMN);
+            scopedVariableValueEquals(variableValue, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1294,9 +1294,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueEqualsIgnoreCase(String name, String value) {
         if (orActive) {
-            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1304,9 +1304,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueNotEquals(String variableName, Object variableValue) {
         if (orActive) {
-            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
-            this.variableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
+            this.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
             ;
         }
         return this;
@@ -1317,7 +1317,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         if (orActive) {
             currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, ScopeTypes.CMMN);
         } else {
-            this.variableValueNotEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueNotEqualsIgnoreCase(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1325,9 +1325,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueGreaterThan(String name, Object value) {
         if (orActive) {
-            currentOrQueryObject.variableValueGreaterThan(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueGreaterThan(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueGreaterThan(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueGreaterThan(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1335,9 +1335,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueGreaterThanOrEqual(String name, Object value) {
         if (orActive) {
-            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueGreaterThanOrEqual(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1345,9 +1345,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueLessThan(String name, Object value) {
         if (orActive) {
-            currentOrQueryObject.variableValueLessThan(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueLessThan(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueLessThan(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueLessThan(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1355,9 +1355,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueLessThanOrEqual(String name, Object value) {
         if (orActive) {
-            currentOrQueryObject.variableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueLessThanOrEqual(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1365,9 +1365,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueLike(String name, String value) {
         if (orActive) {
-            currentOrQueryObject.variableValueLike(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueLike(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueLike(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueLike(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1375,9 +1375,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableValueLikeIgnoreCase(String name, String value) {
         if (orActive) {
-            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
         } else {
-            this.variableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
+            this.scopedVariableValueLikeIgnoreCase(name, value, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1385,9 +1385,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableExists(String name) {
         if (orActive) {
-            currentOrQueryObject.variableExists(name, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableExists(name, ScopeTypes.CMMN);
         } else {
-            this.variableExists(name, ScopeTypes.CMMN);
+            this.scopedVariableExists(name, ScopeTypes.CMMN);
         }
         return this;
     }
@@ -1395,9 +1395,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery caseVariableNotExists(String name) {
         if (orActive) {
-            currentOrQueryObject.variableNotExists(name, ScopeTypes.CMMN);
+            currentOrQueryObject.scopedVariableNotExists(name, ScopeTypes.CMMN);
         } else {
-            this.variableNotExists(name, ScopeTypes.CMMN);
+            this.scopedVariableNotExists(name, ScopeTypes.CMMN);
         }
         return this;
     }
