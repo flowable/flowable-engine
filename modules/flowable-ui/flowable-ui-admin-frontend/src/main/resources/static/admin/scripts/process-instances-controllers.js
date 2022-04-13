@@ -329,9 +329,9 @@ flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
         $scope.status.loading = true;
         var dataForPost = {action: "terminate", deleteReason: $translate.instant('PROCESS-INSTANCES.POPUP.DELETE.DELETE-REASON')};
 
-        // terminate
+        // terminate, not allready terminated processes
         var terminatedPromises = Promise.all(
-            $scope.processes.map( async process => {
+            $scope.processes.filter(process => !process.endTime).map( async process => {
                 await $http({
                     method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances/' + process.id,
                     data: dataForPost
@@ -343,6 +343,9 @@ flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
             })
         )
         await terminatedPromises;
+
+        // add processes that were allready terminated
+        $scope.status.successfullyTerminated = $scope.status.successfullyTerminated.concat($scope.processes.filter(process => process.endTime))
 
         // delete all succesfully terminated
         dataForPost.action = "delete"
