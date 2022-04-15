@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <signal id="cancelSignal" name="cancelSignal" flowable:scope="global"></signal>
+  <process id="signalThrowProcess" name="signalThrowProcess" isExecutable="true">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:language><![CDATA[English]]></design:language>
+      <design:creationdate><![CDATA[2022-04-12T12:20:21.878Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2022-04-13T09:02:13.716Z]]></design:modificationdate>
+    </extensionElements>
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </startEvent>
+    <intermediateThrowEvent id="intermediateSignalEventThrowing1">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateSignalEventThrowing]]></design:stencilid>
+      </extensionElements>
+      <signalEventDefinition signalRef="cancelSignal"></signalEventDefinition>
+    </intermediateThrowEvent>
+    <sequenceFlow id="sequenceFlow2" sourceRef="startnoneevent1" targetRef="intermediateSignalEventThrowing1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="endNoneEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow4" sourceRef="intermediateSignalEventThrowing1" targetRef="endNoneEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+</definitions>

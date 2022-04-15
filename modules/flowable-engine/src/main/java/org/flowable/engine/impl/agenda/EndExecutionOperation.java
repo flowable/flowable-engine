@@ -198,7 +198,7 @@ public class EndExecutionOperation extends AbstractOperation {
         LOGGER.debug("Parent execution found. Continuing process using execution {}", parentExecution.getId());
 
         // When ending an execution in a multi instance subprocess , special care is needed
-        if (isEndEventInMultiInstanceSubprocess(execution)) {
+        if (isEndEventOrImpliedEndEventInMultiInstanceSubprocess(execution)) {
             handleMultiInstanceSubProcess(executionEntityManager, parentExecution, execution);
             return;
         }
@@ -424,13 +424,23 @@ public class EndExecutionOperation extends AbstractOperation {
         }
     }
 
-    protected boolean isEndEventInMultiInstanceSubprocess(ExecutionEntity executionEntity) {
-        if (executionEntity.getCurrentFlowElement() instanceof EndEvent) {
-            SubProcess subProcess = ((EndEvent) execution.getCurrentFlowElement()).getSubProcess();
+    protected boolean isEndEventOrImpliedEndEventInMultiInstanceSubprocess(ExecutionEntity executionEntity) {
+        FlowElement currentFlowElement = executionEntity.getCurrentFlowElement();
+        if (currentFlowElement instanceof EndEvent || isFlowNodeWithoutOutgoingSequenceFlow(currentFlowElement)) {
+            SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
             return !executionEntity.getParent().isProcessInstanceType()
                     && subProcess != null
                     && subProcess.getLoopCharacteristics() != null
                     && subProcess.getBehavior() instanceof MultiInstanceActivityBehavior;
+
+        }
+        return false;
+    }
+
+    protected boolean isFlowNodeWithoutOutgoingSequenceFlow(FlowElement flowElement) {
+        if (flowElement instanceof FlowNode) {
+            FlowNode flowNode = (FlowNode) flowElement;
+            return flowNode.getOutgoingFlows() == null || flowNode.getOutgoingFlows().isEmpty();
         }
         return false;
     }
