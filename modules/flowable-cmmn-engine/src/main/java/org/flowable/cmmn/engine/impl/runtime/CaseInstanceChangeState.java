@@ -35,7 +35,8 @@ public class CaseInstanceChangeState {
     protected Set<MoveToAvailablePlanItemDefinitionMapping> changePlanItemToAvailables;
     protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions;
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
-    protected HashMap<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
+    protected Map<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
+    protected Map<String, PlanItemInstanceEntity> terminatedPlanItemInstances = new HashMap<>();
 
     public CaseInstanceChangeState() {
     }
@@ -174,7 +175,7 @@ public class CaseInstanceChangeState {
         return this;
     }
 
-    public HashMap<String, PlanItemInstanceEntity> getCreatedStageInstances() {
+    public Map<String, PlanItemInstanceEntity> getCreatedStageInstances() {
         return createdStageInstances;
     }
 
@@ -185,5 +186,18 @@ public class CaseInstanceChangeState {
     
     public void addCreatedStageInstance(String key, PlanItemInstanceEntity planItemInstance) {
         this.createdStageInstances.put(key, planItemInstance);
+    }
+    
+    public Map<String, PlanItemInstanceEntity> getTerminatedPlanItemInstances() {
+        return terminatedPlanItemInstances;
+    }
+
+    public CaseInstanceChangeState setTerminatedPlanItemInstances(HashMap<String, PlanItemInstanceEntity> terminatedPlanItemInstances) {
+        this.terminatedPlanItemInstances = terminatedPlanItemInstances;
+        return this;
+    }
+    
+    public void addTerminatedPlanItemInstance(String key, PlanItemInstanceEntity planItemInstance) {
+        this.terminatedPlanItemInstances.put(key, planItemInstance);
     }
 }

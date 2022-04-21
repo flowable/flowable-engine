@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="testCase" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+    
+      <planItem id="planItem1" definitionRef="expandedStage1" />
+    
+      <stage id="expandedStage1">
+         <planItem id="planItem2" name="Cancel case" definitionRef="userEventListener1">
+            <itemControl>
+              <extensionElements>
+                <flowable:completionNeutralRule></flowable:completionNeutralRule>
+              </extensionElements>
+            </itemControl>
+          </planItem>
+          
+          <planItem id="planItem3" name="My new taskname 1" definitionRef="humanTask1"></planItem>
+          
+          <humanTask id="humanTask1" name="My new taskname 1" />
+          <userEventListener id="userEventListener1" name="Cancel case">
+            <extensionElements>
+              <design:completionneutral><![CDATA[true]]></design:completionneutral>
+            </extensionElements>
+          </userEventListener>
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>
