@@ -274,7 +274,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //UserEventListener is consumed
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isZero();
 
-        //Task is om Active state and a second task instance waiting for repetition
+        //Task is on Active state and a second task instance waiting for repetition
         Map<String, List<PlanItemInstance>> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
                 .planItemDefinitionId("taskA")
@@ -301,6 +301,205 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
         //Since WAITING_FOR_REPETITION is a "Semi-terminal", completing taskB should complete the stage and case
         cmmnTaskService.complete(cmmnTaskService.createTaskQuery().active().singleResult().getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventRepetitionWithRepeatingEntryCriteriaHavingMaxInstanceCountOneInStage() {
+        //Test case that activates a repeating task (entryCriteria) with a repeating UserEvent
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .variable("whileRepeatActivateTaskA", "true")
+                .start();
+
+        assertThat(caseInstance).isNotNull();
+
+        //TaskA on available state until the entry criteria occurs
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA").singleResult();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        //Trigger the userEvent
+        PlanItemInstance userEvent = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
+
+        //UserEventListener is consumed and a new one is created
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(1);
+        PlanItemInstance repeatedUserEvent = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
+        assertThat(repeatedUserEvent.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(repeatedUserEvent.getPlanItemDefinitionId()).isEqualTo(userEvent.getPlanItemDefinitionId());
+
+        //Task is on Active state and a second task instance waiting for repetition
+        Map<String, List<PlanItemInstance>> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks)
+                .hasSize(2)
+                .containsKey(PlanItemInstanceState.ACTIVE);
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
+        assertThat(tasks).containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertThat(tasks.get(PlanItemInstanceState.WAITING_FOR_REPETITION)).hasSize(1);
+
+        cmmnRuntimeService.triggerPlanItemInstance(repeatedUserEvent.getId());
+
+        //Since the first taskA is not yet completed and is configured with "maxInstanceCount=1",
+        //no new task instance was created when the repeated user event was triggered
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .planItemInstanceStateActive()
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
+        
+        //Complete first active task
+        Task activeTaskA = cmmnTaskService.createTaskQuery().taskDefinitionKey("taskA").active().singleResult();
+        assertThat(taskA.getId()).isEqualTo(activeTaskA.getSubScopeId());
+        cmmnTaskService.complete(activeTaskA.getId());
+
+        //There is still one instance of TaskA waiting for repetition
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get("taskA").get(0).getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventRepetitionWithRepeatingEntryCriteriaAndMaxInstanceCountOneInStage() {
+        //Test case that activates a repeating task (entryCriteria) with a repeating UserEvent
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .variable("whileRepeatActivateTaskA", "true")
+                .start();
+
+        assertThat(caseInstance).isNotNull();
+
+        //TaskA on available state until the entry criteria occurs
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA").singleResult();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        //Trigger the userEvent
+        PlanItemInstance userEvent = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
+
+        //UserEventListener is consumed and a new one is created
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(1);
+        PlanItemInstance repeatedUserEvent = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
+        assertThat(repeatedUserEvent.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(repeatedUserEvent.getPlanItemDefinitionId()).isEqualTo(userEvent.getPlanItemDefinitionId());
+
+        //Task is on Active state and a second task instance waiting for repetition
+        Map<String, List<PlanItemInstance>> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks)
+                .hasSize(2)
+                .containsKey(PlanItemInstanceState.ACTIVE);
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
+        assertThat(tasks).containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertThat(tasks.get(PlanItemInstanceState.WAITING_FOR_REPETITION)).hasSize(1);
+
+        cmmnRuntimeService.triggerPlanItemInstance(repeatedUserEvent.getId());
+
+        //Since the first taskA is not yet completed but is NOT configured with "maxInstanceCount=1".
+        //a new task instance was created when the repeated user event was triggered
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .planItemInstanceStateActive()
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(2);
+        
+        //Complete first active task
+        Task activeTaskA = cmmnTaskService.createTaskQuery().planItemInstanceId(taskA.getId()).singleResult();
+        cmmnTaskService.complete(activeTaskA.getId());
+
+        //Only one TaskA remains
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get("taskA").get(0).getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testUserEventRepetitionWithRepeatingEntryCriteriaAndMaxInstanceCountOne() {
+        //Test case that activates a repeating task (entryCriteria) with a repeating UserEvent
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey(name.getMethodName())
+                .variable("whileRepeatActivateTaskA", "true")
+                .start();
+
+        assertThat(caseInstance).isNotNull();
+
+        //TaskA on available state until the entry criteria occurs
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA").singleResult();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        //Trigger the userEvent
+        PlanItemInstance userEvent = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
+
+        //UserEventListener is consumed and a new one is created
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count()).isEqualTo(1);
+        PlanItemInstance repeatedUserEvent = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
+        assertThat(repeatedUserEvent.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(repeatedUserEvent.getPlanItemDefinitionId()).isEqualTo(userEvent.getPlanItemDefinitionId());
+
+        //Task is on Active state and a second task instance waiting for repetition
+        Map<String, List<PlanItemInstance>> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks)
+                .hasSize(2)
+                .containsKey(PlanItemInstanceState.ACTIVE);
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
+        assertThat(tasks).containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION);
+        assertThat(tasks.get(PlanItemInstanceState.WAITING_FOR_REPETITION)).hasSize(1);
+
+        cmmnRuntimeService.triggerPlanItemInstance(repeatedUserEvent.getId());
+
+        //Since the first taskA is not yet completed but is NOT configured with "maxInstanceCount=1".
+        //a new task instance was created when the repeated user event was triggered
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemDefinitionId("taskA")
+                .planItemInstanceStateActive()
+                .list().stream()
+                .collect(Collectors.groupingBy(PlanItemInstance::getState));
+        assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(2);
+
+        //Complete first active task
+        Task activeTaskA = cmmnTaskService.createTaskQuery().planItemInstanceId(taskA.getId()).singleResult();
+        cmmnTaskService.complete(activeTaskA.getId());
+
+        //Only one TaskA remains
+        tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list().stream().collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get("taskA").get(0).getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
     }
 
     @Test
