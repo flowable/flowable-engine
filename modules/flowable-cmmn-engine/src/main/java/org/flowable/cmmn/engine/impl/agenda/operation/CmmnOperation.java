@@ -204,7 +204,7 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     public boolean isEventListenerWithAvailableCondition(PlanItem planItem) {
-        if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener) {
+        if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener) {
             EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
             return StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression());
         }
