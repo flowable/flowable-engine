@@ -93,7 +93,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
         // evaluate the entry criteria of the plan item and return it, if at least one was satisfied
         Criterion satisfiedEntryCriterion = evaluateEntryCriteria(planItemInstanceEntity, planItem);
-        if (planItem.getEntryCriteria().isEmpty() || satisfiedEntryCriterion != null) {
+        if ((planItem != null && planItem.getEntryCriteria().isEmpty()) || satisfiedEntryCriterion != null) {
             // entry criteria is satisfied for this plan item instance, so we can basically activate it, but we need to check further options like
             // repetition
 
@@ -206,6 +206,10 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      */
     public boolean evaluateForCompletion(PlanItemInstanceEntity planItemInstanceEntity, PlanItemEvaluationResult evaluationResult) {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        if (planItem == null) {
+            return false;
+        }
+        
         String state = planItemInstanceEntity.getState();
 
         // search and evaluate for exit criteria on the plan item, for at least one satisfied exit criterion
@@ -504,18 +508,22 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected Criterion evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
-        List<Criterion> criteria = planItem.getEntryCriteria();
-        if (criteria != null && !criteria.isEmpty()) {
-            return evaluateCriteria(planItemInstanceEntity, criteria);
+        if (planItem != null) {
+            List<Criterion> criteria = planItem.getEntryCriteria();
+            if (criteria != null && !criteria.isEmpty()) {
+                return evaluateCriteria(planItemInstanceEntity, criteria);
+            }
         }
         return null;
     }
 
     // EntityWithSentryPartInstances -> can be used for both case instance and plan item instance
     protected Criterion evaluateExitCriteria(EntityWithSentryPartInstances entityWithSentryPartInstances, HasExitCriteria hasExitCriteria) {
-        List<Criterion> criteria = hasExitCriteria.getExitCriteria();
-        if (criteria != null && !criteria.isEmpty()) {
-            return evaluateCriteria(entityWithSentryPartInstances, criteria);
+        if (hasExitCriteria != null) {
+            List<Criterion> criteria = hasExitCriteria.getExitCriteria();
+            if (criteria != null && !criteria.isEmpty()) {
+                return evaluateCriteria(entityWithSentryPartInstances, criteria);
+            }
         }
         return null;
     }

@@ -250,7 +250,7 @@ public class PlanItemInstancesWrapper {
                 childPlanItemInstances.add(childPlanItemInstance);
             }
 
-            if (childPlanItemInstance.getPlanItem().getPlanItemDefinition() instanceof Stage) {
+            if (childPlanItemInstance.getPlanItem() != null && childPlanItemInstance.getPlanItem().getPlanItemDefinition() instanceof Stage) {
                 collectAllChildPlanItemInstances(commandContext, childPlanItemInstance, childPlanItemInstances);
             }
         }
