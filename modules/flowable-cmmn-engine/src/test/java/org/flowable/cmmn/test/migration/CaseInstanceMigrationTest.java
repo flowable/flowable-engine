@@ -1316,6 +1316,24 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .extracting(PlanItemInstance::getPlanItemDefinitionId)
                 .containsExactlyInAnyOrder("userEventListener1", "expandedStage1", "expandedStage1", "userEventListener2", "humanTask1");
         
+        if (!cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(6);
+            assertThat(historicPlanItemInstances)
+                    .extracting(HistoricPlanItemInstance::getCaseDefinitionId)
+                    .containsOnly(destinationDefinition.getId());
+            assertThat(historicPlanItemInstances)
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionId)
+                    .containsExactlyInAnyOrder("userEventListener1", "userEventListener1", "expandedStage1", "expandedStage1", "userEventListener2", "humanTask1");
+            
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener1").planItemInstanceState(PlanItemInstanceState.COMPLETED).singleResult().getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener1").planItemInstanceState(PlanItemInstanceState.AVAILABLE).singleResult().getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("humanTask1").singleResult().getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("expandedStage1").planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("expandedStage1").planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION).singleResult().getState()).isEqualTo(PlanItemInstanceState.WAITING_FOR_REPETITION);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener2").singleResult().getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        }
+        
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
         
@@ -1466,6 +1484,24 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(planItemInstances)
                 .extracting(PlanItemInstance::getPlanItemDefinitionId)
                 .containsExactlyInAnyOrder("userEventListener1", "rootTask");
+        
+        if (!cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(7);
+            assertThat(historicPlanItemInstances)
+                    .extracting(HistoricPlanItemInstance::getCaseDefinitionId)
+                    .containsOnly(destinationDefinition.getId());
+            assertThat(historicPlanItemInstances)
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionId)
+                    .containsExactlyInAnyOrder("userEventListener1", "userEventListener1", "expandedStage1", "expandedStage1", "humanTask1", "userEventListener2", "rootTask");
+            
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener1").planItemInstanceState(PlanItemInstanceState.COMPLETED).singleResult().getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener1").planItemInstanceState(PlanItemInstanceState.AVAILABLE).singleResult().getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("humanTask1").singleResult().getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("expandedStage1").planItemInstanceState(PlanItemInstanceState.TERMINATED).count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("userEventListener2").singleResult().getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceDefinitionId("rootTask").singleResult().getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        }
         
         cmmnRuntimeService.completeUserEventListenerInstance(
                 cmmnRuntimeService.createUserEventListenerInstanceQuery()
