@@ -20,7 +20,9 @@ import java.util.function.Predicate;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,7 +76,17 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         
         ArrayNode moveToAvailableMappingNodes = convertToJsonMoveToAvailablePlanItemDefinitionMappings(caseInstanceMigrationDocument.getMoveToAvailablePlanItemDefinitionMappings());
         if (moveToAvailableMappingNodes != null && !moveToAvailableMappingNodes.isNull()) {
-            documentNode.set(TERMINATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION, moveToAvailableMappingNodes);
+            documentNode.set(MOVE_TO_AVAILABLE_PLAN_ITEM_DEFINITIONS_JSON_SECTION, moveToAvailableMappingNodes);
+        }
+        
+        ArrayNode waitingForRepetitionMappingNodes = convertToJsonWaitingForRepetitionPlanItemDefinitionMappings(caseInstanceMigrationDocument.getWaitingForRepetitionPlanItemDefinitionMappings());
+        if (waitingForRepetitionMappingNodes != null && !waitingForRepetitionMappingNodes.isNull()) {
+            documentNode.set(WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION, waitingForRepetitionMappingNodes);
+        }
+        
+        ArrayNode removeWaitingForRepetitionMappingNodes = convertToJsonRemoveWaitingForRepetitionPlanItemDefinitionMappings(caseInstanceMigrationDocument.getRemoveWaitingForRepetitionPlanItemDefinitionMappings());
+        if (removeWaitingForRepetitionMappingNodes != null && !removeWaitingForRepetitionMappingNodes.isNull()) {
+            documentNode.set(REMOVE_WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION, removeWaitingForRepetitionMappingNodes);
         }
 
         JsonNode caseInstanceVariablesNode = convertToJsonCaseInstanceVariables(caseInstanceMigrationDocument, objectMapper);
@@ -131,6 +143,30 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
         return mappingsArray;
     }
+    
+    protected static ArrayNode convertToJsonWaitingForRepetitionPlanItemDefinitionMappings(List<WaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings) {
+        ArrayNode mappingsArray = objectMapper.createArrayNode();
+
+        for (WaitingForRepetitionPlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
+            ObjectNode mappingNode = objectMapper.createObjectNode();
+            mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingsArray.add(mappingNode);
+        }
+
+        return mappingsArray;
+    }
+    
+    protected static ArrayNode convertToJsonRemoveWaitingForRepetitionPlanItemDefinitionMappings(List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings) {
+        ArrayNode mappingsArray = objectMapper.createArrayNode();
+
+        for (RemoveWaitingForRepetitionPlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
+            ObjectNode mappingNode = objectMapper.createObjectNode();
+            mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingsArray.add(mappingNode);
+        }
+
+        return mappingsArray;
+    }
 
     public static CaseInstanceMigrationDocument convertFromJson(String jsonCaseInstanceMigrationDocument) {
 
@@ -173,6 +209,24 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     MoveToAvailablePlanItemDefinitionMapping moveToAvailableDefinitionMapping = new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId);
                     documentBuilder.addMoveToAvailablePlanItemDefinitionMapping(moveToAvailableDefinitionMapping);
+                }
+            }
+            
+            JsonNode waitingForRepetitionMappingNodes = rootNode.get(WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION);
+            if (waitingForRepetitionMappingNodes != null) {
+                for (JsonNode mappingNode : waitingForRepetitionMappingNodes) {
+                    String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
+                    WaitingForRepetitionPlanItemDefinitionMapping waitingForRepetitionDefinitionMapping = new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
+                    documentBuilder.addWaitingForRepetitionPlanItemDefinitionMapping(waitingForRepetitionDefinitionMapping);
+                }
+            }
+            
+            JsonNode removeWaitingForRepetitionMappingNodes = rootNode.get(REMOVE_WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION);
+            if (removeWaitingForRepetitionMappingNodes != null) {
+                for (JsonNode mappingNode : removeWaitingForRepetitionMappingNodes) {
+                    String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
+                    RemoveWaitingForRepetitionPlanItemDefinitionMapping removeWaitingForRepetitionDefinitionMapping = new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
+                    documentBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionMapping(removeWaitingForRepetitionDefinitionMapping);
                 }
             }
 
