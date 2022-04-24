@@ -51,15 +51,22 @@ import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.UserEventListener;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.JobService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
@@ -207,7 +214,10 @@ public abstract class AbstractCmmnDynamicStateManager {
                 } else if (planItem.getParentStage() != null) {
                     List<PlanItemInstanceEntity> caseInstancePlanItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
                     for (PlanItemInstanceEntity caseInstancePlanItemInstance : caseInstancePlanItemInstances) {
-                        if (caseInstancePlanItemInstance.getPlanItemDefinitionId().equals(planItem.getParentStage().getId())) {
+                        if (caseInstancePlanItemInstance.getPlanItemDefinitionId().equals(planItem.getParentStage().getId()) &&
+                                !PlanItemInstanceState.WAITING_FOR_REPETITION.equalsIgnoreCase(caseInstancePlanItemInstance.getState()) &&
+                                !PlanItemInstanceState.isInTerminalState(caseInstancePlanItemInstance)) {
+                            
                             parentPlanItemInstance = caseInstancePlanItemInstance;
                             break;
                         }
@@ -682,6 +692,33 @@ public abstract class AbstractCmmnDynamicStateManager {
         } else if (planItemDefinition instanceof ProcessTask) {
             if (planItemInstance.getReferenceId() != null) {
                 cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
+            }
+        
+        } else if (planItemDefinition instanceof EventListener) {
+            
+            if (planItemDefinition instanceof TimerEventListener) {
+                JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
+                List<Job> timerJobs = jobService.createTimerJobQuery()
+                    .caseInstanceId(planItemInstance.getCaseInstanceId())
+                    .planItemInstanceId(planItemInstance.getId())
+                    .elementId(planItemInstance.getPlanItemDefinitionId())
+                    .list();
+                
+                if (timerJobs != null && !timerJobs.isEmpty()) {
+                    for (Job job : timerJobs) {
+                        cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager().delete(job.getId());
+                    }
+                }
+            
+            } else if (!(planItemDefinition instanceof UserEventListener)) {
+                EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
+                
+                if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
+                    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                        eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                    }
+                }
             }
         }
     }
