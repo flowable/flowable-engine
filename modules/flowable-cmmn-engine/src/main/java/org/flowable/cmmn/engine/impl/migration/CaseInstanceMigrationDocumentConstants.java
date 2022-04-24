@@ -28,6 +28,8 @@ public interface CaseInstanceMigrationDocumentConstants {
     String ACTIVATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "activatePlanItemDefinitions";
     String TERMINATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "terminatePlanItemDefinitions";
     String MOVE_TO_AVAILABLE_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "moveToAvailablePlanItemDefinitions";
+    String WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "waitingForRepetitionPlanItemDefinitions";
+    String REMOVE_WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "removeWaitingForRepetitionPlanItemDefinitions";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";
     String CASE_INSTANCE_VARIABLES_JSON_SECTION = "caseInstanceVariables";
 

@@ -450,32 +450,34 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
         boolean showInOverview = false;
         
-        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-        String includeInStageOverviewValue = null;
-        if (planItemInstanceEntity.isStage()) {
-            if (planItemDefinition instanceof Stage) {
-                Stage stage = (Stage) planItemDefinition;
-                includeInStageOverviewValue = stage.getIncludeInStageOverview();
-            }
-            
-        } else if (planItemDefinition instanceof Milestone) {
-            Milestone milestone = (Milestone) planItemDefinition;
-            includeInStageOverviewValue = milestone.getIncludeInStageOverview();
-        }
-        
-        if (StringUtils.isNotEmpty(includeInStageOverviewValue)) {
-            if ("true".equalsIgnoreCase(includeInStageOverviewValue)) {
-                showInOverview = true;
-            
-            } else if (!"false".equalsIgnoreCase(includeInStageOverviewValue)) {
-                Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(includeInStageOverviewValue);
-                Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
-                if (!(stageValueObject instanceof Boolean)) {
-                    throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
-                                    includeInStageOverviewValue + ": " + stageValueObject);
+        if (planItemInstanceEntity.getPlanItem() != null) {
+            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+            String includeInStageOverviewValue = null;
+            if (planItemInstanceEntity.isStage()) {
+                if (planItemDefinition instanceof Stage) {
+                    Stage stage = (Stage) planItemDefinition;
+                    includeInStageOverviewValue = stage.getIncludeInStageOverview();
                 }
                 
-                showInOverview = (Boolean) stageValueObject;
+            } else if (planItemDefinition instanceof Milestone) {
+                Milestone milestone = (Milestone) planItemDefinition;
+                includeInStageOverviewValue = milestone.getIncludeInStageOverview();
+            }
+            
+            if (StringUtils.isNotEmpty(includeInStageOverviewValue)) {
+                if ("true".equalsIgnoreCase(includeInStageOverviewValue)) {
+                    showInOverview = true;
+                
+                } else if (!"false".equalsIgnoreCase(includeInStageOverviewValue)) {
+                    Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(includeInStageOverviewValue);
+                    Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
+                    if (!(stageValueObject instanceof Boolean)) {
+                        throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
+                                        includeInStageOverviewValue + ": " + stageValueObject);
+                    }
+                    
+                    showInOverview = (Boolean) stageValueObject;
+                }
             }
         }
         
