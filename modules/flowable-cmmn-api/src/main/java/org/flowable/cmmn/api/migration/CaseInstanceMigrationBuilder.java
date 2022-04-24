@@ -95,6 +95,24 @@ public interface CaseInstanceMigrationBuilder {
      * @see MoveToAvailablePlanItemDefinitionMapping
      */
     CaseInstanceMigrationBuilder addMoveToAvailablePlanItemDefinitionMapping(MoveToAvailablePlanItemDefinitionMapping mapping);
+    
+    /**
+     * Adds a waiting for repetition plan item definition mapping to the case instance migration plan.
+     *
+     * @param mapping Mapping for a specific plan item definition
+     * @return Returns the builder
+     * @see WaitingForRepetitionPlanItemDefinitionMapping
+     */
+    CaseInstanceMigrationBuilder addWaitingForRepetitionPlanItemDefinitionMapping(WaitingForRepetitionPlanItemDefinitionMapping mapping);
+    
+    /**
+     * Removes a waiting for repetition plan item definition mapping to the case instance migration plan.
+     *
+     * @param mapping Mapping for a specific plan item definition
+     * @return Returns the builder
+     * @see WaitingForRepetitionPlanItemDefinitionMapping
+     */
+    CaseInstanceMigrationBuilder removeWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping mapping);
 
     /**
      * Specifies a case instance variable that will also be available during the case migration
