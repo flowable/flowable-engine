@@ -560,7 +560,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         
         PlanItemInstanceEntity newPlanItemInstance = newPlanItemInstances.get(0);
         PlanItem planItem = newPlanItemInstance.getPlanItem();
-        if (planItem.getParentStage() != null) {
+        if (planItem != null && planItem.getParentStage() != null) {
             for (PlanItem stagePlanItem : planItem.getParentStage().getPlanItems()) {
                 if (!newPlanItemInstanceIds.contains(stagePlanItem.getId()) && !runtimePlanItemInstanceMap.containsKey(stagePlanItem.getPlanItemDefinition().getId()) 
                         && !terminatedPlanItemInstances.containsKey(stagePlanItem.getPlanItemDefinition().getId())) {
@@ -592,14 +592,16 @@ public abstract class AbstractCmmnDynamicStateManager {
     protected boolean isStageAncestorOfAnyPlanItemInstance(String stageId, Map<String, List<PlanItemInstanceEntity>> planItemInstanceMap) {
         for (List<PlanItemInstanceEntity> planItemInstanceList : planItemInstanceMap.values()) {
             for (PlanItemInstanceEntity planItemInstance : planItemInstanceList) {
-                PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
-                
-                if (planItemDefinition.getId().equals(stageId)) {
-                    return true;
-                }
-    
-                if (isStageAncestor(stageId, planItemDefinition)) {
-                    return true;
+                if (planItemInstance.getPlanItem() != null) {
+                    PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
+                    
+                    if (planItemDefinition.getId().equals(stageId)) {
+                        return true;
+                    }
+        
+                    if (isStageAncestor(stageId, planItemDefinition)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -673,54 +675,56 @@ public abstract class AbstractCmmnDynamicStateManager {
         cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
                 commandContext, planItemInstance, currentPlanItemInstanceState, planItemInstance.getState());
         
-        PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
-        if (planItemDefinition instanceof HumanTask) {
-            if (PlanItemInstanceState.ACTIVE.equals(currentPlanItemInstanceState)) {
-                TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
-                List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
-                if (taskEntities == null || taskEntities.isEmpty()) {
-                    throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
-                }
-    
-                // Should be only one
-                for (TaskEntity taskEntity : taskEntities) {
-                    if (!taskEntity.isDeleted()) {
-                        TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false, cmmnEngineConfiguration);
+        if (planItemInstance.getPlanItem() != null) {
+            PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
+            if (planItemDefinition instanceof HumanTask) {
+                if (PlanItemInstanceState.ACTIVE.equals(currentPlanItemInstanceState)) {
+                    TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+                    List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
+                    if (taskEntities == null || taskEntities.isEmpty()) {
+                        throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
+                    }
+        
+                    // Should be only one
+                    for (TaskEntity taskEntity : taskEntities) {
+                        if (!taskEntity.isDeleted()) {
+                            TaskHelper.deleteTask(taskEntity, "Change plan item state", false, false, cmmnEngineConfiguration);
+                        }
                     }
                 }
-            }
-            
-        } else if (planItemDefinition instanceof Stage) {
-            deleteChildPlanItemInstances(planItemInstance, commandContext);
-        
-        } else if (planItemDefinition instanceof ProcessTask) {
-            if (planItemInstance.getReferenceId() != null) {
-                cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
-            }
-        
-        } else if (planItemDefinition instanceof EventListener) {
-            
-            if (planItemDefinition instanceof TimerEventListener) {
-                JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
-                List<Job> timerJobs = jobService.createTimerJobQuery()
-                    .caseInstanceId(planItemInstance.getCaseInstanceId())
-                    .planItemInstanceId(planItemInstance.getId())
-                    .elementId(planItemInstance.getPlanItemDefinitionId())
-                    .list();
                 
-                if (timerJobs != null && !timerJobs.isEmpty()) {
-                    for (Job job : timerJobs) {
-                        cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager().delete(job.getId());
-                    }
+            } else if (planItemDefinition instanceof Stage) {
+                deleteChildPlanItemInstances(planItemInstance, commandContext);
+            
+            } else if (planItemDefinition instanceof ProcessTask) {
+                if (planItemInstance.getReferenceId() != null) {
+                    cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
                 }
             
-            } else if (!(planItemDefinition instanceof UserEventListener)) {
-                EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
+            } else if (planItemDefinition instanceof EventListener) {
                 
-                if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
-                    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                        eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                if (planItemDefinition instanceof TimerEventListener) {
+                    JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
+                    List<Job> timerJobs = jobService.createTimerJobQuery()
+                        .caseInstanceId(planItemInstance.getCaseInstanceId())
+                        .planItemInstanceId(planItemInstance.getId())
+                        .elementId(planItemInstance.getPlanItemDefinitionId())
+                        .list();
+                    
+                    if (timerJobs != null && !timerJobs.isEmpty()) {
+                        for (Job job : timerJobs) {
+                            cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager().delete(job.getId());
+                        }
+                    }
+                
+                } else if (!(planItemDefinition instanceof UserEventListener)) {
+                    EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+                    List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
+                    
+                    if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
+                        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                            eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                        }
                     }
                 }
             }
