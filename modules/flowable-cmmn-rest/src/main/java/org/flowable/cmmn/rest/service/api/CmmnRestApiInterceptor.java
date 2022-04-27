@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.Set;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -82,8 +84,12 @@ public interface CmmnRestApiInterceptor {
     
     void terminateCaseInstance(CaseInstance caseInstance);
     
+    void bulkTerminateCaseInstance(Set<String> caseInstanceIdList);
+
     void deleteCaseInstance(CaseInstance caseInstance);
     
+    void bulkDeleteCaseInstance(Set<String> caseInstanceIdsSet);
+
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);

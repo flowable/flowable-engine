@@ -20,8 +20,10 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
@@ -873,6 +875,63 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         }
     }
     
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testDeleteCaseInstance.cmmn" })
+    public void testBulkDeleteCaseInstance() {
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance2.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+
+        Set<String> caseInstanceIdList = new HashSet<>();
+        caseInstanceIdList.add(caseInstance1.getId());
+        caseInstanceIdList.add(caseInstance2.getId());
+
+        cmmnRuntimeService.bulkDeleteCaseInstance(caseInstanceIdList);
+        assertCaseInstanceEnded(caseInstance1, 0);
+        assertCaseInstanceEnded(caseInstance2, 1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance2.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testTerminateCaseInstance.cmmn" })
+    public void testBulkTerminateCaseInstance() {
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance2.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+
+        Set<String> caseInstanceIdList = new HashSet<>();
+        caseInstanceIdList.add(caseInstance1.getId());
+        caseInstanceIdList.add(caseInstance2.getId());
+
+        cmmnRuntimeService.bulkTerminateCaseInstance(caseInstanceIdList);
+
+        assertCaseInstanceEnded(caseInstance1, 0);
+        assertCaseInstanceEnded(caseInstance2, 1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance2.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+    }
+
     @Test
     @CmmnDeployment
     public void testDeleteCaseInstance() {

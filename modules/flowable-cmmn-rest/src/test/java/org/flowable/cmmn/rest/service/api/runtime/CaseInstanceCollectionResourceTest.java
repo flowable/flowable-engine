@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -43,6 +44,7 @@ import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -454,13 +456,13 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         org.flowable.cmmn.api.repository.CmmnDeployment tenantDeployment = null;
 
         try {
-            // Deploy the same process, in another tenant
+            // Deploy the same case, in another tenant
             tenantDeployment = repositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
                     .tenantId("tenant1").deploy();
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            // Start using process definition key, in tenant 1
+            // Start using case definition key, in tenant 1
             requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
             requestNode.put("tenantId", "tenant1");
 
@@ -708,5 +710,41 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task1";
         assertResultsPresentInDataResponse(url);
+    }
+
+    /**
+     * Test  bulk deletion of case instances.
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testBulkDeleteCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
+        HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());
+        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
+        // Check if case-instance is gone
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isZero();
+
+    }
+
+    /**
+     * Test bulk termination of case instances.
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testBulkTerminateCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE;
+        HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());
+        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
+        // Check if case-instance is gone
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isZero();
+
     }
 }

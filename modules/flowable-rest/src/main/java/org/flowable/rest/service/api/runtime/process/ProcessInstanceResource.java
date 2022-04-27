@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -248,6 +252,22 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         } else {
             throw new FlowableIllegalArgumentException("injection type is not supported " + injectActivityRequest.getInjectionType());
         }
+    }
+
+    @ApiOperation(value = "Delete a process instance", tags = { "Process Instances" }, nickname = "deleteProcessInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @DeleteMapping(value = "/runtime/process-instances")
+    public void bulkDeleteProcessInstances(@RequestParam(name = "processInstanceIds") List<String> processInstanceIds,
+            @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+        Set<String> instanceIds = new HashSet<>(processInstanceIds);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.bulkDeleteProcessInstance(instanceIds);
+        }
+        runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason);
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {

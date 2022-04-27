@@ -15,11 +15,13 @@ package org.flowable.rest.service.api.runtime.process;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -36,6 +38,7 @@ import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Frederik Heremans
@@ -305,11 +308,27 @@ public class BaseProcessInstanceResource {
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceInfoById(processInstance);
         }
-        
+
         return processInstance;
+    }
+
+    protected List<ProcessInstance> getProcessInstancesFromRequest(Collection<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("process instance ids cannot be null");
+        }
+        Set<String> processInstanceIdsSet = new HashSet<>(processInstanceIds);
+
+        List<ProcessInstance> foundProcessInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIdsSet).list();
+
+        if (CollectionUtils.isEmpty(foundProcessInstances) || foundProcessInstances.size() != processInstanceIdsSet.size()) {
+            foundProcessInstances.forEach(caseInstance -> processInstanceIdsSet.remove(caseInstance.getId()));
+            throw new FlowableObjectNotFoundException(
+                    "Could not find a any process instance with one of the ids:" + processInstanceIdsSet.stream().collect(Collectors.joining(",")));
+        }
+        return foundProcessInstances;
     }
 }

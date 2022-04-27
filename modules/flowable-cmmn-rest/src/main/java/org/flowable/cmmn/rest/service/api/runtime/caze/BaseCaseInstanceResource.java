@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -36,6 +37,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Tijs Rademakers
@@ -205,6 +207,19 @@ public class BaseCaseInstanceResource {
         }
 
         return caseInstance;
+    }
+
+    protected List<CaseInstance> getCaseInstancesFromRequest(Set<String> caseInstanceIdsSet) {
+        if (caseInstanceIdsSet == null) {
+            throw new FlowableIllegalArgumentException("Case instance ids cannot be null");
+        }
+        List<CaseInstance> foundCaseInstances = runtimeService.createCaseInstanceQuery().caseInstanceIds(caseInstanceIdsSet).list();
+        if (CollectionUtils.isEmpty(foundCaseInstances) || foundCaseInstances.size() != caseInstanceIdsSet.size()) {
+            foundCaseInstances.forEach(caseInstance -> caseInstanceIdsSet.remove(caseInstance.getId()));
+            throw new FlowableObjectNotFoundException(
+                    "Could not find a any case instance with one of the ids:" + caseInstanceIdsSet.stream().collect(Collectors.joining(",")));
+        }
+        return foundCaseInstances;
     }
 
     protected void addVariables(CaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {

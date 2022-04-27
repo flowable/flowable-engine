@@ -15,6 +15,7 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
@@ -64,9 +65,13 @@ public interface CmmnRuntimeService {
     
     void terminateCaseInstance(String caseInstanceId);
 
+    void bulkTerminateCaseInstance(Set<String> caseInstanceId);
+
     void terminatePlanItemInstance(String planItemInstanceId);
     
     void deleteCaseInstance(String caseInstanceId);
+
+    void bulkDeleteCaseInstance(Set<String> caseInstanceId);
 
     void evaluateCriteria(String caseInstanceId);
     

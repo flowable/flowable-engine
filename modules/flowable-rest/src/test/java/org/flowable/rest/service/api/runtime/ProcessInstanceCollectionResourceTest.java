@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -774,5 +775,41 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
                 + "} ]"
                 + "}");
+    }
+
+    /**
+     * Test bulk deletion of process instances.
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testBulkDeleteProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey2");
+
+        String url = SERVER_URL_PREFIX + RestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + RestUrls.SEGMENT_PROCESS_INSTANCE_RESOURCE;
+        HttpDelete httpDelete = new HttpDelete(url + "?processInstanceIds=" + processInstance.getId() + "," + processInstance2.getId());
+        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
+        // Check if process-instance is gone
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isZero();
+
+    }
+
+    /**
+     * Test bulk deletion of process instances  with invalid instance id.
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testInvalidBulkDeleteProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey2");
+
+        String url = SERVER_URL_PREFIX + RestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + RestUrls.SEGMENT_PROCESS_INSTANCE_RESOURCE;
+        HttpDelete httpDelete = new HttpDelete(url + "?processInstanceIds=" + processInstance.getId() + "," + processInstance2.getId() + ",notValidID");
+        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
+        // Check if process-instance is gone
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(1);
+
     }
 }
