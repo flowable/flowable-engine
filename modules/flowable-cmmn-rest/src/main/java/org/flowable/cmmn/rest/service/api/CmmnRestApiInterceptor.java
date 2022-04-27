@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -130,6 +132,10 @@ public interface CmmnRestApiInterceptor {
 
     void deleteHistoryJob(HistoryJob historyJob);
     
+    void moveDeadLetterJob(Job job, String action);
+
+    void bulkMoveDeadLetterJobs(List<String> jobIds, String action);
+
     void accessEventSubscriptionById(EventSubscription eventSubscription);
     
     void accessEventSubscriptionInfoWithQuery(EventSubscriptionQuery eventSubscriptionQuery);

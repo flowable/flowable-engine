@@ -15,12 +15,16 @@ package org.flowable.rest.service.api.management;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -31,6 +35,8 @@ import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -297,5 +303,89 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?tenantIdLike=anotherTenant";
         assertResultsPresentInDataResponse(url);
 
+    }
+    @Test
+    public void getUnexistingDeadLetterJob() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, "unexistingjob")), HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeDeadLetterJobBadAction() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "badAction");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, timerJob.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeBulkDeadLetterMove() throws Exception {
+
+        ArrayNode jobIds = objectMapper.createArrayNode();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        jobIds.add(timerJob.getId());
+        managementService.moveJobToDeadLetterJob(timerJob.getId());
+
+        processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        jobIds.add(timerJob.getId());
+        managementService.moveJobToDeadLetterJob(timerJob.getId());
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "move");
+        requestNode.putArray("jobIds").addAll(jobIds);
+
+        waitForJobExecutorToProcessAllJobs(2000, 500);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        waitForJobExecutorToProcessAllJobs(5000, 500);
+
+        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeInvalidBulkDeadLetterMove() throws Exception {
+
+        ArrayNode jobIds = objectMapper.createArrayNode();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        jobIds.add(timerJob.getId());
+        managementService.moveJobToDeadLetterJob(timerJob.getId());
+
+        processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        jobIds.add(timerJob.getId());
+        managementService.moveJobToDeadLetterJob(timerJob.getId());
+        jobIds.add("notExistingTestId");
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "move");
+        requestNode.putArray("jobIds").addAll(jobIds);
+
+        waitForJobExecutorToProcessAllJobs(2000, 500);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
     }
 }

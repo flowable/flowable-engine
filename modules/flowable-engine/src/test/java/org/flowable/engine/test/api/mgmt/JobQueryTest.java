@@ -150,6 +150,25 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByIds() {
+        List<String> jobIds = new ArrayList<>();
+
+        managementService.createJobQuery().list().forEach(job -> jobIds.add(job.getId()));
+        JobQuery query = managementService.createJobQuery().jobIds(jobIds);
+        verifyQueryResults(query, jobIds.size());
+
+        jobIds.clear();
+        managementService.createTimerJobQuery().list().forEach(job -> jobIds.add(job.getId()));
+        TimerJobQuery timerQuery = managementService.createTimerJobQuery().jobIds(jobIds);
+        verifyQueryResults(timerQuery, jobIds.size());
+
+        query = managementService.createJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(query, 1);
+        timerQuery = managementService.createTimerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(timerQuery, 3);
+    }
+
+    @Test
     public void testQueryByNoCriteriaWithPaging() {
         List<Job> jobs = managementService.createJobQuery().listPage(1, 2);
         assertThat(jobs).isEmpty();

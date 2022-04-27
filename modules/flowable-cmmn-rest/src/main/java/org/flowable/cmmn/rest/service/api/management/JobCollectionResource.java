@@ -15,20 +15,30 @@ package org.flowable.cmmn.rest.service.api.management;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.rest.service.api.BulkMoveDeadLetterActionRequest;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +58,9 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
 public class JobCollectionResource {
 
+    private static final String MOVE_ACTION = "move";
+    private static final String MOVE_TO_HISTORY_JOB_ACTION = "moveToHistoryJob";
+
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
 
@@ -56,6 +69,9 @@ public class JobCollectionResource {
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     // Fixme documentation & real parameters
     @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs")
@@ -168,5 +184,63 @@ public class JobCollectionResource {
         }
 
         return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
+    }
+
+    @ApiOperation(value = "Move a bulk of deadletter jobs. Accepts 'move' and 'moveToHistoryJob' as action.", tags = { "Jobs" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the dead letter jobs where moved. Response-body is intentionally empty."),
+            @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
+    })
+    @PostMapping("/cmmn-management/deadletter-jobs")
+    public void executeDeadLetterJobAction(@RequestBody BulkMoveDeadLetterActionRequest actionRequest,
+            HttpServletResponse response) {
+        if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
+            throw new FlowableIllegalArgumentException("Invalid action, only 'move' or 'moveToHistoryJob' is supported.");
+        }
+
+        long existingJobIdCount = managementService.createDeadLetterJobQuery().jobIds(actionRequest.getJobIds()).count();
+        if (actionRequest.getJobIds().size() != existingJobIdCount) {
+            List<Job> foundJobs = managementService.createDeadLetterJobQuery().jobIds(actionRequest.getJobIds()).list();
+            for (Job job : foundJobs) {
+                actionRequest.getJobIds().remove(job.getId());
+            }
+            throw new FlowableObjectNotFoundException(
+                    "Could not find a dead letter job(s) with id(s) {" + actionRequest.getJobIds().stream().collect(Collectors.joining(",")) + "}", Job.class);
+        }
+
+        if (MOVE_ACTION.equals(actionRequest.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_ACTION);
+            }
+            /*
+             * Note that the jobType is checked to know which kind of move that needs to be done.
+             * The MOVE_TO_HISTORY_JOB_ACTION allows to specifically force the move to a history job and trigger the else part below.
+             */
+
+            try {
+                managementService.bulkMoveDeadLetterJob(actionRequest.getJobIds(), cmmnEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
+
+            } catch (FlowableObjectNotFoundException aonfe) {
+                // Re-throw to have consistent error-messaging across REST-API
+                //TODO: throw proper exception
+                //throw new FlowableObjectNotFoundException("Could not find any of the requested' ++ " '.", Job.class);
+            }
+
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+
+        } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_TO_HISTORY_JOB_ACTION);
+            }
+            try {
+                managementService.bulkMoveDeadLetterJobToHistoryJob(actionRequest.getJobIds(),
+                        cmmnEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
+            } catch (FlowableObjectNotFoundException aonfe) {
+                // Re-throw to have consistent error-messaging across REST-api
+                //TODO:proper exception
+                //                throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
+            }
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        }
     }
 }

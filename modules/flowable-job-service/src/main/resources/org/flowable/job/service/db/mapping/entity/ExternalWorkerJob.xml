@@ -166,6 +166,12 @@
             <if test="id != null">
                 RES.ID_ = #{id}
             </if>
+            <if test="jobIds != null and jobIds.size() > 0">
+                RES.ID_ IN
+                <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
+                    #{jobId}
+                </foreach>
+            </if>
             <if test="processInstanceId != null">
                 and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
             </if>
