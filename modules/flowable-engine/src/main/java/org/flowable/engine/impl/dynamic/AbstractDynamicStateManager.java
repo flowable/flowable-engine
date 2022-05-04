@@ -896,7 +896,7 @@ public abstract class AbstractDynamicStateManager {
 
             // Set name
             String name = null;
-            if(newFlowElement.getName() != null) {
+            if (newFlowElement.getName() != null) {
                 Object nameValue = expressionManager.createExpression(newFlowElement.getName()).getValue(childExecution);
                 if (nameValue != null) {
                     name = nameValue.toString();
@@ -906,7 +906,7 @@ public abstract class AbstractDynamicStateManager {
 
             // Set description
             String description = null;
-            if(newFlowElement.getDocumentation() != null) {
+            if (newFlowElement.getDocumentation() != null) {
                 Object descriptionValue = expressionManager.createExpression(newFlowElement.getDocumentation()).getValue(childExecution);
                 if (descriptionValue != null) {
                     description = descriptionValue.toString();
