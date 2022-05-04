@@ -209,19 +209,6 @@ public class BaseCaseInstanceResource {
         return caseInstance;
     }
 
-    protected List<CaseInstance> getCaseInstancesFromRequest(Set<String> caseInstanceIdsSet) {
-        if (caseInstanceIdsSet == null) {
-            throw new FlowableIllegalArgumentException("Case instance ids cannot be null");
-        }
-        List<CaseInstance> foundCaseInstances = runtimeService.createCaseInstanceQuery().caseInstanceIds(caseInstanceIdsSet).list();
-        if (CollectionUtils.isEmpty(foundCaseInstances) || foundCaseInstances.size() != caseInstanceIdsSet.size()) {
-            foundCaseInstances.forEach(caseInstance -> caseInstanceIdsSet.remove(caseInstance.getId()));
-            throw new FlowableObjectNotFoundException(
-                    "Could not find a any case instance with one of the ids:" + caseInstanceIdsSet.stream().collect(Collectors.joining(",")));
-        }
-        return foundCaseInstances;
-    }
-
     protected void addVariables(CaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {
         for (QueryVariable variable : variables) {
             if (variable.getVariableOperation() == null) {

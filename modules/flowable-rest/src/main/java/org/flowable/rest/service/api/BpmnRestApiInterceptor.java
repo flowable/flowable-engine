@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.service.api;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.batch.api.Batch;
@@ -112,7 +113,7 @@ public interface BpmnRestApiInterceptor {
 
     void deleteProcessInstance(ProcessInstance processInstance);
     
-    void bulkDeleteProcessInstance(Set<String> processInstances);
+    void bulkDeleteProcessInstances(Collection<String> processInstances);
 
     void accessVariableInfoById(VariableInstance variableInstance);
     

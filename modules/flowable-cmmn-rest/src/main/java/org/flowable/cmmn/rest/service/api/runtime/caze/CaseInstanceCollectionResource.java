@@ -341,9 +341,9 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             HttpServletResponse response) {
         Set<String> caseInstanceIdList = new HashSet<>(caseInstanceIds);
         if (restApiInterceptor != null) {
-            restApiInterceptor.bulkTerminateCaseInstance(caseInstanceIdList);
+            restApiInterceptor.bulkTerminateCaseInstances(caseInstanceIdList);
         }
-        runtimeService.bulkTerminateCaseInstance(caseInstanceIdList);
+        runtimeService.bulkTerminateCaseInstances(caseInstanceIdList);
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
@@ -357,7 +357,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             HttpServletResponse response) {
         Set<String> caseInstanceIdsSet = new HashSet<>(caseInstanceIds);
         if (restApiInterceptor != null) {
-            restApiInterceptor.bulkDeleteCaseInstance(caseInstanceIdsSet);
+            restApiInterceptor.bulkDeleteCaseInstances(caseInstanceIdsSet);
         }
         runtimeService.bulkDeleteCaseInstance(caseInstanceIdsSet);
         response.setStatus(HttpStatus.NO_CONTENT.value());

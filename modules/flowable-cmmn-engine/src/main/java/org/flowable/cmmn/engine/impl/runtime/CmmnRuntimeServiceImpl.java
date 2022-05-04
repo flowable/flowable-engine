@@ -162,12 +162,12 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
-    public void bulkTerminateCaseInstance(Set<String> caseInstanceIds) {
+    public void bulkTerminateCaseInstances(Collection<String> caseInstanceIds) {
         commandExecutor.execute(new BulkTerminateCaseInstancesCmd(caseInstanceIds));
     }
 
     @Override
-    public void terminatePlanItemInstance(String planItemInstanceId) {
+    public void terminatePlanItemInstances(String planItemInstanceId) {
         commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
     

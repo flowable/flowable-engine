@@ -315,20 +315,4 @@ public class BaseProcessInstanceResource {
 
         return processInstance;
     }
-
-    protected List<ProcessInstance> getProcessInstancesFromRequest(Collection<String> processInstanceIds) {
-        if (processInstanceIds == null) {
-            throw new FlowableIllegalArgumentException("process instance ids cannot be null");
-        }
-        Set<String> processInstanceIdsSet = new HashSet<>(processInstanceIds);
-
-        List<ProcessInstance> foundProcessInstances = runtimeService.createProcessInstanceQuery().processInstanceIds(processInstanceIdsSet).list();
-
-        if (CollectionUtils.isEmpty(foundProcessInstances) || foundProcessInstances.size() != processInstanceIdsSet.size()) {
-            foundProcessInstances.forEach(caseInstance -> processInstanceIdsSet.remove(caseInstance.getId()));
-            throw new FlowableObjectNotFoundException(
-                    "Could not find a any process instance with one of the ids:" + processInstanceIdsSet.stream().collect(Collectors.joining(",")));
-        }
-        return foundProcessInstances;
-    }
 }

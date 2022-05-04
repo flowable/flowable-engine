@@ -84,11 +84,11 @@ public interface CmmnRestApiInterceptor {
     
     void terminateCaseInstance(CaseInstance caseInstance);
     
-    void bulkTerminateCaseInstance(Set<String> caseInstanceIdList);
+    void bulkTerminateCaseInstances(Set<String> caseInstanceIdList);
 
     void deleteCaseInstance(CaseInstance caseInstance);
     
-    void bulkDeleteCaseInstance(Set<String> caseInstanceIdsSet);
+    void bulkDeleteCaseInstances(Set<String> caseInstanceIdsSet);
 
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
 

@@ -14,8 +14,10 @@
 package org.flowable.rest.service.api.runtime.process;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +35,7 @@ import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -348,11 +351,27 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
                 processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
             }
-            
+
             return processInstanceResponse;
 
         } catch (FlowableObjectNotFoundException e) {
             throw new FlowableIllegalArgumentException(e.getMessage(), e);
         }
+    }
+
+    @ApiOperation(value = "Delete a process instance", tags = { "Process Instances" }, nickname = "deleteProcessInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @DeleteMapping(value = "/runtime/process-instances")
+    public void bulkDeleteProcessInstances(@RequestParam(name = "processInstanceIds") List<String> processInstanceIds,
+            @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+        Set<String> instanceIds = new HashSet<>(processInstanceIds);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.bulkDeleteProcessInstances(instanceIds);
+        }
+        runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason);
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

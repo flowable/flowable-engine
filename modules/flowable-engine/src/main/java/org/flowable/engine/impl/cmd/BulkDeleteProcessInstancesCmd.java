@@ -13,6 +13,8 @@
 package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -21,14 +23,14 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Christopher Welsch
  */
-public class BulkDeleteProcessInstanceCmd implements Command<Void>, Serializable {
+public class BulkDeleteProcessInstancesCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected Set<String> processInstanceIds;
     protected String deleteReason;
 
-    public BulkDeleteProcessInstanceCmd(Set<String> processInstanceIds, String deleteReason) {
-        this.processInstanceIds = processInstanceIds;
+    public BulkDeleteProcessInstancesCmd(Collection<String> processInstanceIds, String deleteReason) {
+        this.processInstanceIds = new HashSet<>(processInstanceIds);
         this.deleteReason = deleteReason;
     }
 

@@ -65,9 +65,9 @@ public interface CmmnRuntimeService {
     
     void terminateCaseInstance(String caseInstanceId);
 
-    void bulkTerminateCaseInstance(Set<String> caseInstanceId);
+    void bulkTerminateCaseInstances(Collection<String> caseInstanceId);
 
-    void terminatePlanItemInstance(String planItemInstanceId);
+    void terminatePlanItemInstances(String planItemInstanceId);
     
     void deleteCaseInstance(String caseInstanceId);
 

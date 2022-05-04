@@ -12,24 +12,30 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Christopher Welsch
  */
-public class BulkTerminateCaseInstancesCmd extends AbstractNeedsCaseInstancesCmd {
+public class BulkTerminateCaseInstancesCmd implements Command<Void> {
 
-    public BulkTerminateCaseInstancesCmd(Set<String> caseInstanceIds) {
-        super(caseInstanceIds);
+    protected Set<String> caseInstanceIds;
+
+    public BulkTerminateCaseInstancesCmd(Collection<String> caseInstanceIds) {
+        this.caseInstanceIds = new HashSet<>(caseInstanceIds);
     }
 
     @Override
-    protected void internalExecute(CommandContext commandContext, Set<String> caseInstanceIds) {
+    public Void execute(CommandContext commandContext) {
         for (String instanceId : caseInstanceIds) {
             CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(instanceId);
         }
+        return null;
     }
 }

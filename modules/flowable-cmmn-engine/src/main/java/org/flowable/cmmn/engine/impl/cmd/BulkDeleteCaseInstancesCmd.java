@@ -12,24 +12,29 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Christopher Welsch
  */
-public class BulkDeleteCaseInstancesCmd extends AbstractNeedsCaseInstancesCmd {
+public class BulkDeleteCaseInstancesCmd implements Command<Void> {
+
+    protected Set<String> caseInstanceIds;
 
     public BulkDeleteCaseInstancesCmd(Set<String> caseInstanceIds) {
-        super(caseInstanceIds);
+        this.caseInstanceIds = new HashSet<>(caseInstanceIds);
     }
 
     @Override
-    protected void internalExecute(CommandContext commandContext, Set<String> caseInstanceIds) {
+    public Void execute(CommandContext commandContext) {
         for (String instanceId : caseInstanceIds) {
             DeleteCaseInstanceCmd command = new DeleteCaseInstanceCmd(instanceId);
             command.execute(commandContext);
         }
+        return null;
     }
 }

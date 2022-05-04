@@ -34,7 +34,7 @@ import org.flowable.engine.impl.cmd.AddEventConsumerCommand;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddMultiInstanceExecutionCmd;
-import org.flowable.engine.impl.cmd.BulkDeleteProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.BulkDeleteProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
@@ -193,8 +193,8 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public void bulkDeleteProcessInstances(Set<String> processInstanceIds, String deleteReason) {
-        commandExecutor.execute(new BulkDeleteProcessInstanceCmd(processInstanceIds, deleteReason));
+    public void bulkDeleteProcessInstances(Collection<String> processInstanceIds, String deleteReason) {
+        commandExecutor.execute(new BulkDeleteProcessInstancesCmd(processInstanceIds, deleteReason));
     }
 
     @Override

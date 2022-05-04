@@ -720,6 +720,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     public void testBulkDeleteCaseInstances() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
         HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());
@@ -738,6 +739,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     public void testBulkTerminateCaseInstances() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE;
         HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());

@@ -339,7 +339,7 @@ public interface RuntimeService {
      * @param deleteReason reason for deleting, can be null.
      * @throws FlowableObjectNotFoundException when no process instance is found with the given id.
      */
-    void bulkDeleteProcessInstances(Set<String> processInstanceIds, String deleteReason);
+    void bulkDeleteProcessInstances(Collection<String> processInstanceIds, String deleteReason);
 
     /**
      * Finds the activity ids for all executions that are waiting in activities. This is a list because a single activity can be active multiple times.
