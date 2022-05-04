@@ -868,6 +868,7 @@ public abstract class AbstractDynamicStateManager {
     protected ExecutionEntity migrateExecutionEntity(ExecutionEntity parentExecutionEntity, ExecutionEntity childExecution, FlowElement newFlowElement, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
         // manage the bidirectional parent-child relation
         childExecution.setProcessInstanceId(parentExecutionEntity.getProcessInstanceId());
@@ -892,7 +893,27 @@ public abstract class AbstractDynamicStateManager {
                     .executionId(childExecution.getId()).singleResult();
             task.setProcessDefinitionId(childExecution.getProcessDefinitionId());
             task.setTaskDefinitionKey(newFlowElement.getId());
-            task.setName(newFlowElement.getName());
+
+            // Set name
+            String name = null;
+            if(newFlowElement.getName() != null) {
+                Object nameValue = expressionManager.createExpression(newFlowElement.getName()).getValue(childExecution);
+                if (nameValue != null) {
+                    name = nameValue.toString();
+                }
+            }
+            task.setName(name);
+
+            // Set description
+            String description = null;
+            if(newFlowElement.getDocumentation() != null) {
+                Object descriptionValue = expressionManager.createExpression(newFlowElement.getDocumentation()).getValue(childExecution);
+                if (descriptionValue != null) {
+                    description = descriptionValue.toString();
+                }
+            }
+            task.setDescription(description);
+
             task.setProcessInstanceId(childExecution.getProcessInstanceId());
 
             //Sync history

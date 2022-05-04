@@ -16,6 +16,7 @@ package org.flowable.cmmn.test.migration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -1857,6 +1858,40 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         } finally {
             cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
         }
+    }
+
+    @Test
+    void withChangedTaskName() {
+        // Arrange
+        CaseDefinition originalDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task-expression-name.cmmn.xml");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVar1", "foo");
+        variables.put("myVar2", "bar");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(originalDefinition.getId())
+                .variables(variables)
+                .start();
+
+        // Assert
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Human Task: foo");
+        assertThat(task.getDescription()).isEqualTo("Description: foo");
+
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task-expression-name-v2.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addTerminatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("humanTask1"))
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask1"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Human Task: bar");
+        assertThat(task.getDescription()).isEqualTo("Description: bar");
     }
 
     // with sentries
