@@ -883,7 +883,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         List<String> jobIds = new ArrayList<>();
         deadLetterJobs.forEach(job -> jobIds.add(job.getId()));
 
-        managementService.bulkMoveDeadLetterJobToHistoryJob(jobIds, 3);
+        managementService.bulkMoveDeadLetterJobsToHistoryJobs(jobIds, 3);
 
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(2);
 

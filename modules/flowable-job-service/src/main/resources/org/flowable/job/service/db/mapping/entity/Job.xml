@@ -144,8 +144,8 @@
             <if test="id != null">
                 RES.ID_ = #{id}
             </if>
-            <if test="jobIds != null and jobIds.size() > 0">
-                RES.ID_ IN
+            <if test="jobIds != null and !jobIds.empty">
+                AND RES.ID_ IN
                 <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
                     #{jobId}
                 </foreach>

@@ -38,7 +38,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected JobServiceConfiguration jobServiceConfiguration;
     
     protected String id;
-    protected List<String> jobIds;
+    protected Collection<String> jobIds;
     protected String processInstanceId;
     protected boolean withoutProcessInstanceId;
     protected String executionId;
@@ -93,7 +93,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     }
 
     @Override
-    public DeadLetterJobQuery jobIds(List<String> jobIds) {
+    public DeadLetterJobQuery jobIds(Collection<String> jobIds) {
         if (jobIds == null) {
             throw new FlowableIllegalArgumentException("Provided job id list is null");
         }

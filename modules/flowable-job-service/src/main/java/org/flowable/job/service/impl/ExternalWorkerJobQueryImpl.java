@@ -37,7 +37,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected JobServiceConfiguration jobServiceConfiguration;
     
     protected String id;
-    protected List<String> jobIds;
+    protected Collection<String> jobIds;
     protected String processInstanceId;
     protected boolean withoutProcessInstanceId;
     protected String executionId;
@@ -94,12 +94,13 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
-    public ExternalWorkerJobQuery jobIds(List<String> jobIds) {
+    public ExternalWorkerJobQuery jobIds(Collection<String> jobIds) {
         if (jobIds == null) {
             throw new FlowableIllegalArgumentException("Provided job id list is null");
         }
         this.jobIds = jobIds;
-        return this;    }
+        return this;
+    }
 
     @Override
     public ExternalWorkerJobQuery processInstanceId(String processInstanceId) {

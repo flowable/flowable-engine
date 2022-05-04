@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.cmd;
 
-import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -29,18 +29,16 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christopher Welsch
  */
-public class BulkMoveDeadLetterJobCmd implements Command<Void>, Serializable {
+public class BulkMoveDeadLetterJobsCmd implements Command<Void> {
 
-    private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BulkMoveDeadLetterJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BulkMoveDeadLetterJobsCmd.class);
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
-    protected List<String> deadLetterJobIds;
+    protected Collection<String> deadLetterJobIds;
     protected int retries;
 
-    public BulkMoveDeadLetterJobCmd(List<String> deadLetterJobIds, int retries, JobServiceConfiguration jobServiceConfiguration) {
+    public BulkMoveDeadLetterJobsCmd(Collection<String> deadLetterJobIds, int retries, JobServiceConfiguration jobServiceConfiguration) {
         this.deadLetterJobIds = deadLetterJobIds;
         this.retries = retries;
         this.jobServiceConfiguration = jobServiceConfiguration;
@@ -57,7 +55,6 @@ public class BulkMoveDeadLetterJobCmd implements Command<Void>, Serializable {
         List<Job> deadLetterJobs = jobServiceConfiguration.getDeadLetterJobEntityManager().findJobsByQueryCriteria(query);
 
         for (Job job : deadLetterJobs) {
-
             if (HistoryJobEntity.HISTORY_JOB_TYPE.equals(job.getJobType())) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Moving deadletter job to history job table {}", job.getId());

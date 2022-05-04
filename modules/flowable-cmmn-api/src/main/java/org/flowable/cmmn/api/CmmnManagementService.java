@@ -117,7 +117,7 @@ public interface CmmnManagementService {
      * @param retries the number of retries (value greater than 0) which will be set on the jobs.
      * @throws FlowableObjectNotFoundException when there is no job with any of the given ids.
      */
-    void bulkMoveDeadLetterJob(List<String> jobIds, int retries);
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries);
 
     /**
      * Moves a bulk of jobs that are in the dead letter job table back to be history jobs,
@@ -127,7 +127,7 @@ public interface CmmnManagementService {
      * @param retries the number of retries (value greater than 0) which will be set on the jobs.
      * @throws FlowableObjectNotFoundException when one job with of the given ids is not found.
      */
-    void bulkMoveDeadLetterJobToHistoryJob(List<String> jobIds, int retries);
+    void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries);
 
     /**
      * Moves a job that is in the dead letter job table back to be an executable job, 

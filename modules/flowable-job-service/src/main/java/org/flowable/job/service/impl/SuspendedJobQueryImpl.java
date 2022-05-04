@@ -38,7 +38,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     protected JobServiceConfiguration jobServiceConfiguration;
     
     protected String id;
-    protected List<String> jobIds;
+    protected Collection<String> jobIds;
     protected String processInstanceId;
     protected boolean withoutProcessInstanceId;
     protected String executionId;
@@ -96,7 +96,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     @Override
-    public SuspendedJobQuery jobIds(List<String> jobIds) {
+    public SuspendedJobQuery jobIds(Collection<String> jobIds) {
         if (jobIds == null) {
             throw new FlowableIllegalArgumentException("Provided job id list is null");
         }

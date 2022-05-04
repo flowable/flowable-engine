@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,13 +23,13 @@ import java.util.List;
  */
 public class BulkMoveDeadLetterActionRequest extends RestActionRequest {
 
-    protected List<String> jobIds;
+    protected Collection<String> jobIds;
 
-    public List<String> getJobIds() {
+    public Collection<String> getJobIds() {
         return jobIds;
     }
 
-    public void setJobIds(List<String> jobIds) {
+    public void setJobIds(Collection<String> jobIds) {
         this.jobIds = jobIds;
     }
 

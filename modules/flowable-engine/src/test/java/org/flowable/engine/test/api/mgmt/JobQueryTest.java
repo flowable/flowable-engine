@@ -33,6 +33,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.BaseJobQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
@@ -166,6 +167,18 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         verifyQueryResults(query, 1);
         timerQuery = managementService.createTimerJobQuery().jobIds(new ArrayList<>());
         verifyQueryResults(timerQuery, 3);
+
+        query = managementService.createJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(query, (int) managementService.createJobQuery().count());
+
+        timerQuery = managementService.createTimerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(timerQuery, (int) managementService.createTimerJobQuery().count());
+
+        ExternalWorkerJobQuery externalWorkerQuery = managementService.createExternalWorkerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(externalWorkerQuery, (int) managementService.createExternalWorkerJobQuery().count());
+
+        SuspendedJobQuery suspendedJobQuery = managementService.createSuspendedJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(suspendedJobQuery, (int) managementService.createSuspendedJobQuery().count());
     }
 
     @Test
@@ -886,7 +899,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         assertThat(failedJob.getExceptionMessage()).containsSequence(EXCEPTION_MESSAGE);
     }
 
-    private void verifyQueryResults(JobQuery query, int countExpected) {
+    private void verifyQueryResults(BaseJobQuery query, int countExpected) {
         assertThat(query.list()).hasSize(countExpected);
         assertThat(query.count()).isEqualTo(countExpected);
 
@@ -899,25 +912,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         }
     }
 
-    private void verifySingleResultFails(JobQuery query) {
-        assertThatThrownBy(() -> query.singleResult())
-                .isExactlyInstanceOf(FlowableException.class);
-    }
-
-    private void verifyQueryResults(TimerJobQuery query, int countExpected) {
-        assertThat(query.list()).hasSize(countExpected);
-        assertThat(query.count()).isEqualTo(countExpected);
-
-        if (countExpected == 1) {
-            assertThat(query.singleResult()).isNotNull();
-        } else if (countExpected > 1) {
-            verifySingleResultFails(query);
-        } else if (countExpected == 0) {
-            assertThat(query.singleResult()).isNull();
-        }
-    }
-
-    private void verifySingleResultFails(TimerJobQuery query) {
+    private void verifySingleResultFails(BaseJobQuery query) {
         assertThatThrownBy(() -> query.singleResult())
                 .isExactlyInstanceOf(FlowableException.class);
     }

@@ -88,7 +88,7 @@ public class BulkMoveDeadLetterJobsTest extends JobExecutorTestCase {
         jobIds.add(jobOfInstance1.getId());
         jobIds.add(jobOfInstance2.getId());
 
-        managementService.bulkMoveDeadLetterJob(jobIds, 0);
+        managementService.bulkMoveDeadLetterJobs(jobIds, 0);
 
         executeJobExecutorForTime(1000, 500);
 

@@ -15,7 +15,6 @@ package org.flowable.job.api;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -35,7 +34,7 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     /**
      * Only select jobs with the given ids. If you use jobId({@link String} jobId) this filter gets ignored.
      */
-    U jobIds(List<String> jobIds);
+    U jobIds(Collection<String> jobIds);
 
     /**
      * Only select jobs which exist for the given process instance.

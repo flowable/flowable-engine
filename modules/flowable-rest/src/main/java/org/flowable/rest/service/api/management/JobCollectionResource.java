@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -185,6 +186,7 @@ public class JobCollectionResource {
             @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
     })
     @PostMapping("/management/deadletter-jobs")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void executeDeadLetterJobAction(@RequestBody BulkMoveDeadLetterActionRequest actionRequest,
             HttpServletResponse response) {
         if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
@@ -202,29 +204,9 @@ public class JobCollectionResource {
                     "Could not find a dead letter job(s) with id(s) {" + jobIds.stream().collect(Collectors.joining(",")) + "}", Job.class);
         }
         if (MOVE_ACTION.equals(actionRequest.getAction())) {
-            /*
-             * Note that the jobType is checked to know which kind of move that needs to be done.
-             * The MOVE_TO_HISTORY_JOB_ACTION allows to specifically force the move to a history job and trigger the else part below.
-             */
-            try {
-                managementService.bulkMoveDeadLetterJob(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
-            } catch (FlowableObjectNotFoundException aonfe) {
-
-                throw new FlowableObjectNotFoundException(
-                        "Could not find a dead letter job(s) with id(s) {" + jobIds.stream().collect(Collectors.joining(",")) + "}", Job.class);
-
-            }
-            response.setStatus(HttpStatus.NO_CONTENT.value());
-
+            managementService.bulkMoveDeadLetterJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
-            try {
-                managementService.bulkMoveDeadLetterJobToHistoryJob(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
-            } catch (FlowableObjectNotFoundException aonfe) {
-                // Re-throw to have consistent error-messaging across REST-api
-                //TODO:proper exception
-                //                throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
-            }
-            response.setStatus(HttpStatus.NO_CONTENT.value());
+            managementService.bulkMoveDeadLetterJobsToHistoryJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         }
     }
 }

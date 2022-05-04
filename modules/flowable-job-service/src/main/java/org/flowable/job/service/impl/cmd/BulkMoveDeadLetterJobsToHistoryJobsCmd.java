@@ -12,15 +12,13 @@
  */
 package org.flowable.job.service.impl.cmd;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
-import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -30,18 +28,16 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christopher Welsch
  */
-public class BulkMoveDeadLetterJobToHistoryJobCmd implements Command<Void>, Serializable {
+public class BulkMoveDeadLetterJobsToHistoryJobsCmd implements Command<Void> {
 
-    private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BulkMoveDeadLetterJobToHistoryJobCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BulkMoveDeadLetterJobsToHistoryJobsCmd.class);
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
-    protected List<String> deadLetterJobIds;
+    protected Collection<String> deadLetterJobIds;
     protected int retries;
 
-    public BulkMoveDeadLetterJobToHistoryJobCmd(List<String> deadLetterJobIds, int retries, JobServiceConfiguration jobServiceConfiguration) {
+    public BulkMoveDeadLetterJobsToHistoryJobsCmd(Collection<String> deadLetterJobIds, int retries, JobServiceConfiguration jobServiceConfiguration) {
         this.deadLetterJobIds = deadLetterJobIds;
         this.retries = retries;
         this.jobServiceConfiguration = jobServiceConfiguration;
