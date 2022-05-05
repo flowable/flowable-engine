@@ -42,6 +42,10 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
 
+    boolean lockEventSubscription(String eventSubscriptionId);
+
+    void unlockEventSubscription(String eventSubscriptionId);
+
     /* Delete */
 
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);

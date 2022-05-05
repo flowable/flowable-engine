@@ -1015,7 +1015,24 @@
     </set>
     where TENANT_ID_ = #{oldTenantId, jdbcType=VARCHAR}
   </update>
-  
+
+  <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR
+    set
+        LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
+    where ID_ = #{id}
+    and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{currentTime})
+  </update>
+
+  <update id="clearEventSubscriptionLockTime" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR
+    set
+        LOCK_TIME_ = null,
+        LOCK_OWNER_ = null
+    where ID_ = #{id}
+  </update>
+
   <!-- DELETE -->
 
   <delete id="deleteSignalEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
