@@ -13,7 +13,6 @@
 package org.flowable.cmmn.rest.service.api;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;

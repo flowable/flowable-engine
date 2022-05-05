@@ -13,7 +13,6 @@
 package org.flowable.rest.service.api;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;

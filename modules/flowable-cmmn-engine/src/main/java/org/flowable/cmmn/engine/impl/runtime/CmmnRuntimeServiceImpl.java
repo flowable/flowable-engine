@@ -15,7 +15,6 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.StageResponse;
