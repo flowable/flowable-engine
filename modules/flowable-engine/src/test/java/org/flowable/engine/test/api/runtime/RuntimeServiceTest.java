@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -461,6 +460,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
 
         String deleteReason = "testing instance deletion";
         Set<String> instanceIds = new HashSet<>();
@@ -468,8 +469,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         instanceIds.add(processInstance2.getId());
 
         runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason);
-
-        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isZero();
 
         // test that the delete reason of the process instance shows up as
         // delete reason of the task in history ACT-848
@@ -483,6 +482,33 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             assertThat(historicInstance.getDeleteReason()).isEqualTo(deleteReason);
             assertThat(historicInstance.getEndTime()).isNotNull();
         }
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance3.getId()).singleResult()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testInvalidBulkDeleteProcessInstance() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+
+        String deleteReason = "testing instance deletion";
+        Set<String> instanceIds = new HashSet<>();
+        instanceIds.add(processInstance1.getId());
+        instanceIds.add(processInstance2.getId());
+        instanceIds.add("invalidID");
+
+        assertThatThrownBy(() -> runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> runtimeService.bulkDeleteProcessInstances(null, deleteReason))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("processInstanceIds are null");
     }
 
     @Test

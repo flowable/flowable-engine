@@ -42,6 +42,8 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -890,7 +892,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         caseInstanceIdList.add(caseInstance1.getId());
         caseInstanceIdList.add(caseInstance2.getId());
 
-        cmmnRuntimeService.bulkDeleteCaseInstance(caseInstanceIdList);
+        cmmnRuntimeService.bulkDeleteCaseInstances(caseInstanceIdList);
         assertCaseInstanceEnded(caseInstance1, 0);
         assertCaseInstanceEnded(caseInstance2, 1);
         assertCaseInstanceNotEnded(caseInstance3);
@@ -934,6 +936,60 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
         }
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance3.getId()).singleResult()).isNotNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testTerminateCaseInstance.cmmn" })
+    public void testInvalidBulkTerminateCaseInstances() {
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance2.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+
+        Set<String> caseInstanceIdList = new HashSet<>();
+        caseInstanceIdList.add(caseInstance1.getId());
+        caseInstanceIdList.add(caseInstance2.getId());
+        caseInstanceIdList.add("inValidId");
+
+        assertThatThrownBy(() -> cmmnRuntimeService.bulkTerminateCaseInstances(caseInstanceIdList))
+                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No case instance found for id inValidId");
+
+        assertCaseInstanceNotEnded(caseInstance1);
+        assertCaseInstanceNotEnded(caseInstance2);
+        assertCaseInstanceNotEnded(caseInstance3);
+
+        assertThatThrownBy(() -> cmmnRuntimeService.bulkTerminateCaseInstances(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("caseInstanceIds are null");
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testTerminateCaseInstance.cmmn" })
+    public void testInvalidBulkDeleteCaseInstances() {
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance2.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+
+        Set<String> caseInstanceIdList = new HashSet<>();
+        caseInstanceIdList.add(caseInstance1.getId());
+        caseInstanceIdList.add(caseInstance2.getId());
+        caseInstanceIdList.add("inValidId");
+
+        assertThatThrownBy(() -> cmmnRuntimeService.bulkDeleteCaseInstances(caseInstanceIdList))
+                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("Cannot find case instance for id inValidId");
+
+        assertCaseInstanceNotEnded(caseInstance1);
+        assertCaseInstanceNotEnded(caseInstance2);
+        assertCaseInstanceNotEnded(caseInstance3);
+
+        assertThatThrownBy(() -> cmmnRuntimeService.bulkDeleteCaseInstances(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("caseInstanceIds are null");
     }
 
     @Test

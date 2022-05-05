@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -723,11 +722,45 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
-        HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());
-        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
         // Check if case-instance is gone
         assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
         assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isZero();
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance3.getId())).isNotNull();
+    }
+
+    /**
+     * Test  bulk deletion of case instances.
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testInvalidBulkDeleteCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId()).add("notValidID");
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
+        // Check if case-instance is gone
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
     }
 
@@ -741,12 +774,46 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
-        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE;
-        HttpDelete httpDelete = new HttpDelete(url + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance2.getId());
-        closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
+
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "terminate");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
         // Check if case-instance is gone
         assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
         assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isZero();
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance3.getId()).singleResult()).isNotNull();
+    }
 
+    /**
+     * Test bulk termination of case instances.
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testInvalidBulkTerminateCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + CmmnRestUrls.SEGMENT_CASE_INSTANCE_RESOURCE + "/delete";
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "terminate");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId()).add("notValidID");
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
+        // Check if case-instance is gone
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "terminate");
+        httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 }

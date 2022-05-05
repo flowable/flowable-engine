@@ -12,9 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -23,15 +25,19 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class BulkDeleteCaseInstancesCmd implements Command<Void> {
 
-    protected Set<String> caseInstanceIds;
+    protected Collection<String> caseInstanceIds;
 
-    public BulkDeleteCaseInstancesCmd(Set<String> caseInstanceIds) {
-        this.caseInstanceIds = new HashSet<>(caseInstanceIds);
+    public BulkDeleteCaseInstancesCmd(Collection<String> caseInstanceIds) {
+        this.caseInstanceIds = caseInstanceIds;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        for (String instanceId : caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("caseInstanceIds are null");
+        }
+        Set<String> instanceIdSet = new HashSet<>(caseInstanceIds);
+        for (String instanceId : instanceIdSet) {
             DeleteCaseInstanceCmd command = new DeleteCaseInstanceCmd(instanceId);
             command.execute(commandContext);
         }

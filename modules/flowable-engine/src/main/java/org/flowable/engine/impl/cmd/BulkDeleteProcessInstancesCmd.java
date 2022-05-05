@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -26,17 +27,22 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class BulkDeleteProcessInstancesCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected Set<String> processInstanceIds;
+    protected Collection<String> processInstanceIds;
     protected String deleteReason;
 
     public BulkDeleteProcessInstancesCmd(Collection<String> processInstanceIds, String deleteReason) {
-        this.processInstanceIds = new HashSet<>(processInstanceIds);
+        this.processInstanceIds = processInstanceIds;
         this.deleteReason = deleteReason;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        for (String processInstanceId : processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("processInstanceIds are null");
+        }
+
+        Set<String> processInstanceIdSet = new HashSet<>(processInstanceIds);
+        for (String processInstanceId : processInstanceIdSet) {
             executeSingleDelete(commandContext, processInstanceId);
         }
         return null;

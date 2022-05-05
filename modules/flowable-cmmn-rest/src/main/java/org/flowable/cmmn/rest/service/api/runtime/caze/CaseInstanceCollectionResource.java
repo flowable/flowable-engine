@@ -14,10 +14,7 @@
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +23,7 @@ import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -33,11 +31,11 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -323,7 +321,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
                 caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
                 caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
             }
-            
+
             return caseInstanceResponse;
 
         } catch (FlowableObjectNotFoundException aonfe) {
@@ -331,35 +329,26 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         }
     }
 
-    @ApiOperation(value = "Terminate a bulk of case instances", tags = { "Case Instances" }, nickname = "bulkTerminateCaseInstances")
-    @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates the bulk of case instances was found and terminate. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates at least one requested case instance was not found.")
-    })
-    @DeleteMapping(value = "/cmmn-runtime/case-instances")
-    public void bulkTerminateCaseInstances(@ApiParam(name = "caseInstanceIds") @RequestParam(name = "caseInstanceIds") List<String> caseInstanceIds,
-            HttpServletResponse response) {
-        Set<String> caseInstanceIdList = new HashSet<>(caseInstanceIds);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.bulkTerminateCaseInstances(caseInstanceIdList);
-        }
-        runtimeService.bulkTerminateCaseInstances(caseInstanceIdList);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    @ApiOperation(value = "Delete a bulk of case instances", tags = { "Case Instances" }, nickname = "bulkDeleteCaseInstances")
+    @ApiOperation(value = "Post action request to delete/terminate a bulk of case instances", tags = { "Case Instances" }, nickname = "bulkDeleteCaseInstances")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the bulk of case instances was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates at least one requested case instance was not found.")
     })
-    @DeleteMapping(value = "/cmmn-runtime/case-instances/delete")
-    public void bulkDeleteCaseInstances(@ApiParam(name = "caseInstanceIds") @RequestParam(name = "caseInstanceIds") List<String> caseInstanceIds,
-            HttpServletResponse response) {
-        Set<String> caseInstanceIdsSet = new HashSet<>(caseInstanceIds);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.bulkDeleteCaseInstances(caseInstanceIdsSet);
+    @PostMapping(value = "/cmmn-runtime/case-instances/delete")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void bulkDeleteCaseInstances(@ApiParam(name = "caseInstanceIds")
+    @RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+        if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkDeleteCaseInstances(request.getInstanceIds());
+            }
+            runtimeService.bulkDeleteCaseInstances(request.getInstanceIds());
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        } else if (BulkDeleteInstancesRestActionRequest.TERMINATE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkTerminateCaseInstances(request.getInstanceIds());
+            }
+            runtimeService.bulkTerminateCaseInstances(request.getInstanceIds());
         }
-        runtimeService.bulkDeleteCaseInstance(caseInstanceIdsSet);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

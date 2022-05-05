@@ -177,7 +177,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
-    public void bulkDeleteCaseInstance(Set<String> caseInstanceIds) {
+    public void bulkDeleteCaseInstances(Collection<String> caseInstanceIds) {
         commandExecutor.execute(new BulkDeleteCaseInstancesCmd(caseInstanceIds));
     }
 
