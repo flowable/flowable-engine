@@ -13,7 +13,6 @@
 package org.flowable.cmmn.api;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.batch.api.Batch;
@@ -22,7 +21,6 @@ import org.flowable.batch.api.BatchPartBuilder;
 import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
