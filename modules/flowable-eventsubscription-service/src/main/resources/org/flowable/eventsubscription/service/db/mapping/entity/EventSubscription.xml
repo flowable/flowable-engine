@@ -27,7 +27,9 @@
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR" />
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />     
+    <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="EVENT_TYPE_">
       <case value="message" resultMap="messageResultMap"/> 
       <case value="signal" resultMap="signalResultMap"/> 
@@ -111,7 +113,7 @@
 	  </if>
 	  <if test="createdAfter != null">
 		and RES.CREATED_ &gt; #{createdAfter}
-	  </if> 
+	  </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
@@ -525,6 +527,12 @@
       <if test="originalPersistentState.scopeType != scopeType">
            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
       </if>
+      <if test="originalPersistentState.lockOwner != lockOwner">
+           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.lockTime != lockTime">
+           LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+      </if>
       <if test="originalPersistentState.tenantId != tenantId">
            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
       </if>
@@ -682,6 +690,12 @@
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
       </if>
+      <if test="originalPersistentState.lockOwner != lockOwner">
+           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.lockTime != lockTime">
+           LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
+      </if>
       <if test="originalPersistentState.tenantId != tenantId">
            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
@@ -838,6 +852,12 @@
       </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
+      </if>
+      <if test="originalPersistentState.lockOwner != lockOwner">
+           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.lockTime != lockTime">
+           LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
@@ -998,6 +1018,12 @@
             </if>
             <if test="originalPersistentState.created != created">
                 CREATED_ = #{created, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.lockOwner != lockOwner">
+                LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.lockTime != lockTime">
+                LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}

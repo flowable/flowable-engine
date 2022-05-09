@@ -18,13 +18,56 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class EventSubscriptionLockingTest extends AbstractBpmnEventRegistryConsumerTest {
+
+    @Test
+    @Deployment
+    public void testEventSubscriptionCanBeLockedAndUnlocked() {
+        ProcessDefinition processDefinition = processEngine.getRepositoryService().createProcessDefinitionQuery()
+                .processDefinitionKey("eventSubscriptionLocking").singleResult();
+
+        EventSubscription eventSubscription = processEngine.getRuntimeService().createEventSubscriptionQuery()
+                .processDefinitionId(processDefinition.getId())
+                .singleResult();
+        assertThat(eventSubscription).isNotNull();
+
+        assertThat(eventSubscription.getLockOwner()).isNull();
+        assertThat(eventSubscription.getLockTime()).isNull();
+
+        EventSubscription finalEventSubscription = eventSubscription;
+        processEngineConfiguration.getManagementService().executeCommand(commandContext -> {
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            eventSubscriptionService.lockEventSubscription(finalEventSubscription.getId());
+            return null;
+        });
+
+        eventSubscription = processEngine.getRuntimeService().createEventSubscriptionQuery()
+                .processDefinitionId(processDefinition.getId())
+                .singleResult();
+        assertThat(eventSubscription.getLockOwner()).isNotNull();
+        assertThat(eventSubscription.getLockTime()).isNotNull();
+
+        processEngineConfiguration.getManagementService().executeCommand(commandContext -> {
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            eventSubscriptionService.unlockEventSubscription(finalEventSubscription.getId());
+            return null;
+        });
+
+        eventSubscription = processEngine.getRuntimeService().createEventSubscriptionQuery()
+                .processDefinitionId(processDefinition.getId())
+                .singleResult();
+        assertThat(eventSubscription.getLockOwner()).isNull();
+        assertThat(eventSubscription.getLockTime()).isNull();
+    }
 
     @Test
     @Deployment

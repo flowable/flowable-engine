@@ -219,7 +219,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             processInstanceBuilder.referenceId(referenceId);
         }
         if (referenceType != null) {
-            processInstanceBuilder.referenceType(ReferenceTypes.EVENT_PROCESS);
+            processInstanceBuilder.referenceType(referenceType);
         }
 
         if (processEngineConfiguration.isEventRegistryStartProcessInstanceAsync()) {

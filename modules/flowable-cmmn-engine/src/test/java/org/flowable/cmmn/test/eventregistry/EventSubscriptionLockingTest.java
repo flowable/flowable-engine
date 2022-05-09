@@ -18,13 +18,52 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
 public class EventSubscriptionLockingTest extends AbstractCmmnEventRegistryConsumerTest {
+
+    @Test
+    @CmmnDeployment
+    public void testEventSubscriptionCanBeLockedAndUnlocked() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("testCaseStartEvent")
+                .singleResult();
+
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().caseDefinitionId(caseDefinition.getId()).singleResult();
+        assertThat(eventSubscription).isNotNull();
+
+        assertThat(eventSubscription.getLockOwner()).isNull();
+        assertThat(eventSubscription.getLockTime()).isNull();
+
+        EventSubscription finalEventSubscription = eventSubscription;
+        ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(commandContext -> {
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            eventSubscriptionService.lockEventSubscription(finalEventSubscription.getId());
+            return null;
+        });
+
+        eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().caseDefinitionId(caseDefinition.getId()).singleResult();
+        assertThat(eventSubscription.getLockOwner()).isNotNull();
+        assertThat(eventSubscription.getLockTime()).isNotNull();
+
+        ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(commandContext -> {
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            eventSubscriptionService.unlockEventSubscription(finalEventSubscription.getId());
+            return null;
+        });
+
+        eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().caseDefinitionId(caseDefinition.getId()).singleResult();
+        assertThat(eventSubscription.getLockOwner()).isNull();
+        assertThat(eventSubscription.getLockTime()).isNull();
+    }
 
     @Test
     @CmmnDeployment
