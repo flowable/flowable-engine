@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +25,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.activation.DataSource;
+import javax.mail.internet.InternetAddress;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +116,24 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             setCharset(email, charSetStr, planItemInstanceEntity.getTenantId());
             attach(email, files, dataSources);
 
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Sending {} email"
+                                + " from '{}' (original value: '{}'),"
+                                + " to '{}' (original value: '{}'),"
+                                + " cc '{}' (original value: '{}'),"
+                                + " bcc '{}' (original value: '{}'),"
+                                + " with final headers '{}' (original headers: '{}', original charset value: '{}', original number of attachments: '{}'),"
+                                + " on host '{}'.",
+                        email instanceof HtmlEmail ? "html" : "text",
+                        email.getFromAddress() == null ? null : email.getFromAddress().getAddress(), fromStr,
+                        email.getToAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), toStr,
+                        email.getCcAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), ccStr,
+                        email.getBccAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), bccStr,
+                        email.getHeaders(), headersStr, charSetStr, files.size(),
+                        email.getHostName()
+                );
+            }
+            
             email.send();
 
         } catch (FlowableException e) {
