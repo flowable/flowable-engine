@@ -13,14 +13,17 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -36,10 +39,13 @@ import org.flowable.task.api.Task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to the Task collection resource.
  *
  * @author Tijs Rademakers
+ * @author Christopher Welsch
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -418,5 +424,30 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=" + stageInstanceId1.getId();
         assertEmptyResultsPresentInDataResponse(url);
+    }
+
+    public void testInvalidBulkUpdateTasks() throws IOException {
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(null);
+        executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+
+        httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
+        requestNode.put("name", "testName");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "message:'Bad request',"
+                        + "exception:'taskIds can not be null for bulk update tasks requests'"
+                        + "}");
+
+        requestNode.putArray("taskIds").add("invalidId");
+
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
     }
 }

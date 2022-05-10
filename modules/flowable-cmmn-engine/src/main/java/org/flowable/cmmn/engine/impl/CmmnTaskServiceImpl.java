@@ -23,6 +23,7 @@ import java.util.Set;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkCmd;
+import org.flowable.cmmn.engine.impl.cmd.BulkSaveTasksCmd;
 import org.flowable.cmmn.engine.impl.cmd.ClaimTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskWithFormCmd;
@@ -80,6 +81,11 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
         commandExecutor.execute(new SaveTaskCmd(task));
     }
     
+    @Override
+    public void bulkSaveTasks(Collection<Task> taskList) {
+        commandExecutor.execute(new BulkSaveTasksCmd(taskList));
+    }
+
     @Override
     public void claim(String taskId, String userId) {
         commandExecutor.execute(new ClaimTaskCmd(taskId, userId));

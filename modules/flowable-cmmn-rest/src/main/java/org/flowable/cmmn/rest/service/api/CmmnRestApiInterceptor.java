@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.Collection;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -40,6 +42,7 @@ import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceUpdateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.ChangePlanItemStateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.BulkTasksRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
@@ -69,6 +72,8 @@ public interface CmmnRestApiInterceptor {
     void createTask(Task task, TaskRequest request);
     
     void updateTask(Task task, TaskRequest request);
+
+    void bulkUpdateTasks(Collection<Task> tasks, BulkTasksRequest request);
 
     void deleteTask(Task task);
     
