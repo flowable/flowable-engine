@@ -112,10 +112,10 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                                 + " with final headers '{}' (original charset value: '{}', original number of attachments: '{}'),"
                                 + " on host '{}'.",
                         email instanceof HtmlEmail ? "html" : "text", execution.getId(), execution.getTenantId(),
-                        email.getFromAddress() == null ? null : email.getFromAddress().getAddress(), fromStr,
-                        email.getToAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), toStr,
-                        email.getCcAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), ccStr,
-                        email.getBccAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), bccStr,
+                        getEmailAddressForLog(email.getFromAddress()), fromStr,
+                        email.getToAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), toStr,
+                        email.getCcAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), ccStr,
+                        email.getBccAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), bccStr,
                         email.getHeaders(), charSetStr, files.size(),
                         email.getHostName()
                 );
@@ -130,6 +130,15 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         leave((ActivityExecution) execution);
+    }
+
+    private String getToExprText(Expression exp) {
+        return exp == null ? null : exp.getExpressionText();
+    }
+
+    private String getEmailAddressForLog(InternetAddress address) {
+        //TODO: introduce email masking based on configuration?
+        return address == null ? null : address.getAddress();
     }
 
     private boolean attachmentsExist(List<File> files, List<DataSource> dataSources) {

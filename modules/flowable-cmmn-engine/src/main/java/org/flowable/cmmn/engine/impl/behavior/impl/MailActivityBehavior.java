@@ -102,7 +102,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             getFilesFromFields(attachments, planItemInstanceEntity, files, dataSources);
 
             if (StringUtils.isAllEmpty(toStr, ccStr, bccStr)) {
-                throw new FlowableException("No recipient could be found for sending email");
+                throw new FlowableException("No recipient could be found for sending email: fields to ("+ getEmailExprText(to)+"), cc ("+ getEmailExprText(cc)+") and bcc ("+ getEmailExprText(bcc)+") are all resolved to an empty value");
             }
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
@@ -125,10 +125,10 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
                                 + " with final headers '{}' (original headers: '{}', original charset value: '{}', original number of attachments: '{}'),"
                                 + " on host '{}'.",
                         email instanceof HtmlEmail ? "html" : "text", planItemInstanceEntity.getId(), planItemInstanceEntity.getTenantId(),
-                        email.getFromAddress() == null ? null : email.getFromAddress().getAddress(), fromStr,
-                        email.getToAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), toStr,
-                        email.getCcAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), ccStr,
-                        email.getBccAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), bccStr,
+                        getEmailAddressForLog(email.getFromAddress()), fromStr,
+                        email.getToAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), toStr,
+                        email.getCcAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), ccStr,
+                        email.getBccAddresses().stream().map(this::getEmailAddressForLog).filter(Objects::nonNull).collect(joining(",")), bccStr,
                         email.getHeaders(), headersStr, charSetStr, files.size(),
                         email.getHostName()
                 );
@@ -144,6 +144,16 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
 
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+    }
+
+    private String getEmailExprText(Expression exp) {
+        //TODO: introduce email masking based on configuration?
+        return exp == null ? null : exp.getExpressionText();
+    }
+
+    private String getEmailAddressForLog(InternetAddress address) {
+        //TODO: introduce email masking based on configuration?
+        return address == null ? null : address.getAddress();
     }
 
     protected void addHeader(Email email, String headersStr) {
