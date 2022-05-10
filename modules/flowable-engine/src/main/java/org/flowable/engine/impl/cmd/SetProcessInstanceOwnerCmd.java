@@ -25,7 +25,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
  * @author Micha Kiener
  */
 public class SetProcessInstanceOwnerCmd extends AbstractProcessInstanceIdentityLinkCmd implements Command<Void>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     protected final String processInstanceId;
@@ -38,8 +37,8 @@ public class SetProcessInstanceOwnerCmd extends AbstractProcessInstanceIdentityL
 
     @Override
     public Void execute(CommandContext commandContext) {
-        removeIdentityLinkType(processInstanceId, IdentityLinkType.OWNER);
-        getRuntimeService().addUserIdentityLink(processInstanceId, ownerUserId, IdentityLinkType.OWNER);
+        removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.OWNER);
+        getIdentityLinkService(commandContext).createProcessInstanceIdentityLink(processInstanceId, ownerUserId, null, IdentityLinkType.OWNER);
         return null;
     }
 }

@@ -15,9 +15,11 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkService;
 
 /**
  * An abstract command supporting functionality around identity link management for case instances.
@@ -26,24 +28,22 @@ import org.flowable.identitylink.api.IdentityLink;
  */
 public abstract class AbstractCaseInstanceIdentityLinkCmd {
 
-    protected void removeIdentityLinkType(String caseInstanceId, String identityType) {
+    protected void removeIdentityLinkType(CommandContext commandContext, String caseInstanceId, String identityType) {
         List<IdentityLink> linksToRemove = new ArrayList<>(1);
-        for (IdentityLink identityLink : getCmmnRuntimeService().getIdentityLinksForCaseInstance(caseInstanceId)) {
+        for (IdentityLink identityLink : getIdentityLinkService(commandContext).findIdentityLinksByScopeIdAndType(caseInstanceId, ScopeTypes.CMMN)) {
             if (identityLink.getType().equalsIgnoreCase(identityType)) {
                 linksToRemove.add(identityLink);
             }
         }
         // remove links in a second loop as we might run into possible concurrent modification exceptions to the identity link list
         for (IdentityLink identityLink : linksToRemove) {
-            if (identityLink.getUserId() != null) {
-                getCmmnRuntimeService().deleteUserIdentityLink(caseInstanceId, identityLink.getUserId(), identityLink.getType());
-            } else if (identityLink.getGroupId() != null) {
-                getCmmnRuntimeService().deleteGroupIdentityLink(caseInstanceId, identityLink.getGroupId(), identityLink.getType());
-            }
+            getIdentityLinkService(commandContext).deleteScopeIdentityLink(caseInstanceId, ScopeTypes.CMMN,
+                identityLink.getUserId(), identityLink.getGroupId(), identityLink.getType());
         }
     }
 
-    protected CmmnRuntimeService getCmmnRuntimeService() {
-        return CommandContextUtil.getCmmnRuntimeService();
+    protected IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
+        return CommandContextUtil.getIdentityLinkService(commandContext);
     }
 }
+

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -24,7 +25,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
  * @author Micha Kiener
  */
 public class SetCaseInstanceAssigneeCmd extends AbstractCaseInstanceIdentityLinkCmd implements Command<Void>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     protected final String caseInstanceId;
@@ -37,8 +37,9 @@ public class SetCaseInstanceAssigneeCmd extends AbstractCaseInstanceIdentityLink
 
     @Override
     public Void execute(CommandContext commandContext) {
-        removeIdentityLinkType(caseInstanceId, IdentityLinkType.ASSIGNEE);
-        getCmmnRuntimeService().addUserIdentityLink(caseInstanceId, assigneeUserId, IdentityLinkType.ASSIGNEE);
+        removeIdentityLinkType(commandContext, caseInstanceId, IdentityLinkType.ASSIGNEE);
+        getIdentityLinkService(commandContext).createScopeIdentityLink(null, caseInstanceId, ScopeTypes.CMMN,
+            assigneeUserId, null, IdentityLinkType.ASSIGNEE);
         return null;
     }
 }

@@ -24,7 +24,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
  * @author Micha Kiener
  */
 public class RemoveCaseInstanceOwnerCmd extends AbstractCaseInstanceIdentityLinkCmd implements Command<Void>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     protected final String caseInstanceId;
@@ -35,7 +34,7 @@ public class RemoveCaseInstanceOwnerCmd extends AbstractCaseInstanceIdentityLink
 
     @Override
     public Void execute(CommandContext commandContext) {
-        removeIdentityLinkType(caseInstanceId, IdentityLinkType.OWNER);
+        removeIdentityLinkType(commandContext, caseInstanceId, IdentityLinkType.OWNER);
         return null;
     }
 }

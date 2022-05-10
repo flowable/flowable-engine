@@ -15,9 +15,10 @@ package org.flowable.engine.impl.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.RuntimeService;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkService;
 
 /**
  * An abstract command supporting functionality around identity link management for process instances.
@@ -26,24 +27,21 @@ import org.flowable.identitylink.api.IdentityLink;
  */
 public abstract class AbstractProcessInstanceIdentityLinkCmd {
 
-    protected void removeIdentityLinkType(String processInstanceId, String identityType) {
+    protected void removeIdentityLinkType(CommandContext commandContext, String processInstanceId, String identityType) {
         List<IdentityLink> linksToRemove = new ArrayList<>(1);
-        for (IdentityLink identityLink : getRuntimeService().getIdentityLinksForProcessInstance(processInstanceId)) {
+        for (IdentityLink identityLink : getIdentityLinkService(commandContext).findIdentityLinksByProcessInstanceId(processInstanceId)) {
             if (identityLink.getType().equalsIgnoreCase(identityType)) {
                 linksToRemove.add(identityLink);
             }
         }
         // remove links in a second loop as we might run into possible concurrent modification exceptions to the identity link list
         for (IdentityLink identityLink : linksToRemove) {
-            if (identityLink.getUserId() != null) {
-                getRuntimeService().deleteUserIdentityLink(processInstanceId, identityLink.getUserId(), identityLink.getType());
-            } else if (identityLink.getGroupId() != null) {
-                getRuntimeService().deleteGroupIdentityLink(processInstanceId, identityLink.getGroupId(), identityLink.getType());
-            }
+            getIdentityLinkService(commandContext).deleteProcessInstanceIdentityLink(processInstanceId, identityLink.getUserId(), identityLink.getGroupId(),
+                identityLink.getType());
         }
     }
 
-    protected RuntimeService getRuntimeService() {
-        return CommandContextUtil.getProcessEngineConfiguration().getRuntimeService();
+    protected IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
+        return CommandContextUtil.getIdentityLinkService(commandContext);
     }
 }

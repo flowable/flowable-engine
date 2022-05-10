@@ -24,7 +24,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
  * @author Micha Kiener
  */
 public class SetProcessInstanceAssigneeCmd extends AbstractProcessInstanceIdentityLinkCmd implements Command<Void>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     protected final String processInstanceId;
@@ -37,8 +36,8 @@ public class SetProcessInstanceAssigneeCmd extends AbstractProcessInstanceIdenti
 
     @Override
     public Void execute(CommandContext commandContext) {
-        removeIdentityLinkType(processInstanceId, IdentityLinkType.ASSIGNEE);
-        getRuntimeService().addUserIdentityLink(processInstanceId, assigneeUserId, IdentityLinkType.ASSIGNEE);
+        removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.ASSIGNEE);
+        getIdentityLinkService(commandContext).createProcessInstanceIdentityLink(processInstanceId, assigneeUserId, null, IdentityLinkType.ASSIGNEE);
         return null;
     }
 }

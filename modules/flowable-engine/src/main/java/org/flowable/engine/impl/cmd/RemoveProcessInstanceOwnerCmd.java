@@ -24,7 +24,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
  * @author Micha Kiener
  */
 public class RemoveProcessInstanceOwnerCmd extends AbstractProcessInstanceIdentityLinkCmd implements Command<Void>, Serializable {
-
     private static final long serialVersionUID = 1L;
 
     protected final String processInstanceId;
@@ -35,7 +34,7 @@ public class RemoveProcessInstanceOwnerCmd extends AbstractProcessInstanceIdenti
 
     @Override
     public Void execute(CommandContext commandContext) {
-        removeIdentityLinkType(processInstanceId, IdentityLinkType.OWNER);
+        removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.OWNER);
         return null;
     }
 }
