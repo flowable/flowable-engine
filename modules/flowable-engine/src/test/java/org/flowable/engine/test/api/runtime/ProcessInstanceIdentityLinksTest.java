@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
@@ -178,5 +179,50 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
                 tuple("muppets", "custom", processInstanceId)
             );
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessAssignee() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setAssignee(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.removeAssignee(processInstance.getId());
+
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessOwner() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setOwner(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.removeOwner(processInstance.getId());
+
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
 
 }

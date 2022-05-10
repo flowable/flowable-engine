@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -143,6 +144,52 @@ public class CaseInstanceIdentityLinksTest extends FlowableCmmnTestCase {
         assertThat(identityLinks)
             .extracting(IdentityLinkInfo::getGroupId)
             .containsExactly("admins");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void testCaseAssignee() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .start();
+
+        cmmnRuntimeService.setAssignee(caseInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getScopeId,
+                IdentityLink::getScopeType)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "kermit", null, caseInstance.getId(), ScopeTypes.CMMN)
+            );
+
+        cmmnRuntimeService.removeAssignee(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void testCaseOwner() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("oneTaskCase")
+            .start();
+
+        cmmnRuntimeService.setOwner(caseInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getScopeId,
+                IdentityLink::getScopeType)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "kermit", null, caseInstance.getId(), ScopeTypes.CMMN)
+            );
+
+        cmmnRuntimeService.removeOwner(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId()))
+            .isEmpty();
     }
 
 }
