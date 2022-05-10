@@ -128,14 +128,14 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 attach(email, files, dataSources);
 
                 if(LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Sending {} email"
+                    LOGGER.debug("Sending of {} email by execution '{}' (in tenant '{}')"
                                     + " from '{}' (original value: '{}'),"
                                     + " to '{}' (original value: '{}'),"
                                     + " cc '{}' (original value: '{}'),"
                                     + " bcc '{}' (original value: '{}'),"
                                     + " with final headers '{}' (original headers: '{}', original charset value: '{}', original number of attachments: '{}'),"
                                     + " on host '{}'.",
-                            email instanceof HtmlEmail ? "html" : "text",
+                            email instanceof HtmlEmail ? "html" : "text", execution.getId(), execution.getTenantId(),
                             email.getFromAddress() == null ? null : email.getFromAddress().getAddress(), fromStr,
                             email.getToAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), toStr,
                             email.getCcAddresses().stream().filter(Objects::nonNull).map(InternetAddress::getAddress).collect(joining(",")), ccStr,
