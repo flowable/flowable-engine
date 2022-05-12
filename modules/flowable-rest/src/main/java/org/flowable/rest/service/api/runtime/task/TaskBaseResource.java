@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime.task;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +123,16 @@ public class TaskBaseResource {
             DelegationState delegationState = getDelegationState(taskRequest.getDelegationState());
             task.setDelegationState(delegationState);
         }
+    }
+
+    protected void populateTasksFromRequest(Collection<Task> taskList, BulkTasksRequest bulkTasksRequest) {
+        for (Task task : taskList) {
+            populateTaskFromRequest(task, bulkTasksRequest);
+        }
+    }
+
+    protected List<Task> getTasksFromIdList(Collection<String> taskIds) {
+        return taskService.createTaskQuery().taskIds(taskIds).list();
     }
 
     protected DataResponse<TaskResponse> getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {

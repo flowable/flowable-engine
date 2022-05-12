@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.Execution;
@@ -46,6 +48,7 @@ import net.javacrumbs.jsonunit.core.Option;
  * Test for all REST-operations related to the Task collection resource.
  *
  * @author Frederik Heremans
+ * @author Christopher Welsch
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -447,5 +450,55 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
                 }
             }
         }
+    }
+    @Test
+    public void testBulkUpdateTaskAssignee() throws IOException {
+
+        taskService.createTaskBuilder().id("taskID1").create();
+        taskService.createTaskBuilder().id("taskID2").create();
+        taskService.createTaskBuilder().id("taskID3").create();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("assignee", "admin");
+        requestNode.putArray("taskIds").add("taskID1").add("taskID3");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(taskService.createTaskQuery().taskId("taskID1").singleResult().getAssignee()).isEqualTo("admin");
+        assertThat(taskService.createTaskQuery().taskId("taskID2").singleResult().getAssignee()).isNull();
+        assertThat(taskService.createTaskQuery().taskId("taskID3").singleResult().getAssignee()).isEqualTo("admin");
+
+        taskService.deleteTask("taskID1", true);
+        taskService.deleteTask("taskID2", true);
+        taskService.deleteTask("taskID3", true);
+
+    }
+    @Test
+    public void testInvalidBulkUpdateTasks() throws IOException {
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(null);
+        executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+
+        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        requestNode.put("name", "testName");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "message:'Bad request',"
+                        + "exception:'taskIds can not be null for bulk update tasks requests'"
+                        + "}");
+
+        requestNode.putArray("taskIds").add("invalidId");
+
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
+
     }
 }

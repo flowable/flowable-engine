@@ -67,6 +67,7 @@ import org.flowable.rest.service.api.runtime.process.ProcessInstanceCreateReques
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceUpdateRequest;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
+import org.flowable.rest.service.api.runtime.task.BulkTasksRequest;
 import org.flowable.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.rest.service.api.runtime.task.TaskRequest;
@@ -88,6 +89,8 @@ public interface BpmnRestApiInterceptor {
     
     void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);
     
+    void bulkUpdateTasks(Collection<Task> taskList, BulkTasksRequest bulkTasksRequest);
+
     void createTask(Task task, TaskRequest request);
     
     void updateTask(Task task, TaskRequest request);

@@ -79,6 +79,14 @@ public interface TaskService {
     void saveTask(Task task);
 
     /**
+     * Saves the given tasks to the persistent data store. If the tasks are already present in the persistent store, it is updated. After a new task has been saved, the task instance passed into this
+     * method is updated with the id of the newly created task.
+     *
+     * @param taskList the list of task instances, cannot be null.
+     */
+    void bulkSaveTasks(Collection<Task> taskList);
+
+    /**
      * Deletes the given task, not deleting historic information that is related to this task.
      * 
      * @param taskId

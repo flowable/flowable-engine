@@ -47,6 +47,8 @@ public interface CmmnTaskService {
     
     void saveTask(Task task);
 
+    void bulkSaveTasks(Collection<Task> taskList);
+
     void complete(String taskId);
     
     void complete(String taskId, Map<String, Object> variables);
