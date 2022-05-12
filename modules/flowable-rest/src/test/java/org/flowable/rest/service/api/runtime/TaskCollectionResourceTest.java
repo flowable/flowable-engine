@@ -451,7 +451,30 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
+    @Test
+    public void testBulkUpdateTaskAssignee() throws IOException {
 
+        taskService.createTaskBuilder().id("taskID1").create();
+        taskService.createTaskBuilder().id("taskID2").create();
+        taskService.createTaskBuilder().id("taskID3").create();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("assignee", "admin");
+        requestNode.putArray("taskIds").add("taskID1").add("taskID3");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(taskService.createTaskQuery().taskId("taskID1").singleResult().getAssignee()).isEqualTo("admin");
+        assertThat(taskService.createTaskQuery().taskId("taskID2").singleResult().getAssignee()).isNull();
+        assertThat(taskService.createTaskQuery().taskId("taskID3").singleResult().getAssignee()).isEqualTo("admin");
+
+        taskService.deleteTask("taskID1", true);
+        taskService.deleteTask("taskID2", true);
+        taskService.deleteTask("taskID3", true);
+
+    }
     @Test
     public void testInvalidBulkUpdateTasks() throws IOException {
         ObjectNode requestNode = objectMapper.createObjectNode();
