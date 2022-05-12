@@ -40,6 +40,8 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     protected String scopeId;
     protected String scopeDefinitionId;
     protected String scopeType;
+    protected Date lockTime;
+    protected String lockOwner;
     protected String tenantId;
     
     public EventSubscriptionEntityImpl() {}
@@ -185,6 +187,26 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public Date getLockTime() {
+        return lockTime;
+    }
+
+    @Override
+    public void setLockTime(Date lockTime) {
+        this.lockTime = lockTime;
+    }
+
+    @Override
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    @Override
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
     }
 
     @Override

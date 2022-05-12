@@ -125,22 +125,15 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
                         PlanItemInstanceState.COMPLETED,
                         PlanItemInstanceState.ACTIVE,
                         PlanItemInstanceState.TERMINATED,
-                        PlanItemInstanceState.COMPLETED,
-                        PlanItemInstanceState.AVAILABLE);
+                        PlanItemInstanceState.COMPLETED);
+        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getPlanItemDefinitionId)
+                .containsExactlyInAnyOrder(
+                        "task1", "task1", "stage1", "subTask1");
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task One");
-
-        cmmnTaskService.complete(task.getId());
-
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
-        assertThat(planItemInstances).hasSize(6);
-
-        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(planItemInstances).hasSize(2);
-
-        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(task.getName()).isEqualTo("Sub task One");
 
         cmmnTaskService.complete(task.getId());
 

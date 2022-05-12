@@ -169,7 +169,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         if (planItem != null && planItemDefinition instanceof EventListener && !(planItemDefinition instanceof TimerEventListener) && 
                 !(planItemDefinition instanceof ReactivateEventListener)) {
             
-            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem)) || !hasRepetitionRule(planItem)) {
+            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem) && !hasMaxInstanceCount(planItem)) 
+                    || !hasRepetitionRule(planItem)) {
                 
                 List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndPlanItemId(
                         planItemInstanceEntity.getCaseInstanceId(), planItem.getId());
@@ -267,6 +268,13 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             && planItem.getItemControl() != null
             && planItem.getItemControl().getRepetitionRule() != null
             && planItem.getItemControl().getRepetitionRule().hasCollectionVariable();
+    }
+    
+    public boolean hasMaxInstanceCount(PlanItem planItem) {
+        return planItem != null
+            && planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null
+            && planItem.getItemControl().getRepetitionRule().getMaxInstanceCount() != null;
     }
 
     public boolean hasRepetitionRuleEntryCriteria(PlanItem planItem) {

@@ -759,7 +759,7 @@ To solve this problem, the *secure scripting* feature can be enabled. Currently,
         <version>${flowable.version}</version>
     </dependency>
 
-Adding this dependency will transitively bring in the Rhino dependency (see [<https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino>]($https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$)). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine **does not** have the features that are needed to implement the secure scripting feature.
+Adding this dependency will transitively bring in the Rhino dependency (see [<https://github.com/mozilla/rhino>]($https://github.com/mozilla/rhino$$)). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine **does not** have the features that are needed to implement the secure scripting feature.
 
 This does mean that there could be (typically small) differences between scripts (for example, *importPackage* works on Rhino, but *load()* has to be used on Nashorn).
 

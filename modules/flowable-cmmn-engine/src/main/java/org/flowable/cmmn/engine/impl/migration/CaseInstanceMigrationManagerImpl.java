@@ -25,7 +25,9 @@ import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -142,6 +144,13 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 validationResult.addValidationMessage("Invalid mapping for move to available plan item definition '" + planItemDefinitionId + "' cannot be found in the case definition");
             }
         }
+        
+        Map<String, PlanItemDefinitionMapping> waitingForRepetitionMappingLookupMap = groupByFromPlanItemId(document.getWaitingForRepetitionPlanItemDefinitionMappings(), validationResult);
+        for (String planItemDefinitionId : waitingForRepetitionMappingLookupMap.keySet()) {
+            if (!hasPlanItemDefinition(cmmnModel, planItemDefinitionId)) {
+                validationResult.addValidationMessage("Invalid mapping for add waiting for repetition plan item definition '" + planItemDefinitionId + "' cannot be found in the case definition");
+            }
+        }
     }
 
     @Override
@@ -196,6 +205,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
                 .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
                 .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
+                .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())
+                .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, commandContext);
@@ -246,6 +257,14 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         for (MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping : document.getMoveToAvailablePlanItemDefinitionMappings()) {
             changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+        }
+        
+        for (WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getWaitingForRepetitionPlanItemDefinitionMappings()) {
+            changePlanItemStateBuilder.addWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+        }
+        
+        for (RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getRemoveWaitingForRepetitionPlanItemDefinitionMappings()) {
+            changePlanItemStateBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
         }
 
         return changePlanItemStateBuilder;

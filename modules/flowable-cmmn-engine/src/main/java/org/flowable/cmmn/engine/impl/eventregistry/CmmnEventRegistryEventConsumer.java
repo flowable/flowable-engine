@@ -23,10 +23,15 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.eventregistry.api.EventConsumerInfo;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -115,37 +120,111 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
                     CaseDefinition caseDefinition = cmmnEngineConfiguration.getCmmnRepositoryService().getCaseDefinition(eventSubscription.getScopeDefinitionId());
-                    
-                    CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
-                            .caseDefinitionKey(caseDefinition.getKey())
-                            .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
-                            .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
-                    
-                    if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                        caseInstanceQuery.caseInstanceTenantId(eventInstance.getTenantId());
-                    }
-                    
-                    long caseInstanceCount = caseInstanceQuery.count();
 
+                    long caseInstanceCount = countCaseInstances(cmmnRuntimeService, eventInstance, correlationKeyWithAllParameters, caseDefinition);
                     if (caseInstanceCount > 0) {
                         // Returning, no new instance should be started
                         eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                         return;
-                    }
 
-                    caseInstanceBuilder.referenceId(correlationKeyWithAllParameters.getValue());
-                    caseInstanceBuilder.referenceType(ReferenceTypes.EVENT_CASE);
+                    } else {
+
+                        /*
+                         * When multiple threads/transactions are querying concurrently, it could happen
+                         * that multiple times zero is returned as result of the count.
+                         *
+                         * To make sure only one unique instance is created, the event subscription
+                         * is locked first, which means that the current logic can now act on it when that's succesful.
+                         *
+                         * Once the lock is acquired, the query is repeated (similar reasoning as when using synchronized methods).
+                         * If the result is again zero, the case instance can be started.
+                         *
+                         * Transactionally, there are 4 transactions at play here:
+                         * - tx 1 for locking the event subscription
+                         * - tx 2 for doing the case instance count
+                         * - tx 3 for starting the case instance (if tx 1 was successful and tx 2 returned 0)
+                         * - tx 4 for unlocking (if tx 1 was successful)
+                         *
+                         * The counting + case instance starting happens exclusively for a given event subscription
+                         * and due to using separate transactions for the count and the start, it's guaranteed
+                         * other engine nodes or other threads will always see any other instance started.
+                         */
+
+                        CmmnManagementServiceImpl cmmnManagementService = (CmmnManagementServiceImpl) cmmnEngineConfiguration.getCmmnManagementService();
+                        boolean eventLocked = cmmnManagementService.executeCommand(
+                                new CommandConfig(false, TransactionPropagation.REQUIRES_NEW),
+                                commandContext -> CommandContextUtil.getEventSubscriptionService(commandContext)
+                                        .lockEventSubscription(eventSubscription.getId()));
+
+                        if (eventLocked) {
+
+                            try {
+
+                                caseInstanceCount = countCaseInstances(cmmnRuntimeService, eventInstance, correlationKeyWithAllParameters, caseDefinition);
+                                if (caseInstanceCount > 0) {
+                                    // Returning, no new instance should be started
+                                    eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
+                                    LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
+                                    return;
+                                }
+
+                                startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
+                                return;
+
+                            } finally {
+                                cmmnManagementService.executeCommand(
+                                        new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), (Command<Void>) commandContext -> {
+                                            CommandContextUtil.getEventSubscriptionService(commandContext)
+                                                    .unlockEventSubscription(eventSubscription.getId());
+                                            return null;
+                                        });
+
+                            }
+
+                        } else {
+                            return;
+
+                        }
+
+                    }
 
                 }
             }
 
-            if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
-                caseInstanceBuilder.startAsync();
-            } else {
-                caseInstanceBuilder.start();
-            }
+            startCaseInstance(caseInstanceBuilder, null, null);
 
+        }
+    }
+
+    protected long countCaseInstances(CmmnRuntimeService cmmnRuntimeService, EventInstance eventInstance,
+            CorrelationKey correlationKey, CaseDefinition caseDefinition) {
+
+        CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey(caseDefinition.getKey())
+                .caseInstanceReferenceId(correlationKey.getValue())
+                .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
+
+        if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+            caseInstanceQuery.caseInstanceTenantId(eventInstance.getTenantId());
+        }
+
+        return caseInstanceQuery.count();
+    }
+
+    protected void startCaseInstance(CaseInstanceBuilder caseInstanceBuilder, String referenceId, String referenceType) {
+
+        if (referenceId != null) {
+            caseInstanceBuilder.referenceId(referenceId);
+        }
+        if (referenceType != null) {
+            caseInstanceBuilder.referenceType(referenceType);
+        }
+
+        if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
+            caseInstanceBuilder.startAsync();
+        } else {
+            caseInstanceBuilder.start();
         }
     }
 

@@ -20,7 +20,9 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.common.engine.api.FlowableException;
 
@@ -35,6 +37,8 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     protected Set<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitions = new HashSet<>();
     protected Set<MoveToAvailablePlanItemDefinitionMapping> changeToAvailableStatePlanItemDefinitions = new HashSet<>();
     protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions = new HashSet<>();
+    protected Set<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitions = new HashSet<>();
+    protected Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions = new HashSet<>();
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
 
@@ -110,6 +114,38 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
         }
         return this;
     }
+    
+    @Override
+    public ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId) {
+        waitingForRepetitionPlanItemDefinitions.add(new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId));
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds) {
+        if (planItemDefinitionIds != null) {
+            for (String planItemDefinitionId : planItemDefinitionIds) {
+                waitingForRepetitionPlanItemDefinitions.add(new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId));
+            }
+        }
+        return this;
+    }
+    
+    @Override
+    public ChangePlanItemStateBuilder addRemoveWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId) {
+        removeWaitingForRepetitionPlanItemDefinitions.add(new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId));
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder addRemoveWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds) {
+        if (planItemDefinitionIds != null) {
+            for (String planItemDefinitionId : planItemDefinitionIds) {
+                removeWaitingForRepetitionPlanItemDefinitions.add(new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId));
+            }
+        }
+        return this;
+    }
 
     @Override
     public ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue) {
@@ -163,6 +199,14 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
 
     public Set<TerminatePlanItemDefinitionMapping> getTerminatePlanItemDefinitions() {
         return terminatePlanItemDefinitions;
+    }
+
+    public Set<WaitingForRepetitionPlanItemDefinitionMapping> getWaitingForRepetitionPlanItemDefinitions() {
+        return waitingForRepetitionPlanItemDefinitions;
+    }
+    
+    public Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> getRemoveWaitingForRepetitionPlanItemDefinitions() {
+        return removeWaitingForRepetitionPlanItemDefinitions;
     }
 
     public Map<String, Object> getCaseVariables() {

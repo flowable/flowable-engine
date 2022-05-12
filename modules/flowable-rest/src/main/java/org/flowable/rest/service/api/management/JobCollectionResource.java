@@ -15,20 +15,31 @@ package org.flowable.rest.service.api.management;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
+import org.flowable.rest.service.api.BulkMoveDeadLetterActionRequest;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -47,14 +58,21 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
 public class JobCollectionResource {
 
+    private static final String EXECUTE_ACTION = "execute";
+    private static final String MOVE_ACTION = "move";
+    private static final String MOVE_TO_HISTORY_JOB_ACTION = "moveToHistoryJob";
+
     @Autowired
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
     protected ManagementService managementService;
-    
-    @Autowired(required=false)
+
+    @Autowired(required = false)
     protected BpmnRestApiInterceptor restApiInterceptor;
+
+    @Autowired
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     // Fixme documentation & real parameters
     @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs")
@@ -154,11 +172,41 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
             query.withoutScopeId();
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessJobInfoWithQuery(query);
         }
 
         return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
+    }
+
+    @ApiOperation(value = "Move a bulk of deadletter jobs. Accepts 'move' and 'moveToHistoryJob' as action.", tags = { "Jobs" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the dead letter jobs where moved. Response-body is intentionally empty."),
+            @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
+    })
+    @PostMapping("/management/deadletter-jobs")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void executeDeadLetterJobAction(@RequestBody BulkMoveDeadLetterActionRequest actionRequest,
+            HttpServletResponse response) {
+        if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
+            throw new FlowableIllegalArgumentException("Invalid action, only 'move' or 'moveToHistoryJob' is supported.");
+        }
+
+        List<String> jobIds = actionRequest.getJobIds();
+        long existingJobIdCount = managementService.createDeadLetterJobQuery().jobIds(jobIds).count();
+        if (jobIds.size() != existingJobIdCount) {
+            List<Job> foundJobs = managementService.createDeadLetterJobQuery().jobIds(jobIds).list();
+            for (Job job : foundJobs) {
+                jobIds.remove(job.getId());
+            }
+            throw new FlowableObjectNotFoundException(
+                    "Could not find a dead letter job(s) with id(s) {" + jobIds.stream().collect(Collectors.joining(",")) + "}", Job.class);
+        }
+        if (MOVE_ACTION.equals(actionRequest.getAction())) {
+            managementService.bulkMoveDeadLetterJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
+        } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+            managementService.bulkMoveDeadLetterJobsToHistoryJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
+        }
     }
 }

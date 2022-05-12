@@ -1888,7 +1888,7 @@ public class LongRunningJavaDelegate implements MapBasedFlowableFutureJavaDelega
 Note: the same rules and logic that applied for the `JavaDelegate` applies for the `FutureJavaDelegate` as well. 
 Keep in mind that when using field expression inject the evaluation of the expression should only be done before or after the execution is done (on the same thread as the process instance).
 
-[\[INTERNAL: non-public implementation classes\]](internal) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
+[\[INTERNAL: non-public implementation classes\]](../oss-introduction.md#internal-implementation-classes) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
 
 #### Field Injection
 

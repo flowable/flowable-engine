@@ -22,7 +22,9 @@ import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocumentBuilder;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 
 /**
  * @author Valentin Zickner
@@ -36,6 +38,8 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     protected List<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<MoveToAvailablePlanItemDefinitionMapping> moveToAvailablePlanItemDefinitionMappings = new ArrayList<>();
+    protected List<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
+    protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
 
     @Override
@@ -92,6 +96,30 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         this.moveToAvailablePlanItemDefinitionMappings.add(planItemDefinitionMapping);
         return this;
     }
+    
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addWaitingForRepetitionPlanItemDefinitionMappings(List<WaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings) {
+        this.waitingForRepetitionPlanItemDefinitionMappings.addAll(planItemDefinitionMappings);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addWaitingForRepetitionPlanItemDefinitionMapping(WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping) {
+        this.waitingForRepetitionPlanItemDefinitionMappings.add(planItemDefinitionMapping);
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMappings(List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings) {
+        this.removeWaitingForRepetitionPlanItemDefinitionMappings.addAll(planItemDefinitionMappings);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping) {
+        this.removeWaitingForRepetitionPlanItemDefinitionMappings.add(planItemDefinitionMapping);
+        return this;
+    }
 
     @Override
     public CaseInstanceMigrationDocumentBuilder addCaseInstanceVariable(String variableName, Object variableValue) {
@@ -113,6 +141,8 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         caseInstanceMigrationDocument.setActivatePlanItemDefinitionMappings(this.activatePlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setTerminatePlanItemDefinitionMappings(this.terminatePlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setMoveToAvailablePlanItemDefinitionMappings(this.moveToAvailablePlanItemDefinitionMappings);
+        caseInstanceMigrationDocument.setWaitingForRepetitionPlanItemDefinitionMappings(this.waitingForRepetitionPlanItemDefinitionMappings);
+        caseInstanceMigrationDocument.setRemoveWaitingForRepetitionPlanItemDefinitionMappings(this.removeWaitingForRepetitionPlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setCaseInstanceVariables(this.caseInstanceVariables);
         return caseInstanceMigrationDocument;
     }

@@ -158,7 +158,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             Map<String, Object> map = (Map<String, Object>) param;
             String caseInstanceId = (String) map.get("caseInstanceId");
             String planItemId = (String) map.get("planItemId");
-            return caseInstanceId.equals(entity.getCaseInstanceId()) && planItemId.equals(entity.getPlanItem().getId());
+            return caseInstanceId.equals(entity.getCaseInstanceId()) && entity.getPlanItem() != null && planItemId.equals(entity.getPlanItem().getId());
         }
 
     }
@@ -170,7 +170,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             Map<String, Object> map = (Map<String, Object>) param;
             String stageInstanceId = (String) map.get("stageInstanceId");
             String planItemId = (String) map.get("planItemId");
-            return stageInstanceId.equals(entity.getStageInstanceId()) && planItemId.equals(entity.getPlanItem().getId());
+            return stageInstanceId.equals(entity.getStageInstanceId()) && entity.getPlanItem() != null && planItemId.equals(entity.getPlanItem().getId());
         }
 
     }

@@ -32,6 +32,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     U jobId(String jobId);
 
     /**
+     * Only select jobs with the given ids. If you use jobId({@link String} jobId) this filter gets ignored.
+     */
+    U jobIds(Collection<String> jobIds);
+
+    /**
      * Only select jobs which exist for the given process instance.
      **/
     U processInstanceId(String processInstanceId);

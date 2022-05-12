@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity.data;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
@@ -71,6 +72,10 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName, String tenantId);
 
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
+
+    boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime);
+
+    void clearEventSubscriptionLockTime(String eventSubscriptionId);
 
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
     
