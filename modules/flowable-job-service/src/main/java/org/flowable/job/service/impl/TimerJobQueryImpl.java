@@ -38,6 +38,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String id;
+    protected Collection<String> jobIds;
     protected String processInstanceId;
     protected boolean withoutProcessInstanceId;
     protected String executionId;
@@ -87,6 +88,15 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided job id is null");
         }
         this.id = jobId;
+        return this;
+    }
+
+    @Override
+    public TimerJobQuery jobIds(Collection<String> jobIds) {
+        if (jobIds == null) {
+            throw new FlowableIllegalArgumentException("Provided job id list is null");
+        }
+        this.jobIds = jobIds;
         return this;
     }
 
