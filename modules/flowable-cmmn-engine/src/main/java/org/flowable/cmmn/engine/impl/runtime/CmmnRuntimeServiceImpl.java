@@ -166,7 +166,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
-    public void terminatePlanItemInstances(String planItemInstanceId) {
+    public void terminatePlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
     

@@ -36,7 +36,7 @@ public class ChildProcessInstanceStateChangeCallback implements RuntimeInstanceS
             cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(callbackData.getCallbackId());
 
         } else if ("cancelled".equals(callbackData.getNewState())) {
-            cmmnEngineConfiguration.getCmmnRuntimeService().terminatePlanItemInstances(callbackData.getCallbackId());
+            cmmnEngineConfiguration.getCmmnRuntimeService().terminatePlanItemInstance(callbackData.getCallbackId());
 
         }
     }

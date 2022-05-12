@@ -582,7 +582,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .planItemInstanceName("The Stage")
                 .singleResult();
 
-        cmmnRuntimeService.terminatePlanItemInstances(stagePlanItemInstance.getId());
+        cmmnRuntimeService.terminatePlanItemInstance(stagePlanItemInstance.getId());
         assertThat(cmmnTaskService.createTaskQuery().taskName("D").singleResult()).isNotNull();
 
         // Terminated
