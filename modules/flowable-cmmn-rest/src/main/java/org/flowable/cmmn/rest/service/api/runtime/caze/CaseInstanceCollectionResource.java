@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -319,11 +321,34 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
                 caseInstanceResponse.setCaseDefinitionName(caseDefinition.getName());
                 caseInstanceResponse.setCaseDefinitionDescription(caseDefinition.getDescription());
             }
-            
+
             return caseInstanceResponse;
 
         } catch (FlowableObjectNotFoundException aonfe) {
             throw new FlowableIllegalArgumentException(aonfe.getMessage(), aonfe);
+        }
+    }
+
+    @ApiOperation(value = "Post action request to delete/terminate a bulk of case instances", tags = { "Case Instances" }, nickname = "bulkDeleteCaseInstances")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the bulk of case instances was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates at least one requested case instance was not found.")
+    })
+    @PostMapping(value = "/cmmn-runtime/case-instances/delete")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void bulkDeleteCaseInstances(@ApiParam(name = "caseInstanceIds")
+    @RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+        if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkDeleteCaseInstances(request.getInstanceIds());
+            }
+            runtimeService.bulkDeleteCaseInstances(request.getInstanceIds());
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        } else if (BulkDeleteInstancesRestActionRequest.TERMINATE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkTerminateCaseInstances(request.getInstanceIds());
+            }
+            runtimeService.bulkTerminateCaseInstances(request.getInstanceIds());
         }
     }
 }
