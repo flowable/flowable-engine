@@ -1070,7 +1070,7 @@ The response body will contain the binary resource-content for the requested res
 <td><p>latest</p></td>
 <td><p>No</p></td>
 <td><p>Boolean</p></td>
-<td><p>Only return the latest process definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.</p></td>
+<td><p>Only return the latest process definition versions. Can only be used together with 'key', 'keyLike', 'resourceName' and 'resourceNameLike' parameters, using any other parameter will result in a 400-response.</p></td>
 </tr>
 <tr class="even">
 <td><p>suspended</p></td>
