@@ -46,6 +46,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
     /** Only select historic variables which were not set task-local. */
     HistoricVariableInstanceQuery excludeTaskVariables();
 
+    /** Only select historic process variables which were not set local. */
+    HistoricVariableInstanceQuery excludeLocalVariables();
+
     /** Don't initialize variable values. This is foremost a way to deal with variable delete queries */
     HistoricVariableInstanceQuery excludeVariableInitialization();
 

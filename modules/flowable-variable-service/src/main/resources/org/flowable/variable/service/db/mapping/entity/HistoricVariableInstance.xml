@@ -287,6 +287,11 @@
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
             </if>
+            <if test="excludeLocalVariables">
+                and RES.TASK_ID_ is NULL
+                and (RES.EXECUTION_ID_ = RES.PROC_INST_ID_ or (RES.EXECUTION_ID_ is NULL and RES.PROC_INST_ID_ is NULL))
+                and RES.SUB_SCOPE_ID_ is NULL
+            </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId}
             </if>
