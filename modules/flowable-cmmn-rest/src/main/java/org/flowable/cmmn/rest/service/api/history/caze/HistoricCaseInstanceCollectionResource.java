@@ -16,11 +16,17 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -188,5 +194,23 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             queryRequest.setWithoutCaseInstanceCallbackId(Boolean.valueOf(allRequestParams.get("withoutCaseInstanceCallbackId")));
         }
         return getQueryResponse(queryRequest, allRequestParams);
+    }
+
+    @ApiOperation(value = "Post action request to delete a bulk of historic case instances", tags = {
+            "Manage History Case Instances" }, nickname = "bulkDeleteHistoricCaseInstances")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the bulk of historic case instances was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates at least one requested case instance was not found.")
+    })
+    @PostMapping(value = "/cmmn-history/historic-case-instances/delete")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void bulkDeleteHistoricCaseInstances(@ApiParam(name = "bulkDeleteRestActionRequest")
+    @RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+        if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkDeleteHistoricCases(request.getInstanceIds());
+            }
+            historyService.bulkDeleteHistoricCaseInstances(request.getInstanceIds());
+        }
     }
 }

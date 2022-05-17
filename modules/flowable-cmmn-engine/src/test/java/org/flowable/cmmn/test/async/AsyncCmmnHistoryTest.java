@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -169,6 +170,51 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncCmmnHistoryTest.testHistoricCaseInstanceDeleted.cmmn")
+    public void testHistoricCaseInstanceBulkDeleted() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task2 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
+        cmmnTaskService.complete(task2.getId());
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task3 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
+        cmmnTaskService.complete(task3.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+        List<String> instanceIdList = new ArrayList<>();
+        instanceIdList.add(caseInstance.getId());
+        instanceIdList.add(caseInstance2.getId());
+        cmmnHistoryService.bulkDeleteHistoricCaseInstances(instanceIdList);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(1);
+    }
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/history/testStartSimplePassthroughCaseInstanceLevel.cmmn")
     public void testInstanceLevelSTP() {
