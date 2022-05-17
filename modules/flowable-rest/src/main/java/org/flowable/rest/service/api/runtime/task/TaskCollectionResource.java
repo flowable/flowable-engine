@@ -15,13 +15,18 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.task.api.Task;
@@ -29,6 +34,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +50,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
+ * @author Christopher Welsch
  */
 @RestController
 @Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
@@ -353,4 +360,47 @@ public class TaskCollectionResource extends TaskBaseResource {
         response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createTaskResponse(task);
     }
+
+    @ApiOperation(value = "Update Tasks", tags = { "Tasks" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
+    })
+    @PutMapping(value = "/runtime/tasks", produces = "application/json")
+    public DataResponse<TaskResponse> bulkUpdateTasks(@RequestBody BulkTasksRequest bulkTasksRequest) {
+
+        if (bulkTasksRequest == null) {
+            throw new FlowableException("A request body was expected when bulk updating tasks.");
+        }
+        if (bulkTasksRequest.getTaskIds() == null) {
+            throw new FlowableIllegalArgumentException("taskIds can not be null for bulk update tasks requests");
+        }
+
+        Collection<Task> taskList = getTasksFromIdList(bulkTasksRequest.getTaskIds());
+
+        if (taskList.size() != bulkTasksRequest.getTaskIds().size()) {
+            taskList.stream().forEach(task -> bulkTasksRequest.getTaskIds().remove(task.getId()));
+            throw new FlowableObjectNotFoundException(
+                    "Could not find task instance with id:" + bulkTasksRequest.getTaskIds().stream().collect(Collectors.joining(",")));
+        }
+
+        // Populate the task properties based on the request
+        populateTasksFromRequest(taskList, bulkTasksRequest);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.bulkUpdateTasks(taskList, bulkTasksRequest);
+        }
+
+        // Save the task and fetch again, it's possible that an
+        // assignment-listener has updated
+        // fields after it was saved so we can not use the in-memory task
+        taskService.bulkSaveTasks(taskList);
+
+        List<Task> taskResultList = getTasksFromIdList(bulkTasksRequest.getTaskIds());
+
+        DataResponse<TaskResponse> dataResponse = new DataResponse<>();
+        dataResponse.setData(restResponseFactory.createTaskResponseList(taskResultList));
+        return dataResponse;
+    }
+
 }

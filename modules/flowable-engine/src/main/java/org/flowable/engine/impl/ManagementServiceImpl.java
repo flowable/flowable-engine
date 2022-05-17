@@ -13,6 +13,7 @@
 package org.flowable.engine.impl;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +83,8 @@ import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.cmd.BulkMoveDeadLetterJobsCmd;
+import org.flowable.job.service.impl.cmd.BulkMoveDeadLetterJobsToHistoryJobsCmd;
 import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteExternalWorkerJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteHistoryJobCmd;
@@ -176,6 +179,16 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries) {
         return commandExecutor.execute(new MoveDeadLetterJobToHistoryJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries) {
+        commandExecutor.execute(new BulkMoveDeadLetterJobsCmd(jobIds, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries) {
+        commandExecutor.execute(new BulkMoveDeadLetterJobsToHistoryJobsCmd(jobIds, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override

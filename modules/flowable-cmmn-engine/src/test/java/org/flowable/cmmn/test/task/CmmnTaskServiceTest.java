@@ -14,10 +14,13 @@ package org.flowable.cmmn.test.task;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -30,6 +33,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -49,6 +53,7 @@ import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
+ * @author Christopher Welsch
  */
 public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
 
@@ -84,6 +89,35 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                     .containsExactly("The Task", "This is a test documentation");
             assertThat(historicTaskInstance.getEndTime()).isNotNull();
         }
+    }
+
+    @Test
+    public void testBulkUpdateTasks() {
+        List<Task> taskList = new ArrayList<>();
+
+        taskList.add(cmmnTaskService.createTaskBuilder().create());
+        taskList.add(cmmnTaskService.createTaskBuilder().create());
+        taskList.add(cmmnTaskService.createTaskBuilder().create());
+        taskList.add(cmmnTaskService.createTaskBuilder().create());
+
+        taskList.forEach(task -> assertThat(task.getAssignee()).isNull());
+
+        taskList.forEach(task -> task.setAssignee("johnDoe"));
+
+        cmmnTaskService.bulkSaveTasks(taskList);
+        List<String> taskIdList = taskList.stream().map(Task::getId).collect(Collectors.toList());
+
+        //Fetch again to ensure updated tasks
+        taskList = cmmnTaskService.createTaskQuery().taskIds(taskIdList).list();
+        taskList.forEach(task -> assertThat(task.getAssignee()).isEqualTo("johnDoe"));
+
+        cmmnTaskService.deleteTasks(taskIdList, true);
+    }
+
+    @Test
+    public void testInvalidBulkUpdateTaskAssignee() {
+        assertThatThrownBy(() -> cmmnTaskService.bulkSaveTasks(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test

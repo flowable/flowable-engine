@@ -53,6 +53,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected IdmIdentityService idmIdentityService;
 
     protected String taskId;
+    protected Collection<String> taskIds;
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
@@ -186,6 +187,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.taskId = taskId;
         } else {
             this.taskId = taskId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskIds(Collection<String> taskIds) {
+        if (taskIds == null) {
+            throw new FlowableIllegalArgumentException("Task ids are null");
+        }
+        if (orActive) {
+            currentOrQueryObject.taskIds = taskIds;
+        } else {
+            this.taskIds = taskIds;
         }
         return this;
     }

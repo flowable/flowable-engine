@@ -54,7 +54,7 @@ In this section we will cover a very simple business process that we will use to
 
 ### Prerequisites
 
-This tutorial assumes that you have the [Flowable demo setup running](demo.setup.one.minute.version), and that you are using a standalone H2 server. Edit db.properties and set the jdbc.url=jdbc:h2:tcp://localhost/flowable, and then run the standalone server according to [H2’s documentation](http://www.h2database.com/html/tutorial.html#using_server).
+This tutorial assumes that you have the Flowable demo setup running, and that you are using a standalone H2 server. Edit db.properties and set the jdbc.url=jdbc:h2:tcp://localhost/flowable, and then run the standalone server according to [H2’s documentation](http://www.h2database.com/html/tutorial.html#using_server).
 
 ### Goal
 

@@ -32,8 +32,10 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
@@ -231,6 +233,45 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(14);
             assertThat(historyService.createHistoricDetailQuery().count()).isEqualTo(5);
         }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/HistoricVariableInstanceTest.testCallActivityAndTask.bpmn20.xml" })
+    public void testVariableInstanceQueryExcludeLocalVariables() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivityAndTask");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        List<HistoricVariableInstance> vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("mySubProcess")
+                .singleResult();
+
+        runtimeService.setVariable(subProcessExecution.getId(), "var2", "test3");
+        runtimeService.setVariableLocal(subProcessExecution.getId(), "varLocal2", "test4");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test5");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test6");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(3);
+        assertThat(vars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1", "test3", "test5");
     }
 
     @Test

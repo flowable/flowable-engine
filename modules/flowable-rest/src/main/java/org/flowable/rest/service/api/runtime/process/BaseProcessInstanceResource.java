@@ -305,11 +305,11 @@ public class BaseProcessInstanceResource {
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.");
         }
-        
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceInfoById(processInstance);
         }
-        
+
         return processInstance;
     }
 }

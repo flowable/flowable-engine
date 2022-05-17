@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -84,6 +85,12 @@ public class CmmnVariableInstanceQueryImpl implements VariableInstanceQuery {
     @Override
     public VariableInstanceQuery excludeTaskVariables() {
         wrappedVariableInstanceQuery.excludeTaskVariables();
+        return this;
+    }
+
+    @Override
+    public VariableInstanceQuery excludeLocalVariables() {
+        wrappedVariableInstanceQuery.excludeLocalVariables();
         return this;
     }
 

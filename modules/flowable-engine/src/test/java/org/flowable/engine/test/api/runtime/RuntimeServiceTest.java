@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
@@ -452,6 +453,64 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         }
     }
     
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testBulkDeleteProcessInstance() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+
+        String deleteReason = "testing instance deletion";
+        Set<String> instanceIds = new HashSet<>();
+        instanceIds.add(processInstance1.getId());
+        instanceIds.add(processInstance2.getId());
+
+        runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason);
+
+        // test that the delete reason of the process instance shows up as
+        // delete reason of the task in history ACT-848
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance1.getId())
+                    .singleResult();
+            assertThat(historicTaskInstance.getDeleteReason()).isEqualTo(deleteReason);
+            HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance1.getId())
+                    .singleResult();
+            assertThat(historicInstance).isNotNull();
+            assertThat(historicInstance.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(historicInstance.getEndTime()).isNotNull();
+        }
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance3.getId()).singleResult()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testInvalidBulkDeleteProcessInstance() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(2);
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+
+        String deleteReason = "testing instance deletion";
+        Set<String> instanceIds = new HashSet<>();
+        instanceIds.add(processInstance1.getId());
+        instanceIds.add(processInstance2.getId());
+        instanceIds.add("invalidID");
+
+        assertThatThrownBy(() -> runtimeService.bulkDeleteProcessInstances(instanceIds, deleteReason))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> runtimeService.bulkDeleteProcessInstances(null, deleteReason))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("processInstanceIds are null");
+    }
+
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessWithListener.bpmn20.xml" })
     public void testDeleteProcessInstanceWithListener() {

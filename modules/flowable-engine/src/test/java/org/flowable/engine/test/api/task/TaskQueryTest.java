@@ -55,6 +55,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Falko Menge
  * @author Filip Hrisafov
+ * @author Christopher Welsch
  */
 public class TaskQueryTest extends PluggableFlowableTestCase {
 
@@ -119,6 +120,30 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.singleResult()).isNotNull();
         assertThat(query.list()).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testQueryByTaskIds() {
+        List<String> testIdList = new ArrayList<>(taskIds);
+        testIdList.remove(10);
+        testIdList.remove(8);
+        testIdList.add("invalid");
+
+        TaskQuery query = taskService.createTaskQuery().taskIds(testIdList);
+        assertThat(query.list()).hasSize(testIdList.size() - 1);
+        assertThat(query.count()).isEqualTo(testIdList.size() - 1);
+    }
+
+    @Test
+    public void testQueryByInvalidTaskIds() {
+        List<String> invalidTaskIdList = new ArrayList<>();
+        invalidTaskIdList.add("invalid");
+        TaskQuery query = taskService.createTaskQuery().taskIds(invalidTaskIdList);
+        assertThat(query.list()).isEmpty();
+        assertThat(query.count()).isZero();
+
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test

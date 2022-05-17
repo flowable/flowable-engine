@@ -87,6 +87,16 @@ public interface EventSubscription {
     Date getCreated();
 
     /**
+     * Gets the owner of this event subscription, if it was locked.
+     */
+    String getLockOwner();
+
+    /**
+     * Gets the date/time when this event subscription was locked.
+     */
+    Date getLockTime();
+
+    /**
      * The tenant identifier of this process instance
      */
     String getTenantId();

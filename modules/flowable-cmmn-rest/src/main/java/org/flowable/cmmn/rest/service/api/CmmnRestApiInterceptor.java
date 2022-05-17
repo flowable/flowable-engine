@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api;
 
+import java.util.Collection;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -40,6 +42,7 @@ import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceUpdateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.ChangePlanItemStateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.BulkTasksRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
@@ -70,6 +73,8 @@ public interface CmmnRestApiInterceptor {
     
     void updateTask(Task task, TaskRequest request);
 
+    void bulkUpdateTasks(Collection<Task> tasks, BulkTasksRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
@@ -82,8 +87,12 @@ public interface CmmnRestApiInterceptor {
     
     void terminateCaseInstance(CaseInstance caseInstance);
     
+    void bulkTerminateCaseInstances(Collection<String> caseInstanceIdList);
+
     void deleteCaseInstance(CaseInstance caseInstance);
     
+    void bulkDeleteCaseInstances(Collection<String> caseInstanceIdsSet);
+
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
@@ -130,6 +139,10 @@ public interface CmmnRestApiInterceptor {
 
     void deleteHistoryJob(HistoryJob historyJob);
     
+    void moveDeadLetterJob(Job job, String action);
+
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, String action);
+
     void accessEventSubscriptionById(EventSubscription eventSubscription);
     
     void accessEventSubscriptionInfoWithQuery(EventSubscriptionQuery eventSubscriptionQuery);

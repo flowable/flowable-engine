@@ -14,6 +14,9 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -192,6 +195,26 @@ public class EventSubscriptionEntityManagerImpl
     @Override
     public void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId) {
         dataManager.updateEventSubscriptionTenantId(oldTenantId, newTenantId);
+    }
+
+    @Override
+    public boolean lockEventSubscription(String eventSubscriptionId) {
+        EventSubscriptionServiceConfiguration serviceConfiguration = getServiceConfiguration();
+
+        int lockMillis = (int) serviceConfiguration.getEventSubscriptionLockTime().toMillis();
+        GregorianCalendar lockCal = new GregorianCalendar();
+        lockCal.setTime(serviceConfiguration.getClock().getCurrentTime());
+        lockCal.add(Calendar.MILLISECOND, lockMillis);
+        Date lockExpirationTime = lockCal.getTime();
+
+        String lockOwner = serviceConfiguration.getLockOwner();
+
+        return dataManager.updateEventSubscriptionLockTime(eventSubscriptionId, lockExpirationTime, lockOwner, getClock().getCurrentTime());
+    }
+
+    @Override
+    public void unlockEventSubscription(String eventSubscriptionId) {
+        dataManager.clearEventSubscriptionLockTime(eventSubscriptionId);
     }
 
     @Override

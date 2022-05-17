@@ -58,6 +58,8 @@ import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.cmd.BulkMoveDeadLetterJobsCmd;
+import org.flowable.job.service.impl.cmd.BulkMoveDeadLetterJobsToHistoryJobsCmd;
 import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteJobCmd;
@@ -140,6 +142,16 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
         return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries) {
+        commandExecutor.execute(new BulkMoveDeadLetterJobsCmd(jobIds, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries) {
+        commandExecutor.execute(new BulkMoveDeadLetterJobsToHistoryJobsCmd(jobIds, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override

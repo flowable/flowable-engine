@@ -29,6 +29,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -348,11 +350,28 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
                 processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
             }
-            
+
             return processInstanceResponse;
 
         } catch (FlowableObjectNotFoundException e) {
             throw new FlowableIllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    @ApiOperation(value = "Bulk delete process instances", tags = { "Process Instances" }, nickname = "deleteProcessInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @PostMapping(value = "/runtime/process-instances/delete")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void bulkDeleteProcessInstances(@RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+        if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
+
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkDeleteProcessInstances(request.getInstanceIds());
+            }
+            runtimeService.bulkDeleteProcessInstances(request.getInstanceIds(), request.getDeleteReason());
         }
     }
 }

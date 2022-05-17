@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,15 @@ public class TaskBaseResource {
         if (taskRequest.isDelegationStateSet()) {
             DelegationState delegationState = getDelegationState(taskRequest.getDelegationState());
             task.setDelegationState(delegationState);
+        }
+    }
+
+    /**
+     * Populate the tasks based on the values that are present in the given {@link BulkTasksRequest}.
+     */
+    protected void populateTasksFromRequest(Collection<Task> taskList, BulkTasksRequest taskRequest) {
+        for (Task task : taskList) {
+            populateTaskFromRequest(task, taskRequest);
         }
     }
 
@@ -506,6 +516,10 @@ public class TaskBaseResource {
         }
 
         return task;
+    }
+
+    protected List<Task> getTasksFromRequest(Collection<String> taskIds) {
+        return taskService.createTaskQuery().taskIds(taskIds).list();
     }
 
     /**
