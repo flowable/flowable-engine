@@ -319,7 +319,7 @@ GET repository/process-definitions
 |categoryNotEquals|No|String|Only return process definitions which don't have the given category.
 |deploymentId|No|String|Only return process definitions which are part of a deployment with the given id.
 |startableByUser|No|String|Only return process definitions which can be started by the given user.
-|latest|No|Boolean|Only return the latest process definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.
+|latest|No|Boolean|Only return the latest process definition versions. Can only be used together with 'key', 'keyLike', 'resourceName' and 'resourceNameLike' parameters, using any other parameter will result in a 400-response.
 |suspended|No|Boolean|If +true+, only returns process definitions which are suspended. If +false+, only active process definitions (which are not suspended) are returned.
 |sort|No|'name' (default), 'id', 'key', 'category', 'deploymentId' and 'version'|Property to sort on, to be used together with the 'order'.
 |The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
