@@ -49,5 +49,9 @@ public interface EventSubscriptionEntity extends EventSubscription, Entity, HasR
     
     void setScopeType(String scopeType);
 
+    void setLockOwner(String lockOwner);
+
+    void setLockTime(Date lockTime);
+
     void setTenantId(String tenantId);
 }

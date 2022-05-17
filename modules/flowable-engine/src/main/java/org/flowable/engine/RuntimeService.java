@@ -333,6 +333,15 @@ public interface RuntimeService {
     void deleteProcessInstance(String processInstanceId, String deleteReason);
 
     /**
+     * Delete a collection of existing runtime process instance.
+     *
+     * @param processInstanceIds Set of ids of process instances to delete, cannot be null.
+     * @param deleteReason reason for deleting, can be null.
+     * @throws FlowableObjectNotFoundException when no process instance is found with the given id.
+     */
+    void bulkDeleteProcessInstances(Collection<String> processInstanceIds, String deleteReason);
+
+    /**
      * Finds the activity ids for all executions that are waiting in activities. This is a list because a single activity can be active multiple times.
      *
      * @param executionId

@@ -3534,6 +3534,44 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     @Test
+    public void testTaskNameExpression() {
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename-v2.bpmn20.xml");
+        ProcessDefinition version3ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename-v3.bpmn20.xml");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVar1", "foo");
+        variables.put("myVar2", "bar");
+
+        // Task name and description contains a variable (myVar1)
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(version1ProcessDef.getId(), variables);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("User Task: foo");
+        assertThat(task.getDescription()).isEqualTo("Description: foo");
+
+        // Task name and description contains a variable (myVar2)
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .migrate(processInstance.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("User Task: bar");
+        assertThat(task.getDescription()).isEqualTo("Description: bar");
+
+        // Task name and description is null
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version3ProcessDef.getId())
+                .migrate(processInstance.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isNull();
+        assertThat(task.getDescription()).isNull();
+    }
+
+    @Test
     public void preUpgradeScriptMigration() {
         //Deploy first version of the process
         deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/serializable-variable-process.bpmn20.xml");

@@ -28,6 +28,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
+import org.flowable.engine.impl.cmd.BulkSaveTasksCmd;
 import org.flowable.engine.impl.cmd.ClaimTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
@@ -110,6 +111,11 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public void saveTask(Task task) {
         commandExecutor.execute(new SaveTaskCmd(task));
+    }
+
+    @Override
+    public void bulkSaveTasks(Collection<Task> taskList) {
+        commandExecutor.execute(new BulkSaveTasksCmd(taskList));
     }
 
     @Override

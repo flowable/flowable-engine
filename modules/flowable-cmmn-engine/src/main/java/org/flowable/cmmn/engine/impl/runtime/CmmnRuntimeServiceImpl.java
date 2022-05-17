@@ -32,6 +32,8 @@ import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.BulkDeleteCaseInstancesCmd;
+import org.flowable.cmmn.engine.impl.cmd.BulkTerminateCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.ChangePlanItemStateCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
@@ -159,6 +161,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
+    public void bulkTerminateCaseInstances(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new BulkTerminateCaseInstancesCmd(caseInstanceIds));
+    }
+
+    @Override
     public void terminatePlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
@@ -166,6 +173,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void deleteCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new DeleteCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public void bulkDeleteCaseInstances(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new BulkDeleteCaseInstancesCmd(caseInstanceIds));
     }
 
     @Override

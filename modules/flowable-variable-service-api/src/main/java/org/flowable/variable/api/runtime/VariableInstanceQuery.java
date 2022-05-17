@@ -16,6 +16,7 @@ package org.flowable.variable.api.runtime;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -88,6 +89,11 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
      * Only select historic variables with the give scope type.
      */
     VariableInstanceQuery scopeType(String scopeType);
+
+    /**
+     * Only select historic process variables which were not set local.
+     */
+    VariableInstanceQuery excludeLocalVariables();
 
     VariableInstanceQuery orderByProcessInstanceId();
 

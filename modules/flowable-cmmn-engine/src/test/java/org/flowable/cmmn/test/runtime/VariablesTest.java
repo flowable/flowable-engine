@@ -758,6 +758,35 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testVariableInstanceQueryExcludeLocalVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask")
+                .caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
+
+        List<VariableInstance> vars = cmmnRuntimeService.createVariableInstanceQuery().planItemInstanceId(planItemInstance.getId()).list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test2");
+
+        vars = cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test1");
+
+        List<HistoricVariableInstance> historyVars = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .excludeLocalVariables().list();
+
+        assertThat(historyVars.size()).isEqualTo(1);
+        assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
+    }
+
     protected void addVariableTypeIfNotExists(VariableType variableType) {
         // We can't remove the VariableType after every test since it would cause the test
         // to fail due to not being able to get the variable value during deleting

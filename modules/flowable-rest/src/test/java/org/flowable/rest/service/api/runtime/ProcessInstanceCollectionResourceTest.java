@@ -775,4 +775,55 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 + "} ]"
                 + "}");
     }
+
+    /**
+     * Test bulk deletion of process instances.
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testBulkDeleteProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey2");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey2");
+
+        String url = SERVER_URL_PREFIX + RestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + RestUrls.SEGMENT_PROCESS_INSTANCE_RESOURCE+ "/delete";
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId());
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
+        // Check if process-instance is gone
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance3.getId()).singleResult()).isNotNull();
+
+    }
+
+    /**
+     * Test bulk deletion of process instances  with invalid instance id.
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testInvalidBulkDeleteProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey2");
+
+        String url = SERVER_URL_PREFIX + RestUrls.SEGMENT_RUNTIME_RESOURCES + "/" + RestUrls.SEGMENT_PROCESS_INSTANCE_RESOURCE+ "/delete";
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId()).add("invalidIds");
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
+        // Check if process-instance is gone
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(1);
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+    }
 }

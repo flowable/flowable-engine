@@ -13,6 +13,7 @@
 package org.flowable.engine;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -200,6 +201,28 @@ public interface ManagementService {
      *              when the job cannot be moved to be a history job (e.g. because it's not history job)
      */
     HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when one job with of the given ids is not found.
+     * @throws FlowableIllegalArgumentException when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries);
 
     /**
      * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.

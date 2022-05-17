@@ -88,6 +88,11 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
      */
     HistoricVariableInstanceQuery scopeType(String scopeType);
 
+    /**
+     * Only select historic process variables which were not set local.
+     */
+    HistoricVariableInstanceQuery excludeLocalVariables();
+
     HistoricVariableInstanceQuery orderByProcessInstanceId();
 
     HistoricVariableInstanceQuery orderByVariableName();

@@ -1070,7 +1070,7 @@ The response body will contain the binary resource-content for the requested res
 <td><p>latest</p></td>
 <td><p>No</p></td>
 <td><p>Boolean</p></td>
-<td><p>Only return the latest process definition versions. Can only be used together with 'key' and 'keyLike' parameters, using any other parameter will result in a 400-response.</p></td>
+<td><p>Only return the latest process definition versions. Can only be used together with 'key', 'keyLike', 'resourceName' and 'resourceNameLike' parameters, using any other parameter will result in a 400-response.</p></td>
 </tr>
 <tr class="even">
 <td><p>suspended</p></td>
@@ -1458,7 +1458,7 @@ The response body is a JSON representation of the org.flowable.bpmn.model.BpmnMo
       "date" : "2013-04-15T00:42:12Z"
     }
 
-See suspend process definition [JSON Body parameters](processDefinitionActionBodyParameters).
+See suspend process definition [JSON Body parameters](#json-body-parameters).
 
 <table>
 <caption>Activate a process definition - Response codes</caption>
@@ -2681,7 +2681,7 @@ Note that also a *transientVariables* property is accepted as part of this json,
 
 The *returnVariables* property can be used to get the existing variables in the process instance context back in the response. By default the variables are not returned.
 
-Only one of processDefinitionId, processDefinitionKey or message can be used in the request body. Parameters businessKey, variables and tenantId are optional. If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in [the REST variables section](restVariables). Note that the variable-scope that is supplied is ignored, process-variables are always local.
+Only one of processDefinitionId, processDefinitionKey or message can be used in the request body. Parameters businessKey, variables and tenantId are optional. If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in [the REST variables section](#variable-representation). Note that the variable-scope that is supplied is ignored, process-variables are always local.
 
 <table>
 <caption>Start a process instance - Response codes</caption>
@@ -2896,7 +2896,7 @@ Only one of processDefinitionId, processDefinitionKey or message can be used in 
 The request body can contain all possible filters that can be used in the [List process instances](bpmn/ch15-REST.md#list-of-process-instances) URL query. On top of these, it’s possible to provide an array of variables
 to include in the query, with their format [described here](#json-query-variable-format).
 
-The general [paging and sorting query-parameters](paging-and-sorting) can be used for this URL.
+The general [paging and sorting query-parameters](#paging-and-sorting) can be used for this URL.
 
 <table>
 <caption>Query process instances - Response codes</caption>
@@ -3432,7 +3432,7 @@ When using POST, all variables that are passed are created. In case one of the v
        ...
     ]
 
-Any number of variables can be passed into the request body array. More information about the variable format can be found in [the REST variables section](restVariables). Note that scope is ignored, only local variables can be set in a process instance.
+Any number of variables can be passed into the request body array. More information about the variable format can be found in [the REST variables section](#variable-representation). Note that scope is ignored, only local variables can be set in a process instance.
 
 <table>
 <caption>Create (or update) variables on a process instance - Response codes</caption>
@@ -3524,7 +3524,7 @@ Any number of variables can be passed into the request body array. More informat
         "value":123
      }
 
-More information about the variable format can be found in [the REST variables section](restVariables). Note that scope is ignored, only local variables can be set in a process instance.
+More information about the variable format can be found in [the REST variables section](#variable-representation). Note that scope is ignored, only local variables can be set in a process instance.
 
 <table>
 <caption>Update a single variable on a process instance - Response codes</caption>
@@ -4156,7 +4156,7 @@ Returns all activities which are active in the execution and in all child-execut
 The request body can contain all possible filters that can be used in the [List executions](bpmn/ch15-REST.md#list-of-executions) URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables
 to include in the query, with their format [described here](#json-query-variable-format).
 
-The general [paging and sorting query-parameters](paging-and-sorting) can be used for this URL.
+The general [paging and sorting query-parameters](#paging-and-sorting) can be used for this URL.
 
 <table>
 <caption>Query executions - Response codes</caption>
@@ -4427,7 +4427,7 @@ When using POST, all variables that are passed are created. In case one of the v
 
     ]
 
-\*Note that you can only provide variables that have the same scope. If the request-body array contains variables from mixed scopes, the request results in an error (400 - BAD REQUEST).\*Any number of variables can be passed into the request body array. More information about the variable format can be found in [the REST variables section](restVariables). Note that scope is ignored, only local variables can be set in a process instance.
+\*Note that you can only provide variables that have the same scope. If the request-body array contains variables from mixed scopes, the request results in an error (400 - BAD REQUEST).\*Any number of variables can be passed into the request body array. More information about the variable format can be found in [the REST variables section](#variable-representation). Note that scope is ignored, only local variables can be set in a process instance.
 
 <table>
 <caption>Create (or update) variables on an execution - Response codes</caption>
@@ -4520,7 +4520,7 @@ When using POST, all variables that are passed are created. In case one of the v
         "scope":"global"
      }
 
-More information about the variable format can be found in [the REST variables section](restVariables).
+More information about the variable format can be found in [the REST variables section](#variable-representation).
 
 <table>
 <caption>Update a variable on an execution - Response codes</caption>
@@ -5293,7 +5293,7 @@ All request values are optional. For example, you can only include the 'assignee
       "variables" : []
     }
 
-Completes the task. Optional variable array can be passed in using the variables property. More information about the variable format can be found in [the REST variables section](restVariables). Note that the variable-scope that is supplied is ignored and the variables are set on the parent-scope unless a variable exists in a local scope, which is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId, variables) invocation.
+Completes the task. Optional variable array can be passed in using the variables property. More information about the variable format can be found in [the REST variables section](#variable-representation). Note that the variable-scope that is supplied is ignored and the variables are set on the parent-scope unless a variable exists in a local scope, which is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId, variables) invocation.
 
 Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.
 
@@ -5507,7 +5507,7 @@ Resolves the task delegation. The task is assigned back to the task owner (if an
 
     ]
 
-The variables are returned as a JSON array. Full response description can be found in the general [REST-variables section](restVariables).
+The variables are returned as a JSON array. Full response description can be found in the general [REST-variables section](#variable-representation).
 
 ### Get a variable from a task
 
@@ -5584,7 +5584,7 @@ The variables are returned as a JSON array. Full response description can be fou
       "value" : "Hello my friend"
     }
 
-Full response body description can be found in the general [REST-variables section](restVariables).
+Full response body description can be found in the general [REST-variables section](#variable-representation).
 
 ### Get the binary data for a variable
 
@@ -5710,7 +5710,7 @@ The request body should be an array containing one or more JSON-objects represen
 
 -   value: Variable value.
 
-More information about the variable format can be found in [the REST variables section](restVariables).
+More information about the variable format can be found in [the REST variables section](#variable-representation).
 
 **Success response body:**
 
@@ -5897,7 +5897,7 @@ The request should be of type multipart/form-data. There should be a single file
 
 -   value: Variable value.
 
-More information about the variable format can be found in [the REST variables section](restVariables).
+More information about the variable format can be found in [the REST variables section](#variable-representation).
 
 **Success response body:**
 

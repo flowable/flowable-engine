@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -142,15 +143,29 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         callbackData.getAdditionalData().put(CallbackConstants.MANUAL_TERMINATION, manualTermination);
     }
 
+    @Override
+    public CaseInstanceEntity getCaseInstanceEntity() {
+        if (caseInstanceEntity == null) {
+            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
+            if (caseInstanceEntity == null) {
+                throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceEntityId);
+            }
+        }
+        return caseInstanceEntity;
+    }
+
     public boolean isManualTermination() {
         return manualTermination;
     }
+
     public void setManualTermination(boolean manualTermination) {
         this.manualTermination = manualTermination;
     }
+
     public String getExitCriterionId() {
         return exitCriterionId;
     }
+
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
     }
