@@ -38,7 +38,7 @@ public class BulkDeleteHistoricCaseInstancesCmd implements Command<Object>, Seri
     @Override
     public Object execute(CommandContext commandContext) {
         if (instanceIds == null) {
-            throw new FlowableIllegalArgumentException("caseInstanceIds are null");
+            throw new FlowableIllegalArgumentException("historic case instanceIds are null");
         }
         Set<String> instanceIdSet = new HashSet<>(instanceIds);
         for (String instanceId : instanceIdSet) {
