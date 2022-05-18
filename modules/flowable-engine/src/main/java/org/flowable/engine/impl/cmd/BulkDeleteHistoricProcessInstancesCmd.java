@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Christopher Welsch
  */
-public class BulkDeleteHistoricProcessInstancesCmd implements Command<Object> {
+public class BulkDeleteHistoricProcessInstancesCmd implements Command<Void> {
 
     protected Collection<String> instanceIds;
 
@@ -33,7 +33,7 @@ public class BulkDeleteHistoricProcessInstancesCmd implements Command<Object> {
     }
 
     @Override
-    public Object execute(CommandContext commandContext) {
+    public Void execute(CommandContext commandContext) {
         if (instanceIds == null) {
             throw new FlowableIllegalArgumentException("historic process instanceIds are null");
         }

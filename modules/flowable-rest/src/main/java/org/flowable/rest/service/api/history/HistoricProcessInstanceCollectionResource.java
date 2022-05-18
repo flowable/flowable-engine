@@ -16,8 +16,8 @@ package org.flowable.rest.service.api.history;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.rest.service.api.BulkDeleteInstancesRestActionRequest;
@@ -212,12 +212,14 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
     @PostMapping(value = "/history/historic-process-instances/delete")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void bulkDeleteHistoricProcessInstances(@ApiParam(name = "bulkDeleteRestActionRequest")
-    @RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+    @RequestBody BulkDeleteInstancesRestActionRequest request) {
         if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
             if (restApiInterceptor != null) {
                 restApiInterceptor.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
             }
             historyService.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
+        } else {
+            throw new FlowableIllegalArgumentException("Illegal action: '" + request.getAction() + "'.");
         }
     }
 }
