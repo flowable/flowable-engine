@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
@@ -22,9 +23,12 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -1207,6 +1211,64 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
         }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testBulkDeleteHistoricInstanceWith() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("startToEnd");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("startToEnd");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        Set<String> instanceIds = new HashSet<>();
+        instanceIds.add(processInstance.getId());
+        instanceIds.add(processInstance2.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+
+        historyService.bulkDeleteHistoricProcessInstances(instanceIds);
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(1);
+
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testInvalidHistoricProcessInstanceBulkDeleted() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("startToEnd");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("startToEnd");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        Set<String> instanceIds = new HashSet<>();
+        instanceIds.add(processInstance.getId());
+        instanceIds.add(processInstance2.getId());
+        instanceIds.add("inValidId");
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(instanceIds))
+                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No historic process instance found with id: inValidId");
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("historic process instanceIds are null");
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+
     }
 
     @Test
