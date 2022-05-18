@@ -16,9 +16,9 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.http.HttpStatus;
@@ -205,12 +205,14 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     @PostMapping(value = "/cmmn-history/historic-case-instances/delete")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void bulkDeleteHistoricCaseInstances(@ApiParam(name = "bulkDeleteRestActionRequest")
-    @RequestBody BulkDeleteInstancesRestActionRequest request, HttpServletResponse response) {
+    @RequestBody BulkDeleteInstancesRestActionRequest request) {
         if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
             if (restApiInterceptor != null) {
                 restApiInterceptor.bulkDeleteHistoricCases(request.getInstanceIds());
             }
             historyService.bulkDeleteHistoricCaseInstances(request.getInstanceIds());
+        } else {
+            throw new FlowableIllegalArgumentException("Illegal action: '" + request.getAction() + "'.");
         }
     }
 }
