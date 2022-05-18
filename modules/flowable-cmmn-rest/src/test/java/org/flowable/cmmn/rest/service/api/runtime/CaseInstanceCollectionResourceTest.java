@@ -815,5 +815,12 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         httpPost = new HttpPost(url);
         httpPost.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "invalidAction");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+        httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 }
