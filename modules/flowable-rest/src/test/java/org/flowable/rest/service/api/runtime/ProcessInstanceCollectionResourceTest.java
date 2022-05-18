@@ -825,5 +825,13 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         httpPost = new HttpPost(url);
         httpPost.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "invalidAction");
+        body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId());
+        httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+
     }
 }
