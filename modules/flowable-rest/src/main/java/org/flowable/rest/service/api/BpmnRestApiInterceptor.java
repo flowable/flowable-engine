@@ -89,6 +89,8 @@ public interface BpmnRestApiInterceptor {
     
     void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);
     
+    void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds);
+
     void bulkUpdateTasks(Collection<Task> taskList, BulkTasksRequest bulkTasksRequest);
 
     void createTask(Task task, TaskRequest request);

@@ -14,6 +14,7 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -26,6 +27,7 @@ import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.BulkDeleteHistoricProcessInstancesCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskLogEntryByLogNumberCmd;
@@ -110,6 +112,11 @@ public class HistoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void deleteHistoricProcessInstance(String processInstanceId) {
         commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
+    }
+
+    @Override
+    public void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds) {
+        commandExecutor.execute(new BulkDeleteHistoricProcessInstancesCmd(instanceIds));
     }
 
     @Override
