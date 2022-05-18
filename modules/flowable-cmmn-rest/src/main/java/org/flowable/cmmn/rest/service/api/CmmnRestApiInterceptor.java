@@ -163,6 +163,8 @@ public interface CmmnRestApiInterceptor {
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
     
+    void bulkDeleteHistoricCases(Collection<String> instanceIds);
+
     void accessStageOverview(CaseInstance caseInstance);
 
     void accessHistoryMilestoneInfoById(HistoricMilestoneInstance historicMilestoneInstance);
