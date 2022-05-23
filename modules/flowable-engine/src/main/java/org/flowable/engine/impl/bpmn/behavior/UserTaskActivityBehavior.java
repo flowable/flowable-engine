@@ -116,7 +116,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
             activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, taskElementProperties);
-            activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
+            activeTaskOwner = getOwnerValue(userTask, migrationContext, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
             activeTaskIdVariableName = DynamicPropertyUtil.getActiveValue(userTask.getTaskIdVariableName(), DynamicBpmnConstants.USER_TASK_TASK_ID_VARIABLE_NAME, taskElementProperties);
@@ -129,7 +129,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskFormKey = userTask.getFormKey();
             activeTaskSkipExpression = userTask.getSkipExpression();
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, null);
-            activeTaskOwner = userTask.getOwner();
+            activeTaskOwner = getOwnerValue(userTask, migrationContext, null);
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
             activeTaskIdVariableName = userTask.getTaskIdVariableName();
@@ -498,6 +498,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         
         } else {
             return userTask.getAssignee();
+        }
+    }
+
+    protected String getOwnerValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getOwner() != null) {
+            return migrationContext.getOwner();
+
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
+
+        } else {
+            return userTask.getOwner();
         }
     }
 }

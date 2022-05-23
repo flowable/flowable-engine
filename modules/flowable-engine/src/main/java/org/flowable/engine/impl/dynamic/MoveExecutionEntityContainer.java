@@ -40,6 +40,7 @@ public class MoveExecutionEntityContainer {
     protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
     protected String newAssigneeId;
+    protected String newOwnerId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new LinkedHashMap<>();
     protected List<String> newExecutionIds = new ArrayList<>();
@@ -147,6 +148,14 @@ public class MoveExecutionEntityContainer {
 
     public String getNewAssigneeId() {
         return newAssigneeId;
+    }
+
+    public String getNewOwnerId() {
+        return newOwnerId;
+    }
+
+    public void setNewOwnerId(String newOwnerId) {
+        this.newOwnerId = newOwnerId;
     }
 
     public void setSuperExecution(ExecutionEntity superExecution) {
