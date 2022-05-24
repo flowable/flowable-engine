@@ -208,6 +208,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
         if (attributeValue == null) {
             attributeValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, attributeName);
+            if (attributeValue == null) {
+                attributeValue = xtr.getAttributeValue(CAMUNDA_EXTENSIONS_NAMESPACE, attributeName);
+            }
         }
 
         return attributeValue;

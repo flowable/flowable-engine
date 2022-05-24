@@ -75,9 +75,9 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
             int matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(compareWithVersion);
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade(schemaComponent, matchingVersionIndex);
+                dbSchemaUpgrade(schemaComponent, matchingVersionIndex, dbVersion);
                 if (isHistoryUsed()) {
-                    dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex);
+                    dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex, dbVersion);
                 }
             }
             

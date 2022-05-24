@@ -31,6 +31,7 @@ public interface BpmnXMLConstants {
     public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
     public static final String ACTIVITI_EXTENSIONS_NAMESPACE = "http://activiti.org/bpmn";
     public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
+    public static final String CAMUNDA_EXTENSIONS_NAMESPACE = "http://camunda.org/schema/1.0/bpmn";
     public static final String BPMNDI_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/DI";
     public static final String BPMNDI_PREFIX = "bpmndi";
     public static final String OMGDC_NAMESPACE = "http://www.omg.org/spec/DD/20100524/DC";

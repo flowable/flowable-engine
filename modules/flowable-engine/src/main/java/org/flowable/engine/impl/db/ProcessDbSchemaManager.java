@@ -237,10 +237,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
             boolean isHistoryTablePresent = isHistoryTablePresent();
             if (isUpgradeNeeded && matchingVersionIndex < version6120Index) {
-                dbSchemaUpgradeUntil6120("engine", matchingVersionIndex);
+                dbSchemaUpgradeUntil6120("engine", matchingVersionIndex, dbVersion);
 
                 if (isHistoryTablePresent) {
-                    dbSchemaUpgradeUntil6120("history", matchingVersionIndex);
+                    dbSchemaUpgradeUntil6120("history", matchingVersionIndex, dbVersion);
                 }
             }
 
@@ -271,9 +271,9 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
                 // Engine upgrade
                 if (version6120Index > matchingVersionIndex) {
-                    dbSchemaUpgrade("engine", version6120Index);
+                    dbSchemaUpgrade("engine", version6120Index, dbVersion);
                 } else {
-                    dbSchemaUpgrade("engine", matchingVersionIndex);
+                    dbSchemaUpgrade("engine", matchingVersionIndex, dbVersion);
                 }
 
                 feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
@@ -285,9 +285,9 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             if (isHistoryTablePresent) {
                 if (isUpgradeNeeded) {
                     if (version6120Index > matchingVersionIndex) {
-                        dbSchemaUpgrade("history", version6120Index);
+                        dbSchemaUpgrade("history", version6120Index, dbVersion);
                     } else {
-                        dbSchemaUpgrade("history", matchingVersionIndex);
+                        dbSchemaUpgrade("history", matchingVersionIndex, dbVersion);
                     }
                 }
 
