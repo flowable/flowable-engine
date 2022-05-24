@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_060g1ty" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="asyncProcess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0fvnqb2</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0fvnqb2" sourceRef="StartEvent_1" targetRef="beforeTask" />
+    <bpmn:userTask id="beforeTask" name="Before task">
+      <bpmn:extensionElements>
+        <camunda:taskListener delegateExpression="${testTaskListener}" event="assignment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0fvnqb2</bpmn:incoming>
+      <bpmn:outgoing>Flow_0c96zlr</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0c96zlr" sourceRef="beforeTask" targetRef="asyncTask" />
+    <bpmn:serviceTask id="asyncTask" name="Async task" camunda:asyncBefore="true" camunda:expression="${someBean.test(execution)}">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${testExecutionListener}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0c96zlr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rljm5s</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0rljm5s" sourceRef="asyncTask" targetRef="afterTask" />
+    <bpmn:userTask id="afterTask" name="After task">
+      <bpmn:incoming>Flow_0rljm5s</bpmn:incoming>
+      <bpmn:outgoing>Flow_10z2ga4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0vwp01g">
+      <bpmn:incoming>Flow_10z2ga4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_10z2ga4" sourceRef="afterTask" targetRef="Event_0vwp01g" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0y6uibp">
+      <bpmndi:BPMNEdge id="Flow_0fvnqb2_di" bpmnElement="Flow_0fvnqb2">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c96zlr_di" bpmnElement="Flow_0c96zlr">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rljm5s_di" bpmnElement="Flow_0rljm5s">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="590" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10z2ga4_di" bpmnElement="Flow_10z2ga4">
+        <di:waypoint x="690" y="117" />
+        <di:waypoint x="752" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vhj0ah_di" bpmnElement="beforeTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08nvkxn_di" bpmnElement="asyncTask">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07jd7zp_di" bpmnElement="afterTask">
+        <dc:Bounds x="590" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0vwp01g_di" bpmnElement="Event_0vwp01g">
+        <dc:Bounds x="752" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

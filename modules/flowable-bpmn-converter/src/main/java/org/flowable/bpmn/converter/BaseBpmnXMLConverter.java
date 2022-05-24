@@ -114,6 +114,21 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 FlowNode flowNode = (FlowNode) currentFlowElement;
                 flowNode.setAsynchronous(async);
                 flowNode.setNotExclusive(notExclusive);
+                
+                if (flowNode.getAttributes().containsKey("asyncBefore")) {
+                    ExtensionAttribute attribute = flowNode.getAttributes().get("asyncBefore").get(0);
+                    System.out.println("asyncBefore " + attribute.getValue());
+                    if ("true".equalsIgnoreCase(attribute.getValue())) {
+                        flowNode.setAsynchronous(true);
+                        
+                        if (flowNode.getAttributes().containsKey("exclusive")) {
+                            ExtensionAttribute exclusiveAttribute = flowNode.getAttributes().get("exclusive").get(0);
+                            if ("false".equalsIgnoreCase(exclusiveAttribute.getValue())) {
+                                flowNode.setExclusive(false);
+                            }
+                        }
+                    }
+                }
 
                 if (currentFlowElement instanceof Activity) {
 

@@ -75,5 +75,7 @@ alter table ACT_RU_IDENTITYLINK
     
 alter table ACT_HI_IDENTITYLINK
     add PROC_INST_ID_ varchar(64);
+    
+alter table ACT_HI_IDENTITYLINK modify TIMESTAMP_ timestamp null;
 
 update ACT_GE_PROPERTY set VALUE_ = '5.15' where NAME_ = 'schema.version';

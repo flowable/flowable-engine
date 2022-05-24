@@ -12,6 +12,7 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CustomProperty;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.HttpServiceTask;
@@ -48,6 +50,26 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected Map<String, BaseChildElementParser> caseServiceChildParserMap = new HashMap<>();
     protected Map<String, BaseChildElementParser> sendEventServiceChildParserMap = new HashMap<>();
+    
+    protected static final List<ExtensionAttribute> defaultServiceTaskAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_TYPE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_CLASS),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_IMPLEMENTATION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_OPERATION_REF),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_ACTIVITY_TRIGGERABLE),
+            new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY),
+            new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_INHERIT_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT),
+            new ExtensionAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT),
+            new ExtensionAttribute(ATTRIBUTE_ID_VARIABLE_NAME));
 
     public ServiceTaskXMLConverter() {
 
@@ -75,6 +97,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         String serviceTaskType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr);
         
@@ -88,8 +111,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else if (ServiceTask.SEND_EVENT_TASK.equals(serviceTaskType)) {
             serviceTask = new SendEventServiceTask();
             
-        } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType)) {
+        } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType) || ServiceTask.EXTERNAL_WORKER_TASK_LEGACY.equals(serviceTaskType)) {
             serviceTask = new ExternalWorkerServiceTask();
+            
         } else {
             serviceTask = new ServiceTask();
         }
@@ -126,6 +150,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr))) {
             serviceTask.setSkipExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr));
         }
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, serviceTask, defaultElementAttributes, defaultActivityAttributes, defaultServiceTaskAttributes);
         
         if (serviceTask instanceof CaseServiceTask) {
             convertCaseServiceTaskXMLProperties((CaseServiceTask) serviceTask, model, xtr);
