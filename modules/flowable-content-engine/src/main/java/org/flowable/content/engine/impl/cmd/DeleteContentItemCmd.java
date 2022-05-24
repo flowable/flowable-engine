@@ -16,16 +16,14 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  */
-public class DeleteContentItemCmd implements Command<Void>, Serializable {
+public class DeleteContentItemCmd extends AbstractDeleteContentItemCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,13 +44,7 @@ public class DeleteContentItemCmd implements Command<Void>, Serializable {
             throw new FlowableObjectNotFoundException("content item could not be found with id " + contentItemId);
         }
 
-        if (contentItem.getContentStoreId() != null) {
-            ContentStorage contentStorage = CommandContextUtil.getContentEngineConfiguration().getContentStorage();
-            if (contentItem.isContentAvailable()) {
-                contentStorage.deleteContentObject(contentItem.getContentStoreId());
-            }
-        }
-
+        deleteContentItemInContentStorage(contentItem);
         CommandContextUtil.getContentItemEntityManager().delete(contentItem);
 
         return null;

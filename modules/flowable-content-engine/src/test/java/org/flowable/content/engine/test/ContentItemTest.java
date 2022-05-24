@@ -22,16 +22,39 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentItem;
-import org.junit.Test;
+import org.flowable.content.api.ContentObject;
+import org.flowable.content.api.ContentStorage;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ContentItemTest extends AbstractFlowableContentTest {
 
+    protected ContentStorage originalContentStorage;
+    protected TestContentStorage testContentStorage;
+
+    @BeforeEach
+    public void wrapContentStorage() {
+        this.originalContentStorage = contentEngineConfiguration.getContentStorage();
+        this.testContentStorage = new TestContentStorage(this.originalContentStorage);
+        contentEngineConfiguration.setContentStorage(this.testContentStorage);
+    }
+
+    @AfterEach
+    public void unwrapContentStorage() {
+        assertThat(this.testContentStorage.getManagedContentIdsCount()).isZero(); // all tests should delete their content at the end
+        contentEngineConfiguration.setContentStorage(this.originalContentStorage);
+    }
+
     @Test
-    public void createSimpleProcessContentItemNoData() throws Exception {
+    public void createSimpleProcessContentItemNoData() {
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");
@@ -208,6 +231,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         contentItem.setMimeType("application/pdf");
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
             contentService.saveContentItem(contentItem, in);
+            assertThat(this.testContentStorage.getManagedContentIdsCount()).isOne();
         }
 
         assertThat(contentItem.getId()).isNotNull();
@@ -324,5 +348,62 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         contentItem.setScopeType("testScopeType");
         contentItem.setScopeId("testScopeId");
         contentService.saveContentItem(contentItem);
+    }
+
+    public static class TestContentStorage implements ContentStorage {
+
+        protected ContentStorage originalContentStorage;
+
+        protected Set<String> managedContentIds = new HashSet<>();
+
+        public TestContentStorage(ContentStorage originalContentStorage) {
+            this.originalContentStorage = originalContentStorage;
+        }
+
+        public int getManagedContentIdsCount() {
+            return managedContentIds.size();
+        }
+
+        @Override
+        public ContentObject createContentObject(InputStream contentStream, Map<String, Object> metaData) {
+            ContentObject contentObject = originalContentStorage.createContentObject(contentStream, metaData);
+            managedContentIds.add(contentObject.getId());
+            return contentObject;
+        }
+
+        @Override
+        public ContentObject updateContentObject(String id, InputStream contentStream, Map<String, Object> metaData) {
+            validateContentItemExists(id);
+            return originalContentStorage.updateContentObject(id, contentStream, metaData);
+        }
+
+        protected void validateContentItemExists(String id) {
+            if (!managedContentIds.contains(id)) {
+                throw new RuntimeException("Calling update on a unencountered content item");
+            }
+        }
+
+        @Override
+        public ContentObject getContentObject(String id) {
+            validateContentItemExists(id);
+            return originalContentStorage.getContentObject(id);
+        }
+
+        @Override
+        public Map<String, Object> getMetaData() {
+            return originalContentStorage.getMetaData();
+        }
+
+        @Override
+        public void deleteContentObject(String id) {
+            validateContentItemExists(id);
+            originalContentStorage.deleteContentObject(id);
+            managedContentIds.remove(id);
+        }
+
+        @Override
+        public String getContentStoreName() {
+            return originalContentStorage.getContentStoreName();
+        }
     }
 }

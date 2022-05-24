@@ -16,8 +16,8 @@ import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Parent class for internal Flowable Content tests.
@@ -29,27 +29,18 @@ import org.junit.Rule;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
+@ExtendWith(FlowableContentExtension.class)
 public class AbstractFlowableContentTest {
 
-    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowablecontent;DB_CLOSE_DELAY=1000";
-
-    @Rule
-    public FlowableContentRule rule = new FlowableContentRule();
-
-    protected static ContentEngine cachedContentEngine;
     protected ContentEngineConfiguration contentEngineConfiguration;
     protected ContentService contentService;
     protected ContentManagementService contentManagementService;
 
-    @Before
-    public void initContentEngine() {
-        if (cachedContentEngine == null) {
-            cachedContentEngine = rule.getContentEngine();
-        }
-
-        this.contentEngineConfiguration = cachedContentEngine.getContentEngineConfiguration();
-        this.contentService = cachedContentEngine.getContentService();
-        this.contentManagementService = cachedContentEngine.getContentManagementService();
+    @BeforeEach
+    public void initContentEngine(ContentEngine contentEngine) {
+        this.contentEngineConfiguration = contentEngine.getContentEngineConfiguration();
+        this.contentService = contentEngine.getContentService();
+        this.contentManagementService = contentEngine.getContentManagementService();
     }
 
 }

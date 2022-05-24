@@ -313,6 +313,22 @@
 	    </where>
 	</sql>
 
+    <select id="selectContentItemsByProcessInstanceId" parameterType="string" resultMap="contentItemResultMap">
+        select * from ${prefix}ACT_CO_CONTENT_ITEM
+        where PROC_INST_ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectContentItemsByTaskId" parameterType="string" resultMap="contentItemResultMap">
+        select * from ${prefix}ACT_CO_CONTENT_ITEM
+        where TASK_ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectContentItemsByScopeIdAndScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject"  resultMap="contentItemResultMap">
+        select * from ${prefix}ACT_CO_CONTENT_ITEM
+        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
+        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+    </select>
+
 	<delete id="deleteContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where ID_ = #{id, jdbcType=VARCHAR}
 	</delete>
