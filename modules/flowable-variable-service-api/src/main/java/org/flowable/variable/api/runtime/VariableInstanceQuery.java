@@ -16,7 +16,6 @@ package org.flowable.variable.api.runtime;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
