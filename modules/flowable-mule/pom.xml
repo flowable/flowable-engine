@@ -16,7 +16,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.mule.version>4.1.9.RELEASE</spring.mule.version>
-    <spring-security.mule.version>4.0.1.RELEASE</spring-security.mule.version>
+    <spring-security.mule.version>5.5.7</spring-security.mule.version>
     <flowable.artifact>
       org.flowable.mule
     </flowable.artifact>
