@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.8_10-alpine
+FROM eclipse-temurin:11.0.15_10-jdk-alpine@sha256:37c5e98456f7a9a36d4e385a2d068963b82c1c8e2d4943610d93d13c5f65324a
 
 LABEL maintainer="Flowable <info@flowable.org>"
 RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
