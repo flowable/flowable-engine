@@ -26,28 +26,18 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
-import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.model.JmsInboundChannelModel;
-import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerEndpoint;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SpringJUnitConfig(classes = ProcessWithDynamicChannelProcessorTestConfiguration.class)
 @ExtendWith(FlowableSpringExtension.class)

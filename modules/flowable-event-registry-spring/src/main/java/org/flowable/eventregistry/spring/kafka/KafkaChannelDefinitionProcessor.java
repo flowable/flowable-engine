@@ -62,7 +62,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Filip Hrisafov
  */
-public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, ChannelModelProcessor {
+public class KafkaChannelDefinitionProcessor
+        implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, ChannelModelProcessor {
 
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 

@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.eventregistry.integrationtest;
 
 import java.time.Duration;
@@ -15,10 +27,7 @@ import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -45,10 +54,10 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
 
         @Override
         public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return true;
+            return true;//this is for example based on the execution environment of the application
         }
     }*/
-    
+
     @ConditionalOnExpression("true")//@Conditional(OnInternalRequestProcessorCondition.class)
     @Bean
     public InternalFakeRequestProcessor internalService(JmsTemplate jmsTemplate) {
@@ -166,7 +175,7 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
             );
         }
     }
-    
+
     private static final class DynamicJmsChannelModelProcessor extends JmsChannelModelProcessor {
 
         private JmsListenerContainerFactory<?> customContainerFactory;
@@ -182,7 +191,7 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
         @Override
         protected JmsListenerEndpoint processInboundDefinition(String tenantId, EventRegistry eventRegistry, JmsInboundChannelModel jmsChannelModel) {
             JmsListenerEndpoint endpoint = createJmsListenerEndpoint(jmsChannelModel, tenantId, eventRegistry);
-            if(jmsChannelModel.getDestination().contains("EXT_QUEUE") && customContainerFactory != null) {
+            if (jmsChannelModel.getDestination().contains("EXT_QUEUE") && customContainerFactory != null) {
                 registerEndpoint(endpoint, customContainerFactory);
             } else {
                 registerEndpoint(endpoint, null);
