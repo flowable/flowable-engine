@@ -18,15 +18,24 @@ import java.util.Optional;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
+import org.flowable.eventregistry.model.JmsOutboundChannelModel;
 import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
+import org.flowable.eventregistry.spring.jms.JmsOperationsOutboundEventChannelAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListener;
@@ -37,46 +46,56 @@ import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jms.support.destination.DynamicDestinationResolver;
+import org.springframework.util.backoff.ExponentialBackOff;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Configuration
 @Import(BpmnWithEventRegistryTestConfiguration.class)
 @EnableJms
 public class ProcessWithDynamicChannelProcessorTestConfiguration {
 
-    /*private class OnInternalRequestProcessorCondition implements Condition {
-
-        public OnInternalRequestProcessorCondition() {
-        }
-
-        @Override
-        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return true;//this is for example based on the execution environment of the application
-        }
-    }*/
-
-    @ConditionalOnExpression("true")//@Conditional(OnInternalRequestProcessorCondition.class)
     @Bean
-    public InternalFakeRequestProcessor internalService(JmsTemplate jmsTemplate) {
-        return new InternalFakeRequestProcessor(jmsTemplate);
+    public ManagementService managementService(ProcessEngine processEngine) {
+        return processEngine.getManagementService();
+    }
+
+    @ConditionalOnExpression("true")//this would be for example based on the execution environment of the application or on some mocking property
+    @Bean
+    public InternalFakeRequestProcessor internalService(ObjectMapper objectMapper, @Qualifier("internalJmsTemplate") JmsTemplate internalJmsTemplate) {
+        return new InternalFakeRequestProcessor(objectMapper, internalJmsTemplate);
     }
 
     /**
      * to be used only for the JmsListeners of InternalFakeRequestProcessor, as well as the ones from the channel models
      * which are used to interact with the InternalFakeRequestProcessor
      */
-    @ConditionalOnExpression("true")//@Conditional(OnInternalRequestProcessorCondition.class)
+    @ConditionalOnExpression("true")//this would be for example based on the execution environment of the application or on some mocking property
     @Bean
-    public JmsListenerContainerFactory<?> testJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory<?> testJmsListenerContainerFactory(ConnectionFactory connectionFactory,
+            @Qualifier("internalServiceDynamicDestinationResolver") DestinationResolver internalServiceDynamicDestinationResolver) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
 
         // configuration properties are Spring Boot defaults
         factory.setPubSubDomain(false);
-        factory.setDestinationResolver(new DynamicDestinationResolver() {
+        factory.setDestinationResolver(internalServiceDynamicDestinationResolver);
+        factory.setSessionTransacted(true);
+        factory.setAutoStartup(true);
+
+        factory.setBackOff(new ExponentialBackOff());
+
+        return factory;
+    }
+
+    @ConditionalOnExpression("true")//this would be for example based on the execution environment of the application or on some mocking property
+    @Bean
+    public DynamicDestinationResolver internalServiceDynamicDestinationResolver() {
+        return new DynamicDestinationResolver() {
 
             @Override
             public Destination resolveDestinationName(Session session, String destinationName, boolean pubSubDomain) throws JMSException {
@@ -87,11 +106,7 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
                 }
                 return super.resolveDestinationName(session, destinationName, pubSubDomain);
             }
-        });
-        factory.setSessionTransacted(true);
-        factory.setAutoStartup(true);
-
-        return factory;
+        };
     }
 
     /**
@@ -111,8 +126,20 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
         return factory;
     }
 
+    @ConditionalOnExpression("true")//this would be for example based on the execution environment of the application or on some mocking property
     @Bean
-    public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
+    public JmsTemplate internalJmsTemplate(ConnectionFactory connectionFactory,
+            @Qualifier("internalServiceDynamicDestinationResolver") DestinationResolver internalServiceDynamicDestinationResolver) {
+        JmsTemplate template = new JmsTemplate(connectionFactory);
+        template.setDestinationResolver(internalServiceDynamicDestinationResolver);
+
+        template.setPubSubDomain(false);
+
+        return template;
+    }
+
+    @Bean
+    public JmsTemplate defaultJmsTemplate(ConnectionFactory connectionFactory) {
         JmsTemplate template = new JmsTemplate(connectionFactory);
 
         template.setPubSubDomain(false);
@@ -138,9 +165,10 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
 
     @Bean
     public JmsChannelModelProcessor testJmsChannelDefinitionProcessor(
-            JmsListenerEndpointRegistry endpointRegistry,
-            JmsOperations jmsOperations,
             ObjectMapper objectMapper,
+            JmsListenerEndpointRegistry endpointRegistry,
+            @Qualifier("defaultJmsTemplate") JmsOperations jmsOperations,
+            @Qualifier("internalJmsTemplate") Optional<JmsOperations> internalJmsTemplate,
             @Qualifier("defaultJmsListenerContainerFactory") JmsListenerContainerFactory<?> defaultJmsListenerContainerFactory,
             @Qualifier("testJmsListenerContainerFactory") Optional<JmsListenerContainerFactory<?>> testJmsListenerContainerFactory) {
 
@@ -151,6 +179,7 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
         jmsChannelDeployer.setContainerFactory(defaultJmsListenerContainerFactory);
 
         testJmsListenerContainerFactory.ifPresent(jmsChannelDeployer::setCustomContainerFactory);
+        internalJmsTemplate.ifPresent(jmsChannelDeployer::setCustomJmsOperations);
 
         return jmsChannelDeployer;
     }
@@ -160,25 +189,39 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
      */
     private static final class InternalFakeRequestProcessor {
 
-        private final JmsTemplate jmsTemplate;
+        private static final Logger LOGGER = LoggerFactory.getLogger(InternalFakeRequestProcessor.class);
+        private final ObjectMapper objectMapper;
+        private final JmsTemplate internalJmsTemplate;
 
-        public InternalFakeRequestProcessor(JmsTemplate jmsTemplate) {
-            this.jmsTemplate = jmsTemplate;
+        public InternalFakeRequestProcessor(ObjectMapper objectMapper, JmsTemplate jmsTemplate) {
+            this.objectMapper = objectMapper;
+            this.internalJmsTemplate = jmsTemplate;
         }
 
         @JmsListener(destination = "EXT_QUEUE_OUT", containerFactory = "testJmsListenerContainerFactory")
-        public void replyToRequest(Object request) {
-            ObjectNode requestNode = (ObjectNode) request;
-            this.jmsTemplate.convertAndSend("EXT_QUEUE_IN", ((ObjectNode) new JsonMapper().createObjectNode().setAll(requestNode))
-                    .put("value1", requestNode.get("value1").textValue() + requestNode.get("value2").textValue())
-                    .put("value2", "your-fake-reply")
+        public void replyToRequest(Message request) throws JMSException, JsonProcessingException {
+            Object content = internalJmsTemplate.getMessageConverter().fromMessage(request);
+            ObjectNode requestNode = (ObjectNode) objectMapper.readTree((String) content);
+            LOGGER.info("Received request on EXT_QUEUE_OUT: {}", requestNode);
+
+            this.internalJmsTemplate.convertAndSend("EXT_QUEUE_IN",
+                    "{"
+                            + "    \"payload1\": \"" + requestNode.get("payload1").asText() + requestNode.get("payload2").asText() + "\","
+                            + "    \"payload2\": " + (1001 + 3 * requestNode.get("payload2").asInt()) + ""
+                            + "}", messageProcessor -> {
+                        messageProcessor.setStringProperty("headerProperty1", request.getStringProperty("headerProperty1"));
+                        messageProcessor.setStringProperty("headerProperty2", request.getStringProperty("headerProperty2"));
+                        return messageProcessor;
+                    }
             );
+            LOGGER.info("Replied on EXT_QUEUE_IN");
         }
     }
 
     private static final class DynamicJmsChannelModelProcessor extends JmsChannelModelProcessor {
 
         private JmsListenerContainerFactory<?> customContainerFactory;
+        private JmsOperations customJmsOperations;
 
         public DynamicJmsChannelModelProcessor(ObjectMapper objectMapper) {
             super(objectMapper);
@@ -186,6 +229,10 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
 
         public void setCustomContainerFactory(JmsListenerContainerFactory<?> customContainerFactory) {
             this.customContainerFactory = customContainerFactory;
+        }
+
+        public void setCustomJmsOperations(JmsOperations customJmsOperations) {
+            this.customJmsOperations = customJmsOperations;
         }
 
         @Override
@@ -197,6 +244,16 @@ public class ProcessWithDynamicChannelProcessorTestConfiguration {
                 registerEndpoint(endpoint, null);
             }
             return endpoint;
+        }
+
+        @Override
+        protected OutboundEventChannelAdapter createOutboundEventChannelAdapter(JmsOutboundChannelModel channelModel) {
+            String destination = resolve(channelModel.getDestination());
+            if (channelModel.getDestination().contains("EXT_QUEUE") && customJmsOperations != null) {
+                return new JmsOperationsOutboundEventChannelAdapter(customJmsOperations, destination);
+            } else {
+                return new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination);
+            }
         }
     }
 }

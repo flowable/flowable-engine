@@ -20,19 +20,24 @@ import java.time.Duration;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
@@ -56,7 +61,11 @@ public class ProcessWithDynamicChannelProcessorTest {
     @Autowired
     protected TaskService taskService;
 
+    @Autowired
+    protected ManagementService managementService;
+
     @SpyBean
+    @Qualifier("defaultJmsTemplate")
     protected JmsTemplate jmsTemplate;
 
     @Test
@@ -66,7 +75,7 @@ public class ProcessWithDynamicChannelProcessorTest {
             "org/flowable/eventregistry/integrationtest/two.channel",
             "org/flowable/eventregistry/integrationtest/two-outbound.channel"
     })
-    public void testHeaderCorrelationEvent() {
+    public void testSendAndReceiveEventWithHeaderCorrelation() {
         try {
             jmsTemplate.convertAndSend("test-queue", "{"
                     + "    \"payload1\": \"kermit\","
@@ -77,7 +86,7 @@ public class ProcessWithDynamicChannelProcessorTest {
                 return messageProcessor;
             });
 
-            await("receive events")
+            await("receive start event")
                     .atMost(Duration.ofSeconds(5))
                     .pollInterval(Duration.ofMillis(200))
                     .untilAsserted(() ->
@@ -95,17 +104,29 @@ public class ProcessWithDynamicChannelProcessorTest {
             assertThat(runtimeService.getVariable(processInstance.getId(), "value1")).isEqualTo("kermit");
             assertThat(runtimeService.getVariable(processInstance.getId(), "value2")).isEqualTo(123);
 
-            Task activeTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            //FIXME: activeTask == null
-            taskService.complete(activeTask.getId());
+            //process send request event job
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job).isNotNull();
+            assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+            assertThat(job.getElementId()).isEqualTo("sendAndReceiveEventTask");
 
-            assertThat(runtimeService.getVariable(processInstance.getId(), "value1")).isEqualTo("your-fake-reply");
-            assertThat(runtimeService.getVariable(processInstance.getId(), "value2")).isEqualTo(123);
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), managementService, 10000, 200);
+
+            await("request event received, reply event sent, response event received and next task created")
+                    .atMost(Duration.ofSeconds(30))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() ->
+                            assertTrue(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count() > 0));
+
+            Task activeTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(activeTask).isNotNull();
+
+            assertThat(runtimeService.getVariable(processInstance.getId(), "value1")).isEqualTo("kermit123");
+            assertThat(runtimeService.getVariable(processInstance.getId(), "value2")).isEqualTo(1370);
 
             assertThat(runtimeService.getVariable(processInstance.getId(), "headerValue1")).isEqualTo("123a");
 
-            Task finalTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            taskService.complete(finalTask.getId());
+            taskService.complete(activeTask.getId());
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         } finally {
