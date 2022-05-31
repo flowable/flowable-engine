@@ -1386,7 +1386,7 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>docker</id>
+			<id>dockerDeps</id>
 			<modules>
 				<module>modules/flowable-ui</module>
 				<module>modules/flowable-app-rest</module>
