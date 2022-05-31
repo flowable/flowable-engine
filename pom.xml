@@ -1386,6 +1386,13 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>docker</id>
+			<modules>
+				<module>modules/flowable-ui</module>
+				<module>modules/flowable-app-rest</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>deploy</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
