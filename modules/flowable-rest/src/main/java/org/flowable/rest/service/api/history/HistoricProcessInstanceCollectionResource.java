@@ -17,10 +17,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
+import org.flowable.rest.service.api.BulkDeleteInstancesRestActionRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -195,5 +201,25 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         }
 
         return getQueryResponse(queryRequest, allRequestParams);
+    }
+
+    @ApiOperation(value = "Post action request to delete a bulk of historic process instances", tags = {
+            "Manage History Process Instances" }, nickname = "bulkDeleteHistoricProcessInstances")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the bulk of historic process instances was found and deleted. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates at least one requested process instance was not found.")
+    })
+    @PostMapping(value = "/history/historic-process-instances/delete")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void bulkDeleteHistoricProcessInstances(@ApiParam(name = "bulkDeleteRestActionRequest")
+    @RequestBody BulkDeleteInstancesRestActionRequest request) {
+        if (BulkDeleteInstancesRestActionRequest.DELETE_ACTION.equals(request.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
+            }
+            historyService.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
+        } else {
+            throw new FlowableIllegalArgumentException("Illegal action: '" + request.getAction() + "'.");
+        }
     }
 }

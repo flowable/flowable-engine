@@ -44,13 +44,28 @@ public class ContentItemEntityManagerImpl
     }
 
     @Override
+    public List<ContentItem> findContentItemsByTaskId(String taskId) {
+        return dataManager.findContentItemsByTaskId(taskId);
+    }
+
+    @Override
     public void deleteContentItemsByTaskId(String taskId) {
         dataManager.deleteContentItemsByTaskId(taskId);
     }
 
     @Override
+    public List<ContentItem> findContentItemsByProcessInstanceId(String processInstanceId) {
+        return dataManager.findContentItemsByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
         dataManager.deleteContentItemsByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    public List<ContentItem> findContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return dataManager.findContentItemsByScopeIdAndScopeType(scopeId, scopeType);
     }
 
     @Override

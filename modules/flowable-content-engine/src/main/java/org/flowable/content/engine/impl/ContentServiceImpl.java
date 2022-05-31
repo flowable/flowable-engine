@@ -21,7 +21,6 @@ import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.cmd.CreateContentItemCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemCmd;
-import org.flowable.content.engine.impl.cmd.DeleteContentItemsByScopeCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemsCmd;
 import org.flowable.content.engine.impl.cmd.GetContentItemStreamCmd;
 import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
@@ -58,17 +57,17 @@ public class ContentServiceImpl extends CommonEngineServiceImpl<ContentEngineCon
 
     @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-        commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null, null));
+        commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null, null, null));
     }
 
     @Override
     public void deleteContentItemsByTaskId(String taskId) {
-        commandExecutor.execute(new DeleteContentItemsCmd(null, taskId, null));
+        commandExecutor.execute(new DeleteContentItemsCmd(null, taskId, null, null));
     }
 
     @Override
     public void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
-        commandExecutor.execute(new DeleteContentItemsByScopeCmd(scopeId, scopeType));
+        commandExecutor.execute(new DeleteContentItemsCmd(null, null, scopeId, scopeType));
     }
 
     @Override

@@ -23,8 +23,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManag
  * @author Joram Barrez
  */
 public class PropertyEntityManagerImpl
-    extends AbstractEngineEntityManager<AbstractEngineConfiguration, PropertyEntity, PropertyDataManager>
-    implements PropertyEntityManager {
+        extends AbstractEngineEntityManager<AbstractEngineConfiguration, PropertyEntity, PropertyDataManager>
+        implements PropertyEntityManager {
 
     public PropertyEntityManagerImpl(AbstractEngineConfiguration engineConfiguration, PropertyDataManager propertyDataManager) {
         super(engineConfiguration, propertyDataManager);
@@ -33,6 +33,11 @@ public class PropertyEntityManagerImpl
     @Override
     public List<PropertyEntity> findAll() {
         return dataManager.findAll();
+    }
+    
+    @Override
+    public void directInsertProperty(String name, String value) {
+        dataManager.directInsertProperty(name, value);
     }
 
 }

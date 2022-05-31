@@ -118,6 +118,7 @@ public abstract class AbstractDynamicStateManager {
                 executionsByParent.values().forEach(executions -> {
                     MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
                     executionContainer.getNewAssigneeId().ifPresent(moveExecutionEntityContainer::setNewAssigneeId);
+                    executionContainer.getNewOwnerId().ifPresent(moveExecutionEntityContainer::setNewOwnerId);
                     moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                 });
             }
@@ -228,6 +229,7 @@ public abstract class AbstractDynamicStateManager {
     protected MoveExecutionEntityContainer createMoveExecutionEntityContainer(MoveActivityIdContainer activityContainer, List<ExecutionEntity> executions, CommandContext commandContext) {
         MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
         activityContainer.getNewAssigneeId().ifPresent(moveExecutionEntityContainer::setNewAssigneeId);
+        activityContainer.getNewOwnerId().ifPresent(moveExecutionEntityContainer::setNewOwnerId);
 
         if (activityContainer.isMoveToParentProcess()) {
             ExecutionEntity processInstanceExecution = executions.get(0).getProcessInstance();
@@ -397,6 +399,7 @@ public abstract class AbstractDynamicStateManager {
                 List<ExecutionEntity> moveExecutions = moveExecutionContainer.getExecutions();
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, moveExecutionContainer.getMoveToActivityIds());
                 subProcessMoveExecutionEntityContainer.setNewAssigneeId(moveExecutionContainer.getNewAssigneeId());
+                subProcessMoveExecutionEntityContainer.setNewOwnerId(moveExecutionContainer.getNewOwnerId());
                 moveExecutions.forEach(executionEntity -> subProcessMoveExecutionEntityContainer.addContinueParentExecution(executionEntity.getId(), callActivityInstanceExecution));
                 newChildExecutions = createEmbeddedSubProcessAndExecutions(moveExecutionContainer.getMoveToFlowElements(), moveExecutions, subProcessMoveExecutionEntityContainer, new ProcessInstanceChangeState(), commandContext);
             }
@@ -437,8 +440,14 @@ public abstract class AbstractDynamicStateManager {
                         migrationContext.setAssignee(moveExecutionContainer.getNewAssigneeId());
                         CommandContextUtil.getAgenda(commandContext).planContinueProcessWithMigrationContextOperation(newChildExecution, migrationContext);
                         
+                    } else if (moveExecutionContainer.getNewOwnerId() != null && moveExecutionContainer.hasNewExecutionId(newChildExecution.getId())) {
+                        MigrationContext migrationContext = new MigrationContext();
+                        migrationContext.setOwner(moveExecutionContainer.getNewOwnerId());
+                        CommandContextUtil.getAgenda(commandContext).planContinueProcessWithMigrationContextOperation(newChildExecution, migrationContext);
+
                     } else {
                         CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(newChildExecution);
+
                     }
                 }
             }
@@ -623,10 +632,18 @@ public abstract class AbstractDynamicStateManager {
                 }
 
                 if (newChildExecution != null) {
-                    if (moveExecutionEntityContainer.getNewAssigneeId() != null && newFlowElement instanceof UserTask && 
-                            !moveExecutionEntityContainer.hasNewExecutionId(newChildExecution.getId())) {
-                        
-                        handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId(), commandContext);
+
+                    if (newFlowElement instanceof UserTask
+                            && !moveExecutionEntityContainer.hasNewExecutionId(newChildExecution.getId())) {
+
+                        if (moveExecutionEntityContainer.getNewAssigneeId() != null) {
+                            handleUserTaskNewAssignee(newChildExecution, moveExecutionEntityContainer.getNewAssigneeId(), commandContext);
+                        }
+
+                        if (moveExecutionEntityContainer.getNewOwnerId() != null) {
+                            handleUserTaskNewOwner(newChildExecution, moveExecutionEntityContainer.getNewOwnerId(), commandContext);
+                        }
+
                     }
 
                     if (newFlowElement instanceof CallActivity && !moveExecutionEntityContainer.isDirectExecutionMigration()) {
@@ -913,6 +930,28 @@ public abstract class AbstractDynamicStateManager {
                 }
             }
             task.setDescription(description);
+            
+            // Set form key
+            String newFormKey = null;
+            String userTaskFormKey = ((UserTask) newFlowElement).getFormKey();
+            if (userTaskFormKey != null) {
+                Object formKeyValue = expressionManager.createExpression(userTaskFormKey).getValue(childExecution);
+                if (formKeyValue != null) {
+                    newFormKey = formKeyValue.toString();
+                }
+            }
+            task.setFormKey(newFormKey);
+
+            // Set newCategory
+            String newCategory = null;
+            String userTaskCategory = ((UserTask) newFlowElement).getCategory();
+            if (userTaskCategory != null) {
+                Object categoryValue = expressionManager.createExpression(userTaskCategory).getValue(childExecution);
+                if (categoryValue != null) {
+                    newCategory = categoryValue.toString();
+                }
+            }
+            task.setCategory(newCategory);
 
             task.setProcessInstanceId(childExecution.getProcessInstanceId());
 
@@ -940,6 +979,16 @@ public abstract class AbstractDynamicStateManager {
                 .executionId(taskExecution.getId()).singleResult();
         if (task != null) {
             TaskHelper.changeTaskAssignee(task, newAssigneeId);
+        }
+    }
+
+    protected void handleUserTaskNewOwner(ExecutionEntity taskExecution, String newOwnerId, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration)
+                .executionId(taskExecution.getId()).singleResult();
+        if (task != null) {
+            TaskHelper.changeTaskOwner(task, newOwnerId);
         }
     }
 

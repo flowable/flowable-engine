@@ -20,10 +20,13 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -169,6 +173,105 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncCmmnHistoryTest.testHistoricCaseInstanceDeleted.cmmn")
+    public void testHistoricCaseInstanceBulkDeleted() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task2 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
+        cmmnTaskService.complete(task2.getId());
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task3 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
+        cmmnTaskService.complete(task3.getId());
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(0);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+        List<String> instanceIdList = new ArrayList<>();
+        instanceIdList.add(caseInstance.getId());
+        instanceIdList.add(caseInstance2.getId());
+        cmmnHistoryService.bulkDeleteHistoricCaseInstances(instanceIdList);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(1);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/async/AsyncCmmnHistoryTest.testHistoricCaseInstanceDeleted.cmmn")
+    public void testInvalidHistoricCaseInstanceBulkDeleted() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task2 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
+        cmmnTaskService.complete(task2.getId());
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("someName")
+                .businessKey("someBusinessKey")
+                .variable("test", "test")
+                .start();
+
+        Task task3 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
+        cmmnTaskService.complete(task3.getId());
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
+        Set<String> caseInstanceIdList = new HashSet<>();
+        caseInstanceIdList.add(caseInstance.getId());
+        caseInstanceIdList.add(caseInstance2.getId());
+        caseInstanceIdList.add("inValidId");
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> cmmnHistoryService.bulkDeleteHistoricCaseInstances(caseInstanceIdList))
+                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No historic case instance found with id: inValidId");
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+
+        assertThatThrownBy(() -> cmmnHistoryService.bulkDeleteHistoricCaseInstances(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("historic case instanceIds are null");
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+
+    }
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/history/testStartSimplePassthroughCaseInstanceLevel.cmmn")
     public void testInstanceLevelSTP() {

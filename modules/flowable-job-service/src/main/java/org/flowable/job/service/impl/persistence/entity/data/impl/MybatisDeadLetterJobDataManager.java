@@ -93,7 +93,7 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateDeadLetterJobTenantIdForDeployment", params);
     }
     
     @Override

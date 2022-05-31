@@ -19,9 +19,11 @@ import java.time.Duration;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -35,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @BpmnJmsEventTest
@@ -48,6 +52,9 @@ public class ProcessWithEventRegistryTest {
     
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired
     protected TaskService taskService;
@@ -188,6 +195,40 @@ public class ProcessWithEventRegistryTest {
         }
     }
     
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testStartProcessWithSystemEvent.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/testSendSystemEvent.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/issueEvent.event"})
+    public void testMultiInstanceSendSystemEvent() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ArrayNode issueArray = objectMapper.createArrayNode();
+            addIssue(issueArray, "1", "bug");
+            addIssue(issueArray, "2", "task");
+            addIssue(issueArray, "3", "question");
+            addIssue(issueArray, "4", "question");
+            addIssue(issueArray, "5", "bug");
+            addIssue(issueArray, "6", "task");
+            addIssue(issueArray, "7", "question");
+            addIssue(issueArray, "8", "question");
+            addIssue(issueArray, "9", "bug");
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("sendEventProcess")
+                    .variable("issues", issueArray)
+                    .start();
+            
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), managementService, 10000, 500);
+            
+            List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("startProcessWithSystemEvent").list();
+            assertThat(processInstances).hasSize(9);
+            
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
     protected EventRepositoryService getEventRepositoryService() {
         return getEventRegistryEngineConfiguration().getEventRepositoryService();
     }
@@ -195,6 +236,12 @@ public class ProcessWithEventRegistryTest {
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
         return (EventRegistryEngineConfiguration) 
                 processEngine.getProcessEngineConfiguration().getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+    
+    protected void addIssue(ArrayNode issueArray, String issueNo, String issueType) {
+        ObjectNode issueNode = issueArray.addObject();
+        issueNode.put("issueNo", issueNo);
+        issueNode.put("issueType", issueType);
     }
     
     protected class TestNonMatchingEventConsumer implements EventRegistryNonMatchingEventConsumer {

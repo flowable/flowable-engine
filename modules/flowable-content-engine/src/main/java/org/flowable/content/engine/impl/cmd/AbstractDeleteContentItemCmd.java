@@ -14,35 +14,25 @@ package org.flowable.content.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.content.api.ContentItem;
+import org.flowable.content.api.ContentStorage;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 /**
- * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class DeleteContentItemsByScopeCmd implements Command<Void>, Serializable {
+public abstract class AbstractDeleteContentItemCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected String scopeId;
-    protected String scopeType;
-
-    public DeleteContentItemsByScopeCmd(String scopeId, String scopeType) {
-        this.scopeId = scopeId;
-        this.scopeType = scopeType;
-    }
-
-    @Override
-    public Void execute(CommandContext commandContext) {
-        if (scopeId == null && scopeType == null) {
-            throw new FlowableIllegalArgumentException("scopeId and scopeType are null");
+    protected void deleteContentItemInContentStorage(ContentItem contentItem) {
+        if (contentItem.getContentStoreId() != null) {
+            ContentStorage contentStorage = CommandContextUtil.getContentEngineConfiguration().getContentStorage();
+            if (contentItem.isContentAvailable()) {
+                contentStorage.deleteContentObject(contentItem.getContentStoreId());
+            }
         }
-
-        CommandContextUtil.getContentItemEntityManager().deleteContentItemsByScopeIdAndScopeType(scopeId, scopeType);
-
-        return null;
     }
 
 }

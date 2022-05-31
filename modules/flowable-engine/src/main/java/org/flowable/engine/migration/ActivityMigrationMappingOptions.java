@@ -41,6 +41,10 @@ public interface ActivityMigrationMappingOptions<T extends ActivityMigrationMapp
 
         String getWithNewAssignee();
 
+        T withNewOwner(String newOwner);
+
+        String getWithNewOwner();
+
         T withLocalVariable(String variableName, Object variableValue);
 
         T withLocalVariables(Map<String, Object> variables);

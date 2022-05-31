@@ -57,7 +57,7 @@ public class ExecuteChangeTenantIdCmd extends BaseChangeTenantIdCmd {
 
         Map<String, Long> results = new HashMap<>();
         for (String entityType : entityTypes) {
-            results.put(entityType, (long) dbSqlSession.update("changeTenantId" + entityType, parameters));
+            results.put(entityType, (long) dbSqlSession.directUpdate("changeTenantId" + entityType, parameters));
         }
 
         return results;
