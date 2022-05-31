@@ -297,10 +297,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui</image>
+                                <!-- <image>flowable/flowable-ui</image> -->
+                                <image>yvoswillens/flowable-ui</image>
                             </to>
                         </configuration>
                         <executions>
@@ -339,10 +340,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui:${project.version}</image>
+                                <!-- <image>flowable/flowable-ui:${project.version}</image> -->
+                                <image>yvoswillens/flowable-ui</image>
                             </to>
                         </configuration>
                         <executions>
@@ -381,10 +383,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui:${project.version}</image>
+                                <!-- <image>flowable/flowable-ui:${project.version}</image> -->
+                                <image>yvoswillens/flowable-ui:${project.version}</image>
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>

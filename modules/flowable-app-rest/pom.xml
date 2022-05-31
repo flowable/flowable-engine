@@ -613,10 +613,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-rest</image>
+                                <!-- <image>flowable/flowable-rest</image> -->
+                                <image>yvoswillens/flowable-rest</image>
                             </to>
                         </configuration>
                         <executions>
@@ -655,10 +656,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-rest:${project.version}</image>
+                                <!-- <image>flowable/flowable-rest:${project.version}</image> -->
+                                <image>yvoswillens/flowable-rest:${project.version}</image>
                             </to>
                         </configuration>
                         <executions>
@@ -697,10 +699,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-rest:${project.version}</image>
+                                <!-- <image>flowable/flowable-rest:${project.version}</image> -->
+                                <image>yvoswillens/flowable-rest:${project.version}</image>
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>
