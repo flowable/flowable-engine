@@ -618,12 +618,7 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-rest</image> -->
                                 <image>flowable-rest</image>
-                                <auth>
-                                    <username>${docker.publisher.user}</username>
-                                    <password>${docker.publisher.password}</password>
-                                </auth>
                             </to>
                         </configuration>
                         <executions>
@@ -665,8 +660,7 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-rest:${project.version}</image> -->
-                                <image>yvoswillens/flowable-rest:${project.version}</image>
+                                <image>flowable/flowable-rest:${project.version}</image>
                                 <auth>
                                     <username>${docker.publisher.user}</username>
                                     <password>${docker.publisher.password}</password>
@@ -712,8 +706,7 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-rest:${project.version}</image> -->
-                                <image>yvoswillens/flowable-rest:${project.version}</image>
+                                <image>flowable/flowable-rest:${project.version}</image>
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>

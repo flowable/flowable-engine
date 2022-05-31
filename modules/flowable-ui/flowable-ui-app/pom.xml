@@ -305,7 +305,6 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-ui</image> -->
                                 <image>flowable-ui</image>
                             </to>
                         </configuration>
@@ -348,8 +347,7 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-ui:${project.version}</image> -->
-                                <image>yvoswillens/flowable-ui:${project.version}</image>
+                                <image>flowable/flowable-ui:${project.version}</image>
                                 <auth>
                                     <username>${docker.publisher.user}</username>
                                     <password>${docker.publisher.password}</password>
@@ -395,8 +393,7 @@
                                 <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <!-- <image>flowable/flowable-ui:${project.version}</image> -->
-                                <image>yvoswillens/flowable-ui:${project.version}</image>
+                                <image>flowable/flowable-ui:${project.version}</image>
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>
