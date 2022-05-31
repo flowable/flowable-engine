@@ -10,6 +10,11 @@
     <artifactId>flowable-ui-app</artifactId>
     <packaging>war</packaging>
 
+    <properties>
+        <docker.publisher.user>-</docker.publisher.user>
+        <docker.publisher.password>-</docker.publisher.password>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -297,10 +302,10 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
-                                <image>flowable/flowable-ui</image>
+                                <image>flowable-ui</image>
                             </to>
                         </configuration>
                         <executions>
@@ -339,10 +344,14 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-ui:${project.version}</image>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
@@ -381,13 +390,17 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.8</image>
+                                <image>flowable/flowable-jre:11.0.15</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-ui:${project.version}</image>
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
