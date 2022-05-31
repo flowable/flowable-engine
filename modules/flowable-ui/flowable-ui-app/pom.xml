@@ -349,7 +349,7 @@
                             </from>
                             <to>
                                 <!-- <image>flowable/flowable-ui:${project.version}</image> -->
-                                <image>yvoswillens/flowable-ui</image>
+                                <image>yvoswillens/flowable-ui:${project.version}</image>
                                 <auth>
                                     <username>${docker.publisher.user}</username>
                                     <password>${docker.publisher.password}</password>
