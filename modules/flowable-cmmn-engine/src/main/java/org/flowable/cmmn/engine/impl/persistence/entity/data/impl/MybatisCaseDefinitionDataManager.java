@@ -131,7 +131,7 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateCaseDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateCaseDefinitionTenantIdForDeploymentId", params);
     }
 
     @Override

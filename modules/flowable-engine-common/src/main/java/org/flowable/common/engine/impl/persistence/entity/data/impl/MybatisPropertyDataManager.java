@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.persistence.entity.data.impl;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -39,6 +40,13 @@ public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEnti
     @Override
     public PropertyEntity create() {
         return new PropertyEntityImpl();
+    }
+    
+    public void directInsertProperty(String name, String value) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("name", name);
+        params.put("value", value);
+        getDbSqlSession().directInsert("insertPropertyWithMap", params);
     }
 
     @Override

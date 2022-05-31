@@ -311,7 +311,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         Map<String, String> params = new HashMap<>();
         params.put("oldTenantId", oldTenantId);
         params.put("newTenantId", newTenantId);
-        getDbSqlSession().update("updateTenantIdOfEventSubscriptions", params);
+        getDbSqlSession().directUpdate("updateTenantIdOfEventSubscriptions", params);
     }
 
     @Override
@@ -322,13 +322,13 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         params.put("currentTime", currentTime);
         params.put("lockOwner", lockOwner);
 
-        int result = getDbSqlSession().update("updateEventSubscriptionLockTime", params);
+        int result = getDbSqlSession().directUpdate("updateEventSubscriptionLockTime", params);
         return result > 0;
     }
 
     @Override
     public void clearEventSubscriptionLockTime(String eventSubscriptionId) {
-        getDbSqlSession().update("clearEventSubscriptionLockTime", eventSubscriptionId);
+        getDbSqlSession().directUpdate("clearEventSubscriptionLockTime", eventSubscriptionId);
     }
 
     @Override

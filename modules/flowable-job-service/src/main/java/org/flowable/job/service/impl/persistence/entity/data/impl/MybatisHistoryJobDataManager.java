@@ -108,7 +108,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateHistoryJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateHistoryJobTenantIdForDeployment", params);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
-        getDbSqlSession().update("resetExpiredHistoryJob", params);
+        getDbSqlSession().directUpdate("resetExpiredHistoryJob", params);
     }
 
     @Override

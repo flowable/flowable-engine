@@ -320,7 +320,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         executeChangeWithInClause(entities, entitiesParameter -> {
             Map<String, Object> copyParameters = new HashMap<>(parameters);
             copyParameters.put(collectionNameInSqlStatement, entitiesParameter);
-            getDbSqlSession().update(statement, copyParameters);
+            getDbSqlSession().directUpdate(statement, copyParameters);
         });
     }
     
