@@ -1,9 +1,9 @@
-name: Release Docker Images
+name: Release Docker Images With Latest
 
 on: workflow_dispatch
 
 jobs:
-  release_docker_images:
+  release_docker_images_with_latest:
     runs-on: ubuntu-latest
 
     steps:
