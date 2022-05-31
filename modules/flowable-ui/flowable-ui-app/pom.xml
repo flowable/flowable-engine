@@ -10,6 +10,11 @@
     <artifactId>flowable-ui-app</artifactId>
     <packaging>war</packaging>
 
+    <properties>
+        <docker.publisher.user>-</docker.publisher.user>
+        <docker.publisher.password>-</docker.publisher.password>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -301,7 +306,7 @@
                             </from>
                             <to>
                                 <!-- <image>flowable/flowable-ui</image> -->
-                                <image>yvoswillens/flowable-ui</image>
+                                <image>flowable-ui</image>
                             </to>
                         </configuration>
                         <executions>
@@ -345,6 +350,10 @@
                             <to>
                                 <!-- <image>flowable/flowable-ui:${project.version}</image> -->
                                 <image>yvoswillens/flowable-ui</image>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
@@ -391,6 +400,10 @@
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>

@@ -17,6 +17,8 @@
     <properties>
         <!--<swagger.host>localhost:8080</swagger.host> -->
         <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
+        <docker.publisher.user>-</docker.publisher.user>
+        <docker.publisher.password>-</docker.publisher.password>
     </properties>
 
     <build>
@@ -617,7 +619,11 @@
                             </from>
                             <to>
                                 <!-- <image>flowable/flowable-rest</image> -->
-                                <image>yvoswillens/flowable-rest</image>
+                                <image>flowable-rest</image>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
@@ -661,6 +667,10 @@
                             <to>
                                 <!-- <image>flowable/flowable-rest:${project.version}</image> -->
                                 <image>yvoswillens/flowable-rest:${project.version}</image>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
@@ -707,6 +717,10 @@
                                 <tags>
                                     <tag>latest</tag>
                                 </tags>
+                                <auth>
+                                    <username>${docker.publisher.user}</username>
+                                    <password>${docker.publisher.password}</password>
+                                </auth>
                             </to>
                         </configuration>
                         <executions>
