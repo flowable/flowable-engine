@@ -52,6 +52,7 @@ import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
@@ -98,6 +99,7 @@ import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ModelResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
 import org.flowable.rest.service.api.runtime.VariableInstanceResponse;
+import org.flowable.rest.service.api.runtime.process.ActivityInstanceResponse;
 import org.flowable.rest.service.api.runtime.process.EventSubscriptionResponse;
 import org.flowable.rest.service.api.runtime.process.ExecutionResponse;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -681,6 +683,40 @@ public class RestResponseFactory {
         return result;
     }
     
+    public List<ActivityInstanceResponse> createActivityInstanceResponseList(List<ActivityInstance> activityInstances) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<ActivityInstanceResponse> responseList = new ArrayList<>(activityInstances.size());
+        for (ActivityInstance instance : activityInstances) {
+            responseList.add(createActivityInstanceResponse(instance, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public ActivityInstanceResponse createActivityInstanceResponse(ActivityInstance activityInstance) {
+        return createActivityInstanceResponse(activityInstance, createUrlBuilder());
+    }
+
+    public ActivityInstanceResponse createActivityInstanceResponse(ActivityInstance activityInstance, RestUrlBuilder urlBuilder) {
+        ActivityInstanceResponse result = new ActivityInstanceResponse();
+        result.setActivityId(activityInstance.getActivityId());
+        result.setActivityName(activityInstance.getActivityName());
+        result.setActivityType(activityInstance.getActivityType());
+        result.setAssignee(activityInstance.getAssignee());
+        result.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
+        result.setDurationInMillis(activityInstance.getDurationInMillis());
+        result.setEndTime(activityInstance.getEndTime());
+        result.setExecutionId(activityInstance.getExecutionId());
+        result.setId(activityInstance.getId());
+        result.setProcessDefinitionId(activityInstance.getProcessDefinitionId());
+        result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, activityInstance.getProcessDefinitionId()));
+        result.setProcessInstanceId(activityInstance.getProcessInstanceId());
+        result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, activityInstance.getProcessInstanceId()));
+        result.setStartTime(activityInstance.getStartTime());
+        result.setTaskId(activityInstance.getTaskId());
+        result.setTenantId(activityInstance.getTenantId());
+        return result;
+    }
+    
     public List<VariableInstanceResponse> createVariableInstanceResponseList(List<VariableInstance> variableInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<VariableInstanceResponse> responseList = new ArrayList<>(variableInstances.size());
@@ -919,7 +955,7 @@ public class RestResponseFactory {
         result.setProcessDefinitionId(activityInstance.getProcessDefinitionId());
         result.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, activityInstance.getProcessDefinitionId()));
         result.setProcessInstanceId(activityInstance.getProcessInstanceId());
-        result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, activityInstance.getId()));
+        result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, activityInstance.getProcessInstanceId()));
         result.setStartTime(activityInstance.getStartTime());
         result.setTaskId(activityInstance.getTaskId());
         result.setTenantId(activityInstance.getTenantId());

@@ -28,6 +28,7 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -57,6 +58,7 @@ import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
 import org.flowable.rest.service.api.repository.ModelRequest;
 import org.flowable.rest.service.api.runtime.VariableInstanceQueryRequest;
+import org.flowable.rest.service.api.runtime.process.ActivityInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionActionRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionChangeActivityStateRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionQueryRequest;
@@ -110,6 +112,8 @@ public interface BpmnRestApiInterceptor {
 
     void deleteProcessInstance(ProcessInstance processInstance);
     
+    void accessActivityInfoWithQuery(ActivityInstanceQuery activityInstanceQuery, ActivityInstanceQueryRequest request);
+
     void accessVariableInfoById(VariableInstance variableInstance);
     
     void accessVariableInfoWithQuery(VariableInstanceQuery variableInstanceQuery, VariableInstanceQueryRequest request);
