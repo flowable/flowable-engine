@@ -3,7 +3,7 @@ name: Release Docker Images
 on: workflow_dispatch
 
 jobs:
-  release:
+  release_docker_images:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,4 +15,7 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Build Docker images with Maven
+        env:
+          docker.publisher.user: ${{ secrets.DOCKER_USER }}
+          docker.publisher.password: ${{ secrets.DOCKER_PASSWORD }}
         run: mvn clean package -B -Dstyle.color=always -P docker -pl :flowable-ui-app,:flowable-app-rest
