@@ -1,8 +1,6 @@
 name: Release Docker Images
 
-on:
-  release:
-    types: [published]
+on: workflow_dispatch
 
 jobs:
   release:
