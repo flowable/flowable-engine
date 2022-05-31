@@ -118,7 +118,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateExternalWorkerJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateExternalWorkerJobTenantIdForDeployment", params);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
         params.put("now", jobServiceConfiguration.getClock().getCurrentTime());
-        getDbSqlSession().update("resetExpiredExternalWorkerJob", params);
+        getDbSqlSession().directUpdate("resetExpiredExternalWorkerJob", params);
     }
 
     @Override

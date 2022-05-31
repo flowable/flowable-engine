@@ -310,7 +310,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         Map<String, String> params = new HashMap<>();
         params.put("oldTenantId", oldTenantId);
         params.put("newTenantId", newTenantId);
-        getDbSqlSession().update("updateTenantIdOfEventSubscriptions", params);
+        getDbSqlSession().directUpdate("updateTenantIdOfEventSubscriptions", params);
     }
 
     @Override

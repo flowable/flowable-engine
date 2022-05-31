@@ -145,12 +145,12 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateTaskTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateTaskTenantIdForDeployment", params);
     }
 
     @Override
     public void updateAllTaskRelatedEntityCountFlags(boolean newValue) {
-        getDbSqlSession().update("updateTaskRelatedEntityCountEnabled", newValue);
+        getDbSqlSession().directUpdate("updateTaskRelatedEntityCountEnabled", newValue);
     }
     
     @Override

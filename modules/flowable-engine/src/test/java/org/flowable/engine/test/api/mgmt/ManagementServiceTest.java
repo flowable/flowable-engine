@@ -580,7 +580,32 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
             managementService.deleteDeadLetterJob(deadLetterJob.getId());
         }
-
+    }
+    
+    @Test
+    void testDirectInsertProperty() {
+        PropertyEntity property = managementService.executeCommand(context -> {
+            CommandContextUtil.getPropertyEntityManager(context).directInsertProperty("test-property", "1234");
+            PropertyEntity propertyEntity = CommandContextUtil.getPropertyEntityManager(context).findById("test-property");
+            return propertyEntity;
+        });
+        
+        assertThat(property.getName()).isEqualTo("test-property");
+        assertThat(property.getValue()).isEqualTo("1234");
+        assertThat(property.getRevision()).isEqualTo(1);
+        
+        property = managementService.executeCommand(context -> {
+            PropertyEntity propertyEntity = CommandContextUtil.getPropertyEntityManager(context).findById("test-property");
+            return propertyEntity;
+        });
+        
+        assertThat(property.getValue()).isEqualTo("1234");
+        
+        managementService.executeCommand(context -> {
+            PropertyEntity propertyEntity = CommandContextUtil.getPropertyEntityManager(context).findById("test-property");
+            CommandContextUtil.getPropertyEntityManager(context).delete(propertyEntity);
+            return null;
+        });
     }
 
     protected void deletePropertyIfExists(String propertyName) {

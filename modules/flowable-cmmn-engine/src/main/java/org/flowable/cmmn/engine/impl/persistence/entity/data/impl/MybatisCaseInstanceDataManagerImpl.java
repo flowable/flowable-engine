@@ -193,7 +193,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         params.put("expirationTime", expirationTime);
         params.put("lockOwner", lockOwner);
 
-        int result = getDbSqlSession().update("updateCaseInstanceLockTime", params);
+        int result = getDbSqlSession().directUpdate("updateCaseInstanceLockTime", params);
         if (result == 0) {
             throw new FlowableOptimisticLockingException("Could not lock case instance");
         }
@@ -203,14 +203,14 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     public void clearLockTime(String caseInstanceId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", caseInstanceId);
-        getDbSqlSession().update("clearCaseInstanceLockTime", params);
+        getDbSqlSession().directUpdate("clearCaseInstanceLockTime", params);
     }
 
     @Override
     public void clearAllLockTimes(String lockOwner) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("lockOwner", lockOwner);
-        getDbSqlSession().update("clearAllCaseInstanceLockTimes", params);
+        getDbSqlSession().directUpdate("clearAllCaseInstanceLockTimes", params);
     }
 
     protected void setSafeInValueLists(CaseInstanceQueryImpl caseInstanceQuery) {

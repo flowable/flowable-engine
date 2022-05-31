@@ -93,6 +93,11 @@ public class DbSqlSession implements Session {
         entityCache.put(entity, false); // False -> entity is inserted, so always changed
         entity.setInserted(true);
     }
+    
+    public int directInsert(String statement, Object parameters) {
+        String insertStatement = dbSqlSessionFactory.mapStatement(statement);
+        return getSqlSession().insert(insertStatement, parameters);
+    }
 
     // update
     // ///////////////////////////////////////////////////////////////////
@@ -102,7 +107,7 @@ public class DbSqlSession implements Session {
         entity.setUpdated(true);
     }
 
-    public int update(String statement, Object parameters) {
+    public int directUpdate(String statement, Object parameters) {
         String updateStatement = dbSqlSessionFactory.mapStatement(statement);
         return getSqlSession().update(updateStatement, parameters);
     }

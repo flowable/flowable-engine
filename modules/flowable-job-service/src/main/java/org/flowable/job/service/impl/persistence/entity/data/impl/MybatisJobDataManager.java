@@ -129,7 +129,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateJobTenantIdForDeployment", params);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
         params.put("now", jobServiceConfiguration.getClock().getCurrentTime());
-        getDbSqlSession().update("resetExpiredJob", params);
+        getDbSqlSession().directUpdate("resetExpiredJob", params);
     }
     
     @Override
