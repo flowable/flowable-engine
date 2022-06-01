@@ -36,8 +36,4 @@ public class DelegateExpressionInboundChannelModel extends InboundChannelModel {
         this.adapterDelegateExpression = adapterDelegateExpression;
     }
 
-    @Override
-    public String getChannelModelHashKey() {
-        return new StringBuilder(super.getChannelModelHashKey()).append(adapterDelegateExpression).toString();
-    }
 }

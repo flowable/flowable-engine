@@ -63,9 +63,4 @@ public class JmsInboundChannelModel extends InboundChannelModel {
         this.concurrency = concurrency;
     }
     
-    @Override
-    public String getChannelModelHashKey() {
-        return new StringBuilder(super.getChannelModelHashKey()).append(destination).append(selector)
-                .append(subscription).append(concurrency).toString();
-    }
 }
