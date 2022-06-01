@@ -106,6 +106,9 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getStartUserId() != null) {
             query.planItemInstanceStartUserId(queryRequest.getStartUserId());
         }
+        if (queryRequest.getIncludeEnded() != null && queryRequest.getIncludeEnded()) {
+            query.includeEnded();
+        }
 
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables(), false);
