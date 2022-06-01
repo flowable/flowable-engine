@@ -76,6 +76,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
     protected static final List<ExtensionAttribute> defaultActivityAttributes = Arrays.asList(
             new ExtensionAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS),
+            new ExtensionAttribute(ATTRIBUTE_ACTIVITY_ASYNC_BEFORE),
             new ExtensionAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE),
             new ExtensionAttribute(ATTRIBUTE_DEFAULT),
             new ExtensionAttribute(ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION));
@@ -115,21 +116,6 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 flowNode.setAsynchronous(async);
                 flowNode.setNotExclusive(notExclusive);
                 
-                if (flowNode.getAttributes().containsKey("asyncBefore")) {
-                    ExtensionAttribute attribute = flowNode.getAttributes().get("asyncBefore").get(0);
-                    System.out.println("asyncBefore " + attribute.getValue());
-                    if ("true".equalsIgnoreCase(attribute.getValue())) {
-                        flowNode.setAsynchronous(true);
-                        
-                        if (flowNode.getAttributes().containsKey("exclusive")) {
-                            ExtensionAttribute exclusiveAttribute = flowNode.getAttributes().get("exclusive").get(0);
-                            if ("false".equalsIgnoreCase(exclusiveAttribute.getValue())) {
-                                flowNode.setExclusive(false);
-                            }
-                        }
-                    }
-                }
-
                 if (currentFlowElement instanceof Activity) {
 
                     Activity activity = (Activity) currentFlowElement;
@@ -317,6 +303,11 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
     protected boolean parseAsync(XMLStreamReader xtr) {
         boolean async = false;
         String asyncString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, xtr);
+
+        if (asyncString == null) {
+            asyncString = xtr.getAttributeValue(CAMUNDA_EXTENSIONS_NAMESPACE, ATTRIBUTE_ACTIVITY_ASYNC_BEFORE);
+        }
+
         if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(asyncString)) {
             async = true;
         }

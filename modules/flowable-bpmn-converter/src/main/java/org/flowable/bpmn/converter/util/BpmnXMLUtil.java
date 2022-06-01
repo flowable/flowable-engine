@@ -567,7 +567,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 for (ExtensionAttribute blackAttribute : blackList) {
                     if (blackAttribute.getName().equals(attribute.getName())) {
                         if (attribute.getNamespace() != null && (FLOWABLE_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
-                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
+                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
+                                CAMUNDA_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
 
                             return true;
                         }

@@ -58,6 +58,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_TASK_IMPLEMENTATION),
             new ExtensionAttribute(ATTRIBUTE_TASK_OPERATION_REF),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
@@ -136,9 +138,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask.setOperationRef(parseOperationRef(xtr.getAttributeValue(null, ATTRIBUTE_TASK_OPERATION_REF), model));
         }
 
-        serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
+        serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME, xtr));
         if (StringUtils.isEmpty(serviceTask.getResultVariableName())) {
-            serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
+            serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE, xtr));
         }
 
         serviceTask.setUseLocalScopeForResultVariable(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, xtr)));
@@ -266,7 +268,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
 
         if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
-            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, serviceTask.getResultVariableName(), xtw);
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName(), xtw);
         }
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
             writeQualifiedAttribute(ATTRIBUTE_TYPE, serviceTask.getType(), xtw);

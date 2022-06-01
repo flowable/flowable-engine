@@ -55,7 +55,7 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         scriptTask.setScriptFormat(xtr.getAttributeValue(null, ATTRIBUTE_TASK_SCRIPT_FORMAT));
         scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE, xtr));
         if (StringUtils.isEmpty(scriptTask.getResultVariable())) {
-            scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
+            scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME, xtr));
         }
         String skipExpression = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, xtr);
         if (StringUtils.isNotEmpty(skipExpression)) {

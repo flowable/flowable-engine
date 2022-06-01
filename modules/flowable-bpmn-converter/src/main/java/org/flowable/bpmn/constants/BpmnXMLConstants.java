@@ -110,6 +110,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_VALUE_FALSE = "false";
 
     public static final String ATTRIBUTE_ACTIVITY_ASYNCHRONOUS = "async";
+    public static final String ATTRIBUTE_ACTIVITY_ASYNC_BEFORE = "asyncBefore";
     public static final String ATTRIBUTE_ACTIVITY_EXCLUSIVE = "exclusive";
     public static final String ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION = "isForCompensation";
     public static final String ATTRIBUTE_ACTIVITY_TRIGGERABLE = "triggerable";
@@ -200,7 +201,8 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_CLASS = "class";
     public static final String ATTRIBUTE_TASK_SERVICE_EXPRESSION = "expression";
     public static final String ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION = "delegateExpression";
-    public static final String ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE = "resultVariableName";
+    public static final String ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME = "resultVariableName";
+    public static final String ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE = "resultVariable";
     public static final String ATTRIBUTE_TASK_SERVICE_EXTENSIONID = "extensionId";
     public static final String ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "useLocalScopeForResultVariable";
