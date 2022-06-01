@@ -65,6 +65,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_ACTIVITY_TRIGGERABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC),
+            new ExtensionAttribute(ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION),
             new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY),
             new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME),
             new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY),
@@ -114,6 +116,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask = new SendEventServiceTask();
             
         } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType) || ServiceTask.EXTERNAL_WORKER_TASK_LEGACY.equals(serviceTaskType)) {
+            serviceTaskType = ServiceTask.EXTERNAL_WORKER_TASK;
             serviceTask = new ExternalWorkerServiceTask();
             
         } else {
