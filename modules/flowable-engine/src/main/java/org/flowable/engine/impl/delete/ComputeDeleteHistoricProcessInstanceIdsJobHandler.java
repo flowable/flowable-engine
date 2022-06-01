@@ -158,7 +158,7 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
         batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, resultNode.toString());
     }
 
-    private void failBatchPart(ProcessEngineConfigurationImpl engineConfiguration, BatchService batchService, BatchPart batchPart, Batch batch,
+    protected void failBatchPart(ProcessEngineConfigurationImpl engineConfiguration, BatchService batchService, BatchPart batchPart, Batch batch,
             String resultJson, boolean sequentialExecution) {
         batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_FAILED, resultJson);
         if (sequentialExecution) {
@@ -177,6 +177,15 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
                 .createHistoricProcessInstanceQuery();
 
         populateQuery(queryNode, query, engineConfiguration);
+
+        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").asBoolean(false)) {
+            // When the query has finishedBefore, finishedAfter or finished then we need to order by the process instance end time
+            // This is done in order to improve the performance when getting pages with large offsets.
+            // When the properties are not set we cannot order on the end time
+            // because we are not guaranteed a consistent order since the end time might be null
+            query.orderByProcessInstanceEndTime().asc();
+        }
+
         return query;
     }
 

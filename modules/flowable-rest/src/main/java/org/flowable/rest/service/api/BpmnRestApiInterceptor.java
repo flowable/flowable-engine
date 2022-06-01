@@ -93,6 +93,8 @@ public interface BpmnRestApiInterceptor {
     
     void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds);
 
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, String moveAction);
+
     void bulkUpdateTasks(Collection<Task> taskList, BulkTasksRequest bulkTasksRequest);
 
     void createTask(Task task, TaskRequest request);

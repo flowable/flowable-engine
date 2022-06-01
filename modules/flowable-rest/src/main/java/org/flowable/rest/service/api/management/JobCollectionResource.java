@@ -204,8 +204,14 @@ public class JobCollectionResource {
                     "Could not find a dead letter job(s) with id(s) {" + jobIds.stream().collect(Collectors.joining(",")) + "}", Job.class);
         }
         if (MOVE_ACTION.equals(actionRequest.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_ACTION);
+            }
             managementService.bulkMoveDeadLetterJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_TO_HISTORY_JOB_ACTION);
+            }
             managementService.bulkMoveDeadLetterJobsToHistoryJobs(jobIds, processEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
         }
     }

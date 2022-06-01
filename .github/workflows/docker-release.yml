@@ -9,10 +9,48 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
+
+      - name: Get current project meta
+        id: meta
+        run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+
       - name: Build Docker images with Maven
-        run: mvn clean package -B -Dstyle.color=always -P dockerDeps,dockerPublish -pl :flowable-ui-app,:flowable-app-rest -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          mvn clean package -B -Dstyle.color=always  \
+          -P dockerDeps,dockerPublish \
+          -pl :flowable-ui-app,:flowable-app-rest \
+          -D docker.publisher.user=${{ secrets.DOCKER_USER }} \
+          -D docker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
+        with:
+          cosign-release: 'v1.7.1'
+
+      - name: Write signing key to disk
+        run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
+
+      - name: Log into dockerhub
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Sign the published Docker images
+        env:
+          COSIGN_PASSWORD: ""
+        run: |
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "ref=${{ github.sha }}" \
+            flowable/flowable-ui:${{ steps.meta.outputs.version }}
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "ref=${{ github.sha }}" \
+            flowable/flowable-rest:${{ steps.meta.outputs.version }} 
