@@ -63,7 +63,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_BUSINESS_KEY, xtr));
         callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_INHERIT_BUSINESS_KEY, xtr)));
         callActivity.setInheritVariables(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, xtr)));
-        callActivity.setSameDeployment(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr)));
+        callActivity.setSameDeployment(parseSameDeployment(xtr));
         callActivity.setUseLocalScopeForOutParameters(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, xtr)));
         callActivity.setCompleteAsync(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC, xtr)));
         
@@ -79,6 +79,16 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
+    }
+
+    protected boolean parseSameDeployment(XMLStreamReader xtr) {
+        String sameDeploymentString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr);
+        if (StringUtils.isNotEmpty(sameDeploymentString)) {
+            return Boolean.valueOf(sameDeploymentString);
+        }
+
+        String calledElementBindingString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALLED_ELEMENT_BINDING, xtr);
+        return StringUtils.isNotEmpty(calledElementBindingString) && "deployment".equalsIgnoreCase(calledElementBindingString);
     }
 
     @Override
