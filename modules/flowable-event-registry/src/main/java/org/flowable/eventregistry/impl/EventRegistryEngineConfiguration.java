@@ -525,7 +525,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     
     public void initInboundChannelModelCacheManager() {
         if (inboundChannelModelCacheManager == null) {
-            inboundChannelModelCacheManager = new DefaultInboundChannelModelCacheManager();
+            inboundChannelModelCacheManager = new DefaultInboundChannelModelCacheManager(this);
         }
     }
     
