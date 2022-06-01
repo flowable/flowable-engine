@@ -391,6 +391,8 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
         callActivityBehaviour.setInheritVariables(callActivity.isInheritVariables());
         callActivityBehaviour.setSameDeployment(callActivity.isSameDeployment());
+        callActivityBehaviour.setBusinessKey(callActivity.getBusinessKey());
+        callActivityBehaviour.setInheritBusinessKey(callActivity.isInheritBusinessKey());
 
         for (IOParameter ioParameter : callActivity.getInParameters()) {
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {

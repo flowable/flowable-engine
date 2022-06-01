@@ -59,6 +59,22 @@ public class InParameterParser extends BaseChildElementParser {
             } else if (parentElement instanceof Event) {
                 ((Event) parentElement).getInParameters().add(parameter);
             }
+
+        } else {
+
+            String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
+            if (StringUtils.isNotEmpty(variables)) {
+                if ("all".equalsIgnoreCase(variables) && parentElement instanceof CallActivity) {
+                    ((CallActivity) parentElement).setInheritVariables(true);
+                }
+            }
+
+            String businessKey = xtr.getAttributeValue(null, ATTRIBUTE_BUSINESS_KEY);
+            if (StringUtils.isNotEmpty(businessKey)) {
+                ((CallActivity) parentElement).setBusinessKey(businessKey);
+            }
+
         }
+
     }
 }
