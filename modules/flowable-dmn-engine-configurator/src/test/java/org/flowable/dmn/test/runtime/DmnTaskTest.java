@@ -511,6 +511,67 @@ public class DmnTaskTest {
         assertThat(result).isEqualTo("1000");
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-3.dmn"
+    })
+    public void withDecisionServiceEmptyResult() {
+        Map<String, Object> processVariables = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionServiceTaskProcess")
+                .variable("a", "101")
+                .variable("b", "101")
+                .variable("c", "101")
+                .start()
+                .getProcessVariables();
+        Object result = processVariables.get("g");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-2.dmn"
+    })
+    public void withTwoOutcomeDecisionsAndOneEmptyResult() {
+        executeWithoutArrays(() -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionServiceTaskProcess")
+                    .variable("a", "101")
+                    .variable("b", "101")
+                    .variable("c", "101")
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            Object resultG = processVariables.get("g");
+            Object resultH = processVariables.get("h");
+
+            assertThat(resultG).isNull();
+            assertThat(resultH).isEqualTo("1");
+        });
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-2.dmn"
+    })
+    public void withTwoOutcomeDecisionsAndOneEmptyResultAsJsonNode() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionServiceTaskProcess")
+                .variable("a", "101")
+                .variable("b", "101")
+                .variable("c", "101")
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object decisionServiceResultObject = processVariables.get("decisionServiceTest");
+
+        assertThat(decisionServiceResultObject).isInstanceOf(ObjectNode.class);
+        ObjectNode decisionServiceResult = (ObjectNode) decisionServiceResultObject;
+        assertThat(decisionServiceResult.size()).isEqualTo(1);
+        assertThat(decisionServiceResult.has("decision4")).isTrue();
+    }
+
     protected void executeWithoutArrays(Runnable runnable) {
         processEngineConfiguration.setAlwaysUseArraysForDmnMultiHitPolicies(false);
         try {
