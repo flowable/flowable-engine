@@ -30,6 +30,7 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
     protected String topicPattern;
     protected String clientIdPrefix;
     protected String concurrency;
+    protected RetryConfiguration retry;
     protected List<CustomProperty> customProperties;
     
     public KafkaInboundChannelModel() {
@@ -77,6 +78,14 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
         this.concurrency = concurrency;
     }
 
+    public RetryConfiguration getRetry() {
+        return retry;
+    }
+
+    public void setRetry(RetryConfiguration retry) {
+        this.retry = retry;
+    }
+
     public List<CustomProperty> getCustomProperties() {
         return customProperties;
     }
@@ -120,4 +129,130 @@ public class KafkaInboundChannelModel extends InboundChannelModel {
         }
     }
     
+    public static class RetryConfiguration {
+
+        protected String attempts;
+        protected String dltTopicSuffix;
+        protected String retryTopicSuffix;
+        protected String fixedDelayTopicStrategy;
+        protected String topicSuffixingStrategy;
+        protected NonBlockingRetryBackOff nonBlockingBackOff;
+
+        protected String autoCreateTopics;
+        protected String numPartitions;
+        protected String replicationFactor;
+
+        public String getAttempts() {
+            return attempts;
+        }
+
+        public void setAttempts(String attempts) {
+            this.attempts = attempts;
+        }
+
+        public String getDltTopicSuffix() {
+            return dltTopicSuffix;
+        }
+
+        public void setDltTopicSuffix(String dltTopicSuffix) {
+            this.dltTopicSuffix = dltTopicSuffix;
+        }
+
+        public String getRetryTopicSuffix() {
+            return retryTopicSuffix;
+        }
+
+        public void setRetryTopicSuffix(String retryTopicSuffix) {
+            this.retryTopicSuffix = retryTopicSuffix;
+        }
+
+        public String getFixedDelayTopicStrategy() {
+            return fixedDelayTopicStrategy;
+        }
+
+        public void setFixedDelayTopicStrategy(String fixedDelayTopicStrategy) {
+            this.fixedDelayTopicStrategy = fixedDelayTopicStrategy;
+        }
+
+        public String getTopicSuffixingStrategy() {
+            return topicSuffixingStrategy;
+        }
+
+        public void setTopicSuffixingStrategy(String topicSuffixingStrategy) {
+            this.topicSuffixingStrategy = topicSuffixingStrategy;
+        }
+
+        public NonBlockingRetryBackOff getNonBlockingBackOff() {
+            return nonBlockingBackOff;
+        }
+
+        public void setNonBlockingBackOff(NonBlockingRetryBackOff nonBlockingBackOff) {
+            this.nonBlockingBackOff = nonBlockingBackOff;
+        }
+
+        public String getAutoCreateTopics() {
+            return autoCreateTopics;
+        }
+
+        public void setAutoCreateTopics(String autoCreateTopics) {
+            this.autoCreateTopics = autoCreateTopics;
+        }
+
+        public String getNumPartitions() {
+            return numPartitions;
+        }
+
+        public void setNumPartitions(String numPartitions) {
+            this.numPartitions = numPartitions;
+        }
+
+        public String getReplicationFactor() {
+            return replicationFactor;
+        }
+
+        public void setReplicationFactor(String replicationFactor) {
+            this.replicationFactor = replicationFactor;
+        }
+    }
+
+    public static class NonBlockingRetryBackOff {
+
+        protected String delay;
+        protected String maxDelay;
+        protected String multiplier;
+        protected String random;
+
+        public String getDelay() {
+            return delay;
+        }
+
+        public void setDelay(String delay) {
+            this.delay = delay;
+        }
+
+        public String getMaxDelay() {
+            return maxDelay;
+        }
+
+        public void setMaxDelay(String maxDelay) {
+            this.maxDelay = maxDelay;
+        }
+
+        public String getMultiplier() {
+            return multiplier;
+        }
+
+        public void setMultiplier(String multiplier) {
+            this.multiplier = multiplier;
+        }
+
+        public String getRandom() {
+            return random;
+        }
+
+        public void setRandom(String random) {
+            this.random = random;
+        }
+    }
+
 }

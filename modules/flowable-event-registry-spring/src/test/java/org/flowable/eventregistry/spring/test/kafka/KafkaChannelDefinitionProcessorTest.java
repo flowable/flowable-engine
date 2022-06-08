@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.test.kafka;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
@@ -628,6 +630,1078 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    void eventShouldBeReceivedMultipleTimesAfterAnExceptionIsThrown() throws Exception {
+        createTopic("test-throwing-topic");
+        AtomicInteger numberOfExceptionsToThrow = new AtomicInteger(5);
+        testEventConsumer.setEventConsumer(event -> {
+            if (numberOfExceptionsToThrow.decrementAndGet() >= 0) {
+                throw new RuntimeException("Failed to receive event " + event.getType());
+            }
+        });
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+                .key("newCustomerChannel")
+                .resourceName("customer.channel")
+                .kafkaChannelAdapter("test-throwing-topic")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        kafkaTemplate.send("test-throwing-topic", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(numberOfExceptionsToThrow).hasNegativeValue());
+
+        // The test event consumer will receive 6 events, since it throws an exception
+        assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsOnly("test")
+                .hasSize(6);
+
+    }
+
+    @Test
+    void channelShouldUseBlockingRetryConfiguration() throws Exception {
+        createTopic("blocking-retry-test");
+
+        AtomicInteger numberOfExceptionsToThrow = new AtomicInteger(3);
+        testEventConsumer.setEventConsumer(event -> {
+            if (numberOfExceptionsToThrow.decrementAndGet() >= 0) {
+                throw new RuntimeException("Failed to receive event " + event.getType());
+            }
+        });
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/blockingRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        kafkaTemplate.send("blocking-retry-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("blocking-retry-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents()).extracting(EventRegistryEvent::getType).hasSize(4));
+
+        // The test event consumer will receive 4 events, since it throws an exception
+        // The first 3 are kermit (since the consumer throws an exception), and the last one is fozzie
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactly(
+                        "kermit", "kermit", "kermit",
+                        "fozzie"
+                );
+
+        assertThat(numberOfExceptionsToThrow).hasValue(-1);
+    }
+
+    @Test
+    void channelShouldUseBlockingRetryConfigurationWithDeadLetterSuffix() throws Exception {
+        createTopic("blocking-retry-dlt-test");
+        createTopic("blocking-retry-dlt-test-dlt");
+        AtomicInteger numberOfExceptionsToThrow = new AtomicInteger(3);
+        testEventConsumer.setEventConsumer(event -> {
+            if (numberOfExceptionsToThrow.decrementAndGet() >= 0) {
+                throw new RuntimeException("Failed to receive event " + event.getType());
+            }
+        });
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/blockingRetryDeadLetterSuffixKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        kafkaTemplate.send("blocking-retry-dlt-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("blocking-retry-dlt-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents()).extracting(EventRegistryEvent::getType).hasSize(4));
+
+        // The test event consumer will receive 4 events, since it throws an exception
+        // The first 3 are kermit (since the consumer throws an exception), and the last one is fozzie
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactly(
+                        "kermit", "kermit", "kermit",
+                        "fozzie"
+                );
+
+        assertThat(numberOfExceptionsToThrow).hasNegativeValue();
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Collections.singleton("blocking-retry-dlt-test-dlt"));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+
+    }
+
+    @Test
+    void channelShouldUseNonBlockingRetryConfigurationWithRetryTopicAndDeadLetterSuffix() throws Exception {
+        createTopic("non-blocking-retry-test");
+        createTopic("non-blocking-retry-test-retry");
+        createTopic("non-blocking-retry-test-dlt");
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingRetryAndDeadLetterSuffixKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("non-blocking-retry-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("non-blocking-retry-test", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(5));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Collections.singleton("non-blocking-retry-test-dlt"));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+
+    }
+
+    @Test
+    void exponentialBackOffRetry() throws Exception {
+        createTopic("exponential-backoff");
+        createTopic("exponential-backoff-retry-topic-0");
+        createTopic("exponential-backoff-retry-topic-1");
+        createTopic("exponential-backoff-dlt-topic");
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingExponentialBackOffRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("exponential-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("exponential-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(5));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "exponential-backoff-retry-topic-0",
+                    "exponential-backoff-retry-topic-1",
+                    "exponential-backoff-dlt-topic"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("exponential-backoff-retry-topic-0"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("exponential-backoff-retry-topic-1"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("exponential-backoff-dlt-topic"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void exponentialBackOffRetryWithDelaySuffixing() throws Exception {
+        createTopic("exponential-backoff-delay");
+        createTopic("exponential-backoff-delay-retry-topic-100");
+        createTopic("exponential-backoff-delay-dlt-topic");
+
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingExponentialBackOffDelaySuffixingRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("exponential-backoff-delay", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("exponential-backoff-delay", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(5));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "exponential-backoff-delay-retry-topic-100",
+                    "exponential-backoff-delay-retry-topic-200",
+                    "exponential-backoff-delay-dlt-topic"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("exponential-backoff-delay-retry-topic-100"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("exponential-backoff-delay-retry-topic-200"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("exponential-backoff-delay-dlt-topic"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void exponentialRandomBackOffRetry() throws Exception {
+        createTopic("random-exponential-backoff");
+
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingExponentialRandomBackOffRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("random-exponential-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("random-exponential-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(6));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "random-exponential-backoff-retry-0",
+                    "random-exponential-backoff-retry-1",
+                    "random-exponential-backoff-retry-2",
+                    "random-exponential-backoff-dlt"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("random-exponential-backoff-retry-0"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("random-exponential-backoff-retry-1"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("random-exponential-backoff-retry-2"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("random-exponential-backoff-dlt"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void uniformRandomBackOffRetry() throws Exception {
+        createTopic("uniform-random-backoff");
+
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingUniformRandomBackOffRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("uniform-random-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("uniform-random-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(6));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "uniform-random-backoff-retry-0",
+                    "uniform-random-backoff-retry-1",
+                    "uniform-random-backoff-retry-2",
+                    "uniform-random-backoff-dlt"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("uniform-random-backoff-retry-0"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("uniform-random-backoff-retry-1"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("uniform-random-backoff-retry-2"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("uniform-random-backoff-dlt"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void fixedBackOffMultiTopicRetry() throws Exception {
+        createTopic("fixed-backoff-multi");
+        createTopic("fixed-backoff-multi-dlt-topic");
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingFixedBackOffMultiTopicRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("fixed-backoff-multi", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("fixed-backoff-multi", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(5));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "fixed-backoff-multi-retry-topic-0",
+                    "fixed-backoff-multi-retry-topic-1",
+                    "fixed-backoff-multi-dlt-topic"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("fixed-backoff-multi-retry-topic-0"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("fixed-backoff-multi-retry-topic-1"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+
+            assertThat(records.records("fixed-backoff-multi-dlt-topic"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
+    void fixedBackOffNoAutoCreateTopic() {
+        createTopic("fixed-backoff-multi");
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        assertThatThrownBy(() -> eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingFixedBackOffRetryNoAutoCreateTopicKafka.channel")
+                .deploy())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Topic(s) [fixed-backoff-no-auto-create] is/are not present and missingTopicsFatal is true");
+    }
+
+    @Test
+    void fixedBackOffRetry() throws Exception {
+        createTopic("fixed-backoff");
+        createTopic("fixed-backoff-dlt-topic");
+        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
+        testEventConsumer.setEventConsumer(event -> {
+            EventInstance eventInstance = (EventInstance) event.getEventObject();
+            Object customer = eventInstance.getCorrelationParameterInstances()
+                    .stream()
+                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
+                    .map(EventPayloadInstance::getValue)
+                    .findAny()
+                    .orElse(null);
+
+            if ("kermit".equals(customer)) {
+                throw new RuntimeException("Cannot receive " + customer);
+            } else if ("fozzie".equals(customer)) {
+                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
+                    throw new RuntimeException("Cannot receive " + customer);
+                }
+            }
+        });
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingFixedBackOffRetryKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        kafkaTemplate.send("fixed-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        kafkaTemplate.send("fixed-backoff", "{"
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie the Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(5));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
+                .containsExactlyInAnyOrder(
+                        "kermit", "kermit", "kermit",
+                        "fozzie", "fozzie"
+                );
+
+        assertThat(numberOfTimesFozzieArrived).hasValue(2);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            // The first event should land in the dead letter topic
+            consumer.subscribe(Arrays.asList(
+                    "fixed-backoff-retry-topic",
+                    "fixed-backoff-dlt-topic"
+            ));
+            consumer.poll(Duration.ofSeconds(1));
+            consumer.seekToBeginning(consumer.assignment());
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records.records("fixed-backoff-retry-topic"))
+                    .satisfiesExactly(
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'fozzie',"
+                                                + "  name: 'Fozzie the Bear'"
+                                                + "}");
+                            },
+                            record -> {
+                                assertThatJson(record.value())
+                                        .isEqualTo("{"
+                                                + "  eventKey: 'test',"
+                                                + "  customer: 'kermit',"
+                                                + "  name: 'Kermit the Frog'"
+                                                + "}");
+                            }
+                    );
+
+            assertThat(records.records("fixed-backoff-dlt-topic"))
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  eventKey: 'test',"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegistered() throws Exception {
         createTopic("outbound-customer");
 
@@ -635,7 +1709,7 @@ class KafkaChannelDefinitionProcessorTest {
             consumer.subscribe(Collections.singleton("outbound-customer"));
 
             eventRepositoryService.createEventModelBuilder()
-                .resourceName("testEvent.event")
+                    .resourceName("testEvent.event")
                 .key("customer")
                 .correlationParameter("customer", EventPayloadTypes.STRING)
                 .payload("name", EventPayloadTypes.STRING)
