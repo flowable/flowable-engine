@@ -222,7 +222,9 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
             for (DmnElementReference elementReference : decisionService.getOutputDecisions()) {
                 DecisionExecutionAuditContainer childDecisionExecution = decisionServiceExecutionAuditContainer
                         .getChildDecisionExecution(elementReference.getParsedId());
-                decisionServiceResult.put(elementReference.getParsedId(), childDecisionExecution.getDecisionResult());
+                if (childDecisionExecution.getDecisionResult() != null && !childDecisionExecution.getDecisionResult().isEmpty()) {
+                    decisionServiceResult.put(elementReference.getParsedId(), childDecisionExecution.getDecisionResult());
+                }
                 multipleResults = multipleResults || childDecisionExecution.isMultipleResults();
             }
 
