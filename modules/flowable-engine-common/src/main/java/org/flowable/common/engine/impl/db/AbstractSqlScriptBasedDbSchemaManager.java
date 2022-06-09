@@ -93,11 +93,13 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                 nextVersion = nextVersion.substring(0, nextVersion.length() - "-SNAPSHOT".length());
             }
 
+            System.out.println("component " + component + " " + nextVersion + " " + dbVersion);
             currentVersion = currentVersion.replace("cam", "");
             currentVersion = currentVersion.replace(".", "");
             if ("fox".equalsIgnoreCase(dbVersion) && FlowableVersions.hasCamMigrationVersion(nextVersion)) {
                 nextVersion = "cam" + nextVersion;
             }
+            System.out.println("nextVersion " + nextVersion);
             nextVersion = nextVersion.replace(".", "");
             
             logger.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", currentVersion, nextVersion, component);

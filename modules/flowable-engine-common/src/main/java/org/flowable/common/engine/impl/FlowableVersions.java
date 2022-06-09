@@ -54,6 +54,7 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.15.1"));
         CAM_MIGRATION_VERSIONS.add(new FlowableVersion("5.15.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.16"));
+        CAM_MIGRATION_VERSIONS.add(new FlowableVersion("5.16"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.2-SNAPSHOT"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.16.2"));
@@ -64,6 +65,7 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.17.0.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.17.0.2"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.18.0.0"));
+        CAM_MIGRATION_VERSIONS.add(new FlowableVersion("5.18.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.18.0.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("5.20.0.1"));
@@ -109,6 +111,7 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.2"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.4.1.3"));
+        CAM_MIGRATION_VERSIONS.add(new FlowableVersion("6.4.1.3"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.1"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.5.0.2"));
