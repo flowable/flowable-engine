@@ -175,7 +175,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
-
         if (element instanceof CaseServiceTask) {
             writeCaseServiceTaskAdditionalAttributes(element, model, xtw);
 
@@ -184,11 +183,12 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else if (element instanceof ExternalWorkerServiceTask) {
             writeExternalTaskAdditionalAttributes((ExternalWorkerServiceTask) element, model, xtw);
+            
         } else if (element instanceof HttpServiceTask) {
             writeHttpServiceTaskAdditionalAttributes((HttpServiceTask) element, model, xtw);
+            
         } else {
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
-
         }
     }
 
@@ -305,7 +305,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else {
             return writeServiceTaskExtensionChildElements((ServiceTask) element, didWriteExtensionStartElement, xtw);
-
         }
     }
 

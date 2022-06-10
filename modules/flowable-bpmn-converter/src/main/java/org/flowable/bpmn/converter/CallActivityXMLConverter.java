@@ -12,7 +12,9 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
@@ -28,6 +30,7 @@ import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.ExtensionAttribute;
 
 /**
  * @author Tijs Rademakers
@@ -35,6 +38,19 @@ import org.flowable.bpmn.model.CallActivity;
 public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
     protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+    
+    protected static final List<ExtensionAttribute> defaultCallActivityAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENT),
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_CALLEDELEMENTTYPE),
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC),
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES),
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_PROCESS_INSTANCE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS),
+            new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_INHERIT_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT),
+            new ExtensionAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT),
+            new ExtensionAttribute(ATTRIBUTE_ID_VARIABLE_NAME));
 
     public CallActivityXMLConverter() {
         InParameterParser inParameterParser = new InParameterParser();
@@ -54,6 +70,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         CallActivity callActivity = new CallActivity();
         BpmnXMLUtil.addXMLLocation(callActivity, xtr);
@@ -77,6 +94,8 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
             callActivity.setProcessInstanceIdVariableName(idVariableName);
         }
         
+        BpmnXMLUtil.addCustomAttributes(xtr, callActivity, defaultElementAttributes, defaultActivityAttributes, defaultCallActivityAttributes);
+        
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
     }
@@ -92,6 +111,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         CallActivity callActivity = (CallActivity) element;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
@@ -127,6 +147,10 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (callActivity.getProcessInstanceIdVariableName() != null) {
             writeQualifiedAttribute(ATTRIBUTE_ID_VARIABLE_NAME, callActivity.getProcessInstanceIdVariableName(), xtw);
         }
+        
+        // write custom attributes
+        BpmnXMLUtil.writeCustomAttributes(callActivity.getAttributes().values(), xtw, defaultElementAttributes,
+                defaultActivityAttributes, defaultCallActivityAttributes);
     }
 
     @Override
