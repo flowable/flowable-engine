@@ -13,16 +13,27 @@ Call Sysproc.admin_cmd ('REORG TABLE ACT_RU_EXECUTION');
 alter table ACT_RU_EVENT_SUBSCR
     add PROC_DEF_ID_ varchar(64);      
    
-Call Sysproc.admin_cmd ('REORG TABLE ACT_RU_EVENT_SUBSCR');     
+Call Sysproc.admin_cmd ('REORG TABLE ACT_RU_EVENT_SUBSCR');
 
-alter table ACT_RE_PROCDEF
-    drop unique ACT_UNIQ_PROCDEF;
+update ACT_RE_PROCDEF set TENANT_ID_ = '' where TENANT_ID_ is null;
+
+alter table ACT_RE_PROCDEF alter column TENANT_ID_ set not null;
+
+alter table ACT_RE_PROCDEF alter column TENANT_ID_ set default '';
+
+Call Sysproc.admin_cmd ('REORG TABLE ACT_RE_PROCDEF');
     
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_, TENANT_ID_);  
     
 Call Sysproc.admin_cmd ('REORG TABLE ACT_RE_PROCDEF');
+
+drop index ACT_UNIQ_VARIABLE;
+
+alter table ACT_RU_VARIABLE alter column VAR_SCOPE_ drop not null;
+
+Call Sysproc.admin_cmd ('REORG TABLE ACT_RU_VARIABLE');
 
 alter table ACT_RU_IDENTITYLINK
     add PROC_INST_ID_ varchar(64);
@@ -32,7 +43,7 @@ Call Sysproc.admin_cmd ('REORG TABLE ACT_RU_IDENTITYLINK');
 alter table ACT_HI_IDENTITYLINK
     add PROC_INST_ID_ varchar(64);
     
-alter table ACT_HI_IDENTITYLINK alter column CREATE_TIME_ set data type timestamp null;
+alter table ACT_HI_IDENTITYLINK alter column TIMESTAMP_ drop not null;
 
 Call Sysproc.admin_cmd ('REORG TABLE ACT_HI_IDENTITYLINK');
 

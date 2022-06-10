@@ -211,8 +211,15 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         int matchingVersionIndex = -1;
         int version6120Index = FlowableVersions.getFlowableVersionIndexForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
 
+        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
+        boolean isEngineTablePresent = isEngineTablePresent();
+        if (isEngineTablePresent) {
+            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
+            dbVersion = dbVersionProperty.getValue();
+        }
+        
         // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaUpdate();
+        getCommonSchemaManager().schemaUpdate(dbVersion);
 
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
         LockManager lockManager;
@@ -224,10 +231,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
 
         try {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            boolean isEngineTablePresent = isEngineTablePresent();
             if (isEngineTablePresent) {
-
                 dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
                 dbVersion = dbVersionProperty.getValue();
 
@@ -244,13 +248,13 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
                 }
             }
 
-            getIdentityLinkSchemaManager().schemaUpdate();
-            getEntityLinkSchemaManager().schemaUpdate();
-            getEventSubscriptionSchemaManager().schemaUpdate();
-            getTaskSchemaManager().schemaUpdate();
-            getVariableSchemaManager().schemaUpdate();
-            getJobSchemaManager().schemaUpdate();
-            getBatchSchemaManager().schemaUpdate();
+            getIdentityLinkSchemaManager().schemaUpdate(dbVersion);
+            getEntityLinkSchemaManager().schemaUpdate(dbVersion);
+            getEventSubscriptionSchemaManager().schemaUpdate(dbVersion);
+            getTaskSchemaManager().schemaUpdate(dbVersion);
+            getVariableSchemaManager().schemaUpdate(dbVersion);
+            getJobSchemaManager().schemaUpdate(dbVersion);
+            getBatchSchemaManager().schemaUpdate(dbVersion);
 
             if (isUpgradeNeeded) {
                 dbVersionProperty.setValue(ProcessEngine.VERSION);

@@ -56,8 +56,8 @@ create table ACT_RU_DEADLETTER_JOB (
     primary key (ID_)
 );
 
-create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
-create index ACT_IDX_JOB_PROCESS_INSTANCE_ID on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
+exec sp_rename 'ACT_RU_JOB.PROCESS_DEF_ID_', 'PROC_DEF_ID_';
+
 create index ACT_IDX_JOB_PROC_DEF_ID on ACT_RU_JOB(PROC_DEF_ID_);
 create index ACT_IDX_TIMER_JOB_EXECUTION_ID on ACT_RU_TIMER_JOB(EXECUTION_ID_);
 create index ACT_IDX_TIMER_JOB_PROCESS_INSTANCE_ID on ACT_RU_TIMER_JOB(PROCESS_INSTANCE_ID_);
@@ -81,8 +81,6 @@ alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_PROCESS_INSTANCE 
     foreign key (PROCESS_INSTANCE_ID_) 
     references ACT_RU_EXECUTION (ID_);
-
-exec sp_rename 'ACT_RU_JOB.PROCESS_DEF_ID_', 'PROC_DEF_ID_';
     
 alter table ACT_RU_JOB 
     add constraint ACT_FK_JOB_PROC_DEF

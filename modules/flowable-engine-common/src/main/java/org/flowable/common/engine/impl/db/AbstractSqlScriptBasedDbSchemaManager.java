@@ -79,7 +79,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         }
     }
     
-    protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex, final String dbVersion) {
+    protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex, final String engineDbVersion) {
         FlowableVersion version = FlowableVersions.FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String currentVersion = version.getMainVersion();
         logger.info("upgrading flowable {} schema from {} to {}", component, currentVersion, FlowableVersions.CURRENT_VERSION);
@@ -93,13 +93,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                 nextVersion = nextVersion.substring(0, nextVersion.length() - "-SNAPSHOT".length());
             }
 
-            System.out.println("component " + component + " " + nextVersion + " " + dbVersion);
             currentVersion = currentVersion.replace("cam", "");
             currentVersion = currentVersion.replace(".", "");
-            if ("fox".equalsIgnoreCase(dbVersion) && FlowableVersions.hasCamMigrationVersion(nextVersion)) {
+            if ("fox".equalsIgnoreCase(engineDbVersion) && FlowableVersions.hasCamMigrationVersion(nextVersion)) {
                 nextVersion = "cam" + nextVersion;
             }
-            System.out.println("nextVersion " + nextVersion);
             nextVersion = nextVersion.replace(".", "");
             
             logger.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", currentVersion, nextVersion, component);

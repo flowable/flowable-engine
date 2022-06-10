@@ -70,6 +70,9 @@ alter table ACT_RE_PROCDEF
     
 alter table ACT_RU_VARIABLE modify VAR_SCOPE_ varchar(255) null;
 
+alter table ACT_RU_VARIABLE
+    drop constraint ACT_UNIQ_VARIABLE;
+
 alter table ACT_RU_IDENTITYLINK
     add PROC_INST_ID_ varchar(64);
     

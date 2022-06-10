@@ -62,6 +62,11 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
 
     @Override
     public String schemaUpdate() {
+        return schemaUpdate(null);
+    }
+    
+    @Override
+    public String schemaUpdate(String engineDbVersion) {
         String feedback = null;
         if (isUpdateNeeded()) {
             String dbVersion = getSchemaVersion();
@@ -72,18 +77,12 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
                 compareWithVersion = dbVersion;
             }
             
-            if (compareWithVersion.equals(getUpgradeStartVersion())) {
-                String engineVersion = getProperty("schema.version");
-                
-                ddd
-            }
-            
             int matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(compareWithVersion);
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade(schemaComponent, matchingVersionIndex, dbVersion);
+                dbSchemaUpgrade(schemaComponent, matchingVersionIndex, engineDbVersion);
                 if (isHistoryUsed()) {
-                    dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex, dbVersion);
+                    dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex, engineDbVersion);
                 }
             }
             
