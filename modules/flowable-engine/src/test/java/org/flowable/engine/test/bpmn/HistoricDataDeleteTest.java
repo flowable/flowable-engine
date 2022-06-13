@@ -1231,10 +1231,15 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         instanceIds.add(processInstance.getId());
         instanceIds.add(processInstance2.getId());
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        }
 
         historyService.bulkDeleteHistoricProcessInstances(instanceIds);
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(1);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(1);
+        }
 
     }
 
@@ -1257,17 +1262,23 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         instanceIds.add(processInstance2.getId());
         instanceIds.add("inValidId");
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        }
 
         assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(instanceIds))
                 .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No historic process instance found with id: inValidId");
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        }
 
         assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(null))
                 .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("historic process instanceIds are null");
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
+        }
 
     }
 
