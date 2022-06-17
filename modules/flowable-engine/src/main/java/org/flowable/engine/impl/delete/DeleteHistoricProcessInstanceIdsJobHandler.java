@@ -26,7 +26,6 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
@@ -36,6 +35,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -79,29 +79,24 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
         if (processInstanceIdsToDelete.isEmpty()) {
             throw new FlowableIllegalArgumentException("There are no process instance ids to delete");
         }
-
-        HistoryService historyService = engineConfiguration.getHistoryService();
-        List<HistoricProcessInstance> processInstances = historyService
-                .createHistoricProcessInstanceQuery()
-                .processInstanceIds(processInstanceIdsToDelete)
-                .list();
-
+        
         String status = DeleteProcessInstanceBatchConstants.STATUS_COMPLETED;
         ObjectNode resultNode = engineConfiguration.getObjectMapper().createObjectNode();
 
-        for (HistoricProcessInstance processInstance : processInstances) {
-            try {
-                historyService.deleteHistoricProcessInstance(processInstance.getId());
-                resultNode.withArray("processInstanceIdsDeleted")
-                        .add(processInstance.getId());
-            } catch (FlowableException ex) {
-                status = DeleteProcessInstanceBatchConstants.STATUS_FAILED;
-                resultNode.withArray("processInstanceIdsFailedToDelete")
-                        .addObject()
-                        .put("id", processInstance.getId())
-                        .put("error", ex.getMessage())
-                        .put("stacktrace", ExceptionUtils.getStackTrace(ex));
-            }
+        HistoryService historyService = engineConfiguration.getHistoryService();
+        
+        try {
+            historyService.bulkDeleteHistoricProcessInstances(processInstanceIdsToDelete);
+            resultNode.withArray("processInstanceIdsDeleted")
+                .addAll((ArrayNode) idsToDelete);
+            
+        } catch (FlowableException ex) {
+            status = DeleteProcessInstanceBatchConstants.STATUS_FAILED;
+            resultNode.withArray("processInstanceIdsFailedToDelete")
+                    .addObject()
+                    .put("id", processInstanceIdsToDelete.iterator().next())
+                    .put("error", ex.getMessage())
+                    .put("stacktrace", ExceptionUtils.getStackTrace(ex));
         }
 
         batchService.completeBatchPart(batchPart.getId(), status, resultNode.toString());
@@ -147,6 +142,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
         try {
             return engineConfiguration.getObjectMapper()
                     .readTree(batchPart.getResultDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
+            
         } catch (JsonProcessingException e) {
             ExceptionUtil.sneakyThrow(e);
             return null;

@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +63,12 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     public List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId) {
         return getDbSqlSession().selectList("selectHistoricTaskInstancesByProcessInstanceId", processInstanceId);
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findHistoricTaskIdsForProcessInstanceIds(Collection<String> processInstanceIds) {
+        return getDbSqlSession().selectList("selectHistoricTaskInstanceIdsForProcessInstanceIds", createSafeInValuesList(processInstanceIds));
+    }
 
     @Override
     public long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
@@ -97,6 +104,11 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         getDbSqlSession().delete("bulkDeleteHistoricTaskInstances", historicTaskInstanceQuery, HistoricTaskInstanceEntityImpl.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskInstancesForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricTaskInstanceEntityImpl.class);
     }
 
     @Override

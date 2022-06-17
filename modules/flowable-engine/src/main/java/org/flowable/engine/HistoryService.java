@@ -98,7 +98,12 @@ public interface HistoryService {
     void deleteHistoricProcessInstance(String processInstanceId);
     
     /**
-     * Deletes a bulk of historic process instances. All historic activities, historic tasks and historic details (variable updates, form properties) are deleted as well.
+     * Deletes the historic process instances for the provided ids in sequence. All historic activities, historic tasks and historic details (variable updates, form properties) are deleted as well.
+     */
+    void deleteHistoricProcessInstancesById(Collection<String> instanceIds);
+    
+    /**
+     * Performs a bulk delete with the provided process instance ids. All historic activities, historic tasks and historic details (variable updates, form properties) are deleted as well.
      */
     void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds);
 

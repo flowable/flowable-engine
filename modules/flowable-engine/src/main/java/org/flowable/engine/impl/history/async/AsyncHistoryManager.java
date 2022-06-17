@@ -15,6 +15,7 @@ package org.flowable.engine.impl.history.async;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -104,6 +105,11 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED_BY_PROCDEF_ID, data);
         }
+    }
+    
+    @Override
+    public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
+        // todo
     }
 
     @Override

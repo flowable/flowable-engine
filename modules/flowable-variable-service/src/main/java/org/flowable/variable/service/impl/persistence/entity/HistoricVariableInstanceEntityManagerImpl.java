@@ -13,6 +13,7 @@
 
 package org.flowable.variable.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +146,17 @@ public class HistoricVariableInstanceEntityManagerImpl
             }
         }
     }
-    
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
+        dataManager.bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
+        dataManager.bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+    }
+
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
         if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {

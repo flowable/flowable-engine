@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
@@ -33,6 +34,8 @@ public interface HistoricEntityLinkEntityManager extends EntityManager<HistoricE
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
 
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -107,6 +108,16 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
     }
     
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
+        getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
+        getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+    }
+
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesForNonExistingProcessInstances();

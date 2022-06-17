@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,20 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
         return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
     }
     
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricVariableInstanceEntity.class);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForTaskIds", createSafeInValuesList(taskIds), HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForTaskIds", createSafeInValuesList(taskIds), HistoricVariableInstanceEntity.class);
+    }
+
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
         // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity

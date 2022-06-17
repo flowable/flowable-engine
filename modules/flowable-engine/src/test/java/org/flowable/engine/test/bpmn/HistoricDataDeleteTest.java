@@ -28,7 +28,6 @@ import java.util.Set;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -493,36 +492,25 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
 
             batch = managementService.createBatchQuery().batchId(batchId).singleResult();
             assertThat(batch).isNotNull();
-            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_FAILED);
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
                     .isEqualTo("{"
                             + "  numberOfInstances: 20,"
-                            + "  numberOfFailedInstances: 10,"
                             + "  batchSize: 5,"
                             + "  query: { }"
                             + "}");
 
-            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(10);
-            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(30);
-            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(0);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(0);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
 
             for (int i = 0; i < 20; i++) {
-                if (i < 10) {
-                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
-                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
-                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
-                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
-                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
-                    }
-
-                } else {
-                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
-                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(1);
-                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
-                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
-                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
-                    }
+                assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
+                assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                    assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
                 }
             }
         }
@@ -1266,15 +1254,12 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
         }
 
-        assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(instanceIds))
-                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No historic process instance found with id: inValidId");
-
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
             assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);
         }
 
         assertThatThrownBy(() -> historyService.bulkDeleteHistoricProcessInstances(null))
-                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("historic process instanceIds are null");
+                .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("processInstanceIds is null");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
             assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(3);

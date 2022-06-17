@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,10 @@ public interface HistoricDetailEntityManager extends EntityManager<HistoricDetai
     long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
 
     void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId);
+    
+    void bulkDeleteHistoricDetailsByTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricDetailsByProcessInstanceIds(Collection<String> historicProcessInstanceIds);
 
     void deleteHistoricDetailForNonExistingProcessInstances();
 }

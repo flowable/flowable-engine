@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.api.history;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,6 +43,8 @@ public interface HistoricEntityLinkService {
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
     
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

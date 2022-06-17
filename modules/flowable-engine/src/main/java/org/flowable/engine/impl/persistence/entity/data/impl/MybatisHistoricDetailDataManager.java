@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,18 @@ public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager
     @Override
     public long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricDetailCountByNativeQuery", parameterMap);
+    }
+
+    @Override
+    public void bulkDeleteHistoricDetailsByProcessInstanceIds(Collection<String> historicProcessInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricDetailForProcessInstanceIds", createSafeInValuesList(historicProcessInstanceIds), HistoricDetailEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricDetailForProcessInstanceIds", createSafeInValuesList(historicProcessInstanceIds), HistoricDetailEntity.class);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricDetailsByTaskIds(Collection<String> taskIds) {
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricDetailForTaskIds", createSafeInValuesList(taskIds), HistoricDetailEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricDetailForTaskIds", createSafeInValuesList(taskIds), HistoricDetailEntity.class);
     }
 
     @Override

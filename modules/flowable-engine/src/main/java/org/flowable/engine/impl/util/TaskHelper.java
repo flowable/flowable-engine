@@ -491,6 +491,27 @@ public class TaskHelper {
             }
         }
     }
+    
+    public static void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration.getHistoryManager().isHistoryEnabled()) {
+            List<String> taskIds = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskInstanceEntityManager()
+                    .findHistoricTaskIdsForProcessInstanceIds(processInstanceIds);
+            
+            if (taskIds != null && !taskIds.isEmpty()) {
+                processEngineConfiguration.getCommentEntityManager().bulkDeleteCommentsForTaskIds(taskIds);
+                processEngineConfiguration.getAttachmentEntityManager().bulkDeleteAttachmentsByTaskId(taskIds);
+                
+                processEngineConfiguration.getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByTaskIds(taskIds);
+                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+                processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+    
+                HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
+                historicTaskService.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+                historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
+            }
+        }
+    }
 
     public static void deleteHistoricTask(String taskId) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
