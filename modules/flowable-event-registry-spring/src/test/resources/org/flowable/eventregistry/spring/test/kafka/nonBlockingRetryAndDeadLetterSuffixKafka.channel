@@ -1,0 +1,24 @@
+{
+    "key": "nonBlockingRetryChannel",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "non-blocking-retry-test"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "customProperties": [
+        {
+            "name": "auto.offset.reset",
+            "value": "earliest"
+        }
+    ],
+    "retry": {
+        "attempts": "3",
+        "retryTopicSuffix": "-retry",
+        "dltTopicSuffix": "-dlt"
+    }
+}

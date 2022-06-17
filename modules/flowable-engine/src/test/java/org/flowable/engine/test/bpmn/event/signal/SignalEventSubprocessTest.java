@@ -671,15 +671,17 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
     public void testInterruptSubprocessOfCallActivity() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SignalEventSubprocessAndCallActivityProcess");
 
-        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertThat(parentProcess.getEndTime()).isNotNull();
+            assertThat(parentProcess.getEndTime()).isNotNull();
 
-        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("signalThrowProcess").singleResult();
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("signalThrowProcess").singleResult();
 
-        assertThat(throwProcess).isNotNull();
-        assertThat(throwProcess.getEndTime()).isNotNull();
-        assertThat(throwProcess.getEndActivityId()).isEqualTo("startSignalEvent1");
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("startSignalEvent1");
+        }
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

@@ -147,6 +147,13 @@ function _drawSendEventServiceTask(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawExternalWorkerServiceTask(element)
+{
+    _drawTask(element);
+    _drawServiceTaskIcon(paper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawDecisionTask(element)
 {
     _drawTask(element);

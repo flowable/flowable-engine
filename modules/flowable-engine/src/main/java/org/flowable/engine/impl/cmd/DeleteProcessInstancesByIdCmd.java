@@ -24,13 +24,13 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Christopher Welsch
  */
-public class BulkDeleteProcessInstancesCmd implements Command<Void>, Serializable {
+public class DeleteProcessInstancesByIdCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
     protected Collection<String> processInstanceIds;
     protected String deleteReason;
 
-    public BulkDeleteProcessInstancesCmd(Collection<String> processInstanceIds, String deleteReason) {
+    public DeleteProcessInstancesByIdCmd(Collection<String> processInstanceIds, String deleteReason) {
         this.processInstanceIds = processInstanceIds;
         this.deleteReason = deleteReason;
     }

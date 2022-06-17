@@ -18,7 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -279,18 +281,26 @@ public class VariableListenerEventSubprocessTest extends PluggableFlowableTestCa
     public void testInterruptSubprocessOfCallActivity() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("VariableEventSubprocessProcess");
 
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNotNull();
+
         // Trigger event subprocess
         runtimeService.setVariable(processInstance.getId(), "myVar", "test");
 
-        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNull();
 
-        assertThat(parentProcess.getEndTime()).isNotNull();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+            assertThat(parentProcess.getEndTime()).isNotNull();
 
-        assertThat(throwProcess).isNotNull();
-        assertThat(throwProcess.getEndTime()).isNotNull();
-        assertThat(throwProcess.getEndActivityId()).isEqualTo("startVariableListenerEvent1");
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("startVariableListenerEvent1");
+        }
+
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

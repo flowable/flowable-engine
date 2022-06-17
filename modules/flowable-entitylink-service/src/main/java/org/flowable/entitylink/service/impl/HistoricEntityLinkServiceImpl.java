@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
@@ -85,6 +86,11 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
         getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
     }
     
+    @Override
+    public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds) {
+        getHistoricEntityLinkEntityManager().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(scopeType, scopeIds);
+    }
+
     @Override
     public void deleteHistoricEntityLinksForNonExistingProcessInstances() {
         getHistoricEntityLinkEntityManager().deleteHistoricEntityLinksForNonExistingProcessInstances();

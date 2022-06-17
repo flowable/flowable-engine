@@ -12,6 +12,7 @@
  */
 package org.flowable.identitylink.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
@@ -90,6 +91,16 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
     
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds) {
+        getHistoricIdentityLinkEntityManager().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds) {
+        getHistoricIdentityLinkEntityManager().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+    }
+
     @Override
     public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
         getHistoricIdentityLinkEntityManager().deleteHistoricProcessIdentityLinksForNonExistingInstances();

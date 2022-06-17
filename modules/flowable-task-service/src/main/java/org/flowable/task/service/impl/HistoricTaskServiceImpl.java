@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -200,6 +201,13 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
     
     @Override
+    public void bulkDeleteHistoricTaskLogEntriesForTaskIds(Collection<String> taskIds) {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
+            getHistoricTaskLogEntryEntityManager().bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
+        }
+    }
+    
+    @Override
     public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
         if (this.configuration.isEnableHistoricTaskLogging()) {
             getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
@@ -217,7 +225,12 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstances(historicTaskInstanceQuery);
     }
-    
+
+    @Override
+    public void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds) {
+        getHistoricTaskInstanceEntityManager().bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+    }
+
     @Override
     public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
         getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesForNonExistingProcessInstances();

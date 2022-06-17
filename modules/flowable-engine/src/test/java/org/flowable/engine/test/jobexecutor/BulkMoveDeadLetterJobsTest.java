@@ -14,8 +14,8 @@ package org.flowable.engine.test.jobexecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -64,36 +64,29 @@ public class BulkMoveDeadLetterJobsTest extends JobExecutorTestCase {
         ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder().variable("fail", true).processDefinitionKey("failedServiceTask").start();
         ProcessInstance instance2 = runtimeService.createProcessInstanceBuilder().variable("fail", true).processDefinitionKey("failedServiceTask").start();
 
-        waitForJobExecutorToProcessAllJobs(1000, 200);
-
-        Job jobOfInstance1 = managementService.createTimerJobQuery().processInstanceId(instance1.getId()).singleResult();
-        managementService.setTimerJobRetries(jobOfInstance1.getId(), 0);
-        managementService.moveJobToDeadLetterJob(jobOfInstance1.getId());
-
-        Job jobOfInstance2 = managementService.createTimerJobQuery().processInstanceId(instance2.getId()).singleResult();
-        managementService.setTimerJobRetries(jobOfInstance2.getId(), 0);
-        managementService.moveJobToDeadLetterJob(jobOfInstance2.getId());
-
-        executeJobExecutorForTime(1000, 500);
+        waitForJobExecutorToProcessAllJobs(10000, 200);
 
         List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
-        assertThat(deadLetterJobs.size()).isEqualTo(2);
+        assertThat(deadLetterJobs).hasSize(2);
 
         runtimeService.setVariable(instance1.getId(), "fail", false);
         runtimeService.setVariable(instance2.getId(), "fail", false);
 
-        executeJobExecutorForTime(1000, 500);
+        List<String> jobIds = deadLetterJobs.stream().map(Job::getId).collect(Collectors.toList());
 
-        List<String> jobIds = new ArrayList<>(2);
-        jobIds.add(jobOfInstance1.getId());
-        jobIds.add(jobOfInstance2.getId());
+        managementService.bulkMoveDeadLetterJobs(jobIds, 3);
 
-        managementService.bulkMoveDeadLetterJobs(jobIds, 0);
+        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
 
-        executeJobExecutorForTime(1000, 500);
+        List<Job> jobs = managementService.createJobQuery().list();
+        assertThat(jobs).hasSize(2);
 
-        deadLetterJobs = managementService.createDeadLetterJobQuery().list();
-        assertThat(deadLetterJobs.size()).isEqualTo(0);
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
 
+        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createJobQuery().list()).isEmpty();
+
+        assertProcessEnded(instance1.getId());
+        assertProcessEnded(instance2.getId());
     }
 }

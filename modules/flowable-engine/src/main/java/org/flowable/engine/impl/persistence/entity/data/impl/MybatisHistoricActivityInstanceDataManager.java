@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,11 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
         getDbSqlSession().delete("bulkDeleteHistoricActivityInstances", historicActivityInstanceQuery, HistoricActivityInstanceEntityImpl.class);
     }
     
+    @Override
+    public void bulkDeleteHistoricActivityInstancesByProcessInstanceIds(Collection<String> historicProcessInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricActivityInstancesForProcessInstanceIds", createSafeInValuesList(historicProcessInstanceIds), HistoricActivityInstanceEntityImpl.class);
+    }
+
     @Override
     public void deleteHistoricActivityInstancesForNonExistingProcessInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances", null, HistoricActivityInstanceEntityImpl.class);

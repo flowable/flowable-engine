@@ -73,6 +73,6 @@ public class ContentManagementServiceTest extends AbstractFlowableContentTest {
                 .isIn("VARCHAR", "VARCHAR2", "NVARCHAR2", "nvarchar", "NVARCHAR", "CHARACTER VARYING");
 
         assertThat(tableMetaData.getColumnTypes().get(createdIndex))
-                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME");
+                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2");
     }
 }

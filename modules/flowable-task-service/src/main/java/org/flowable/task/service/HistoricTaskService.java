@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -81,11 +82,15 @@ public interface HistoricTaskService {
 
     void deleteHistoricTaskLogEntriesForTaskId(String taskId);
     
+    void bulkDeleteHistoricTaskLogEntriesForTaskIds(Collection<String> taskIds);
+    
     void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
     
     void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
     
     void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    
+    void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds);
 
     void deleteHistoricTaskInstancesForNonExistingProcessInstances();
     

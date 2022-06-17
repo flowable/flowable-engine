@@ -529,20 +529,27 @@ public class TimerEventSubprocessTest extends PluggableFlowableTestCase {
     public void testInterruptSubprocessOfCallActivity() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TimerEventSubprocessProcessAndCallActivity");
 
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNotNull();
+
         // Trigger the Event sub process
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
 
-        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNull();
 
-        assertThat(parentProcess.getEndTime()).isNotNull();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+            assertThat(parentProcess.getEndTime()).isNotNull();
 
-        assertThat(throwProcess).isNotNull();
-        assertThat(throwProcess.getEndTime()).isNotNull();
-        assertThat(throwProcess.getEndActivityId()).isEqualTo("startTimerEvent1");
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("startTimerEvent1");
+        }
     }
 }

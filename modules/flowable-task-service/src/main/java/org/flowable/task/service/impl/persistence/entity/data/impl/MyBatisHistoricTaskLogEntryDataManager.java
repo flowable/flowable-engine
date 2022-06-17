@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,11 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     @Override
     public void deleteHistoricTaskLogEntriesByTaskId(String taskId) {
         getDbSqlSession().delete("deleteHistoricTaskLogEntriesByTaskId", taskId, HistoricTaskLogEntryEntityImpl.class);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricTaskLogEntriesForTaskIds(Collection<String> taskIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskLogEntriesForTaskIds", createSafeInValuesList(taskIds), HistoricTaskLogEntryEntityImpl.class);
     }
 
     @Override

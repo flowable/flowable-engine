@@ -848,7 +848,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         changeTransformerTypeToInvalidType((HistoryJobEntity) historyJob);
 
         assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
-        waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 200L);
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(0);
 
         Job deadLetterJob = managementService.createDeadLetterJobQuery().singleResult();
@@ -874,7 +874,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         for (HistoryJob historyJob : historicJobList) {
             changeTransformerTypeToInvalidType((HistoryJobEntity) historyJob);
         }
-        waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 200L);
 
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(0);
 
@@ -977,7 +977,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertThat(originalAdvancedConfiguration).isNotEmpty();
         assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(0);
 
-        waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 200L);
 
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(0);
         Job deadLetterJob = managementService.createDeadLetterJobQuery().singleResult();

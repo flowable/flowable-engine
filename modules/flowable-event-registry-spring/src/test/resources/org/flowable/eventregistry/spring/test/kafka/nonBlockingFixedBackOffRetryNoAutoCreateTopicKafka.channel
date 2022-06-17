@@ -1,0 +1,29 @@
+{
+    "key": "fixedBackOffNoAutoCreate",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "fixed-backoff-no-auto-create"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "customProperties": [
+        {
+            "name": "auto.offset.reset",
+            "value": "earliest"
+        }
+    ],
+    "retry": {
+        "attempts": "3",
+        "retryTopicSuffix": "-retry-topic",
+        "dltTopicSuffix": "-dlt-topic",
+        "autoCreateTopics": "false",
+        "nonBlockingBackOff": {
+            "delay": "100"
+        }
+
+    }
+}

@@ -11,7 +11,7 @@
 
         <serviceTask id="failingServiceTask" activiti:async="true" activiti:class="org.flowable.engine.test.cmd.FailingDelegate">
             <extensionElements>
-                <activiti:failedJobRetryTimeCycle>R5/PT5M</activiti:failedJobRetryTimeCycle>
+                <activiti:failedJobRetryTimeCycle>R0/PT5M</activiti:failedJobRetryTimeCycle>
             </extensionElements>
         </serviceTask>
 

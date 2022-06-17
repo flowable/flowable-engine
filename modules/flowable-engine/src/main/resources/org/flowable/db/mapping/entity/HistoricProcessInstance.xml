@@ -235,6 +235,19 @@
     </foreach>
   </delete>
   
+  <delete id="bulkDeleteHistoricProcessInstancesByIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_PROCINST where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
   <!-- HISTORIC PROCESS INSTANCE RESULT MAP -->
   
   <resultMap id="historicProcessInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -329,6 +342,18 @@
     where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
   </select>
   
+  <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_ from ${prefix}ACT_HI_PROCINST where 
+    <foreach item="listItem" index="listIndex" collection="parameter">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SUPER_PROCESS_INSTANCE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </select>
 
   <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
     <if test="needsPaging">${limitBefore}</if>
