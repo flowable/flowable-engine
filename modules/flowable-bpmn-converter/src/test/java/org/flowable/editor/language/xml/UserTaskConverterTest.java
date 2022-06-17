@@ -97,4 +97,16 @@ class UserTaskConverterTest {
         
         assertThat(model.getEdgeInfo("flow1")).isNull();
     }
+
+    @BpmnXmlConverterTest("userTaskWithStringCommaSeparatedExpressionCandidates.bpmn")
+    void validateModelWithCommaSeparatedStringExpressionCandidates(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("usertask");
+
+                    assertThat(userTask.getCandidateUsers()).containsExactlyInAnyOrder("${'kermit, fozzie'}");
+                    assertThat(userTask.getCandidateGroups()).containsExactlyInAnyOrder("${'management, sales'}");
+                });
+    }
 }
