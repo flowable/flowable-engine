@@ -92,7 +92,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds" parameterType="java.util.Map">
-    delete from ${prefix}ACT_HI_ENTITYLINK LINK where SCOPE_TYPE_ = #{scopeType} and SCOPE_ID_ in
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = #{scopeType} and SCOPE_ID_ in
     <foreach item="item" index="index" collection="scopeIds" open="(" separator="," close=")">
       #{item}
     </foreach>
