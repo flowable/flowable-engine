@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.util.CmmnXmlUtil.parseDelimitedList;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,18 +52,12 @@ public class HumanTaskXmlConverter extends TaskXmlConverter {
 
         String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
         if (StringUtils.isNotEmpty(candidateUsersString)) {
-            String[] candidateUsers = candidateUsersString.split(",");
-            for (String candidateUser : candidateUsers) {
-                task.getCandidateUsers().add(candidateUser);
-            }
+            task.getCandidateUsers().addAll(parseDelimitedList(candidateUsersString));
         }
         
         String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
         if (StringUtils.isNotEmpty(candidateGroupsString)) {
-            String[] candidateGroups = candidateGroupsString.split(",");
-            for (String candidateGroup : candidateGroups) {
-                task.getCandidateGroups().add(candidateGroup);
-            }
+            task.getCandidateGroups().addAll(parseDelimitedList(candidateGroupsString));
         }
         
         return task;
