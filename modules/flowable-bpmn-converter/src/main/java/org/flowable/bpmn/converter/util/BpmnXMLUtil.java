@@ -49,8 +49,10 @@ import org.flowable.bpmn.converter.child.FlowableHttpResponseHandlerParser;
 import org.flowable.bpmn.converter.child.FlowableMapExceptionParser;
 import org.flowable.bpmn.converter.child.FormPropertyParser;
 import org.flowable.bpmn.converter.child.IOSpecificationParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.MessageEventDefinitionParser;
 import org.flowable.bpmn.converter.child.MultiInstanceParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.child.SignalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.TaskListenerParser;
 import org.flowable.bpmn.converter.child.TerminateEventDefinitionParser;
@@ -443,6 +445,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             if (ioParameter.isTransient()) {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT, "true", xtw);
             }
+
+            writeCustomAttributes(ioParameter.getAttributes().values(), xtw,
+                    InParameterParser.defaultInParameterAttributes, OutParameterParser.defaultOutParameterAttributes);
 
             xtw.writeEndElement();
         }

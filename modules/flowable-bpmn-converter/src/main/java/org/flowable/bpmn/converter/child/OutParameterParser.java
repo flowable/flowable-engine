@@ -12,17 +12,29 @@
  */
 package org.flowable.bpmn.converter.child;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.IOParameter;
 
 public class OutParameterParser extends BaseChildElementParser {
+
+    public static final List<ExtensionAttribute> defaultOutParameterAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET)
+    );
 
     @Override
     public String getElementName() {
@@ -34,31 +46,32 @@ public class OutParameterParser extends BaseChildElementParser {
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
-        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
 
-            IOParameter parameter = new IOParameter();
-            if (StringUtils.isNotEmpty(sourceExpression)) {
-                parameter.setSourceExpression(sourceExpression);
-            } else {
-                parameter.setSource(source);
-            }
-
-            parameter.setTarget(target);
-            
-            String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
-            if ("true".equalsIgnoreCase(transientValue)) {
-                parameter.setTransient(true);
-            }
-
-            if (parentElement instanceof CallActivity) {
-                ((CallActivity) parentElement).getOutParameters().add(parameter);
-                
-            } else if (parentElement instanceof CaseServiceTask) {
-                ((CaseServiceTask) parentElement).getOutParameters().add(parameter);
-            
-            } else if (parentElement instanceof Event) {
-                ((Event) parentElement).getOutParameters().add(parameter);
-            }
+        IOParameter parameter = new IOParameter();
+        if (StringUtils.isNotEmpty(sourceExpression)) {
+            parameter.setSourceExpression(sourceExpression);
+        } else {
+            parameter.setSource(source);
         }
+
+        parameter.setTarget(target);
+
+        String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+        if ("true".equalsIgnoreCase(transientValue)) {
+            parameter.setTransient(true);
+        }
+
+        BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultOutParameterAttributes);
+
+        if (parentElement instanceof CallActivity) {
+            ((CallActivity) parentElement).getOutParameters().add(parameter);
+
+        } else if (parentElement instanceof CaseServiceTask) {
+            ((CaseServiceTask) parentElement).getOutParameters().add(parameter);
+
+        } else if (parentElement instanceof Event) {
+            ((Event) parentElement).getOutParameters().add(parameter);
+        }
+
     }
 }
