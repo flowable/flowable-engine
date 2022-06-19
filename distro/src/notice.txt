@@ -130,7 +130,7 @@ org.apache.geronimo.bundles     json                        20090211_1      The 
 org.apache.groovy               groovy                      4.0.0           The Apache Software License, Version 2.0
 org.apache.groovy               groovy-jsr223               4.0.0           The Apache Software License, Version 2.0
 org.liquibase                   liquibase-core              4.5.0           Apache License, Version 2.0
-org.mybatis                     mybatis                     3.5.9           The Apache Software License, Version 2.0
+org.mybatis                     mybatis                     3.5.10          The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.7           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
 org.slf4j                       jcl-over-slf4j              1.7.36          MIT License
