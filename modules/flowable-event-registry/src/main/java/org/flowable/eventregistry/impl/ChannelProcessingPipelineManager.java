@@ -10,7 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.api;
+package org.flowable.eventregistry.impl;
+
+import org.flowable.eventregistry.api.InboundEventDeserializer;
 
 public interface ChannelProcessingPipelineManager {
     
@@ -23,9 +25,7 @@ public interface ChannelProcessingPipelineManager {
     final String DESERIALIZER_XML_TYPE = "deserializerxml";
 
     InboundEventDeserializer<?> getInboundEventDeserializer(String channelType, String deserializerType);
-    
-    InboundEventDeserializer<?> getDefaultInboundEventDeserializer(String deserializerType);
-    
+
     void registerInboundEventDeserializer(String channelType, String deserializerType, InboundEventDeserializer<?> inboundEventDeserializer);
    
 }

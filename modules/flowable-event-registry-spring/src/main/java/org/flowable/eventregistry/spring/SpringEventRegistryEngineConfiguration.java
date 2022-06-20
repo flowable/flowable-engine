@@ -27,7 +27,7 @@ import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.common.spring.SpringTransactionContextFactory;
 import org.flowable.common.spring.SpringTransactionInterceptor;
-import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
+import org.flowable.eventregistry.impl.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.EventRegistryEngines;

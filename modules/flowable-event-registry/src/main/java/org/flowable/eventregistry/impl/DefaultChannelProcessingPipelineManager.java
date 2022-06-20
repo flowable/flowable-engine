@@ -15,7 +15,6 @@ package org.flowable.eventregistry.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 
 public class DefaultChannelProcessingPipelineManager implements ChannelProcessingPipelineManager {
@@ -30,16 +29,6 @@ public class DefaultChannelProcessingPipelineManager implements ChannelProcessin
             if (channelDeserializerMap == null) {
                 return null;
             }
-        }
-        
-        return channelDeserializerMap.get(deserializerType);
-    }
-
-    @Override
-    public InboundEventDeserializer<?> getDefaultInboundEventDeserializer(String deserializerType) {
-        Map<String, InboundEventDeserializer<?>> channelDeserializerMap = eventDeserializerMap.get(CHANNEL_DEFAULT_TYPE);
-        if (channelDeserializerMap == null) {
-            return null;
         }
         
         return channelDeserializerMap.get(deserializerType);

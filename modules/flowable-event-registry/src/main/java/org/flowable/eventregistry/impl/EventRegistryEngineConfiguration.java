@@ -34,7 +34,6 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
-import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
@@ -592,7 +591,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     public void initChannelDefinitionProcessors() {
         channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this, objectMapper));
         channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this, objectMapper));
-        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper));
+        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper, this::getEventSerializerManager));
         channelModelProcessors.add(new OutboundChannelModelProcessor(objectMapper));
     }
 
