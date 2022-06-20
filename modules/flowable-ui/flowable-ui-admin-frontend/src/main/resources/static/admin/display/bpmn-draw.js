@@ -207,7 +207,7 @@ function _drawSendEventServiceTask(element, isMigrationModelElement, currentPape
 function _drawExternalWorkerServiceTask(element, isMigrationModelElement, currentPaper)
 {
     _drawTask(element, currentPaper);
-    _drawServiceTaskIcon(currentPaper, element.x - 4, element.y - 4, element);
+    _drawServiceTaskIcon(currentPaper, element.x + 4, element.y + 4, element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
