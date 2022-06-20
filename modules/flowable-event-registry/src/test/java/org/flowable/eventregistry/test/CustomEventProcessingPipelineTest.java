@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.FlowableEventInfo;
+import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
@@ -35,7 +35,6 @@ import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
@@ -231,9 +230,9 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public FlowableEventInfo<String> deserialize(Object rawEvent) {
+        public String deserialize(Object rawEvent) {
             counter.incrementAndGet();
-            return new FlowableEventInfoImpl<>(null, rawEvent.toString());
+            return rawEvent.toString();
         }
 
     }
@@ -243,7 +242,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public String detectEventDefinitionKey(FlowableEventInfo<String> event) {
+        public String detectEventDefinitionKey(String payload) {
             counter.incrementAndGet();
             return "testKey";
         }
@@ -254,7 +253,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public String detectTenantId(FlowableEventInfo<String> event) {
+        public String detectTenantId(String payload) {
             counter.incrementAndGet();
             return "testTenantId";
         }
@@ -265,7 +264,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger payloadCounter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<String> event) {
+        public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, String payload) {
             payloadCounter.incrementAndGet();
             return Collections.emptyList();
         }
@@ -321,7 +320,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
+        public Collection<EventRegistryEvent> run(String channelKey, InboundEvent rawEvent) {
             counter.incrementAndGet();
             return Collections.emptyList();
         }

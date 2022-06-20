@@ -20,6 +20,6 @@ import java.util.Collection;
  */
 public interface InboundEventProcessingPipeline {
 
-    Collection<EventRegistryEvent> run(String channelKey, Object rawEvent);
+    Collection<EventRegistryEvent> run(String channelKey, InboundEvent inboundEvent);
     
 }

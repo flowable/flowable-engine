@@ -18,6 +18,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.FlowableEventInfo;
+import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
@@ -26,6 +27,7 @@ import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 
@@ -58,8 +60,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     }
 
     @Override
-    public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
-        FlowableEventInfo<T> event = deserialize(rawEvent);
+    public Collection<EventRegistryEvent> run(String channelKey, InboundEvent inboundEvent) {
+
+        T deserializedBody = deserialize(inboundEvent.getBody());
+
+        FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody);
         
         String eventKey = detectEventDefinitionKey(event);
 
@@ -81,7 +86,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         return transform(eventInstance);
     }
 
-    public FlowableEventInfo<T> deserialize(Object rawEvent) {
+    public T deserialize(Object rawEvent) {
         return inboundEventDeserializer.deserialize(rawEvent);
     }
 

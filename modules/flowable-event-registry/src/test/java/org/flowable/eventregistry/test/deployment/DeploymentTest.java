@@ -396,7 +396,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper(), eventEngineConfiguration::getEventSerializerManager));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -463,7 +463,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper(), eventEngineConfiguration::getEventSerializerManager));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -531,7 +531,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper(), eventEngineConfiguration::getEventSerializerManager));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -674,7 +674,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         protected List<ChannelModel> registeredChannelModels = new ArrayList<>();
         
         public TestChannelModelProcessor(ObjectMapper objectMapper) {
-            super(objectMapper, eventEngineConfiguration::getEventSerializerManager);
+            super(objectMapper);
         }
 
         @Override

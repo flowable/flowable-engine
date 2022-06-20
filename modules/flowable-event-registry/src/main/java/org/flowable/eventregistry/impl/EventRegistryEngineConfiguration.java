@@ -15,9 +15,7 @@ package org.flowable.eventregistry.impl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -40,7 +38,6 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
-import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
@@ -86,8 +83,6 @@ import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventChannelAdap
 import org.flowable.eventregistry.impl.pipeline.InMemoryOutboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.pipeline.InboundChannelModelProcessor;
 import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
-import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
-import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
@@ -159,10 +154,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected OutboundEventProcessor outboundEventProcessor;
     protected OutboundEventProcessor systemOutboundEventProcessor;
     
-    protected ChannelProcessingPipelineManager eventSerializerManager;
-    protected Map<String, InboundEventDeserializer<?>> defaultEventDeserializers;
-    protected Map<String, Map<String, InboundEventDeserializer<?>>> channelEventDeserializers;
-
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
     protected long eventRegistryChangeDetectionInitialDelayInMs = 10000L;
@@ -261,7 +252,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initInboundEventProcessor();
         initOutboundEventProcessor();
         initSystemOutboundEventProcessor();
-        initEventSerializerManager();
         initChannelDefinitionProcessors();
         initDeployers();
         initInboundChannelModelCacheManager();
@@ -558,40 +548,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         this.eventRegistry.setSystemOutboundEventProcessor(systemOutboundEventProcessor);
     }
     
-    public void initEventSerializerManager() {
-        if (this.eventSerializerManager == null) {
-            this.eventSerializerManager = new DefaultChannelProcessingPipelineManager();
-        }
-        
-        initDefaultEventDeserializers();
-        
-        for (String deserializerType : defaultEventDeserializers.keySet()) {
-            this.eventSerializerManager.registerInboundEventDeserializer(ChannelProcessingPipelineManager.CHANNEL_DEFAULT_TYPE, deserializerType, 
-                    defaultEventDeserializers.get(deserializerType));
-        }
-        
-        if (channelEventDeserializers != null) {
-            for (String channelType : channelEventDeserializers.keySet()) {
-                Map<String, InboundEventDeserializer<?>> channelDeserializerMap = channelEventDeserializers.get(channelType);
-                for (String deserializerType : channelDeserializerMap.keySet()) {
-                    this.eventSerializerManager.registerInboundEventDeserializer(channelType, deserializerType, channelDeserializerMap.get(deserializerType));
-                }
-            }
-        }
-    }
-    
-    public void initDefaultEventDeserializers() {
-        if (defaultEventDeserializers == null) {
-            defaultEventDeserializers = new HashMap<>();
-            defaultEventDeserializers.put(ChannelProcessingPipelineManager.DESERIALIZER_JSON_TYPE, new StringToJsonDeserializer());
-            defaultEventDeserializers.put(ChannelProcessingPipelineManager.DESERIALIZER_XML_TYPE, new StringToXmlDocumentDeserializer());
-        }
-    }
-
     public void initChannelDefinitionProcessors() {
         channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this, objectMapper));
         channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this, objectMapper));
-        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper, this::getEventSerializerManager));
+        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper));
         channelModelProcessors.add(new OutboundChannelModelProcessor(objectMapper));
     }
 
@@ -814,57 +774,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setChannelModelProcessors(Collection<ChannelModelProcessor> channelModelProcessors) {
         this.channelModelProcessors = channelModelProcessors;
-        return this;
-    }
-
-    public ChannelProcessingPipelineManager getEventSerializerManager() {
-        return eventSerializerManager;
-    }
-
-    public EventRegistryEngineConfiguration setEventSerializerManager(ChannelProcessingPipelineManager eventSerializerManager) {
-        this.eventSerializerManager = eventSerializerManager;
-        return this;
-    }
-
-    public Map<String, InboundEventDeserializer<?>> getDefaultEventDeserializers() {
-        return defaultEventDeserializers;
-    }
-    
-    public void addDefaultEventDeserializer(String deserializerType, InboundEventDeserializer<?> inboundEventDeserializer) {
-        if (defaultEventDeserializers == null) {
-            defaultEventDeserializers = new HashMap<>();
-        }
-        
-        defaultEventDeserializers.put(deserializerType, inboundEventDeserializer);
-    }
-
-    public EventRegistryEngineConfiguration setDefaultEventDeserializers(Map<String, InboundEventDeserializer<?>> defaultEventDeserializers) {
-        this.defaultEventDeserializers = defaultEventDeserializers;
-        return this;
-    }
-
-    public Map<String, Map<String, InboundEventDeserializer<?>>> getChannelEventDeserializers() {
-        return channelEventDeserializers;
-    }
-    
-    public void addChannelEventDeserializer(String channelType, String deserializerType, InboundEventDeserializer<?> inboundEventDeserializer) {
-        if (channelEventDeserializers == null) {
-            channelEventDeserializers = new HashMap<>();
-        }
-        
-        Map<String, InboundEventDeserializer<?>> channelDeserializerMap = null;
-        if (channelEventDeserializers.containsKey(channelType)) {
-            channelDeserializerMap = channelEventDeserializers.get(channelType);
-        } else {
-            channelDeserializerMap = new HashMap<>();
-        }
-        
-        channelDeserializerMap.put(deserializerType, inboundEventDeserializer);
-        channelEventDeserializers.put(channelType, channelDeserializerMap);
-    }
-
-    public EventRegistryEngineConfiguration setChannelEventDeserializers(Map<String, Map<String, InboundEventDeserializer<?>>> channelEventDeserializers) {
-        this.channelEventDeserializers = channelEventDeserializers;
         return this;
     }
 

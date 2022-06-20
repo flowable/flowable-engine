@@ -19,6 +19,6 @@ import org.flowable.eventregistry.model.InboundChannelModel;
  */
 public interface InboundEventProcessor {
 
-    void eventReceived(InboundChannelModel channelModel, Object event);
+    void eventReceived(InboundChannelModel channelModel, InboundEvent event);
 
 }

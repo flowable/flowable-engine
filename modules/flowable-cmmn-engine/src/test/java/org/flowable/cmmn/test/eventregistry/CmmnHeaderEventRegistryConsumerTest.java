@@ -16,33 +16,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.InboundEventDeserializer;
-import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
-import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
+import org.flowable.eventregistry.impl.DefaultInboundEvent;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -74,17 +66,14 @@ public class CmmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryCm
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
         beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
-        beans.put("testDeserializer", new TestDeserializer());
-        beans.put("testInboundEventKeyDetector", new TestInboundEventKeyDetector());
-        beans.put("testInboundEventPayloadExtractor", new TestInboundEventPayloadExtractor());
 
         getEventRepositoryService().createInboundChannelModelBuilder()
                 .key("test-channel")
                 .resourceName("test.channel")
                 .channelAdapter("${inboundEventChannelAdapter}")
-                .delegateExpressionDeserializer("${testDeserializer}")
-                .delegateExpressionKeyDetector("${testInboundEventKeyDetector}")
-                .payloadExtractor("${testInboundEventPayloadExtractor}")
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("type")
+                .jsonFieldsMapDirectlyToPayload()
                 .deploy();
 
         return inboundEventChannelAdapter;
@@ -137,11 +126,12 @@ public class CmmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryCm
 
         public void triggerTestEventWithHeaders(String customerId, String headerValue1, Integer headerValue2) {
             ObjectNode eventNode = createTestEventNode(customerId, null);
-            ObjectNode headersNode = eventNode.putObject("headers");
-            headersNode.put("headerProperty1", headerValue1);
-            headersNode.put("headerProperty2", headerValue2);
+            Map<String, Object> headers = new HashMap<>();
+            headers.put("headerProperty1", headerValue1);
+            headers.put("headerProperty2", headerValue2);
             try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
+                String event = objectMapper.writeValueAsString(eventNode);
+                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -165,44 +155,4 @@ public class CmmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryCm
 
     }
 
-    protected class TestDeserializer implements InboundEventDeserializer<JsonNode> {
-
-        @Override
-        public FlowableEventInfo<JsonNode> deserialize(Object rawEvent) {
-            try {
-                Map<String, Object> headerMap = new HashMap<>();
-                JsonNode eventNode = getEventRegistryEngineConfiguration().getObjectMapper().readTree(rawEvent.toString());
-                JsonNode headersNode = eventNode.get("headers");
-                if (headersNode != null) {
-                    Iterator<String> itHeader = headersNode.fieldNames();
-                    while (itHeader.hasNext()) {
-                        String headerKey = itHeader.next();
-                        JsonNode headerValue = headersNode.get(headerKey);
-                        if (NumberUtils.isCreatable(headerValue.asText())) {
-                            headerMap.put(headerKey, headersNode.get(headerKey).asInt());
-                        } else {
-                            headerMap.put(headerKey, headersNode.get(headerKey).asText());
-                        }
-                    }
-                }
-                
-                return new FlowableEventInfoImpl<>(headerMap, eventNode);
-                
-            } catch (Exception e) {
-                throw new FlowableException("Error reading event json", e);
-            }
-        }
-    }
-    
-    protected class TestInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
-        
-        @Override
-        public String detectEventDefinitionKey(FlowableEventInfo<JsonNode> event) {
-            return event.getPayload().get("type").asText();
-        }
-    }
-    
-    protected class TestInboundEventPayloadExtractor extends JsonFieldToMapPayloadExtractor {
-
-    }
 }

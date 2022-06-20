@@ -12,16 +12,21 @@
  */
 package org.flowable.eventregistry.api;
 
+import java.util.Collection;
+
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.model.EventModel;
+
 /**
- * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 @FunctionalInterface
-public interface InboundEventTenantDetector<T> {
+public interface InboundEventInfoAwarePayloadExtractor<T> extends InboundEventPayloadExtractor<T> {
 
-    String detectTenantId(T payload);
-
-    default String detectTenantId(FlowableEventInfo<T> event) {
-        return detectTenantId(event.getPayload());
+    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload) {
+        throw new UnsupportedOperationException("Payload extraction should never call this ");
     }
+
+    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event);
 
 }
