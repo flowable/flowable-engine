@@ -30,6 +30,7 @@ import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 /**
  * @author Joram Barrez
@@ -60,11 +61,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     }
 
     @Override
-    public Collection<EventRegistryEvent> run(String channelKey, InboundEvent inboundEvent) {
+    public Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent inboundEvent) {
 
         T deserializedBody = deserialize(inboundEvent.getBody());
 
-        FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody);
+        FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody, inboundChannel);
         
         String eventKey = detectEventDefinitionKey(event);
 

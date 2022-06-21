@@ -320,7 +320,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventRegistryEvent> run(String channelKey, InboundEvent rawEvent) {
+        public Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent rawEvent) {
             counter.incrementAndGet();
             return Collections.emptyList();
         }

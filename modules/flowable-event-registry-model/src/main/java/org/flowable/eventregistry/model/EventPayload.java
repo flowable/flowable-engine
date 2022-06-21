@@ -14,6 +14,7 @@ package org.flowable.eventregistry.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -27,7 +28,8 @@ public class EventPayload {
     protected boolean header;
     protected boolean correlationParameter;
     protected boolean isFullPayload;
-    
+    protected boolean metaParameter;
+
     public EventPayload() {}
 
     public EventPayload(String name, String type) {
@@ -104,6 +106,20 @@ public class EventPayload {
         return payload;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isMetaParameter() {
+        return metaParameter;
+    }
+
+    public void setMetaParameter(boolean metaParameter) {
+        this.metaParameter = metaParameter;
+    }
+
+    @JsonIgnore
+    public boolean isNotForBody() {
+        return header || isFullPayload || metaParameter;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -114,7 +130,7 @@ public class EventPayload {
         }
         EventPayload that = (EventPayload) o;
         return Objects.equals(name, that.name) && Objects.equals(type, that.type) && correlationParameter == that.correlationParameter
-                && header == that.header && isFullPayload == that.isFullPayload;
+                && header == that.header && isFullPayload == that.isFullPayload && metaParameter == that.metaParameter;
     }
 
     @Override

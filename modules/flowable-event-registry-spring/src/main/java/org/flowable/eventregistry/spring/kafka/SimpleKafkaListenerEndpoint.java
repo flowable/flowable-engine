@@ -13,26 +13,30 @@
 package org.flowable.eventregistry.spring.kafka;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.kafka.config.KafkaListenerEndpoint;
 import org.springframework.kafka.listener.GenericMessageListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.TopicPartitionOffset;
 import org.springframework.kafka.support.converter.MessageConverter;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Filip Hrisafov
  */
-public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint {
+public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint, InitializingBean {
 
     protected String id;
     protected String groupId;
     protected Collection<String> topics;
     protected Pattern topicPattern;
+    protected Collection<TopicPartitionOffset> topicPartitions;
     protected String clientIdPrefix;
     protected Integer concurrency;
     protected Properties consumerProperties;
@@ -73,7 +77,7 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
 
     @Override
     public Collection<String> getTopics() {
-        return topics;
+        return topics != null ? topics : Collections.emptyList();
     }
 
     public void setTopics(Collection<String> topics) {
@@ -82,7 +86,11 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
 
     @Override
     public TopicPartitionOffset[] getTopicPartitionsToAssign() {
-        return new TopicPartitionOffset[0];
+        return topicPartitions == null ? null : topicPartitions.toArray(new TopicPartitionOffset[0]);
+    }
+
+    public void setTopicPartitions(Collection<TopicPartitionOffset> topicPartitions) {
+        this.topicPartitions = topicPartitions;
     }
 
     @Override
@@ -143,10 +151,28 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint 
     }
 
     @Override
+    public void afterPropertiesSet() throws Exception {
+        boolean topicsEmpty = getTopics().isEmpty();
+        boolean topicPartitionsEmpty = ObjectUtils.isEmpty(getTopicPartitionsToAssign());
+        if (!topicsEmpty && !topicPartitionsEmpty) {
+            throw new IllegalStateException("Topics or topicPartitions must be provided but not both for " + this);
+        }
+        if (this.topicPattern != null && (!topicsEmpty || !topicPartitionsEmpty)) {
+            throw new IllegalStateException("Only one of topics, topicPartitions or topicPattern must are allowed for "
+                    + this);
+        }
+        if (this.topicPattern == null && topicsEmpty && topicPartitionsEmpty) {
+            throw new IllegalStateException("At least one of topics, topicPartitions or topicPattern must be provided "
+                    + "for " + this);
+        }
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "[" + this.id
             + "] topics=" + this.topics
             + "' | topicPattern='" + this.topicPattern + "'"
+            + "' | topicPartitions='" + this.topicPartitions + "'"
             + " | messageListener='" + messageListener + "'";
     }
 }

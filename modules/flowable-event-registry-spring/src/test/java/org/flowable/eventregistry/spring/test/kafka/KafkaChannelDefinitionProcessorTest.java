@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.awaitility.Awaitility.await;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
@@ -71,7 +74,9 @@ import org.springframework.test.context.TestPropertySource;
  */
 @KafkaEventTest
 @TestPropertySource(properties = {
-        "application.test.kafka-topic=test-expression-customer"
+        "application.test.kafka-topic=test-expression-customer",
+        "application.test.kafka-partition1=0-2",
+        "application.test.kafka-partition2=3-4",
 })
 class KafkaChannelDefinitionProcessorTest {
 
@@ -627,6 +632,263 @@ class KafkaChannelDefinitionProcessorTest {
                 tuple("testDoubleHeader", 12.3)
             );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+    }
+
+    @Test
+    void eventWithConsumerRecordInformation() throws Exception {
+        createTopic("test-customer-multi-partition", 2);
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .payload("receivedTopic", EventPayloadTypes.STRING)
+            .payload("receivedOffset", EventPayloadTypes.LONG)
+            .payload("receivedPartition", EventPayloadTypes.INTEGER)
+            .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/consumerRecordInformationToEventKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>("test-customer-multi-partition", 0, null, "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog 1\""
+                + "}");
+        kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        producerRecord = new ProducerRecord<>("test-customer-multi-partition", 1, null, "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog 2\""
+                + "}");
+        kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        producerRecord = new ProducerRecord<>("test-customer-multi-partition", 0, null, "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Fozzie the Bear 1\""
+                + "}");
+        kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSize(3));
+
+        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Kermit the Frog 1"),
+                tuple("receivedTopic", "test-customer-multi-partition"),
+                tuple("receivedPartition", 0),
+                tuple("receivedOffset", 0L)
+            );
+
+        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Kermit the Frog 2"),
+                tuple("receivedTopic", "test-customer-multi-partition"),
+                tuple("receivedPartition", 1),
+                tuple("receivedOffset", 0L)
+            );
+
+        event = (EventInstance) testEventConsumer.getEvents().get(2).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Fozzie the Bear 1"),
+                tuple("receivedTopic", "test-customer-multi-partition"),
+                tuple("receivedPartition", 0),
+                tuple("receivedOffset", 1L)
+            );
+    }
+
+    @Test
+    void eventWithConsumerRecordInformationAndHeader() throws Exception {
+        createTopic("test-customer-header-and-consumer");
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .payload("topic", EventPayloadTypes.STRING)
+            .payload("offset", EventPayloadTypes.LONG)
+            .payload("partition", EventPayloadTypes.INTEGER)
+            .header("testHeader", EventPayloadTypes.STRING)
+            .deploy();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/consumerRecordAndHeaderInformationToEventKafka.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>("test-customer-header-and-consumer", 0, (Object) null, "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}", Collections.singleton(new RecordHeader("testHeader", "Kermit header".getBytes(StandardCharsets.UTF_8))));
+        kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        producerRecord = new ProducerRecord<>("test-customer-header-and-consumer", 0, (Object) null, "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Fozzie the Bear\""
+                + "}", Collections.singleton(new RecordHeader("testHeader", "Fozzie header".getBytes(StandardCharsets.UTF_8))));
+        kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSize(2));
+
+        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Kermit the Frog"),
+                tuple("testHeader", "Kermit header"),
+                tuple("topic", "test-customer-header-and-consumer"),
+                tuple("offset", 0L)
+            );
+
+        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("name", "Fozzie the Bear"),
+                tuple("testHeader", "Fozzie header"),
+                tuple("topic", "test-customer-header-and-consumer"),
+                tuple("offset", 1L)
+            );
+    }
+
+    @Test
+    void differentConsumersListenerOnDifferentPartitions() throws Exception {
+        createTopic("test-customer-split-partitions", 8);
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .payload("topic", EventPayloadTypes.STRING)
+            .payload("partition", EventPayloadTypes.INTEGER)
+            .deploy();
+
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsKafkaPart1.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        String kafkaEvent = "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}";
+        // Send to partitions 0-4, 6-7
+        kafkaTemplate.send("test-customer-split-partitions", 0,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 1,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 2,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 3,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 4,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 6,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 7,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+
+        // We should only receive the events that were send to partitions 0-3, 6-7
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSize(6));
+
+        eventRepositoryService.deleteDeployment(deployment.getId());
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("partition"))
+                .containsExactlyInAnyOrder(0, 1, 2, 4, 6, 7);
+        testEventConsumer.clear();
+
+        eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsKafkaPart2.channel")
+                .deploy();
+
+
+        // Send to partition 5
+        kafkaTemplate.send("test-customer-split-partitions", 5,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+
+        // The rest of the events should be received 3 and 5 using the second channel
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .hasSize(2));
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("partition"))
+                .containsExactlyInAnyOrder(3, 5);
+    }
+
+    @Test
+    void differentConsumersListenerOnDifferentPartitionsUsingExpression() throws Exception {
+        createTopic("test-customer-split-partitions-expression", 5);
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .payload("name", EventPayloadTypes.STRING)
+            .payload("topic", EventPayloadTypes.STRING)
+            .payload("partition", EventPayloadTypes.INTEGER)
+            .deploy();
+
+        EventDeployment deployment = eventRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsUsingExpression.channel")
+                .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        String kafkaEvent = "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}";
+        // Send to partitions 0-4
+        kafkaTemplate.send("test-customer-split-partitions-expression", 0,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 1,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 2,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 3,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 4,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+
+        // We should only receive the events that were send to partitions 3-4
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSize(2));
+
+        eventRepositoryService.deleteDeployment(deployment.getId());
+
+        assertThat(testEventConsumer.getEventInstancePayloadValues("partition"))
+                .containsExactlyInAnyOrder(3, 4);
     }
 
     @Test
@@ -1968,9 +2230,276 @@ class KafkaChannelDefinitionProcessorTest {
         }
     }
 
-    protected void createTopic(String topicName) {
+    @Test
+    void kafkaOutboundChannelShouldUseEventPayloadForPartition() {
+        createTopic("test-custom-partition", 2);
 
-        CreateTopicsResult topicsResult = adminClient.createTopics(Collections.singleton(new NewTopic(topicName, 1, (short) 1)));
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testCustomPartition", "testClientCustomPartition")) {
+            consumer.subscribe(Collections.singleton("test-custom-partition"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .metaParameter("partition", EventPayloadTypes.INTEGER)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomPartitionFromEvent.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("customPartition");
+            EventPayload customer = new EventPayload("customer", EventPayloadTypes.STRING);
+            EventPayload name = new EventPayload("name", EventPayloadTypes.STRING);
+            EventPayload partition = new EventPayload("partition", EventPayloadTypes.STRING);
+            partition.setMetaParameter(true);
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(customer, "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(name, "Kermit the Frog"));
+            payloadInstances.add(new EventPayloadInstanceImpl(partition, "0"));
+
+            EventInstance event = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Arrays.asList(
+                    new TopicPartition("test-custom-partition", 0),
+                    new TopicPartition("test-custom-partition", 1)
+            ));
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                        assertThat(record.partition()).isEqualTo(0);
+                    });
+
+            payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(customer, "fozzie"));
+            payloadInstances.add(new EventPayloadInstanceImpl(name, "Fozzie the Bear"));
+            payloadInstances.add(new EventPayloadInstanceImpl(partition, 1));
+            event = new EventInstanceImpl("customer", payloadInstances);
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'fozzie',"
+                                        + "  name: 'Fozzie the Bear'"
+                                        + "}");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseRoundRobinForPartition() {
+        createTopic("test-custom-partition-round-robin", 5);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testCustomPartitionRoundRobin", "testClientCustomPartitionRoundRobin")) {
+            consumer.subscribe(Collections.singleton("test-custom-partition-round-robin"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomRoundPartition.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("customPartitionRoundRobin");
+            EventPayloadInstanceImpl customer = new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(customer);
+
+            EventInstance event = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(IntStream.range(0, 5)
+                    .mapToObj(partition -> new TopicPartition("test-custom-partition-round-robin", partition))
+                    .collect(Collectors.toList()));
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'kermit' }");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+
+            customer.setValue("fozzie");
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'fozzie' }");
+                        assertThat(record.partition()).isEqualTo(2);
+                    });
+
+            customer.setValue("piggy");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'piggy' }");
+                        assertThat(record.partition()).isEqualTo(3);
+                    });
+
+            customer.setValue("gonzo");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'gonzo' }");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseRoundRobinForPartitionWithExpression() {
+        createTopic("test-custom-partition-round-robin-expression", 5);
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testCustomPartitionRoundRobin", "testClientCustomPartitionRoundRobin")) {
+            consumer.subscribe(Collections.singleton("test-custom-partition-round-robin-expression"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomRoundPartitionExpression.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("customPartitionRoundRobin");
+            EventPayloadInstanceImpl customer = new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(customer);
+
+            EventInstance event = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(IntStream.range(0, 5)
+                    .mapToObj(partition -> new TopicPartition("test-custom-partition-round-robin-expression", partition))
+                    .collect(Collectors.toList()));
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'kermit' }");
+                        assertThat(record.partition()).isEqualTo(0);
+                    });
+
+            customer.setValue("fozzie");
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'fozzie' }");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+
+            customer.setValue("piggy");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'piggy' }");
+                        assertThat(record.partition()).isEqualTo(2);
+                    });
+
+            customer.setValue("gonzo");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'gonzo' }");
+                        assertThat(record.partition()).isEqualTo(0);
+                    });
+        }
+    }
+
+    protected void createTopic(String topicName) {
+        createTopic(topicName, 1);
+    }
+
+    protected void createTopic(String topicName, int numPartitions) {
+
+        CreateTopicsResult topicsResult = adminClient.createTopics(Collections.singleton(new NewTopic(topicName, numPartitions, (short) 1)));
         try {
             topicsResult.all().get(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {

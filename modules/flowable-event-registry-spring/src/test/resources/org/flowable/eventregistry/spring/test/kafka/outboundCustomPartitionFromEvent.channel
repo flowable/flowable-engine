@@ -1,0 +1,11 @@
+{
+    "key": "customPartition",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-custom-partition",
+    "serializerType": "json",
+    "partition": {
+        "eventField": "partition"
+    }
+}

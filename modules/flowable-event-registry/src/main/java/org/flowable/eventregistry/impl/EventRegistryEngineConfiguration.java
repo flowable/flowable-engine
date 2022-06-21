@@ -15,7 +15,9 @@ package org.flowable.eventregistry.impl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -38,6 +40,7 @@ import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
+import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
@@ -57,6 +60,7 @@ import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDete
 import org.flowable.eventregistry.impl.management.DefaultEventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.parser.ChannelDefinitionParseFactory;
 import org.flowable.eventregistry.impl.parser.EventDefinitionParseFactory;
+import org.flowable.eventregistry.impl.payload.HeadersPayloadExtractor;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.Deployer;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
@@ -153,6 +157,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected InboundEventProcessor inboundEventProcessor;
     protected OutboundEventProcessor outboundEventProcessor;
     protected OutboundEventProcessor systemOutboundEventProcessor;
+
+    protected Map<String, InboundEventPayloadExtractor<?>> inboundEventPayloadExtractorsByChannelType;
+    protected InboundEventPayloadExtractor<?> defaultInboundEventPayloadExtractor;
     
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
@@ -252,6 +259,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initInboundEventProcessor();
         initOutboundEventProcessor();
         initSystemOutboundEventProcessor();
+        initInboundEventPayloadExtractorProvider();
         initChannelDefinitionProcessors();
         initDeployers();
         initInboundChannelModelCacheManager();
@@ -547,11 +555,17 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         }
         this.eventRegistry.setSystemOutboundEventProcessor(systemOutboundEventProcessor);
     }
+
+    public void initInboundEventPayloadExtractorProvider() {
+        if (this.defaultInboundEventPayloadExtractor == null) {
+            this.defaultInboundEventPayloadExtractor = new HeadersPayloadExtractor<>();
+        }
+    }
     
     public void initChannelDefinitionProcessors() {
         channelModelProcessors.add(new DelegateExpressionInboundChannelModelProcessor(this, objectMapper));
         channelModelProcessors.add(new DelegateExpressionOutboundChannelModelProcessor(this, objectMapper));
-        channelModelProcessors.add(new InboundChannelModelProcessor(objectMapper));
+        channelModelProcessors.add(new InboundChannelModelProcessor(this, objectMapper));
         channelModelProcessors.add(new OutboundChannelModelProcessor(objectMapper));
     }
 
@@ -669,6 +683,41 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setSystemOutboundEventProcessor(OutboundEventProcessor systemOutboundEventProcessor) {
         this.systemOutboundEventProcessor = systemOutboundEventProcessor;
+        return this;
+    }
+
+    public Map<String, InboundEventPayloadExtractor<?>> getInboundEventPayloadExtractorsByChannelType() {
+        return inboundEventPayloadExtractorsByChannelType;
+    }
+
+    public EventRegistryEngineConfiguration setInboundEventPayloadExtractorsByChannelType(Map<String, InboundEventPayloadExtractor<?>> inboundEventPayloadExtractorsByChannelType) {
+        this.inboundEventPayloadExtractorsByChannelType = inboundEventPayloadExtractorsByChannelType;
+        return this;
+    }
+
+    public EventRegistryEngineConfiguration registerInboundEventPayloadExtractor(String channelType, InboundEventPayloadExtractor<?> payloadExtractor) {
+        if (this.inboundEventPayloadExtractorsByChannelType == null) {
+            this.inboundEventPayloadExtractorsByChannelType = new HashMap<>();
+        }
+
+        this.inboundEventPayloadExtractorsByChannelType.put(channelType, payloadExtractor);
+        return this;
+    }
+
+    public EventRegistryEngineConfiguration removeInboundEventPayloadExtractor(String channelType) {
+        if (this.inboundEventPayloadExtractorsByChannelType != null) {
+            this.inboundEventPayloadExtractorsByChannelType.remove(channelType);
+        }
+
+        return this;
+    }
+
+    public InboundEventPayloadExtractor<?> getDefaultInboundEventPayloadExtractor() {
+        return defaultInboundEventPayloadExtractor;
+    }
+
+    public EventRegistryEngineConfiguration setDefaultInboundEventPayloadExtractor(InboundEventPayloadExtractor<?> defaultInboundEventPayloadExtractor) {
+        this.defaultInboundEventPayloadExtractor = defaultInboundEventPayloadExtractor;
         return this;
     }
 

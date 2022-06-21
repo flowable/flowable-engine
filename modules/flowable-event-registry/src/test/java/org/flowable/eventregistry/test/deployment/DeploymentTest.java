@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
@@ -396,7 +397,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration, eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -463,7 +464,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration, eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -531,7 +532,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             for (int i = 0; i < channelModelProcessors.size(); i++) {
                 ChannelModelProcessor channelModelProcessor = channelModelProcessors.get(i);
                 if (channelModelProcessor instanceof TestChannelModelProcessor) {
-                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration.getObjectMapper()));
+                    channelModelProcessors.set(i, new InboundChannelModelProcessor(eventEngineConfiguration, eventEngineConfiguration.getObjectMapper()));
                 }
             }
             
@@ -674,7 +675,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         protected List<ChannelModel> registeredChannelModels = new ArrayList<>();
         
         public TestChannelModelProcessor(ObjectMapper objectMapper) {
-            super(objectMapper);
+            super(eventEngineConfiguration, objectMapper);
         }
 
         @Override

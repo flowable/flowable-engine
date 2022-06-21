@@ -62,7 +62,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
                 throw new FlowableException("Could not find an outbound channel adapter for channel " + channelModel.getKey());
             }
             
-            outboundEventChannelAdapter.sendEvent(rawEvent, headerMap);
+            outboundEventChannelAdapter.sendEvent(new DefaultOutboundEvent(rawEvent, eventInstance, headerMap));
         }
     }
 

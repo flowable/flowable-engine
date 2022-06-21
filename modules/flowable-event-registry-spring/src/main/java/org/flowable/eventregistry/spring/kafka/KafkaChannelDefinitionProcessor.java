@@ -15,9 +15,11 @@ package org.flowable.eventregistry.spring.kafka;
 import java.lang.reflect.Field;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -25,10 +27,12 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -109,6 +113,8 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
 
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 
+    protected static final int DEFAULT_PARTITION_FOR_MANUAL_ASSIGNMENT = 0;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected KafkaOperations<Object, Object> kafkaOperations;
@@ -169,6 +175,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         endpoint.setGroupId(getEndpointGroupId(channelModel, endpoint.getId()));
         endpoint.setTopics(resolveTopics(channelModel));
         endpoint.setTopicPattern(resolvePattern(channelModel));
+        endpoint.setTopicPartitions(resolveTopicPartitions(channelModel));
         endpoint.setClientIdPrefix(resolveExpressionAsString(channelModel.getClientIdPrefix(), "clientIdPrefix"));
 
         endpoint.setConcurrency(resolveExpressionAsInteger(channelModel.getConcurrency(), "concurrency"));
@@ -212,8 +219,21 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
 
         if (retryTopicConfiguration != null) {
 
-            Collection<String> topics = mainEndpoint.getTopics();
-            if (topics == null || topics.isEmpty()) {
+            Collection<String> topics;
+            if (mainEndpoint.getTopics().isEmpty()) {
+                TopicPartitionOffset[] topicPartitionsToAssign = mainEndpoint.getTopicPartitionsToAssign();
+                if (topicPartitionsToAssign != null && topicPartitionsToAssign.length > 0) {
+                    topics = Arrays.stream(topicPartitionsToAssign)
+                            .map(TopicPartitionOffset::getTopic)
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+                } else {
+                    topics = Collections.emptyList();
+                }
+            } else {
+                topics = mainEndpoint.getTopics();
+            }
+
+            if (topics.isEmpty()) {
                 throw new FlowableException("Channel model " + channelModel.getKey() + " in tenant " + tenantId
                         + " has retry configuration but no topics have been provided for it");
             }
@@ -252,7 +272,13 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                     SimpleKafkaListenerEndpoint<?, ?> simpleEndpoint = (SimpleKafkaListenerEndpoint<?, ?>) endpoint;
                     simpleEndpoint.setId(suffixer.maybeAddTo(simpleEndpoint.getId()));
                     simpleEndpoint.setGroupId(suffixer.maybeAddTo(simpleEndpoint.getGroupId()));
-                    simpleEndpoint.setTopics(suffixer.maybeAddTo(simpleEndpoint.getTopics()));
+                    TopicPartitionOffset[] topicPartitionsToAssign = endpoint.getTopicPartitionsToAssign();
+                    if (endpoint.getTopics().isEmpty() && topicPartitionsToAssign != null) {
+                        simpleEndpoint.setTopicPartitions(getTopicPartitions(destinationTopicProperties, suffixer,
+                                endpoint.getTopicPartitionsToAssign()));
+                    } else {
+                        simpleEndpoint.setTopics(suffixer.maybeAddTo(simpleEndpoint.getTopics()));
+                    }
                     simpleEndpoint.setClientIdPrefix(suffixer.maybeAddTo(simpleEndpoint.getClientIdPrefix()));
 
                     configurations.add(
@@ -277,6 +303,28 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         } else {
             return Collections.singleton(new Configuration(mainEndpoint, containerFactory));
         }
+    }
+
+    protected static Collection<TopicPartitionOffset> getTopicPartitions(DestinationTopic.Properties properties,
+            Suffixer suffixer,
+            TopicPartitionOffset[] topicPartitionOffsets) {
+        return Stream.of(topicPartitionOffsets)
+                .map(tpo -> properties.isMainEndpoint()
+                        ? getTPOForMainTopic(suffixer, tpo)
+                        : getTPOForRetryTopics(properties, suffixer, tpo))
+                .collect(Collectors.toList());
+    }
+
+    private static TopicPartitionOffset getTPOForRetryTopics(DestinationTopic.Properties properties, Suffixer suffixer, TopicPartitionOffset tpo) {
+        return new TopicPartitionOffset(suffixer.maybeAddTo(tpo.getTopic()),
+                tpo.getPartition() <= properties.numPartitions() ? tpo.getPartition() : DEFAULT_PARTITION_FOR_MANUAL_ASSIGNMENT);
+    }
+
+    private static TopicPartitionOffset getTPOForMainTopic(Suffixer suffixer, TopicPartitionOffset tpo) {
+        TopicPartitionOffset newTpo = new TopicPartitionOffset(suffixer.maybeAddTo(tpo.getTopic()),
+                tpo.getPartition(), tpo.getOffset(), tpo.getPosition());
+        newTpo.setRelativeToCurrent(tpo.isRelativeToCurrent());
+        return newTpo;
     }
 
     protected Consumer<Collection<String>> getTopicCreationFunction(ResolvedRetryConfiguration retryConfiguration) {
@@ -343,8 +391,11 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         String topic = channelModel.getTopic();
         if (channelModel.getOutboundEventChannelAdapter() == null && StringUtils.hasText(topic)) {
             String resolvedTopic = resolve(topic);
+
+            KafkaPartitionProvider partitionProvider = resolveKafkaPartitionProvider(channelModel);
+
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
-                            kafkaOperations, resolvedTopic, channelModel.getRecordKey()));
+                            kafkaOperations, partitionProvider, resolvedTopic, channelModel.getRecordKey()));
         }
     }
 
@@ -432,6 +483,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     protected Collection<String> resolveTopics(KafkaInboundChannelModel channelDefinition) {
         Collection<String> topics = channelDefinition.getTopics();
 
+        if (topics == null || topics.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<String> resultTopics = new ArrayList<>();
 
         for (String queue : topics) {
@@ -475,6 +530,140 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
 
         return pattern;
+    }
+
+    protected Collection<TopicPartitionOffset> resolveTopicPartitions(KafkaInboundChannelModel channelModel) {
+        Collection<KafkaInboundChannelModel.TopicPartition> topicPartitions = channelModel.getTopicPartitions();
+        if (topicPartitions == null || topicPartitions.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<TopicPartitionOffset> tps = new ArrayList<>();
+        for (KafkaInboundChannelModel.TopicPartition topicPartition : topicPartitions) {
+            String topic = resolveExpressionAsString(topicPartition.getTopic(), "topicPartitions[].topic");
+            if (!StringUtils.hasText(topic)) {
+                throw new FlowableIllegalArgumentException(
+                        "topic in topic partition in channel model [ " + channelModel.getKey() + " ] must resolve to a non empty string");
+            }
+
+            Collection<String> partitions = topicPartition.getPartitions();
+            if (partitions == null || partitions.isEmpty()) {
+                throw new FlowableIllegalArgumentException(
+                        "partitions in topic partition in channel model [ " + channelModel.getKey() + " ] must not be empty");
+            }
+
+            for (String partition : partitions) {
+                resolvePartitionAsInteger(topic, resolveExpression(partition), tps);
+            }
+
+        }
+
+        return tps;
+    }
+
+    protected void resolvePartitionAsInteger(String topic, Object resolvedValue, List<TopicPartitionOffset> result) {
+        // This is the same as it is done in the KafkaListenerAnnotationBeanPostProcessor#resolvePartitionAsInteger
+
+        if (resolvedValue instanceof String[]) {
+            for (Object object : (String[]) resolvedValue) {
+                resolvePartitionAsInteger(topic, object, result);
+            }
+        }
+        else if (resolvedValue instanceof String) {
+            Assert.state(StringUtils.hasText((String) resolvedValue),
+                    () -> "partition in TopicPartition for topic '" + topic + "' cannot be empty");
+            List<TopicPartitionOffset> collected = parsePartitions((String) resolvedValue)
+                    .map(part -> new TopicPartitionOffset(topic, part))
+                    .collect(Collectors.toList());
+            result.addAll(collected);
+        }
+        else if (resolvedValue instanceof Integer[]) {
+            for (Integer partition : (Integer[]) resolvedValue) {
+                result.add(new TopicPartitionOffset(topic, partition));
+            }
+        }
+        else if (resolvedValue instanceof Integer) {
+            result.add(new TopicPartitionOffset(topic, (Integer) resolvedValue));
+        }
+        else if (resolvedValue instanceof Iterable) {
+            //noinspection unchecked
+            for (Object object : (Iterable<Object>) resolvedValue) {
+                resolvePartitionAsInteger(topic, object, result);
+            }
+        }
+        else {
+            throw new IllegalArgumentException(
+                    "partition in TopicPartition for topic '" + topic + "' can't resolve '" + resolvedValue + "' as an Integer or String");
+        }
+    }
+
+    /**
+     * Parse a list of partitions into a {@link List}. Example: "0-5,10-15".
+     * This parsing is the same as it is done in the {@code KafkaListenerAnnotationBeanPostProcessor}.
+     *
+     * @param partsString the comma-delimited list of partitions/ranges.
+     * @return the stream of partition numbers, sorted and de-duplicated.
+     */
+    protected Stream<Integer> parsePartitions(String partsString) {
+        // This is the same as it is done in the KafkaListenerAnnotationBeanPostProcessor#parsePartitions
+        String[] partsStrings = partsString.split(",");
+        if (partsStrings.length == 1 && !partsStrings[0].contains("-")) {
+            return Stream.of(Integer.parseInt(partsStrings[0].trim()));
+        }
+        List<Integer> parts = new ArrayList<>();
+        for (String part : partsStrings) {
+            if (part.contains("-")) {
+                String[] startEnd = part.split("-");
+                Assert.state(startEnd.length == 2, "Only one hyphen allowed for a range of partitions: " + part);
+                int start = Integer.parseInt(startEnd[0].trim());
+                int end = Integer.parseInt(startEnd[1].trim());
+                Assert.state(end >= start, "Invalid range: " + part);
+                for (int i = start; i <= end; i++) {
+                    parts.add(i);
+                }
+            }
+            else {
+                parsePartitions(part).forEach(p -> parts.add(p));
+            }
+        }
+        return parts.stream()
+                .sorted()
+                .distinct();
+    }
+
+    protected KafkaPartitionProvider resolveKafkaPartitionProvider(KafkaOutboundChannelModel channelModel) {
+        KafkaOutboundChannelModel.KafkaPartition partition = channelModel.getPartition();
+        if (partition == null) {
+            return null;
+        }
+
+        if (StringUtils.hasText(partition.getEventField())) {
+            return new EventPayloadKafkaPartitionProvider(partition.getEventField());
+        } else if (StringUtils.hasText(partition.getDelegateExpression())) {
+            return resolveExpression(partition.getDelegateExpression(), KafkaPartitionProvider.class);
+        } else if (StringUtils.hasText(partition.getRoundRobin())) {
+            List<TopicPartitionOffset> tpo = new ArrayList<>();
+            resolvePartitionAsInteger(channelModel.getTopic(), resolveExpression(partition.getRoundRobin()), tpo);
+            List<Integer> partitions = new ArrayList<>(tpo.size());
+            for (TopicPartitionOffset offset : tpo) {
+                partitions.add(offset.getPartition());
+            }
+            return new RoundRobinKafkaPartitionProvider(partitions);
+        } else {
+            throw new FlowableException(
+                    "The kafka partition value was not found for the channel model with key " + channelModel.getKey()
+                            + ". One of eventField, delegateExpression should be set.");
+        }
+    }
+
+    protected <T> T resolveExpression(String expression, Class<T> type) {
+        Object value = resolveExpression(expression);
+        if (type.isInstance(value)) {
+            return type.cast(value);
+        }
+
+        throw new FlowableException("expected expression " + expression + " to resolve to " + type + " but it did not. Resolved value is " + value);
+
     }
 
     protected Object resolveExpression(String value) {

@@ -36,7 +36,7 @@ public class DefaultInboundEventProcessor implements InboundEventProcessor {
     @Override
     public void eventReceived(InboundChannelModel channelModel, InboundEvent event) {
         InboundEventProcessingPipeline inboundEventProcessingPipeline = (InboundEventProcessingPipeline) channelModel.getInboundEventProcessingPipeline();
-        Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelModel.getKey(), event);
+        Collection<EventRegistryEvent> eventRegistryEvents = inboundEventProcessingPipeline.run(channelModel, event);
 
         for (EventRegistryEvent eventRegistryEvent : eventRegistryEvents) {
             eventRegistry.sendEventToConsumers(eventRegistryEvent);

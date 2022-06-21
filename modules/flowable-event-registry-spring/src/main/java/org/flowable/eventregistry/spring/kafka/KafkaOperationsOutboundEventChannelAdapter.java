@@ -22,6 +22,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.eventregistry.api.OutboundEvent;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.springframework.kafka.core.KafkaOperations;
 
@@ -31,18 +32,22 @@ import org.springframework.kafka.core.KafkaOperations;
 public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
     protected KafkaOperations<Object, Object> kafkaOperations;
+    protected KafkaPartitionProvider partitionProvider;
     protected String topic;
     protected String key;
 
-    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, String topic, String key) {
+    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
         this.kafkaOperations = kafkaOperations;
+        this.partitionProvider = partitionProvider;
         this.topic = topic;
         this.key = key;
     }
 
     @Override
-    public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
+    public void sendEvent(OutboundEvent<String> event) {
         try {
+            String rawEvent = event.getBody();
+            Map<String, Object> headerMap = event.getHeaders();
             List<Header> headers = new ArrayList<>();
             for (String headerKey : headerMap.keySet()) {
                 Object headerValue = headerMap.get(headerKey);
@@ -51,7 +56,9 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
                 }
             }
 
-            ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, null, key, rawEvent, headers);
+            Integer partition = partitionProvider == null ? null : partitionProvider.determinePartition(event);
+
+            ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, partition, key, rawEvent, headers);
             kafkaOperations.send(producerRecord).get();
             
         } catch (InterruptedException e) {
@@ -64,5 +71,10 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
                 throw new FlowableException("failed to send event", e.getCause());
             }
         }
+    }
+
+    @Override
+    public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
+        throw new UnsupportedOperationException("Outbound processor should never call this");
     }
 }

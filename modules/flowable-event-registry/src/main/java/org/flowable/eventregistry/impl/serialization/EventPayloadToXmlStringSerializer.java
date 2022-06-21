@@ -49,7 +49,7 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
 
             if (!eventInstance.getPayloadInstances().isEmpty()) {
                 for (EventPayloadInstance payloadInstance : eventInstance.getPayloadInstances()) {
-                    if (!payloadInstance.getEventPayloadDefinition().isHeader()) {
+                    if (!payloadInstance.getEventPayloadDefinition().isNotForBody()) {
                         Element element = doc.createElement(payloadInstance.getDefinitionName());
                         element.setTextContent(payloadInstance.getValue().toString());
                         rootElement.appendChild(element);

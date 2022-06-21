@@ -12,16 +12,19 @@
  */
 package org.flowable.eventregistry.api;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.api.runtime.EventInstance;
 
 /**
- * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public interface InboundEventProcessingPipeline {
+public interface OutboundEvent<T> {
 
-    Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent inboundEvent);
-    
+    T getBody();
+
+    Map<String, Object> getHeaders();
+
+    EventInstance getEventInstance();
+
 }

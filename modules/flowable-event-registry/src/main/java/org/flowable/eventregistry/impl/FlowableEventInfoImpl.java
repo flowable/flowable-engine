@@ -16,15 +16,18 @@ import java.util.Map;
 
 import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEvent;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 public class FlowableEventInfoImpl<T> implements FlowableEventInfo<T> {
     
     protected InboundEvent inboundEvent;
     protected T payload;
+    protected InboundChannelModel inboundChannel;
 
-    public FlowableEventInfoImpl(InboundEvent inboundEvent, T payload) {
+    public FlowableEventInfoImpl(InboundEvent inboundEvent, T payload, InboundChannelModel inboundChannel) {
         this.inboundEvent = inboundEvent;
         this.payload = payload;
+        this.inboundChannel = inboundChannel;
     }
 
     @Override
@@ -40,5 +43,10 @@ public class FlowableEventInfoImpl<T> implements FlowableEventInfo<T> {
     @Override
     public Object getRawEvent() {
         return inboundEvent.getRawEvent();
+    }
+
+    @Override
+    public InboundChannelModel getInboundChannel() {
+        return inboundChannel;
     }
 }

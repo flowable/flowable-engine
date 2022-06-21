@@ -1,0 +1,15 @@
+{
+    "key": "exposeConsumerRecordAndHeaderInformationChannel",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "test-customer-header-and-consumer"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "topicOutputName": "topic",
+    "offsetOutputName": "offset"
+}
