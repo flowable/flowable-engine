@@ -56,4 +56,17 @@ public class ProcessInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     public void testGetUnexistingProcessInstance() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }
+
+    @Test
+    @Deployment
+    public void testGetProcessDiagramWithAnnotationOnSequenceFlow() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleProcess");
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
+                HttpStatus.SC_OK);
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
+        closeResponse(response);
+    }
 }
