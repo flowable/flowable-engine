@@ -39,11 +39,7 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
         int batchSize = processEngineConfiguration.getCleanInstancesBatchSize();
 
         HistoricProcessInstanceQuery query = processEngineConfiguration.getHistoryCleaningManager().createHistoricProcessInstanceCleaningQuery();
-        if (processEngineConfiguration.isCleanInstancesSequentially()) {
-            query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
-        } else {
-            query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
-        }
+        query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
 
         BatchQuery batchCleaningQuery = processEngineConfiguration.getHistoryCleaningManager().createBatchCleaningQuery();
         if (batchCleaningQuery != null) {

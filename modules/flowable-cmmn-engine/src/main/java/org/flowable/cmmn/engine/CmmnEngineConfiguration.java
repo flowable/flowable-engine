@@ -711,7 +711,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
     protected Duration cleanInstancesEndedAfter = Duration.ofDays(365);
     protected int cleanInstancesBatchSize = 100;
-    protected boolean cleanInstancesSequentially = false;
     protected CmmnHistoryCleaningManager cmmnHistoryCleaningManager;
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
@@ -4352,15 +4351,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCleanInstancesBatchSize(int cleanInstancesBatchSize) {
         this.cleanInstancesBatchSize = cleanInstancesBatchSize;
-        return this;
-    }
-
-    public boolean isCleanInstancesSequentially() {
-        return cleanInstancesSequentially;
-    }
-
-    public CmmnEngineConfiguration setCleanInstancesSequentially(boolean cleanInstancesSequentially) {
-        this.cleanInstancesSequentially = cleanInstancesSequentially;
         return this;
     }
 

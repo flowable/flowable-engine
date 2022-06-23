@@ -38,12 +38,8 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
 
         int batchSize = cmmnEngineConfiguration.getCleanInstancesBatchSize();
         HistoricCaseInstanceQuery query = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createHistoricCaseInstanceCleaningQuery();
-
-        if (cmmnEngineConfiguration.isCleanInstancesSequentially()) {
-            query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
-        } else {
-            query.deleteInParallelUsingBatch(batchSize, DEFAULT_BATCH_NAME);
-        }
+        
+        query.deleteSequentiallyUsingBatch(batchSize, DEFAULT_BATCH_NAME);
 
         BatchQuery batchCleaningQuery = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createBatchCleaningQuery();
         if (batchCleaningQuery != null) {

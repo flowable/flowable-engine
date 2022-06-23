@@ -141,7 +141,6 @@ public class ProcessEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -161,7 +160,6 @@ public class ProcessEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -224,7 +222,6 @@ public class ProcessEngineAutoConfigurationTest {
             assertThat(springProcessEngineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 0 1 * * ?");
             assertThat(springProcessEngineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(365));
             assertThat(springProcessEngineConfiguration.getCleanInstancesBatchSize()).isEqualTo(100);
-            assertThat(springProcessEngineConfiguration.isCleanInstancesSequentially()).isFalse();
 
             deleteDeployments(processEngine);
         });
