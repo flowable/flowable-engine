@@ -275,10 +275,10 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId()).add("notValidID");
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
         httpPost.setEntity(new StringEntity(body.toString()));
-        closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
-        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(1);
-        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(0);
         assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
 
 
