@@ -107,6 +107,15 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
     }
 
     @Override
+    public void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        parameters.put("scopeType", scopeType);
+        
+        getDbSqlSession().delete("bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType", parameters, HistoricIdentityLinkEntityImpl.class);
+    }
+
+    @Override
     public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricProcessIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);
     }

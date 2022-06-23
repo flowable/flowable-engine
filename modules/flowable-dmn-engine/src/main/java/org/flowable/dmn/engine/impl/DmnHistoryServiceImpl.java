@@ -12,11 +12,14 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import java.util.Collection;
+
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.cmd.BulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeTypeCmd;
 
 /**
  * @author Tijs Rademakers
@@ -31,5 +34,10 @@ public class DmnHistoryServiceImpl extends CommonEngineServiceImpl<DmnEngineConf
     @Override
     public NativeHistoricDecisionExecutionQuery createNativeHistoricDecisionExecutionQuery() {
         return new NativeHistoryDecisionExecutionQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public void bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType(Collection<String> instanceIds, String scopeType) {
+        commandExecutor.execute(new BulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeTypeCmd(instanceIds, scopeType));
     }
 }

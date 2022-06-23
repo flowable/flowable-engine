@@ -15,30 +15,36 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
-public class BulkDeleteHistoricCaseInstancesCmd implements Command<Object>, Serializable {
+/**
+ * @author Christopher Welsch
+ */
+public class DeleteHistoricCaseInstancesByIdCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected Collection<String> caseInstanceIds;
+    protected Collection<String> instanceIds;
 
-    public BulkDeleteHistoricCaseInstancesCmd(Collection<String> caseInstanceIds) {
-        this.caseInstanceIds = caseInstanceIds;
+    public DeleteHistoricCaseInstancesByIdCmd(Collection<String> instanceIds) {
+        this.instanceIds = instanceIds;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
-        if (caseInstanceIds == null) {
+        if (instanceIds == null) {
             throw new FlowableIllegalArgumentException("historic case instanceIds are null");
         }
-        
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
-        
+        Set<String> instanceIdSet = new HashSet<>(instanceIds);
+        for (String instanceId : instanceIdSet) {
+            DeleteHistoricCaseInstanceCmd command = new DeleteHistoricCaseInstanceCmd(instanceId);
+            command.execute(commandContext);
+        }
         return null;
     }
 

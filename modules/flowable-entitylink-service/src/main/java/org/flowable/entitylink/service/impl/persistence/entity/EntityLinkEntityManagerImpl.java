@@ -52,7 +52,7 @@ public class EntityLinkEntityManagerImpl
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
-    
+
     @Override
     public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
         return dataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);

@@ -12,6 +12,7 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,6 +223,16 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         parameters.put("scopeDefinitionId", scopeDefinitionId);
         parameters.put("scopeType", scopeType);
         getDbSqlSession().delete("deleteIdentityLinksByScopeDefinitionIdAndScopeType", parameters, IdentityLinkEntityImpl.class);
+    }
+    
+
+    @Override
+    public void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        parameters.put("scopeType", scopeType);
+        
+        getDbSqlSession().delete("bulkDeleteIdentityLinksForScopeIdsAndScopeType", parameters, IdentityLinkEntityImpl.class);
     }
 
     @Override

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -67,6 +68,38 @@ public class CmmnHistoryHelper {
         // Also delete any sub cases that may be active
         historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list()
                 .forEach(c -> deleteHistoricCaseInstance(cmmnEngineConfiguration, c.getId()));
+    }
+    
+    public static void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+
+        HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+        historicMilestoneInstanceEntityManager.bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(caseInstanceIds);
+
+        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+        historicPlanItemInstanceEntityManager.bulkDeleteHistoricPlanItemInstancesForCaseInstanceIds(caseInstanceIds);
+
+        HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
+        historicIdentityLinkService.bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+        historicIdentityLinkService.bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.PLAN_ITEM);
+        
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.CMMN, caseInstanceIds);
+        }
+
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
+        historicVariableInstanceEntityManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+
+        TaskHelper.bulkDeleteHistoricTaskInstancesByCaseInstanceIds(caseInstanceIds, cmmnEngineConfiguration);
+
+        historicCaseInstanceEntityManager.bulkDeleteHistoricCaseInstances(caseInstanceIds);
+
+        // Also delete any sub cases that may be active
+        List<String> subCaseInstanceIds = historicCaseInstanceEntityManager.findHistoricCaseInstanceIdsByParentIds(caseInstanceIds);
+        if (subCaseInstanceIds != null && !subCaseInstanceIds.isEmpty()) {
+            bulkDeleteHistoricCaseInstances(subCaseInstanceIds, cmmnEngineConfiguration);
+        }
     }
 
 }

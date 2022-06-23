@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -30,6 +31,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.entitylink.api.EntityLinkType;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.junit.jupiter.api.Test;
@@ -406,6 +409,40 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             validateEmptyHistoricDataForProcessInstance(processInstance3.getId());
             validateEmptyHistoricDataForTask(task3.getId());
 
+        } finally {
+            processEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml" })
+    public void bulkQueryOnEntityLinksTest() {
+        HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+        try {
+            processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("startToEnd")
+                    .variable("testString", "test")
+                    .start();
+            
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            
+            List<String> processInstanceIds = new ArrayList<>();
+            processInstanceIds.add(processInstance.getId());
+            List<HistoricEntityLink> historicEntityLinks = managementService.executeCommand(new Command<List<HistoricEntityLink>>() {
+
+                @Override
+                public List<HistoricEntityLink> execute(CommandContext commandContext) {
+                    return CommandContextUtil.getProcessEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getHistoricEntityLinkEntityManager()
+                            .findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(processInstanceIds, ScopeTypes.BPMN, EntityLinkType.CHILD);
+                }
+                
+            });
+            
+            assertThat(historicEntityLinks).hasSize(1);
+            assertThat(historicEntityLinks.get(0).getReferenceScopeId()).isEqualTo(task.getId());
+            assertThat(historicEntityLinks.get(0).getScopeId()).isEqualTo(processInstance.getId());
+            
         } finally {
             processEngineConfiguration.setHistoryLevel(historyLevel);
         }

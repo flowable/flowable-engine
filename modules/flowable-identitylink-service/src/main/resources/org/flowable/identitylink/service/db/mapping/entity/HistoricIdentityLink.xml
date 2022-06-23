@@ -121,15 +121,16 @@
   
   <delete id="bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType" parameterType="map">
     delete from ${prefix}ACT_HI_IDENTITYLINK where 
-    <foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
+    (<foreach item="listItem" index="listIndex" collection="scopeIds">
         <if test="listIndex &gt; 0">
         or
         </if>
-        TASK_ID_ in 
+        SCOPE_ID_ in 
         <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
           #{item}
         </foreach>
-    </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{scopeType}
   </delete>
   
   <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">

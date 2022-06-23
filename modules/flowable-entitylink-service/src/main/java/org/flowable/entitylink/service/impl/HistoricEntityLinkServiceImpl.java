@@ -47,6 +47,11 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
     }
 
     @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        return getHistoricEntityLinkEntityManager().findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(scopeIds, scopeType, linkType);
+    }
+
+    @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
         return getHistoricEntityLinkEntityManager().findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
     }

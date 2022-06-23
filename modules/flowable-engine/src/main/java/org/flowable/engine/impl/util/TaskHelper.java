@@ -499,16 +499,7 @@ public class TaskHelper {
                     .findHistoricTaskIdsForProcessInstanceIds(processInstanceIds);
             
             if (taskIds != null && !taskIds.isEmpty()) {
-                processEngineConfiguration.getCommentEntityManager().bulkDeleteCommentsForTaskIds(taskIds);
-                processEngineConfiguration.getAttachmentEntityManager().bulkDeleteAttachmentsByTaskId(taskIds);
-                
-                processEngineConfiguration.getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByTaskIds(taskIds);
-                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
-                processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
-    
-                HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
-                historicTaskService.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
-                historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
+                bulkDeleteHistoricTaskInstances(taskIds, processEngineConfiguration);
             }
         }
     }
@@ -575,6 +566,24 @@ public class TaskHelper {
             throw new FlowableException("Unable to resolve formFieldValidationExpression without variable container");
         }
         return true;
+    }
+    
+    protected static void bulkDeleteHistoricTaskInstances(Collection<String> taskIds, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
+        List<String> subTaskIds = historicTaskService.findHistoricTaskIdsByParentTaskIds(taskIds);
+        if (subTaskIds != null && !subTaskIds.isEmpty()) {
+            bulkDeleteHistoricTaskInstances(subTaskIds, processEngineConfiguration);
+        }
+        
+        processEngineConfiguration.getCommentEntityManager().bulkDeleteCommentsForTaskIds(taskIds);
+        processEngineConfiguration.getAttachmentEntityManager().bulkDeleteAttachmentsByTaskId(taskIds);
+        
+        processEngineConfiguration.getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByTaskIds(taskIds);
+        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+        processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+
+        historicTaskService.bulkDeleteHistoricTaskInstances(taskIds);
+        historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
     }
 
     protected static Boolean getBoolean(Object booleanObject) {

@@ -453,36 +453,26 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
             batch = cmmnManagementService.createBatchQuery().batchId(batchId).singleResult();
             assertThat(batch).isNotNull();
-            assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_FAILED);
+            assertThat(batch.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED);
             assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_CASE_DELETE_TYPE);
             assertThat(batch.getCompleteTime()).isNotNull();
             assertThatJson(batch.getBatchDocumentJson(ScopeTypes.CMMN))
                     .isEqualTo("{"
                             + "  numberOfInstances: 20,"
-                            + "  numberOfFailedInstances: 10,"
                             + "  batchSize: 5,"
                             + "  query: { }"
                             + "}");
 
             waitForAsyncHistoryExecutorToProcessAllJobs();
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(10);
-            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(20);
-            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
 
             for (int i = 0; i < 20; i++) {
-                if (i < 10) {
-                    assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).isEmpty();
-                    assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
-                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
-                    assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
-                            .isZero();
-                } else {
-                    assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).hasSize(1);
-                    assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(1);
-                    assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(3);
-                    assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
-                            .isEqualTo(1);
-                }
+                assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).isEmpty();
+                assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
+                assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
+                assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count()).isZero();
             }
         }
     }

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -157,6 +158,13 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
         if (getHistoryConfigurationSettings().isHistoryEnabled()) {
             CmmnHistoryHelper.deleteHistoricCaseInstance(cmmnEngineConfiguration, caseInstanceId);
+        }
+    } 
+
+    @Override
+    public void recordBulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        if (getHistoryConfigurationSettings().isHistoryEnabled()) {
+            CmmnHistoryHelper.bulkDeleteHistoricCaseInstances(caseInstanceIds, cmmnEngineConfiguration);
         }
     }
 

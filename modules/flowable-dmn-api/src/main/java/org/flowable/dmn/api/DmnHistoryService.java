@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.api;
 
+import java.util.Collection;
+
 /**
  * Service providing access to the history of decision executions.
  *
@@ -23,4 +25,5 @@ public interface DmnHistoryService {
 
     NativeHistoricDecisionExecutionQuery createNativeHistoricDecisionExecutionQuery();
 
+    void bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType(Collection<String> instanceIds, String scopeType);
 }

@@ -42,6 +42,8 @@ public interface HistoricIdentityLinkEntityManager extends EntityManager<Histori
     
     void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds);
     
+    void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+    
     void deleteHistoricProcessIdentityLinksForNonExistingInstances();
     
     void deleteHistoricCaseIdentityLinksForNonExistingInstances();

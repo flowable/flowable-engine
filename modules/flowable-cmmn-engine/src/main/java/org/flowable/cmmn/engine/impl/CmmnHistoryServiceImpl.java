@@ -26,10 +26,13 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.BulkDeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesByIdCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
@@ -92,6 +95,11 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
         commandExecutor.execute(new BulkDeleteHistoricCaseInstancesCmd(caseInstanceIds));
     }
+    
+    @Override
+    public void deleteHistoricCaseInstancesById(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new DeleteHistoricCaseInstancesByIdCmd(caseInstanceIds));
+    }
 
     @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
@@ -137,6 +145,16 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkChildrenForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForTaskCmd(taskId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkParentsForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForTaskCmd(taskId));
     }
 
     @Override

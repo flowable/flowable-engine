@@ -137,6 +137,17 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     }
 
     @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("scopeIds", createSafeInValuesList(scopeIds));
+        params.put("scopeType", scopeType);
+        
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
+    }
+
+    @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
         // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
         getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);

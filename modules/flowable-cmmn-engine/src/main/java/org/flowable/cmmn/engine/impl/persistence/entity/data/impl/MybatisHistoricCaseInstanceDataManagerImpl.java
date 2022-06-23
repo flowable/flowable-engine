@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -57,6 +58,12 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricCaseInstanceIdsByParentIds(Collection<String> caseInstanceIds) {
+        return getDbSqlSession().selectList("selectHistoricCaseInstanceIdsByParentIds", createSafeInValuesList(caseInstanceIds));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query) {
         setSafeInValueLists(query);
         return getDbSqlSession().selectList("selectHistoricCaseInstancesByQueryCriteria", query, getManagedEntityClass());
@@ -86,6 +93,11 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         getDbSqlSession().delete("bulkDeleteHistoricCaseInstances", historicCaseInstanceQuery, getManagedEntityClass());
     }
     
+    @Override
+    public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricCaseInstancesByIds", createSafeInValuesList(caseInstanceIds), getManagedEntityClass());
+    }
+
     protected void setSafeInValueLists(HistoricCaseInstanceQueryImpl caseInstanceQuery) {
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));

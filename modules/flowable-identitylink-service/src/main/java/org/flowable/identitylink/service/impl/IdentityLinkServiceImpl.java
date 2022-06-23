@@ -187,6 +187,11 @@ public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServi
     public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
         getIdentityLinkEntityManager().deleteIdentityLinksByProcessInstanceId(processInstanceId);
     }
+    
+    @Override
+    public void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        getIdentityLinkEntityManager().bulkDeleteIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
 
     public IdentityLinkEntityManager getIdentityLinkEntityManager() {
         return configuration.getIdentityLinkEntityManager();

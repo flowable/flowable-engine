@@ -60,6 +60,11 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
+    public List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds) {
+        return getHistoricTaskInstanceEntityManager().findHistoricTaskIdsByParentTaskIds(parentTaskIds);
+    }
+
+    @Override
     public List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId) {
         return getHistoricTaskInstanceEntityManager().findHistoricTasksByProcessInstanceId(processInstanceId);
     }
@@ -227,8 +232,8 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds) {
-        getHistoricTaskInstanceEntityManager().bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+    public void bulkDeleteHistoricTaskInstances(Collection<String> taskIds) {
+        getHistoricTaskInstanceEntityManager().bulkDeleteHistoricTaskInstancesForIds(taskIds);
     }
 
     @Override
