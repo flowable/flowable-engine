@@ -99,6 +99,11 @@ public class HistoricIdentityLinkEntityManagerImpl
     }
 
     @Override
+    public void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        dataManager.bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
+    @Override
     public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
         dataManager.deleteHistoricProcessIdentityLinksForNonExistingInstances();
     }

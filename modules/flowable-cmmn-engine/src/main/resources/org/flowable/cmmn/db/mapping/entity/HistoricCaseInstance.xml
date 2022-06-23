@@ -143,6 +143,19 @@
     <delete id="deleteHistoricCaseInstanceByCaseDefinitionId" parameterType="string">
         delete from ${prefix}ACT_CMMN_HI_CASE_INST where CASE_DEF_ID_ = #{value}
     </delete>
+    
+    <delete id="bulkDeleteHistoricCaseInstancesByIds" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_CMMN_HI_CASE_INST where 
+        <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            ID_ in
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
+    </delete>
 
     <resultMap id="historicCaseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -203,6 +216,19 @@
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
         left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         where RES.ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectHistoricCaseInstanceIdsByParentIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+        select ID_ from ${prefix}ACT_CMMN_HI_CASE_INST where 
+        <foreach item="listItem" index="listIndex" collection="parameter">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            PARENT_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
     </select>
 
     <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">

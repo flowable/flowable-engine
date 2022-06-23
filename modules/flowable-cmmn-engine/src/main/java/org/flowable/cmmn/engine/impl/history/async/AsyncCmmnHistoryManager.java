@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history.async;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryHelper;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
@@ -148,6 +150,13 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_HISTORIC_CASE_INSTANCE_DELETED, data, 
                     historicCaseInstanceEntity != null ? historicCaseInstanceEntity.getTenantId() : null);
+        }
+    }
+
+    @Override
+    public void recordBulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        if (getHistoryConfigurationSettings().isHistoryEnabled()) {
+            CmmnHistoryHelper.bulkDeleteHistoricCaseInstances(caseInstanceIds, cmmnEngineConfiguration);
         }
     }
 

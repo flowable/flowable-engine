@@ -39,6 +39,8 @@ public interface HistoricTaskService {
     
     List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId);
     
+    List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds);
+    
     List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId);
     
     List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
@@ -90,7 +92,7 @@ public interface HistoricTaskService {
     
     void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
     
-    void bulkDeleteHistoricTaskInstancesForProcessInstanceIds(Collection<String> processInstanceIds);
+    void bulkDeleteHistoricTaskInstances(Collection<String> taskIds);
 
     void deleteHistoricTaskInstancesForNonExistingProcessInstances();
     

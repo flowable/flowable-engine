@@ -158,6 +158,11 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        dataManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
+    @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
         if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             dataManager.deleteHistoricVariableInstancesForNonExistingProcessInstances();

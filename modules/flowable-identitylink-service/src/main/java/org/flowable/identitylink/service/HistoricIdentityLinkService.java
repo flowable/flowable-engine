@@ -52,6 +52,8 @@ public interface HistoricIdentityLinkService {
     
     void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds);
     
+    void bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+    
     void deleteHistoricProcessIdentityLinksForNonExistingInstances();
     
     void deleteHistoricCaseIdentityLinksForNonExistingInstances();

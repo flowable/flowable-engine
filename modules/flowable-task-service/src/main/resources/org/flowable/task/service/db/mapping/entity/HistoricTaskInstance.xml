@@ -300,13 +300,13 @@
     </foreach>
   </delete>
   
-  <delete id="bulkDeleteHistoricTaskInstancesForProcessInstanceIds" parameterType="java.util.Collection">
+  <delete id="bulkDeleteHistoricTaskInstancesForIds" parameterType="java.util.Collection">
     delete from ${prefix}ACT_HI_TASKINST where 
     <foreach item="listItem" index="listIndex" collection="collection">
         <if test="listIndex &gt; 0">
         or
         </if>
-        PROC_INST_ID_ in 
+        ID_ in 
         <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
           #{item}
         </foreach>
@@ -451,6 +451,19 @@
   <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter}
   </select>
+  
+  <select id="selectHistoricTaskIdsByParentTaskIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_ from ${prefix}ACT_HI_TASKINST where 
+    <foreach item="listItem" index="listIndex" collection="parameter">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PARENT_TASK_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </select>
 
   <select id="selectHistoricTaskInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap" >
     select *
@@ -469,6 +482,20 @@
           #{item}
         </foreach>
     </foreach>
+  </select>
+  
+  <select id="selectHistoricTaskInstanceIdsForScopeIdsAndScopeType" parameterType="map" resultType="string">
+    select ID_ from ${prefix}ACT_HI_TASKINST where 
+    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">

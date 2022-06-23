@@ -47,6 +47,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
     void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds);
     
     void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
 
     void deleteHistoricVariableInstancesForNonExistingProcessInstances();
     

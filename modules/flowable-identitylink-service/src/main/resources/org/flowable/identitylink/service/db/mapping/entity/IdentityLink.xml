@@ -130,7 +130,20 @@
   <delete id="deleteIdentityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
     delete from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
-  
+
+  <delete id="bulkDeleteIdentityLinksForScopeIdsAndScopeType" parameterType="map">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where 
+    (<foreach item="listItem" index="listIndex" collection="scopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{scopeType}
+  </delete>  
 
   <!-- IDENTITY LINK RESULTMAP -->
 

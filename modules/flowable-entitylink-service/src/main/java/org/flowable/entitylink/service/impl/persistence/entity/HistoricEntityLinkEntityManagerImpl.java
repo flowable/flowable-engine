@@ -50,6 +50,11 @@ public class HistoricEntityLinkEntityManagerImpl
     }
 
     @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        return dataManager.findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(scopeIds, scopeType, linkType);
+    }
+
+    @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
         return dataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
     }

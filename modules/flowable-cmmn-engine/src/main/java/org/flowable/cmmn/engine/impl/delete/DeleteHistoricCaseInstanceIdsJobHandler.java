@@ -21,7 +21,6 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
@@ -37,6 +36,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -80,29 +80,24 @@ public class DeleteHistoricCaseInstanceIdsJobHandler implements JobHandler {
         if (caseInstanceIdsToDelete.isEmpty()) {
             throw new FlowableIllegalArgumentException("There are no case instance ids to delete");
         }
-
-        CmmnHistoryService historyService = engineConfiguration.getCmmnHistoryService();
-        List<HistoricCaseInstance> caseInstances = historyService
-                .createHistoricCaseInstanceQuery()
-                .caseInstanceIds(caseInstanceIdsToDelete)
-                .list();
-
+        
         String status = DeleteCaseInstanceBatchConstants.STATUS_COMPLETED;
         ObjectNode resultNode = engineConfiguration.getObjectMapper().createObjectNode();
 
-        for (HistoricCaseInstance caseInstance : caseInstances) {
-            try {
-                historyService.deleteHistoricCaseInstance(caseInstance.getId());
-                resultNode.withArray("caseInstanceIdsDeleted")
-                        .add(caseInstance.getId());
-            } catch (FlowableException ex) {
-                status = DeleteCaseInstanceBatchConstants.STATUS_FAILED;
-                resultNode.withArray("caseInstanceIdsFailedToDelete")
-                        .addObject()
-                        .put("id", caseInstance.getId())
-                        .put("error", ex.getMessage())
-                        .put("stacktrace", ExceptionUtils.getStackTrace(ex));
-            }
+        CmmnHistoryService historyService = engineConfiguration.getCmmnHistoryService();
+        
+        try {
+            historyService.bulkDeleteHistoricCaseInstances(caseInstanceIdsToDelete);
+            resultNode.withArray("caseInstanceIdsDeleted")
+                .addAll((ArrayNode) idsToDelete);
+            
+        } catch (FlowableException ex) {
+            status = DeleteCaseInstanceBatchConstants.STATUS_FAILED;
+            resultNode.withArray("caseInstanceIdsFailedToDelete")
+                    .addObject()
+                    .put("id", caseInstanceIdsToDelete.iterator().next())
+                    .put("error", ex.getMessage())
+                    .put("stacktrace", ExceptionUtils.getStackTrace(ex));
         }
 
         batchService.completeBatchPart(batchPart.getId(), status, resultNode.toString());

@@ -100,6 +100,11 @@ public class HistoricIdentityLinkServiceImpl extends CommonServiceImpl<IdentityL
     public void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds) {
         getHistoricIdentityLinkEntityManager().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
     }
+    
+    @Override
+    public void bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        getHistoricIdentityLinkEntityManager().bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
 
     @Override
     public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {

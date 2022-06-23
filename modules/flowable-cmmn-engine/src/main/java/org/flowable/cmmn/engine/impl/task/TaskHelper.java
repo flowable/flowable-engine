@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.task;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -174,6 +175,17 @@ public class TaskHelper {
             }
         }
     }
+    
+    public static void bulkDeleteHistoricTaskInstancesByCaseInstanceIds(Collection<String> caseInstanceIds, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            List<String> taskIds = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskInstanceEntityManager()
+                    .findHistoricTaskIdsForScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+            
+            if (taskIds != null && !taskIds.isEmpty()) {
+                bulkDeleteHistoricTaskInstances(taskIds, cmmnEngineConfiguration);
+            }
+        }
+    }
 
     public static void deleteHistoricTask(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
@@ -235,6 +247,22 @@ public class TaskHelper {
             throw new FlowableException("Unable to resolve formFieldValidationExpression without variable container");
         }
         return true;
+    }
+    
+    protected static void bulkDeleteHistoricTaskInstances(Collection<String> taskIds, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
+        
+        List<String> subTaskIds = historicTaskService.findHistoricTaskIdsByParentTaskIds(taskIds);
+        if (subTaskIds != null && !subTaskIds.isEmpty()) {
+            bulkDeleteHistoricTaskInstances(subTaskIds, cmmnEngineConfiguration);
+        }
+        
+        cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+        cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+        
+        historicTaskService.bulkDeleteHistoricTaskInstances(taskIds);
+        
+        historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
     }
 
     protected static Boolean getBoolean(Object booleanObject) {

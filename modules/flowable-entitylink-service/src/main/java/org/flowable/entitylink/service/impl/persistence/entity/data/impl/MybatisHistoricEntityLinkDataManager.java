@@ -69,7 +69,19 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
+        
         return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        parameters.put("scopeType", scopeType);
+        parameters.put("linkType", linkType);
+        
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType", parameters);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -112,7 +124,7 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("scopeType", scopeType);
-        parameters.put("scopeIds", scopeIds);
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
         getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
     }
 
