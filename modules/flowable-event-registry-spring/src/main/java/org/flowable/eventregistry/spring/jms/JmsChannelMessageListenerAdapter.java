@@ -35,7 +35,7 @@ public class JmsChannelMessageListenerAdapter extends AbstractAdaptableMessageLi
 
     @Override
     public void onMessage(Message message, Session session) throws JMSException {
-        eventRegistry.eventReceived(inboundChannelModel, message);
+        eventRegistry.eventReceived(inboundChannelModel, new JmsMessageInboundEvent(message));
     }
 
     public EventRegistry getEventRegistry() {

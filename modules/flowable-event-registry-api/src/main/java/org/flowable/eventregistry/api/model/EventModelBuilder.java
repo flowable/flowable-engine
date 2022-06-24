@@ -81,7 +81,13 @@ public interface EventModelBuilder {
      * Will create a correlation {@link org.flowable.eventregistry.model.EventPayload EventPayload} behind the scenes.
      */
     EventModelBuilder correlationParameter(String name, String type);
-    
+
+    /**
+     * Defines one meta parameter that can be used in models.
+     * Each meta parameter is automatically a {@link #payload(String, String)} element.
+     */
+    EventModelBuilder metaParameter(String name, String type);
+
     /**
      * Defines the property name for the full payload.
      */

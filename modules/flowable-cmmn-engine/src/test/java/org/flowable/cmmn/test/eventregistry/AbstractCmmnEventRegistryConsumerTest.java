@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test.eventregistry;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,6 +22,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.DefaultInboundEvent;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.After;
 import org.junit.Before;
@@ -103,11 +105,12 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
         
         public void triggerTestEventWithHeaders(String customerId, String headerValue1, Integer headerValue2) {
             ObjectNode eventNode = createTestEventNode(customerId, null);
-            ObjectNode headersNode = eventNode.putObject("headers");
-            headersNode.put("headerProperty1", headerValue1);
-            headersNode.put("headerProperty2", headerValue2);
+            Map<String, Object> headers = new HashMap<>();
+            headers.put("headerProperty1", headerValue1);
+            headers.put("headerProperty2", headerValue2);
             try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
+                String event = objectMapper.writeValueAsString(eventNode);
+                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

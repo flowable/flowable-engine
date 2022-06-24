@@ -36,7 +36,7 @@ public class KafkaChannelMessageListenerAdapter implements AcknowledgingConsumer
     public void onMessage(ConsumerRecord<Object, Object> data, Acknowledgment acknowledgment, Consumer<?, ?> consumer) {
         // This can easily be the default MessageListener.
         // However, the Spring Kafka retry mechanism requires this to be AcknowledgingConsumerAwareMessageListener
-        eventRegistry.eventReceived(inboundChannelModel, data);
+        eventRegistry.eventReceived(inboundChannelModel, new KafkaConsumerRecordInboundEvent(data));
         if (acknowledgment != null) {
             acknowledgment.acknowledge();
         }

@@ -13,16 +13,34 @@
 package org.flowable.eventregistry.impl.payload;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.FlowableEventInfo;
-import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
+import org.flowable.eventregistry.api.InboundEventInfoAwarePayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 
-public abstract class BaseMapPayloadExtractor<T> implements InboundEventPayloadExtractor<T> {
+public class HeadersPayloadExtractor<T> implements InboundEventInfoAwarePayloadExtractor<T> {
+
+    @Override
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event) {
+        Collection<EventPayload> headers = eventModel.getHeaders();
+        if (headers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, Object> filteredHeaders = convertHeaderValues(event, eventModel);
+        return headers.stream()
+                .filter(headerDefinition -> filteredHeaders.containsKey(headerDefinition.getName()))
+                .map(headerDefinition -> new EventPayloadInstanceImpl(headerDefinition, filteredHeaders.get(headerDefinition.getName())))
+                .collect(Collectors.toList());
+    }
 
     protected Map<String, Object> convertHeaderValues(FlowableEventInfo<T> eventInfo, EventModel eventModel) {
         Map<String, Object> filteredHeaders = new HashMap<>();
@@ -40,8 +58,6 @@ public abstract class BaseMapPayloadExtractor<T> implements InboundEventPayloadE
                     }
                 }
             }
-            
-            eventInfo.setHeaders(filteredHeaders);
         }
         
         return filteredHeaders;

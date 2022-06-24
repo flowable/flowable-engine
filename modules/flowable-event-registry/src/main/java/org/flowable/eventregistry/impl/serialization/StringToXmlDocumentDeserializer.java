@@ -20,9 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
-import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.w3c.dom.Document;
 
 /**
@@ -31,13 +29,13 @@ import org.w3c.dom.Document;
 public class StringToXmlDocumentDeserializer implements InboundEventDeserializer<Document> {
 
     @Override
-    public FlowableEventInfo<Document> deserialize(Object rawEvent) {
+    public Document deserialize(Object rawEvent) {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             try (InputStream inputStream = new ByteArrayInputStream(convertEventToBytes(rawEvent))) {
                 Document document = documentBuilder.parse(inputStream);
-                return new FlowableEventInfoImpl<>(null, document);
+                return document;
             }
             
         } catch (Exception e) {

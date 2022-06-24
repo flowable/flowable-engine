@@ -18,6 +18,10 @@ package org.flowable.eventregistry.api;
 @FunctionalInterface
 public interface InboundEventTenantDetector<T> {
 
-    String detectTenantId(FlowableEventInfo<T> event);
+    String detectTenantId(T payload);
+
+    default String detectTenantId(FlowableEventInfo<T> event) {
+        return detectTenantId(event.getPayload());
+    }
 
 }

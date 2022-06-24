@@ -12,7 +12,6 @@
  */
 package org.flowable.eventregistry.impl.keydetector;
 
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 
 /**
@@ -27,7 +26,7 @@ public class InboundEventStaticKeyDetector<T> implements InboundEventKeyDetector
     }
 
     @Override
-    public String detectEventDefinitionKey(FlowableEventInfo<T> event) {
+    public String detectEventDefinitionKey(T payload) {
         return staticKey;
     }
 

@@ -12,7 +12,6 @@
  */
 package org.flowable.eventregistry.impl.tenantdetector;
 
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 
 /**
@@ -27,7 +26,7 @@ public class InboundEventStaticTenantDetector<T> implements InboundEventTenantDe
     }
 
     @Override
-    public String detectTenantId(FlowableEventInfo<T> event) {
+    public String detectTenantId(T payload) {
         return staticTenantId;
     }
 

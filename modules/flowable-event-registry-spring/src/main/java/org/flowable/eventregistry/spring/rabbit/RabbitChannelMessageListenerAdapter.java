@@ -32,7 +32,7 @@ public class RabbitChannelMessageListenerAdapter implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        eventRegistry.eventReceived(inboundChannelModel, message);
+        eventRegistry.eventReceived(inboundChannelModel, new RabbitInboundEvent(message));
     }
 
     public EventRegistry getEventRegistry() {

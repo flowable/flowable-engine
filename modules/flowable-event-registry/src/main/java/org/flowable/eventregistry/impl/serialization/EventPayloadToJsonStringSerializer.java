@@ -43,7 +43,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
         Collection<EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances();
         for (EventPayloadInstance payloadInstance : payloadInstances) {
             
-            if (payloadInstance.getEventPayloadDefinition().isHeader()) {
+            if (payloadInstance.getEventPayloadDefinition().isNotForBody()) {
                 continue;
             }
 

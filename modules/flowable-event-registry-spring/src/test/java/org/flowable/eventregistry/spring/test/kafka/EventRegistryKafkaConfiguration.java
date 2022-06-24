@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.test.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -21,7 +22,9 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.kafka.payload.KafkaConsumerRecordInformationPayloadExtractor;
 import org.flowable.eventregistry.spring.test.config.EventRegistryEngineTestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -105,6 +108,13 @@ public class EventRegistryKafkaConfiguration {
         kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
         kafkaChannelDefinitionProcessor.setKafkaAdminOperations(kafkaAdminOperations);
         return kafkaChannelDefinitionProcessor;
+    }
+
+    @Bean
+    public Consumer<SpringEventRegistryEngineConfiguration> kafkaEventRegisterEngineConfigurer() {
+        return engineConfiguration -> {
+            engineConfiguration.registerInboundEventPayloadExtractor("kafka", new KafkaConsumerRecordInformationPayloadExtractor<>());
+        };
     }
 
     @Bean

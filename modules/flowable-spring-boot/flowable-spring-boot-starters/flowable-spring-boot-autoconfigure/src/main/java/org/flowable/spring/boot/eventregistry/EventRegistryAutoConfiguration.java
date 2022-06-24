@@ -14,6 +14,7 @@ package org.flowable.spring.boot.eventregistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -26,6 +27,8 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
+import org.flowable.eventregistry.impl.payload.CompositePayloadExtractor;
+import org.flowable.eventregistry.impl.payload.HeadersPayloadExtractor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
@@ -33,6 +36,7 @@ import org.flowable.eventregistry.spring.autodeployment.SingleResourceAutoDeploy
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.kafka.payload.KafkaConsumerRecordInformationPayloadExtractor;
 import org.flowable.eventregistry.spring.management.DefaultSpringEventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.spring.rabbit.RabbitChannelDefinitionProcessor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
@@ -279,6 +283,14 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
             kafkaChannelDefinitionProcessor.setKafkaAdminOperations(kafkaAdminOperations.getIfAvailable());
 
             return kafkaChannelDefinitionProcessor;
+        }
+
+        @Bean("kafkaEventRegistryEngineConfigurer")
+        @ConditionalOnMissingBean(name = "kafkaEventRegistryEngineConfigurer")
+        public EngineConfigurationConfigurer<SpringEventRegistryEngineConfiguration> kafkaEventRegistryEngineConfigurer() {
+            return engineConfiguration -> {
+                engineConfiguration.registerInboundEventPayloadExtractor("kafka", new KafkaConsumerRecordInformationPayloadExtractor<>());
+            };
         }
     }
 }
