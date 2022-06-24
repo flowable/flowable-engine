@@ -270,7 +270,6 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
         conf.setCleanInstancesEndedAfter(flowableProperties.getHistoryCleaningAfter());
         conf.setCleanInstancesBatchSize(flowableProperties.getHistoryCleaningBatchSize());
-        conf.setCleanInstancesSequentially(flowableProperties.isHistoryCleaningSequential());
 
         IdGenerator idGenerator = getIfAvailable(processIdGenerator, globalIdGenerator);
         if (idGenerator == null) {
