@@ -161,30 +161,20 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
     protected void createBatchPartsForSequentialExecution(CmmnEngineConfiguration engineConfiguration, Batch batch, long numberOfBatchParts) {
         CmmnManagementService managementService = engineConfiguration.getCmmnManagementService();
 
-        BatchPart firstBatchPart = null;
-        for (int i = 0; i < numberOfBatchParts; i++) {
+        BatchPart firstBatchPart = managementService.createBatchPartBuilder(batch)
+                .type(DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE)
+                .searchKey(Integer.toString(0))
+                .status(DeleteCaseInstanceBatchConstants.STATUS_WAITING)
+                .create();
 
-            BatchPart batchPart = managementService.createBatchPartBuilder(batch)
-                    .type(DeleteCaseInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE)
-                    .searchKey(Integer.toString(i))
-                    .status(DeleteCaseInstanceBatchConstants.STATUS_WAITING)
-                    .create();
+        JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
 
-            if (firstBatchPart == null) {
-                firstBatchPart = batchPart;
-            }
-        }
-
-        if (firstBatchPart != null) {
-            JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
-
-            JobEntity job = jobService.createJob();
-            job.setJobHandlerType(ComputeDeleteHistoricCaseInstanceIdsJobHandler.TYPE);
-            job.setJobHandlerConfiguration(firstBatchPart.getId());
-            job.setScopeType(ScopeTypes.CMMN);
-            jobService.createAsyncJob(job, false);
-            jobService.scheduleAsyncJob(job);
-        }
+        JobEntity job = jobService.createJob();
+        job.setJobHandlerType(DeleteHistoricCaseInstancesSequentialJobHandler.TYPE);
+        job.setJobHandlerConfiguration(firstBatchPart.getId());
+        job.setScopeType(ScopeTypes.CMMN);
+        jobService.createAsyncJob(job, false);
+        jobService.scheduleAsyncJob(job);
     }
 
     protected void populateQueryNode(ObjectNode queryNode, HistoricCaseInstanceQueryImpl query) {

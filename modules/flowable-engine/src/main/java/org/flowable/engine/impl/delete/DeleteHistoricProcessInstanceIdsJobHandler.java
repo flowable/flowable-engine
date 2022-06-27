@@ -101,6 +101,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
 
         batchService.completeBatchPart(batchPart.getId(), status, resultNode.toString());
 
+        // This part is here for backwards compatibility when the sequential deletion was done with a compute as well
         if (computeBatchPartResult.path("sequential").booleanValue()) {
             // If the computation was sequential we need to schedule the next job
             List<BatchPart> nextDeleteParts = engineConfiguration.getManagementService()
