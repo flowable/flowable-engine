@@ -315,12 +315,12 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                 .collect(Collectors.toList());
     }
 
-    private static TopicPartitionOffset getTPOForRetryTopics(DestinationTopic.Properties properties, Suffixer suffixer, TopicPartitionOffset tpo) {
+    protected static TopicPartitionOffset getTPOForRetryTopics(DestinationTopic.Properties properties, Suffixer suffixer, TopicPartitionOffset tpo) {
         return new TopicPartitionOffset(suffixer.maybeAddTo(tpo.getTopic()),
                 tpo.getPartition() <= properties.numPartitions() ? tpo.getPartition() : DEFAULT_PARTITION_FOR_MANUAL_ASSIGNMENT);
     }
 
-    private static TopicPartitionOffset getTPOForMainTopic(Suffixer suffixer, TopicPartitionOffset tpo) {
+    protected static TopicPartitionOffset getTPOForMainTopic(Suffixer suffixer, TopicPartitionOffset tpo) {
         TopicPartitionOffset newTpo = new TopicPartitionOffset(suffixer.maybeAddTo(tpo.getTopic()),
                 tpo.getPartition(), tpo.getOffset(), tpo.getPosition());
         newTpo.setRelativeToCurrent(tpo.isRelativeToCurrent());
@@ -562,7 +562,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     }
 
     protected void resolvePartitionAsInteger(String topic, Object resolvedValue, List<TopicPartitionOffset> result) {
-        // This is the same as it is done in the KafkaListenerAnnotationBeanPostProcessor#resolvePartitionAsInteger
+        // This is the same as it is done in the Spring KafkaListenerAnnotationBeanPostProcessor#resolvePartitionAsInteger
 
         if (resolvedValue instanceof String[]) {
             for (Object object : (String[]) resolvedValue) {
@@ -599,13 +599,13 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
 
     /**
      * Parse a list of partitions into a {@link List}. Example: "0-5,10-15".
-     * This parsing is the same as it is done in the {@code KafkaListenerAnnotationBeanPostProcessor}.
+     * This parsing is the same as it is done in the Spring {@code KafkaListenerAnnotationBeanPostProcessor}.
      *
      * @param partsString the comma-delimited list of partitions/ranges.
      * @return the stream of partition numbers, sorted and de-duplicated.
      */
     protected Stream<Integer> parsePartitions(String partsString) {
-        // This is the same as it is done in the KafkaListenerAnnotationBeanPostProcessor#parsePartitions
+        // This is the same as it is done in the Spring KafkaListenerAnnotationBeanPostProcessor#parsePartitions
         String[] partsStrings = partsString.split(",");
         if (partsStrings.length == 1 && !partsStrings[0].contains("-")) {
             return Stream.of(Integer.parseInt(partsStrings[0].trim()));
