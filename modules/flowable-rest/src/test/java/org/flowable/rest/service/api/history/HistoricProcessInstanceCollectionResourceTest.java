@@ -247,10 +247,10 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId()).add("notValidID");
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
         httpPost.setEntity(new StringEntity(body.toString()));
-        closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
-        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(0);
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance3.getId()).count()).isEqualTo(1);
 
         body = objectMapper.createObjectNode();
