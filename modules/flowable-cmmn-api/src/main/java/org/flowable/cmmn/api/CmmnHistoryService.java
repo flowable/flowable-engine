@@ -60,8 +60,6 @@ public interface CmmnHistoryService {
     void deleteHistoricCaseInstance(String caseInstanceId);
     
     void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds);
-    
-    void deleteHistoricCaseInstancesById(Collection<String> caseInstanceIds);
 
     /**
      * Deletes historic task instance. This might be useful for tasks that are {@link CmmnTaskService#newTask() dynamically created} and then {@link CmmnTaskService#complete(String) completed}. If the

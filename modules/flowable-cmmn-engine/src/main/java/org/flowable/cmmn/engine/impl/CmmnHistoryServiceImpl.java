@@ -26,7 +26,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.BulkDeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
-import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesByIdCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
@@ -94,11 +93,6 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
         commandExecutor.execute(new BulkDeleteHistoricCaseInstancesCmd(caseInstanceIds));
-    }
-    
-    @Override
-    public void deleteHistoricCaseInstancesById(Collection<String> caseInstanceIds) {
-        commandExecutor.execute(new DeleteHistoricCaseInstancesByIdCmd(caseInstanceIds));
     }
 
     @Override

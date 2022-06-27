@@ -192,73 +192,23 @@
     where LINK_TYPE_ = #{parameter.linkType}
   </select>
   
-  <!-- If you change something in the select, then check the other DBs as well -->
   <select id="selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType" resultMap="historicEntityLinkResultMap">
     select RES.*
-    from ${prefix}ACT_HI_ENTITYLINK RES
-    inner join (
-                    select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
-                    from ${prefix}ACT_HI_ENTITYLINK
-                    where 
-                    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
-                        <if test="listIndex &gt; 0">
-                        or
-                        </if>
-                        SCOPE_ID_ in 
-                        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                          #{item}
-                        </foreach>
-                    </foreach>)
-                    and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
-                    limit 1
-                ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
-  </select>
-  
-  <!-- If you change something in the select, then check the other DBs as well -->
-  <select id="selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType" databaseId="oracle" resultMap="historicEntityLinkResultMap">
-    select RES.*
-    from ${prefix}ACT_HI_ENTITYLINK RES
-    inner join (
-                    select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
-                    from ${prefix}ACT_HI_ENTITYLINK
-                    where 
-                    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
-                        <if test="listIndex &gt; 0">
-                        or
-                        </if>
-                        SCOPE_ID_ in 
-                        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                          #{item}
-                        </foreach>
-                    </foreach>)
-                    and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
-                    and ROWNUM = 1
-                ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
-  </select>
-
-  <!-- If you change something in the select, then check the other DBs as well -->
-  <select id="selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType" databaseId="mssql" resultMap="historicEntityLinkResultMap">
-    select RES.*
-    from ${prefix}ACT_HI_ENTITYLINK RES
-    inner join (
-                    select TOP(1)
-                    ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
-                    from ${prefix}ACT_HI_ENTITYLINK
-                    where 
-                    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
-                        <if test="listIndex &gt; 0">
-                        or
-                        </if>
-                        SCOPE_ID_ in 
-                        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                          #{item}
-                        </foreach>
-                    </foreach>)
-                    and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
-                ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
+    from ${prefix}ACT_HI_ENTITYLINK RES where ROOT_SCOPE_ID_ in (
+        select ROOT_SCOPE_ID_ from ${prefix}ACT_HI_ENTITYLINK
+        where 
+        (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            SCOPE_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>)
+        and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
+    ) 
+    and LINK_TYPE_ = #{parameter.linkType}
   </select>
   
 </mapper>

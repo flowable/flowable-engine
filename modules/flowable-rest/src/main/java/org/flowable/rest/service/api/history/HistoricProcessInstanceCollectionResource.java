@@ -217,7 +217,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             if (restApiInterceptor != null) {
                 restApiInterceptor.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
             }
-            historyService.deleteHistoricProcessInstancesById(request.getInstanceIds());
+            historyService.bulkDeleteHistoricProcessInstances(request.getInstanceIds());
         } else {
             throw new FlowableIllegalArgumentException("Illegal action: '" + request.getAction() + "'.");
         }
