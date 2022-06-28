@@ -76,6 +76,7 @@ import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceIds
 import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceStatusJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsStatusJobHandler;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentialJobHandler;
 import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
@@ -1689,6 +1690,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         addJobHandler(new ComputeDeleteHistoricCaseInstanceIdsJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceStatusJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsJobHandler());
+        addJobHandler(new DeleteHistoricCaseInstancesSequentialJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsStatusJobHandler());
 
         // if we have custom job handlers, register them
