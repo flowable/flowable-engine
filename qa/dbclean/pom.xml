@@ -7,7 +7,7 @@
   <groupId>org.flowable</groupId>
   <artifactId>flowable-dbclean</artifactId>
   <packaging>pom</packaging>
-  <version>6.7.2.19</version>
+  <version>6.7.2.20</version>
 
   <dependencies>
     <dependency>
