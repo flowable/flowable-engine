@@ -74,10 +74,7 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
             .orderByEndTime().asc());
 
         // Filter out the states that shouldn't be returned in the overview
-        planItemInstances.removeIf(planItemInstance -> {
-            return Objects.equals(PlanItemInstanceState.WAITING_FOR_REPETITION, planItemInstance.getState())
-                || Objects.equals(PlanItemInstanceState.ASYNC_ACTIVE, planItemInstance.getState());
-        });
+        planItemInstances.removeIf(planItemInstance -> PlanItemInstanceState.INTERMEDIARY_STATES.contains(planItemInstance.getState()));
 
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstance.getCaseDefinitionId());

@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
@@ -78,9 +81,15 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(OperationSerializationMetadata.FIELD_PLAN_ITEM_INSTANCE_ID, planItemInstanceEntity.getId());
+        return metadata;
+    }
+
+    @Override
     public String getOperationName() {
         return "[Complete plan item]";
     }
 
-    
 }

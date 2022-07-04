@@ -53,7 +53,14 @@ public interface PlanItemInstanceState {
      */
     String ASYNC_ACTIVE = "async-active";
 
-    Set<String> ACTIVE_STATES = new HashSet<>(Arrays.asList(ACTIVE, ASYNC_ACTIVE));
+    /**
+     * Non-spec state, indicating the plan item instance is scheduled to move from active to a terminal state asynchronously.
+     */
+    String ASYNC_ACTIVE_LEAVE = "async-active-leave";
+
+    Set<String> ACTIVE_STATES = new HashSet<>(Arrays.asList(ACTIVE, ASYNC_ACTIVE, ASYNC_ACTIVE_LEAVE));
+
+    Set<String> INTERMEDIARY_STATES = new HashSet<>(Arrays.asList(WAITING_FOR_REPETITION, ASYNC_ACTIVE, ASYNC_ACTIVE_LEAVE));
 
     Set<String> EVALUATE_ENTRY_CRITERIA_STATES = new HashSet<>(Arrays.asList(AVAILABLE, WAITING_FOR_REPETITION));
 

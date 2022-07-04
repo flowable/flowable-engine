@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -43,7 +45,7 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
         // Only event listeners can be repeating on occur
         return planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener;
     }
-    
+
     @Override
     protected boolean shouldAggregateForSingleInstance() {
         return true;
@@ -59,6 +61,11 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
         planItemInstanceEntity.setOccurredTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceOccurred(planItemInstanceEntity);
+    }
+
+    @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        throw new UnsupportedOperationException("Occur does not support async leave");
     }
 
     @Override

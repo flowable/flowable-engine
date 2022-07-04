@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="parallelGw" />
+
+    <parallelGateway id="parallelGw" name="Exclusive Gateway" flowable:asyncLeave="true"/>
+    <sequenceFlow sourceRef="parallelGw" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression">${var:equals(input,1)}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow sourceRef="parallelGw" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression">${var:equals(input,2)}</conditionExpression>
+    </sequenceFlow>
+    
+    <userTask id="usertask1" name="Task A"/>
+    <sequenceFlow sourceRef="usertask2" targetRef="theEnd" />
+
+    <userTask id="usertask2" name="Task B"/>
+    <sequenceFlow sourceRef="usertask2" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

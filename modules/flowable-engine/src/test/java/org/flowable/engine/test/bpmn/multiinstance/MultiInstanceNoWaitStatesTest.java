@@ -150,7 +150,7 @@ public class MultiInstanceNoWaitStatesTest extends PluggableFlowableTestCase {
     @Deployment
     public void testNestedParallelAsyncAndExclusiveSubProcess() {
 
-        // Nested subprocesses, both with only wait states flag set.
+        // Nested subprocesses, both with no wait states flag set.
         // Technically, this use doesn't make a lot of sense: it would be better if only making the root subprocess have the 'noWaitState' flag.
         // This test however validates that things don't break.
 

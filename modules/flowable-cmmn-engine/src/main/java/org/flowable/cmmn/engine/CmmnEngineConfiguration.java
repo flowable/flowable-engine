@@ -131,6 +131,7 @@ import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
+import org.flowable.cmmn.engine.impl.job.AsyncLeaveActivePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -1684,6 +1685,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers = new HashMap<>();
         jobHandlers.put(TriggerTimerEventJobHandler.TYPE, new TriggerTimerEventJobHandler());
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
+        jobHandlers.put(AsyncLeaveActivePlanItemInstanceJobHandler.TYPE, new AsyncLeaveActivePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
         jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
