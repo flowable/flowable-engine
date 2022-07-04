@@ -12,7 +12,9 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
@@ -24,12 +26,21 @@ import org.flowable.bpmn.converter.child.ScriptTextParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ScriptTask;
 
 /**
  * @author Tijs Rademakers
  */
 public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
+
+    protected static final List<ExtensionAttribute> defaultScriptTaskAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_FORMAT),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE)
+    );
 
     protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
@@ -49,6 +60,7 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         ScriptTask scriptTask = new ScriptTask();
         BpmnXMLUtil.addXMLLocation(scriptTask, xtr);
@@ -65,17 +77,25 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(autoStoreVariables)) {
             scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
         }
+
+        BpmnXMLUtil.addCustomAttributes(xtr, scriptTask, defaultElementAttributes, defaultActivityAttributes, defaultScriptTaskAttributes);
+
         parseChildElements(getXMLElementName(), scriptTask, childParserMap, model, xtr);
+
         return scriptTask;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         ScriptTask scriptTask = (ScriptTask) element;
         writeDefaultAttribute(ATTRIBUTE_TASK_SCRIPT_FORMAT, scriptTask.getScriptFormat(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE, scriptTask.getResultVariable(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, scriptTask.getSkipExpression(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, String.valueOf(scriptTask.isAutoStoreVariables()), xtw);
+
+        BpmnXMLUtil.writeCustomAttributes(scriptTask.getAttributes().values(), xtw, defaultElementAttributes,
+                defaultActivityAttributes, defaultScriptTaskAttributes);
     }
 
     @Override

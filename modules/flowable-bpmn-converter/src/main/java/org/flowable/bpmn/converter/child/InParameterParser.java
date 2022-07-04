@@ -48,30 +48,47 @@ public class InParameterParser extends BaseChildElementParser {
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
 
-        IOParameter parameter = new IOParameter();
-        if (StringUtils.isNotEmpty(sourceExpression)) {
-            parameter.setSourceExpression(sourceExpression);
-        } else {
-            parameter.setSource(source);
-        }
+            IOParameter parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
 
-        parameter.setTarget(target);
+            parameter.setTarget(target);
 
-        String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
-        if ("true".equalsIgnoreCase(transientValue)) {
-            parameter.setTransient(true);
-        }
+            String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+            if ("true".equalsIgnoreCase(transientValue)) {
+                parameter.setTransient(true);
+            }
 
-        BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultInParameterAttributes);
+            if (parentElement instanceof CallActivity) {
+                ((CallActivity) parentElement).getInParameters().add(parameter);
 
-        if (parentElement instanceof CallActivity) {
+            } else if (parentElement instanceof CaseServiceTask) {
+                ((CaseServiceTask) parentElement).getInParameters().add(parameter);
+
+            } else if (parentElement instanceof Event) {
+                ((Event) parentElement).getInParameters().add(parameter);
+            }
+
+            BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultInParameterAttributes);
+
+        } else if (parentElement instanceof CallActivity) {
             CallActivity callActivity = (CallActivity) parentElement;
-            callActivity.getInParameters().add(parameter);
 
             String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
             if ("all".equalsIgnoreCase(variables)) {
                 callActivity.setInheritVariables(true);
+
+                // Value needs to be put on the call activity when the parameter does not have source/sourceExpression/etc.
+                // Otherwise, the attribute will be on the parameter.
+                String local = xtr.getAttributeValue(null, "local");
+                if (StringUtils.isNotEmpty(local) && "true".equalsIgnoreCase(local)) {
+                    callActivity.addAttribute(new ExtensionAttribute("allInVariableslocal", "true"));
+                }
             }
 
             String businessKey = xtr.getAttributeValue(null, ATTRIBUTE_BUSINESS_KEY);
@@ -79,11 +96,6 @@ public class InParameterParser extends BaseChildElementParser {
                 callActivity.setBusinessKey(businessKey);
             }
 
-        } else if (parentElement instanceof CaseServiceTask) {
-            ((CaseServiceTask) parentElement).getInParameters().add(parameter);
-
-        } else if (parentElement instanceof Event) {
-            ((Event) parentElement).getInParameters().add(parameter);
         }
 
     }

@@ -1,14 +1,7 @@
 alter table ACT_RU_TASK 
     add CATEGORY_ varchar(255);
     
-alter table ACT_RU_EXECUTION drop foreign key ACT_FK_EXE_PROCDEF;
-
-alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF 
-    foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);
-
-#  
+#
 # ACT-1867: MySQL DATETIME and TIMESTAMP precision
 # The way this is done, is by creating a new column, pumping over all data
 # and then removing the old column.
