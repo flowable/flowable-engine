@@ -14,6 +14,7 @@ package org.flowable.engine;
 
 import java.util.Collection;
 
+import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.interceptor.MigrationContext;
 
@@ -35,6 +36,8 @@ public interface FlowableEngineAgenda extends Agenda {
     void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter);
 
     void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
+
+    void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions);
 
     void planEndExecutionOperation(ExecutionEntity execution);
     

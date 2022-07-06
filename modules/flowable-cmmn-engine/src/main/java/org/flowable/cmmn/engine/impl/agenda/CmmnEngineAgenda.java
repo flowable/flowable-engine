@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
@@ -62,6 +63,8 @@ public interface CmmnEngineAgenda extends Agenda {
     void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
     void planActivateAsyncPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
+
+    void planAsyncLeaveActivePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String transition, Map<String, String> transitionMetadata);
 
     void planDisablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 

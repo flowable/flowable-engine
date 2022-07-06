@@ -211,7 +211,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             // with the old logic and we can't async leave.
             boolean asyncLeave = usesParallelMultiInstanceLoopVariable
                 && processEngineConfiguration.isParallelMultiInstanceAsyncLeave()
-                && !isAsyncWithoutWaitStates(processEngineConfiguration); // when using the 'no wait states' flag, arriving here should execute the regular logic.
+                && !isAsyncWithoutWaitStates(processEngineConfiguration); // when using the 'no wait states' flag, the regular leave logic should be executed.
 
             if (!asyncLeave) {
                 // If we are not leaving async then we have to lock the parent scope

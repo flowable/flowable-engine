@@ -186,6 +186,10 @@ public class PlanItemInstancesWrapper {
         return getPlanItemInstancesWithState(PlanItemInstanceState.ASYNC_ACTIVE);
     }
 
+    public PlanItemInstancesWrapper asyncActiveLeave() {
+        return getPlanItemInstancesWithState(PlanItemInstanceState.ASYNC_ACTIVE_LEAVE);
+    }
+
     public PlanItemInstancesWrapper onlyTerminal() {
         ensurePlanItemInstanceInitialized();
 

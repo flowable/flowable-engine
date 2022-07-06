@@ -76,7 +76,8 @@ public interface CmmnStencilConstants {
     
     String PROPERTY_IS_ASYNC = "isasync";
     String PROPERTY_IS_EXCLUSIVE = "isexclusive";
-    
+    String PROPERTY_IS_ASYNC_LEAVE = "isasyncleave";
+
     String PROPERTY_REQUIRED_ENABLED = "requiredenabled";
     String PROPERTY_REQUIRED_RULE_CONDITION = "requiredrulecondition";
     

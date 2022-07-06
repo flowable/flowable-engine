@@ -48,6 +48,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.SignalEventListener;
+import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.cmmn.model.VariableAggregationDefinitions;
@@ -80,6 +81,16 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         // Need to capture the original state before the super.run() will change it
         String originalState = planItemInstanceEntity.getState();
 
+        PlanItemDefinition planItemDefinition = null;
+        if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null) {
+            planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        }
+        if (isAsyncLeave(planItemInstanceEntity, planItemDefinition)) {
+            CommandContextUtil.getAgenda(commandContext)
+                    .planAsyncLeaveActivePlanItemInstanceOperation(planItemInstanceEntity, getLifeCycleTransition(), getAsyncLeaveTransitionMetadata());
+            return;
+        }
+
         // Not overriding the internalExecute, as that's meant for subclasses of this operation.
         super.run();
 
@@ -101,16 +112,13 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
             if (isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists) {
 
-                if (planItemInstanceEntity.getPlanItem() == null || planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof TimerEventListener || 
-                        !(planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener)) {
+                if (planItemDefinition != null && (planItemDefinition instanceof TimerEventListener || !(planItemDefinition instanceof EventListener))) {
                 
-                    PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-                    
                     // Create new repeating instance
                     PlanItemInstanceEntity newPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
     
-                    if (planItemInstanceEntity.getPlanItem() != null && (planItemDefinition instanceof TimerEventListener || planItemDefinition instanceof ReactivateEventListener)) {
-                        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
+                    if (planItemDefinition instanceof TimerEventListener || planItemDefinition instanceof ReactivateEventListener) {
+                        agenda.planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
                         
                     } else {
                         String oldState = newPlanItemInstanceEntity.getState();
@@ -137,6 +145,12 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
             removeSentryRelatedData();
         }
+    }
+
+    protected boolean isAsyncLeave(PlanItemInstanceEntity planItemInstanceEntity, PlanItemDefinition planItemDefinition) {
+        return !PlanItemInstanceState.ASYNC_ACTIVE_LEAVE.equals(planItemInstanceEntity.getState())
+                && StateTransition.isPossible(planItemInstanceEntity, PlanItemTransition.ASYNC_LEAVE_ACTIVE)
+                && planItemDefinition instanceof Task && ((Task) planItemDefinition).isAsyncLeave();
     }
 
     protected VariableAggregationDefinitions getVariableAggregations() {
@@ -443,5 +457,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     protected abstract boolean shouldAggregateForMultipleInstances();
 
     public abstract boolean isEvaluateRepetitionRule();
-    
+
+    protected abstract Map<String, String> getAsyncLeaveTransitionMetadata();
+
 }
