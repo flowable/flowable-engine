@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,8 @@ public interface HistoricTaskLogEntryDataManager extends DataManager<HistoricTas
     void deleteHistoricTaskLogEntriesByScopeDefinitionId(String scopeType, String scopeDefinitionId);
 
     void deleteHistoricTaskLogEntriesByTaskId(String taskId);
+    
+    void bulkDeleteHistoricTaskLogEntriesForTaskIds(Collection<String> taskIds);
     
     void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
     

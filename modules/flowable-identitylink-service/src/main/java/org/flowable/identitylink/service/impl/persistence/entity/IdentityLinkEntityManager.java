@@ -87,5 +87,7 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
     void deleteIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
     void deleteIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
 
 }

@@ -221,6 +221,7 @@ import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceIdsJo
 import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceStatusJobHandler;
 import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsJobHandler;
 import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsStatusJobHandler;
+import org.flowable.engine.impl.delete.DeleteHistoricProcessInstancesSequentialJobHandler;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
@@ -2092,6 +2093,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         ComputeDeleteHistoricProcessInstanceStatusJobHandler computeDeleteHistoricProcessInstanceStatusJobHandler = new ComputeDeleteHistoricProcessInstanceStatusJobHandler();
         jobHandlers.put(computeDeleteHistoricProcessInstanceStatusJobHandler.getType(), computeDeleteHistoricProcessInstanceStatusJobHandler);
+
+        DeleteHistoricProcessInstancesSequentialJobHandler deleteHistoricProcessInstancesSequentialJobHandler = new DeleteHistoricProcessInstancesSequentialJobHandler();
+        jobHandlers.put(deleteHistoricProcessInstancesSequentialJobHandler.getType(), deleteHistoricProcessInstancesSequentialJobHandler);
 
         DeleteHistoricProcessInstanceIdsStatusJobHandler deleteHistoricProcessInstanceStatusJobHandler = new DeleteHistoricProcessInstanceIdsStatusJobHandler();
         jobHandlers.put(deleteHistoricProcessInstanceStatusJobHandler.getType(), deleteHistoricProcessInstanceStatusJobHandler);

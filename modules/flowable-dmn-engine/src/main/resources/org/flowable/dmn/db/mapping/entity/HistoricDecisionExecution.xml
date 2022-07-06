@@ -79,21 +79,42 @@
   <delete id="deleteHistoricDecisionExecutionsByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where DEPLOYMENT_ID_ = #{deploymenId} 
   </delete>
+  
+  <delete id="bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType" parameterType="map">
+    delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where 
+    (<foreach item="listItem" index="listIndex" collection="instanceIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        INSTANCE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    <choose>
+        <when test="scopeType == null">
+          and SCOPE_TYPE_ is null
+        </when>
+        <otherwise>
+          and SCOPE_TYPE_ = #{scopeType}
+        </otherwise>
+    </choose>
+  </delete>
 
-    <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl">
-        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> DEL_RES </if>
-        from ${prefix}ACT_DMN_HI_DECISION_EXECUTION DEL_RES
-        where DEL_RES.ID_ in (
-            select RES.ID_
-            <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
-        )
-    </delete>
-
-    <!-- For MySQL / MariaDB we cannot use the table we want to delete from in a subquery -->
-    <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" databaseId="mysql">
-        delete RES
+  <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl">
+    delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> DEL_RES </if>
+    from ${prefix}ACT_DMN_HI_DECISION_EXECUTION DEL_RES
+    where DEL_RES.ID_ in (
+        select RES.ID_
         <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
-    </delete>
+    )
+  </delete>
+
+  <!-- For MySQL / MariaDB we cannot use the table we want to delete from in a subquery -->
+  <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" databaseId="mysql">
+    delete RES
+    <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
+  </delete>
   
   <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
 

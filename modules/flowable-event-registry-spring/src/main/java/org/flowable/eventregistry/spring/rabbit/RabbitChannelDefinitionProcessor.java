@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
-import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.model.ChannelModel;
@@ -101,7 +100,7 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof RabbitInboundChannelModel) {

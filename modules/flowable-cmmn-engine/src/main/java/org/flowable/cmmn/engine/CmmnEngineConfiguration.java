@@ -76,6 +76,7 @@ import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceIds
 import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceStatusJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsStatusJobHandler;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentialJobHandler;
 import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
@@ -712,7 +713,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
     protected Duration cleanInstancesEndedAfter = Duration.ofDays(365);
     protected int cleanInstancesBatchSize = 100;
-    protected boolean cleanInstancesSequentially = false;
     protected CmmnHistoryCleaningManager cmmnHistoryCleaningManager;
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
@@ -1692,6 +1692,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         addJobHandler(new ComputeDeleteHistoricCaseInstanceIdsJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceStatusJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsJobHandler());
+        addJobHandler(new DeleteHistoricCaseInstancesSequentialJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsStatusJobHandler());
 
         // if we have custom job handlers, register them
@@ -4354,15 +4355,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCleanInstancesBatchSize(int cleanInstancesBatchSize) {
         this.cleanInstancesBatchSize = cleanInstancesBatchSize;
-        return this;
-    }
-
-    public boolean isCleanInstancesSequentially() {
-        return cleanInstancesSequentially;
-    }
-
-    public CmmnEngineConfiguration setCleanInstancesSequentially(boolean cleanInstancesSequentially) {
-        this.cleanInstancesSequentially = cleanInstancesSequentially;
         return this;
     }
 

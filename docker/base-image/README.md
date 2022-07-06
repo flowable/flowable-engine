@@ -1,6 +1,6 @@
 # Flowable Docker base image
 
-Extends from adoptopenjdk/openjdk11:jre-11.0.8_10-alpine
+Extends from eclipse-temurin:11.0.15_10-jdk-alpine
 
 Adds `flowable:flowable` user which can be used to 'step down' from root when executing Flowable applications.
 

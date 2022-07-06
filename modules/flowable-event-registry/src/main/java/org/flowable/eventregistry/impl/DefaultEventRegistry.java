@@ -21,6 +21,7 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
+import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventProcessor;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -66,10 +67,15 @@ public class DefaultEventRegistry implements EventRegistry {
     }
 
     @Override
-    public void eventReceived(InboundChannelModel channelModel, Object event) {
+    public void eventReceived(InboundChannelModel channelModel, String event) {
+        inboundEventProcessor.eventReceived(channelModel, new DefaultInboundEvent(event));
+    }
+
+    @Override
+    public void eventReceived(InboundChannelModel channelModel, InboundEvent event) {
         inboundEventProcessor.eventReceived(channelModel, event);
     }
-    
+
     @Override
     public void sendEventToConsumers(EventRegistryEvent eventRegistryEvent) {
         Collection<EventRegistryEventConsumer> engineEventRegistryEventConsumers = engineConfiguration.getEventRegistryEventConsumers().values();

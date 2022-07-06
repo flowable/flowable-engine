@@ -579,4 +579,10 @@
 
     </changeSet>
 
+    <changeSet id="17" author="flowable">
+        <createIndex tableName="ACT_CMMN_HI_CASE_INST" indexName="ACT_IDX_HI_CASE_INST_END">
+            <column name="END_TIME_"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

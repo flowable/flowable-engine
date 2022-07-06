@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
@@ -63,6 +64,11 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deleteHistoricPlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void bulkDeleteHistoricPlanItemInstancesForCaseInstanceIds(Collection<String> caseInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricPlanItemInstancesByCaseInstanceIds", createSafeInValuesList(caseInstanceIds), getManagedEntityClass());
     }
     
     @Override

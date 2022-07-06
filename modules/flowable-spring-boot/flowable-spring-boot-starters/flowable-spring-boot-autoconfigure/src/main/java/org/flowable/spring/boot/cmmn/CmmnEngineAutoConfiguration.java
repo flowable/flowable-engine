@@ -244,7 +244,6 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
         configuration.setCleanInstancesEndedAfter(flowableProperties.getHistoryCleaningAfter());
         configuration.setCleanInstancesBatchSize(flowableProperties.getHistoryCleaningBatchSize());
-        configuration.setCleanInstancesSequentially(flowableProperties.isHistoryCleaningSequential());
 
         return configuration;
     }

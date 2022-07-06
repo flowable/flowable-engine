@@ -15,30 +15,38 @@ package org.flowable.eventregistry.impl;
 import java.util.Map;
 
 import org.flowable.eventregistry.api.FlowableEventInfo;
+import org.flowable.eventregistry.api.InboundEvent;
+import org.flowable.eventregistry.model.InboundChannelModel;
 
 public class FlowableEventInfoImpl<T> implements FlowableEventInfo<T> {
     
-    protected Map<String, Object> headers;
+    protected InboundEvent inboundEvent;
     protected T payload;
-    
-    public FlowableEventInfoImpl(Map<String, Object> headers, T payload) {
-        this.headers = headers;
+    protected InboundChannelModel inboundChannel;
+
+    public FlowableEventInfoImpl(InboundEvent inboundEvent, T payload, InboundChannelModel inboundChannel) {
+        this.inboundEvent = inboundEvent;
         this.payload = payload;
+        this.inboundChannel = inboundChannel;
     }
 
     @Override
     public Map<String, Object> getHeaders() {
-        return headers;
+        return inboundEvent.getHeaders();
     }
     
-    @Override
-    public void setHeaders(Map<String, Object> headers) {
-        this.headers = headers;
-    }
-
     @Override
     public T getPayload() {
         return payload;
     }
 
+    @Override
+    public Object getRawEvent() {
+        return inboundEvent.getRawEvent();
+    }
+
+    @Override
+    public InboundChannelModel getInboundChannel() {
+        return inboundChannel;
+    }
 }

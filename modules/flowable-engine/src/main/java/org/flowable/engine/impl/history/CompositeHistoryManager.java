@@ -121,6 +121,13 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
+    public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.recordBulkDeleteProcessInstances(processInstanceIds);
+        }
+    }
+
+    @Override
     public void recordActivityStart(ActivityInstance activityInstance) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.recordActivityStart(activityInstance);

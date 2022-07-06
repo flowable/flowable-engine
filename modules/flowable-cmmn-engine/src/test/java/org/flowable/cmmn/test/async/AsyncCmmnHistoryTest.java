@@ -185,6 +185,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.complete(task.getId());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -195,6 +197,8 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
 
         Task task2 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
         cmmnTaskService.complete(task2.getId());
+        
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
@@ -260,15 +264,14 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
 
         assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
 
-        assertThatThrownBy(() -> cmmnHistoryService.bulkDeleteHistoricCaseInstances(caseInstanceIdList))
-                .isInstanceOf(FlowableObjectNotFoundException.class).hasMessage("No historic case instance found with id: inValidId");
+        cmmnHistoryService.bulkDeleteHistoricCaseInstances(caseInstanceIdList);
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(1);
 
         assertThatThrownBy(() -> cmmnHistoryService.bulkDeleteHistoricCaseInstances(null))
                 .isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("historic case instanceIds are null");
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(3);
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(1);
 
     }
 

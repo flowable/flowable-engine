@@ -22,7 +22,7 @@ public interface ChannelModelProcessor {
     boolean canProcess(ChannelModel channelModel);
 
     void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant);
 
     void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService);

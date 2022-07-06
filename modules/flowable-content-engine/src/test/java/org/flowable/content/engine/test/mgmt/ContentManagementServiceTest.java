@@ -22,7 +22,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntity;
 import org.flowable.content.engine.test.AbstractFlowableContentTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ContentManagementServiceTest extends AbstractFlowableContentTest {
 
@@ -73,6 +73,6 @@ public class ContentManagementServiceTest extends AbstractFlowableContentTest {
                 .isIn("VARCHAR", "VARCHAR2", "NVARCHAR2", "nvarchar", "NVARCHAR", "CHARACTER VARYING");
 
         assertThat(tableMetaData.getColumnTypes().get(createdIndex))
-                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME");
+                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2");
     }
 }

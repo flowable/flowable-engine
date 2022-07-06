@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.impl.keydetector.XpathBasedInboundEventKeyDetector;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class XpathBasedInboundEventKeyDetectorTest {
 
     @Test
     void testDetectEventDefinitionKey() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
 
         String xPath = "/data/eventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);
@@ -38,7 +37,7 @@ class XpathBasedInboundEventKeyDetectorTest {
 
     @Test
     void testDetectEventDefinitionKeyWrongXpath() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name><eventKey>event-01</eventKey></data>");
 
         String xPath = "/data/wrongEventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);
@@ -47,7 +46,7 @@ class XpathBasedInboundEventKeyDetectorTest {
 
     @Test
     void testDetectEventDefinitionKeyMissingDefinitionKeyInXml() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
 
         String xPath = "/data/eventKey";
         XpathBasedInboundEventKeyDetector detector = new XpathBasedInboundEventKeyDetector(xPath);

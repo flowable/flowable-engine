@@ -134,7 +134,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -154,7 +153,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -215,7 +213,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 0 1 * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(365));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(100);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isFalse();
 
             deleteDeployments(cmmnEngine);
         });

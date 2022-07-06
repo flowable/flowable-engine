@@ -31,7 +31,6 @@ import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
@@ -40,7 +39,6 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
-import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
@@ -354,10 +352,9 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<Customer>() {
 
             @Override
-            public FlowableEventInfo<Customer> deserialize(Object rawEvent) {
+            public Customer deserialize(Object rawEvent) {
                 try {
-                    Customer customer = new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
-                    return new FlowableEventInfoImpl<>(null, customer);
+                    return new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
@@ -366,20 +363,19 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         });
 
         inboundEventProcessingPipeline.setInboundEventKeyDetector(new InboundEventKeyDetector<Customer> () {
-            
+
             @Override
-            public String detectEventDefinitionKey(FlowableEventInfo<Customer> event) {
-                return event.getPayload().getType();
+            public String detectEventDefinitionKey(Customer payload) {
+                return payload.getType();
             }
         });
         
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<Customer>() {
 
             @Override
-            public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<Customer> event) {
+            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer) {
                 Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
-                for (EventPayload eventPayloadDefinition : eventDefinition.getPayload()) {
-                    Customer customer = event.getPayload();
+                for (EventPayload eventPayloadDefinition : eventModel.getPayload()) {
                     switch (eventPayloadDefinition.getName()) {
                         case "payload1":
                             payloadInstances.add(new EventPayloadInstanceImpl(eventPayloadDefinition, customer.getPayload1()));

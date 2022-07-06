@@ -13,6 +13,7 @@
 
 package org.flowable.task.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,8 @@ import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstan
  * @author Joram Barrez
  */
 public class HistoricTaskInstanceEntityManagerImpl
-    extends AbstractTaskServiceEntityManager<HistoricTaskInstanceEntity, HistoricTaskInstanceDataManager>
-    implements HistoricTaskInstanceEntityManager {
+        extends AbstractTaskServiceEntityManager<HistoricTaskInstanceEntity, HistoricTaskInstanceDataManager>
+        implements HistoricTaskInstanceEntityManager {
 
     public HistoricTaskInstanceEntityManagerImpl(TaskServiceConfiguration taskServiceConfiguration, HistoricTaskInstanceDataManager historicTaskInstanceDataManager) {
         super(taskServiceConfiguration, historicTaskInstanceDataManager);
@@ -45,8 +46,23 @@ public class HistoricTaskInstanceEntityManagerImpl
     }
     
     @Override
+    public List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds) {
+        return dataManager.findHistoricTaskIdsByParentTaskIds(parentTaskIds);
+    }
+
+    @Override
     public List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId) {
         return dataManager.findHistoricTasksByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    public List<String> findHistoricTaskIdsForProcessInstanceIds(Collection<String> processInstanceIds) {
+        return dataManager.findHistoricTaskIdsForProcessInstanceIds(processInstanceIds);
+    }
+
+    @Override
+    public List<String> findHistoricTaskIdsForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        return dataManager.findHistoricTaskIdsForScopeIdsAndScopeType(scopeIds, scopeType);
     }
 
     @Override
@@ -90,6 +106,11 @@ public class HistoricTaskInstanceEntityManagerImpl
         dataManager.deleteHistoricTaskInstances(historicTaskInstanceQuery);
     }
     
+    @Override
+    public void bulkDeleteHistoricTaskInstancesForIds(Collection<String> taskIds) {
+        dataManager.bulkDeleteHistoricTaskInstancesForIds(taskIds);
+    }
+
     @Override
     public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
         dataManager.deleteHistoricTaskInstancesForNonExistingProcessInstances();

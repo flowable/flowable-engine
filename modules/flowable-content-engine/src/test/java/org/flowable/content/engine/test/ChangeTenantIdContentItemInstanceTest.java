@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.content.api.ContentItem;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableContentTest {
 

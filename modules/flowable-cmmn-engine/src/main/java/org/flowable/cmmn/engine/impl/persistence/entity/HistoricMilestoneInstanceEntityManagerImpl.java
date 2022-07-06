@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -48,6 +49,11 @@ public class HistoricMilestoneInstanceEntityManagerImpl
         return dataManager.findHistoricMilestoneInstancesCountByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
     }
     
+    @Override
+    public void bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(Collection<String> caseInstanceIds) {
+        dataManager.bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(caseInstanceIds);
+    }
+
     @Override
     public void deleteHistoricMilestoneInstancesForNonExistingCaseInstances() {
         dataManager.deleteHistoricMilestoneInstancesForNonExistingCaseInstances();

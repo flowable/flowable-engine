@@ -97,7 +97,7 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
         params.put("now", jobServiceConfiguration.getClock().getCurrentTime());
-        getDbSqlSession().update("resetExpiredTimerJob", params);
+        getDbSqlSession().directUpdate("resetExpiredTimerJob", params);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateTimerJobTenantIdForDeployment", params);
     }
 
     @Override

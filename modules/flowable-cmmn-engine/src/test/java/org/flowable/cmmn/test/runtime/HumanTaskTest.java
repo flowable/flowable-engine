@@ -374,6 +374,26 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment
+    public void humanTaskWithCommaSeparatedStringExpressionCandidates() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.CANDIDATE, "user1", null),
+                        tuple(IdentityLinkType.CANDIDATE, "user2", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "groupA"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "groupB")
+                );
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskIdVariableName.cmmn")
     public void testHumanTaskIdVariableName() {
         Authentication.setAuthenticatedUserId("JohnDoe");

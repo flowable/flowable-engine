@@ -300,6 +300,19 @@
     </foreach>
   </delete>
   
+  <delete id="bulkDeleteHistoricTaskInstancesForIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_TASKINST where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and TASK.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TASK.PROC_INST_ID_ = PROCINST.ID_)
@@ -438,11 +451,51 @@
   <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
     select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter}
   </select>
+  
+  <select id="selectHistoricTaskIdsByParentTaskIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_ from ${prefix}ACT_HI_TASKINST where 
+    <foreach item="listItem" index="listIndex" collection="parameter">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PARENT_TASK_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </select>
 
   <select id="selectHistoricTaskInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap" >
     select *
     from ${prefix}ACT_HI_TASKINST
     where PROC_INST_ID_ = #{parameter}
+  </select>
+  
+  <select id="selectHistoricTaskInstanceIdsForProcessInstanceIds" parameterType="java.util.Collection" resultType="string">
+    select ID_ from ${prefix}ACT_HI_TASKINST where 
+    <foreach item="listItem" index="listIndex" collection="parameter">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PROC_INST_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </select>
+  
+  <select id="selectHistoricTaskInstanceIdsForScopeIdsAndScopeType" parameterType="map" resultType="string">
+    select ID_ from ${prefix}ACT_HI_TASKINST where 
+    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">

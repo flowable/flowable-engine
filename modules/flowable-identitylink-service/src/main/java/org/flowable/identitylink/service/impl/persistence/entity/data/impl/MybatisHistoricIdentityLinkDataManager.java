@@ -12,6 +12,7 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,25 @@ public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<
         getDbSqlSession().delete("deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType", parameters, HistoricIdentityLinkEntityImpl.class);
     }
     
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricIdentityLinksForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricIdentityLinkEntityImpl.class);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricIdentityLinksForTaskIds", createSafeInValuesList(taskIds), HistoricIdentityLinkEntityImpl.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        parameters.put("scopeType", scopeType);
+        
+        getDbSqlSession().delete("bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType", parameters, HistoricIdentityLinkEntityImpl.class);
+    }
+
     @Override
     public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricProcessIdentityLinks", null, HistoricIdentityLinkEntityImpl.class);

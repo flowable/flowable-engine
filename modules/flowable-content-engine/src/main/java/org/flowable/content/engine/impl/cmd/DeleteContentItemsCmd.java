@@ -13,43 +13,74 @@
 package org.flowable.content.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.content.api.ContentItem;
+import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class DeleteContentItemsCmd implements Command<Void>, Serializable {
+public class DeleteContentItemsCmd extends AbstractDeleteContentItemCmd implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     protected String processInstanceId;
     protected String taskId;
-    protected String caseId;
+    protected String scopeId;
+    protected String scopeType;
 
-    public DeleteContentItemsCmd(String processInstanceId, String taskId, String caseId) {
+    public DeleteContentItemsCmd(String processInstanceId, String taskId, String scopeId, String scopeType) {
         this.processInstanceId = processInstanceId;
         this.taskId = taskId;
-        this.caseId = caseId;
+        this.scopeId = scopeId;
+        this.scopeType = scopeType;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (processInstanceId == null && taskId == null && caseId == null) {
-            throw new FlowableIllegalArgumentException("taskId, processInstanceId and caseId are null");
+        if (processInstanceId == null && taskId == null && scopeId == null) {
+            throw new FlowableIllegalArgumentException("taskId, processInstanceId and scopeId are null");
         }
 
+        ContentItemEntityManager contentItemEntityManager = CommandContextUtil.getContentItemEntityManager();
         if (processInstanceId != null) {
-            CommandContextUtil.getContentItemEntityManager().deleteContentItemsByProcessInstanceId(processInstanceId);
 
-        } else if (StringUtils.isNotEmpty(caseId)) {
-            CommandContextUtil.getContentItemEntityManager().deleteContentItemsByScopeIdAndScopeType(caseId, "cmmn");
+            List<ContentItem> contentItems = contentItemEntityManager.findContentItemsByProcessInstanceId(processInstanceId);
+            if (contentItems != null) {
+                for (ContentItem contentItem : contentItems) {
+                    deleteContentItemInContentStorage(contentItem);
+                }
+            }
+
+            contentItemEntityManager.deleteContentItemsByProcessInstanceId(processInstanceId);
+
+        } else if (StringUtils.isNotEmpty(scopeId)) {
+
+            List<ContentItem> contentItems = contentItemEntityManager.findContentItemsByScopeIdAndScopeType(scopeId, scopeType);
+            if (contentItems != null) {
+                for (ContentItem contentItem : contentItems) {
+                    deleteContentItemInContentStorage(contentItem);
+                }
+            }
+
+            contentItemEntityManager.deleteContentItemsByScopeIdAndScopeType(scopeId, scopeType);
+
         } else {
-            CommandContextUtil.getContentItemEntityManager().deleteContentItemsByTaskId(taskId);
+
+            List<ContentItem> contentItems = contentItemEntityManager.findContentItemsByTaskId(taskId);
+            if (contentItems != null) {
+                for (ContentItem contentItem : contentItems) {
+                    deleteContentItemInContentStorage(contentItem);
+                }
+            }
+
+            contentItemEntityManager.deleteContentItemsByTaskId(taskId);
         }
 
         return null;

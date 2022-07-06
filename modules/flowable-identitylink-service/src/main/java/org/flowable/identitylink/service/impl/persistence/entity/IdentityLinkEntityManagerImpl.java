@@ -325,6 +325,11 @@ public class IdentityLinkEntityManagerImpl
         dataManager.deleteIdentityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
     }
 
+    @Override
+    public void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        dataManager.bulkDeleteIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
     protected IdentityLinkEventHandler getIdentityLinkEventHandler() {
         return serviceConfiguration.getIdentityLinkEventHandler();
     }

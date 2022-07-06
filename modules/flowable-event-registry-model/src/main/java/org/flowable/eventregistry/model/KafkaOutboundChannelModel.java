@@ -23,7 +23,9 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
 
     protected String topic;
     protected String recordKey;
-    
+
+    protected KafkaPartition partition;
+
     public KafkaOutboundChannelModel() {
         super();
         setType("kafka");
@@ -43,5 +45,45 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
 
     public void setRecordKey(String recordKey) {
         this.recordKey = recordKey;
+    }
+
+    public KafkaPartition getPartition() {
+        return partition;
+    }
+
+    public void setPartition(KafkaPartition partition) {
+        this.partition = partition;
+    }
+
+    @JsonInclude(Include.NON_NULL)
+    public static class KafkaPartition {
+
+        protected String eventField;
+        protected String roundRobin;
+        protected String delegateExpression;
+
+        public String getEventField() {
+            return eventField;
+        }
+
+        public void setEventField(String eventField) {
+            this.eventField = eventField;
+        }
+
+        public String getRoundRobin() {
+            return roundRobin;
+        }
+
+        public void setRoundRobin(String roundRobin) {
+            this.roundRobin = roundRobin;
+        }
+
+        public String getDelegateExpression() {
+            return delegateExpression;
+        }
+
+        public void setDelegateExpression(String delegateExpression) {
+            this.delegateExpression = delegateExpression;
+        }
     }
 }

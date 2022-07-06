@@ -28,8 +28,10 @@ import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
@@ -137,6 +139,16 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkChildrenForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForTaskCmd(taskId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkParentsForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForTaskCmd(taskId));
     }
 
     @Override

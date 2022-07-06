@@ -12,6 +12,7 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
@@ -33,6 +34,12 @@ public interface HistoricIdentityLinkDataManager extends DataManager<HistoricIde
     void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
     
     void deleteHistoricIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
     
     void deleteHistoricProcessIdentityLinksForNonExistingInstances();
     

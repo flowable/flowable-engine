@@ -98,6 +98,10 @@ public class EventModel {
         }
     }
 
+    public void addPayload(EventPayload payload) {
+        this.payload.put(payload.getName(), payload);
+    }
+
     public void addCorrelation(String name, String type) {
         EventPayload eventPayload = payload.get(name);
         if (eventPayload != null) {

@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.usertask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,8 @@ import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.AfterEach;
@@ -209,6 +212,26 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         assertThat(query.taskCandidateGroup("management").count()).isEqualTo(1);
         assertThat(query.taskCandidateGroup("accountancy").count()).isEqualTo(1);
         assertThat(query.taskCandidateGroup("sales").count()).isZero();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/usertask/TaskAssignmentExtensionsTest.testCandidatesWithCommaSeparatedStringExpression.bpmn20.xml")
+    public void testCandidatesWithCommaSeparatedStringExpression() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidatesExpression")
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(taskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.CANDIDATE, "user1", null),
+                        tuple(IdentityLinkType.CANDIDATE, "user2", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "groupA"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "groupB")
+                );
     }
 
     // Test where the candidate user extension is used together

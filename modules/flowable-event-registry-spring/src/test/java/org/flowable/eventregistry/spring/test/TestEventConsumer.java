@@ -15,11 +15,15 @@ package org.flowable.eventregistry.spring.test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.EventConsumerInfo;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -28,7 +32,8 @@ import org.opentest4j.AssertionFailedError;
 public class TestEventConsumer implements EventRegistryEventConsumer {
 
     protected final List<EventRegistryEvent> events = new ArrayList<>();
-    
+    protected Consumer<EventRegistryEvent> eventConsumer = event -> {};
+
     @Override
     public String getConsumerKey() {
         return "testEventConsumer";
@@ -37,6 +42,7 @@ public class TestEventConsumer implements EventRegistryEventConsumer {
     @Override
     public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
         events.add(event);
+        eventConsumer.accept(event);
         EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
         eventRegistryProcessingInfo.addEventConsumerInfo(new EventConsumerInfo());
         return eventRegistryProcessingInfo;
@@ -53,7 +59,22 @@ public class TestEventConsumer implements EventRegistryEventConsumer {
             .orElseThrow(() -> new AssertionFailedError(events + " does not container an event with type " + eventType));
     }
 
+    public List<Object> getEventInstancePayloadValues(String payloadName) {
+        return getEvents().stream()
+                .map(EventRegistryEvent::getEventObject)
+                .map(EventInstance.class::cast)
+                .flatMap(e -> e.getPayloadInstances().stream())
+                .filter(p -> payloadName.equals(p.getDefinitionName()))
+                .map(EventPayloadInstance::getValue)
+                .collect(Collectors.toList());
+    }
+
+    public void setEventConsumer(Consumer<EventRegistryEvent> eventConsumer) {
+        this.eventConsumer = eventConsumer;
+    }
+
     public void clear() {
         events.clear();
+        eventConsumer = event -> {};
     }
 }

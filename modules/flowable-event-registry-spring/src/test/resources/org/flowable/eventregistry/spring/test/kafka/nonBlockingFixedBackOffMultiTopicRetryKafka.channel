@@ -1,0 +1,29 @@
+{
+    "key": "fixedBackOffMultiTopic",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "fixed-backoff-multi"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "customProperties": [
+        {
+            "name": "auto.offset.reset",
+            "value": "earliest"
+        }
+    ],
+    "retry": {
+        "attempts": "3",
+        "retryTopicSuffix": "-retry-topic",
+        "dltTopicSuffix": "-dlt-topic",
+        "fixedDelayTopicStrategy": "MULTIPLE_TOPICS",
+        "nonBlockingBackOff": {
+            "delay": "100"
+        }
+
+    }
+}

@@ -13,6 +13,7 @@
 
 package org.flowable.identitylink.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
@@ -85,6 +86,21 @@ public class HistoricIdentityLinkEntityManagerImpl
     @Override
     public void deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
         dataManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds) {
+        dataManager.bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds) {
+        dataManager.bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        dataManager.bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
     }
 
     @Override

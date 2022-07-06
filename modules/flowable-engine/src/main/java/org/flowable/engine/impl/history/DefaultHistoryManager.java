@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -156,6 +157,30 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 // The tenantId is not important for the DefaultHistoryManager
                 recordProcessInstanceDeleted(historicProcessInstanceId, processDefinitionId, null);
             }
+        }
+    }
+    
+    @Override
+    public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
+        if (isHistoryEnabled() && processInstanceIds != null && !processInstanceIds.isEmpty()) {
+            getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+            getHistoricActivityInstanceEntityManager().bulkDeleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
+            TaskHelper.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
+            
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.BPMN, processInstanceIds);
+            }
+            
+            getCommentEntityManager().bulkDeleteCommentsForProcessInstanceIds(processInstanceIds);
+    
+            getHistoricProcessInstanceEntityManager().bulkDeleteHistoricProcessInstances(processInstanceIds);
+    
+            // Also delete any sub-processes that may be active (ACT-821)
+    
+            List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
+            recordBulkDeleteProcessInstances(subProcessInstanceIds);
         }
     }
 

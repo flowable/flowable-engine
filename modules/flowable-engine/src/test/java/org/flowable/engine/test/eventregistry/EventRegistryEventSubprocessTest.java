@@ -367,18 +367,25 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         variableMap.put("customerIdVar", "gonzo");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EventRegistryEventSubprocessProcessAndCallActivity", variableMap);
 
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNotNull();
+
         // Trigger event subprocess
         inboundEventChannelAdapter.triggerTestEvent("gonzo");
 
-        HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNull();
 
-        assertThat(parentProcess.getEndTime()).isNotNull();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+            assertThat(parentProcess.getEndTime()).isNotNull();
 
-        assertThat(throwProcess).isNotNull();
-        assertThat(throwProcess.getEndTime()).isNotNull();
-        assertThat(throwProcess.getEndActivityId()).isEqualTo("eventProcessStart");
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("eventProcessStart");
+        }
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

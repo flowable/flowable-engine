@@ -37,8 +37,8 @@ public class JsonPointerBasedInboundEventTenantDetector implements InboundEventT
     }
 
     @Override
-    public String detectTenantId(FlowableEventInfo<JsonNode> event) {
-        JsonNode result = event.getPayload().at(jsonPointer);
+    public String detectTenantId(JsonNode payload) {
+        JsonNode result = payload.at(jsonPointer);
 
         if (result == null || result.isMissingNode() || result.isNull()) {
             LOGGER.warn("JsonPointer expression {} did not detect event tenant", jsonPointer);

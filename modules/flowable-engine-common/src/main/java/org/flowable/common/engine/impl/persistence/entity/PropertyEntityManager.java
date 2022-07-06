@@ -21,4 +21,5 @@ public interface PropertyEntityManager extends EntityManager<PropertyEntity> {
 
     List<PropertyEntity> findAll();
 
+    void directInsertProperty(String name, String value);
 }

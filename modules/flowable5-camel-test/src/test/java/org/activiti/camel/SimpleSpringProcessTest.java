@@ -50,7 +50,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
                 from("direct:start").to("flowable:camelProcess");
                 from("direct:receive").to("flowable:camelProcess:receive");
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
-                from("flowable:camelProcess:serviceTask1").setBody().simple("property[var1]").to("mock:service1").setProperty("var2").constant("var2").setBody().mvel("properties");
+                from("flowable:camelProcess:serviceTask1").setBody().simple("${exchangeProperty.var1}").to("mock:service1").setProperty("var2").constant("var2").setBody().mvel("properties");
             }
         });
 

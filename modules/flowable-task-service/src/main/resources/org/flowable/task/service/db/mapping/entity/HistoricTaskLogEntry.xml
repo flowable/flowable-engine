@@ -206,6 +206,19 @@
     delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId}
   </delete>
   
+  <delete id="bulkDeleteHistoricTaskLogEntriesForTaskIds" parameterType="string">
+    delete from ${prefix}ACT_HI_TSK_LOG where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        TASK_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
   <delete id="bulkDeleteHistoricTaskLogEntriesForNonExistingProcessInstances" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'" > TSKLOG </if> from ${prefix}ACT_HI_TSK_LOG TSKLOG where TSKLOG.PROC_INST_ID_ is not null and TSKLOG.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TSKLOG.PROC_INST_ID_ = PROCINST.ID_)

@@ -14,12 +14,14 @@ package org.flowable.eventregistry.api;
 
 import java.util.Collection;
 
+import org.flowable.eventregistry.model.InboundChannelModel;
+
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
 public interface InboundEventProcessingPipeline {
 
-    Collection<EventRegistryEvent> run(String channelKey, Object rawEvent);
+    Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent inboundEvent);
     
 }

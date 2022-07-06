@@ -49,8 +49,8 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.ArrayTypeHandler;
 import org.apache.ibatis.type.BigDecimalTypeHandler;
-import org.apache.ibatis.type.BlobByteObjectArrayTypeHandler;
 import org.apache.ibatis.type.BlobInputStreamTypeHandler;
+import org.apache.ibatis.type.BlobTypeHandler;
 import org.apache.ibatis.type.BooleanTypeHandler;
 import org.apache.ibatis.type.ByteTypeHandler;
 import org.apache.ibatis.type.ClobTypeHandler;
@@ -940,7 +940,7 @@ public abstract class AbstractEngineConfiguration {
         handlerRegistry.register(Object.class, JdbcType.NUMERIC, new BigDecimalTypeHandler());
 
         handlerRegistry.register(Object.class, JdbcType.BLOB, new BlobInputStreamTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new BlobByteObjectArrayTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.LONGVARBINARY, new BlobTypeHandler());
 
         handlerRegistry.register(Object.class, JdbcType.DATE, new DateOnlyTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.TIME, new TimeOnlyTypeHandler());

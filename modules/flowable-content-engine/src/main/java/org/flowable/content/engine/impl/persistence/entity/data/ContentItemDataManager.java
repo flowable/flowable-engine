@@ -28,9 +28,15 @@ public interface ContentItemDataManager extends DataManager<ContentItemEntity> {
 
     List<ContentItem> findContentItemsByQueryCriteria(ContentItemQueryImpl contentItemQuery);
 
+    List<ContentItem> findContentItemsByTaskId(String taskId);
+
     void deleteContentItemsByTaskId(String taskId);
 
+    List<ContentItem> findContentItemsByProcessInstanceId(String processInstanceId);
+
     void deleteContentItemsByProcessInstanceId(String processInstanceId);
+
+    List<ContentItem> findContentItemsByScopeIdAndScopeType(String scopeId, String scopeType);
 
     void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType);
 }

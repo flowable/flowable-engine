@@ -114,7 +114,7 @@ public class MybatisAppDefinitionDataManager extends AbstractAppDataManager<AppD
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateAppDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateAppDefinitionTenantIdForDeploymentId", params);
     }
 
     @Override

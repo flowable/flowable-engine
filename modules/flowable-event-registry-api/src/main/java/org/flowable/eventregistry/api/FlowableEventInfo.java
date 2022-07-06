@@ -14,11 +14,16 @@ package org.flowable.eventregistry.api;
 
 import java.util.Map;
 
+import org.flowable.eventregistry.model.InboundChannelModel;
+
 public interface FlowableEventInfo<T> {
 
     Map<String, Object> getHeaders();
-    
-    void setHeaders(Map<String, Object> headers);
-    
+
     T getPayload();
+
+    Object getRawEvent();
+
+    InboundChannelModel getInboundChannel();
+
 }

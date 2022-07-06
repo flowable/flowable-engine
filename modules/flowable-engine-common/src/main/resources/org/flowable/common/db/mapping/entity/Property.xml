@@ -37,6 +37,18 @@
     </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="insertPropertyWithMap" parameterType="java.util.Map">
+      insert into ${prefix}ACT_GE_PROPERTY (
+        NAME_,
+        VALUE_,
+        REV_
+      ) values (
+        #{name ,jdbcType=VARCHAR},
+        #{value, jdbcType=VARCHAR},
+        1
+      )
+  </insert>
 
   <!-- PROPERTY UPDATE -->
   
