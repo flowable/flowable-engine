@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;

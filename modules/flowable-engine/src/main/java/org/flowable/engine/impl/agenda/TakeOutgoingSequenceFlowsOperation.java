@@ -51,9 +51,6 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Operation which purpose is to leave a {@link FlowNode}.
  * This can be done by setting either the {@link FlowNode} or selecting a particular {@link SequenceFlow}:

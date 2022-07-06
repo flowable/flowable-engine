@@ -14,7 +14,6 @@
 package org.flowable.cmmn.rest.service.api;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Class that represents a bulk action to be performed on a resource.

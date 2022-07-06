@@ -14,7 +14,6 @@ package org.flowable.engine.impl.agenda;
 
 import java.util.Collection;
 
-import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;

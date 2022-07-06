@@ -14,7 +14,6 @@ package org.flowable.engine;
 
 import java.util.Collection;
 
-import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.interceptor.MigrationContext;
 

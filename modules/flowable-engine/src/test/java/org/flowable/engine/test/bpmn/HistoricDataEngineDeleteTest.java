@@ -26,8 +26,6 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
-import org.flowable.engine.impl.delete.ComputeDeleteHistoricProcessInstanceIdsJobHandler;
-import org.flowable.engine.impl.delete.DeleteHistoricProcessInstanceIdsStatusJobHandler;
 import org.flowable.engine.impl.delete.DeleteHistoricProcessInstancesSequentialJobHandler;
 import org.flowable.engine.impl.delete.DeleteProcessInstanceBatchConstants;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
