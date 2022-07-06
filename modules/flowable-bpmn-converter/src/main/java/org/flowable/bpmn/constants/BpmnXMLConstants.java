@@ -247,8 +247,10 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC = "completeAsync";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
+    public static final String ATTRIBUTE_IOPARAMETER_SOURCE_TYPE = "sourceType";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    public static final String ATTRIBUTE_IOPARAMETER_TARGET_TYPE = "targetType";
     public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
     public static final String ATTRIBUTE_IOPARAMETER_VARIABLES = "variables";
 

@@ -31,9 +31,12 @@ public class InParameterParser extends BaseChildElementParser {
 
     public static final List<ExtensionAttribute> defaultInParameterAttributes = Arrays.asList(
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_VARIABLES),
             new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY)
     );
