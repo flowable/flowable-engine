@@ -12,7 +12,6 @@
  */
 package org.flowable.eventregistry.impl.tenantdetector;
 
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

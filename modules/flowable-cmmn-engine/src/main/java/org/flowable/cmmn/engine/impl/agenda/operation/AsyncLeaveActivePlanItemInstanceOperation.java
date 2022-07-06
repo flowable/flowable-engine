@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import static org.flowable.cmmn.engine.impl.agenda.operation.OperationSerializationMetadata.OPERATION_TRANSITION;
-
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;

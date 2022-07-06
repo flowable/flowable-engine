@@ -17,7 +17,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
