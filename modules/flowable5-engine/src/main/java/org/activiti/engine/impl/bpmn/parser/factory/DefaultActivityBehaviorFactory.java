@@ -25,6 +25,7 @@ import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
@@ -66,6 +67,7 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.InclusiveGateway;
@@ -171,6 +173,18 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         }
         return new ServiceTaskExpressionActivityBehavior(serviceTask.getId(), expression, skipExpression,
                 serviceTask.getResultVariableName(), serviceTask.getMapExceptions());
+    }
+    
+    @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerTaskActivityBehavior(ExternalWorkerServiceTask externalWorkerServiceTask) {
+        Expression topicExpression = expressionManager.createExpression(externalWorkerServiceTask.getTopic());
+        Expression skipExpression;
+        if (StringUtils.isNotEmpty(externalWorkerServiceTask.getSkipExpression())) {
+            skipExpression = expressionManager.createExpression(externalWorkerServiceTask.getSkipExpression());
+        } else {
+            skipExpression = null;
+        }
+        return new ExternalWorkerTaskActivityBehavior(externalWorkerServiceTask, topicExpression, skipExpression);
     }
 
     @Override
@@ -377,6 +391,8 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
         callActivityBehaviour.setInheritVariables(callActivity.isInheritVariables());
         callActivityBehaviour.setSameDeployment(callActivity.isSameDeployment());
+        callActivityBehaviour.setBusinessKey(callActivity.getBusinessKey());
+        callActivityBehaviour.setInheritBusinessKey(callActivity.isInheritBusinessKey());
 
         for (IOParameter ioParameter : callActivity.getInParameters()) {
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {

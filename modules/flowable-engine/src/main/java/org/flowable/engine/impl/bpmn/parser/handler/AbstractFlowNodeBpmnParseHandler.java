@@ -18,5 +18,5 @@ import org.flowable.bpmn.model.FlowNode;
  * @author Joram Barrez
  */
 public abstract class AbstractFlowNodeBpmnParseHandler<T extends FlowNode> extends AbstractBpmnParseHandler<T> {
-
+    
 }

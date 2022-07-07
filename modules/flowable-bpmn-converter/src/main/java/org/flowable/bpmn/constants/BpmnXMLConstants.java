@@ -31,6 +31,7 @@ public interface BpmnXMLConstants {
     public static final String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
     public static final String ACTIVITI_EXTENSIONS_NAMESPACE = "http://activiti.org/bpmn";
     public static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
+    public static final String CAMUNDA_EXTENSIONS_NAMESPACE = "http://camunda.org/schema/1.0/bpmn";
     public static final String BPMNDI_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/DI";
     public static final String BPMNDI_PREFIX = "bpmndi";
     public static final String OMGDC_NAMESPACE = "http://www.omg.org/spec/DD/20100524/DC";
@@ -109,6 +110,8 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_VALUE_FALSE = "false";
 
     public static final String ATTRIBUTE_ACTIVITY_ASYNCHRONOUS = "async";
+    public static final String ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_BEFORE = "asyncBefore";
+    public static final String ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE = "asyncLeave";
     public static final String ATTRIBUTE_ACTIVITY_EXCLUSIVE = "exclusive";
     public static final String ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION = "isForCompensation";
     public static final String ATTRIBUTE_ACTIVITY_TRIGGERABLE = "triggerable";
@@ -199,7 +202,8 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_CLASS = "class";
     public static final String ATTRIBUTE_TASK_SERVICE_EXPRESSION = "expression";
     public static final String ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION = "delegateExpression";
-    public static final String ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE = "resultVariableName";
+    public static final String ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME = "resultVariableName";
+    public static final String ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE = "resultVariable";
     public static final String ATTRIBUTE_TASK_SERVICE_EXTENSIONID = "extensionId";
     public static final String ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "useLocalScopeForResultVariable";
@@ -229,6 +233,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     public static final String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
+    public static final String ATTRIBUTE_CALLED_ELEMENT_BINDING = "calledElementBinding";
     public static final String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     public static final String ATTRIBUTE_ID_VARIABLE_NAME = "idVariableName";
     public static final String ELEMENT_IN_PARAMETERS = "in";
@@ -242,9 +247,12 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_CALL_ACTIVITY_COMPLETE_ASYNC = "completeAsync";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
+    public static final String ATTRIBUTE_IOPARAMETER_SOURCE_TYPE = "sourceType";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    public static final String ATTRIBUTE_IOPARAMETER_TARGET_TYPE = "targetType";
     public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
+    public static final String ATTRIBUTE_IOPARAMETER_VARIABLES = "variables";
 
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";
     public static final String ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME = "caseInstanceName";

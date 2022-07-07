@@ -294,6 +294,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         task.setBlockingExpression(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
         task.setAsync(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
         task.setExclusive(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
+        task.setAsyncLeave(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_ASYNC_LEAVE, elementNode));
     }
     
     protected void handleRequiredRule(JsonNode elementNode, PlanItem planItem) {

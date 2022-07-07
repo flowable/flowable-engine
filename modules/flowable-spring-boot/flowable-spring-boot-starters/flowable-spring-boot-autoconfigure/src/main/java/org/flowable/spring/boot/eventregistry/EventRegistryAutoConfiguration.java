@@ -14,7 +14,6 @@ package org.flowable.spring.boot.eventregistry;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -27,8 +26,6 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
-import org.flowable.eventregistry.impl.payload.CompositePayloadExtractor;
-import org.flowable.eventregistry.impl.payload.HeadersPayloadExtractor;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.eventregistry.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;

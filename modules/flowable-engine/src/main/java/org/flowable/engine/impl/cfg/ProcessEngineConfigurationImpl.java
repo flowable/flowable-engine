@@ -284,6 +284,7 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
+import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
@@ -2038,6 +2039,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         AsyncContinuationJobHandler asyncContinuationJobHandler = new AsyncContinuationJobHandler();
         jobHandlers.put(asyncContinuationJobHandler.getType(), asyncContinuationJobHandler);
+
+        AsyncLeaveJobHandler asyncLeaveJobHandler = new AsyncLeaveJobHandler();
+        jobHandlers.put(asyncLeaveJobHandler.getType(), asyncLeaveJobHandler);
 
         AsyncTriggerJobHandler asyncTriggerJobHandler = new AsyncTriggerJobHandler();
         jobHandlers.put(asyncTriggerJobHandler.getType(), asyncTriggerJobHandler);

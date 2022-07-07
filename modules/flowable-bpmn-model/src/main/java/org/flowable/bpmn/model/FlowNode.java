@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public abstract class FlowNode extends FlowElement {
 
     protected boolean asynchronous;
+    protected boolean asynchronousLeave;
     protected boolean notExclusive;
 
     protected List<SequenceFlow> incomingFlows = new ArrayList<>();
@@ -42,6 +43,14 @@ public abstract class FlowNode extends FlowElement {
 
     public void setAsynchronous(boolean asynchronous) {
         this.asynchronous = asynchronous;
+    }
+
+    public boolean isAsynchronousLeave() {
+        return asynchronousLeave;
+    }
+
+    public void setAsynchronousLeave(boolean asynchronousLeave) {
+        this.asynchronousLeave = asynchronousLeave;
     }
 
     public boolean isExclusive() {
@@ -88,5 +97,6 @@ public abstract class FlowNode extends FlowElement {
         super.setValues(otherNode);
         setAsynchronous(otherNode.isAsynchronous());
         setNotExclusive(otherNode.isNotExclusive());
+        setAsynchronousLeave(otherNode.isAsynchronousLeave());
     }
 }

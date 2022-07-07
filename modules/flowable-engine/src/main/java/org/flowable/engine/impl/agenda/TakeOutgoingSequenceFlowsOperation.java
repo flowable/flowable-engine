@@ -39,17 +39,27 @@ import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.UelExpressionCondition;
+import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.impl.util.condition.ConditionUtil;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Operation that leaves the {@link FlowElement} where the {@link ExecutionEntity} is currently at and leaves it following the sequence flow.
- * 
+ * Operation which purpose is to leave a {@link FlowNode}.
+ * This can be done by setting either the {@link FlowNode} or selecting a particular {@link SequenceFlow}:
+ *
+ * - when the execution currently is at a {@link FlowNode}, leaves it by following the outgoing sequence flow, evaluating conditions if necessary.
+ * - when the execution currently is at a {@link SequenceFlow}, this sequence flow will be followed. Any condition is ignored, as the assumed
+ *   use case for this situation is a custom {@link org.flowable.engine.impl.delegate.ActivityBehavior} (such as a gateway) that has non-default
+ *   behavior of leaving the {@link FlowNode} by checking conditions on all sequence flow and taking those which evaluate to true.
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -58,10 +68,12 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     private static final Logger LOGGER = LoggerFactory.getLogger(TakeOutgoingSequenceFlowsOperation.class);
 
     protected boolean evaluateConditions;
+    protected boolean forcedSynchronous;
 
-    public TakeOutgoingSequenceFlowsOperation(CommandContext commandContext, ExecutionEntity executionEntity, boolean evaluateConditions) {
+    public TakeOutgoingSequenceFlowsOperation(CommandContext commandContext, ExecutionEntity executionEntity, boolean evaluateConditions, boolean forcedSynchronous) {
         super(commandContext, executionEntity);
         this.evaluateConditions = evaluateConditions;
+        this.forcedSynchronous = forcedSynchronous;
     }
 
     @Override
@@ -83,14 +95,56 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         // When leaving the current activity, we need to delete any related execution (eg active boundary events)
         cleanupExecutions(currentFlowElement);
 
-        if (currentFlowElement instanceof FlowNode) {
+        FlowNode sourceFlowNode = getFlowNode(currentFlowElement);
+        if (!forcedSynchronous && sourceFlowNode != null && sourceFlowNode.isAsynchronousLeave()) {
+            handleAsynchronousLeave(currentFlowElement, sourceFlowNode);
+
+        } else if (currentFlowElement instanceof FlowNode) {
             handleFlowNode((FlowNode) currentFlowElement);
+
         } else if (currentFlowElement instanceof SequenceFlow) {
             handleSequenceFlow();
+
+        } else {
+            throw new FlowableException("Programmatic error: this operation needs either a FlowNode or a SequenceFlow as current FlowElement");
+
         }
     }
 
+    protected FlowNode getFlowNode(FlowElement currentFlowElement) {
+        FlowNode sourceFlowNode = null;
+        if (currentFlowElement instanceof FlowNode) {
+            sourceFlowNode = (FlowNode) currentFlowElement;
+
+        } else if (currentFlowElement instanceof SequenceFlow){
+            SequenceFlow sequenceFlow = (SequenceFlow) currentFlowElement;
+            FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
+            if (sourceFlowElement instanceof FlowNode) {
+                sourceFlowNode = (FlowNode) sourceFlowElement;
+            }
+        }
+        return sourceFlowNode;
+    }
+
+    protected void handleAsynchronousLeave(FlowElement currentFlowElement, FlowNode sourceFlowNode) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
+        JobEntity job = JobUtil.createJob(execution, sourceFlowNode, AsyncLeaveJobHandler.TYPE, processEngineConfiguration);
+
+        String jobHandlerConfig = null;
+        if (currentFlowElement instanceof FlowNode) {
+            jobHandlerConfig = AsyncLeaveJobHandler.createJobConfiguration(processEngineConfiguration, evaluateConditions);
+        } else {
+            jobHandlerConfig = AsyncLeaveJobHandler.createJobConfiguration(processEngineConfiguration, (SequenceFlow) currentFlowElement);
+        }
+        job.setJobHandlerConfiguration(jobHandlerConfig);
+
+        jobService.createAsyncJob(job, sourceFlowNode.isExclusive());
+        jobService.scheduleAsyncJob(job);
+    }
+
     protected void handleFlowNode(FlowNode flowNode) {
+
         handleActivityEnd(flowNode);
         if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
             handleAdhocSubProcess(flowNode);

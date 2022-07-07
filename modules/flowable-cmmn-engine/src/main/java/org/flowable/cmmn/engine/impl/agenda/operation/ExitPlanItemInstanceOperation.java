@@ -20,6 +20,9 @@ import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES;
 import static org.flowable.cmmn.model.Criterion.EXIT_TYPE_ACTIVE_INSTANCES;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
@@ -155,6 +158,17 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
         // by default, we don't create new instances for repeatable plan items being terminated, however, if the exit type is set to only terminate active or
         // enabled instances, we might want to immediately create a new instance for repetition, but only, if the current one was terminated, of course
         return (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) || EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType)) && TERMINATED.equals(getNewState());
+    }
+
+    @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(OperationSerializationMetadata.FIELD_PLAN_ITEM_INSTANCE_ID, planItemInstanceEntity.getId());
+        metadata.put(OperationSerializationMetadata.FIELD_EXIT_CRITERION_ID, exitCriterionId);
+        metadata.put(OperationSerializationMetadata.FIELD_EXIT_TYPE, exitType);
+        metadata.put(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE, exitEventType);
+        metadata.put(OperationSerializationMetadata.FIELD_IS_STAGE, isStage != null ? isStage.toString() : Boolean.FALSE.toString());
+        return metadata;
     }
 
     @Override

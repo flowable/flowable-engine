@@ -21,12 +21,17 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmProcessInstance;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -47,6 +52,8 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean inheritVariables;
     protected boolean sameDeployment;
+    protected String businessKey;
+    protected boolean inheritBusinessKey;
 
     public CallActivityBehavior(String processDefinitionKey, List<MapExceptionEntry> mapExceptions) {
         this.processDefinitonKey = processDefinitionKey;
@@ -75,13 +82,15 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             processDefinitonKey = (String) processDefinitionExpression.getValue(execution);
         }
 
-        DeploymentManager deploymentManager = Context.getProcessEngineConfiguration().getDeploymentManager();
+        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
 
         ProcessDefinition processDefinition = null;
 
         if (sameDeployment) {
             String deploymentId = deploymentManager.findDeployedProcessDefinitionById(execution.getProcessDefinitionId()).getDeploymentId();
             processDefinition = Context.getCommandContext().getProcessDefinitionEntityManager().findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitonKey);
+            processDefinition = deploymentManager.findDeployedProcessDefinitionById(processDefinition.getId());
         }
 
         if (processDefinition == null) {
@@ -106,6 +115,23 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             for (Map.Entry<String, Object> entry : variables.entrySet()) {
                 subProcessInstance.setVariable(entry.getKey(), entry.getValue());
             }
+        }
+
+        String subProcessInstanceBusinessKey = null;
+        if (StringUtils.isNotEmpty(businessKey)) {
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+            Expression expression = expressionManager.createExpression(businessKey);
+            subProcessInstanceBusinessKey = expression.getValue(execution).toString();
+
+        } else if (inheritBusinessKey) {
+            ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+            ExecutionEntity parentProcessInstance = executionEntityManager.findExecutionById(execution.getProcessInstanceId());
+            subProcessInstanceBusinessKey = parentProcessInstance.getBusinessKey();
+
+        }
+
+        if (StringUtils.isNotEmpty(subProcessInstanceBusinessKey) && subProcessInstance instanceof ExecutionEntity) {
+            ((ExecutionEntity) subProcessInstance).setBusinessKey(subProcessInstanceBusinessKey);
         }
 
         // copy process variables
@@ -186,4 +212,19 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         this.sameDeployment = sameDeployment;
     }
 
+    public String getBusinessKey() {
+        return businessKey;
+    }
+
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
+    }
+
+    public boolean isInheritBusinessKey() {
+        return inheritBusinessKey;
+    }
+
+    public void setInheritBusinessKey(boolean inheritBusinessKey) {
+        this.inheritBusinessKey = inheritBusinessKey;
+    }
 }

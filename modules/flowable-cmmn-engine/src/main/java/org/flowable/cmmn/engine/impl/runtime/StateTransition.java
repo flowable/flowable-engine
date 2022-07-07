@@ -70,10 +70,17 @@ public class StateTransition {
                 PlanItemTransition.SUSPEND, 
                 PlanItemTransition.TERMINATE, 
                 PlanItemTransition.PARENT_SUSPEND, 
-                PlanItemTransition.EXIT);
+                PlanItemTransition.EXIT,
+                PlanItemTransition.ASYNC_LEAVE_ACTIVE);
         
         addPlanItemTransition(PlanItemInstanceState.ASYNC_ACTIVE,
                 PlanItemTransition.ASYNC_ACTIVATE);
+
+        addPlanItemTransition(PlanItemInstanceState.ASYNC_ACTIVE_LEAVE,
+                PlanItemTransition.FAULT,
+                PlanItemTransition.COMPLETE,
+                PlanItemTransition.TERMINATE,
+                PlanItemTransition.EXIT);
         
         addPlanItemTransition(PlanItemInstanceState.FAILED,
                 PlanItemTransition.REACTIVATE, 
