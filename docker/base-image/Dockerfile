@@ -1,4 +1,4 @@
-FROM eclipse-temurin:11.0.15_10-jdk-alpine@sha256:37c5e98456f7a9a36d4e385a2d068963b82c1c8e2d4943610d93d13c5f65324a
+FROM eclipse-temurin:11.0.15_10-jre-alpine@sha256:d401c4025eb1ead95cf2ca83cd5155bff8756527a4f4e9820570900e835f5ba4
 
 LABEL maintainer="Flowable <info@flowable.org>"
 RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
