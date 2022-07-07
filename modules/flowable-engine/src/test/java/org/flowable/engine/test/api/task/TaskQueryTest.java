@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -236,7 +237,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByNameInOr() {
-        List<String> taskNameList = Arrays.asList("testTask", "gonzoTask");
+        List<String> taskNameList = asList("testTask", "gonzoTask");
 
         TaskQuery query = taskService.createTaskQuery().or().taskNameIn(taskNameList).taskId("invalid");
         assertThat(query.list()).hasSize(7);
@@ -248,7 +249,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByNameInIgnoreCaseOr() {
-        List<String> taskNameList = Arrays.asList("testtask", "gonzotask");
+        List<String> taskNameList = asList("testtask", "gonzotask");
 
         TaskQuery query = taskService.createTaskQuery().or().taskNameInIgnoreCase(taskNameList).taskId("invalid");
         assertThat(query.list()).hasSize(7);
@@ -436,7 +437,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .extracting(Task::getFormKey)
                 .containsExactly("testFormKey");
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                     .taskFormKey("testFormKey")
                     .list();
@@ -458,7 +459,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .extracting(Task::getFormKey)
                 .containsExactly("testFormKey");
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().or()
                     .taskFormKey("testFormKey")
                     .list();
@@ -480,7 +481,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .extracting(Task::getFormKey)
                 .containsExactly("testFormKey");
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
                     .taskWithFormKey()
                     .list();
@@ -586,20 +587,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByAssigneeIds() {
-        TaskQuery query = taskService.createTaskQuery().taskAssigneeIds(Arrays.asList("gonzo", "kermit"));
+        TaskQuery query = taskService.createTaskQuery().taskAssigneeIds(asList("gonzo", "kermit"));
         assertThat(query.count()).isEqualTo(1);
         assertThat(query.list()).hasSize(1);
         assertThat(query.singleResult()).isNotNull();
 
-        query = taskService.createTaskQuery().taskAssigneeIds(Arrays.asList("kermit", "kermit2"));
+        query = taskService.createTaskQuery().taskAssigneeIds(asList("kermit", "kermit2"));
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
-            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(Arrays.asList("gonzo", "kermit")).count()).isEqualTo(1);
-            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(Arrays.asList("kermit", "kermit2")).count()).isZero();
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(asList("gonzo", "kermit")).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(asList("kermit", "kermit2")).count()).isZero();
         }
 
         org.flowable.task.api.Task adhocTask = taskService.newTask();
@@ -607,13 +608,13 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         adhocTask.setAssignee("testAssignee");
         taskService.saveTask(adhocTask);
 
-        query = taskService.createTaskQuery().taskAssigneeIds(Arrays.asList("gonzo", "testAssignee"));
+        query = taskService.createTaskQuery().taskAssigneeIds(asList("gonzo", "testAssignee"));
         assertThat(query.count()).isEqualTo(2);
         assertThat(query.list()).hasSize(2);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
-            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(Arrays.asList("gonzo", "testAssignee")).count()).isEqualTo(2);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(asList("gonzo", "testAssignee")).count()).isEqualTo(2);
         }
 
         taskService.deleteTask(adhocTask.getId(), true);
@@ -621,21 +622,21 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByAssigneeIdsOr() {
-        TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("gonzo", "kermit"));
+        TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(asList("gonzo", "kermit"));
         assertThat(query.count()).isEqualTo(1);
         assertThat(query.list()).hasSize(1);
         assertThat(query.singleResult()).isNotNull();
 
-        query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("kermit", "kermit2"));
+        query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(asList("kermit", "kermit2"));
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
-            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("gonzo", "kermit")).count())
+            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(asList("gonzo", "kermit")).count())
                     .isEqualTo(1);
-            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("kermit", "kermit2")).count())
+            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(asList("kermit", "kermit2")).count())
                     .isZero();
         }
 
@@ -644,13 +645,13 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         adhocTask.setAssignee("testAssignee");
         taskService.saveTask(adhocTask);
 
-        query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("gonzo", "testAssignee"));
+        query = taskService.createTaskQuery().or().taskId("invalid").taskAssigneeIds(asList("gonzo", "testAssignee"));
         assertThat(query.count()).isEqualTo(2);
         assertThat(query.list()).hasSize(2);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
-            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(Arrays.asList("gonzo", "testAssignee")).count())
+            assertThat(historyService.createHistoricTaskInstanceQuery().or().taskId("invalid").taskAssigneeIds(asList("gonzo", "testAssignee")).count())
                     .isEqualTo(2);
         }
 
@@ -692,7 +693,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("kermit").count()).isEqualTo(1);
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId())
                         .or().taskId("invalid").taskInvolvedUser("fozzie").count()).isEqualTo(1);
             }
@@ -764,7 +765,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(query.count()).isEqualTo(0);
             assertThat(query.list()).hasSize(0);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid")
                         .taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
             }
@@ -800,7 +801,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.createTaskQuery().or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count())
                     .isEqualTo(2);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().
                         or().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(2);
             }
@@ -827,7 +828,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.createTaskQuery().or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr().count())
                     .isEqualTo(2);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(
                         historyService.createHistoricTaskInstanceQuery().or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr()
                                 .count()).isEqualTo(2);
@@ -854,7 +855,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertThat(taskService.createTaskQuery().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(
                         historyService.createHistoricTaskInstanceQuery().taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).count())
                         .isEqualTo(1);
@@ -883,7 +884,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertThat(taskService.createTaskQuery().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).count())
                         .isEqualTo(1);
             }
@@ -910,7 +911,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.getIdentityLinksForTask(adhocTask.getId())).hasSize(1);
 
             assertThat(taskService.createTaskQuery().taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(
                         historyService.createHistoricTaskInstanceQuery().taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).count())
                         .isEqualTo(1);
@@ -939,7 +940,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertThat(taskService.createTaskQuery().taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup"))
                         .count()).isEqualTo(1);
             }
@@ -968,7 +969,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.createTaskQuery().taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup"))
                     .count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeIds(Collections.singletonList("kermit"))
                         .taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
             }
@@ -998,7 +999,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     .endOr()
                     .count()).isEqualTo(3);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery()
                         .or()
                         .taskOwnerLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup"))
@@ -1031,7 +1032,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     .endOr()
                     .count()).isEqualTo(3);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery()
                         .or()
                         .taskAssigneeLike("ker%").taskInvolvedGroups(Collections.singleton("testGroup"))
@@ -1064,7 +1065,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     .endOr()
                     .count()).isEqualTo(3);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery()
                         .or()
                         .taskAssigneeIds(Collections.singletonList("kermit")).taskInvolvedGroups(Collections.singleton("testGroup"))
@@ -1097,7 +1098,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     .endOr()
                     .count()).isEqualTo(3);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery()
                         .or()
                         .taskAssignee("kermit").taskInvolvedGroups(Collections.singleton("testGroup"))
@@ -1137,7 +1138,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskName("testName").
                     taskInvolvedGroups(Collections.singleton("testGroup")).
                     count()).isEqualTo(1);
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().
                         or().
                         taskName("testName").
@@ -1183,7 +1184,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskCandidateGroupIn(Collections.singletonList("testGroup")).
                     count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().
                         or().
                         taskName("testName").
@@ -1229,7 +1230,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskCandidateUser("homer").
                     count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().
                         or().
                         taskName("testName").
@@ -1245,6 +1246,316 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         } finally {
             deleteAllTasks();
         }
+    }
+
+    @Test
+    public void testWithoutCategory() {
+        deleteAllTasks();
+        try {
+            saveTaskWithCategory("t1", "Cat 1");
+            saveTaskWithCategory("t2", "Cat 1");
+            saveTaskWithCategory("t3", "Cat 2");
+            saveTaskWithCategory("t4", null);
+            saveTaskWithCategory("t5", null);
+
+            List<Task> noResult = taskService.createTaskQuery().taskName("t1").taskWithoutCategory().orderByTaskName().asc().list();
+            assertThat(noResult).extracting(Task::getName).isEmpty();
+
+            List<Task> noCategory = taskService.createTaskQuery().taskWithoutCategory().orderByTaskName().asc().list();
+            assertThat(noCategory).extracting(Task::getName).containsExactly("t4", "t5");
+
+            List<Task> likeAndNull = taskService.createTaskQuery().taskNameLike("t%").taskWithoutCategory().orderByTaskName().asc().list();
+            assertThat(likeAndNull).extracting(Task::getName).containsExactly("t4", "t5");
+
+            List<Task> t1AndNull = taskService.createTaskQuery().or().taskName("t1").taskWithoutCategory().endOr().orderByTaskName().asc().list();
+            assertThat(t1AndNull).extracting(Task::getName).containsExactly("t1", "t4", "t5");
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    @Test
+    public void testWithoutCategoryHistory() {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            deleteAllTasks();
+            try {
+                saveTaskWithCategory("t1", "Cat 1");
+                saveTaskWithCategory("t2", "Cat 1");
+                saveTaskWithCategory("t3", "Cat 2");
+                saveTaskWithCategory("t4", null);
+                saveTaskWithCategory("t5", null);
+
+                List<HistoricTaskInstance> noResult = historyService.createHistoricTaskInstanceQuery().taskName("t1").taskWithoutCategory().orderByTaskName()
+                        .asc().list();
+                assertThat(noResult).extracting(HistoricTaskInstance::getName).isEmpty();
+
+                List<HistoricTaskInstance> noCategory = historyService.createHistoricTaskInstanceQuery().taskWithoutCategory().orderByTaskName().asc().list();
+                assertThat(noCategory).extracting(HistoricTaskInstance::getName).containsExactly("t4", "t5");
+
+                List<HistoricTaskInstance> likeAndNull = historyService.createHistoricTaskInstanceQuery().taskNameLike("t%").taskWithoutCategory()
+                        .orderByTaskName().asc().list();
+                assertThat(likeAndNull).extracting(HistoricTaskInstance::getName).containsExactly("t4", "t5");
+
+                List<HistoricTaskInstance> t1AndNull = historyService.createHistoricTaskInstanceQuery().or().taskName("t1").taskWithoutCategory().endOr()
+                        .orderByTaskName().asc().list();
+                assertThat(t1AndNull).extracting(HistoricTaskInstance::getName).containsExactly("t1", "t4", "t5");
+
+            } finally {
+                deleteAllTasks();
+            }
+        }
+    }
+
+    @Test
+    public void testQueryByCategoryIn() {
+        deleteAllTasks();
+        try {
+            saveTaskWithCategory("t1", "Cat 1");
+            saveTaskWithCategory("t2", "Cat 1");
+            saveTaskWithCategory("t3", "Cat 2");
+            saveTaskWithCategory("t4", null);
+            saveTaskWithCategory("t5", "Cat 3");
+
+            assertThat(taskService.createTaskQuery()
+                    .taskCategoryIn(asList("Cat 1"))
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t1", "t2");
+
+            assertThat(taskService.createTaskQuery()
+                    .taskCategoryIn(asList("Cat 1", "Cat 2"))
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t1", "t2", "t3");
+
+            assertThat(taskService.createTaskQuery()
+                    .taskCategoryIn(asList("Cat 2"))
+                    .taskWithoutCategory()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .isEmpty();
+
+            // Verify or cases behave like expected
+            assertThat(taskService.createTaskQuery()
+                    .or()
+                    .taskCategory("Cat 1")
+                    .taskCategoryIn(asList("Cat 2"))
+                    .endOr()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t1", "t2", "t3");
+
+            assertThat(taskService.createTaskQuery()
+                    .or()
+                    .taskCategoryIn(asList("Cat 2"))
+                    .taskName("t4")
+                    .endOr()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName).containsExactly("t3", "t4");
+
+            assertThat(taskService.createTaskQuery()
+                    .or()
+                    .taskWithoutCategory()
+                    .taskCategoryIn(asList("Cat 2"))
+                    .endOr()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t3", "t4");
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    @Test
+    public void testQueryByCategoryInHistory() {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            deleteAllTasks();
+            try {
+                saveTaskWithCategory("t1", "Cat 1");
+                saveTaskWithCategory("t2", "Cat 1");
+                saveTaskWithCategory("t3", "Cat 2");
+                saveTaskWithCategory("t4", null);
+                saveTaskWithCategory("t5", "Cat 3");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .taskCategoryIn(asList("Cat 1"))
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t1", "t2");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .taskCategoryIn(asList("Cat 1", "Cat 2"))
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t1", "t2", "t3");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .taskCategoryIn(asList("Cat 2"))
+                        .taskWithoutCategory()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .isEmpty();
+
+                // Verify or cases behave like expected
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .or()
+                        .taskCategory("Cat 1")
+                        .taskCategoryIn(asList("Cat 2"))
+                        .endOr()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t1", "t2", "t3");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .or()
+                        .taskCategoryIn(asList("Cat 2"))
+                        .taskName("t4")
+                        .endOr()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName).containsExactly("t3", "t4");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .or()
+                        .taskWithoutCategory()
+                        .taskCategoryIn(asList("Cat 2"))
+                        .endOr()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t3", "t4");
+            } finally {
+                deleteAllTasks();
+            }
+        }
+    }
+
+    @Test
+    public void testQueryByCategoryInIllegalArguments() {
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryIn(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryIn(Collections.emptyList()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryIn(Arrays.asList("val", null)))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByCategoryInIllegalArgumentsHistory() {
+        assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().taskCategoryIn(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().taskCategoryIn(Collections.emptyList()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().taskCategoryIn(Arrays.asList("val", null)))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByCategoryNotIn() {
+        deleteAllTasks();
+        try {
+            saveTaskWithCategory("t1", "Cat 1");
+            saveTaskWithCategory("t2", "Cat 1");
+            saveTaskWithCategory("t3", "Cat 2");
+            saveTaskWithCategory("t4", null);
+            saveTaskWithCategory("t5", "Cat 3");
+
+            assertThat(taskService.createTaskQuery()
+                    .taskCategoryNotIn(asList("Cat 1"))
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t3", "t5");
+
+            assertThat(taskService.createTaskQuery()
+                    .taskCategoryNotIn(asList("Cat 1", "Cat 2"))
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t5");
+
+            assertThat(taskService.createTaskQuery()
+                    .or()
+                    .taskCategoryNotIn(asList("Cat 1", "Cat 2"))
+                    .taskWithoutCategory()
+                    .endOr()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t4", "t5");
+
+            assertThat(taskService.createTaskQuery()
+                    .or()
+                    .taskCategoryIn(asList("Cat 1"))
+                    .taskCategoryNotIn(asList("Cat 2"))
+                    .endOr()
+                    .orderByTaskName().asc().list())
+                    .extracting(Task::getName)
+                    .containsExactly("t1", "t2", "t5");
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    @Test
+    public void testQueryByCategoryNotInHistory() {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            deleteAllTasks();
+            try {
+                saveTaskWithCategory("t1", "Cat 1");
+                saveTaskWithCategory("t2", "Cat 1");
+                saveTaskWithCategory("t3", "Cat 2");
+                saveTaskWithCategory("t4", null);
+                saveTaskWithCategory("t5", "Cat 3");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .taskCategoryNotIn(asList("Cat 1"))
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t3", "t5");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .taskCategoryNotIn(asList("Cat 1", "Cat 2"))
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t5");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .or()
+                        .taskCategoryNotIn(asList("Cat 1", "Cat 2"))
+                        .taskWithoutCategory()
+                        .endOr()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t4", "t5");
+
+                assertThat(historyService.createHistoricTaskInstanceQuery()
+                        .or()
+                        .taskCategoryIn(asList("Cat 1"))
+                        .taskCategoryNotIn(asList("Cat 2"))
+                        .endOr()
+                        .orderByTaskName().asc().list())
+                        .extracting(HistoricTaskInstance::getName)
+                        .containsExactly("t1", "t2", "t5");
+
+            } finally {
+                deleteAllTasks();
+            }
+        }
+    }
+
+    @Test
+    public void testQueryByCategoryNotInIllegalArguments() {
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryNotIn(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryNotIn(Collections.emptyList()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.createTaskQuery().taskCategoryNotIn(Arrays.asList("val", null)))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    private void saveTaskWithCategory(String t1, String category) {
+        Task t1Cat1 = taskService.newTask();
+        t1Cat1.setName(t1);
+        t1Cat1.setCategory(category);
+        taskService.saveTask(t1Cat1);
     }
 
     @Test
@@ -1275,7 +1586,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                     taskCandidateGroup("testGroup").
                     count()).isEqualTo(1);
 
-            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().
                         or().
                         taskName("testName").
@@ -1603,7 +1914,6 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         taskService.addCandidateGroup(magementTask.getId(), "management");
         createdTasks.add(magementTask.getId());
 
-
         List<Task> kermitCandidateTasks = taskService.createTaskQuery()
                 .taskCandidateUser("kermit")
                 .taskName("testTask")
@@ -1701,7 +2011,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.list()).isEmpty();
 
         // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
-        groups = Arrays.asList("management", "accountancy", "sales", "unexising");
+        groups = asList("management", "accountancy", "sales", "unexising");
         query = taskService.createTaskQuery().taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
@@ -1726,7 +2036,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByCandidateGroupInOr() {
-        List<String> groups = Arrays.asList("management", "accountancy");
+        List<String> groups = asList("management", "accountancy");
         TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
@@ -1753,7 +2063,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.list()).hasSize(5);
 
         // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
-        groups = Arrays.asList("management", "accountancy", "sales", "unexising");
+        groups = asList("management", "accountancy", "sales", "unexising");
         query = taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
@@ -2007,16 +2317,16 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).list();
         assertThat(tasks)
-            .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
-            .containsExactlyInAnyOrder(
-                tuple("taskKey1", "Task A"),
-                tuple("taskKey123", "Task B")
-            );
+                .extracting(TaskInfo::getTaskDefinitionKey, TaskInfo::getName)
+                .containsExactlyInAnyOrder(
+                        tuple("taskKey1", "Task A"),
+                        tuple("taskKey123", "Task B")
+                );
 
-        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(asList("taskKey1", "taskKey123", "invalid")).count()).isEqualTo(2);
 
-        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).count()).isZero();
-        assertThat(taskService.createTaskQuery().taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).list()).isEmpty();
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(asList("invalid1", "invalid2")).count()).isZero();
+        assertThat(taskService.createTaskQuery().taskDefinitionKeys(asList("invalid1", "invalid2")).list()).isEmpty();
     }
 
     @Test
@@ -2035,10 +2345,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 tuple("taskKey123", "Task B")
             );
 
-        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("taskKey1", "taskKey123", "invalid")).endOr().count())
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(asList("taskKey1", "taskKey123", "invalid")).endOr().count())
                 .isEqualTo(2);
 
-        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().count())
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(asList("invalid1", "invalid2")).endOr().count())
                 .isZero();
 
         assertThat(taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeys(Arrays.asList("invalid1", "invalid2")).endOr().list())
@@ -2665,7 +2975,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().processDefinitionKeyIn(includeIds).count()).isEqualTo(13);
         includeIds = Collections.singletonList("unexisting");
         assertThat(taskService.createTaskQuery().processDefinitionKeyIn(includeIds).count()).isZero();
-        includeIds = Arrays.asList("unexisting", "oneTaskProcess");
+        includeIds = asList("unexisting", "oneTaskProcess");
         assertThat(taskService.createTaskQuery().processDefinitionKeyIn(includeIds).count()).isEqualTo(1);
     }
 
@@ -2686,7 +2996,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .processDefinitionKeyIn(includeIds)
                 .count()).isZero();
 
-        includeIds = Arrays.asList("unexisting", "oneTaskProcess");
+        includeIds = asList("unexisting", "oneTaskProcess");
         assertThat(taskService.createTaskQuery()
                 .or().taskId("invalid")
                 .processDefinitionKeyIn(includeIds)
@@ -2823,11 +3133,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertThat(taskService.createTaskQuery().processInstanceIdIn(Arrays.asList(processInstance1.getId(), processInstance2.getId())).count()).isEqualTo(2);
-        assertThat(taskService.createTaskQuery().processInstanceIdIn(Arrays.asList(processInstance1.getId(), processInstance2.getId(), "unexisting")).count())
+        assertThat(taskService.createTaskQuery().processInstanceIdIn(asList(processInstance1.getId(), processInstance2.getId())).count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().processInstanceIdIn(asList(processInstance1.getId(), processInstance2.getId(), "unexisting")).count())
                 .isEqualTo(2);
 
-        assertThat(taskService.createTaskQuery().processInstanceIdIn(Arrays.asList("unexisting1", "unexisting2")).count()).isZero();
+        assertThat(taskService.createTaskQuery().processInstanceIdIn(asList("unexisting1", "unexisting2")).count()).isZero();
     }
 
     @Test
@@ -2836,14 +3146,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        assertThat(taskService.createTaskQuery().or().taskId("invalid").processInstanceIdIn(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").processInstanceIdIn(asList(processInstance1.getId(), processInstance2.getId()))
                 .count()).isEqualTo(2);
         assertThat(taskService.createTaskQuery().or().taskId("invalid")
-                .processInstanceIdIn(Arrays.asList(processInstance1.getId(), processInstance2.getId(), "unexisting")).count()).isEqualTo(2);
+                .processInstanceIdIn(asList(processInstance1.getId(), processInstance2.getId(), "unexisting")).count()).isEqualTo(2);
 
-        assertThat(taskService.createTaskQuery().or().taskId("invalid").processInstanceIdIn(Arrays.asList("unexisting1", "unexisting2")).count()).isZero();
+        assertThat(taskService.createTaskQuery().or().taskId("invalid").processInstanceIdIn(asList("unexisting1", "unexisting2")).count()).isZero();
     }
-    
+
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testWithoutProcessInstanceId() throws Exception {
@@ -3798,7 +4108,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult()).isNotNull();
         assertThat(taskService.createTaskQuery().deploymentIdIn(deploymentIds).count()).isEqualTo(1);
 
-        deploymentIds = Arrays.asList(deployment.getId(), "invalid");
+        deploymentIds = asList(deployment.getId(), "invalid");
         assertThat(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult()).isNotNull();
         assertThat(taskService.createTaskQuery().deploymentIdIn(deploymentIds).count()).isEqualTo(1);
 
@@ -3817,7 +4127,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         assertThat(taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).count()).isEqualTo(1);
 
-        deploymentIds = Arrays.asList(deployment.getId(), "invalid");
+        deploymentIds = asList(deployment.getId(), "invalid");
         assertThat(taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).singleResult()).isNotNull();
 
         assertThat(taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).count()).isEqualTo(1);
@@ -3848,7 +4158,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskNameLikeIgnoreCase("%Gonzo%").count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().taskNameLikeIgnoreCase("Task%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%task%").count()).isEqualTo(12);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskNameLikeIgnoreCase("%Task%").count()).isEqualTo(12);
@@ -3868,7 +4178,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         assertThat(taskService.createTaskQuery().or().taskNameLikeIgnoreCase("ACCOUN%").taskDescriptionLikeIgnoreCase("%ESCR%").endOr().count()).isEqualTo(9);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%task%").taskDescriptionLikeIgnoreCase("%task%").endOr()
                     .count()).isEqualTo(12);
@@ -3892,7 +4202,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskDescriptionLikeIgnoreCase("Gonzo%").count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().taskDescriptionLikeIgnoreCase("%manage%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%task%").count()).isEqualTo(6);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskDescriptionLikeIgnoreCase("%Task%").count()).isEqualTo(6);
@@ -3916,7 +4226,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskAssigneeLikeIgnoreCase("%nzo%").count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().taskAssigneeLikeIgnoreCase("%doesnotexist%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%gonzo%").count()).isEqualTo(1);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLikeIgnoreCase("%GONZO%").count()).isEqualTo(1);
@@ -3938,7 +4248,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskOwnerLikeIgnoreCase("%nzo%").count()).isEqualTo(6);
         assertThat(taskService.createTaskQuery().taskOwnerLikeIgnoreCase("%doesnotexist%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%gonzo%").count()).isEqualTo(6);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskOwnerLikeIgnoreCase("%GONZO%").count()).isEqualTo(6);
@@ -3964,7 +4274,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().processInstanceBusinessKeyLikeIgnoreCase("business%").count()).isEqualTo(2);
         assertThat(taskService.createTaskQuery().processInstanceBusinessKeyLikeIgnoreCase("%doesnotexist%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%key%").count()).isEqualTo(3);
             assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("%KEY%").count()).isEqualTo(3);
@@ -3990,7 +4300,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("ON%").count()).isEqualTo(4);
         assertThat(taskService.createTaskQuery().processDefinitionKeyLikeIgnoreCase("%fake%").count()).isZero();
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%one%").count()).isEqualTo(4);
             assertThat(historyService.createHistoricTaskInstanceQuery().processDefinitionKeyLikeIgnoreCase("%ONE%").count()).isEqualTo(4);
@@ -4008,7 +4318,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                         .taskOwnerLike("G%").endOr()
                         .count()).isEqualTo(12);
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
             // History
             assertThat(historyService.createHistoricTaskInstanceQuery().or().taskNameLikeIgnoreCase("%task%").taskDescriptionLikeIgnoreCase("%desc%")
                     .taskAssigneeLikeIgnoreCase("Gonz%")
@@ -4425,6 +4735,10 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(
                         tuple("my task", processWithStringValue.getId())
                 );
+    }
+
+    private boolean isHistoryLevelAtLeast(HistoryLevel level) {
+        return HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration);
     }
 
     /**

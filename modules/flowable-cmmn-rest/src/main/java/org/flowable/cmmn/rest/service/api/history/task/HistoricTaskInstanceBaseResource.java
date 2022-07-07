@@ -126,6 +126,15 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskCategory() != null) {
             query.taskCategory(queryRequest.getTaskCategory());
         }
+        if (queryRequest.getTaskCategoryIn() != null) {
+            query.taskCategoryIn(queryRequest.getTaskCategoryIn());
+        }
+        if (queryRequest.getTaskCategoryNotIn() != null) {
+            query.taskCategoryNotIn(queryRequest.getTaskCategoryNotIn());
+        }
+        if (queryRequest.getTaskWithoutCategory() != null && Boolean.TRUE.equals(queryRequest.getTaskWithoutCategory())) {
+            query.taskWithoutCategory();
+        }
         if (queryRequest.getTaskDeleteReason() != null) {
             query.taskDeleteReason(queryRequest.getTaskDeleteReason());
         }
