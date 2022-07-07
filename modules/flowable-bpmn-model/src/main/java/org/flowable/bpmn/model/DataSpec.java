@@ -50,6 +50,7 @@ public class DataSpec extends BaseElement {
     }
 
     public void setValues(DataSpec otherDataSpec) {
+        super.setValues(otherDataSpec);
         setName(otherDataSpec.getName());
         setItemSubjectRef(otherDataSpec.getItemSubjectRef());
         setCollection(otherDataSpec.isCollection());

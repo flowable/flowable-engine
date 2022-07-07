@@ -38,21 +38,27 @@ public class Sentry extends CaseElement {
     public String getTriggerMode() {
         return triggerMode;
     }
+
     public void setTriggerMode(String triggerMode) {
         this.triggerMode = triggerMode;
     }
+
     public List<SentryOnPart> getOnParts() {
         return onParts;
     }
+
     public void setOnParts(List<SentryOnPart> onParts) {
         this.onParts = onParts;
     }
+
     public void addSentryOnPart(SentryOnPart sentryOnPart) {
         onParts.add(sentryOnPart);
     }
+
     public SentryIfPart getSentryIfPart() {
         return sentryIfPart;
     }
+
     public void setSentryIfPart(SentryIfPart sentryIfPart) {
         this.sentryIfPart = sentryIfPart;
     }

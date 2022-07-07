@@ -84,11 +84,11 @@ public class ExtensionElement extends BaseElement {
     }
 
     public void setValues(ExtensionElement otherElement) {
+        super.setValues(otherElement);
         setName(otherElement.getName());
         setNamespacePrefix(otherElement.getNamespacePrefix());
         setNamespace(otherElement.getNamespace());
         setElementText(otherElement.getElementText());
-        setAttributes(otherElement.getAttributes());
 
         childElements = new LinkedHashMap<>();
         if (otherElement.getChildElements() != null && !otherElement.getChildElements().isEmpty()) {

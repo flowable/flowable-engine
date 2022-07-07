@@ -112,9 +112,13 @@ public class FlowableListener extends CmmnElement {
     }
 
     public void setValues(FlowableListener otherListener) {
+        super.setValues(otherListener);
         setEvent(otherListener.getEvent());
+        setSourceState(otherListener.getSourceState());
+        setTargetState(otherListener.getTargetState());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
+        setOnTransaction(otherListener.getOnTransaction());
 
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {

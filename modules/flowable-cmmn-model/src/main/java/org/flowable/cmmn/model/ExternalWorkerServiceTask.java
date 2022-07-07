@@ -51,6 +51,7 @@ public class ExternalWorkerServiceTask extends Task {
 
     public void setValues(ExternalWorkerServiceTask otherElement) {
         super.setValues(otherElement);
+        setType(otherElement.getType());
         setTopic(otherElement.getTopic());
     }
 
