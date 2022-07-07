@@ -31,6 +31,7 @@ public class VariableInstanceQueryRequest {
     private String processInstanceId;
     private String variableName;
     private String variableNameLike;
+    private Boolean excludeLocalVariables;
     private List<QueryVariable> variables;
 
     public Boolean getExcludeTaskVariables() {
@@ -89,4 +90,13 @@ public class VariableInstanceQueryRequest {
     public void setVariables(List<QueryVariable> variables) {
         this.variables = variables;
     }
+
+    public void setExcludeLocalVariables(Boolean excludeLocalVariables) {
+        this.excludeLocalVariables = excludeLocalVariables;
+    }
+
+    public Boolean getExcludeLocalVariables() {
+        return excludeLocalVariables;
+    }
+
 }

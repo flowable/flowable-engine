@@ -18,15 +18,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +55,8 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        runtimeService.setVariableLocal(processInstance.getId(), "localProcessVar", "localProcessValue");
+
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.setVariableLocal(task.getId(), "taskVariable", "test");
@@ -66,9 +71,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         assertResultsPresentInDataResponse(url + "?variableName=booleanVar2", 0, null, null);
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 4, "taskVariable", "test");
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 5, "taskVariable", "test");
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeTaskVariables=true", 3, "intVar", 67890);
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeTaskVariables=true", 4, "intVar", 67890);
 
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 3, "stringVar", "Azerty");
 
@@ -76,9 +81,49 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         assertResultsPresentInDataResponse(url + "?taskId=" + task.getId() + "&variableName=booleanVar", 0, null, null);
 
-        assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var"), 6, "stringVar", "Azerty");
+        assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var"), 7, "stringVar", "Azerty");
 
         assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var2"), 0, null, null);
+    }
+
+    /**
+     * Test querying variable instance without local variables.
+     */
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/VariableInstanceCollectionResourceTest.testQueryVariableInstances.bpmn20.xml")
+    public void testQueryExcludeLocalVariable() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list().get(1);
+        runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
+
+        List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test4");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test5");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES);
+
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 4, "varLocal3", "test5");
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeLocalVariables=true", 2, "var3", "test4");
+
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
