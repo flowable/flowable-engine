@@ -36,6 +36,10 @@ public class BulkDeleteHistoricCaseInstancesCmd implements Command<Object>, Seri
         if (caseInstanceIds == null) {
             throw new FlowableIllegalArgumentException("historic case instanceIds are null");
         }
+
+        if (caseInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("historic case instanceIds are empty");
+        }
         
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
         
