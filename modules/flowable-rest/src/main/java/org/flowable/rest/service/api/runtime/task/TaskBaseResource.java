@@ -342,6 +342,7 @@ public class TaskBaseResource {
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
         }
+
         if (request.getCategoryIn() != null && !request.getCategoryIn().isEmpty()) {
             taskQuery.taskCategoryIn(request.getCategoryIn());
         }

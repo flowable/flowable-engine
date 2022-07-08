@@ -154,7 +154,6 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         }
     }
 
-    @Test
     public void testQueryTaskByCategory() throws Exception {
         Task t1 = taskService.newTask();
         t1.setName("t1");
