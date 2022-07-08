@@ -111,24 +111,26 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     
     @Override
     public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
-        getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
-        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
-        getHistoricActivityInstanceEntityManager().bulkDeleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
-        TaskHelper.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
-        processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
-        
-        if (processEngineConfiguration.isEnableEntityLinks()) {
-            processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.BPMN, processInstanceIds);
+        if (isHistoryEnabled() && processInstanceIds != null && !processInstanceIds.isEmpty()) {
+            getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+            getHistoricActivityInstanceEntityManager().bulkDeleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
+            TaskHelper.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
+
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.BPMN, processInstanceIds);
+            }
+
+            getCommentEntityManager().bulkDeleteCommentsForProcessInstanceIds(processInstanceIds);
+
+            getHistoricProcessInstanceEntityManager().bulkDeleteHistoricProcessInstances(processInstanceIds);
+
+            // Also delete any sub-processes that may be active (ACT-821)
+
+            List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(subProcessInstanceIds);
         }
-        
-        getCommentEntityManager().bulkDeleteCommentsForProcessInstanceIds(processInstanceIds);
-
-        getHistoricProcessInstanceEntityManager().bulkDeleteHistoricProcessInstances(processInstanceIds);
-
-        // Also delete any sub-processes that may be active (ACT-821)
-
-        List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
-        recordBulkDeleteProcessInstances(subProcessInstanceIds);
     }
 
     @Override

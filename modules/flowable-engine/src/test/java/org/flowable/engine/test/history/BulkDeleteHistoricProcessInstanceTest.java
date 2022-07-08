@@ -59,6 +59,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.complete(task.getId());
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
             
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).list()).hasSize(3);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(3);
@@ -171,6 +172,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             taskService.addComment(null, subProcessInstance.getId(), "test");
             
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(subProcessInstance.getId()).list()).hasSize(3);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(subProcessInstance.getId()).list()).hasSize(3);
             
@@ -294,6 +296,8 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             taskService.addComment(task.getId(), null, "test");
             
             taskService.complete(task.getId());
+
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
             
             assertThat(historyService.createHistoricDetailQuery().taskId(task.getId()).list()).hasSize(2);
             assertThat(historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).list()).hasSize(2);
@@ -368,6 +372,8 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             taskService.addComment(task3.getId(), null, "test");
             
             taskService.complete(task3.getId());
+
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
             
             List<String> processInstanceIds = new ArrayList<>();
             processInstanceIds.add(processInstance.getId());
@@ -426,6 +432,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .start();
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
             
             List<String> processInstanceIds = new ArrayList<>();
             processInstanceIds.add(processInstance.getId());

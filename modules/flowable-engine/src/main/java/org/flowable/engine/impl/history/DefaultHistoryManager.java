@@ -180,7 +180,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             // Also delete any sub-processes that may be active (ACT-821)
     
             List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
-            recordBulkDeleteProcessInstances(subProcessInstanceIds);
+            processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(subProcessInstanceIds);
         }
     }
 
