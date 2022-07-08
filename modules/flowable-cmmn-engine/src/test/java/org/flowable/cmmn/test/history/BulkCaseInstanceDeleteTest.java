@@ -54,6 +54,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             cmmnTaskService.complete(task.getId());
             
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(3);
             
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("serializableVar").singleResult();
@@ -88,6 +90,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .variable("numVar", 43)
                     .variable("serializableVar", Collections.singletonMap("key", "value"))
                     .start();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             
             List<String> caseInstanceIds = new ArrayList<>();
             caseInstanceIds.add(caseInstance.getId());
@@ -136,6 +140,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             
             cmmnRuntimeService.addUserIdentityLink(subCaseInstance.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
             cmmnRuntimeService.addGroupIdentityLink(subCaseInstance.getId(), "sales", IdentityLinkType.PARTICIPANT);
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).list()).hasSize(3);
             
@@ -182,6 +188,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             cmmnTaskService.complete(mainTask.getId());
             
             CaseInstance subCaseInstance3 = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance3.getId()).singleResult();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             
             List<String> caseInstanceIds = new ArrayList<>();
             caseInstanceIds.add(caseInstance.getId());
@@ -234,6 +242,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             cmmnTaskService.addGroupIdentityLink(task.getId(), "sales", IdentityLinkType.PARTICIPANT);
             
             cmmnTaskService.complete(task.getId());
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
             
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).list()).hasSize(2);
             
@@ -284,6 +294,8 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             cmmnTaskService.addUserIdentityLink(task3.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
             cmmnTaskService.addGroupIdentityLink(task3.getId(), "sales", IdentityLinkType.PARTICIPANT);
             
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<String> caseInstanceIds = new ArrayList<>();
             caseInstanceIds.add(caseInstance.getId());
             caseInstanceIds.add(caseInstance2.getId());

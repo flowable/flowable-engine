@@ -98,7 +98,7 @@ public class CmmnHistoryHelper {
         // Also delete any sub cases that may be active
         List<String> subCaseInstanceIds = historicCaseInstanceEntityManager.findHistoricCaseInstanceIdsByParentIds(caseInstanceIds);
         if (subCaseInstanceIds != null && !subCaseInstanceIds.isEmpty()) {
-            bulkDeleteHistoricCaseInstances(subCaseInstanceIds, cmmnEngineConfiguration);
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordBulkDeleteHistoricCaseInstances(subCaseInstanceIds);
         }
     }
 
