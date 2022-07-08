@@ -129,7 +129,9 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
             // Also delete any sub-processes that may be active (ACT-821)
 
             List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
-            processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(subProcessInstanceIds);
+            if (subProcessInstanceIds != null && !subProcessInstanceIds.isEmpty()) {
+                processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(subProcessInstanceIds);
+            }
         }
     }
 

@@ -35,6 +35,10 @@ public class BulkDeleteHistoricProcessInstancesCmd implements Command<Object>, S
         if (processInstanceIds == null) {
             throw new FlowableIllegalArgumentException("processInstanceIds is null");
         }
+
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("processInstanceIds is empty");
+        }
         
         CommandContextUtil.getHistoryManager(commandContext).recordBulkDeleteProcessInstances(processInstanceIds);
 
