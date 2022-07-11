@@ -58,7 +58,7 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class);
         StartEvent initialStartEvent = null;
         for (StartEvent startEvent : startEvents) {
-            if (startEvent.getEventDefinitions().size() == 0) {
+            if (startEvent.getEventDefinitions().isEmpty()) {
                 initialStartEvent = startEvent;
                 break;
                 
@@ -101,6 +101,11 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
         SequenceFlow flowFromStart = new SequenceFlow(initialStartEvent.getId(), parallelGateway.getId());
         flowFromStart.setId(dynamicUserTaskBuilder.nextFlowId(process.getFlowElementMap()));
         process.addFlowElement(flowFromStart);
+
+        if (dynamicUserTaskBuilder.getDynamicUserTaskCallback() != null) {
+            dynamicUserTaskBuilder.getDynamicUserTaskCallback().handleCreatedDynamicUserTask(userTask,
+                    userTask.getSubProcess(), userTask.getParentContainer(), process);
+        }
         
         GraphicInfo elementGraphicInfo = bpmnModel.getGraphicInfo(initialStartEvent.getId());
         if (elementGraphicInfo != null) {
