@@ -114,16 +114,25 @@ public class FlowableListenerExport implements BpmnXMLConstants {
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EXPRESSION, listener.getImplementation(), xtw);
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType())) {
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_DELEGATEEXPRESSION, listener.getImplementation(), xtw);
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_TYPE.equals(listener.getImplementationType())) {
+                        BpmnXMLUtil.writeDefaultAttribute(ImplementationType.IMPLEMENTATION_TYPE_TYPE, listener.getImplementation(), xtw);
+                    }
+
+                    if (listener.getScriptInfo() != null) {
+                        ScriptInfoExport.writeScriptInfo(xtw, listener.getScriptInfo());
                     }
 
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ON_TRANSACTION, listener.getOnTransaction(), xtw);
 
                     if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(listener.getCustomPropertiesResolverImplementationType())) {
-                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_CLASS, listener.getCustomPropertiesResolverImplementation(), xtw);
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_CLASS,
+                                listener.getCustomPropertiesResolverImplementation(), xtw);
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getCustomPropertiesResolverImplementationType())) {
-                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_EXPRESSION, listener.getCustomPropertiesResolverImplementation(), xtw);
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_EXPRESSION,
+                                listener.getCustomPropertiesResolverImplementation(), xtw);
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getCustomPropertiesResolverImplementationType())) {
-                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_DELEGATEEXPRESSION, listener.getCustomPropertiesResolverImplementation(), xtw);
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_DELEGATEEXPRESSION,
+                                listener.getCustomPropertiesResolverImplementation(), xtw);
                     }
 
                     FieldExtensionExport.writeFieldExtensions(listener.getFieldExtensions(), true, xtw);

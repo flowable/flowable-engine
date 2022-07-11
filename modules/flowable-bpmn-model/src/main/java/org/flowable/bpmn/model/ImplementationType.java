@@ -17,6 +17,7 @@ public class ImplementationType {
     public static final String IMPLEMENTATION_TYPE_CLASS = "class";
     public static final String IMPLEMENTATION_TYPE_EXPRESSION = "expression";
     public static final String IMPLEMENTATION_TYPE_DELEGATEEXPRESSION = "delegateExpression";
+    public static final String IMPLEMENTATION_TYPE_TYPE = "type";
     public static final String IMPLEMENTATION_TYPE_INSTANCE = "instance";
     public static final String IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT = "throwSignalEvent";
     public static final String IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT = "throwGlobalSignalEvent";

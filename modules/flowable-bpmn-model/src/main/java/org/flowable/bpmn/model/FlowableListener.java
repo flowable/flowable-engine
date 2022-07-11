@@ -33,7 +33,9 @@ public class FlowableListener extends BaseElement {
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
-    
+
+    protected ScriptInfo scriptInfo;
+
     public FlowableListener() {
         // Always generate a random identifier to look up the listener while executing the logic
         setId(UUID.randomUUID().toString());
@@ -103,6 +105,26 @@ public class FlowableListener extends BaseElement {
         this.instance = instance;
     }
 
+    /**
+     * Return the script info, if present.
+     * <p>
+     * ScriptInfo must be populated, when <code>type="script"</code> e.g. when
+     * implementationType is 'type' and implementation='script'.
+     * </p>
+     */
+    public ScriptInfo getScriptInfo() {
+        return scriptInfo;
+    }
+
+    /**
+     * Sets the script info
+     *
+     * @see #getScriptInfo()
+     */
+    public void setScriptInfo(ScriptInfo scriptInfo) {
+        this.scriptInfo = scriptInfo;
+    }
+
     @Override
     public FlowableListener clone() {
         FlowableListener clone = new FlowableListener();
@@ -114,7 +136,7 @@ public class FlowableListener extends BaseElement {
         setEvent(otherListener.getEvent());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
-
+        setScriptInfo(otherListener.getScriptInfo().clone());
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {

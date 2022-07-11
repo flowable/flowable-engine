@@ -83,11 +83,14 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EXECUTION_LISTENER = "executionListener";
     public static final String ELEMENT_EVENT_LISTENER = "eventListener";
     public static final String ELEMENT_TASK_LISTENER = "taskListener";
+    public static final String ELEMENT_SCRIPT = "script";
     public static final String ATTRIBUTE_LISTENER_EVENT = "event";
     public static final String ATTRIBUTE_LISTENER_EVENTS = "events";
     public static final String ATTRIBUTE_LISTENER_ENTITY_TYPE = "entityType";
     public static final String ATTRIBUTE_LISTENER_CLASS = "class";
     public static final String ATTRIBUTE_LISTENER_EXPRESSION = "expression";
+    public static final String ATTRIBUTE_LISTENER_TYPE = "type";
+    public static final String ATTRIBUTE_LISTENER_TYPE_SCRIPT = "script";
     public static final String ATTRIBUTE_LISTENER_DELEGATEEXPRESSION = "delegateExpression";
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE = "throwEvent";
     public static final String ATTRIBUTE_LISTENER_THROW_SIGNAL_EVENT_NAME = "signalName";
@@ -97,6 +100,8 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_CLASS = "customPropertiesResolverClass";
     public static final String ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_EXPRESSION = "customPropertiesResolverExpression";
     public static final String ATTRIBUTE_LISTENER_CUSTOM_PROPERTIES_RESOLVER_DELEGATEEXPRESSION = "customPropertiesResolverDelegateExpression";
+    public static final String ATTRIBUTE_SCRIPT_LANGUAGE = "language";
+    public static final String ATTRIBUTE_SCRIPT_RESULTVARIABLE = "resultVariable";
 
     public static final String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     public static final String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";

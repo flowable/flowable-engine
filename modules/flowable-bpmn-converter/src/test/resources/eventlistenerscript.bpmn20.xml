@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+
+    <process id="scriptTaskListenerProcess" name="Script Task Example">
+        <startEvent id="startevent1" name="Start"></startEvent>
+
+        <userTask id="userTask" name="Flowable Script Task Listener Test">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener">
+                    <flowable:field name="script">
+                        <flowable:string>
+                            def bar = "BAR";  // local variable
+                            task.setVariable('scriptTaskListenerClass', "Class"); // pushes variable to execution context
+                            task.setOwner("kermit"); // test access to task instance
+                            taskService.saveTask(task);
+                            bar // implicit return value
+                        </flowable:string>
+                    </flowable:field>
+                    <flowable:field name="language" stringValue="groovy" />
+                    <flowable:field name="resultVariable" stringValue="scriptClassResult" />
+                </flowable:taskListener>
+                <flowable:taskListener event="create" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptTypeResult">
+                        <![CDATA[
+                        task.setVariable('scriptTaskListenerType', "Type"); // pushes variable to execution context
+                        ]]>
+                    </flowable:script>
+                    <flowable:field name="myField" stringValue="foo" /> <!-- Should be ignored -->
+                    <flowable:field name="myOtherField" stringValue="bar" />  <!-- Should be ignored -->
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+
+        <endEvent id="endevent1" name="End" />
+
+        <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="userTask" />
+        <sequenceFlow id="flow12" name="" sourceRef="userTask" targetRef="endevent1" />
+    </process>
+</definitions>
