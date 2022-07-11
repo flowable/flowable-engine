@@ -55,8 +55,6 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        runtimeService.setVariableLocal(processInstance.getId(), "localProcessVar", "localProcessValue");
-
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.setVariableLocal(task.getId(), "taskVariable", "test");
@@ -71,9 +69,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         assertResultsPresentInDataResponse(url + "?variableName=booleanVar2", 0, null, null);
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 5, "taskVariable", "test");
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 4, "taskVariable", "test");
 
-        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeTaskVariables=true", 4, "intVar", 67890);
+        assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeTaskVariables=true", 3, "intVar", 67890);
 
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 3, "stringVar", "Azerty");
 
@@ -81,7 +79,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         assertResultsPresentInDataResponse(url + "?taskId=" + task.getId() + "&variableName=booleanVar", 0, null, null);
 
-        assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var"), 7, "stringVar", "Azerty");
+        assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var"), 6, "stringVar", "Azerty");
 
         assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var2"), 0, null, null);
     }
@@ -101,7 +99,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         waitForJobExecutorToProcessAllJobs(7000, 100);
 
-        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list().get(1);
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
         runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
 
         List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();

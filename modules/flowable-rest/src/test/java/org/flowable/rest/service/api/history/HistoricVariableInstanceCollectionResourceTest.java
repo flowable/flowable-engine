@@ -99,7 +99,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
 
         waitForJobExecutorToProcessAllJobs(7000, 100);
 
-        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list().get(1);
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
         runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
 
         List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
