@@ -65,6 +65,7 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
     public abstract AbstractFlowableHttpHandler clone();
 
     public void setValues(AbstractFlowableHttpHandler otherHandler) {
+        super.setValues(otherHandler);
         setImplementation(otherHandler.getImplementation());
         setImplementationType(otherHandler.getImplementationType());
 
