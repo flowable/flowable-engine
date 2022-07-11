@@ -126,6 +126,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     }
 
     public void setValues(MultiInstanceLoopCharacteristics otherLoopCharacteristics) {
+        super.setValues(otherLoopCharacteristics);
         setInputDataItem(otherLoopCharacteristics.getInputDataItem());
         setCollectionString(otherLoopCharacteristics.getCollectionString());
         if (otherLoopCharacteristics.getHandler() != null) {
