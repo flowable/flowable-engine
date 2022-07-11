@@ -90,6 +90,11 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Appli
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof RabbitInboundChannelModel || channelModel instanceof RabbitOutboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return false;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 

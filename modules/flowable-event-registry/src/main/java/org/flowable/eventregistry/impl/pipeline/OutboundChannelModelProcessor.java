@@ -37,6 +37,11 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof OutboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return channelModel instanceof OutboundChannelModel;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 

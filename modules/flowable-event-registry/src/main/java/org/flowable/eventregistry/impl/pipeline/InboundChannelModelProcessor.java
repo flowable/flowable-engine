@@ -56,6 +56,11 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof InboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return channelModel instanceof InboundChannelModel;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
@@ -64,7 +69,6 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         if (channelModel instanceof InboundChannelModel) {
             registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, fallbackToDefaultTenant);
         }
-
     }
 
     protected void registerChannelModel(InboundChannelModel inboundChannelModel, EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
