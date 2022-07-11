@@ -133,6 +133,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date completedAfterDate;
     protected Date completedBeforeDate;
     protected String category;
+    protected Collection<String> categoryInList;
+    protected Collection<String> categoryNotInList;
+    protected boolean withoutCategory;
     protected boolean withFormKey;
     protected String formKey;
     protected String tenantId;
@@ -1552,6 +1555,53 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskCategoryIn(Collection<String> taskCategoryInList) {
+        checkTaskCategoryList(taskCategoryInList);
+
+        if (inOrStatement) {
+            currentOrQueryObject.categoryInList = taskCategoryInList;
+        } else {
+            this.categoryInList = taskCategoryInList;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCategoryNotIn(Collection<String> taskCategoryNotInList) {
+        checkTaskCategoryList(taskCategoryNotInList);
+        if (inOrStatement) {
+            currentOrQueryObject.categoryNotInList = taskCategoryNotInList;
+        } else {
+            this.categoryNotInList = taskCategoryNotInList;
+        }
+        return this;
+    }
+
+    protected void checkTaskCategoryList(Collection<String> taskCategoryInList) {
+        if (taskCategoryInList == null) {
+            throw new FlowableIllegalArgumentException("Task category list is null");
+        }
+        if (taskCategoryInList.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task category list is empty");
+        }
+        for (String processCategory : taskCategoryInList) {
+            if (processCategory == null) {
+                throw new FlowableIllegalArgumentException("None of the given task categories can be null");
+            }
+        }
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskWithoutCategory() {
+        if (inOrStatement) {
+            currentOrQueryObject.withoutCategory = true;
+        } else {
+            this.withoutCategory = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskWithFormKey() {
         if (inOrStatement) {
             currentOrQueryObject.withFormKey = true;
@@ -2131,6 +2181,18 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCategory() {
         return category;
+    }
+
+    public Collection<String> getCategoryInList() {
+        return categoryInList;
+    }
+
+    public Collection<String> getCategoryNotInList() {
+        return categoryNotInList;
+    }
+
+    public boolean isWithoutCategory() {
+        return withoutCategory;
     }
 
     public boolean isWithFormKey() {

@@ -111,7 +111,16 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         taskList = cmmnTaskService.createTaskQuery().taskIds(taskIdList).list();
         taskList.forEach(task -> assertThat(task.getAssignee()).isEqualTo("johnDoe"));
 
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.TASK, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().list())
+                    .extracting(HistoricTaskInstance::getAssignee)
+                    .isNotEmpty()
+                    .containsOnly("johnDoe");
+        }
+
+
         cmmnTaskService.deleteTasks(taskIdList, true);
+        waitForAsyncHistoryExecutorToProcessAllJobs();
     }
 
     @Test

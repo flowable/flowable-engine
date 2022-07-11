@@ -371,6 +371,15 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Category filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?categoryIn=" + encode("non-exisiting,some-category");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?categoryNotIn=" + encode("some-category");
+            assertResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutCategory=true";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
             
             // Without process instance id filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=true";

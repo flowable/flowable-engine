@@ -110,6 +110,9 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "candidateOrAssigned", dataType = "string", value = "Select tasks that has been claimed or assigned to user or waiting to claim by user (candidate user or groups).", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "categoryIn", dataType = "string", value = "Select tasks for the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotIn", dataType = "string", value = "Select tasks which are not assigned to the given categories. Does not return tasks without categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
@@ -186,9 +189,7 @@ public class TaskCollectionResource extends TaskBaseResource {
         }
 
         if (requestParams.containsKey("candidateGroups")) {
-            String[] candidateGroups = requestParams.get("candidateGroups").split(",");
-            List<String> groups = new ArrayList<>(candidateGroups.length);
-            Collections.addAll(groups, candidateGroups);
+            List<String> groups = csvToList("candidateGroups", requestParams);
             request.setCandidateGroupIn(groups);
         }
 
@@ -332,6 +333,18 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setCategory(requestParams.get("category"));
         }
 
+        if (requestParams.containsKey("withoutCategory") && Boolean.valueOf(requestParams.get("withoutCategory"))) {
+            request.setWithoutCategory(Boolean.TRUE);
+        }
+
+        if (requestParams.containsKey("categoryIn")) {
+            request.setCategoryIn(csvToList("categoryIn", requestParams));
+        }
+
+        if (requestParams.containsKey("categoryNotIn")) {
+            request.setCategoryNotIn(csvToList("categoryNotIn", requestParams));
+        }
+
         return getTasksFromQueryRequest(request, requestParams);
     }
 
@@ -403,4 +416,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         return dataResponse;
     }
 
+    protected List<String> csvToList(String key, Map<String, String> requestParams) {
+        String[] candidateGroupsSplit = requestParams.get(key).split(",");
+        List<String> groups = new ArrayList<>(candidateGroupsSplit.length);
+        Collections.addAll(groups, candidateGroupsSplit);
+        return groups;
+    }
 }

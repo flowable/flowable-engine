@@ -81,6 +81,9 @@ public class TaskQueryRequest extends PaginateRequest {
     protected Boolean withoutTenantId;
     protected String candidateOrAssigned;
     protected String category;
+    protected List<String> categoryIn;
+    protected List<String> categoryNotIn;
+    protected Boolean withoutCategory;
 
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processInstanceVariables;
@@ -525,5 +528,29 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public List<String> getCategoryIn() {
+        return categoryIn;
+    }
+
+    public void setCategoryIn(List<String> categoryIn) {
+        this.categoryIn = categoryIn;
+    }
+
+    public List<String> getCategoryNotIn() {
+        return categoryNotIn;
+    }
+
+    public void setCategoryNotIn(List<String> categoryNotIn) {
+        this.categoryNotIn = categoryNotIn;
+    }
+
+    public Boolean getWithoutCategory() {
+        return withoutCategory;
+    }
+
+    public void setWithoutCategory(Boolean withoutCategory) {
+        this.withoutCategory = withoutCategory;
     }
 }

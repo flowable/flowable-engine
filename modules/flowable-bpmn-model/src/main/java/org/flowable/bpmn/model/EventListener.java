@@ -74,6 +74,7 @@ public class EventListener extends BaseElement {
     }
 
     public void setValues(EventListener otherListener) {
+        super.setValues(otherListener);
         setEvents(otherListener.getEvents());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());

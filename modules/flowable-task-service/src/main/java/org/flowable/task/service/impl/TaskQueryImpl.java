@@ -102,6 +102,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Date createTimeBefore;
     protected Date createTimeAfter;
     protected String category;
+    protected Collection<String> categoryInList;
+    protected Collection<String> categoryNotInList;
+    protected boolean withoutCategory;
     protected boolean withFormKey;
     protected String formKey;
     protected String taskDefinitionId;
@@ -959,6 +962,52 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             this.category = category;
         }
         return this;
+    }
+
+    @Override
+    public TaskQuery taskCategoryIn(Collection<String> taskCategoryInList) {
+        checkTaskCategoryList(taskCategoryInList);
+        if (orActive) {
+            currentOrQueryObject.categoryInList = taskCategoryInList;
+        } else {
+            this.categoryInList = taskCategoryInList;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskCategoryNotIn(Collection<String> taskCategoryNotInList) {
+        checkTaskCategoryList(taskCategoryNotInList);
+        if (orActive) {
+            currentOrQueryObject.categoryNotInList = taskCategoryNotInList;
+        } else {
+            this.categoryNotInList = taskCategoryNotInList;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskWithoutCategory() {
+        if (orActive) {
+            currentOrQueryObject.withoutCategory = true;
+        } else {
+            this.withoutCategory = true;
+        }
+        return this;
+    }
+
+    protected void checkTaskCategoryList(Collection<String> taskCategoryInList) {
+        if (taskCategoryInList == null) {
+            throw new FlowableIllegalArgumentException("Task category list is null");
+        }
+        if (taskCategoryInList.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task category list is empty");
+        }
+        for (String category : taskCategoryInList) {
+            if (category == null) {
+                throw new FlowableIllegalArgumentException("None of the given task categories can be null");
+            }
+        }
     }
 
     @Override
@@ -2201,6 +2250,18 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getCategory() {
         return category;
+    }
+
+    public Collection<String> getCategoryInList() {
+        return categoryInList;
+    }
+
+    public Collection<String> getCategoryNotInList() {
+        return categoryNotInList;
+    }
+
+    public boolean isWithoutCategory() {
+        return withoutCategory;
     }
 
     public boolean isWithFormKey() {

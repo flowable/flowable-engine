@@ -61,10 +61,12 @@ public class HistoricVariableInstanceBaseResource {
         HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
         // Populate query based on request
-        if (queryRequest.getExcludeTaskVariables() != null) {
-            if (queryRequest.getExcludeTaskVariables()) {
-                query.excludeTaskVariables();
-            }
+        if (Boolean.TRUE.equals(queryRequest.getExcludeTaskVariables())) {
+            query.excludeTaskVariables();
+        }
+
+        if (Boolean.TRUE.equals(queryRequest.getExcludeLocalVariables())) {
+            query.excludeLocalVariables();
         }
 
         if (queryRequest.getTaskId() != null) {

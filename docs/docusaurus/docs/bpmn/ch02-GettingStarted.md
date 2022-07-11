@@ -478,7 +478,7 @@ If you get back a proper json response, the REST API is up and running.
 
 The first step is to deploy a process definition. With the REST API, this is done by uploading a .bpmn20.xml file (or .zip file for multiple process definitions) as 'multipart/formdata':
 
-    curl --user rest-admin:test -F "file=@holiday-request.bpmn20.xml" http://localhost:8080/flowable-rest/service/repository/deployments
+    curl --user rest-admin:test  -X POST -F "file=@holiday-request.bpmn20.xml" http://localhost:8080/flowable-rest/service/repository/deployments
 
 To verify that the process definition is deployed correctly, the list of process definitions can be requested:
 

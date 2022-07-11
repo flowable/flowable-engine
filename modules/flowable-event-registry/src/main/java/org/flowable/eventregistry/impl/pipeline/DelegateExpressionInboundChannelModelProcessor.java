@@ -46,6 +46,11 @@ public class DelegateExpressionInboundChannelModelProcessor implements ChannelMo
     }
 
     @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return channelModel instanceof DelegateExpressionInboundChannelModel;
+    }
+
+    @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
             EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant) {

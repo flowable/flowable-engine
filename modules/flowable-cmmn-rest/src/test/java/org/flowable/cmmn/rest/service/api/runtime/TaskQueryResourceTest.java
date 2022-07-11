@@ -275,7 +275,19 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("category", "some-category");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
-            
+
+            requestNode.removeAll();
+            requestNode.putArray("categoryIn").add("not-existing-category").add("some-category");
+            assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+
+            requestNode.removeAll();
+            requestNode.putArray("categoryNotIn").add("some-category");
+            assertResultsPresentInPostDataResponse(url, requestNode);
+
+            requestNode.removeAll();
+            requestNode.put("withoutCategory", Boolean.TRUE);
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
             // Without process instance id filtering
             requestNode.removeAll();
             requestNode.put("withoutProcessInstanceId", true);

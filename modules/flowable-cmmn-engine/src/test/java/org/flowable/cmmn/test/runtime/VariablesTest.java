@@ -770,21 +770,25 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId()).singleResult();
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
 
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.setVariableLocal(task.getId(),"localTaskVariable","localTaskVarValue");
         List<VariableInstance> vars = cmmnRuntimeService.createVariableInstanceQuery().planItemInstanceId(planItemInstance.getId()).list();
 
-        assertThat(vars.size()).isEqualTo(1);
-        assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test2");
+        assertThat(vars.size()).isEqualTo(2);
+        assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test2","localTaskVarValue");
 
         vars = cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).excludeLocalVariables().list();
 
         assertThat(vars.size()).isEqualTo(1);
         assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test1");
 
-        List<HistoricVariableInstance> historyVars = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
-                .excludeLocalVariables().list();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historyVars = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .excludeLocalVariables().list();
 
-        assertThat(historyVars.size()).isEqualTo(1);
-        assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
+            assertThat(historyVars.size()).isEqualTo(1);
+            assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
+        }
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {
