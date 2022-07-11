@@ -780,11 +780,13 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertThat(vars.size()).isEqualTo(1);
         assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test1");
 
-        List<HistoricVariableInstance> historyVars = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
-                .excludeLocalVariables().list();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historyVars = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .excludeLocalVariables().list();
 
-        assertThat(historyVars.size()).isEqualTo(1);
-        assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
+            assertThat(historyVars.size()).isEqualTo(1);
+            assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
+        }
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {
