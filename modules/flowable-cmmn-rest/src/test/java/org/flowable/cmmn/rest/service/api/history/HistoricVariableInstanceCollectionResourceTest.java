@@ -23,6 +23,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
@@ -79,6 +80,27 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var2"), 0, null, null);
     }
 
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testQueryVariableExcludeLocalVariable() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask")
+                .caseInstanceId(caseInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(),"localTaskVariable","localTaskVarValue");
+
+        runtimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCES);
+
+        assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId(), 3, "myLocalVar", "test2");
+
+        assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId() + "&excludeLocalVariables=true", 1, "myVar", "test1");
+
+    }
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
             throws JsonProcessingException, IOException {
 
