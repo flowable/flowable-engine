@@ -146,6 +146,11 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof KafkaInboundChannelModel || channelModel instanceof KafkaOutboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return false;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry,

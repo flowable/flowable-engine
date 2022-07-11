@@ -92,7 +92,15 @@ public class CachingAndArtifactsManager {
             
             boolean channelRegistered = eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().registerChannelModel(inboundChannelModel, channelDefinition);
             if (!channelRegistered) {
-                // inbound channel model is already registered, returning to prevent the same listener from getting registered again
+                for (ChannelModelProcessor channelDefinitionProcessor : eventRegistryEngineConfiguration.getChannelModelProcessors()) {
+                    if (channelDefinitionProcessor.canProcessIfChannelModelAlreadyRegistered(channelModel)) {
+                        channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRepositoryService());
+                        channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRegistry(),
+                                eventRegistryEngineConfiguration.getEventRepositoryService(),
+                                eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+                    }
+                }
+                
                 return;
             }
 

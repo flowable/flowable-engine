@@ -44,6 +44,11 @@ public class DelegateExpressionOutboundChannelModelProcessor implements ChannelM
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof DelegateExpressionOutboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return channelModel instanceof DelegateExpressionOutboundChannelModel;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, EventRepositoryService eventRepositoryService,
