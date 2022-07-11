@@ -26,15 +26,12 @@ public class VariableEventListener extends EventListener {
     public String getVariableName() {
         return variableName;
     }
-
     public void setVariableName(String variableName) {
         this.variableName = variableName;
     }
-
     public String getVariableChangeType() {
         return variableChangeType;
     }
-
     public void setVariableChangeType(String variableChangeType) {
         this.variableChangeType = variableChangeType;
     }

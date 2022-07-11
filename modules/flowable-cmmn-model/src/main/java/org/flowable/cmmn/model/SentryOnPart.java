@@ -25,31 +25,24 @@ public class SentryOnPart extends CmmnElement {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getSourceRef() {
         return sourceRef;
     }
-
     public void setSourceRef(String sourceRef) {
         this.sourceRef = sourceRef;
     }
-
     public PlanItem getSource() {
         return source;
     }
-
     public void setSource(PlanItem source) {
         this.source = source;
     }
-
     public String getStandardEvent() {
         return standardEvent;
     }
-
     public void setStandardEvent(String standardEvent) {
         this.standardEvent = standardEvent;
     }

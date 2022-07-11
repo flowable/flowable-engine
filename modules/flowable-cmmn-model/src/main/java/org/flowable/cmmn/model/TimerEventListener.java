@@ -25,31 +25,24 @@ public class TimerEventListener extends EventListener {
     public String getTimerExpression() {
         return timerExpression;
     }
-
     public void setTimerExpression(String timerExpression) {
         this.timerExpression = timerExpression;
     }
-
     public String getTimerStartTriggerSourceRef() {
         return timerStartTriggerSourceRef;
     }
-
     public void setTimerStartTriggerSourceRef(String timerStartTriggerSourceRef) {
         this.timerStartTriggerSourceRef = timerStartTriggerSourceRef;
     }
-
     public PlanItem getTimerStartTriggerPlanItem() {
         return timerStartTriggerPlanItem;
     }
-
     public void setTimerStartTriggerPlanItem(PlanItem timerStartTriggerPlanItem) {
         this.timerStartTriggerPlanItem = timerStartTriggerPlanItem;
     }
-
     public String getTimerStartTriggerStandardEvent() {
         return timerStartTriggerStandardEvent;
     }
-
     public void setTimerStartTriggerStandardEvent(String timerStartTriggerStandardEvent) {
         this.timerStartTriggerStandardEvent = timerStartTriggerStandardEvent;
     }

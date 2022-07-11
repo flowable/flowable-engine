@@ -68,7 +68,6 @@ public class ProcessTask extends ChildTask {
     public String getProcessInstanceIdVariableName() {
         return processInstanceIdVariableName;
     }
-
     public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
         this.processInstanceIdVariableName = processInstanceIdVariableName;
     }
