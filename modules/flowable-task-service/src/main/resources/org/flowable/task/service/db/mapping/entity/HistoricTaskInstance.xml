@@ -1272,6 +1272,23 @@
       <if test="category != null">
         and ${queryTablePrefix}CATEGORY_ = #{category}
       </if>
+      <if test="categoryInList != null &amp;&amp; !categoryInList.empty">
+          and ${queryTablePrefix}CATEGORY_ IN
+          <foreach item="taskCategory" index="index" collection="categoryInList"
+                   open="(" separator="," close=")">
+              #{taskCategory}
+          </foreach>
+      </if>
+      <if test="categoryNotInList != null &amp;&amp; !categoryNotInList.empty">
+          and ${queryTablePrefix}CATEGORY_ NOT IN
+          <foreach item="taskCategory" index="index" collection="categoryNotInList"
+                   open="(" separator="," close=")">
+              #{taskCategory}
+          </foreach>
+      </if>
+      <if test="withoutCategory">
+          and ${queryTablePrefix}CATEGORY_ IS NULL
+      </if>
       <if test="withFormKey">
         and ${queryTablePrefix}FORM_KEY_ IS NOT NULL
       </if>
@@ -1530,6 +1547,23 @@
       </if>
       <if test="orQueryObject.category != null">
         or ${queryTablePrefix}CATEGORY_ = #{orQueryObject.category}
+      </if>
+      <if test="orQueryObject.categoryInList != null &amp;&amp; !orQueryObject.categoryInList.empty">
+          or ${queryTablePrefix}CATEGORY_ IN
+          <foreach item="taskCategory" index="index" collection="orQueryObject.categoryInList"
+                   open="(" separator="," close=")">
+              #{taskCategory}
+          </foreach>
+      </if>
+      <if test="orQueryObject.categoryNotInList != null &amp;&amp; !orQueryObject.categoryNotInList.empty">
+          or ${queryTablePrefix}CATEGORY_ NOT IN
+          <foreach item="taskCategory" index="index" collection="orQueryObject.categoryNotInList"
+                   open="(" separator="," close=")">
+              #{taskCategory}
+          </foreach>
+      </if>
+      <if test="orQueryObject.withoutCategory">
+        or ${queryTablePrefix}CATEGORY_ IS NULL
       </if>
       <if test="orQueryObject.withFormKey">
         or ${queryTablePrefix}FORM_KEY_ IS NOT NULL

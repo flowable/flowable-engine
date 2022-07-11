@@ -754,6 +754,23 @@
       <if test="category != null">
         and RES.CATEGORY_ = #{category}
       </if>
+      <if test="categoryInList != null &amp;&amp; !categoryInList.empty">
+          and RES.CATEGORY_ IN
+          <foreach item="taskCategory" index="index" collection="categoryInList"
+                   open="(" separator="," close=")">
+              #{taskCategory}
+          </foreach>
+      </if>
+      <if test="categoryNotInList != null &amp;&amp; !categoryNotInList.empty">
+          and RES.CATEGORY_ NOT IN
+          <foreach item="taskCategory" index="index" collection="categoryNotInList"
+                     open="(" separator="," close=")">
+              #{taskCategory}
+            </foreach>
+      </if>
+      <if test="withoutCategory">
+        and RES.CATEGORY_ IS NULL
+      </if>
       <if test="withFormKey">
         and RES.FORM_KEY_ IS NOT NULL
       </if>
@@ -1289,6 +1306,23 @@
             </if>
             <if test="orQueryObject.category != null">
               or RES.CATEGORY_ = #{orQueryObject.category}
+            </if>
+            <if test="orQueryObject.categoryInList != null &amp;&amp; !orQueryObject.categoryInList.empty">
+                or RES.CATEGORY_ IN
+                <foreach item="taskCategory" index="index" collection="orQueryObject.categoryInList"
+                         open="(" separator="," close=")">
+                    #{taskCategory}
+                </foreach>
+            </if>
+            <if test="orQueryObject.categoryNotInList != null &amp;&amp; !orQueryObject.categoryNotInList.empty">
+                or RES.CATEGORY_ NOT IN
+                <foreach item="taskCategory" index="index" collection="orQueryObject.categoryNotInList"
+                         open="(" separator="," close=")">
+                    #{taskCategory}
+                </foreach>
+            </if>
+            <if test="orQueryObject.withoutCategory">
+                or RES.CATEGORY_ IS NULL
             </if>
             <if test="orQueryObject.withFormKey">
               or RES.FORM_KEY_ IS NOT NULL

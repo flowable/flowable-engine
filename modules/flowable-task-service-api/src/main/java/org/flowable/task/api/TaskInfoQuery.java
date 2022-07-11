@@ -311,7 +311,37 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with the given category.
      */
     T taskCategory(String category);
-    
+
+    /**
+     * Only select tasks belonging to one of the categories in the given list.
+     *
+     * @param taskCategoryInList
+     * @throws FlowableIllegalArgumentException When passed category list is empty or <code>null</code> or contains <code>null</code> String.
+     */
+    T taskCategoryIn(Collection<String> taskCategoryInList);
+
+    /**
+     * Only select tasks with a defined category which do not belong to a category present in the given list.
+     * <p>
+     * NOTE: This method does <b>not</b> return tasks <b>without</b> category e.g. tasks having a <code>null</code> category.
+     * To include <code>null</code> categories, use <code>query.or().taskCategoryNotIn(...).taskWithoutCategory().endOr()</code>
+     * </p>
+     *
+     * @param taskCategoryNotInList
+     * @throws FlowableIllegalArgumentException When passed category list is empty or <code>null</code> or contains <code>null String</code>.
+     * @see #taskWithoutCategory
+     */
+    T taskCategoryNotIn(Collection<String> taskCategoryNotInList);
+
+    /**
+     * Selects tasks without category.
+     * <p>
+     * Can also be used in conjunction with other filter criteria to include tasks without category e.g. in <code>or</code> queries.
+     * </p>
+     * @see #taskCategoryNotIn(Collection)
+     */
+    T taskWithoutCategory();
+
     /**
      * Only select tasks with form key.
      */

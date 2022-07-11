@@ -371,6 +371,15 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?categoryIn=" + encode("some-other-category,some-category");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?categoryNotIn=" + encode("some-category");
+            assertResultsPresentInDataResponse(url);
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutCategory=true";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
             // Suspend process-instance to have a suspended task
             runtimeService.suspendProcessInstanceById(processInstance.getId());
 

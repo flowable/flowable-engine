@@ -322,6 +322,17 @@ public class TaskBaseResource {
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
         }
+        if (request.getCategoryIn() != null && !request.getCategoryIn().isEmpty()) {
+            taskQuery.taskCategoryIn(request.getCategoryIn());
+        }
+
+        if (request.getCategoryNotIn() != null && !request.getCategoryNotIn().isEmpty()) {
+            taskQuery.taskCategoryNotIn(request.getCategoryNotIn());
+        }
+
+        if (Boolean.TRUE.equals(request.getWithoutCategory())) {
+            taskQuery.taskWithoutCategory();
+        }
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
