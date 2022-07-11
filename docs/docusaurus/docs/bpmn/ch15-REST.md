@@ -2504,7 +2504,7 @@ Response body contains the model’s raw editor source. The response’s content
 
 ### Delete a process instance
 
-    DELETE runtime/process-instances/{processInstanceId}
+    DELETE runtime/process-instances/{processInstanceId}?deleteReason={deleteReason}
 
 <table>
 <caption>Delete a process instance - URL parameters</caption>
@@ -2528,6 +2528,12 @@ Response body contains the model’s raw editor source. The response’s content
 <td><p>Yes</p></td>
 <td><p>String</p></td>
 <td><p>The id of the process instance to delete.</p></td>
+</tr>
+<tr class="even">
+<td><p>deleteReason</p></td>
+<td><p>False</p></td>
+<td><p>String</p></td>
+<td><p>Reason why the process instance is deleted.</p></td>
 </tr>
 </tbody>
 </table>
@@ -5362,7 +5368,7 @@ Resolves the task delegation. The task is assigned back to the task owner (if an
     DELETE runtime/tasks/{taskId}?cascadeHistory={cascadeHistory}&deleteReason={deleteReason}
 
 <table>
-<caption>&gt;Delete a task - URL parameters</caption>
+<caption>Delete a task - URL parameters</caption>
 <colgroup>
 <col style="width: 25%" />
 <col style="width: 25%" />
@@ -5400,7 +5406,7 @@ Resolves the task delegation. The task is assigned back to the task owner (if an
 </table>
 
 <table>
-<caption>&gt;Delete a task - Response codes</caption>
+<caption>Delete a task - Response codes</caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />

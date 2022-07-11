@@ -74,5 +74,6 @@ public class Association extends CmmnElement {
         super.setValues(otherElement);
         setSourceRef(otherElement.getSourceRef());
         setTargetRef(otherElement.getTargetRef());
+        setTransitionEvent(otherElement.getTransitionEvent());
     }
 }

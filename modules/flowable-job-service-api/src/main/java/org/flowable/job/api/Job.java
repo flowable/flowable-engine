@@ -27,7 +27,6 @@ public interface Job extends JobInfo {
     String JOB_TYPE_EXTERNAL_WORKER = "externalWorker";
 
     boolean DEFAULT_EXCLUSIVE = true;
-    int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
 
     /**
      * Returns the correlation id of a job.

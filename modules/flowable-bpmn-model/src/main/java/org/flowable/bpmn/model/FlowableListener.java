@@ -111,6 +111,7 @@ public class FlowableListener extends BaseElement {
     }
 
     public void setValues(FlowableListener otherListener) {
+        super.setValues(otherListener);
         setEvent(otherListener.getEvent());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
@@ -121,5 +122,9 @@ public class FlowableListener extends BaseElement {
                 fieldExtensions.add(extension.clone());
             }
         }
+
+        setOnTransaction(otherListener.getOnTransaction());
+        setCustomPropertiesResolverImplementationType(otherListener.getCustomPropertiesResolverImplementationType());
+        setCustomPropertiesResolverImplementation(otherListener.getCustomPropertiesResolverImplementation());
     }
 }

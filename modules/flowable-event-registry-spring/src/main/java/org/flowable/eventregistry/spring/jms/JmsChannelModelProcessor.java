@@ -87,6 +87,11 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
     public boolean canProcess(ChannelModel channelModel) {
         return channelModel instanceof JmsInboundChannelModel || channelModel instanceof JmsOutboundChannelModel;
     }
+    
+    @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return false;
+    }
 
     @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 

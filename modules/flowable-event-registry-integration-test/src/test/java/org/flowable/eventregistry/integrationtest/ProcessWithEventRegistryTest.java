@@ -21,6 +21,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.test.JobTestHelper;
@@ -49,6 +50,9 @@ public class ProcessWithEventRegistryTest {
     
     @Autowired
     protected ProcessEngine processEngine;
+    
+    @Autowired
+    protected RepositoryService repositoryService;
     
     @Autowired
     protected RuntimeService runtimeService;
@@ -163,6 +167,50 @@ public class ProcessWithEventRegistryTest {
             "org/flowable/eventregistry/integrationtest/one.channel"})
     public void testFullPayloadEvent() {
         try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+            
+            jmsTemplate.convertAndSend("test-queue", "{"
+                + "    \"payload1\": \"kermit\","
+                + "    \"payload2\": 123"
+                + "}", messageProcessor -> {
+                    
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> {
+                    assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+                });
+            
+            ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
+            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndFullPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-fullpayload.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testFullPayloadEventWithDuplicateDeployment() {
+        try {
+            repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndFullPayload.bpmn20.xml")
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/one-fullpayload.event")
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/one.channel")
+                .deploy();
+            
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
                     .variable("customerIdVar", "123a")
                     .start();

@@ -35,6 +35,7 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -152,6 +153,36 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    public void testQueryTaskByCategory() throws Exception {
+        Task t1 = taskService.newTask();
+        t1.setName("t1");
+        t1.setCategory("Cat 1");
+        taskService.saveTask(t1);
+
+        Task t2 = taskService.newTask();
+        t2.setName("t2");
+        t2.setCategory("Cat 2");
+        taskService.saveTask(t2);
+
+        Task t3 = taskService.newTask();
+        t3.setName("t3");
+        taskService.saveTask(t3);
+
+        try {
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES);
+            assertResultsPresentInDataResponse(url + "?taskCategory=" + encode("Cat 1"), 1, t1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCategoryIn=" + encode("Cat 1"), 1, t1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCategoryNotIn=" + encode("Cat 1"), 1, t2.getId());
+            assertResultsPresentInDataResponse(url + "?taskWithoutCategory=true", 1, t3.getId());
+
+        } finally {
+            taskService.deleteTask(t1.getId(), true);
+            taskService.deleteTask(t2.getId(), true);
+            taskService.deleteTask(t3.getId(), true);
+        }
+    }
+
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
