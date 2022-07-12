@@ -82,8 +82,8 @@ class EventListenerConverterTest {
         // Verify new type=script taskListener.
         FlowableListener scriptTaskListenerType = taskListeners.get(1);
         assertThat(scriptTaskListenerType.getEvent()).isEqualTo("create");
-        assertThat(scriptTaskListenerType.getImplementationType()).isEqualTo("type");
-        assertThat(scriptTaskListenerType.getImplementation()).isEqualTo("script");
+        assertThat(scriptTaskListenerType.getImplementationType()).isEqualTo("script");
+        assertThat(scriptTaskListenerType.getImplementation()).isNull();
         assertThat(scriptTaskListenerType.getScriptInfo()).isNotNull();
         assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains(" task.setVariable('scriptTaskListenerType', \"Type\");");
         assertThat(scriptTaskListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");

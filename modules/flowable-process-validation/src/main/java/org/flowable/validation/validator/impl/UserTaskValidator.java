@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.validation.ValidationError;
@@ -33,8 +34,18 @@ public class UserTaskValidator extends ProcessLevelValidator {
         for (UserTask userTask : userTasks) {
             if (userTask.getTaskListeners() != null) {
                 for (FlowableListener listener : userTask.getTaskListeners()) {
-                    if (listener.getImplementation() == null || listener.getImplementationType() == null) {
-                        addError(errors, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, process, userTask, listener, "Element 'class' or 'expression' or 'type' is mandatory on executionListener");
+                    if (listener.getEvent() == null) {
+                        addError(errors, Problems.USER_TASK_LISTENER_MISSING_EVENT, process, userTask, listener,
+                                "Element 'event' is mandatory on taskListener");
+                    }
+                    if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+                        if (listener.getScriptInfo() == null) {
+                            addError(errors, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, process, userTask, listener,
+                                    "taskListener of type 'script' expects a <script> child element.");
+                        }
+                    } else if (listener.getImplementation() == null || listener.getImplementationType() == null) {
+                        addError(errors, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, process, userTask, listener,
+                                "Element 'class' or 'expression' or 'type=\"script\"' is mandatory on taskListener");
                     }
                 }
             }

@@ -74,5 +74,4 @@ public class ScriptInfo extends BaseElement {
         clone.setResultVariable(this.resultVariable);
         return clone;
     }
-
 }

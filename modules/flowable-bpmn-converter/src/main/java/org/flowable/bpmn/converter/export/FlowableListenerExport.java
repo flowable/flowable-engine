@@ -114,8 +114,8 @@ public class FlowableListenerExport implements BpmnXMLConstants {
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EXPRESSION, listener.getImplementation(), xtw);
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType())) {
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_DELEGATEEXPRESSION, listener.getImplementation(), xtw);
-                    } else if (ImplementationType.IMPLEMENTATION_TYPE_TYPE.equals(listener.getImplementationType())) {
-                        BpmnXMLUtil.writeDefaultAttribute(ImplementationType.IMPLEMENTATION_TYPE_TYPE, listener.getImplementation(), xtw);
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_TYPE, listener.getImplementationType(), xtw);
                     }
 
                     if (listener.getScriptInfo() != null) {

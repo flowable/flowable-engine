@@ -44,6 +44,8 @@ public interface ListenerFactory {
 
     TaskListener createDelegateExpressionTaskListener(FlowableListener listener);
 
+    TaskListener createScriptTypeTaskListener(FlowableListener listener);
+
     ExecutionListener createClassDelegateExecutionListener(FlowableListener listener);
 
     ExecutionListener createExpressionExecutionListener(FlowableListener listener);

@@ -16,13 +16,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
 
@@ -302,5 +309,57 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasNoCause()
                 .hasMessage("Message from listener");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/examples/bpmn/tasklistener/TaskListenerNoEventDefined.bpmn20.xml", validateBpmn = false)
+    public void testTaskWithMissingEventAttribute() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess1"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessageContaining("No event defined for taskListener in UserTask 'Task with Listener missing event attribute'");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTypeScript.bpmn20.xml" })
+    public void testInvalidTypeEventListener() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess3"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessageContaining("Script content is null or evaluated to null for taskListener of type 'script'");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTypeScript.bpmn20.xml" })
+    public void testTaskListenerTypeScript() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("scriptLanguageAsExpression", "groovy");
+        vars.put("scriptPayloadAsExpression", "def foo = \"usertask2ReturnVal\"; return foo");
+        vars.put("resultVarAsExpression", "task2ScriptListenerResult");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerTypeScriptProcess", vars);
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task.getName()).as("Name does not match").isEqualTo("User Task with Script Task Listener");
+        assertThat(task.getOwner()).isEqualTo("kermit");
+
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            /* The script calls taskService.save(task) after setting the owner.
+             * Without calling taskService.save() the historic instance has owner set to null, but the actual instance above
+             * has the owner set. */
+            HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTask.getOwner()).isEqualTo("kermit");
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task.getName()).as("Task name not set with 'scriptResultVariable' variable").isEqualTo("User Task 2 name defined in script");
+        }
+
+        Object localVariable = runtimeService.getVariable(processInstance.getId(), "localVariable");
+        assertThat(localVariable).as("Expected 'localVariable' variable to be local to script").isNull();
+
+        Object scriptVar = runtimeService.getVariable(processInstance.getId(), "scriptVar");
+        assertThat(scriptVar).as("Could not find the 'scriptVar' variable in variable scope").isEqualTo("scriptVarValue");
+
+        // Expect evaluation of script supports expressions for language, payload and resultVariable
+        Object task2ScriptListenerResult = runtimeService.getVariable(processInstance.getId(), "task2ScriptListenerResult");
+        assertThat(task2ScriptListenerResult).as("Expected 'task2ScriptListenerResult' variable in variable scope").isEqualTo("usertask2ReturnVal");
     }
 }

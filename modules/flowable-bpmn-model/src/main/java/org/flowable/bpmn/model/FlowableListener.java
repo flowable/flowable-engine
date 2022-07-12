@@ -34,6 +34,9 @@ public class FlowableListener extends BaseElement {
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
 
+    /**
+     * ScriptInfo is populated for implementationType 'script'
+     */
     protected ScriptInfo scriptInfo;
 
     public FlowableListener() {
@@ -108,8 +111,8 @@ public class FlowableListener extends BaseElement {
     /**
      * Return the script info, if present.
      * <p>
-     * ScriptInfo must be populated, when <code>type="script"</code> e.g. when
-     * implementationType is 'type' and implementation='script'.
+     * ScriptInfo must be populated, when {@code <executionListener type="script" ...>} e.g. when
+     * implementationType is 'script'.
      * </p>
      */
     public ScriptInfo getScriptInfo() {

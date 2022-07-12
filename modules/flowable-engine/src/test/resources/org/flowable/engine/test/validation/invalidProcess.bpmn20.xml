@@ -137,6 +137,8 @@
 		<userTask id="userTask1" name="userTask1">
 			<extensionElements>
 				<activiti:taskListener event="create" />
+				<activiti:taskListener event="create" type="script"/>
+				<activiti:taskListener class="foo"/>
 			</extensionElements>
 		</userTask>
 
