@@ -215,7 +215,7 @@ public class JobCollectionResource {
             if (restApiInterceptor != null) {
                 restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_ACTION);
             }
-            managementService.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), cmmnEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
+            managementService.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
         } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
             if (restApiInterceptor != null) {
                 restApiInterceptor.bulkMoveDeadLetterJobs(actionRequest.getJobIds(), MOVE_TO_HISTORY_JOB_ACTION);

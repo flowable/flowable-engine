@@ -137,6 +137,9 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         jobIds.add(timerJob.getId());
         managementService.moveJobToDeadLetterJob(timerJob.getId());
 
+        assertThat(managementService.createDeadLetterJobQuery().list()).hasSize(2);
+        assertThat(managementService.createJobQuery().list()).isEmpty();
+
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
@@ -149,6 +152,15 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createJobQuery().list())
+                .hasSize(2)
+                .extracting(Job::getRetries)
+                .containsOnly(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 7000, 200, true);
+
+        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createJobQuery().list()).isEmpty();
     }
 
 }
