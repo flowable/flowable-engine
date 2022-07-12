@@ -83,6 +83,7 @@ public class JavaTaskCmmnXmlConverterTest {
                     assertThat(taskB.getImplementation()).isEqualTo("${testJavaDelegate}");
                     assertThat(taskB.getResultVariableName()).isNull();
                     assertThat(taskB.isAsync()).isTrue();
+                    assertThat(taskB.isAsyncLeave()).isTrue();
                     assertThat(taskB.isExclusive()).isTrue();
                     assertThat(taskB.isStoreResultVariableAsTransient()).isFalse();
 
