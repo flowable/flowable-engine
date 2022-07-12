@@ -56,6 +56,8 @@ public class TaskBaseResource {
         properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
         properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
         properties.put("tenantId", TaskQueryProperty.TENANT_ID);
+        properties.put("assignee", TaskQueryProperty.ASSIGNEE);
+        properties.put("owner", TaskQueryProperty.OWNER);
     }
 
     @Autowired
