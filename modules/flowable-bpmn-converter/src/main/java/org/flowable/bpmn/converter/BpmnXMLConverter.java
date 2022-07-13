@@ -596,15 +596,17 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_ORDERING, adhocSubProcess.getOrdering(), xtw);
                 }
             } else if (!(subProcess instanceof Transaction)) {
+                boolean exclusiveAttributeWritten = false;
                 if (subProcess.isAsynchronous()) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, ATTRIBUTE_VALUE_TRUE, xtw);
                     if (subProcess.isNotExclusive()) {
                         BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
+                        exclusiveAttributeWritten = true;
                     }
                 }
                 if (subProcess.isAsynchronousLeave()) {
                     BpmnXMLUtil.writeQualifiedAttribute(BpmnXMLConstants.ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE, ATTRIBUTE_VALUE_TRUE, xtw);
-                    if (subProcess.isNotExclusive()) {
+                    if (subProcess.isNotExclusive() && !exclusiveAttributeWritten) {
                         BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
                     }
                 }
