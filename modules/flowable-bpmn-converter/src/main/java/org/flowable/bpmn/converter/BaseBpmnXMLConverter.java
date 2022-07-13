@@ -178,6 +178,9 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             }
             if (flowNode.isAsynchronousLeave()) {
                 writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE, ATTRIBUTE_VALUE_TRUE, xtw);
+                if (flowNode.isNotExclusive()) {
+                    writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw); // shared with async
+                }
             }
 
             if (baseElement instanceof Activity) {

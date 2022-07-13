@@ -604,6 +604,9 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 }
                 if (subProcess.isAsynchronousLeave()) {
                     BpmnXMLUtil.writeQualifiedAttribute(BpmnXMLConstants.ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE, ATTRIBUTE_VALUE_TRUE, xtw);
+                    if (subProcess.isNotExclusive()) {
+                        BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
+                    }
                 }
             }
 

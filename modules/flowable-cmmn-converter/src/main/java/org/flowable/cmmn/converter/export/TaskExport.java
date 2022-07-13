@@ -50,6 +50,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
 
         if (task.isAsyncLeave()) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE, String.valueOf(task.isAsyncLeave()));
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(task.isExclusive())); // exclusive is shared with async
         }
 
         if (task instanceof SendEventServiceTask) {
