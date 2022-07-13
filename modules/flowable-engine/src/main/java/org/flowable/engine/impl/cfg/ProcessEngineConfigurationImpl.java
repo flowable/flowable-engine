@@ -799,6 +799,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
+    protected Collection<ResolverFactory> preDefaultResolverFactories;
+    protected Collection<ResolverFactory> postDefaultResolverFactories;
 
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
@@ -2479,8 +2481,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initScriptingEngines() {
         if (resolverFactories == null) {
             resolverFactories = new ArrayList<>();
+            if (preDefaultResolverFactories != null) {
+                resolverFactories.addAll(preDefaultResolverFactories);
+            }
             resolverFactories.add(new VariableScopeResolverFactory());
             resolverFactories.add(new BeansResolverFactory());
+            if (postDefaultResolverFactories != null) {
+                resolverFactories.addAll(postDefaultResolverFactories);
+            }
         }
         if (scriptingEngines == null) {
             scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
@@ -3723,6 +3731,42 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setResolverFactories(List<ResolverFactory> resolverFactories) {
         this.resolverFactories = resolverFactories;
+        return this;
+    }
+
+    public Collection<ResolverFactory> getPreDefaultResolverFactories() {
+        return preDefaultResolverFactories;
+    }
+
+    public ProcessEngineConfigurationImpl setPreDefaultResolverFactories(Collection<ResolverFactory> preDefaultResolverFactories) {
+        this.preDefaultResolverFactories = preDefaultResolverFactories;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addPreDefaultResolverFactory(ResolverFactory resolverFactory) {
+        if (this.preDefaultResolverFactories == null) {
+            this.preDefaultResolverFactories = new ArrayList<>();
+        }
+
+        this.preDefaultResolverFactories.add(resolverFactory);
+        return this;
+    }
+
+    public Collection<ResolverFactory> getPostDefaultResolverFactories() {
+        return postDefaultResolverFactories;
+    }
+
+    public ProcessEngineConfigurationImpl setPostDefaultResolverFactories(Collection<ResolverFactory> postDefaultResolverFactories) {
+        this.postDefaultResolverFactories = postDefaultResolverFactories;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addPostDefaultResolverFactory(ResolverFactory resolverFactory) {
+        if (this.postDefaultResolverFactories == null) {
+            this.postDefaultResolverFactories = new ArrayList<>();
+        }
+
+        this.postDefaultResolverFactories.add(resolverFactory);
         return this;
     }
 
