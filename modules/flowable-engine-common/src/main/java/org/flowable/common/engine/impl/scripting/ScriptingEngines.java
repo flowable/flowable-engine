@@ -85,7 +85,7 @@ public class ScriptingEngines {
     }
 
     public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables);
+        return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables).getResult();
     }
 
     public void setCacheScriptingEngines(boolean cacheScriptingEngines) {
