@@ -35,6 +35,7 @@ import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskFutureJavaDelegateActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskJavaDelegateActivityBehavior;
+import org.flowable.engine.impl.bpmn.listener.DelegateExecutionListener;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -97,8 +98,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     // Execution listener
     @Override
     public void notify(DelegateExecution execution) {
-        ExecutionListener executionListenerInstance = getExecutionListenerInstance();
-        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
+        getExecutionListenerInstance().notify(execution);
     }
 
     // Transaction Dependent execution listener
@@ -133,14 +133,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     }
 
     protected ExecutionListener getExecutionListenerInstance() {
-        Object delegateInstance = instantiateDelegate(className, fieldDeclarations);
-        if (delegateInstance instanceof ExecutionListener) {
-            return (ExecutionListener) delegateInstance;
-        } else if (delegateInstance instanceof JavaDelegate) {
-            return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance, triggerable, skipExpression);
-        } else {
-            throw new FlowableIllegalArgumentException(delegateInstance.getClass().getName() + " doesn't implement " + ExecutionListener.class + " nor " + JavaDelegate.class);
-        }
+        return new DelegateExecutionListener(instantiateDelegate(className, fieldDeclarations));
     }
 
     protected TransactionDependentExecutionListener getTransactionDependentExecutionListenerInstance() {
