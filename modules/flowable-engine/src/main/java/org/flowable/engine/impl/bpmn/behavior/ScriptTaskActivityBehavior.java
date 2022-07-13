@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
@@ -113,7 +114,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     protected void executeScript(DelegateExecution execution) {
 
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+        ScriptEvaluation scriptEvaluation = scriptingEngines.evaluateWithEvaluationResult(script, language, execution, storeScriptVariables);
+        Object result = scriptEvaluation.getResult();
 
         if (null != result) {
             if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {

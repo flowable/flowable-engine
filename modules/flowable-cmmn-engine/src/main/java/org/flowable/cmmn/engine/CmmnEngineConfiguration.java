@@ -461,6 +461,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
 
     protected ScriptingEngines scriptingEngines;
+    protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
@@ -863,6 +864,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initBatchServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
+        initScriptBindingsFactory();
         initScriptingEngines();
         configuratorsAfterInit();
         afterInitEventRegistryEventBusConsumer();
@@ -1420,7 +1422,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 Collections.singletonList(new ChildBpmnCaseInstanceStateChangeCallback()));
     }
 
-    protected void initScriptingEngines() {
+    protected void initScriptBindingsFactory() {
         if (resolverFactories == null) {
             resolverFactories = new ArrayList<>();
             if (preDefaultResolverFactories != null) {
@@ -1432,9 +1434,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 resolverFactories.addAll(postDefaultResolverFactories);
             }
         }
-        if (scriptingEngines == null) {
+        if (scriptBindingsFactory == null) {
+            scriptBindingsFactory = new ScriptBindingsFactory(this, resolverFactories);
+        }
+    }
 
-            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+    protected void initScriptingEngines() {
+        if (scriptingEngines == null) {
+            scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
         }
     }
     
