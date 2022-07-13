@@ -19,7 +19,6 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 
 /**
@@ -43,14 +42,11 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         String scriptFormat = scriptTask.getScriptFormat() != null ? scriptTask.getScriptFormat() : ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
         
         try {
-            ScriptEvaluation scriptEvaluation = scriptingEngines.evaluateWithEvaluationResult(scriptTask.getScript(), scriptFormat, planItemInstanceEntity, scriptTask.isAutoStoreVariables());
-            Object result = scriptEvaluation.getResult();
-
+            Object result = scriptingEngines.evaluate(scriptTask.getScript(), scriptFormat, planItemInstanceEntity, scriptTask.isAutoStoreVariables());
             String resultVariableName = scriptTask.getResultVariableName();
             if (StringUtils.isNotBlank(scriptTask.getResultVariableName())) {
                 planItemInstanceEntity.setVariable(resultVariableName.trim(), result);
             }
-
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
 
         } catch (FlowableException e) {
