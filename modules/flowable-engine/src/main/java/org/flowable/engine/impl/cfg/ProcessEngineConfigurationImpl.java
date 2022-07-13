@@ -284,9 +284,9 @@ import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
-import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
@@ -798,6 +798,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected Collection<ELResolver> postDefaultELResolvers;
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
+    protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
@@ -985,6 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initVariableTypes();
         initFormEngines();
         initFormTypes();
+        initScriptBindingsFactory();
         initScriptingEngines();
         initBusinessCalendarManager();
         initServices();
@@ -2478,7 +2480,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initScriptingEngines() {
+    public void initScriptBindingsFactory() {
         if (resolverFactories == null) {
             resolverFactories = new ArrayList<>();
             if (preDefaultResolverFactories != null) {
@@ -2490,8 +2492,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 resolverFactories.addAll(postDefaultResolverFactories);
             }
         }
+        if (scriptBindingsFactory == null) {
+            scriptBindingsFactory = new ScriptBindingsFactory(this, resolverFactories);
+        }
+    }
+
+    public void initScriptingEngines() {
         if (scriptingEngines == null) {
-            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+            scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
         }
     }
 
