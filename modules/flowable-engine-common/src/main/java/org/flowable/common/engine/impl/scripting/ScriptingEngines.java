@@ -66,12 +66,26 @@ public class ScriptingEngines {
         }
     }
 
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
+        Bindings bindings = createBindings(variableScope);
+        Object result = evaluate(script, language, bindings);
+
+        return new ScriptEvaluationImpl(bindings, result);
+    }
+
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
+        Bindings bindings = createBindings(variableScope, storeScriptVariables);
+        Object result = evaluate(script, language, bindings);
+
+        return new ScriptEvaluationImpl(bindings, result);
+    }
+
     public Object evaluate(String script, String language, VariableScope variableScope) {
-        return evaluate(script, language, createBindings(variableScope));
+        return evaluateWithEvaluationResult(script, language, variableScope).getResult();
     }
 
     public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return evaluate(script, language, createBindings(variableScope, storeScriptVariables));
+        return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables);
     }
 
     public void setCacheScriptingEngines(boolean cacheScriptingEngines) {
