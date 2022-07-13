@@ -69,7 +69,7 @@ public class JavaTaskCmmnXmlConverterTest {
                     assertThat(taskA.getImplementation()).isEqualTo("org.flowable.TestJavaDelegate");
                     assertThat(taskA.getResultVariableName()).isEqualTo("result");
                     assertThat(taskA.isAsync()).isFalse();
-                    assertThat(taskA.isExclusive()).isFalse();
+                    assertThat(taskA.isExclusive()).isTrue();
                     assertThat(taskA.isAsyncLeave()).isTrue();
                     assertThat(taskA.isStoreResultVariableAsTransient()).isFalse();
                 });
