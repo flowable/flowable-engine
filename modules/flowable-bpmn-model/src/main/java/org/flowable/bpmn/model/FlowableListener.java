@@ -141,7 +141,7 @@ public class FlowableListener extends BaseElement {
         setEvent(otherListener.getEvent());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
-        Optional.ofNullable(otherListener.getScriptInfo()).ifPresent(this::setScriptInfo);
+        Optional.ofNullable(otherListener.getScriptInfo()).map(ScriptInfo::clone).ifPresent(this::setScriptInfo);
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {

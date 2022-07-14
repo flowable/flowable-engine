@@ -115,7 +115,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
                         .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
                 return scriptListener;
             } else {
-                throw new FlowableIllegalStateException("Cannot create 'type' task listener with implementation 'script'. Missing ScriptInfo.");
+                throw new FlowableIllegalStateException("Cannot create 'script' task listener. Missing ScriptInfo.");
             }
         }
         throw new FlowableIllegalStateException("Cannot create event listener. Unknown implementation type '" + listener.getImplementationType() + "'");

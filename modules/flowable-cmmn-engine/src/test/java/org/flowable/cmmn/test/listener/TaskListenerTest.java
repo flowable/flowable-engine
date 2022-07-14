@@ -56,10 +56,18 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
     @Test
     @CmmnDeployment
     public void testCreateEvent() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("scriptLanguage", "groovy");
+        vars.put("scriptResultVariable", "myScriptResultVar");
+        vars.put("scriptPayload", "task.setVariable('groovyVar', 'setInGroovy'); def foo = \"bar\"; return foo;");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().variables(vars).caseDefinitionKey("testTaskListeners").start();
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
+        assertVariable(caseInstance, "groovyVar", "setInGroovy");
+        assertVariable(caseInstance, "myScriptResultVar", "bar");
     }
 
     @Test
@@ -75,6 +83,8 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
     }
 
 
@@ -91,6 +101,8 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
     }
 
     @Test

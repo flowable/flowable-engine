@@ -57,6 +57,10 @@ public interface CmmnXmlConstants {
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
 
     String ELEMENT_TASK_LISTENER = "taskListener";
+    String ATTRIBUTE_LISTENER_TYPE = "type";
+    String ELEMENT_SCRIPT = "script";
+    String ATTRIBUTE_SCRIPT_LANGUAGE = "language";
+    String ATTRIBUTE_SCRIPT_RESULTVARIABLE = "resultVariable";
     String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
     String ELEMENT_CASE_LIFECYCLE_LISTENER = "caseLifecycleListener";
     String ATTRIBUTE_LISTENER_CLASS = "class";

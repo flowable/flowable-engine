@@ -23,6 +23,7 @@ public interface Problems {
     String DECISION_TASK_REFERENCE_MISSING = "flowable-decision-task-missing-decision-table-or-decision-service";
 
     String HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING = "flowable-humantask-listener-implementation-missing";
+    String HUMAN_TASK_LISTENER_MISSING_EVENT = "flowable-humantask-listener-event-missing";
 
     String PLAN_MODEL_EMPTY = "flowable-plan-model-empty";
 }
