@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,9 +228,9 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerJavaDelegate.bpmn20.xml" })
     public void testJavaDelegateAsExecutionListenerFollowsCorrectFlow() {
         ProcessInstance myFlow = runtimeService.startProcessInstanceByKey("MyFlow");
-        List<String> myActions = runtimeService.getVariable(myFlow.getId(), "myActions", ArrayList.class);
+        String myActions = runtimeService.getVariable(myFlow.getId(), "myActions", String.class);
         Task task = assertDoesNotThrow(() -> taskService.createTaskQuery().singleResult(), "Only one task 'Production Manager' must be returned.");
         assertThat(task.getName()).isEqualTo("Production Manager");
-        assertThat(myActions).containsExactly("Start executionListener", "ProductionManager taskListener");
+        assertThat(myActions).isEqualTo("Start executionListener,ProductionManager taskListener");
     }
 }

@@ -32,16 +32,16 @@ public class JavaDelegateTestExecutionListener implements JavaDelegate, TaskList
     @Override
     public void notify(DelegateTask delegateTask) {
         LOGGER.info("Hello TaskListener --- {} ", action.getExpressionText());
-        ArrayList myActions = Optional.ofNullable(delegateTask.getVariable("myActions", ArrayList.class)).orElseGet(ArrayList::new);
-        myActions.add(action.getExpressionText());
+        String myActions = delegateTask.getVariable("myActions", String.class);
+        myActions = myActions != null ? myActions + ","+ action.getExpressionText()  : action.getExpressionText();
         delegateTask.setVariable("myActions", myActions);
     }
 
     @Override
     public void execute(DelegateExecution execution) {
         LOGGER.info("Hello ExecutionListener --- {}", action.getExpressionText());
-        ArrayList myActions = Optional.ofNullable(execution.getVariable("myActions", ArrayList.class)).orElseGet(ArrayList::new);
-        myActions.add(action.getExpressionText());
+        String myActions = execution.getVariable("myActions", String.class);
+        myActions = myActions != null ? myActions + ","+ action.getExpressionText()  : action.getExpressionText();
         execution.setVariable("myActions", myActions);
     }
 }
