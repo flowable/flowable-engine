@@ -63,7 +63,7 @@ public class DefaultProcessValidatorTest {
         assertThat(bpmnModel).isNotNull();
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        assertThat(allErrors).hasSize(71);
+        assertThat(allErrors).hasSize(73);
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -116,8 +116,15 @@ public class DefaultProcessValidatorTest {
         assertCommonProblemFieldForActivity(problems.get(0));
 
         // User task
-        problems = findErrors(allErrors, setName, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, 1);
+        problems = findErrors(allErrors, setName, Problems.USER_TASK_LISTENER_IMPLEMENTATION_MISSING, 2);
         assertCommonProblemFieldForActivity(problems.get(0));
+        ValidationError missingScriptInfo = problems.get(1);
+        assertCommonProblemFieldForActivity(missingScriptInfo);
+        assertThat(missingScriptInfo.getDefaultDescription()).contains("Listener of type 'script' expects a <script> child element");
+
+        problems = findErrors(allErrors, setName, Problems.USER_TASK_LISTENER_MISSING_EVENT, 1);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        assertThat(problems.get(0).getDefaultDescription()).contains("Element 'event' is mandatory on taskListener");
 
         // Service task
         problems = findErrors(allErrors, setName, Problems.SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE, 1);
