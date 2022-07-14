@@ -16,6 +16,7 @@ package org.flowable.examples.bpmn.executionlistener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -218,4 +221,16 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
                 .hasMessage("Message from listener");
     }
 
+    /**
+     * https://github.com/flowable/flowable-engine/issues/3327
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerJavaDelegate.bpmn20.xml" })
+    public void testJavaDelegateAsExecutionListenerFollowsCorrectFlow() {
+        ProcessInstance myFlow = runtimeService.startProcessInstanceByKey("MyFlow");
+        String myActions = runtimeService.getVariable(myFlow.getId(), "myActions", String.class);
+        Task task = assertDoesNotThrow(() -> taskService.createTaskQuery().singleResult(), "Only one task 'Production Manager' must be returned.");
+        assertThat(task.getName()).isEqualTo("Production Manager");
+        assertThat(myActions).isEqualTo("Start executionListener,ProductionManager taskListener");
+    }
 }
