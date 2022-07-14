@@ -38,6 +38,7 @@ public interface Problems {
     String SEQ_FLOW_INVALID_TARGET = "flowable-seq-flow-invalid-target";
 
     String USER_TASK_LISTENER_IMPLEMENTATION_MISSING = "flowable-usertask-listener-implementation-missing";
+    String USER_TASK_LISTENER_MISSING_EVENT = "flowable-usertask-listener-event-missing";
 
     String SERVICE_TASK_INVALID_TYPE = "flowable-servicetask-invalid-type";
     String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "flowable-servicetask-result-var-name-with-delegate";

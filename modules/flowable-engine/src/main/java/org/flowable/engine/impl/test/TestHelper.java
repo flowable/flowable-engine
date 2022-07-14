@@ -118,6 +118,9 @@ public abstract class TestHelper {
                 deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
             }
 
+            if (!deploymentAnnotation.validateBpmn()) {
+                deploymentBuilder = deploymentBuilder.disableBpmnValidation();
+            }
             deploymentId = deploymentBuilder.deploy().getId();
         }
 

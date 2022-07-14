@@ -79,4 +79,12 @@ public @interface Deployment {
 
     /** Specify tenantId to deploy for */
     String tenantId() default "";
+
+    /**
+     * Whether the model should be validated during deployment. Defaults to true.
+     *
+     * Useful to suppress validation to assert on runtime errors occuring
+     * when invalid models are being executed.
+     */
+    boolean validateBpmn() default true;
 }
