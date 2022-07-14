@@ -12,7 +12,9 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
@@ -25,6 +27,7 @@ import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.alfresco.AlfrescoStartEvent;
 
@@ -34,6 +37,13 @@ import org.flowable.bpmn.model.alfresco.AlfrescoStartEvent;
 public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     
     protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+    
+    protected static final List<ExtensionAttribute> defaultStartEventAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_FORM_FORMKEY),
+            new ExtensionAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION),
+            new ExtensionAttribute(ATTRIBUTE_EVENT_START_INITIATOR),
+            new ExtensionAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING),
+            new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT));
     
     public StartEventXMLConverter() {
         VariableListenerEventDefinitionParser variableListenerEventDefinitionParser = new VariableListenerEventDefinitionParser();
@@ -51,6 +61,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         String formKey = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FORMKEY, xtr);
         StartEvent startEvent = null;
@@ -83,6 +94,8 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
         if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(sameDeploymentAttribute)) {
             startEvent.setSameDeployment(false);
         }
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, startEvent, defaultElementAttributes, defaultActivityAttributes, defaultStartEventAttributes);
 
         parseChildElements(getXMLElementName(), startEvent, childParserMap, model, xtr);
 

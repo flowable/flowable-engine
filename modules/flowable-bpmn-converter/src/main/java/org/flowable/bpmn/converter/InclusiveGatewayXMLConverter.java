@@ -36,9 +36,13 @@ public class InclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         InclusiveGateway gateway = new InclusiveGateway();
         BpmnXMLUtil.addXMLLocation(gateway, xtr);
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, gateway, defaultElementAttributes, defaultActivityAttributes);
+        
         parseChildElements(getXMLElementName(), gateway, model, xtr);
         return gateway;
     }

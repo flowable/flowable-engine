@@ -36,9 +36,13 @@ public class ReceiveTaskXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         ReceiveTask receiveTask = new ReceiveTask();
         BpmnXMLUtil.addXMLLocation(receiveTask, xtr);
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, receiveTask, defaultElementAttributes, defaultActivityAttributes);
+        
         parseChildElements(getXMLElementName(), receiveTask, model, xtr);
         return receiveTask;
     }
