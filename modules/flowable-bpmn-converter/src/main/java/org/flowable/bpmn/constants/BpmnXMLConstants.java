@@ -288,6 +288,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_GATEWAY_INCLUSIVE = "inclusiveGateway";
     public static final String ELEMENT_GATEWAY_PARALLEL = "parallelGateway";
     public static final String ELEMENT_GATEWAY_COMPLEX = "complexGateway";
+    public static final String ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE = "isMarkerVisible";
 
     public static final String ELEMENT_EVENT_START = "startEvent";
     public static final String ELEMENT_EVENT_END = "endEvent";

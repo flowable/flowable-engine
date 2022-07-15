@@ -17,6 +17,16 @@ package org.flowable.bpmn.model;
  */
 public class ExclusiveGateway extends Gateway {
 
+    protected boolean markerVisible;
+
+    public boolean isMarkerVisible() {
+        return markerVisible;
+    }
+
+    public void setMarkerVisible(boolean markerVisible) {
+        this.markerVisible = markerVisible;
+    }
+
     @Override
     public ExclusiveGateway clone() {
         ExclusiveGateway clone = new ExclusiveGateway();
@@ -26,5 +36,6 @@ public class ExclusiveGateway extends Gateway {
 
     public void setValues(ExclusiveGateway otherElement) {
         super.setValues(otherElement);
+        setMarkerVisible(otherElement.isMarkerVisible());
     }
 }
