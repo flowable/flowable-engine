@@ -122,6 +122,14 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
                 locationGraphicInfo.setY(locationGraphicInfo.getY() + yDiff);
             }
             
+            Map<String, GraphicInfo> labelLocationMap = bpmnModel.getLabelLocationMap();
+            for (final String labelLocationId : labelLocationMap.keySet()) {
+                GraphicInfo labelLocationGraphicInfo = labelLocationMap.get(labelLocationId);
+                
+                labelLocationGraphicInfo.setX(labelLocationGraphicInfo.getX() + xDiff);
+                labelLocationGraphicInfo.setY(labelLocationGraphicInfo.getY() + yDiff);
+            }
+            
             Map<String, List<GraphicInfo>> flowLocationMap = bpmnModel.getFlowLocationMap();
             for (String flowId : flowLocationMap.keySet()) {
                 if (flowFromStart.getId().equals(flowId)) {
