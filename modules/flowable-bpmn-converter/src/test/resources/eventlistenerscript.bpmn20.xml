@@ -33,7 +33,17 @@
 
         <endEvent id="endevent1" name="End" />
 
-        <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="userTask" />
+        <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="userTask">
+            <extensionElements>
+                <flowable:executionListener type="script">
+                    <flowable:script language="groovy" resultVariable="scriptTypeResult">
+                        <![CDATA[
+                        task.setVariable('scriptTaskListenerType', "Type"); // pushes variable to execution context
+                        ]]>
+                    </flowable:script>
+                </flowable:executionListener>
+            </extensionElements>
+        </sequenceFlow>
         <sequenceFlow id="flow12" name="" sourceRef="userTask" targetRef="endevent1" />
     </process>
 </definitions>

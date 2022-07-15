@@ -34,6 +34,7 @@
 			<activiti:eventListener events="ENTITY_DELETE"
 				throwEvent="iDoNoExist" signalName="theSignal" />
 			<activiti:executionListener event="start" />
+			<activiti:executionListener event="start" type="script" />
 		</extensionElements>
 
 		<association associationDirection="One" sourceRef=""

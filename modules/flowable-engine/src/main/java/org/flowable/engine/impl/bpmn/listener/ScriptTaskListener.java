@@ -13,64 +13,23 @@
 
 package org.flowable.engine.impl.bpmn.listener;
 
-import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Rich Kroll
  * @author Joram Barrez
  */
-public class ScriptTaskListener implements TaskListener {
+public class ScriptTaskListener extends ScriptExecutingListener implements TaskListener {
 
     private static final long serialVersionUID = -8915149072830499057L;
 
-    protected Expression script;
-
-    protected Expression language;
-
-    protected Expression resultVariable;
-
-    protected boolean autoStoreVariables;
+    public ScriptTaskListener() {
+        autoStoreVariables = true;
+    }
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        validateParameters();
-
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        Object result = scriptingEngines.evaluate(script.getExpressionText(), language.getExpressionText(), delegateTask, autoStoreVariables);
-
-        if (resultVariable != null) {
-            delegateTask.setVariable(resultVariable.getExpressionText(), result);
-        }
+        validateParametersAndEvaluteScript(delegateTask);
     }
-
-    protected void validateParameters() {
-        if (script == null) {
-            throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");
-        }
-
-        if (language == null) {
-            throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
-        }
-    }
-
-    public void setScript(Expression script) {
-        this.script = script;
-    }
-
-    public void setLanguage(Expression language) {
-        this.language = language;
-    }
-
-    public void setResultVariable(Expression resultVariable) {
-        this.resultVariable = resultVariable;
-    }
-
-    public void setAutoStoreVariables(boolean autoStoreVariables) {
-        this.autoStoreVariables = autoStoreVariables;
-    }
-
 }

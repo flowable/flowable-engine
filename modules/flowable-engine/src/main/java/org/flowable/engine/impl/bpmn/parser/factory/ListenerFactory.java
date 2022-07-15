@@ -52,6 +52,8 @@ public interface ListenerFactory {
 
     ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener);
 
+    ExecutionListener createScriptTypeExecutionListener(FlowableListener listener);
+
     TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener);
 
     FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
