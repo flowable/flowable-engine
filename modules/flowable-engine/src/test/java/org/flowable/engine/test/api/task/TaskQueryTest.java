@@ -3429,22 +3429,28 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQuerySorting() {
         assertThat(taskService.createTaskQuery().orderByTaskId().asc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByTaskDefinitionKey().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskPriority().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskAssignee().asc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByTaskOwner().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskDescription().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByProcessInstanceId().asc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByProcessDefinitionId().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByExecutionId().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskCreateTime().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskDueDate().asc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByCategory().asc().list()).hasSize(12);
 
         assertThat(taskService.createTaskQuery().orderByTaskId().desc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByTaskDefinitionKey().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskName().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskPriority().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskAssignee().desc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByTaskOwner().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskDescription().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByProcessInstanceId().desc().list()).hasSize(12);
+        assertThat(taskService.createTaskQuery().orderByProcessDefinitionId().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByExecutionId().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskCreateTime().desc().list()).hasSize(12);
         assertThat(taskService.createTaskQuery().orderByTaskDueDate().desc().list()).hasSize(12);

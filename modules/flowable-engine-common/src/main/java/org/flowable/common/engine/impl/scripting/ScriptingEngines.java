@@ -26,6 +26,8 @@ import javax.script.ScriptException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
@@ -33,6 +35,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  * @author Frederik Heremans
  */
 public class ScriptingEngines {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptingEngines.class);
 
     public static final String DEFAULT_SCRIPTING_LANGUAGE = "juel";
     public static final String GROOVY_SCRIPTING_LANGUAGE = "groovy";
@@ -66,12 +70,26 @@ public class ScriptingEngines {
         }
     }
 
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
+        Bindings bindings = createBindings(variableScope);
+        Object result = evaluate(script, language, bindings);
+
+        return new ScriptEvaluationImpl(bindings, result);
+    }
+
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
+        Bindings bindings = createBindings(variableScope, storeScriptVariables);
+        Object result = evaluate(script, language, bindings);
+
+        return new ScriptEvaluationImpl(bindings, result);
+    }
+
     public Object evaluate(String script, String language, VariableScope variableScope) {
-        return evaluate(script, language, createBindings(variableScope));
+        return evaluateWithEvaluationResult(script, language, variableScope).getResult();
     }
 
     public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return evaluate(script, language, createBindings(variableScope, storeScriptVariables));
+        return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables).getResult();
     }
 
     public void setCacheScriptingEngines(boolean cacheScriptingEngines) {
@@ -95,6 +113,7 @@ public class ScriptingEngines {
             if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             }
+            LOGGER.debug("Problem evaluating script: {}{}{}", e.getMessage(), System.lineSeparator(), script);
             throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
         }
     }

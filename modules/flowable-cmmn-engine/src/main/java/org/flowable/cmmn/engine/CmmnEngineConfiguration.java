@@ -461,7 +461,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
 
     protected ScriptingEngines scriptingEngines;
+    protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
+    protected Collection<ResolverFactory> preDefaultResolverFactories;
+    protected Collection<ResolverFactory> postDefaultResolverFactories;
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -861,6 +864,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initBatchServiceConfiguration();
         initAsyncExecutor();
         initAsyncHistoryExecutor();
+        initScriptBindingsFactory();
         initScriptingEngines();
         configuratorsAfterInit();
         afterInitEventRegistryEventBusConsumer();
@@ -1418,15 +1422,26 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 Collections.singletonList(new ChildBpmnCaseInstanceStateChangeCallback()));
     }
 
-    protected void initScriptingEngines() {
+    protected void initScriptBindingsFactory() {
         if (resolverFactories == null) {
             resolverFactories = new ArrayList<>();
+            if (preDefaultResolverFactories != null) {
+                resolverFactories.addAll(preDefaultResolverFactories);
+            }
             resolverFactories.add(new CmmnVariableScopeResolverFactory());
             resolverFactories.add(new BeansResolverFactory());
+            if (postDefaultResolverFactories != null) {
+                resolverFactories.addAll(postDefaultResolverFactories);
+            }
         }
-        if (scriptingEngines == null) {
+        if (scriptBindingsFactory == null) {
+            scriptBindingsFactory = new ScriptBindingsFactory(this, resolverFactories);
+        }
+    }
 
-            scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(this, resolverFactories));
+    protected void initScriptingEngines() {
+        if (scriptingEngines == null) {
+            scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
         }
     }
     
@@ -4280,6 +4295,50 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public CmmnEngineConfiguration setScriptingEngines(ScriptingEngines scriptingEngines) {
         this.scriptingEngines = scriptingEngines;
+        return this;
+    }
+
+    public List<ResolverFactory> getResolverFactories() {
+        return resolverFactories;
+    }
+
+    public void setResolverFactories(List<ResolverFactory> resolverFactories) {
+        this.resolverFactories = resolverFactories;
+    }
+
+    public Collection<ResolverFactory> getPreDefaultResolverFactories() {
+        return preDefaultResolverFactories;
+    }
+
+    public CmmnEngineConfiguration setPreDefaultResolverFactories(Collection<ResolverFactory> preDefaultResolverFactories) {
+        this.preDefaultResolverFactories = preDefaultResolverFactories;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addPreDefaultResolverFactory(ResolverFactory resolverFactory) {
+        if (this.preDefaultResolverFactories == null) {
+            this.preDefaultResolverFactories = new ArrayList<>();
+        }
+
+        this.preDefaultResolverFactories.add(resolverFactory);
+        return this;
+    }
+
+    public Collection<ResolverFactory> getPostDefaultResolverFactories() {
+        return postDefaultResolverFactories;
+    }
+
+    public CmmnEngineConfiguration setPostDefaultResolverFactories(Collection<ResolverFactory> postDefaultResolverFactories) {
+        this.postDefaultResolverFactories = postDefaultResolverFactories;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addPostDefaultResolverFactory(ResolverFactory resolverFactory) {
+        if (this.postDefaultResolverFactories == null) {
+            this.postDefaultResolverFactories = new ArrayList<>();
+        }
+
+        this.postDefaultResolverFactories.add(resolverFactory);
         return this;
     }
     

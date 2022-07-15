@@ -14,11 +14,14 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -39,7 +42,9 @@ import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionDepen
 import org.flowable.engine.impl.bpmn.listener.ExpressionCustomPropertiesResolver;
 import org.flowable.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.flowable.engine.impl.bpmn.listener.ExpressionTaskListener;
+import org.flowable.engine.impl.bpmn.listener.ScriptTypeTaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -97,6 +102,30 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     @Override
     public TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener) {
         return new DelegateExpressionTransactionDependentTaskListener(expressionManager.createExpression(listener.getImplementation()));
+    }
+
+    @Override
+    public TaskListener createScriptTypeTaskListener(FlowableListener listener) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+            if (listener.getScriptInfo() != null) {
+                ScriptTypeTaskListener scriptListener = new ScriptTypeTaskListener(
+                        createExpression(listener.getScriptInfo().getLanguage()),
+                        createExpression(listener.getScriptInfo().getScript()));
+                Optional.ofNullable(listener.getScriptInfo().getResultVariable())
+                        .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
+                return scriptListener;
+            } else {
+                throw new FlowableIllegalStateException("Cannot create 'type' task listener with implementation 'script'. Missing ScriptInfo.");
+            }
+        }
+        throw new FlowableIllegalStateException("Cannot create event listener. Unknown implementation type '" + listener.getImplementationType() + "'");
+    }
+
+    protected Expression createExpression(Object value) {
+        if (value instanceof String && ((String) value).trim().startsWith("${")) {
+            return expressionManager.createExpression((String) value);
+        }
+        return new FixedValue(value);
     }
 
     @Override

@@ -348,14 +348,24 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
 
         waitForJobExecutorToProcessAllJobs(2000, 500);
 
+        assertThat(managementService.createDeadLetterJobQuery().list()).hasSize(2);
+        assertThat(managementService.createJobQuery().list()).isEmpty();
+
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
+        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createJobQuery().list())
+                .hasSize(2)
+                .extracting(Job::getRetries)
+                .containsOnly(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
         waitForJobExecutorToProcessAllJobs(5000, 500);
 
         assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createJobQuery().list()).isEmpty();
 
     }
 

@@ -36,9 +36,13 @@ public class EndEventXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         EndEvent endEvent = new EndEvent();
         BpmnXMLUtil.addXMLLocation(endEvent, xtr);
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, endEvent, defaultElementAttributes, defaultActivityAttributes);
+        
         parseChildElements(getXMLElementName(), endEvent, model, xtr);
         return endEvent;
     }

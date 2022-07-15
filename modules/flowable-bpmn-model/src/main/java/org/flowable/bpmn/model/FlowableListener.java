@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,7 +34,12 @@ public class FlowableListener extends BaseElement {
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
-    
+
+    /**
+     * ScriptInfo is populated for implementationType 'script'
+     */
+    protected ScriptInfo scriptInfo;
+
     public FlowableListener() {
         // Always generate a random identifier to look up the listener while executing the logic
         setId(UUID.randomUUID().toString());
@@ -103,6 +109,26 @@ public class FlowableListener extends BaseElement {
         this.instance = instance;
     }
 
+    /**
+     * Return the script info, if present.
+     * <p>
+     * ScriptInfo must be populated, when {@code <executionListener type="script" ...>} e.g. when
+     * implementationType is 'script'.
+     * </p>
+     */
+    public ScriptInfo getScriptInfo() {
+        return scriptInfo;
+    }
+
+    /**
+     * Sets the script info
+     *
+     * @see #getScriptInfo()
+     */
+    public void setScriptInfo(ScriptInfo scriptInfo) {
+        this.scriptInfo = scriptInfo;
+    }
+
     @Override
     public FlowableListener clone() {
         FlowableListener clone = new FlowableListener();
@@ -115,7 +141,7 @@ public class FlowableListener extends BaseElement {
         setEvent(otherListener.getEvent());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
-
+        Optional.ofNullable(otherListener.getScriptInfo()).ifPresent(this::setScriptInfo);
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {

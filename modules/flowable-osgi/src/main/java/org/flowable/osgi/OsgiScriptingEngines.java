@@ -18,6 +18,7 @@ import javax.script.ScriptEngineManager;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.osgi.framework.InvalidSyntaxException;
@@ -36,14 +37,23 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
+        return super.evaluateWithEvaluationResult(script, language, variableScope);
+    }
+
+    @Override
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
+        return super.evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables);
+    }
+
+    @Override
     public Object evaluate(String script, String language, VariableScope variableScope) {
-        Bindings bindings = createBindings(variableScope);
-        return evaluate(script, language, bindings);
+        return super.evaluate(script, language, variableScope);
     }
 
     @Override
     public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return evaluate(script, language, createBindings(variableScope, storeScriptVariables));
+        return super.evaluate(script, language, variableScope, storeScriptVariables);
     }
 
     @Override

@@ -53,6 +53,7 @@ import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.MessageEventDefinitionParser;
 import org.flowable.bpmn.converter.child.MultiInstanceParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
+import org.flowable.bpmn.converter.child.ScriptInfoParser;
 import org.flowable.bpmn.converter.child.SignalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.TaskListenerParser;
 import org.flowable.bpmn.converter.child.TerminateEventDefinitionParser;
@@ -85,6 +86,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new EscalationEventDefinitionParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
+        addGenericParser(new ScriptInfoParser());
         addGenericParser(new FlowableEventListenerParser());
         addGenericParser(new FlowableHttpRequestHandlerParser());
         addGenericParser(new FlowableHttpResponseHandlerParser());
