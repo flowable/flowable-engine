@@ -67,10 +67,7 @@ public class DefaultCmmnListenerFactory implements CmmnListenerFactory {
     }
 
     protected Expression createExpression(Object value) {
-        if (value instanceof String && ((String) value).trim().startsWith("${")) {
-            return expressionManager.createExpression((String) value);
-        }
-        return new FixedValue(value);
+        return value instanceof String ? expressionManager.createExpression((String) value) : new FixedValue(value);
     }
 
     @Override
