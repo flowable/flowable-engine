@@ -26,10 +26,12 @@ import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.FlowableHttpResponseHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ScriptInfo;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -37,6 +39,7 @@ import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.http.handler.ClassDelegateHttpHandler;
 import org.flowable.engine.impl.bpmn.http.handler.DelegateExpressionHttpHandler;
+import org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
@@ -155,34 +158,55 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         HttpRequestHandler requestHandler = null;
 
         if (handler != null) {
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
             if (IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(handler.getImplementationType())) {
                 requestHandler = new ClassDelegateHttpHandler(handler.getImplementation(),
                         createFieldDeclarations(handler.getFieldExtensions(), processEngineConfiguration));
 
             } else if (IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(handler.getImplementationType())) {
                 requestHandler = new DelegateExpressionHttpHandler(
-                        processEngineConfiguration.getExpressionManager().createExpression(handler.getImplementation()),
+                        expressionManager.createExpression(handler.getImplementation()),
                         createFieldDeclarations(handler.getFieldExtensions(), processEngineConfiguration));
+            } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(handler.getImplementationType()) && handler.getScriptInfo() != null) {
+                ScriptHttpHandler scriptHttpHandler = createScriptHttpHandler(expressionManager, handler.getScriptInfo());
+                requestHandler = scriptHttpHandler;
             }
         }
         return requestHandler;
+    }
+
+    protected Expression createExpression(ExpressionManager expManager, Object value) {
+        return value instanceof String ? expManager.createExpression((String) value) : new FixedValue(value);
     }
 
     protected HttpResponseHandler createHttpResponseHandler(FlowableHttpResponseHandler handler, ProcessEngineConfigurationImpl processEngineConfiguration) {
         HttpResponseHandler responseHandler = null;
 
         if (handler != null) {
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(handler.getImplementationType())) {
                 responseHandler = new ClassDelegateHttpHandler(handler.getImplementation(),
                         createFieldDeclarations(handler.getFieldExtensions(), processEngineConfiguration));
 
             } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(handler.getImplementationType())) {
                 responseHandler = new DelegateExpressionHttpHandler(
-                        processEngineConfiguration.getExpressionManager().createExpression(handler.getImplementation()),
+                        expressionManager.createExpression(handler.getImplementation()),
                         createFieldDeclarations(handler.getFieldExtensions(), processEngineConfiguration));
+            } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(handler.getImplementationType()) && handler.getScriptInfo() != null) {
+                ScriptHttpHandler scriptHttpHandler = createScriptHttpHandler(expressionManager, handler.getScriptInfo());
+                responseHandler = scriptHttpHandler;
             }
         }
         return responseHandler;
+    }
+
+    protected ScriptHttpHandler createScriptHttpHandler(ExpressionManager expressionManager, ScriptInfo scriptInfo) {
+        ScriptHttpHandler scriptHttpHandler = new ScriptHttpHandler(createExpression(expressionManager, scriptInfo.getLanguage()),
+                createExpression(expressionManager, scriptInfo.getScript()));
+        if (scriptInfo.getResultVariable() != null) {
+            scriptHttpHandler.setResultVariable(createExpression(expressionManager, scriptInfo.getResultVariable()));
+        }
+        return scriptHttpHandler;
     }
 
     protected List<FieldDeclaration> createFieldDeclarations(List<FieldExtension> fieldList, ProcessEngineConfigurationImpl processEngineConfiguration) {

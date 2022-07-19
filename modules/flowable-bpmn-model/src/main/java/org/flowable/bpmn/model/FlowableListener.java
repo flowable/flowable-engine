@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * @author Tijs Rademakers
  */
-public class FlowableListener extends BaseElement {
+public class FlowableListener extends BaseElement implements HasScriptInfo {
 
     protected String event;
     protected String implementationType;
@@ -116,6 +116,7 @@ public class FlowableListener extends BaseElement {
      * implementationType is 'script'.
      * </p>
      */
+    @Override
     public ScriptInfo getScriptInfo() {
         return scriptInfo;
     }
@@ -125,6 +126,7 @@ public class FlowableListener extends BaseElement {
      *
      * @see #getScriptInfo()
      */
+    @Override
     public void setScriptInfo(ScriptInfo scriptInfo) {
         this.scriptInfo = scriptInfo;
     }

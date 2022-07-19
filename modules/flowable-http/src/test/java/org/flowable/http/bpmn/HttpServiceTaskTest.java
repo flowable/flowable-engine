@@ -134,6 +134,47 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
     @Test
     @Deployment
+    public void testGetWithScriptRequestHandler() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptRequestHandlerResult");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(scriptRequestHandlerResult).isEqualTo("http://localhost:1111/bla");
+
+        String requestHeaders = (String) proc.getProcessVariables().get("requestHeaders");
+        assertThat(requestHeaders).containsIgnoringCase("Content-Type: application/json");
+
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptRequestHandlerResult", "httpGetResponseBody", "originalUrl", "requestHeaders");
+        assertThatJson(variables.stream().filter(v -> v.getVariableName().equals("httpGetResponseBody")).findFirst().map(HistoricVariableInstance::getValue)
+                .orElse(null))
+                .isNotNull()
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+
+        assertProcessEnded(proc.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptResponseHandler() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptResponseHandlerResult");
+        assertThat(scriptRequestHandlerResult).contains("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
+
+        String responseHeaders = (String) proc.getProcessVariables().get("responseHeaders");
+        assertThat(responseHeaders).containsIgnoringCase("Content-Type: application/json");
+
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
+        assertThatJson(variables.get(1).getValue())
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertProcessEnded(proc.getId());
+    }
+
+    @Test
+    @Deployment
     public void testGetWithBpmnThrowingResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         final HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
