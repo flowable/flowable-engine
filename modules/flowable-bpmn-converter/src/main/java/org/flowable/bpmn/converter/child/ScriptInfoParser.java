@@ -19,7 +19,6 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.HasScriptInfo;
 import org.flowable.bpmn.model.ScriptInfo;
 
