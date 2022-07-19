@@ -13,19 +13,27 @@
 
 package org.flowable.engine.impl.bpmn.listener;
 
+import org.flowable.common.engine.impl.scripting.AbstractScriptEvaluator;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Rich Kroll
  * @author Joram Barrez
  */
-public class ScriptTaskListener extends ScriptExecutingListener implements TaskListener {
+public class ScriptTaskListener extends AbstractScriptEvaluator implements TaskListener {
 
     private static final long serialVersionUID = -8915149072830499057L;
 
     public ScriptTaskListener() {
         autoStoreVariables = true;
+    }
+
+    @Override
+    protected ScriptingEngines getScriptingEngines() {
+        return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
     }
 
     @Override

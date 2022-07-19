@@ -11,47 +11,71 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.bpmn.listener;
+package org.flowable.common.engine.impl.scripting;
 
 import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.scripting.ScriptingEngines;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
- * Base class for listeners executing scripts.
+ * Base class simplifying binding and evaluation of scriptable elements.
  *
  * @author Rich Kroll
  * @author Joram Barrez
  * @author Arthur Hupka-Merle
  */
-public class ScriptExecutingListener {
+public abstract class AbstractScriptEvaluator {
 
     private static final long serialVersionUID = -8915149072831499057L;
 
-    protected Expression script;
-
+    /**
+     * The language of the script e.g. an Expression evaluating to javascript, juel, groovy, etc. Mandatory.
+     * <p/>
+     * Must not be or evaluate to <code>null</code> to null.
+     */
     protected Expression language;
 
+    /**
+     * The actual payload of the script in the given language. Mandatory.
+     * <p/>
+     * Must not be or evaluate to <code>null</code> to null.
+     */
+    protected Expression script;
+
+    /**
+     * The name of the result variable to store the result of the script evaluation in the
+     * variableScope.
+     */
     protected Expression resultVariable;
 
+    /**
+     * Hint for the ScriptingEngine to automatically add
+     * variables which are locally defined in the script, to
+     * as execution variable.
+     */
     protected boolean autoStoreVariables;
 
-    public ScriptExecutingListener() {
+    public AbstractScriptEvaluator() {
     }
 
-    public ScriptExecutingListener(Expression language, Expression script) {
+    public AbstractScriptEvaluator(Expression language, Expression script) {
         this.script = script;
         this.language = language;
     }
 
-    public void validateParametersAndEvaluteScript(VariableScope variableScope) {
+    /**
+     * Validates that required parameters are present and evaluates the script.
+     * <p/>
+     * Handles setting the result value of the script to the given variable scope, in case {@link #resultVariable} is set.
+     *
+     * @param variableScope the variable scope used for the script execution. Available in the script context.
+     * @return the result of the script evaluation.
+     */
+    public Object validateParametersAndEvaluteScript(VariableScope variableScope) {
         validateParameters();
 
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
         String language = Objects.toString(this.language.getValue(variableScope), null);
         if (language == null) {
             throw new FlowableIllegalStateException("'language' evaluated to null for listener of type 'script'");
@@ -61,7 +85,7 @@ public class ScriptExecutingListener {
             throw new FlowableIllegalStateException("Script content is null or evaluated to null for listener of type 'script'");
         }
 
-        Object result = evaluateScript(variableScope, scriptingEngines, language, script);
+        Object result = evaluateScript(variableScope, getScriptingEngines(), language, script);
 
         if (resultVariable != null) {
             String resultVariable = Objects.toString(this.resultVariable.getValue(variableScope), null);
@@ -69,6 +93,7 @@ public class ScriptExecutingListener {
                 variableScope.setVariable(resultVariable, result);
             }
         }
+        return result;
     }
 
     protected Object evaluateScript(VariableScope variableScope, ScriptingEngines scriptingEngines, String language, String script) {
@@ -84,6 +109,8 @@ public class ScriptExecutingListener {
             throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
         }
     }
+
+    protected abstract ScriptingEngines getScriptingEngines();
 
     public void setScript(Expression script) {
         this.script = script;

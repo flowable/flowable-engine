@@ -13,7 +13,10 @@
 package org.flowable.engine.impl.bpmn.listener;
 
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.AbstractScriptEvaluator;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**
@@ -23,13 +26,18 @@ import org.flowable.task.service.delegate.DelegateTask;
  * @author Joram Barrez
  * @author Arthur Hupka-Merle
  */
-public class ScriptTypeTaskListener extends ScriptExecutingListener implements TaskListener {
+public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements TaskListener {
 
     private static final long serialVersionUID = -8915149072830499057L;
 
     public ScriptTypeTaskListener(Expression language, Expression script) {
         this.script = script;
         this.language = language;
+    }
+
+    @Override
+    protected ScriptingEngines getScriptingEngines() {
+        return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
     }
 
     @Override
