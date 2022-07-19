@@ -49,8 +49,8 @@ public class CaseInstanceService {
     public static final String RUNTIME_CASE_INSTANCE_VARIABLES = "cmmn-runtime/case-instances/{0}/variables";
     public static final String RUNTIME_CASE_INSTANCE_VARIABLE_URL = "cmmn-runtime/case-instances/{0}/variables/{1}";
     public static final String CURRENT_PLAN_ITEM_INSTANCE_LIST_URL = "cmmn-runtime/plan-item-instances";
-    public static final String RUNTIME_CASE_INSTANCE_CHANGE_STATE_URL = "runtime/case-instances/{0}/change-state";
-    public static final String RUNTIME_CASE_INSTANCE_MIGRATE_URL = "runtime/case-instances/{0}/migrate";
+    public static final String RUNTIME_CASE_INSTANCE_CHANGE_STATE_URL = "cmmn-runtime/case-instances/{0}/change-state";
+    public static final String RUNTIME_CASE_INSTANCE_MIGRATE_URL = "cmmn-runtime/case-instances/{0}/migrate";
     
     private static final String DEFAULT_SUBTASK_RESULT_SIZE = "1024";
     private static final String DEFAULT_CASEINSTANCE_SIZE = "100";
