@@ -21,6 +21,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.validation.CaseValidationContext;
 import org.flowable.cmmn.validation.validator.Problems;
 
@@ -35,9 +36,19 @@ public class HumanTaskValidator extends CaseLevelValidator {
         for (HumanTask humanTask : humanTasks) {
             if (humanTask.getTaskListeners() != null) {
                 for (FlowableListener listener : humanTask.getTaskListeners()) {
+                    if (listener.getEvent() == null) {
+                        validationContext.addError(Problems.HUMAN_TASK_LISTENER_MISSING_EVENT, caze, humanTask, listener,
+                                "Element 'event' is mandatory on taskListener");
+                    }
+                    if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType()) && listener.getScriptInfo() == null) {
+                        if (listener.getScriptInfo() == null) {
+                            validationContext.addError(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING, caze, humanTask, listener,
+                                    "taskListener of type 'script' expects a <script> child element");
+                        }
+                    }
                     if (listener.getImplementationType() == null) {
                         validationContext.addError(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING, caze, humanTask, listener,
-                                "Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener");
+                                "Element 'class', 'expression' or 'delegateExpression' or type=\"script\" is mandatory on taskListener");
                     }
                 }
             }

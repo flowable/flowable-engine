@@ -78,8 +78,9 @@ public class CmmnListenerNotificationHelper {
             taskListener = listenerFactory.createDelegateExpressionTaskListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
             taskListener = (TaskListener) listener.getInstance();
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+            taskListener = listenerFactory.createScriptTypeTaskListener(listener);
         }
-
         return taskListener;
     }
 

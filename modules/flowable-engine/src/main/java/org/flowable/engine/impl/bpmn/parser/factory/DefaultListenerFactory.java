@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
@@ -44,7 +45,6 @@ import org.flowable.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.flowable.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.flowable.engine.impl.bpmn.listener.ScriptTypeTaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -115,17 +115,14 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
                         .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
                 return scriptListener;
             } else {
-                throw new FlowableIllegalStateException("Cannot create 'type' task listener with implementation 'script'. Missing ScriptInfo.");
+                throw new FlowableIllegalStateException("Cannot create 'script' task listener. Missing ScriptInfo.");
             }
         }
         throw new FlowableIllegalStateException("Cannot create event listener. Unknown implementation type '" + listener.getImplementationType() + "'");
     }
 
     protected Expression createExpression(Object value) {
-        if (value instanceof String && ((String) value).trim().startsWith("${")) {
-            return expressionManager.createExpression((String) value);
-        }
-        return new FixedValue(value);
+        return value instanceof String ? expressionManager.createExpression((String) value) : new FixedValue(value);
     }
 
     @Override

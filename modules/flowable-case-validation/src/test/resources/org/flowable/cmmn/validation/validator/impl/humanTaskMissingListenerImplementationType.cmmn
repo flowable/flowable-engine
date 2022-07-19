@@ -21,6 +21,7 @@
             <humanTask id="task1" name="Task 1" flowable:taskIdVariableName="myTaskId">
                 <extensionElements>
                     <flowable:taskListener class=""/>
+                    <flowable:taskListener event="create" type="script"/>
                 </extensionElements>
             </humanTask>
         </casePlanModel>

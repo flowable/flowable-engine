@@ -21,6 +21,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
@@ -192,5 +193,18 @@ public class CmmnXmlConverterTest {
                 assertThat(onPart.getId()).isNotNull();
             }
         }
+    }
+
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest(value = "org/flowable/test/cmmn/converter/event-listener-user-task.cmmn")
+    public void testHumanTaskScriptEventListener(CmmnModel cmmnModel) {
+        Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
+        HumanTask taskA = (HumanTask) cmmnModel.getPrimaryCase().getAllCaseElements().get("taskA");
+        assertThat(taskA.getTaskListeners()).hasSize(1);
+        FlowableListener listener = taskA.getTaskListeners().get(0);
+
+        assertThat(listener.getScriptInfo()).isNotNull();
+        assertThat(listener.getScriptInfo().getLanguage()).isEqualTo("groovy");
+        assertThat(listener.getScriptInfo().getResultVariable()).isEqualTo("scriptReturnVar");
+        assertThat(listener.getScriptInfo().getScript().trim()).contains("def foo = \"bar\";");
     }
 }
