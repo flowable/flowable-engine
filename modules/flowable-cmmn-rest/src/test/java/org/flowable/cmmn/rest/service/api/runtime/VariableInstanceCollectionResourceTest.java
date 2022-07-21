@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -103,7 +104,32 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testVariableInstanceScopeIsPresent() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask")
+                .caseInstanceId(caseInstance.getId()).singleResult();
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(), "localTaskVariable", "localTaskVarValue");
+
+        runtimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCES);
+
+        JsonNode node = assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId(), 3, "myLocalVar", "test2");
+        assertThat(node.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.LOCAL.name());
+        node = assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId() + "&excludeLocalVariables=true", 1, "myVar",
+                "test1");
+        assertThat(node.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.GLOBAL.name());
+
+    }
+
+    protected JsonNode assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
             throws JsonProcessingException, IOException {
 
         // Do the actual call
@@ -113,14 +139,14 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertThat(dataNode).hasSize(numberOfResultsExpected);
-
+        JsonNode variableNode = null;
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 JsonNode dataElementNode = it.next();
-                JsonNode variableNode = dataElementNode.get("variable");
+                variableNode = dataElementNode.get("variable");
                 String name = variableNode.get("name").textValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
@@ -131,9 +157,11 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else {
                         assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
+                    break;
                 }
             }
             assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
+        return variableNode;
     }
 }

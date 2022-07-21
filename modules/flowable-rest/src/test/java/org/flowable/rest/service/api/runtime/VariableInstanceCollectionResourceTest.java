@@ -28,6 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
@@ -124,7 +125,51 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
+    /**
+     * Test querying variable instance and check response for scope value
+     */
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/VariableInstanceCollectionResourceTest.testQueryVariableInstances.bpmn20.xml")
+    public void testVariableInstanceScopeIsPresent() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
+
+        List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test4");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test5");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES);
+
+        JsonNode variableNode   = assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 4, "varLocal3", "test5");
+        assertThat(variableNode.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.LOCAL.name());
+
+        variableNode   =assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeLocalVariables=true", 2, "var3", "test4");
+        assertThat(variableNode.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.GLOBAL.name());
+
+    }
+
+    protected JsonNode assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
+            throws JsonProcessingException, IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -133,14 +178,14 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertThat(dataNode).hasSize(numberOfResultsExpected);
-
+        JsonNode variableNode = null;
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 JsonNode dataElementNode = it.next();
-                JsonNode variableNode = dataElementNode.get("variable");
+                variableNode = dataElementNode.get("variable");
                 String name = variableNode.get("name").textValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
@@ -151,9 +196,11 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else {
                         assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
+                    break;
                 }
             }
             assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
+        return variableNode;
     }
 }

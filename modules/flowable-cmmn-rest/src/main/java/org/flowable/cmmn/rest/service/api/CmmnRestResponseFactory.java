@@ -597,7 +597,18 @@ public class CmmnRestResponseFactory {
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, variableInstance.getScopeId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
+
+        RestVariableScope scope = RestVariableScope.GLOBAL;
+        boolean localCmmn = variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId()); // cmmn
+        boolean taskLocal = variableInstance.getTaskId() != null;
+
+        if (localCmmn || taskLocal) {
+            scope = RestVariableScope.LOCAL;
+        }
+
+        result.setVariable(
+                createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false,
+                        urlBuilder));
         return result;
     }
     
