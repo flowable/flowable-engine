@@ -4336,7 +4336,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return historyConfigurationSettings;
     }
 
-    public historyManager setHistoryConfigurationSettings(HistoryConfigurationSettings historyConfigurationSettings) {
+    public ProcessEngineConfigurationImpl setHistoryConfigurationSettings(HistoryConfigurationSettings historyConfigurationSettings) {
         this.historyConfigurationSettings = historyConfigurationSettings;
         return this;
     }
