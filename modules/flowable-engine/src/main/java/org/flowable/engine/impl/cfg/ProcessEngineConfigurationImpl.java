@@ -4332,6 +4332,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public HistoryConfigurationSettings getHistoryConfigurationSettings() {
+        return historyConfigurationSettings;
+    }
+
+    public historyManager setHistoryConfigurationSettings(HistoryConfigurationSettings historyConfigurationSettings) {
+        this.historyConfigurationSettings = historyConfigurationSettings;
+        return this;
+    }
+
     public boolean isAsyncHistoryEnabled() {
         return isAsyncHistoryEnabled;
     }

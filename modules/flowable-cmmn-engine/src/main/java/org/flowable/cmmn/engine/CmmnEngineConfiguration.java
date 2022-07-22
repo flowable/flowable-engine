@@ -2406,6 +2406,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CmmnHistoryConfigurationSettings getCmmnHistoryConfigurationSettings() {
+        return cmmnHistoryConfigurationSettings;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryConfigurationSettings(CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+        this.cmmnHistoryConfigurationSettings = cmmnHistoryConfigurationSettings;
+        return this;
+    }
+
     public CmmnDynamicStateManager getDynamicStateManager() {
         return dynamicStateManager;
     }
