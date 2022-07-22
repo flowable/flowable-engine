@@ -48,9 +48,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public abstract class AbstractAsyncCmmnHistoryManager extends BaseCmmnHistoryManager implements CmmnHistoryManager {
 
-    public AbstractAsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration,
-            CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
-        super(cmmnEngineConfiguration, cmmnHistoryConfigurationSettings);
+    public AbstractAsyncCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
     }
 
     protected void addCommonCaseInstanceFields(CaseInstanceEntity caseInstanceEntity, ObjectNode data) {

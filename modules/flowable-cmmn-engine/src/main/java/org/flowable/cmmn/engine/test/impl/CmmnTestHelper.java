@@ -161,8 +161,7 @@ public abstract class CmmnTestHelper {
             if (isAsyncHistoryEnabled) {
                 cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
                 asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration,
-                        new DefaultCmmnHistoryConfigurationSettings(cmmnEngineConfiguration)));
+                cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
             }
 
             consumer.accept(cmmnEngineConfiguration);
