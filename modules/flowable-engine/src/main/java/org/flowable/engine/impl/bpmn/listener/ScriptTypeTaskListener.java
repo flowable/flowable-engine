@@ -12,10 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.listener;
 
-import java.util.Objects;
-
-import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.AbstractScriptEvaluator;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -28,18 +26,9 @@ import org.flowable.task.service.delegate.DelegateTask;
  * @author Joram Barrez
  * @author Arthur Hupka-Merle
  */
-public class ScriptTypeTaskListener implements TaskListener {
+public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements TaskListener {
 
     private static final long serialVersionUID = -8915149072830499057L;
-
-    protected Expression script;
-
-    protected Expression language;
-
-    protected Expression resultVariable;
-
-    public ScriptTypeTaskListener() {
-    }
 
     public ScriptTypeTaskListener(Expression language, Expression script) {
         this.script = script;
@@ -47,48 +36,12 @@ public class ScriptTypeTaskListener implements TaskListener {
     }
 
     @Override
+    protected ScriptingEngines getScriptingEngines() {
+        return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+    }
+
+    @Override
     public void notify(DelegateTask delegateTask) {
-        validateParameters();
-
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        String language = Objects.toString(this.language.getValue(delegateTask), null);
-        if (language == null) {
-            throw new FlowableIllegalStateException("'language' evaluated to null for taskListener of type 'script'");
-        }
-        String script = Objects.toString(this.script.getValue(delegateTask), null);
-        if (script == null) {
-            throw new FlowableIllegalStateException("Script content is null or evaluated to null for taskListener of type 'script'");
-        }
-
-        Object result = scriptingEngines.evaluate(script, language, delegateTask, false);
-
-        if (resultVariable != null) {
-            String resultVariable = Objects.toString(this.resultVariable.getValue(delegateTask), null);
-            if (resultVariable != null) {
-                delegateTask.setVariable(resultVariable, result);
-            }
-        }
-    }
-
-    protected void validateParameters() {
-        if (script == null) {
-            throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");
-        }
-
-        if (language == null) {
-            throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
-        }
-    }
-
-    public void setScript(Expression script) {
-        this.script = script;
-    }
-
-    public void setLanguage(Expression language) {
-        this.language = language;
-    }
-
-    public void setResultVariable(Expression resultVariable) {
-        this.resultVariable = resultVariable;
+        validateParametersAndEvaluteScript(delegateTask);
     }
 }

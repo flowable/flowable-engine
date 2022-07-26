@@ -63,7 +63,7 @@ public class DefaultProcessValidatorTest {
         assertThat(bpmnModel).isNotNull();
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        assertThat(allErrors).hasSize(73);
+        assertThat(allErrors).hasSize(74);
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -80,9 +80,11 @@ public class DefaultProcessValidatorTest {
         assertProcessElementError(problems.get(0));
 
         // Execution listeners
-        problems = findErrors(allErrors, setName, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, 2);
+        problems = findErrors(allErrors, setName, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, 3);
         assertProcessElementError(problems.get(0));
-        assertCommonProblemFieldForActivity(problems.get(1));
+        assertCommonProblemFieldForActivity(problems.get(2));
+        ValidationError missingScriptInfoExecutionListener = problems.get(1);
+        assertThat(missingScriptInfoExecutionListener.getDefaultDescription()).contains("Listener of type 'script' expects a <script> child element");
 
         // Association
         problems = findErrors(allErrors, setName, Problems.ASSOCIATION_INVALID_SOURCE_REFERENCE, 1);

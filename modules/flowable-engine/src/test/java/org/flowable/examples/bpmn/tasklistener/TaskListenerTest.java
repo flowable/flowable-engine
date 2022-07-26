@@ -324,7 +324,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     public void testInvalidTypeEventListener() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess3"))
                 .isInstanceOf(FlowableIllegalStateException.class)
-                .hasMessageContaining("Script content is null or evaluated to null for taskListener of type 'script'");
+                .hasMessageContaining("Script content is null or evaluated to null for listener of type 'script'");
     }
 
     @Test
