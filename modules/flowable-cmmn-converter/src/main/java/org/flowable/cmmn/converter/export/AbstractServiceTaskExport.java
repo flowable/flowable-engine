@@ -36,7 +36,7 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, serviceTask.getType());
         }
-        
+
         switch (serviceTask.getType()) {
             case ServiceTask.JAVA_TASK:
                 if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
@@ -68,7 +68,6 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (parallelInSameTransaction != null) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION, parallelInSameTransaction.toString());
                 }
-
                 break;
 
             case ScriptServiceTask.SCRIPT_TASK:

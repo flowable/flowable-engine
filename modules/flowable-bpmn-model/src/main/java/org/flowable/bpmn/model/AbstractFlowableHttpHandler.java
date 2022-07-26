@@ -14,17 +14,19 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Tijs Rademakers
  */
-public abstract class AbstractFlowableHttpHandler extends BaseElement {
+public abstract class AbstractFlowableHttpHandler extends BaseElement implements HasScriptInfo {
 
     protected String implementationType;
     protected String implementation;
     protected List<FieldExtension> fieldExtensions = new ArrayList<>();
+    protected ScriptInfo scriptInfo;
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
@@ -62,13 +64,23 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
     }
 
     @Override
+    public ScriptInfo getScriptInfo() {
+        return scriptInfo;
+    }
+
+    @Override
+    public void setScriptInfo(ScriptInfo scriptInfo) {
+        this.scriptInfo = scriptInfo;
+    }
+
+    @Override
     public abstract AbstractFlowableHttpHandler clone();
 
     public void setValues(AbstractFlowableHttpHandler otherHandler) {
         super.setValues(otherHandler);
         setImplementation(otherHandler.getImplementation());
         setImplementationType(otherHandler.getImplementationType());
-
+        Optional.ofNullable(this.scriptInfo).map(ScriptInfo::clone).ifPresent(this::setScriptInfo);
         fieldExtensions = new ArrayList<>();
         if (otherHandler.getFieldExtensions() != null && !otherHandler.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherHandler.getFieldExtensions()) {
