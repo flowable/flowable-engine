@@ -76,20 +76,25 @@ public class DbSqlSession implements Session {
     // insert ///////////////////////////////////////////////////////////////////
 
     public void insert(Entity entity, IdGenerator idGenerator) {
-        if (entity.getId() == null) {
-            String id = idGenerator.getNextId();
-            if (dbSqlSessionFactory.isUsePrefixId()) {
-                id = entity.getIdPrefix() + id;
-            }
-            entity.setId(id);
-        }
-        
         Class<? extends Entity> clazz = entity.getClass();
         if (!insertedObjects.containsKey(clazz)) {
             insertedObjects.put(clazz, new LinkedHashMap<>()); // order of insert is important, hence LinkedHashMap
         }
+        Map map = insertedObjects.get(clazz);
 
-        insertedObjects.get(clazz).put(entity.getId(), entity);
+        if (entity.getId() == null) {
+            String id = generateEntityId(entity, idGenerator);
+            // give it a second chance to generate unique id if the first one is already taken, which is probably sufficient in all cases, see https://github.com/flowable/flowable-engine/issues/3406
+            if (map.containsKey(id)) {
+                id = generateEntityId(entity, idGenerator);
+            }
+            if (map.containsKey(id)) {
+                throw new FlowableException("failed to generate unique id, please check your idGenerator");
+            }
+            entity.setId(id);
+        }
+
+        map.put(entity.getId(), entity);
         entityCache.put(entity, false); // False -> entity is inserted, so always changed
         entity.setInserted(true);
     }
@@ -133,6 +138,14 @@ public class DbSqlSession implements Session {
         }
         deletedObjects.get(clazz).put(entity.getId(), entity);
         entity.setDeleted(true);
+    }
+
+    protected String generateEntityId(Entity entity, IdGenerator idGenerator) {
+        String id = idGenerator.getNextId();
+        if (dbSqlSessionFactory.isUsePrefixId()) {
+            id = entity.getIdPrefix() + id;
+        }
+        return id;
     }
 
     // select
