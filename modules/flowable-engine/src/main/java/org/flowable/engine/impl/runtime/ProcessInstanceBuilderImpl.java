@@ -13,7 +13,9 @@
 package org.flowable.engine.impl.runtime;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
@@ -52,6 +54,8 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected FormInfo extraFormInfo;
     protected String extraFormOutcome;
     protected boolean fallbackToDefaultTenant;
+    protected Map<String, Set<String>> userIdentityLinks;
+    protected Map<String, Set<String>> groupIdentityLinks;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
@@ -92,7 +96,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         this.businessKey = businessKey;
         return this;
     }
-    
+
     @Override
     public ProcessInstanceBuilder businessStatus(String businessStatus) {
         this.businessStatus = businessStatus;
@@ -104,7 +108,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         this.callbackId = callbackId;
         return this;
     }
-    
+
     @Override
     public ProcessInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
@@ -134,7 +138,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         this.tenantId = tenantId;
         return this;
     }
-    
+
     @Override
     public ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId) {
         this.overrideDefinitionTenantId = tenantId;
@@ -232,11 +236,62 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
-
     @Override
     public ProcessInstanceBuilder fallbackToDefaultTenant() {
         this.fallbackToDefaultTenant = true;
         return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder userIdentityLinks(Map<String, Set<String>> userIdentityLinks) {
+        if (userIdentityLinks != null) {
+            if (this.userIdentityLinks == null) {
+                this.userIdentityLinks = new HashMap<>();
+            }
+            mergeIdentityLinks(this.userIdentityLinks, userIdentityLinks);
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder userIdentityLink(String identityLinkType, String user) {
+        if (identityLinkType != null && user != null) {
+            userIdentityLinks(Map.of(identityLinkType, Set.of(user)));
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder groupIdentityLinks(Map<String, Set<String>> groupIdentityLinks) {
+        if (groupIdentityLinks != null) {
+            if (this.groupIdentityLinks == null) {
+                this.groupIdentityLinks = new HashMap<>();
+            }
+            mergeIdentityLinks(this.groupIdentityLinks, groupIdentityLinks);
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder groupIdentityLink(String identityLinkType, String group) {
+        if (identityLinkType != null && group != null) {
+            groupIdentityLinks(Map.of(identityLinkType, Set.of(group)));
+        }
+        return this;
+    }
+
+    private void mergeIdentityLinks(Map<String, Set<String>> target, Map<String, Set<String>> additionalLinks) {
+        for (Map.Entry<String, Set<String>> additionalLink : additionalLinks.entrySet()) {
+            String linkType = additionalLink.getKey();
+            Set<String> parties = additionalLink.getValue();
+            if (linkType != null && parties != null) {
+                target.merge(linkType, parties, (party1, party2) -> {
+                    Set<String> combinedParties = new HashSet<String>(party1);
+                    combinedParties.addAll(party2);
+                    return combinedParties;
+                });
+            }
+        }
     }
 
     @Override
@@ -272,7 +327,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     public String getBusinessKey() {
         return businessKey;
     }
-    
+
     public String getBusinessStatus() {
         return businessStatus;
     }
@@ -338,6 +393,14 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public boolean isFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
+    }
+
+    public Map<String, Set<String>> getUserIdentityLinks() {
+        return userIdentityLinks;
+    }
+
+    public Map<String, Set<String>> getGroupIdentityLinks() {
+        return groupIdentityLinks;
     }
 
 }

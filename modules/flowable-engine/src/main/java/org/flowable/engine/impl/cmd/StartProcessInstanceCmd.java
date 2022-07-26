@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -75,6 +76,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected FormInfo extraFormInfo;
     protected String extraFormOutcome;
     protected boolean fallbackToDefaultTenant;
+    protected Map<String, Set<String>> userIdentityLinks;
+    protected Map<String, Set<String>> groupIdentityLinks;
     protected ProcessInstanceHelper processInstanceHelper;
 
     public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
@@ -112,6 +115,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.extraFormInfo = processInstanceBuilder.getExtraFormInfo();
         this.extraFormOutcome = processInstanceBuilder.getExtraFormOutcome();
         this.fallbackToDefaultTenant = processInstanceBuilder.isFallbackToDefaultTenant();
+        this.userIdentityLinks = processInstanceBuilder.getUserIdentityLinks();
+        this.groupIdentityLinks = processInstanceBuilder.getGroupIdentityLinks();
         this.businessStatus = processInstanceBuilder.getBusinessStatus();
     }
 
@@ -238,7 +243,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
         return processInstanceHelper.createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName,
             overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
-            callbackId, callbackType, referenceId, referenceType, stageInstanceId, true);
+            callbackId, callbackType, referenceId, referenceType, stageInstanceId, userIdentityLinks, groupIdentityLinks, true);
     }
 
     protected boolean hasStartFormData() {

@@ -13,10 +13,12 @@
 package org.flowable.engine.runtime;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
 
 /**
  * Helper for starting new ProcessInstance.
@@ -159,6 +161,32 @@ public interface ProcessInstanceBuilder {
      * Use default tenant as a fallback in the case when process definition was not found by key and tenant id
      */
     ProcessInstanceBuilder fallbackToDefaultTenant();
+
+    /**
+     * Adds user identity links to the process instance.
+     *
+     * @param userIdentityLinks
+     *     for each identity link type (@see {@link IdentityLinkType}), a set of users can be provided; null values will be ignored
+     */
+    ProcessInstanceBuilder userIdentityLinks(Map<String, Set<String>> userIdentityLinks);
+
+    /**
+     * Adds a user identity link to the process instance
+     */
+    ProcessInstanceBuilder userIdentityLink(String identityLinkType, String user);
+
+    /**
+     * Adds group identity links to the process instance.
+     *
+     * @param groupIdentityLinks
+     *     for each identity link type (@see {@link IdentityLinkType}), a set of groups can be provided; null values will be ignored
+     */
+    ProcessInstanceBuilder groupIdentityLinks(Map<String, Set<String>> groupIdentityLinks);
+
+    /**
+     * Adds a group identity link to the process instance
+     */
+    ProcessInstanceBuilder groupIdentityLink(String identityLinkType, String group);
 
     /**
      * Start the process instance

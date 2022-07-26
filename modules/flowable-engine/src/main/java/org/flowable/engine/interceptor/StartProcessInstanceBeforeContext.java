@@ -13,6 +13,7 @@
 package org.flowable.engine.interceptor;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
@@ -28,7 +29,9 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
     protected String initiatorVariableName;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
-    
+    protected Map<String, Set<String>> userIdentityLinks;
+    protected Map<String, Set<String>> groupIdentityLinks;
+
     public StartProcessInstanceBeforeContext() {
 
     }
@@ -37,7 +40,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
             String callbackId, String callbackType, String referenceId, String referenceType,
             Map<String, Object> variables, Map<String, Object> transientVariables, String tenantId,
             String initiatorVariableName, String initialActivityId, FlowElement initialFlowElement, Process process,
-            ProcessDefinition processDefinition, String overrideDefinitionTenantId, String predefinedProcessInstanceId) {
+            ProcessDefinition processDefinition, String overrideDefinitionTenantId, String predefinedProcessInstanceId,
+            Map<String, Set<String>> userIdentityLinks, Map<String, Set<String>> groupIdentityLinks) {
         
         super(businessKey, businessStatus, processInstanceName, variables, transientVariables, initialActivityId, initialFlowElement, process,
                 processDefinition);
@@ -50,6 +54,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
         this.initiatorVariableName = initiatorVariableName;
         this.overrideDefinitionTenantId = overrideDefinitionTenantId;
         this.predefinedProcessInstanceId = predefinedProcessInstanceId;
+        this.userIdentityLinks = userIdentityLinks;
+        this.groupIdentityLinks = groupIdentityLinks;
     }
 
     public String getCallbackId() {
@@ -114,5 +120,21 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
 
     public void setPredefinedProcessInstanceId(String predefinedProcessInstanceId) {
         this.predefinedProcessInstanceId = predefinedProcessInstanceId;
+    }
+
+    public Map<String, Set<String>> getUserIdentityLinks() {
+        return userIdentityLinks;
+    }
+
+    public void setUserIdentityLinks(Map<String, Set<String>> userIdentityLinks) {
+        this.userIdentityLinks = userIdentityLinks;
+    }
+
+    public Map<String, Set<String>> getGroupIdentityLinks() {
+        return groupIdentityLinks;
+    }
+
+    public void setGroupIdentityLinks(Map<String, Set<String>> groupIdentityLinks) {
+        this.groupIdentityLinks = groupIdentityLinks;
     }
 }

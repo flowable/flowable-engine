@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
@@ -76,12 +77,13 @@ public class ProcessInstanceHelper {
             Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         return createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName, null, null,
-                variables, transientVariables, null, null, null, null, null, false);
+                variables, transientVariables, null, null, null, null, null, null, null, false);
     }
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String businessStatus, String processInstanceName,
             String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables,
-            String callbackId, String callbackType, String referenceId, String referenceType, String stageInstanceId, boolean startProcessInstance) {
+            String callbackId, String callbackType, String referenceId, String referenceType, String stageInstanceId, Map<String, Set<String>> userIdentityLinks,
+            Map<String, Set<String>> groupIdentityLinks, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -109,7 +111,7 @@ public class ProcessInstanceHelper {
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, processInstanceName,
                 overrideDefinitionTenantId,
                 predefinedProcessInstanceId, initialFlowElement, process, variables, transientVariables,
-                callbackId, callbackType, referenceId, referenceType, stageInstanceId, startProcessInstance);
+                callbackId, callbackType, referenceId, referenceType, stageInstanceId, userIdentityLinks, groupIdentityLinks, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey,
@@ -153,7 +155,7 @@ public class ProcessInstanceHelper {
         }
 
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, null, null, null, initialFlowElement,
-                process, variables, transientVariables, callbackId, callbackType, referenceId, referenceType, null, true);
+                process, variables, transientVariables, callbackId, callbackType, referenceId, referenceType, null, null, null, true);
     }
     
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
@@ -162,7 +164,7 @@ public class ProcessInstanceHelper {
             Map<String, Object> transientVariables, boolean startProcessInstance) {
         
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, processInstanceName, null, null,
-                initialFlowElement, process, variables, transientVariables, null, null, null, null, null, startProcessInstance);
+                initialFlowElement, process, variables, transientVariables, null, null, null, null, null, null, null, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
@@ -171,7 +173,8 @@ public class ProcessInstanceHelper {
             FlowElement initialFlowElement, Process process,
             Map<String, Object> variables, Map<String, Object> transientVariables,
             String callbackId, String callbackType, String referenceId, String referenceType,
-            String stageInstanceId, boolean startProcessInstance) {
+            String stageInstanceId, Map<String, Set<String>> userIdentityLinks,
+            Map<String, Set<String>> groupIdentityLinks, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
 
@@ -191,7 +194,8 @@ public class ProcessInstanceHelper {
         StartProcessInstanceBeforeContext startInstanceBeforeContext = new StartProcessInstanceBeforeContext(businessKey, businessStatus, processInstanceName,
                 callbackId, callbackType, referenceId, referenceType,
                 variables, transientVariables, tenantId, initiatorVariableName, initialFlowElement.getId(),
-                initialFlowElement, process, processDefinition, overrideDefinitionTenantId, predefinedProcessInstanceId);
+                initialFlowElement, process, processDefinition, overrideDefinitionTenantId, predefinedProcessInstanceId,
+                userIdentityLinks, groupIdentityLinks);
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
@@ -240,7 +244,35 @@ public class ProcessInstanceHelper {
                 processInstance.setTransientVariable(varName, startInstanceBeforeContext.getTransientVariables().get(varName));
             }
         }
-        
+
+        if (startInstanceBeforeContext.getUserIdentityLinks() != null) {
+            for (Map.Entry<String, Set<String>> entry : startInstanceBeforeContext.getUserIdentityLinks().entrySet()) {
+                String identityLinkType = entry.getKey();
+                Set<String> users = entry.getValue();
+                if (identityLinkType != null && users != null) {
+                    for (String user : users) {
+                        if (user != null) {
+                            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, user, null, identityLinkType);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (startInstanceBeforeContext.getGroupIdentityLinks() != null) {
+            for (Map.Entry<String, Set<String>> entry : startInstanceBeforeContext.getGroupIdentityLinks().entrySet()) {
+                String identityLinkType = entry.getKey();
+                Set<String> groups = entry.getValue();
+                if (identityLinkType != null && groups != null) {
+                    for (String group : groups) {
+                        if (group != null) {
+                            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, null, group, identityLinkType);
+                        }
+                    }
+                }
+            }
+        }
+
         // Fire events
         if (eventDispatcherEnabled) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, 
