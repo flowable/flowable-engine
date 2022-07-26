@@ -17,11 +17,13 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 public class BaseCmmnHistoryManager {
     
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected CmmnHistoryConfigurationSettings historyConfigurationSettings;
-    
-    public BaseCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+
+    public BaseCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
-        this.historyConfigurationSettings = cmmnHistoryConfigurationSettings;
+    }
+
+    protected CmmnHistoryConfigurationSettings getHistoryConfigurationSettings() {
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings();
     }
 
 }

@@ -509,22 +509,25 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 }
                 List<GraphicInfo> graphicInfoList = bpmnModel.getFlowLocationGraphicInfo(artifact.getId());
                 graphicInfoList = connectionPerfectionizer(processDiagramCanvas, bpmnModel, sourceElement, targetElement, graphicInfoList);
-                int[] xPoints = new int[graphicInfoList.size()];
-                int[] yPoints = new int[graphicInfoList.size()];
-                for (int i = 1; i < graphicInfoList.size(); i++) {
-                    GraphicInfo graphicInfo = graphicInfoList.get(i);
-                    GraphicInfo previousGraphicInfo = graphicInfoList.get(i - 1);
 
-                    if (i == 1) {
-                        xPoints[0] = (int) previousGraphicInfo.getX();
-                        yPoints[0] = (int) previousGraphicInfo.getY();
+                if (graphicInfoList != null) {
+                    int[] xPoints = new int[graphicInfoList.size()];
+                    int[] yPoints = new int[graphicInfoList.size()];
+                    for (int i = 1; i < graphicInfoList.size(); i++) {
+                        GraphicInfo graphicInfo = graphicInfoList.get(i);
+                        GraphicInfo previousGraphicInfo = graphicInfoList.get(i - 1);
+
+                        if (i == 1) {
+                            xPoints[0] = (int) previousGraphicInfo.getX();
+                            yPoints[0] = (int) previousGraphicInfo.getY();
+                        }
+                        xPoints[i] = (int) graphicInfo.getX();
+                        yPoints[i] = (int) graphicInfo.getY();
                     }
-                    xPoints[i] = (int) graphicInfo.getX();
-                    yPoints[i] = (int) graphicInfo.getY();
-                }
 
-                AssociationDirection associationDirection = association.getAssociationDirection();
-                processDiagramCanvas.drawAssociation(xPoints, yPoints, associationDirection, false, scaleFactor);
+                    AssociationDirection associationDirection = association.getAssociationDirection();
+                    processDiagramCanvas.drawAssociation(xPoints, yPoints, associationDirection, false, scaleFactor);
+                }
             }
         });
     }

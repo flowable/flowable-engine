@@ -1351,9 +1351,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             if (isAsyncHistoryEnabled) {
-                cmmnHistoryManager = new AsyncCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
+                cmmnHistoryManager = new AsyncCmmnHistoryManager(this);
             } else {
-                cmmnHistoryManager = new DefaultCmmnHistoryManager(this, cmmnHistoryConfigurationSettings);
+                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
             }
         }
     }
@@ -2403,6 +2403,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnHistoryManager(CmmnHistoryManager cmmnHistoryManager) {
         this.cmmnHistoryManager = cmmnHistoryManager;
+        return this;
+    }
+
+    public CmmnHistoryConfigurationSettings getCmmnHistoryConfigurationSettings() {
+        return cmmnHistoryConfigurationSettings;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryConfigurationSettings(CmmnHistoryConfigurationSettings cmmnHistoryConfigurationSettings) {
+        this.cmmnHistoryConfigurationSettings = cmmnHistoryConfigurationSettings;
         return this;
     }
 

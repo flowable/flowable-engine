@@ -403,14 +403,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected void deleteDeployments() {
         boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
 
-        HistoryConfigurationSettings historyConfigurationSettings
-                = new DefaultHistoryConfigurationSettings(processEngineConfiguration);
-
         HistoryManager asyncHistoryManager = null;
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, historyConfigurationSettings));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
@@ -429,8 +426,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration,
-                    new DefaultHistoryConfigurationSettings(processEngineConfiguration)));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         repositoryService.deleteDeployment(deploymentId, true);

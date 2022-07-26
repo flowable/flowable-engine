@@ -31,12 +31,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
+ * @author Joram Barrez
  */
 public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager {
 
-    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration,
-                                       HistoryConfigurationSettings historyConfigurationSettings) {
-        super(processEngineConfiguration, historyConfigurationSettings);
+    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
 
     protected void addCommonProcessInstanceFields(ExecutionEntity processInstance, ObjectNode data) {
