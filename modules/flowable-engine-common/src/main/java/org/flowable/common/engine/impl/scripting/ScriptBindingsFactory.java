@@ -36,15 +36,17 @@ public class ScriptBindingsFactory {
     }
 
     public Bindings createBindings(VariableContainer variableContainer) {
-        return new ScriptBindings(createResolvers(variableContainer), variableContainer);
+        return new ScriptBindings(createResolvers(variableContainer, null), variableContainer);
     }
 
-    public Bindings createBindings(VariableContainer variableContainer, boolean storeScriptVariables) {
-        return new ScriptBindings(createResolvers(variableContainer), variableContainer, storeScriptVariables);
+    public Bindings createBindings(ScriptEngineRequest request) {
+        return new ScriptBindings(createResolvers(request.getVariableContainer(), request.getAdditionalResolver()), request.getVariableContainer(),
+                request.isStoreScriptVariables());
     }
 
-    protected List<Resolver> createResolvers(VariableContainer variableContainer) {
+    protected List<Resolver> createResolvers(VariableContainer variableContainer, List<Resolver> additionalResolver) {
         List<Resolver> scriptResolvers = new ArrayList<>();
+        scriptResolvers.addAll(additionalResolver);
         for (ResolverFactory scriptResolverFactory : resolverFactories) {
             Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, variableContainer);
             if (resolver != null) {
