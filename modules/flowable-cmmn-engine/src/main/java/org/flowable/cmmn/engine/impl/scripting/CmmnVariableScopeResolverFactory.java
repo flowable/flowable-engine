@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.scripting;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
@@ -25,7 +26,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class CmmnVariableScopeResolverFactory implements ResolverFactory {
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableScope) {
         if (variableScope != null) {
             return new CmmnVariableScopeResolver((CmmnEngineConfiguration) engineConfiguration, variableScope);
         }

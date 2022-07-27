@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.test.mock;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by process execution. <br>
@@ -51,7 +51,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class MockResolverFactory implements ResolverFactory {
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableContainer) {
         return new Resolver() {
 
             @Override
