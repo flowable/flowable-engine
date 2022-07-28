@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.scripting;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import javax.script.Bindings;
 import javax.script.SimpleScriptContext;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -89,22 +91,22 @@ public class ScriptBindings implements Bindings {
 
     @Override
     public Set<Map.Entry<String, Object>> entrySet() {
-        return variableContainer.getVariables().entrySet();
+        return getVariables().entrySet();
     }
 
     @Override
     public Set<String> keySet() {
-        return variableContainer.getVariables().keySet();
+        return getVariables().keySet();
     }
 
     @Override
     public int size() {
-        return variableContainer.getVariables().size();
+        return getVariables().size();
     }
 
     @Override
     public Collection<Object> values() {
-        return variableContainer.getVariables().values();
+        return getVariables().values();
     }
 
     @Override
@@ -139,4 +141,10 @@ public class ScriptBindings implements Bindings {
         UNSTORED_KEYS.add(unstoredKey);
     }
 
+    protected Map<String, Object> getVariables() {
+        if (this.variableContainer instanceof VariableScope) {
+            return ((VariableScope) this.variableContainer).getVariables();
+        }
+        return Collections.emptyMap();
+    }
 }

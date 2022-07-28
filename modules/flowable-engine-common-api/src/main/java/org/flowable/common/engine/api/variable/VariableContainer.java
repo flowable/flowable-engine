@@ -12,9 +12,6 @@
  */
 package org.flowable.common.engine.api.variable;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
  * @author Joram Barrez
  */
@@ -29,13 +26,5 @@ public interface VariableContainer {
     void setTransientVariable(String variableName, Object variableValue);
 
     String getTenantId();
-
-    /**
-     * Returns all variables.
-     */
-    default Map<String, Object> getVariables() {
-        // default for backwards compatibility
-        return Collections.emptyMap();
-    }
 
 }
