@@ -14,7 +14,6 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -143,7 +142,9 @@ public class FlowableListener extends BaseElement implements HasScriptInfo {
         setEvent(otherListener.getEvent());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
-        Optional.ofNullable(otherListener.getScriptInfo()).map(ScriptInfo::clone).ifPresent(this::setScriptInfo);
+        if (otherListener.getScriptInfo() != null) {
+            setScriptInfo(otherListener.getScriptInfo().clone());
+        }
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {
