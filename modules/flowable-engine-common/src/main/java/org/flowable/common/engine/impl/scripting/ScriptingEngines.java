@@ -25,7 +25,7 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,25 +70,25 @@ public class ScriptingEngines {
         }
     }
 
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
-        Bindings bindings = createBindings(variableScope);
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
+        Bindings bindings = createBindings(variableContainer);
         Object result = evaluate(script, language, bindings);
 
         return new ScriptEvaluationImpl(bindings, result);
     }
 
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        Bindings bindings = createBindings(variableScope, storeScriptVariables);
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
+        Bindings bindings = createBindings(variableContainer, storeScriptVariables);
         Object result = evaluate(script, language, bindings);
 
         return new ScriptEvaluationImpl(bindings, result);
     }
 
-    public Object evaluate(String script, String language, VariableScope variableScope) {
-        return evaluateWithEvaluationResult(script, language, variableScope).getResult();
+    public Object evaluate(String script, String language, VariableContainer variableContainer) {
+        return evaluateWithEvaluationResult(script, language, variableContainer).getResult();
     }
 
-    public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
+    public Object evaluate(String script, String language, VariableContainer variableScope, boolean storeScriptVariables) {
         return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables).getResult();
     }
 
@@ -167,13 +167,13 @@ public class ScriptingEngines {
     }
 
     /** override to build a spring aware ScriptingEngines */
-    protected Bindings createBindings(VariableScope variableScope) {
-        return scriptBindingsFactory.createBindings(variableScope);
+    protected Bindings createBindings(VariableContainer variableContainer) {
+        return scriptBindingsFactory.createBindings(variableContainer);
     }
 
     /** override to build a spring aware ScriptingEngines */
-    protected Bindings createBindings(VariableScope variableScope, boolean storeScriptVariables) {
-        return scriptBindingsFactory.createBindings(variableScope, storeScriptVariables);
+    protected Bindings createBindings(VariableContainer variableContainer, boolean storeScriptVariables) {
+        return scriptBindingsFactory.createBindings(variableContainer, storeScriptVariables);
     }
 
     public ScriptBindingsFactory getScriptBindingsFactory() {

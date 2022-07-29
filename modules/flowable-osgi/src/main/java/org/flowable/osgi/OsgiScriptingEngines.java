@@ -17,6 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
@@ -37,23 +38,23 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
-        return super.evaluateWithEvaluationResult(script, language, variableScope);
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
+        return super.evaluateWithEvaluationResult(script, language, variableContainer);
     }
 
     @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return super.evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables);
+    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
+        return super.evaluateWithEvaluationResult(script, language, variableContainer, storeScriptVariables);
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope) {
-        return super.evaluate(script, language, variableScope);
+    public Object evaluate(String script, String language, VariableContainer variableContainer) {
+        return super.evaluate(script, language, variableContainer);
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return super.evaluate(script, language, variableScope, storeScriptVariables);
+    public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
+        return super.evaluate(script, language, variableContainer, storeScriptVariables);
     }
 
     @Override
