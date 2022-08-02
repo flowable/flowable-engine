@@ -693,7 +693,7 @@
                                 <exclude>**/CmmnHistoryServiceTaskLogTest.java</exclude>
 
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
