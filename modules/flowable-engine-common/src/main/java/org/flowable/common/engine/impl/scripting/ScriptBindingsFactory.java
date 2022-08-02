@@ -14,12 +14,10 @@
 package org.flowable.common.engine.impl.scripting;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.script.Bindings;
 
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 
 /**
@@ -36,20 +34,16 @@ public class ScriptBindingsFactory {
         this.resolverFactories = resolverFactories;
     }
 
-    public Bindings createBindings(VariableContainer variableContainer) {
-        return new ScriptBindings(createResolvers(variableContainer, Collections.emptyList()), variableContainer);
-    }
-
     public Bindings createBindings(ScriptEngineRequest request) {
-        return new ScriptBindings(createResolvers(request.getVariableContainer(), request.getAdditionalResolvers()), request.getVariableContainer(),
+        return new ScriptBindings(createResolvers(request), request.getVariableContainer(),
                 request.isStoreScriptVariables());
     }
 
-    protected List<Resolver> createResolvers(VariableContainer variableContainer, List<Resolver> additionalResolver) {
+    protected List<Resolver> createResolvers(ScriptEngineRequest request) {
         List<Resolver> scriptResolvers = new ArrayList<>();
-        scriptResolvers.addAll(additionalResolver);
+        scriptResolvers.addAll(request.getAdditionalResolvers());
         for (ResolverFactory scriptResolverFactory : resolverFactories) {
-            Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, variableContainer);
+            Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, request.getVariableContainer());
             if (resolver != null) {
                 scriptResolvers.add(resolver);
             }

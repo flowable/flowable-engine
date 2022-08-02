@@ -43,16 +43,6 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
-        return super.evaluateWithEvaluationResult(script, language, variableContainer);
-    }
-
-    @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        return super.evaluateWithEvaluationResult(script, language, variableContainer, storeScriptVariables);
-    }
-
-    @Override
     public Object evaluate(String script, String language, VariableContainer variableContainer) {
         return super.evaluate(script, language, variableContainer);
     }

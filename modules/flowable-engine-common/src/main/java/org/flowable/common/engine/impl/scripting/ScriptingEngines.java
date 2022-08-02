@@ -64,30 +64,6 @@ public class ScriptingEngines {
     }
 
     /**
-     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}
-     */
-    @Deprecated
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
-        Bindings bindings = createBindings(variableContainer);
-        Object result = evaluate(script, language, bindings);
-
-        return new ScriptEvaluationImpl(bindings, result);
-    }
-
-    /**
-     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}
-     */
-    @Deprecated
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
-                .script(script)
-                .language(language)
-                .variableContainer(variableContainer);
-        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
-        return evaluate(builder.build());
-    }
-
-    /**
      * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
      */
     @Deprecated
@@ -172,13 +148,6 @@ public class ScriptingEngines {
             throw new FlowableException("Can't find scripting engine for '" + language + "'");
         }
         return scriptEngine;
-    }
-
-    /**
-     * override to build a spring aware ScriptingEngines
-     */
-    protected Bindings createBindings(VariableContainer variableContainer) {
-        return scriptBindingsFactory.createBindings(variableContainer);
     }
 
     /**
