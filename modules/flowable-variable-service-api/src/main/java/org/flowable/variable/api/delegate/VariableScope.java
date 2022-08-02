@@ -36,7 +36,7 @@ public interface VariableScope extends VariableContainer {
      * @return an empty (null object) variable scope.
      */
     public static VariableScope empty() {
-        return EmptyVariableScope.getSharedInstance();
+        return EmptyVariableScope.INSTANCE;
     }
 
     /**

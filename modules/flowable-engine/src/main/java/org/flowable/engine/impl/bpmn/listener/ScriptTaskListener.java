@@ -34,6 +34,6 @@ public class ScriptTaskListener extends AbstractScriptEvaluator implements TaskL
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        evaluateScriptRequest(createScriptRequest(delegateTask).setStoreScriptVariables(true));
+        evaluateScriptRequest(createScriptRequest(delegateTask).storeScriptVariables());
     }
 }

@@ -25,40 +25,30 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @see VariableScope#empty()
  */
 class EmptyVariableScope implements VariableScope {
-    private static final EmptyVariableScope INSTANCE = new EmptyVariableScope();
-
-    EmptyVariableScope() {
-    }
-
-    /**
-     * @return the singleton instance
-     */
-    public static EmptyVariableScope getSharedInstance() {
-        return INSTANCE;
-    }
+    static final EmptyVariableScope INSTANCE = new EmptyVariableScope();
 
     public Map<String, Object> getVariables() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> getVariablesLocal() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> getVariables(Collection<String> variableNames) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> getVariablesLocal(Collection<String> variableNames) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     public Object getVariable(String variableName) {
@@ -86,7 +76,7 @@ class EmptyVariableScope implements VariableScope {
     }
 
     public Set<String> getVariableNames() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     public Set<String> getVariableNamesLocal() {
@@ -134,27 +124,27 @@ class EmptyVariableScope implements VariableScope {
     }
 
     public void setVariable(String variableName, Object value) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setVariable(String variableName, Object value, boolean fetchAllVariables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public Object setVariableLocal(String variableName, Object value) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setVariables(Map<String, ? extends Object> variables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public boolean hasVariables() {
@@ -174,51 +164,51 @@ class EmptyVariableScope implements VariableScope {
     }
 
     public void createVariableLocal(String variableName, Object value) {
-        throw new UnsupportedOperationException("No execution active, no variables can be created");
+        throw new UnsupportedOperationException("Empty object, no variables can be created");
     }
 
     public void createVariablesLocal(Map<String, ? extends Object> variables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be created");
+        throw new UnsupportedOperationException("Empty object, no variables can be created");
     }
 
     public void removeVariable(String variableName) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeVariableLocal(String variableName) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeVariables() {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeVariablesLocal() {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeVariables(Collection<String> variableNames) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeVariablesLocal(Collection<String> variableNames) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void setTransientVariablesLocal(Map<String, Object> transientVariables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setTransientVariableLocal(String variableName, Object variableValue) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setTransientVariables(Map<String, Object> transientVariables) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public void setTransientVariable(String variableName, Object variableValue) {
-        throw new UnsupportedOperationException("No execution active, no variables can be set");
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     public Object getTransientVariableLocal(String variableName) {
@@ -238,19 +228,19 @@ class EmptyVariableScope implements VariableScope {
     }
 
     public void removeTransientVariableLocal(String variableName) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeTransientVariablesLocal() {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeTransientVariable(String variableName) {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public void removeTransientVariables() {
-        throw new UnsupportedOperationException("No execution active, no variables can be removed");
+        throw new UnsupportedOperationException("Empty object, no variables can be removed");
     }
 
     public String getTenantId() {

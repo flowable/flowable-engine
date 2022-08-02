@@ -29,6 +29,6 @@ public class ScriptExecutionListener extends AbstractScriptEvaluator implements 
 
     @Override
     public void notify(DelegateExecution execution) {
-        evaluateScriptRequest(createScriptRequest(execution).setStoreScriptVariables(true));
+        evaluateScriptRequest(createScriptRequest(execution).storeScriptVariables());
     }
 }

@@ -30,8 +30,8 @@ import org.flowable.common.engine.api.variable.VariableContainer;
  */
 public class MapDelegateVariableContainer implements VariableContainer {
 
-    protected Map<String, Object> transientVariables;
-    protected VariableContainer delegate;
+    protected final Map<String, Object> transientVariables;
+    protected final VariableContainer delegate;
 
     public MapDelegateVariableContainer(Map<String, Object> transientVariables, VariableContainer delegate) {
         this.transientVariables = transientVariables;
@@ -67,20 +67,21 @@ public class MapDelegateVariableContainer implements VariableContainer {
      * when not found in either.
      */
     @Override
-    public Object getVariable(String s) {
-        Object o = this.transientVariables.get(s);
-        if (o == null) {
-            o = this.delegate.getVariable(s);
+    public Object getVariable(String key) {
+        if (this.transientVariables.containsKey(key)) {
+            return this.transientVariables.get(key);
         }
-        return o;
+        return this.delegate.getVariable(key);
     }
 
     /**
      * Sets the variable to the delegate.
      * <p/>
      * <b>NOTE</b>: this does not add the variable to this variable container,
-     * but to the delegate. In case delegate is {@link VariableContainer#empty()}
-     * it is be set as transient variable for this container.
+     * but to the delegate.
+     * Only in case delegate is {@link VariableContainer#empty()}
+     * it is set as transient variable for this container to ensure consistent
+     * behavior, when using this variable container without a delegate.
      * Use {@link #addTransientVariable(String, Object)} to add
      * variables local to this variable container only.
      *
@@ -116,8 +117,8 @@ public class MapDelegateVariableContainer implements VariableContainer {
      * Convenience method which returns <code>this</code> for method concatenation.
      * Same as {@link #setTransientVariable(String, Object)}
      */
-    public MapDelegateVariableContainer addTransientVariable(String s, Object o) {
-        setTransientVariable(s, o);
+    public MapDelegateVariableContainer addTransientVariable(String key, Object variable) {
+        setTransientVariable(key, variable);
         return this;
     }
 
@@ -126,6 +127,18 @@ public class MapDelegateVariableContainer implements VariableContainer {
      */
     public void clearTransientVariables() {
         this.transientVariables.clear();
+    }
+
+    /**
+     * @return all available transient variables
+     */
+    public Map<String, Object> getTransientVariables(){
+        return this.transientVariables;
+    }
+
+    public MapDelegateVariableContainer removeTransientVariable(String key){
+        this.transientVariables.remove(key);
+        return this;
     }
 
     @Override

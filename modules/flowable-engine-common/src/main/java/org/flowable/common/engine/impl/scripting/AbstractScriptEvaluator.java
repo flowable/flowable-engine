@@ -77,7 +77,7 @@ public abstract class AbstractScriptEvaluator {
         }
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder();
 
-        return builder.setLanguage(language).setScript(script).setVariableContainer(variableContainer);
+        return builder.language(language).script(script).variableContainer(variableContainer);
     }
 
     protected Object evaluateScriptRequest(ScriptEngineRequest.Builder requestBuilder) {
@@ -95,7 +95,7 @@ public abstract class AbstractScriptEvaluator {
     }
 
     protected Object evaluateScript(ScriptingEngines scriptingEngines, ScriptEngineRequest request) {
-        return scriptingEngines.evaluateWithEvaluationResult(request).getResult();
+        return scriptingEngines.evaluate(request).getResult();
     }
 
     protected void validateParameters() {

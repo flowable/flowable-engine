@@ -20,11 +20,10 @@ import java.util.Map;
  */
 public class MapResolver implements Resolver {
 
-    protected Map<Object, Object> map;
+    protected final Map<Object, Object> map;
 
     public MapResolver(Map<Object, Object> map) {
-        this.map = new HashMap<>();
-        this.map.putAll(map);
+        this.map = new HashMap<>(map);
     }
 
     public MapResolver() {
@@ -33,12 +32,12 @@ public class MapResolver implements Resolver {
 
     @Override
     public boolean containsKey(Object key) {
-        return map != null ? map.containsKey(key) : false;
+        return map.containsKey(key);
     }
 
     @Override
     public Object get(Object key) {
-        return map != null ? map.get(key) : null;
+        return map.get(key);
     }
 
     public MapResolver put(Object key, Object value) {

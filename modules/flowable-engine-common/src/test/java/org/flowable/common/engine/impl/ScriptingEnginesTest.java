@@ -55,12 +55,12 @@ public class ScriptingEnginesTest {
 
 
         ScriptEngineRequest request = ScriptEngineRequest.builder()
-                .setScript(script)
-                .setLanguage("JavaScript")
-                .setVariableContainer(VariableScope.empty())
+                .script(script)
+                .language("JavaScript")
+                .variableContainer(VariableScope.empty())
                 .build();
         // WHEN
-        Object scriptResult = engines.evaluate(request);
+        Object scriptResult = engines.evaluate(request).getResult();
 
         // THEN
         assertThat(scriptResult).isInstanceOfSatisfying(MyBean.class, result -> {
@@ -75,14 +75,14 @@ public class ScriptingEnginesTest {
         String script = "myBean.setBar('setInScript'); myBean";
 
         ScriptEngineRequest request = ScriptEngineRequest.builder()
-                .setScript(script)
-                .setLanguage("JavaScript")
-                .setVariableContainer(VariableScope.empty())
-                .addAdditionalResolver(resolver)
+                .script(script)
+                .language("JavaScript")
+                .variableContainer(VariableScope.empty())
+                .additionalResolver(resolver)
                 .build();
 
         // WHEN
-        Object scriptResult = engines.evaluateWithEvaluationResult(request).getResult();
+        Object scriptResult = engines.evaluate(request).getResult();
 
         // THEN
         assertThat(scriptResult).isInstanceOfSatisfying(MyBean.class, result -> {
@@ -105,14 +105,14 @@ public class ScriptingEnginesTest {
         String script = "myBean.setBar('setInScript'); myBean";
 
         ScriptEngineRequest request = ScriptEngineRequest.builder()
-                .setScript(script)
-                .setLanguage("JavaScript")
-                .setVariableContainer(VariableScope.empty())
-                .addAdditionalResolver(resolver)
+                .script(script)
+                .language("JavaScript")
+                .variableContainer(VariableScope.empty())
+                .additionalResolver(resolver)
                 .build();
 
         // WHEN
-        Object scriptResult = engines.evaluateWithEvaluationResult(request).getResult();
+        Object scriptResult = engines.evaluate(request).getResult();
 
         // THEN
         assertThat(scriptResult).isInstanceOfSatisfying(MyBean.class, result -> {

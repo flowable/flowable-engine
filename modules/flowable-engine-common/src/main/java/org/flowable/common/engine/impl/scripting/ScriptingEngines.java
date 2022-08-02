@@ -57,19 +57,14 @@ public class ScriptingEngines {
         cachedEngines = new HashMap<>();
     }
 
-    public ScriptEvaluation evaluateWithEvaluationResult(ScriptEngineRequest request) {
+    public ScriptEvaluation evaluate(ScriptEngineRequest request) {
         Bindings bindings = createBindings(request);
         Object result = evaluate(request.getScript(), request.getLanguage(), bindings);
-
         return new ScriptEvaluationImpl(bindings, result);
     }
 
-    public Object evaluate(ScriptEngineRequest request) {
-        return evaluateWithEvaluationResult(request).getResult();
-    }
-
     /**
-     * @deprecated since 6.8.0 use {@link #evaluateWithEvaluationResult(ScriptEngineRequest)}
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}
      */
     @Deprecated
     public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
@@ -80,36 +75,37 @@ public class ScriptingEngines {
     }
 
     /**
-     * @deprecated since 6.8.0 use {@link #evaluateWithEvaluationResult(ScriptEngineRequest)}
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}
      */
     @Deprecated
     public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        return evaluateWithEvaluationResult(ScriptEngineRequest.builder()
-                .setScript(script)
-                .setLanguage(language)
-                .setVariableContainer(variableContainer)
-                .setStoreScriptVariables(storeScriptVariables)
-                .build());
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(script)
+                .language(language)
+                .variableContainer(variableContainer);
+        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
+        return evaluate(builder.build());
     }
 
     /**
-     * @deprecated since 6.8.0 use {@link #evaluateWithEvaluationResult(ScriptEngineRequest)}
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
      */
+    @Deprecated
     public Object evaluate(String script, String language, VariableContainer variableContainer) {
         return evaluate(script, language, variableContainer, false);
     }
 
     /**
-     * @deprecated since 6.8.0 use {@link #evaluateWithEvaluationResult(ScriptEngineRequest)}
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
      */
+    @Deprecated
     public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        return evaluateWithEvaluationResult(ScriptEngineRequest.builder()
-                .setScript(script)
-                .setLanguage(language)
-                .setVariableContainer(variableContainer)
-                .setStoreScriptVariables(storeScriptVariables)
-                .build())
-                .getResult();
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(script)
+                .language(language)
+                .variableContainer(variableContainer);
+        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
+        return evaluate(builder.build()).getResult();
     }
 
     protected Object evaluate(String script, String language, Bindings bindings) {

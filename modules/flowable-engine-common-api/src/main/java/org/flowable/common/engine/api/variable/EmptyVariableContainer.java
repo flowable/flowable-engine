@@ -19,10 +19,6 @@ class EmptyVariableContainer implements VariableContainer {
 
     static final EmptyVariableContainer INSTANCE = new EmptyVariableContainer();
 
-    EmptyVariableContainer() {
-
-    }
-
     @Override
     public boolean hasVariable(String variableName) {
         return false;
@@ -35,12 +31,12 @@ class EmptyVariableContainer implements VariableContainer {
 
     @Override
     public void setVariable(String variableName, Object variableValue) {
-
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     @Override
     public void setTransientVariable(String variableName, Object variableValue) {
-
+        throw new UnsupportedOperationException("Empty object, no variables can be set");
     }
 
     @Override
