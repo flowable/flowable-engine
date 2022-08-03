@@ -41,7 +41,6 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
-import org.flowable.engine.impl.delegate.invocation.ExecutionListenerInvocation;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
