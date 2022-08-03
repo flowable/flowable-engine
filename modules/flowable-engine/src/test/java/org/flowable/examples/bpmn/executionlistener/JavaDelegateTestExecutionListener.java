@@ -12,9 +12,6 @@
  */
 package org.flowable.examples.bpmn.executionlistener;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
