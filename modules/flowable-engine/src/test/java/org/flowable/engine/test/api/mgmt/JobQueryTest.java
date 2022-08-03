@@ -286,6 +286,34 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testDeadLetterJobQueryByType() {
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_MESSAGE);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(0);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_TIMER);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(2);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_EXTERNAL_WORKER);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(3);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(1);
+
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().messages().singleResult().getId());
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().timers().singleResult().getId());
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().externalWorkers().singleResult().getId());
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+    }
+
+    @Test
     public void testQueryByHandlerTypes() {
 
         List<String> testTypes = new ArrayList<>();
@@ -968,6 +996,36 @@ public class JobQueryTest extends PluggableFlowableTestCase {
             }
         });
 
+    }
+
+    private JobEntity createJobWithType(String type) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        return commandExecutor.execute(new Command<JobEntity>() {
+
+            @Override
+            public JobEntity execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity result = jobService.createJob();
+                result.setJobType(type);
+                result.setRetries(0);
+                jobService.insertJob(result);
+                assertThat(result.getId()).isNotNull();
+                return result;
+            }
+        });
+    }
+
+    private void createDeadLetterJobWithType(String type) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                jobService.moveJobToDeadLetterJob(createJobWithType(type));
+                return null;
+            }
+        });
     }
 
     private JobEntity createJobWithHandlerType(String handlerType) {
