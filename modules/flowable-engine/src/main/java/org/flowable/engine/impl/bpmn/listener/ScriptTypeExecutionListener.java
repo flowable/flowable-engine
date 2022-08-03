@@ -24,9 +24,6 @@ public class ScriptTypeExecutionListener extends AbstractScriptEvaluator impleme
 
     private static final long serialVersionUID = 1L;
 
-    public ScriptTypeExecutionListener() {
-    }
-
     public ScriptTypeExecutionListener(Expression language, Expression script) {
         super(language, script);
     }
@@ -38,7 +35,7 @@ public class ScriptTypeExecutionListener extends AbstractScriptEvaluator impleme
 
     @Override
     public void notify(DelegateExecution execution) {
-        validateParametersAndEvaluteScript(execution);
+        evaluateScriptRequest(createScriptRequest(execution));
     }
 
 }

@@ -44,7 +44,7 @@ public class ScriptHttpHandler extends AbstractScriptEvaluator implements HttpRe
     public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, FlowableHttpClient client) {
         if (execution instanceof VariableScope) {
             ((VariableScope) execution).setTransientVariableLocal("httpRequest", httpRequest);
-            validateParametersAndEvaluteScript((VariableScope) execution);
+            evaluateScriptRequest(createScriptRequest(execution));
         } else {
             throw new FlowableIllegalStateException(
                     "The given execution " + execution.getClass().getName() + " is not of type " + VariableScope.class.getName());
@@ -55,7 +55,7 @@ public class ScriptHttpHandler extends AbstractScriptEvaluator implements HttpRe
     public void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse) {
         if (execution instanceof VariableScope) {
             ((VariableScope) execution).setTransientVariableLocal("httpResponse", httpResponse);
-            validateParametersAndEvaluteScript((VariableScope) execution);
+            evaluateScriptRequest(createScriptRequest(execution));
         } else {
             throw new FlowableIllegalStateException(
                     "The given execution " + execution.getClass().getName() + " is not of type " + VariableScope.class.getName());
