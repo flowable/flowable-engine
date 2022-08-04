@@ -738,7 +738,18 @@ public class RestResponseFactory {
             result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, variableInstance.getProcessInstanceId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
+
+        RestVariableScope scope;
+        if (variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId())
+                || variableInstance.getTaskId() != null) {
+            scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
+        }
+
+        result.setVariable(
+                createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false,
+                        urlBuilder));
         return result;
     }
 
