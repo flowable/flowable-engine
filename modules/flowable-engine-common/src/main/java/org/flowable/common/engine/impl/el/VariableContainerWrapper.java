@@ -15,12 +15,13 @@ package org.flowable.common.engine.impl.el;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.MapAwareVariableContainer;
 import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * @author Joram Barrez
  */
-public class VariableContainerWrapper implements VariableContainer {
+public class VariableContainerWrapper implements VariableContainer, MapAwareVariableContainer {
     
     protected Map<String, Object> variables = new HashMap<>();
     protected String instanceId;
@@ -76,5 +77,10 @@ public class VariableContainerWrapper implements VariableContainer {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public Map<String, Object> getVariables() {
+        return this.variables;
     }
 }

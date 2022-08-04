@@ -12,10 +12,13 @@
  */
 package org.flowable.common.engine.api.variable;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Arthur Hupka-Merle
  */
-class EmptyVariableContainer implements VariableContainer {
+class EmptyVariableContainer implements VariableContainer, MapAwareVariableContainer {
 
     static final EmptyVariableContainer INSTANCE = new EmptyVariableContainer();
 
@@ -42,5 +45,10 @@ class EmptyVariableContainer implements VariableContainer {
     @Override
     public String getTenantId() {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getVariables() {
+        return Collections.emptyMap();
     }
 }

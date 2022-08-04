@@ -24,8 +24,8 @@ import java.util.Set;
 import javax.script.Bindings;
 import javax.script.SimpleScriptContext;
 
+import org.flowable.common.engine.api.variable.MapAwareVariableContainer;
 import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -142,8 +142,8 @@ public class ScriptBindings implements Bindings {
     }
 
     protected Map<String, Object> getVariables() {
-        if (this.variableContainer instanceof VariableScope) {
-            return ((VariableScope) this.variableContainer).getVariables();
+        if (this.variableContainer instanceof MapAwareVariableContainer) {
+            return ((MapAwareVariableContainer) this.variableContainer).getVariables();
         }
         return Collections.emptyMap();
     }

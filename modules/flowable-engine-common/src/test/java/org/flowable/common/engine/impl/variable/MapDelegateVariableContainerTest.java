@@ -18,7 +18,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -44,6 +48,27 @@ class MapDelegateVariableContainerTest {
         verify(delegate, never()).getVariable("myVar1");
         verify(delegate, times(1)).getVariable("myVar2");
         verify(delegate, times(1)).hasVariable("myVar2");
+
+        Map<String, Object> variables = container.getVariables();
+        // Mock variable container is not a MapAwareVariableContainer
+        assertThat(variables).hasSize(1).containsEntry("myVar", "Foo");
+    }
+
+    @Test
+    void expectGetVariablesReturnsDelegateValuesWhenMapAwareAndRespectsShadowOrder() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("myVar1", "Bar");
+        vars.put("myVar2", "Bar");
+        vars.put("myVar3", "FooBar");
+        VariableContainerWrapper wrapper = new VariableContainerWrapper(vars);
+        MapDelegateVariableContainer container = new MapDelegateVariableContainer(wrapper).addTransientVariable("myVar1", "Foo");
+
+        assertThat(container.getVariable("myVar1")).isEqualTo("Foo");
+        assertThat(container.getVariable("myVar2")).isEqualTo("Bar");
+        assertThat(container.getVariable("myVar3")).isEqualTo("FooBar");
+
+        Map<String, Object> variables = container.getVariables();
+        assertThat(variables).hasSize(3).containsEntry("myVar1", "Foo").containsEntry("myVar2", "Bar").containsEntry("myVar3", "FooBar");
     }
 
     @Test

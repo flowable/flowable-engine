@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.variable.MapAwareVariableContainer;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -30,18 +31,19 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface VariableScope extends VariableContainer {
+public interface VariableScope extends VariableContainer, MapAwareVariableContainer {
 
     /**
      * @return an empty (null object) variable scope.
      */
-    public static VariableScope empty() {
+    static VariableScope empty() {
         return EmptyVariableScope.INSTANCE;
     }
 
     /**
      * Returns all variables. This will include all variables of parent scopes too.
      */
+    @Override
     Map<String, Object> getVariables();
 
     /**

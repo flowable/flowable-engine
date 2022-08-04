@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.variable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.variable.MapAwareVariableContainer;
 import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
@@ -28,7 +29,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
  *
  * @author Arthur Hupka-Merle
  */
-public class MapDelegateVariableContainer implements VariableContainer {
+public class MapDelegateVariableContainer implements VariableContainer, MapAwareVariableContainer {
 
     protected final Map<String, Object> transientVariables;
     protected final VariableContainer delegate;
@@ -134,6 +135,22 @@ public class MapDelegateVariableContainer implements VariableContainer {
      */
     public Map<String, Object> getTransientVariables(){
         return this.transientVariables;
+    }
+
+    /**
+     * @return all variables this container holds, including the delegate variables in case it is a {@link MapAwareVariableContainer}.
+     */
+    @Override
+    public Map<String, Object> getVariables() {
+        int totalSize = this.transientVariables.size();
+        if (this.delegate instanceof MapAwareVariableContainer) {
+            totalSize += ((MapAwareVariableContainer) this.delegate).getVariables().size();
+            Map<String, Object> map = new HashMap<>(totalSize);
+            map.putAll(((MapAwareVariableContainer) this.delegate).getVariables());
+            map.putAll(getTransientVariables());
+            return map;
+        }
+        return new HashMap<>(getTransientVariables());
     }
 
     public MapDelegateVariableContainer removeTransientVariable(String key){
