@@ -739,13 +739,12 @@ public class RestResponseFactory {
         }
         result.setTaskId(variableInstance.getTaskId());
 
-        RestVariableScope scope = RestVariableScope.GLOBAL;
-
-        boolean local = variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId()); // bpmn
-        boolean taskLocal = variableInstance.getTaskId() != null;
-
-        if (local || taskLocal) {
+        RestVariableScope scope;
+        if (variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId())
+                || variableInstance.getTaskId() != null) {
             scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
         }
 
         result.setVariable(

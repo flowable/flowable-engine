@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -27,11 +28,12 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the variable instance query resource.
@@ -119,13 +121,64 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         runtimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
 
-        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCES);
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCES) + "?caseInstanceId=" + caseInstance.getId();
 
-        JsonNode node = assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId(), 3, "myLocalVar", "test2");
-        assertThat(node.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.LOCAL.name());
-        node = assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId() + "&excludeLocalVariables=true", 1, "myVar",
-                "test1");
-        assertThat(node.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.GLOBAL.name());
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 3,"
+                + " data : ["
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'localTaskVariable',"
+                + "             value:'localTaskVarValue',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'myLocalVar',"
+                + "             value:'test2',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'myVar',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCES) + "?caseInstanceId=" + caseInstance.getId()
+                + "&excludeLocalVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("{"
+                + " size: 1,"
+                + " data : ["
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'myVar',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
 
     }
 

@@ -598,12 +598,11 @@ public class CmmnRestResponseFactory {
         }
         result.setTaskId(variableInstance.getTaskId());
 
-        RestVariableScope scope = RestVariableScope.GLOBAL;
-        boolean localCmmn = variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId()); // cmmn
-        boolean taskLocal = variableInstance.getTaskId() != null;
-
-        if (localCmmn || taskLocal) {
+        RestVariableScope scope;
+        if (variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId()) ||  variableInstance.getTaskId() != null) {
             scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
         }
 
         result.setVariable(

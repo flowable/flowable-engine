@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -28,13 +29,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the variable instance query resource.
@@ -158,13 +160,80 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         waitForJobExecutorToProcessAllJobs(7000, 100);
 
-        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES);
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId();
 
-        JsonNode variableNode   = assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 4, "varLocal3", "test5");
-        assertThat(variableNode.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.LOCAL.name());
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
-        variableNode   =assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeLocalVariables=true", 2, "var3", "test4");
-        assertThat(variableNode.path("scope").asText()).isEqualToIgnoringCase(RestVariable.RestVariableScope.GLOBAL.name());
+        // Check status and size
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 4,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal2',"
+                + "             value:'test3',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal3',"
+                + "             value:'test5',"
+                + "             scope:'local'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId()
+                + "&excludeLocalVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 2,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
 
     }
 
