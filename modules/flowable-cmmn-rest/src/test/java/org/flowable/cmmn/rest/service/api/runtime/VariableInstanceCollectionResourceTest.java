@@ -182,7 +182,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
     }
 
-    protected JsonNode assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
+    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
             throws JsonProcessingException, IOException {
 
         // Do the actual call
@@ -192,14 +192,14 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertThat(dataNode).hasSize(numberOfResultsExpected);
-        JsonNode variableNode = null;
+
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 JsonNode dataElementNode = it.next();
-                variableNode = dataElementNode.get("variable");
+                JsonNode variableNode = dataElementNode.get("variable");
                 String name = variableNode.get("name").textValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
@@ -210,11 +210,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else {
                         assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
-                    break;
                 }
             }
             assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
-        return variableNode;
     }
 }
