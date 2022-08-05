@@ -758,6 +758,12 @@ public class CmmnRestResponseFactory {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
             }
         }
+        if (taskInstance.getCaseVariables() != null) {
+            Map<String, Object> variableMap = taskInstance.getCaseVariables();
+            for (String name : variableMap.keySet()) {
+                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+            }
+        }
         if (taskInstance.getTaskLocalVariables() != null) {
             Map<String, Object> variableMap = taskInstance.getTaskLocalVariables();
             for (String name : variableMap.keySet()) {
