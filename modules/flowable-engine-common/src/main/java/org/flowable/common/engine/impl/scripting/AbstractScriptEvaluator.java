@@ -17,7 +17,7 @@ import java.util.Objects;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Base class simplifying binding and evaluation of scriptable elements.
@@ -50,13 +50,6 @@ public abstract class AbstractScriptEvaluator {
      */
     protected Expression resultVariable;
 
-    /**
-     * Hint for the ScriptingEngine to automatically add
-     * variables which are locally defined in the script, to
-     * as execution variable.
-     */
-    protected boolean autoStoreVariables;
-
     public AbstractScriptEvaluator() {
     }
 
@@ -66,38 +59,43 @@ public abstract class AbstractScriptEvaluator {
     }
 
     /**
-     * Validates that required parameters are present and evaluates the script.
-     * <p/>
-     * Handles setting the result value of the script to the given variable scope, in case {@link #resultVariable} is set.
+     * Validates language and script and creates a pre-populated {@link ScriptEngineRequest.Builder} which
+     * can be evaluated using {@link #evaluateScriptRequest(ScriptEngineRequest.Builder)}.
      *
-     * @param variableScope the variable scope used for the script execution. Available in the script context.
-     * @return the result of the script evaluation.
+     * @return the ScriptEngineRequest builder instance for further population
      */
-    public Object validateParametersAndEvaluteScript(VariableScope variableScope) {
+    public ScriptEngineRequest.Builder createScriptRequest(VariableContainer variableContainer) {
         validateParameters();
 
-        String language = Objects.toString(this.language.getValue(variableScope), null);
+        String language = Objects.toString(this.language.getValue(variableContainer), null);
         if (language == null) {
             throw new FlowableIllegalStateException("'language' evaluated to null for listener of type 'script'");
         }
-        String script = Objects.toString(this.script.getValue(variableScope), null);
+        String script = Objects.toString(this.script.getValue(variableContainer), null);
         if (script == null) {
             throw new FlowableIllegalStateException("Script content is null or evaluated to null for listener of type 'script'");
         }
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder();
 
-        Object result = evaluateScript(variableScope, getScriptingEngines(), language, script);
+        return builder.language(language).script(script).variableContainer(variableContainer);
+    }
+
+    protected Object evaluateScriptRequest(ScriptEngineRequest.Builder requestBuilder) {
+        ScriptEngineRequest request = requestBuilder.build();
+        Object result = evaluateScript(getScriptingEngines(), request);
 
         if (resultVariable != null) {
-            String resultVariable = Objects.toString(this.resultVariable.getValue(variableScope), null);
-            if (resultVariable != null) {
-                variableScope.setVariable(resultVariable, result);
+            VariableContainer variableContainer = request.getVariableContainer();
+            String resultVariable = Objects.toString(this.resultVariable.getValue(variableContainer), null);
+            if (variableContainer != null && resultVariable != null) {
+                variableContainer.setVariable(resultVariable, result);
             }
         }
         return result;
     }
 
-    protected Object evaluateScript(VariableScope variableScope, ScriptingEngines scriptingEngines, String language, String script) {
-        return scriptingEngines.evaluate(script, language, variableScope, autoStoreVariables);
+    protected Object evaluateScript(ScriptingEngines scriptingEngines, ScriptEngineRequest request) {
+        return scriptingEngines.evaluate(request).getResult();
     }
 
     protected void validateParameters() {

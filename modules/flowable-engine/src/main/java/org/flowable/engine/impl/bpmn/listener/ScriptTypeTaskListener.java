@@ -42,6 +42,6 @@ public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements T
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        validateParametersAndEvaluteScript(delegateTask);
+        evaluateScriptRequest(createScriptRequest(delegateTask));
     }
 }

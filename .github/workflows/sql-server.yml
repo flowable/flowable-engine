@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mssql: [2017-latest-ubuntu]
+        mssql: [2017-latest-ubuntu, 2019-latest]
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mssql: [2017-latest-ubuntu]
+        mssql: [2017-latest-ubuntu, 2019-latest]
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
@@ -120,7 +120,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mssql: [2017-latest-ubuntu]
+        mssql: [2017-latest-ubuntu, 2019-latest]
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}

@@ -333,7 +333,7 @@
                         <exclude>${exclude.tests2}</exclude>
                         <exclude>${exclude.tests3}</exclude>
                     </excludes>
-                    <argLine>${argLine} -Xmx4g</argLine>
+                    <argLine>${argLine} -Xmx5g</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -880,7 +880,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -954,7 +954,7 @@
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1010,7 +1010,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1201,7 +1201,7 @@
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1263,7 +1263,7 @@
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
                                 <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1313,7 +1313,7 @@
                                 <exclude>**/CompensateEventTest</exclude> <!-- Needs investigation -->
                                 <exclude>**/MultipleExternalWorkerAcquireServiceTaskTest</exclude> <!-- Fails occasionally when system has lots of concurrency. Excluded, as the external workers don't use async history -->
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

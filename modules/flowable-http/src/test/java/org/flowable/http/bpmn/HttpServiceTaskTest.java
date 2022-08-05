@@ -167,7 +167,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
         assertThat(variables)
                 .extracting(HistoricVariableInstance::getVariableName)
-                .containsExactly("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
+                .containsExactlyInAnyOrder("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
         assertThatJson(variables.get(1).getValue())
                 .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(proc.getId());

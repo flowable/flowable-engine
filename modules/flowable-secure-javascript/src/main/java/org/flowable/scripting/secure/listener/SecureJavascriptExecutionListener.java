@@ -12,11 +12,11 @@
  */
 package org.flowable.scripting.secure.listener;
 
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener;
 import org.flowable.scripting.secure.behavior.SecureJavascriptTaskParseHandler;
 import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
@@ -24,11 +24,11 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class SecureJavascriptExecutionListener extends ScriptExecutionListener {
 
     @Override
-    protected Object evaluateScript(VariableScope variableScope, ScriptingEngines scriptingEngines, String language, String script) {
-        if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language)) {
-            return SecureJavascriptUtil.evaluateScript(variableScope, script);
+    protected Object evaluateScript(ScriptingEngines engines, ScriptEngineRequest request) {
+        if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(request.getLanguage())) {
+            return SecureJavascriptUtil.evaluateScript(request.getVariableContainer(), request.getScript());
         } else {
-            return super.evaluateScript(variableScope, scriptingEngines, language, script);
+            return super.evaluateScript(engines, request);
         }
     }
 }

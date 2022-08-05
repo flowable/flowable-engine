@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,47 +57,31 @@ public class ScriptingEngines {
         cachedEngines = new HashMap<>();
     }
 
-    public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
-        scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
-        return this;
-    }
-
-    public void setScriptEngineFactories(List<ScriptEngineFactory> scriptEngineFactories) {
-        if (scriptEngineFactories != null) {
-            for (ScriptEngineFactory scriptEngineFactory : scriptEngineFactories) {
-                scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
-            }
-        }
-    }
-
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer) {
-        Bindings bindings = createBindings(variableContainer);
-        Object result = evaluate(script, language, bindings);
-
+    public ScriptEvaluation evaluate(ScriptEngineRequest request) {
+        Bindings bindings = createBindings(request);
+        Object result = evaluate(request.getScript(), request.getLanguage(), bindings);
         return new ScriptEvaluationImpl(bindings, result);
     }
 
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        Bindings bindings = createBindings(variableContainer, storeScriptVariables);
-        Object result = evaluate(script, language, bindings);
-
-        return new ScriptEvaluationImpl(bindings, result);
-    }
-
+    /**
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
+     */
+    @Deprecated
     public Object evaluate(String script, String language, VariableContainer variableContainer) {
-        return evaluateWithEvaluationResult(script, language, variableContainer).getResult();
+        return evaluate(script, language, variableContainer, false);
     }
 
-    public Object evaluate(String script, String language, VariableContainer variableScope, boolean storeScriptVariables) {
-        return evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables).getResult();
-    }
-
-    public void setCacheScriptingEngines(boolean cacheScriptingEngines) {
-        this.cacheScriptingEngines = cacheScriptingEngines;
-    }
-
-    public boolean isCacheScriptingEngines() {
-        return cacheScriptingEngines;
+    /**
+     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
+     */
+    @Deprecated
+    public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(script)
+                .language(language)
+                .variableContainer(variableContainer);
+        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
+        return evaluate(builder.build()).getResult();
     }
 
     protected Object evaluate(String script, String language, Bindings bindings) {
@@ -166,14 +150,11 @@ public class ScriptingEngines {
         return scriptEngine;
     }
 
-    /** override to build a spring aware ScriptingEngines */
-    protected Bindings createBindings(VariableContainer variableContainer) {
-        return scriptBindingsFactory.createBindings(variableContainer);
-    }
-
-    /** override to build a spring aware ScriptingEngines */
-    protected Bindings createBindings(VariableContainer variableContainer, boolean storeScriptVariables) {
-        return scriptBindingsFactory.createBindings(variableContainer, storeScriptVariables);
+    /**
+     * override to build a spring aware ScriptingEngines
+     */
+    protected Bindings createBindings(ScriptEngineRequest request) {
+        return scriptBindingsFactory.createBindings(request);
     }
 
     public ScriptBindingsFactory getScriptBindingsFactory() {
@@ -183,4 +164,26 @@ public class ScriptingEngines {
     public void setScriptBindingsFactory(ScriptBindingsFactory scriptBindingsFactory) {
         this.scriptBindingsFactory = scriptBindingsFactory;
     }
+
+    public void setScriptEngineFactories(List<ScriptEngineFactory> scriptEngineFactories) {
+        if (scriptEngineFactories != null) {
+            for (ScriptEngineFactory scriptEngineFactory : scriptEngineFactories) {
+                scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
+            }
+        }
+    }
+
+    public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
+        scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
+        return this;
+    }
+
+    public void setCacheScriptingEngines(boolean cacheScriptingEngines) {
+        this.cacheScriptingEngines = cacheScriptingEngines;
+    }
+
+    public boolean isCacheScriptingEngines() {
+        return cacheScriptingEngines;
+    }
+
 }
