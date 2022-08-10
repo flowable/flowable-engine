@@ -738,6 +738,7 @@ public class RestResponseFactory {
             result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, variableInstance.getProcessInstanceId()));
         }
         result.setTaskId(variableInstance.getTaskId());
+        result.setExecutionId(variableInstance.getExecutionId());
 
         RestVariableScope scope;
         if (variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId())
