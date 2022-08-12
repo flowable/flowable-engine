@@ -180,6 +180,9 @@ public abstract class AbstractFlowableEngineEventListener extends AbstractFlowab
                     case PROCESS_COMPLETED_WITH_ERROR_END_EVENT:
                         processCompletedWithErrorEnd((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
+                    case PROCESS_COMPLETED_WITH_ESCALATION_END_EVENT:
+                        processCompletedWithEscalationEnd((FlowableEngineEntityEvent) flowableEngineEvent);
+                        break;
                     case PROCESS_CANCELLED:
                         processCancelled((FlowableCancelledEvent) flowableEngineEvent);
                         break;
@@ -293,6 +296,8 @@ public abstract class AbstractFlowableEngineEventListener extends AbstractFlowab
     protected void processCompletedWithTerminateEnd(FlowableEngineEntityEvent event) {}
 
     protected void processCompletedWithErrorEnd(FlowableEngineEntityEvent event) {}
+    
+    protected void processCompletedWithEscalationEnd(FlowableEngineEntityEvent event) {}
 
     protected void processCancelled(FlowableCancelledEvent event) {}
 
