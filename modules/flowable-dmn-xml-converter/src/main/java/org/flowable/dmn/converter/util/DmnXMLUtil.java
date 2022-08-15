@@ -204,6 +204,10 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void writeExtensionElements(DmnElement dmnElement, XMLStreamWriter xtw) throws Exception {
+        writeExtensionElements(dmnElement, null, xtw);
+    }
+
+    public static void writeExtensionElements(DmnElement dmnElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (writeExtensionElements(dmnElement, false, xtw)) {
             xtw.writeEndElement();
         }
