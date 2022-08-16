@@ -98,13 +98,6 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
-
-        httpPut = new HttpPut(buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE, planItem.getId(), "unexistingVariable"));
-        httpPut.setEntity(new StringEntity(requestNode.toString()));
-        response = executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
-        closeResponse(response);
-        // Check resulting instance
-
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })

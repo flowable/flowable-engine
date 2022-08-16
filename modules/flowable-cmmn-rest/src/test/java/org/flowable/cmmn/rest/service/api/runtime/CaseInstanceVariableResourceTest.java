@@ -412,6 +412,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                 .isEqualTo("{"
                         + "  name: 'binaryVariable',"
                         + "  value: null,"
+                        + "  scope: 'global'"
                         + "  type: 'binary',"
                         + "  valueUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "binaryVariable") + "'"
