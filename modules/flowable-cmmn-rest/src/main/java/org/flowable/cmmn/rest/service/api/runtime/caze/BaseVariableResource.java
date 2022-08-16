@@ -116,7 +116,7 @@ public class BaseVariableResource {
             return constructRestVariable(variableName, value, caseInstance.getId(), includeBinary, null);
         }
     }
-
+    
     protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, HttpServletResponse response) {
 
         try {
@@ -217,7 +217,7 @@ public class BaseVariableResource {
 
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
-
+    
     protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, RestVariableScope scope) {
         if (restVariable.getName() == null) {
             throw new FlowableIllegalArgumentException("Variable name is required");
@@ -236,7 +236,7 @@ public class BaseVariableResource {
     protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, String instanceId, int responseVariableType, boolean isNew) {
         return setBinaryVariable(request, instanceId, responseVariableType, isNew, RestVariableScope.GLOBAL);
     }
-
+    
     protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, String instanceId, int responseVariableType, boolean isNew,
             RestVariableScope scope) {
 
@@ -318,26 +318,6 @@ public class BaseVariableResource {
     }
 
     protected void setVariable(String instanceId, String name, Object value, RestVariableScope scope, boolean isNew) {
-        //        boolean hasVariable = hasVariableOnScope(instanceId, name, scope);
-        //        if (isNew && hasVariable) {
-        //            String message;
-        //            if (RestVariableScope.LOCAL == scope) {
-        //                message = "Variable '" + name + "' is already present on plan item instance '" + instanceId + "'.";
-        //            } else {
-        //                message = "Variable '" + name + "' is already present on case instance '" + instanceId + "'.";
-        //            }
-        //            throw new FlowableException(message);
-        //        }
-        //
-        //        if (!isNew && !hasVariable) {
-        //            String message;
-        //            if (RestVariableScope.LOCAL == scope) {
-        //                message = "Plan item instance '" + instanceId + "' does not have a variable with name: '" + name + "'.";
-        //            } else {
-        //                message = "case instance '" + instanceId + "' does not have a variable with name: '" + name + "'.";
-        //            }
-        //            throw new FlowableObjectNotFoundException(message);
-        //        }
         if (RestVariableScope.LOCAL == scope) {
             runtimeService.setLocalVariable(instanceId, name, value);
         } else {
@@ -360,7 +340,7 @@ public class BaseVariableResource {
         }
         return variableFound;
     }
-
+    
     protected void setVariable(PlanItemInstance planItemInstance, String name, Object value, RestVariableScope scope, boolean isNew) {
         runtimeService.setVariable(planItemInstance.getCaseInstanceId(), name, value);
     }
