@@ -27,6 +27,7 @@ public class DmnDefinition extends NamedElement {
     protected String namespace;
     protected String exporter;
     protected String exporterVersion;
+    protected Map<String, String> namespaceMap = new LinkedHashMap<>();
     protected List<InputData> inputData = new ArrayList<>();
     protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
     protected List<Decision> decisions = new ArrayList<>();
@@ -253,5 +254,13 @@ public class DmnDefinition extends NamedElement {
     }
     public void setExporterVersion(String exporterVersion) {
         this.exporterVersion = exporterVersion;
+    }
+
+    public Map<String, String> getNamespaces() {
+        return namespaceMap;
+    }
+
+    public void addNamespace(String prefix, String uri) {
+        namespaceMap.put(prefix, uri);
     }
 }
