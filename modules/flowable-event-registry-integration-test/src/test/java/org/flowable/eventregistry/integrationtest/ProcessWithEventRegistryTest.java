@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @BpmnJmsEventTest
 @TestPropertySource(properties = {
-        "application.test.jms-queue=test-queue"
+        "application.test.jms-queue=test-bpmn-queue"
 })
 public class ProcessWithEventRegistryTest {
     
@@ -76,7 +76,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
@@ -105,7 +105,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "456b")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"fozzie\","
                 + "    \"payload2\": 456"
                 + "}", messageProcessor -> {
@@ -129,7 +129,7 @@ public class ProcessWithEventRegistryTest {
             
             nonMatchingEventConsumer.setNonMatchingEvent(null);
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"fozzie\","
                 + "    \"payload2\": 456"
                 + "}", messageProcessor -> {
@@ -171,7 +171,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
@@ -215,7 +215,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {

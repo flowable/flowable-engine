@@ -16,7 +16,6 @@ package org.flowable.common.engine.impl.scripting;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

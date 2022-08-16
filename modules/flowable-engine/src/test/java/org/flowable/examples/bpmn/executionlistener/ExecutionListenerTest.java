@@ -32,7 +32,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.task.api.Task;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
