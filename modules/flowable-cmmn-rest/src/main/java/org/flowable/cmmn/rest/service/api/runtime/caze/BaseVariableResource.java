@@ -101,7 +101,7 @@ public class BaseVariableResource {
         return planItemInstance;
     }
 
-    public RestVariable getVariableFromRequest(CaseInstance caseInstance, String variableName, boolean includeBinary) {
+    public RestVariable getVariableFromRequest(CaseInstance caseInstance, String variableName, int variableType, boolean includeBinary) {
         Object value = null;
 
         if (caseInstance == null) {
@@ -113,16 +113,41 @@ public class BaseVariableResource {
         if (value == null) {
             throw new FlowableObjectNotFoundException("Case instance '" + caseInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstance.class);
         } else {
-            return constructRestVariable(variableName, value, caseInstance.getId(), includeBinary, null);
+            return constructRestVariable(variableName, value, caseInstance.getId(), variableType, includeBinary, null);
         }
     }
-    
-    protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, HttpServletResponse response) {
 
+    public RestVariable getVariableFromRequest(PlanItemInstance planItemInstance, String variableName, int variableType, boolean includeBinary) {
+        Object value = null;
+
+        if (planItemInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a plan item instance", CaseInstance.class);
+        }
+
+        value = runtimeService.getLocalVariable(planItemInstance.getId(), variableName);
+
+        if (value == null) {
+            throw new FlowableObjectNotFoundException(
+                    "Plan item instance '" + planItemInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.",
+                    VariableInstance.class);
+        } else {
+            return constructRestVariable(variableName, value, planItemInstance.getId(), variableType, includeBinary, null);
+        }
+    }
+
+    protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, int variableType, HttpServletResponse response) {
+        RestVariable variable = getVariableFromRequest(caseInstance, variableName, variableType, true);
+        return restVariableDataToRestResponse(variable, response);
+    }
+
+    protected byte[] getVariableDataByteArray(PlanItemInstance planItemInstance, String variableName, int variableType, HttpServletResponse response) {
+        RestVariable variable = getVariableFromRequest(planItemInstance, variableName, variableType, true);
+        return restVariableDataToRestResponse(variable, response);
+    }
+
+    protected byte[] restVariableDataToRestResponse(RestVariable variable, HttpServletResponse response) {
+        byte[] result = null;
         try {
-            byte[] result = null;
-
-            RestVariable variable = getVariableFromRequest(caseInstance, variableName, true);
             if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -138,16 +163,15 @@ public class BaseVariableResource {
             } else {
                 throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
             }
-            return result;
-
         } catch (IOException ioe) {
-            throw new FlowableException("Error getting variable " + variableName, ioe);
+            throw new FlowableException("Error getting variable " + variable.getName(), ioe);
         }
+        return result;
     }
 
-    protected RestVariable constructRestVariable(String variableName, Object value, String caseInstanceId, boolean includeBinary,
+    protected RestVariable constructRestVariable(String variableName, Object value, String caseInstanceId, int variableType, boolean includeBinary,
             RestVariableScope scope) {
-        return restResponseFactory.createRestVariable(variableName, value, scope, caseInstanceId, CmmnRestResponseFactory.VARIABLE_CASE, includeBinary);
+        return restResponseFactory.createRestVariable(variableName, value, scope, caseInstanceId, variableType, includeBinary);
     }
 
     protected List<RestVariable> processCaseVariables(CaseInstance caseInstance, int variableType) {
@@ -218,7 +242,7 @@ public class BaseVariableResource {
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
-    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, RestVariableScope scope) {
+    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, RestVariableScope scope, int variableType) {
         if (restVariable.getName() == null) {
             throw new FlowableIllegalArgumentException("Variable name is required");
         }
@@ -226,11 +250,11 @@ public class BaseVariableResource {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(instanceId, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return constructRestVariable(restVariable.getName(), actualVariableValue, instanceId, false, scope);
+        return constructRestVariable(restVariable.getName(), actualVariableValue, instanceId, variableType, false, scope);
     }
 
-    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew) {
-        return setSimpleVariable(restVariable, instanceId, isNew, RestVariableScope.GLOBAL);
+    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, int variableType) {
+        return setSimpleVariable(restVariable, instanceId, isNew, RestVariableScope.GLOBAL, variableType);
     }
 
     protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, String instanceId, int responseVariableType, boolean isNew) {

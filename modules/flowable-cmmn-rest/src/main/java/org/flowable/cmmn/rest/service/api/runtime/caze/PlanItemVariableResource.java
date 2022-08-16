@@ -24,7 +24,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -107,7 +106,7 @@ public class PlanItemVariableResource extends BaseVariableResource {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, planItem.getId(),false,RestVariable.RestVariableScope.LOCAL);
+            result = setSimpleVariable(restVariable, planItem.getId(), false, RestVariable.RestVariableScope.LOCAL, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM);
         }
         return result;
     }

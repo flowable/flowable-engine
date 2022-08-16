@@ -290,6 +290,11 @@ public final class CmmnRestUrls {
             "{1}" };
 
     /**
+     * URL template for a single case instance: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables/{1:variableName}/data</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}",
+            SEGMENT_VARIABLES, "{1}" };
+    /**
      * URL template for variable instance query: <i>cmmn-runtime/variable-instances</i>
      */
     public static final String[] URL_VARIABLE_INSTANCES = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_VARIABLE_INSTANCE_RESOURCE };
@@ -395,7 +400,7 @@ public final class CmmnRestUrls {
     public static final String[] URL_HISTORIC_CASE_INSTANCE_IDENTITY_LINKS = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS };
 
     /**
-     * URL template for historic case instance variables: <i>history/historic-case-instances/{0:caseInstanceId}/variables/{1:variableName}</i>
+     * URL template for historic case instance variables: <i>history/historic-case-instances/{0:caseInstanceId}/variables/{1:variableName}/data</i>
      */
     public static final String[] URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}",
             SEGMENT_VARIABLE_DATA };
@@ -416,7 +421,7 @@ public final class CmmnRestUrls {
     public static final String[] URL_HISTORIC_TASK_INSTANCE_IDENTITY_LINKS = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS };
 
     /**
-     * URL template for a single historic task instance: <i>history/historic-task-instances/{0:taskId}/variables/{1:variableName}</i>
+     * URL template for a single historic task instance: <i>history/historic-task-instances/{0:taskId}/variables/{1:variableName}/data</i>
      */
     public static final String[] URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_TASK_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}", SEGMENT_VARIABLE_DATA };
 

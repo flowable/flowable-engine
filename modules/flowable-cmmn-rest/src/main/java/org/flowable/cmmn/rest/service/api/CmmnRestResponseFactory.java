@@ -326,6 +326,8 @@ public class CmmnRestResponseFactory {
                     restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, id, name));
                 } else if (variableType == VARIABLE_HISTORY_CASE) {
                     restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, id, name));
+                } else if (variableType == VARIABLE_PLAN_ITEM) {
+                    restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, id, name));
                 }
             }
         }
@@ -345,7 +347,7 @@ public class CmmnRestResponseFactory {
         } else if (responseVariableType == VARIABLE_CASE) {
             restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, instanceId, name));
         } else if (responseVariableType == VARIABLE_PLAN_ITEM) {
-            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE, instanceId, name));
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, instanceId, name));
         }
 
         return restVar;
