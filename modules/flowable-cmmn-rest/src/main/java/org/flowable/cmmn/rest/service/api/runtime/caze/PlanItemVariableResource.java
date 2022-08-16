@@ -16,7 +16,6 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -24,6 +23,7 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,9 +53,6 @@ public class PlanItemVariableResource extends BaseVariableResource {
 
     @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-
-    @Autowired
-    protected CmmnMigrationService cmmnMigrationService;
 
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update a variable on a plan item", tags = { "Plan Item Instances" }, nickname = "updatePlanItemVariable",
@@ -132,7 +129,7 @@ public class PlanItemVariableResource extends BaseVariableResource {
         if (!runtimeService.hasLocalVariable(planItem.getId(), variableName)) {
             throw new FlowableObjectNotFoundException(
                     "Plan item instance '" + planItem.getId() + "' does not have a variable '" + variableName + "' in local scope",
-                    VariableInstanceEntity.class);
+                    VariableInstance.class);
         }
         runtimeService.removeLocalVariable(planItem.getId(), variableName);
     }

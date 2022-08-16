@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
@@ -25,9 +26,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Christopher Welsch
  */
-public class HasPlanItemInstanceVariableCmd implements Command<Boolean>, Serializable {
+public class HasPlanItemInstanceVariableCmd implements Command<Boolean> {
 
-    private static final long serialVersionUID = 1L;
     protected String planItemInstanceId;
     protected String variableName;
 
@@ -48,7 +48,7 @@ public class HasPlanItemInstanceVariableCmd implements Command<Boolean>, Seriali
         PlanItemInstanceEntity planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
 
         if (planItemInstance == null) {
-            throw new FlowableObjectNotFoundException("plan item instance " + planItemInstanceId + " doesn't exist", PlanItem.class);
+            throw new FlowableObjectNotFoundException("plan item instance " + planItemInstanceId + " doesn't exist", PlanItemInstance.class);
         }
         return planItemInstance.hasVariableLocal(variableName);
     }
