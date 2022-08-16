@@ -85,7 +85,7 @@ public class PlanItemVariableResource extends BaseVariableResource {
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, planItem.getId(), CmmnRestResponseFactory.VARIABLE_EXECUTION, false,
+            result = setBinaryVariable((MultipartHttpServletRequest) request, planItem.getId(), CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, false,
                     RestVariable.RestVariableScope.LOCAL);
 
             if (!result.getName().equals(variableName)) {
