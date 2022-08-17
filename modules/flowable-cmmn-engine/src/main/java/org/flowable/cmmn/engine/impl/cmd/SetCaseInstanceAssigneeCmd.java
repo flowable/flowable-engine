@@ -14,7 +14,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -37,9 +36,12 @@ public class SetCaseInstanceAssigneeCmd extends AbstractCaseInstanceIdentityLink
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL assignee identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, caseInstanceId, IdentityLinkType.ASSIGNEE);
-        getIdentityLinkService(commandContext).createScopeIdentityLink(null, caseInstanceId, ScopeTypes.CMMN,
-            assigneeUserId, null, IdentityLinkType.ASSIGNEE);
+
+        // now add the new one, but only, if it is not null, which means using the setAssignee with a null value results in the same
+        // as removeAssignee
+        createIdentityLinkType(commandContext, caseInstanceId, assigneeUserId, null, IdentityLinkType.ASSIGNEE);
         return null;
     }
 }

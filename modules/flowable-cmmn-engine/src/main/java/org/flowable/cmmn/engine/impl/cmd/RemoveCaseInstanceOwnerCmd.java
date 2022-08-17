@@ -34,6 +34,7 @@ public class RemoveCaseInstanceOwnerCmd extends AbstractCaseInstanceIdentityLink
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL owner identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, caseInstanceId, IdentityLinkType.OWNER);
         return null;
     }

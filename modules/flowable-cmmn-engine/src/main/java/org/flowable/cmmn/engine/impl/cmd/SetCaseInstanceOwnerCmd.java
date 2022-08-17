@@ -14,7 +14,6 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -37,9 +36,12 @@ public class SetCaseInstanceOwnerCmd extends AbstractCaseInstanceIdentityLinkCmd
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL owner identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, caseInstanceId, IdentityLinkType.OWNER);
-        getIdentityLinkService(commandContext).createScopeIdentityLink(null, caseInstanceId, ScopeTypes.CMMN,
-            ownerUserId, null, IdentityLinkType.OWNER);
+
+        // now add the new one, but only, if it is not null, which means using the setOwner with a null value results in the same
+        // as removeOwner
+        createIdentityLinkType(commandContext, caseInstanceId, ownerUserId, null, IdentityLinkType.OWNER);
         return null;
     }
 }

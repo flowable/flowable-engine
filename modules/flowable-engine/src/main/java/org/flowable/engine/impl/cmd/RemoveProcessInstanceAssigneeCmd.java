@@ -34,6 +34,7 @@ public class RemoveProcessInstanceAssigneeCmd extends AbstractProcessInstanceIde
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL assignee identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.ASSIGNEE);
         return null;
     }

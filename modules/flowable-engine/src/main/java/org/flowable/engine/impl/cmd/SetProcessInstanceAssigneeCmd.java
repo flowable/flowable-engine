@@ -36,8 +36,12 @@ public class SetProcessInstanceAssigneeCmd extends AbstractProcessInstanceIdenti
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL assignee identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.ASSIGNEE);
-        getIdentityLinkService(commandContext).createProcessInstanceIdentityLink(processInstanceId, assigneeUserId, null, IdentityLinkType.ASSIGNEE);
+
+        // now add the new one, but only, if it is not null, which means using the setAssignee with a null value results in the same
+        // as removeAssignee
+        createIdentityLinkType(commandContext, processInstanceId, assigneeUserId, null, IdentityLinkType.ASSIGNEE);
         return null;
     }
 }

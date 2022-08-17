@@ -15,9 +15,11 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.Assert.assertThrows;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -27,10 +29,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Wendel Kerr
+ * @author Micha Kiener
  */
 public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase {
 
@@ -204,6 +208,59 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessAssigneeChange() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setAssignee(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.setAssignee(processInstance.getId(), "denise");
+
+        identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+
+        runtimeService.removeAssignee(processInstance.getId());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessAssigneeRemovalWithEmptyUserId() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setAssignee(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.setAssignee(processInstance.getId(), null);
+
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
     public void testProcessOwner() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("IdentityLinksProcess")
@@ -224,5 +281,167 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
             .isEmpty();
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessOwnerChange() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setOwner(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.setOwner(processInstance.getId(), "denise");
+
+        identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "denise", null, processInstance.getId())
+            );
+
+
+        runtimeService.removeOwner(processInstance.getId());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessOwnerRemovalWithEmptyUserId() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setOwner(processInstance.getId(), "kermit");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId())
+            );
+
+        runtimeService.setOwner(processInstance.getId(), null);
+
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessOwnerAndAssignee() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setOwner(processInstance.getId(), "kermit");
+        runtimeService.setAssignee(processInstance.getId(), "denise");
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactlyInAnyOrder(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+        runtimeService.removeOwner(processInstance.getId());
+        identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+        runtimeService.removeAssignee(processInstance.getId());
+        assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/IdentityLinksProcess.bpmn20.xml")
+    public void testProcessOwnerAndAssigneeHistoryEntries() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("IdentityLinksProcess")
+            .start();
+
+        runtimeService.setOwner(processInstance.getId(), "kermit");
+        runtimeService.setAssignee(processInstance.getId(), "denise");
+
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactlyInAnyOrder(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+        runtimeService.removeOwner(processInstance.getId());
+        identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+        runtimeService.removeAssignee(processInstance.getId());
+        assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()))
+            .isEmpty();
+    }
+
+    @Test
+    public void testSettingOwnerWithWrongProcessId() {
+        FlowableIllegalArgumentException thrown = assertThrows(
+            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
+            FlowableIllegalArgumentException.class,
+            () -> runtimeService.setOwner("notExistingProcessInstanceId", "kermit")
+        );
+
+        assertThat(thrown.getMessage()).isEqualTo(
+            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+    }
+
+    @Test
+    public void testSettingAssigneeWithWrongProcessId() {
+        FlowableIllegalArgumentException thrown = assertThrows(
+            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
+            FlowableIllegalArgumentException.class,
+            () -> runtimeService.setAssignee("notExistingProcessInstanceId", "kermit")
+        );
+
+        assertThat(thrown.getMessage()).isEqualTo(
+            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+    }
+
+    @Test
+    public void testRemovingOwnerWithWrongProcessId() {
+        FlowableIllegalArgumentException thrown = assertThrows(
+            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
+            FlowableIllegalArgumentException.class,
+            () -> runtimeService.removeOwner("notExistingProcessInstanceId")
+        );
+
+        assertThat(thrown.getMessage()).isEqualTo(
+            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+    }
+
+    @Test
+    public void testRemovingAssigneeWithWrongProcessId() {
+        FlowableIllegalArgumentException thrown = assertThrows(
+            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
+            FlowableIllegalArgumentException.class,
+            () -> runtimeService.removeAssignee("notExistingProcessInstanceId")
+        );
+
+        assertThat(thrown.getMessage()).isEqualTo(
+            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+    }
 
 }

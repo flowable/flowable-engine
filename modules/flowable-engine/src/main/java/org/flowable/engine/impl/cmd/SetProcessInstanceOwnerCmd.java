@@ -37,8 +37,12 @@ public class SetProcessInstanceOwnerCmd extends AbstractProcessInstanceIdentityL
 
     @Override
     public Void execute(CommandContext commandContext) {
+        // remove ALL owner identity links (there should only be one of course)
         removeIdentityLinkType(commandContext, processInstanceId, IdentityLinkType.OWNER);
-        getIdentityLinkService(commandContext).createProcessInstanceIdentityLink(processInstanceId, ownerUserId, null, IdentityLinkType.OWNER);
+
+        // now add the new one, but only, if it is not null, which means using the setOwner with a null value results in the same
+        // as removeOwner
+        createIdentityLinkType(commandContext, processInstanceId, ownerUserId, null, IdentityLinkType.OWNER);
         return null;
     }
 }
