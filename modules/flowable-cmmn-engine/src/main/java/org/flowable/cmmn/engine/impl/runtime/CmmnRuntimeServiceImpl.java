@@ -59,6 +59,7 @@ import org.flowable.cmmn.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.HasPlanItemInstanceVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariablesCmd;
@@ -240,6 +241,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         return commandExecutor.execute(new HasCaseInstanceVariableCmd(caseInstanceId, variableName, false));
     }
     
+    @Override
+    public boolean hasLocalVariable(String planItemInstanceId, String variableName) {
+        return commandExecutor.execute(new HasPlanItemInstanceVariableCmd(planItemInstanceId, variableName));
+    }
+
     @Override
     public void setVariable(String caseInstanceId, String variableName, Object variableValue) {
         commandExecutor.execute(new SetVariableCmd(caseInstanceId, variableName, variableValue));

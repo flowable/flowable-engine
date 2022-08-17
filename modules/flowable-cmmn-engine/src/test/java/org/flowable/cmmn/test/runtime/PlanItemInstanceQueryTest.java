@@ -20,12 +20,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
-import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -733,7 +733,9 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
         assertThat(planItemWithDoubleValue).isNotNull();
 
+        assertThat(cmmnRuntimeService.hasLocalVariable(planItemWithStringValue.getId(), "var")).isFalse();
         cmmnRuntimeService.setLocalVariable(planItemWithStringValue.getId(), "var", "TEST");
+        assertThat(cmmnRuntimeService.hasLocalVariable(planItemWithStringValue.getId(), "var")).isTrue();
         cmmnRuntimeService.setLocalVariable(planItemWithNullValue.getId(), "var", null);
         cmmnRuntimeService.setLocalVariable(planItemWithLongValue.getId(), "var", 100L);
         cmmnRuntimeService.setLocalVariable(planItemWithDoubleValue.getId(), "var", 45.55);

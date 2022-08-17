@@ -179,6 +179,11 @@ public interface CmmnRuntimeService {
      */
     boolean hasVariable(String caseInstanceId, String variableName);
     
+    /**
+     * Check whether or not this plan item instance has local variable set with the given name.
+     */
+    boolean hasLocalVariable(String planItemInstanceId, String variableName);
+
     void setVariables(String caseInstanceId, Map<String, Object> variables);
     
     void setVariable(String caseInstanceId, String variableName, Object variableValue);
