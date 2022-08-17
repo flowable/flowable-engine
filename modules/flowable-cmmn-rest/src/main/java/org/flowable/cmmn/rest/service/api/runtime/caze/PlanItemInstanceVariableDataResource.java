@@ -46,7 +46,7 @@ public class PlanItemInstanceVariableDataResource extends BaseVariableResource {
             @ApiResponse(code = 404, message = "Indicates the requested plan item was not found or the plan item does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @ResponseBody
-    @GetMapping(value = "/cmmn-runtime/plan-item-instances/{caseInstanceId}/variables/{variableName}/data")
+    @GetMapping(value = "/cmmn-runtime/plan-item-instances/{planItemInstanceId}/variables/{variableName}/data")
     public byte[] getVariableData(@ApiParam(name = "planItemInstanceId") @PathVariable("planItemInstanceId") String planItemInstanceId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,

@@ -293,7 +293,7 @@ public final class CmmnRestUrls {
      * URL template for a single case instance: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables/{1:variableName}/data</i>
      */
     public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}",
-            SEGMENT_VARIABLES, "{1}" };
+            SEGMENT_VARIABLES, "{1}",SEGMENT_VARIABLE_DATA };
     /**
      * URL template for variable instance query: <i>cmmn-runtime/variable-instances</i>
      */

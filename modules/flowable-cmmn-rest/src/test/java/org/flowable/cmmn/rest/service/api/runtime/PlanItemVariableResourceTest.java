@@ -16,17 +16,26 @@ package org.flowable.cmmn.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
+import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -122,4 +131,68 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetBinaryVariableData() throws Exception {
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        runtimeService.setLocalVariable(planItem.getId(), "var", "This is a binary piece of text".getBytes());
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA,
+                        planItem.getId(), "var")), HttpStatus.SC_OK);
+
+        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+        closeResponse(response);
+        assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateBinaryCaseVariable() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
+                .variables(Collections.singletonMap("overlappingVariable", (Object) "processValue")).start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        runtimeService.setLocalVariable(planItem.getId(), "binaryVariable", "Initial binary value".getBytes());
+
+        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+
+        // Add name and type
+        Map<String, String> additionalFields = new HashMap<>();
+        additionalFields.put("name", "binaryVariable");
+        additionalFields.put("type", "binary");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE, planItem.getId(), "binaryVariable"));
+        httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
+        CloseableHttpResponse response = executeBinaryRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'binaryVariable',"
+                        + "  value: null,"
+                        + "  scope: 'local',"
+                        + "  type: 'binary',"
+                        + "  valueUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, planItem.getId(), "binaryVariable") + "'"
+                        + "}");
+
+        // Check actual value of variable in engine
+        Object variableValue = runtimeService.getLocalVariable(planItem.getId(), "binaryVariable");
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
 }
+
