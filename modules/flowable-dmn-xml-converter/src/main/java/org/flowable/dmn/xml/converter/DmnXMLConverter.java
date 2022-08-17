@@ -87,6 +87,14 @@ public class DmnXMLConverter implements DmnXMLConstants {
     protected static final String DMN_13_TARGET_NAMESPACE = "https://www.omg.org/spec/DMN/20191111/MODEL/";
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
+    protected static final Collection<DmnExtensionAttribute> KNOWN_DEFINITION_ATTRIBUTES = Arrays.asList(
+            new DmnExtensionAttribute(ATTRIBUTE_ID),
+            new DmnExtensionAttribute(ATTRIBUTE_NAME),
+            new DmnExtensionAttribute(ATTRIBUTE_EXPORTER),
+            new DmnExtensionAttribute(ATTRIBUTE_EXPORTER_VERSION),
+            new DmnExtensionAttribute(ATTRIBUTE_NAMESPACE)
+    );
+
     protected static final Collection<DmnExtensionAttribute> KNOWN_DECISION_ATTRIBUTES = Arrays.asList(
             new DmnExtensionAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORCE_DMN_11),
             new DmnExtensionAttribute(ATTRIBUTE_ID),
@@ -284,6 +292,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
                             model.addNamespace(prefix, xtr.getNamespaceURI(i));
                         }
                     }
+
+                    DmnXMLUtil.parseAttributes(model, xtr, KNOWN_DEFINITION_ATTRIBUTES);
                     parentElement = model;
                 } else if (ELEMENT_DECISION.equals(xtr.getLocalName())) {
 
@@ -414,6 +424,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeAttribute(DmnXMLConstants.ATTRIBUTE_EXPORTER_VERSION, model.getExporterVersion());
             }
 
+            DmnXMLUtil.writeAttributes(model, model.getNamespaces(), xtw);
             DmnXMLUtil.writeElementDescription(model, xtw);
             DmnXMLUtil.writeExtensionElements(model, model.getNamespaces(), xtw);
 

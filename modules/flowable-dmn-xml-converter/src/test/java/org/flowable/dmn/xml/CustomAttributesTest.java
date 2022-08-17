@@ -44,6 +44,12 @@ public class CustomAttributesTest extends AbstractConverterTest {
     }
 
     private void validateModel(DmnDefinition model) {
+        assertThat(model.getAttributes().get("customAttribute"))
+                .extracting(DmnExtensionAttribute::getNamespacePrefix, DmnExtensionAttribute::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("flowable", "definition"),
+                        tuple("custom", "definitionCustom")
+                );
         List<Decision> decisions = model.getDecisions();
         assertThat(decisions.get(0).getAttributes().get("customAttribute"))
                 .extracting(DmnExtensionAttribute::getNamespacePrefix, DmnExtensionAttribute::getValue)
