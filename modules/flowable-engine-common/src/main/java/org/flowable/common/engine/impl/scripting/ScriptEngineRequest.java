@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 /**
  * Request to execute a script in the scripting environment.
  * Use {@link ScriptEngineRequest#builder()} to create and configure instances.
-  */
+ */
 public class ScriptEngineRequest {
 
     protected final String language;
@@ -29,6 +29,7 @@ public class ScriptEngineRequest {
     protected final VariableContainer variableContainer;
     protected final List<Resolver> additionalResolvers;
     protected final boolean storeScriptVariables;
+    protected final ScriptTraceEnhancer traceEnhancer;
 
     /**
      * @return a new Builder instance to create a {@link ScriptEngineRequest}
@@ -47,6 +48,7 @@ public class ScriptEngineRequest {
         protected VariableContainer variableContainer;
         protected List<Resolver> additionalResolvers = new LinkedList<>();
         protected boolean storeScriptVariables;
+        protected ScriptTraceEnhancer traceEnhancer;
 
         protected Builder() {
         }
@@ -100,6 +102,18 @@ public class ScriptEngineRequest {
             return this;
         }
 
+        /**
+         * Configure an {@link ScriptTraceEnhancer}
+         * which is called, when a ScriptTrace is created.
+         * Allows to provide additional context information for a script trace by allow to "tag"
+         * the script invocation with additional meta information.
+         * Script traces are produced in case of errors and/or when a {@link ScriptTraceListener} is configured.
+         */
+        public Builder traceEnhancer(ScriptTraceEnhancer enhancer) {
+            this.traceEnhancer = enhancer;
+            return this;
+        }
+
         public ScriptEngineRequest build() {
             if (script == null || script.isEmpty()) {
                 throw new FlowableIllegalStateException("A script is required");
@@ -108,7 +122,8 @@ public class ScriptEngineRequest {
                     language,
                     variableContainer,
                     storeScriptVariables,
-                    additionalResolvers);
+                    additionalResolvers,
+                    traceEnhancer);
         }
     }
 
@@ -116,12 +131,14 @@ public class ScriptEngineRequest {
             String language,
             VariableContainer variableContainer,
             boolean storeScriptVariables,
-            List<Resolver> additionalResolvers) {
+            List<Resolver> additionalResolvers,
+            ScriptTraceEnhancer errorTraceEnhancer) {
         this.script = script;
         this.language = language;
         this.variableContainer = variableContainer;
         this.storeScriptVariables = storeScriptVariables;
         this.additionalResolvers = additionalResolvers;
+        this.traceEnhancer = errorTraceEnhancer;
     }
 
     /**
@@ -157,5 +174,13 @@ public class ScriptEngineRequest {
      */
     public List<Resolver> getAdditionalResolvers() {
         return additionalResolvers;
+    }
+
+
+    /**
+     * @see Builder#traceEnhancer(ScriptTraceEnhancer)
+     */
+    public ScriptTraceEnhancer getTraceEnhancer() {
+        return traceEnhancer;
     }
 }

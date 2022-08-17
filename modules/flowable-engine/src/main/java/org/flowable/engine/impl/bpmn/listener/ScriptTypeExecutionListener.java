@@ -35,7 +35,7 @@ public class ScriptTypeExecutionListener extends AbstractScriptEvaluator impleme
 
     @Override
     public void notify(DelegateExecution execution) {
-        evaluateScriptRequest(createScriptRequest(execution));
+        evaluateScriptRequest(createScriptRequest(execution).traceEnhancer(trace -> trace.addTraceTag("type", "executionListener")));
     }
 
 }
