@@ -1,4 +1,4 @@
-<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_ad55494e-316f-11ea-b048-da8e6afe55af" name="ForceDMN11 Collect SUM" namespace="http://www.flowable.org/dmn" xmlns:flowable="http://flowable.org/dmn" xmlns:custom="http://flowable.org/dmn-custom">
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_ad55494e-316f-11ea-b048-da8e6afe55af" name="ForceDMN11 Collect SUM" namespace="http://www.flowable.org/dmn" xmlns:flowable="http://flowable.org/dmn" xmlns:custom="http://flowable.org/dmn-custom" flowable:customAttribute="definition" custom:customAttribute="definitionCustom">
   <decision id="ForceDMN11_Collect_SUM_1" name="ForceDMN11 Collect SUM" flowable:customAttribute="decision" custom:customAttribute="decisionCustom">
     <decisionTable id="decisionTable_ad55494e-316f-11ea-b048-da8e6afe55af" hitPolicy="COLLECT" aggregation="SUM">
       <input>
