@@ -53,17 +53,17 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
-    protected Object evaluate(String script, String language, Bindings bindings) {
+    protected Object evaluate(ScriptEngineRequest request, Bindings bindings) {
         ScriptEngine scriptEngine = null;
         try {
-            scriptEngine = Extender.resolveScriptEngine(language);
+            scriptEngine = Extender.resolveScriptEngine(request.getLanguage());
         } catch (InvalidSyntaxException e) {
             throw new FlowableException("problem resolving scripting engine: " + e.getMessage(), e);
         }
 
         if (scriptEngine == null) {
-            return super.evaluate(script, language, bindings);
+            return super.evaluate(request, bindings);
         }
-        return evaluate(scriptEngine, script, bindings);
+        return evaluate(scriptEngine, request, bindings);
     }
 }

@@ -22,8 +22,10 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -94,9 +96,26 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
                 .as("Starting process should result in error in script")
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Error evaluating juel script");
+                .hasMessageContaining(
+                        "Error evaluating juel script: \"execution.setVariable(\"myVar\", scriptVar)\" of activity id: theScriptTaskWithJuel of process definition id: testErrorInScript");
     }
-    
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testErrorInScriptJavaScript() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testErrorInScript").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'TypeError: foo.substring is not a function in <eval> at line number 2' "
+                        + "Trace: scopeType=bpmn, scopeDefinitionKey=testErrorInScript, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=theScriptTaskWithJavaScript, tenantId=<empty>, type=scriptTask");
+    }
+
     @Test
     @Deployment
     public void testThrowFlowableIllegalArgumentException() {

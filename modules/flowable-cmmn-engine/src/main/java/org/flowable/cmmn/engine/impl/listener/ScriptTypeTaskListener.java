@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
@@ -60,7 +61,12 @@ public class ScriptTypeTaskListener implements TaskListener {
             throw new FlowableIllegalStateException("Script content is null or evaluated to null for taskListener of type 'script'");
         }
 
-        Object result = scriptingEngines.evaluate(script, language, delegateTask, false);
+        ScriptEngineRequest.Builder request = ScriptEngineRequest.builder()
+                .script(script)
+                .language(language)
+                .variableContainer(delegateTask)
+                .traceEnhancer(trace -> trace.addTraceTag("type", "taskListener"));
+        Object result = scriptingEngines.evaluate(request.build()).getResult();
 
         if (resultVariable != null) {
             String resultVariable = Objects.toString(this.resultVariable.getValue(delegateTask), null);

@@ -360,6 +360,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefin
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
+import org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
@@ -796,13 +797,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected Collection<ELResolver> preDefaultELResolvers;
     protected Collection<ELResolver> preBeanELResolvers;
     protected Collection<ELResolver> postDefaultELResolvers;
+    // SCRIPTING ///////////////////////////////////////////////////////
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
     protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
-
+    // END SCRIPTING
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
@@ -2500,6 +2502,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initScriptingEngines() {
         if (scriptingEngines == null) {
             scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
+            scriptingEngines.setDefaultTraceEnhancer(new ProcessEngineScriptTraceEnhancer());
         }
     }
 
@@ -3723,6 +3726,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.listenerFactory = listenerFactory;
         return this;
     }
+
 
     public BpmnParseFactory getBpmnParseFactory() {
         return bpmnParseFactory;

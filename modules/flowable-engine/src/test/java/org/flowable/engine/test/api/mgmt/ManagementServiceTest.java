@@ -104,7 +104,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             managementService.moveTimerToExecutableJob(timerJob.getId());
             managementService.executeJob(timerJob.getId());
         })
-                .isExactlyInstanceOf(FlowableException.class)
+                .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("This is an exception thrown from scriptTask");
 
         // Fetch the task to see that the exception that occurred is persisted
@@ -205,8 +205,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         String correlationId = asyncJob.getCorrelationId();
         final String asyncId = asyncJob.getId();
         assertThatThrownBy(() -> managementService.executeJob(asyncId))
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
@@ -222,8 +222,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             Job job = managementService.moveTimerToExecutableJob(jobId);
             managementService.executeJob(job.getId());
         })
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
@@ -237,8 +237,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             Job job = managementService.moveTimerToExecutableJob(jobId2);
             managementService.executeJob(jobId2);
         })
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createDeadLetterJobQuery()
                 .processInstanceId(processInstance.getId())

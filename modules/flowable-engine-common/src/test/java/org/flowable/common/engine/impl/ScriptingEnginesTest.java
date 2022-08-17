@@ -13,14 +13,22 @@
 package org.flowable.common.engine.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.flowable.common.engine.impl.scripting.CompositeScriptTraceListener;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.common.engine.impl.scripting.MapResolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
+import org.flowable.common.engine.impl.scripting.ScriptTrace;
+import org.flowable.common.engine.impl.scripting.ScriptTraceListener;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.jupiter.api.AfterEach;
@@ -123,9 +131,134 @@ public class ScriptingEnginesTest {
         assertThat(myBeanResolverFactory.getBar()).isNull();
     }
 
-   public static class MyBean {
+    @Test
+    public void expectScriptTraceEnhancersAreAppliedInCaseOfException() {
+        String script = "throw Error('MyError')";
+        engines.setDefaultTraceEnhancer(trace -> trace.addTraceTag("global", "foo"));
+
+        ScriptEngineRequest request = ScriptEngineRequest.builder()
+                .script(script)
+                .language("JavaScript")
+                .traceEnhancer(trace -> trace.addTraceTag("requestSpecific", "bar"))
+                .build();
+        assertThatThrownBy(() -> engines.evaluate(request))
+                .isInstanceOfSatisfying(FlowableScriptEvaluationException.class, ex -> {
+                    ScriptTrace errorTrace = ex.getErrorTrace();
+                    assertThat(errorTrace.getTraceTags()).containsExactly(entry("global", "foo"), entry("requestSpecific", "bar"));
+                    assertThat(ex.getMessage()).contains("MyError", "global=foo", "requestSpecific=bar");
+                });
+    }
+
+    @Test
+    public void expectScriptTraceEnhancersAreAppliedForErrorTraceListenerAndCalledForErrorsOnlyByDefault() {
+        // GIVEN
+        engines.setDefaultTraceEnhancer(trace -> trace.addTraceTag("global", "foo"));
+        List<ScriptTrace> capturedTrace = new LinkedList<>();
+        engines.setScriptErrorListener(trace -> capturedTrace.add(trace));
+
+        // WHEN
+        ScriptEngineRequest errorRequest = ScriptEngineRequest.builder()
+                .script("throw Error('MyError');")
+                .language("JavaScript")
+                .traceEnhancer(trace -> trace.addTraceTag("requestSpecific", "bar"))
+                .build();
+        assertThatThrownBy(() -> engines.evaluate(errorRequest)).isInstanceOf(FlowableScriptEvaluationException.class);
+
+        ScriptEngineRequest successRequest = ScriptEngineRequest.builder()
+                .script("var foo = 'bar';")
+                .language("JavaScript")
+                .traceEnhancer(trace -> trace.addTraceTag("requestSpecific", "bar"))
+                .build();
+        engines.evaluate(successRequest);
+
+        // THEN
+        assertThat(capturedTrace).describedAs("expected only error request to have been captured")
+                .singleElement().satisfies(c -> {
+                    assertThat(c.getTraceTags()).containsExactly(entry("global", "foo"), entry("requestSpecific", "bar"));
+                    assertThat(c.getException()).isNotNull();
+                    assertThat(c.hasException()).isTrue();
+                });
+    }
+
+    @Test
+    public void expectScriptTraceEnhancersAreAppliedForErrorTraceListenerAndCapturesAll() {
+        // GIVEN
+        engines.setDefaultTraceEnhancer(trace -> trace.addTraceTag("global", "foo"));
+        List<ScriptTrace> capturedTrace = new LinkedList<>();
+        ScriptTraceListener listener = scriptTrace -> capturedTrace.add(scriptTrace);
+        engines.setScriptErrorListener(listener);
+        engines.setScriptSuccessListener(listener);
+
+        // WHEN
+        ScriptEngineRequest errorRequest = ScriptEngineRequest.builder()
+                .script("throw Error('MyError');")
+                .language("JavaScript")
+                .traceEnhancer(trace -> trace.addTraceTag("requestSpecific", "bar"))
+                .build();
+        assertThatThrownBy(() -> engines.evaluate(errorRequest)).isInstanceOf(FlowableScriptEvaluationException.class);
+
+        ScriptEngineRequest successRequest = ScriptEngineRequest.builder()
+                .script("var foo = 'bar';")
+                .language("JavaScript")
+                // Note no additional enhancer in request
+                .build();
+        engines.evaluate(successRequest);
+
+        // THEN
+        assertThat(capturedTrace).hasSize(2);
+        assertThat(capturedTrace.get(0)).satisfies(c -> {
+            assertThat(c.getTraceTags()).containsExactly(entry("global", "foo"), entry("requestSpecific", "bar"));
+            assertThat(c.getException()).isNotNull();
+            assertThat(c.hasException()).isTrue();
+        });
+
+        assertThat(capturedTrace.get(1)).satisfies(c -> {
+            assertThat(c.getTraceTags()).containsExactly(entry("global", "foo"));
+            assertThat(c.getException()).isNull();
+            assertThat(c.hasException()).isFalse();
+        });
+    }
+
+    @Test
+    public void epxectCompoundTraceListenerAppendsAll() {
+        // GIVEN
+        engines.setDefaultTraceEnhancer(trace -> trace.addTraceTag("global", "foo"));
+        List<ScriptTrace> capturedTrace = new LinkedList<>();
+        ScriptTraceListener listener = scriptTrace -> capturedTrace.add(scriptTrace);
+        engines.setScriptErrorListener(new CompositeScriptTraceListener(Arrays.asList(listener, listener)));
+        engines.setScriptSuccessListener(new CompositeScriptTraceListener(Arrays.asList(listener, listener)));
+
+        // WHEN
+        ScriptEngineRequest errorRequest = ScriptEngineRequest.builder()
+                .script("throw Error('MyError');")
+                .language("JavaScript")
+                .build();
+        assertThatThrownBy(() -> engines.evaluate(errorRequest)).isInstanceOf(FlowableScriptEvaluationException.class);
+
+        ScriptEngineRequest successRequest = ScriptEngineRequest.builder()
+                .script("var foo = 'bar';")
+                .language("JavaScript")
+                // Note no additional enhancer in request
+                .build();
+        engines.evaluate(successRequest);
+
+        // THEN
+        assertThat(capturedTrace).hasSize(4);
+        assertThat(capturedTrace.get(0)).satisfies(c -> {
+            assertThat(c.getException()).isNotNull();
+            assertThat(c.hasException()).isTrue();
+        });
+
+        assertThat(capturedTrace.get(2)).satisfies(c -> {
+            assertThat(c.getException()).isNull();
+            assertThat(c.hasException()).isFalse();
+        });
+    }
+
+    public static class MyBean {
+
         protected String foo;
-        protected  String bar;
+        protected String bar;
 
         public String getBar() {
             return bar;

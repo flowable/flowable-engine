@@ -217,6 +217,7 @@ import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.runtime.DefaultCmmnDynamicStateManager;
 import org.flowable.cmmn.engine.impl.runtime.DynamicCmmnServiceImpl;
+import org.flowable.cmmn.engine.impl.scripting.CmmnEngineScriptTraceEnhancer;
 import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.impl.variable.CmmnAggregatedVariableType;
@@ -460,6 +461,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected int expressionCacheSize = 4096;
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
 
+    // Scripting support
     protected ScriptingEngines scriptingEngines;
     protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
@@ -1442,6 +1444,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initScriptingEngines() {
         if (scriptingEngines == null) {
             scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
+            scriptingEngines.setDefaultTraceEnhancer(new CmmnEngineScriptTraceEnhancer());
         }
     }
     

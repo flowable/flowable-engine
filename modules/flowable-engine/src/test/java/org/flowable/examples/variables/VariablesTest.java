@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.DataObject;
@@ -1959,7 +1959,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         try {
             assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<>()))
-                    .isExactlyInstanceOf(FlowableException.class);
+                    .isExactlyInstanceOf(FlowableScriptEvaluationException.class);
         } finally {
             runtimeService.deleteProcessInstance(processId, "intentional exception in script task");
         }
