@@ -64,7 +64,7 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         ObjectNode body = objectMapper.createObjectNode();
 
         body.put("name", "testLocalVar");
-        body.put("value", "testVarValue");
+        body.put("value", "newTestValue");
         body.put("type", "string");
 
         HttpPut putRequest = new HttpPut(url);
@@ -77,12 +77,12 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + "   value: 'testVarValue',"
+                        + "   value: 'newTestValue',"
                         + "   scope: 'local'"
                         + "}");
 
         // Check resulting instance
-        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("testVarValue");
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
 
     }
 

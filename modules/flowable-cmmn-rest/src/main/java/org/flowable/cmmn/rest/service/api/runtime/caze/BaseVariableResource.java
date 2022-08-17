@@ -113,6 +113,7 @@ public class BaseVariableResource {
         if (value == null) {
             throw new FlowableObjectNotFoundException("Case instance '" + caseInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstance.class);
         } else {
+            //we use null for the scope, because the extraction from request does not require the scope
             return constructRestVariable(variableName, value, caseInstance.getId(), variableType, includeBinary, null);
         }
     }
@@ -131,6 +132,7 @@ public class BaseVariableResource {
                     "Plan item instance '" + planItemInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.",
                     VariableInstance.class);
         } else {
+            //we use null for the scope, because the extraction from request does not require the scope
             return constructRestVariable(variableName, value, planItemInstance.getId(), variableType, includeBinary, null);
         }
     }
@@ -349,22 +351,6 @@ public class BaseVariableResource {
         }
     }
 
-    protected boolean hasVariableOnScope(String instanceId, String variableName, RestVariableScope scope) {
-        boolean variableFound = false;
-
-        if (scope == RestVariableScope.GLOBAL) {
-            if (runtimeService.hasVariable(instanceId, variableName)) {
-                variableFound = true;
-            }
-
-        } else if (scope == RestVariableScope.LOCAL) {
-            if (runtimeService.hasLocalVariable(instanceId, variableName)) {
-                variableFound = true;
-            }
-        }
-        return variableFound;
-    }
-    
     protected void setVariable(PlanItemInstance planItemInstance, String name, Object value, RestVariableScope scope, boolean isNew) {
         runtimeService.setVariable(planItemInstance.getCaseInstanceId(), name, value);
     }
