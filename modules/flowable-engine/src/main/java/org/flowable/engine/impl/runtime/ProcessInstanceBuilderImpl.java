@@ -256,7 +256,11 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder userIdentityLink(String identityLinkType, String user) {
         if (identityLinkType != null && user != null) {
-            userIdentityLinks(Map.of(identityLinkType, Set.of(user)));
+            Set<String> users = new HashSet<>();
+            users.add(user);
+            Map<String, Set<String>> identityLinkMap = new HashMap<>();
+            identityLinkMap.put(identityLinkType, users);
+            userIdentityLinks(identityLinkMap);
         }
         return this;
     }
@@ -275,7 +279,11 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder groupIdentityLink(String identityLinkType, String group) {
         if (identityLinkType != null && group != null) {
-            groupIdentityLinks(Map.of(identityLinkType, Set.of(group)));
+            Set<String> groups = new HashSet<>();
+            groups.add(group);
+            Map<String, Set<String>> identityLinkMap = new HashMap<>();
+            identityLinkMap.put(identityLinkType, groups);
+            groupIdentityLinks(identityLinkMap);
         }
         return this;
     }

@@ -77,8 +77,12 @@ class ProcessInstanceCreateWithIdentityLinkTest extends PluggableFlowableTestCas
     @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     void testProcessInstanceCreateWithSeveralUserLinksInBulk() {
 
+        Map<String, Set<String>> userIdentityLinks = new HashMap<>();
+        userIdentityLinks.put(IdentityLinkType.OWNER, createSet(USER_ALICE));
+        userIdentityLinks.put(CUSTOM_LINK_TYPE_1, createSet(USER_ALICE, USER_BOB));
+
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
-                        .userIdentityLinks(Map.of(IdentityLinkType.OWNER, Set.of(USER_ALICE), CUSTOM_LINK_TYPE_1, Set.of(USER_ALICE, USER_BOB)))
+                        .userIdentityLinks(userIdentityLinks)
                         .start();
 
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
@@ -92,10 +96,18 @@ class ProcessInstanceCreateWithIdentityLinkTest extends PluggableFlowableTestCas
     @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     void testProcessInstanceCreateWithSeveralUsersAndGroups() {
 
+        Map<String, Set<String>> userIdentityLinks = new HashMap<>();
+        userIdentityLinks.put(IdentityLinkType.OWNER, createSet(USER_ALICE));
+        userIdentityLinks.put(CUSTOM_LINK_TYPE_1, createSet(USER_ALICE, USER_BOB));
+
+        Map<String, Set<String>> groupIdentityLinks = new HashMap<>();
+        groupIdentityLinks.put(CUSTOM_LINK_TYPE_1, createSet(GROUP_ALPHA, GROUP_BETA));
+        groupIdentityLinks.put(CUSTOM_LINK_TYPE_2, createSet(GROUP_GAMMA));
+
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
-                        .userIdentityLinks(Map.of(IdentityLinkType.OWNER, Set.of(USER_ALICE), CUSTOM_LINK_TYPE_1, Set.of(USER_ALICE, USER_BOB)))
+                        .userIdentityLinks(userIdentityLinks)
                         .groupIdentityLink(CUSTOM_LINK_TYPE_1, GROUP_ALPHA)
-                        .groupIdentityLinks(Map.of(CUSTOM_LINK_TYPE_1, Set.of(GROUP_ALPHA, GROUP_BETA), CUSTOM_LINK_TYPE_2, Set.of(GROUP_GAMMA)))
+                        .groupIdentityLinks(groupIdentityLinks)
                         .groupIdentityLink(CUSTOM_LINK_TYPE_2, GROUP_DELTA)
                         .start();
 
@@ -117,12 +129,12 @@ class ProcessInstanceCreateWithIdentityLinkTest extends PluggableFlowableTestCas
         setContainingNull.add(null);
 
         Map<String, Set<String>> userLinksContainingNullValues = new HashMap<>();
-        userLinksContainingNullValues.put(null, Set.of(USER_ALICE));
+        userLinksContainingNullValues.put(null, createSet(USER_ALICE));
         userLinksContainingNullValues.put(CUSTOM_LINK_TYPE_2, null);
         userLinksContainingNullValues.put(CUSTOM_LINK_TYPE_3, setContainingNull);
 
         Map<String, Set<String>> groupLinksContainingNullValues = new HashMap<>();
-        groupLinksContainingNullValues.put(null, Set.of(GROUP_ALPHA));
+        groupLinksContainingNullValues.put(null, createSet(GROUP_ALPHA));
         groupLinksContainingNullValues.put(CUSTOM_LINK_TYPE_2, null);
         groupLinksContainingNullValues.put(CUSTOM_LINK_TYPE_3, setContainingNull);
 
@@ -162,5 +174,13 @@ class ProcessInstanceCreateWithIdentityLinkTest extends PluggableFlowableTestCas
                         .map(idRetriever)
                         .filter(Objects::nonNull);
         assertThat(relevantIds).containsOnly(expectedIds);
+    }
+
+    private Set<String> createSet(String... entries) {
+        Set<String> stringSet = new HashSet<>();
+        for (String entry : entries) {
+            stringSet.add(entry);
+        }
+        return stringSet;
     }
 }
