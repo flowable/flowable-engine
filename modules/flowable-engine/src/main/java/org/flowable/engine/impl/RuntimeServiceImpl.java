@@ -67,10 +67,14 @@ import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
 import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.flowable.engine.impl.cmd.RemoveProcessInstanceAssigneeCmd;
+import org.flowable.engine.impl.cmd.RemoveProcessInstanceOwnerCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessStatusCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceOwnerCmd;
 import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
@@ -482,6 +486,26 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables) {
         commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, processVariables));
+    }
+
+    @Override
+    public void setOwner(String processInstanceId, String userId) {
+        commandExecutor.execute(new SetProcessInstanceOwnerCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void removeOwner(String processInstanceId) {
+        commandExecutor.execute(new RemoveProcessInstanceOwnerCmd(processInstanceId));
+    }
+
+    @Override
+    public void setAssignee(String processInstanceId, String userId) {
+        commandExecutor.execute(new SetProcessInstanceAssigneeCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void removeAssignee(String processInstanceId) {
+        commandExecutor.execute(new RemoveProcessInstanceAssigneeCmd(processInstanceId));
     }
 
     @Override

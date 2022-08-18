@@ -59,14 +59,19 @@ import org.flowable.cmmn.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.HasPlanItemInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceAssigneeCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceOwnerCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceAssigneeCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessKeyCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessStatusCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceNameCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceOwnerCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
@@ -241,6 +246,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
     
     @Override
+    public boolean hasLocalVariable(String planItemInstanceId, String variableName) {
+        return commandExecutor.execute(new HasPlanItemInstanceVariableCmd(planItemInstanceId, variableName));
+    }
+
+    @Override
     public void setVariable(String caseInstanceId, String variableName, Object variableValue) {
         commandExecutor.execute(new SetVariableCmd(caseInstanceId, variableName, variableValue));
     }
@@ -328,6 +338,26 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<StageResponse> getStageOverview(String caseInstanceId) {
         return commandExecutor.execute(new GetStageOverviewCmd(caseInstanceId));
+    }
+
+    @Override
+    public void setOwner(String caseInstanceId, String userId) {
+        commandExecutor.execute(new SetCaseInstanceOwnerCmd(caseInstanceId, userId));
+    }
+
+    @Override
+    public void removeOwner(String caseInstanceId) {
+        commandExecutor.execute(new RemoveCaseInstanceOwnerCmd(caseInstanceId));
+    }
+
+    @Override
+    public void setAssignee(String caseInstanceId, String userId) {
+        commandExecutor.execute(new SetCaseInstanceAssigneeCmd(caseInstanceId, userId));
+    }
+
+    @Override
+    public void removeAssignee(String caseInstanceId) {
+        commandExecutor.execute(new RemoveCaseInstanceAssigneeCmd(caseInstanceId));
     }
 
     @Override

@@ -34,6 +34,9 @@ public class VariableInstanceQueryRequest {
     private List<QueryVariable> variables;
     private Boolean excludeLocalVariables;
 
+
+    private String variableScope;
+
     public Boolean getExcludeTaskVariables() {
         return excludeTaskVariables;
     }
@@ -97,5 +100,13 @@ public class VariableInstanceQueryRequest {
 
     public Boolean getExcludeLocalVariables() {
         return excludeLocalVariables;
+    }
+
+    public String getVariableScope() {
+        return variableScope;
+    }
+
+    public void setVariableScope(String variableScope) {
+        this.variableScope = variableScope;
     }
 }

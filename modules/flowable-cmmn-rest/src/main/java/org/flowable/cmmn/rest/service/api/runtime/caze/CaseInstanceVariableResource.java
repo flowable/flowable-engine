@@ -63,7 +63,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        return getVariableFromRequest(caseInstance, variableName, false);
+        return getVariableFromRequest(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, false);
     }
 
     @ApiOperation(value = "Update a single variable on a case instance", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariable",
@@ -93,7 +93,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, caseInstance, CmmnRestResponseFactory.VARIABLE_CASE, false);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, false);
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
@@ -114,7 +114,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, caseInstance, false);
+            result = setSimpleVariable(restVariable, caseInstance.getId(), false, CmmnRestResponseFactory.VARIABLE_CASE);
         }
         return result;
     }

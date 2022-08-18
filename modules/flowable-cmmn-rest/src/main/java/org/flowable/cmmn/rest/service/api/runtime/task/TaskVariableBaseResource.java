@@ -181,7 +181,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), null);
+            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK);
 
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);

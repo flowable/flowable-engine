@@ -143,7 +143,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
                 .isEqualTo("{"
                         + "  name: 'binaryVariable',"
                         + "  value: null,"
-                        + "  scope: 'local',"
+                        + "  scope: 'global',"
                         + "  type: 'binary',"
                         + "  valueUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "binaryVariable") + "'"
@@ -191,7 +191,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
                 .isEqualTo("{"
                         + "  name: 'serializableVariable',"
                         + "  value: null,"
-                        + "  scope: 'local',"
+                        + "  scope: 'global',"
                         + "  type: 'serializable',"
                         + "  valueUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                         .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "serializableVariable") + "'"
