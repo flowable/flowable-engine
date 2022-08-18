@@ -16,9 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
