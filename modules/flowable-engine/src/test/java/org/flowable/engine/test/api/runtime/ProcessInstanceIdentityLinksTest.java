@@ -14,8 +14,8 @@
 package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertThrows;
 
 import java.util.List;
 
@@ -375,73 +375,58 @@ public class ProcessInstanceIdentityLinksTest extends PluggableFlowableTestCase 
         runtimeService.setOwner(processInstance.getId(), "kermit");
         runtimeService.setAssignee(processInstance.getId(), "denise");
 
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
-        assertThat(identityLinks)
-            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
-            .containsExactlyInAnyOrder(
-                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
-                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
-            );
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+            assertThat(identityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                    tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
+                    tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+                );
+        }
 
         runtimeService.removeOwner(processInstance.getId());
-        identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
-        assertThat(identityLinks)
-            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
-            .containsExactly(
-                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
-            );
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+            assertThat(identityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactly(
+                    tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+                );
+        }
 
         runtimeService.removeAssignee(processInstance.getId());
-        assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()))
-            .isEmpty();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId()))
+                .isEmpty();
+        }
     }
 
     @Test
     public void testSettingOwnerWithWrongProcessId() {
-        FlowableIllegalArgumentException thrown = assertThrows(
-            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
-            FlowableIllegalArgumentException.class,
-            () -> runtimeService.setOwner("notExistingProcessInstanceId", "kermit")
-        );
-
-        assertThat(thrown.getMessage()).isEqualTo(
-            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+        assertThatThrownBy(() -> runtimeService.setOwner("dummy", "kermit"))
+            .isInstanceOf(FlowableIllegalArgumentException.class)
+            .hasMessage("The process instance with id 'dummy' could not be found as an active process instance.");
     }
 
     @Test
     public void testSettingAssigneeWithWrongProcessId() {
-        FlowableIllegalArgumentException thrown = assertThrows(
-            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
-            FlowableIllegalArgumentException.class,
-            () -> runtimeService.setAssignee("notExistingProcessInstanceId", "kermit")
-        );
-
-        assertThat(thrown.getMessage()).isEqualTo(
-            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+        assertThatThrownBy(() -> runtimeService.setAssignee("dummy", "kermit"))
+            .isInstanceOf(FlowableIllegalArgumentException.class)
+            .hasMessage("The process instance with id 'dummy' could not be found as an active process instance.");
     }
 
     @Test
     public void testRemovingOwnerWithWrongProcessId() {
-        FlowableIllegalArgumentException thrown = assertThrows(
-            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
-            FlowableIllegalArgumentException.class,
-            () -> runtimeService.removeOwner("notExistingProcessInstanceId")
-        );
-
-        assertThat(thrown.getMessage()).isEqualTo(
-            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+        assertThatThrownBy(() -> runtimeService.removeOwner("dummy"))
+            .isInstanceOf(FlowableIllegalArgumentException.class)
+            .hasMessage("The process instance with id 'dummy' could not be found as an active process instance.");
     }
 
     @Test
     public void testRemovingAssigneeWithWrongProcessId() {
-        FlowableIllegalArgumentException thrown = assertThrows(
-            "There must be an exception thrown, if a wrong (non-existing) process id is provided",
-            FlowableIllegalArgumentException.class,
-            () -> runtimeService.removeAssignee("notExistingProcessInstanceId")
-        );
-
-        assertThat(thrown.getMessage()).isEqualTo(
-            "The process instance with id 'notExistingProcessInstanceId' could not be found as an active process instance.");
+        assertThatThrownBy(() -> runtimeService.removeAssignee("dummy"))
+            .isInstanceOf(FlowableIllegalArgumentException.class)
+            .hasMessage("The process instance with id 'dummy' could not be found as an active process instance.");
     }
-
 }
