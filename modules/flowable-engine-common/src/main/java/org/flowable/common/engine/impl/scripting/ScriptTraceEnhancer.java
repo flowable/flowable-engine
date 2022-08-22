@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
+
 /**
  * Functional interface to enhance {@link ScriptTraceContext} information
  * with metadata
@@ -43,6 +45,13 @@ public interface ScriptTraceEnhancer {
          * etc.
          */
         ScriptTraceContext addTraceTag(String key, String value);
+
+        /**
+         * @return the variable container which shall be used to extract trace tags from
+         */
+        default VariableContainer getVariableContainer() {
+            return getRequest().getVariableContainer();
+        }
 
         /**
          * @return the processed request which lead to this script trace.
