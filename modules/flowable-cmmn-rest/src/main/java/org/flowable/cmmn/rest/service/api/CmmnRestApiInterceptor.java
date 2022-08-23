@@ -87,6 +87,8 @@ public interface CmmnRestApiInterceptor {
     
     void terminateCaseInstance(CaseInstance caseInstance);
     
+    void terminatePlanItemInstance(PlanItemInstance planItemInstance);
+
     void bulkTerminateCaseInstances(Collection<String> caseInstanceIdList);
 
     void deleteCaseInstance(CaseInstance caseInstance);

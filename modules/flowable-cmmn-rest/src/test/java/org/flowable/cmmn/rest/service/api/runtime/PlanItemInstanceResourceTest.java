@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -96,6 +97,70 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
                         + "  extraValue: null,"
                         + "  tenantId: ''"
                         + "}");
+    }
+
+    /**
+     * Test getting a single plan item instance.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testTerminatePlanItemInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItem.getId());
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        // Check resulting instance
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "  id: '" + planItem.getId() + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItem.getId()) + "',"
+                        + "  name: 'The Task',"
+                        + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                        + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItem.getCaseInstanceId()) + "',"
+                        + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                        + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItem.getCaseDefinitionId()) + "',"
+                        + "  derivedCaseDefinitionId: null,"
+                        + "  derivedCaseDefinitionUrl: null,"
+                        + "  stageInstanceId: null,"
+                        + "  stageInstanceUrl: null,"
+                        + "  planItemDefinitionId: 'theTask',"
+                        + "  planItemDefinitionType: 'humantask',"
+                        + "  state: 'active',"
+                        + "  stage: false,"
+                        + "  elementId: 'planItem1',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: '${json-unit.any-string}',"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: null,"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: null,"
+                        + "  startUserId: null,"
+                        + "  referenceId: '${json-unit.any-string}',"
+                        + "  referenceType: 'cmmn-1.1-to-cmmn-1.1-child-human-task',"
+                        + "  completable: false,"
+                        + "  entryCriterionId: null,"
+                        + "  exitCriterionId: null,"
+                        + "  formKey: null,"
+                        + "  extraValue: null,"
+                        + "  tenantId: ''"
+                        + "}");
+
+        response = executeRequest(new HttpDelete(url), HttpStatus.SC_NO_CONTENT);
+
+        response = executeRequest(new HttpDelete(url), HttpStatus.SC_NOT_FOUND);
+
     }
 
     /**

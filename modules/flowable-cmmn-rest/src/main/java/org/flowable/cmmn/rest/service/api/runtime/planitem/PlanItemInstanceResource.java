@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -92,5 +93,22 @@ public class PlanItemInstanceResource extends PlanItemInstanceBaseResource {
         } else {
             return restResponseFactory.createPlanItemInstanceResponse(planItemInstance);
         }
+    }
+
+    @ApiOperation(value = "Terminate a plan item instance", tags = { "Plan Item Instances" }, nickname = "terminatePlanItemInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the plan item instance was found and terminate. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested plan item instance was not found.")
+    })
+    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
+    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+        PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.terminatePlanItemInstance(planItemInstance);
+        }
+
+        runtimeService.terminatePlanItemInstance(planItemInstance.getId());
+        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }
