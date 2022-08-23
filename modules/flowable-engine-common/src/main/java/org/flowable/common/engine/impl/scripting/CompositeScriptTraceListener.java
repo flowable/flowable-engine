@@ -36,4 +36,8 @@ public class CompositeScriptTraceListener implements ScriptTraceListener {
             l.onScriptTrace(scriptTrace);
         }
     }
+
+    public List<ScriptTraceListener> getListeners() {
+        return listeners;
+    }
 }

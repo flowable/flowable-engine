@@ -32,7 +32,10 @@ public class CmmnEngineScriptTraceEnhancer implements ScriptTraceEnhancer {
 
     @Override
     public void enhanceScriptTrace(ScriptTraceContext scriptTrace) {
-        VariableContainer container = scriptTrace.getRequest().getVariableContainer();
+        enhanceScriptTrace(scriptTrace, scriptTrace.getVariableContainer());
+    }
+
+    protected void enhanceScriptTrace(ScriptTraceContext scriptTrace, VariableContainer container) {
         if (container instanceof Task) {
             Task task = (Task) container;
             if (ScopeTypes.CMMN.equals((task.getScopeType()))) {

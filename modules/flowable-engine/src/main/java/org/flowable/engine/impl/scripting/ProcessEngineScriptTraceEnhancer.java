@@ -30,38 +30,41 @@ public class ProcessEngineScriptTraceEnhancer implements ScriptTraceEnhancer {
     private static final String EMPTY_INDICATOR = "<empty>";
 
     @Override
-    public void enhanceScriptTrace(ScriptTraceContext scriptTrace) {
-        VariableContainer container = scriptTrace.getRequest().getVariableContainer();
+    public void enhanceScriptTrace(ScriptTraceContext context) {
+        enhanceScriptTrace(context, context.getVariableContainer());
+    }
+
+    protected void enhanceScriptTrace(ScriptTraceContext context, VariableContainer container) {
         if (container instanceof DelegateExecution) {
-            scriptTrace.addTraceTag("scopeType", ScopeTypes.BPMN);
-            DelegateExecution execution = (DelegateExecution) scriptTrace.getRequest().getVariableContainer();
-            addScopeTags(execution.getProcessDefinitionId(), scriptTrace);
-            scriptTrace.addTraceTag("subScopeDefinitionKey", execution.getCurrentActivityId());
-            addTenantId(scriptTrace, execution.getTenantId());
+            context.addTraceTag("scopeType", ScopeTypes.BPMN);
+            DelegateExecution execution = (DelegateExecution) container;
+            addScopeTags(execution.getProcessDefinitionId(), context);
+            context.addTraceTag("subScopeDefinitionKey", execution.getCurrentActivityId());
+            addTenantId(context, execution.getTenantId());
         } else if (container instanceof DelegateTask) {
-            DelegateTask task = (DelegateTask) scriptTrace.getRequest().getVariableContainer();
+            DelegateTask task = (DelegateTask) container;
             if (task.getProcessInstanceId() != null) {
-                scriptTrace.addTraceTag("scopeType", ScopeTypes.BPMN);
-                addScopeTags(task.getProcessDefinitionId(), scriptTrace);
-                scriptTrace.addTraceTag("subScopeDefinitionKey", task.getTaskDefinitionKey());
-                addTenantId(scriptTrace, task.getTenantId());
+                context.addTraceTag("scopeType", ScopeTypes.BPMN);
+                addScopeTags(task.getProcessDefinitionId(), context);
+                context.addTraceTag("subScopeDefinitionKey", task.getTaskDefinitionKey());
+                addTenantId(context, task.getTenantId());
             }
         }
     }
 
-    protected void addScopeTags(String processDefinitionId, ScriptTraceContext scriptTrace) {
+    protected void addScopeTags(String processDefinitionId, ScriptTraceContext context) {
         ProcessDefinition processDefinition = getProcessDefinition(processDefinitionId);
         if (processDefinition != null) {
-            scriptTrace.addTraceTag("scopeDefinitionKey", processDefinition.getKey());
-            scriptTrace.addTraceTag("scopeDefinitionId", processDefinition.getId());
+            context.addTraceTag("scopeDefinitionKey", processDefinition.getKey());
+            context.addTraceTag("scopeDefinitionId", processDefinition.getId());
         }
     }
 
-    protected void addTenantId(ScriptTraceContext scriptTrace, String tenantId) {
+    protected void addTenantId(ScriptTraceContext context, String tenantId) {
         if (tenantId != null && !tenantId.isEmpty()) {
-            scriptTrace.addTraceTag("tenantId", tenantId);
+            context.addTraceTag("tenantId", tenantId);
         } else {
-            scriptTrace.addTraceTag("tenantId", EMPTY_INDICATOR);
+            context.addTraceTag("tenantId", EMPTY_INDICATOR);
         }
     }
 
