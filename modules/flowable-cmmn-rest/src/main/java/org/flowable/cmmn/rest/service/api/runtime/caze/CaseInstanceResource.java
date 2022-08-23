@@ -133,7 +133,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance")
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates the case instance was found and terminate. Response body is left empty intentionally."),
+            @ApiResponse(code = 204, message = "Indicates the case instance was found and terminated. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")

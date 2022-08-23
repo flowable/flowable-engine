@@ -97,11 +97,11 @@ public class PlanItemInstanceResource extends PlanItemInstanceBaseResource {
 
     @ApiOperation(value = "Terminate a plan item instance", tags = { "Plan Item Instances" }, nickname = "terminatePlanItemInstance")
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates the plan item instance was found and terminate. Response body is left empty intentionally."),
+            @ApiResponse(code = 204, message = "Indicates the plan item instance was found and terminated. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested plan item instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
-    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+    public void terminatePlanItemInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
         PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(caseInstanceId);
 
         if (restApiInterceptor != null) {
