@@ -23,8 +23,10 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
@@ -360,5 +362,23 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         // Expect evaluation of script supports expressions for language, payload and resultVariable
         Object task2ScriptListenerResult = runtimeService.getVariable(processInstance.getId(), "task2ScriptListenerResult");
         assertThat(task2ScriptListenerResult).as("Expected 'task2ScriptListenerResult' variable in variable scope").isEqualTo("usertask2ReturnVal");
+    }
+
+    /**
+     * Tests error trace enhancement by {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer} and
+     * {@link org.flowable.engine.impl.bpmn.listener.ScriptTypeTaskListener}
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTypeScript.bpmn20.xml" })
+    public void testTaskListenerTypeScriptSyntaxErrorInScript() {
+        ProcessDefinition processDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testProcessErrorInScript")
+                .singleResult();
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcessErrorInScript"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessageContaining(
+                        "groovy script evaluation failed: 'javax.script.ScriptException: groovy.lang.MissingPropertyException: No such property: syntaxError for class: Script")
+                .hasMessageContaining("Trace: scopeType=bpmn, scopeDefinitionKey=testProcessErrorInScript, scopeDefinitionId=" + processDef.getId() + ","
+                                + " subScopeDefinitionKey=p4usertask1, tenantId=<empty>, type=taskListener");
     }
 }

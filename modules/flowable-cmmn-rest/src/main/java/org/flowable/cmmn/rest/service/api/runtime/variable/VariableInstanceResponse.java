@@ -26,7 +26,7 @@ public class VariableInstanceResponse {
     protected String caseInstanceId;
     protected String caseInstanceUrl;
     protected String taskId;
-    protected String subScopeId;
+    protected String planItemInstanceId;
     protected RestVariable variable;
 
     @ApiModelProperty(example = "14")
@@ -73,11 +73,11 @@ public class VariableInstanceResponse {
         this.variable = variable;
     }
 
-    public void setSubScopeId(String subScopeId) {
-        this.subScopeId = subScopeId;
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
     }
 
-    public String getSubScopeId() {
-        return subScopeId;
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
     }
 }

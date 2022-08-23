@@ -438,6 +438,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this.handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+	return this.handlerTypes;
+    }
+
     public Date getNow() {
         return jobServiceConfiguration.getClock().getCurrentTime();
     }

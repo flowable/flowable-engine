@@ -601,7 +601,7 @@ public class CmmnRestResponseFactory {
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, variableInstance.getScopeId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setSubScopeId(variableInstance.getSubScopeId());
+        result.setPlanItemInstanceId(variableInstance.getSubScopeId());
 
         RestVariableScope scope;
         if (variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId()) ||  variableInstance.getTaskId() != null) {

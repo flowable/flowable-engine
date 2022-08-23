@@ -51,4 +51,20 @@
         <sequenceFlow id="p3flow10" sourceRef="p3startevent1" targetRef="p3usertask1"/>
         <sequenceFlow id="p3flow12" sourceRef="p3usertask1" targetRef="p3endevent1"/>
     </process>
+
+    <process id="testProcessErrorInScript" name="testProcessErrorInScript">
+        <startEvent id="p4startevent1" name="Start"/>
+        <userTask id="p4usertask1" name="Task">
+            <extensionElements>
+                <flowable:taskListener id="myFailingTaskListener" event="create" type="script">
+                    <flowable:script language="groovy">
+                        syntaxError
+                    </flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+        <endEvent id="p4endevent1" name="End"/>
+        <sequenceFlow id="p4flow10" sourceRef="p4startevent1" targetRef="p4usertask1"/>
+        <sequenceFlow id="p4flow12" sourceRef="p4usertask1" targetRef="p4endevent1"/>
+    </process>
 </definitions>

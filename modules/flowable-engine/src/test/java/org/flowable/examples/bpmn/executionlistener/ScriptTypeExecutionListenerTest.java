@@ -18,11 +18,12 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -59,11 +60,16 @@ public class ScriptTypeExecutionListenerTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testThrowNonFlowableException() {
+        ProcessDefinition processDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("scriptExecutionListenerProcess")
+                .singleResult();
+
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptExecutionListenerProcess"))
-                .isInstanceOf(FlowableException.class)
+                .isInstanceOf(FlowableScriptEvaluationException.class)
                 .hasMessage(
-                        "problem evaluating script: java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 28")
-                .getRootCause()
+                        "JavaScript script evaluation failed: 'java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 28' "
+                                + "Trace: scopeType=bpmn, scopeDefinitionKey=scriptExecutionListenerProcess, scopeDefinitionId=" + processDef.getId() + ","
+                                + " subScopeDefinitionKey=flow1, tenantId=<empty>, type=executionListener")
+                .rootCause()
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Illegal argument in listener");
     }

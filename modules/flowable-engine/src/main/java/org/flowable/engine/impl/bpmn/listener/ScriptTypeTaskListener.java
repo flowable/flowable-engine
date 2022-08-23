@@ -42,6 +42,6 @@ public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements T
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        evaluateScriptRequest(createScriptRequest(delegateTask));
+        evaluateScriptRequest(createScriptRequest(delegateTask).traceEnhancer(trace -> trace.addTraceTag("type", "taskListener")));
     }
 }

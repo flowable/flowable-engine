@@ -24,9 +24,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
@@ -288,10 +288,16 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertCaseInstanceNotEnded(caseInstance);
     }
 
+    /**
+     * Tests {@link org.flowable.cmmn.engine.impl.scripting.CmmnEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior}
+     * contributing the expected error trace information
+     */
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(tenantId = "myTenant")
     public void testScriptThrowsNonFlowableException() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .tenantId("myTenant")
                 .caseDefinitionKey("scriptCase")
                 .start();
         assertThat(caseInstance).isNotNull();
@@ -304,12 +310,17 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         PlanItemInstance blockerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("blockerPlanItem").singleResult();
         assertThat(blockerPlanItemInstance).isNotNull();
+
+        String errorMessage =
+                "JavaScript script evaluation failed: 'java.lang.RuntimeException: Illegal argument in script in <eval> at line number 2 at column number 28'"
+                        + " Trace: scopeType=cmmn, scopeDefinitionKey=scriptCase, scopeDefinitionId=" + planItemInstance.getCaseDefinitionId() + ","
+                        + " subScopeDefinitionKey=taskA, tenantId=myTenant, type=scriptTask";
         assertThatThrownBy(() -> cmmnRuntimeService.triggerPlanItemInstance(blockerPlanItemInstance.getId()))
-            .isExactlyInstanceOf(FlowableException.class)
-            .hasMessage("problem evaluating script: java.lang.RuntimeException: Illegal argument in script in <eval> at line number 2 at column number 28")
-            .getRootCause()
-            .isExactlyInstanceOf(RuntimeException.class)
-            .hasMessage("Illegal argument in script");
+                .isExactlyInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage(errorMessage)
+                .rootCause()
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Illegal argument in script");
 
         assertCaseInstanceNotEnded(caseInstance);
     }

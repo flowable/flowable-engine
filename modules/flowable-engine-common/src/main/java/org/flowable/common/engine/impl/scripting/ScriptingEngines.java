@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Manages and provides access to JSR-223 {@link ScriptEngine ScriptEngines}.
+ *
+ * <p>
+ * ScriptEngines are attempted to be cached by default, if the ScriptEngines
+ * factory {@link ScriptEngineFactory#getParameter(String) THREADING parameter}
+ * indicates thread safe read access.
+ * </p>
+ *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Frederik Heremans
+ * @author Arthur Hupka-Merle
+ * @see ScriptEngineManager
  */
 public class ScriptingEngines {
 
@@ -47,6 +58,11 @@ public class ScriptingEngines {
     protected boolean cacheScriptingEngines = true;
     protected Map<String, ScriptEngine> cachedEngines;
 
+    protected ScriptTraceEnhancer defaultTraceEnhancer;
+
+    protected ScriptTraceListener scriptErrorListener = null;
+    protected ScriptTraceListener scriptSuccessListener = null;
+
     public ScriptingEngines(ScriptBindingsFactory scriptBindingsFactory) {
         this(new ScriptEngineManager());
         this.scriptBindingsFactory = scriptBindingsFactory;
@@ -59,7 +75,7 @@ public class ScriptingEngines {
 
     public ScriptEvaluation evaluate(ScriptEngineRequest request) {
         Bindings bindings = createBindings(request);
-        Object result = evaluate(request.getScript(), request.getLanguage(), bindings);
+        Object result = evaluate(request, bindings);
         return new ScriptEvaluationImpl(bindings, result);
     }
 
@@ -84,21 +100,53 @@ public class ScriptingEngines {
         return evaluate(builder.build()).getResult();
     }
 
-    protected Object evaluate(String script, String language, Bindings bindings) {
-        ScriptEngine scriptEngine = getEngineByName(language);
-        return evaluate(scriptEngine, script, bindings);
+    protected Object evaluate(ScriptEngineRequest request, Bindings bindings) {
+        ScriptEngine scriptEngine = getEngineByName(request.getLanguage());
+        return evaluate(scriptEngine, request, bindings);
     }
 
-    protected Object evaluate(ScriptEngine scriptEngine, String script, Bindings bindings) {
+    protected Object evaluate(ScriptEngine scriptEngine, ScriptEngineRequest request, Bindings bindings) {
+        long startNanos = System.nanoTime();
         try {
-            return scriptEngine.eval(script, bindings);
+            Object scriptResult = scriptEngine.eval(request.getScript(), bindings);
+            if (scriptSuccessListener != null) {
+                DefaultScriptTrace scriptTrace = DefaultScriptTrace.successTrace(Duration.ofNanos(System.nanoTime() - startNanos), request);
+                enhanceScriptTrace(request, scriptTrace);
+                notifyScriptTraceListener(scriptSuccessListener, scriptTrace);
+            }
+            return scriptResult;
         } catch (ScriptException e) {
+            DefaultScriptTrace scriptTrace = DefaultScriptTrace.errorTrace(Duration.ofNanos(System.nanoTime() - startNanos), request, e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Caught exception evaluating script. {}{}{}", request.getLanguage(), System.lineSeparator(),
+                        request.getScript());
+            }
+            enhanceScriptTrace(request, scriptTrace);
+            if (scriptErrorListener != null) {
+                notifyScriptTraceListener(scriptErrorListener, scriptTrace);
+            }
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             }
-            LOGGER.debug("Problem evaluating script: {}{}{}", e.getMessage(), System.lineSeparator(), script);
-            throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
+            throw new FlowableScriptEvaluationException(scriptTrace, e);
+        }
+    }
+
+    protected void notifyScriptTraceListener(ScriptTraceListener listener, ScriptTrace scriptTrace) {
+        try {
+            listener.onScriptTrace(scriptTrace);
+        } catch (Exception e) {
+            LOGGER.warn("Exception while executing scriptTraceListener: {}", e.getMessage(), e);
+        }
+    }
+
+    protected void enhanceScriptTrace(ScriptEngineRequest request, DefaultScriptTrace scriptTrace) {
+        if (defaultTraceEnhancer != null) {
+            defaultTraceEnhancer.enhanceScriptTrace(scriptTrace);
+        }
+        if (request.getTraceEnhancer() != null) {
+            request.getTraceEnhancer().enhanceScriptTrace(scriptTrace);
         }
     }
 
@@ -186,4 +234,31 @@ public class ScriptingEngines {
         return cacheScriptingEngines;
     }
 
+    public ScriptTraceEnhancer getDefaultTraceEnhancer() {
+        return defaultTraceEnhancer;
+    }
+
+    public void setDefaultTraceEnhancer(ScriptTraceEnhancer defaultTraceEnhancer) {
+        this.defaultTraceEnhancer = defaultTraceEnhancer;
+    }
+
+    public ScriptTraceListener getScriptErrorListener() {
+        return scriptErrorListener;
+    }
+
+    public void setScriptErrorListener(ScriptTraceListener scriptErrorListener) {
+        this.scriptErrorListener = scriptErrorListener;
+    }
+
+    public ScriptTraceListener getScriptSuccessListener() {
+        return scriptSuccessListener;
+    }
+
+    public void setScriptSuccessListener(ScriptTraceListener scriptSuccessListener) {
+        this.scriptSuccessListener = scriptSuccessListener;
+    }
+
+    public ScriptEngineManager getScriptEngineManager() {
+        return scriptEngineManager;
+    }
 }
