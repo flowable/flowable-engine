@@ -107,7 +107,6 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
             @ApiResponse(code = 201, message = "Indicates the case instance was found and variable is created."),
             @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found."),
-            @ApiResponse(code = 409, message = "Indicates the case instance was found but already contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
 
     })
     

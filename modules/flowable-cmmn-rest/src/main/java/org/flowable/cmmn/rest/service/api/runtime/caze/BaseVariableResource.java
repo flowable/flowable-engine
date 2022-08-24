@@ -38,6 +38,7 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVaria
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -345,6 +346,9 @@ public class BaseVariableResource {
 
     protected void setVariable(String instanceId, String name, Object value, RestVariableScope scope, boolean isNew) {
         if (RestVariableScope.LOCAL == scope) {
+            if (isNew && runtimeService.hasLocalVariable(instanceId, name)) {
+                throw new FlowableConflictException("Local variable '" + name + "' is already present on plan item instance '" + instanceId + "'.");
+            }
             runtimeService.setLocalVariable(instanceId, name, value);
         } else {
             runtimeService.setVariable(instanceId, name, value);
