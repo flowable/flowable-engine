@@ -27,6 +27,8 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
     protected String parentId;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
+    protected String ownerId;
+    protected String assigneeId;
     protected String initiatorVariableName;
     protected String overrideDefinitionTenantId;
     protected String predefinedCaseInstanceId;
@@ -37,7 +39,7 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
 
     public StartCaseInstanceBeforeContext(String businessKey, String businessStatus, String caseInstanceName, String callbackId, String callbackType,
             String referenceId, String referenceType, String parentId, Map<String, Object> variables,
-            Map<String, Object> transientVariables, String tenantId,
+            Map<String, Object> transientVariables, String tenantId, String ownerId, String assigneeId,
             String initiatorVariableName, Case caseModel, CaseDefinition caseDefinition, CmmnModel cmmnModel,
             String overrideDefinitionTenantId, String predefinedCaseInstanceId) {
 
@@ -50,6 +52,8 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
         this.parentId = parentId;
         this.transientVariables = transientVariables;
         this.tenantId = tenantId;
+        this.ownerId = ownerId;
+        this.assigneeId = assigneeId;
         this.initiatorVariableName = initiatorVariableName;
         this.overrideDefinitionTenantId = overrideDefinitionTenantId;
         this.predefinedCaseInstanceId = predefinedCaseInstanceId;
@@ -105,6 +109,14 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public String getAssigneeId() {
+        return assigneeId;
     }
 
     public void setTenantId(String tenantId) {

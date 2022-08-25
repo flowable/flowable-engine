@@ -42,6 +42,7 @@ import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceBeforeContext;
@@ -66,6 +67,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -272,7 +274,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 caseInstanceBuilder.getBusinessStatus(), caseInstanceBuilder.getName(), caseInstanceBuilder.getCallbackId(),
                 caseInstanceBuilder.getCallbackType(), caseInstanceBuilder.getReferenceId(), caseInstanceBuilder.getReferenceType(),
                 caseInstanceBuilder.getParentId(), caseInstanceBuilder.getVariables(), caseInstanceBuilder.getTransientVariables(),
-                caseInstanceBuilder.getTenantId(), caseModel.getInitiatorVariableName(), caseModel, caseDefinition, cmmnModel,
+                caseInstanceBuilder.getTenantId(), caseInstanceBuilder.getOwner(), caseInstanceBuilder.getAssignee(),
+                caseModel.getInitiatorVariableName(), caseModel, caseDefinition, cmmnModel,
                 caseInstanceBuilder.getOverrideDefinitionTenantId(), caseInstanceBuilder.getPredefinedCaseInstanceId());
 
         if (cmmnEngineConfiguration.getStartCaseInstanceInterceptor() != null) {
@@ -474,6 +477,16 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         
         caseInstanceEntityManager.insert(caseInstanceEntity);
         caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<>(1));
+
+        // initialize owner / assignee, if provided
+        if (StringUtils.isNotEmpty(instanceBeforeContext.getOwnerId())) {
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, instanceBeforeContext.getOwnerId(), null,
+                IdentityLinkType.OWNER, cmmnEngineConfiguration);
+        }
+        if (StringUtils.isNotEmpty(instanceBeforeContext.getAssigneeId())) {
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, instanceBeforeContext.getAssigneeId(), null,
+                IdentityLinkType.ASSIGNEE, cmmnEngineConfiguration);
+        }
 
         return caseInstanceEntity;
     }
