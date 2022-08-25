@@ -111,16 +111,24 @@ public class StartCaseInstanceBeforeContext extends AbstractStartCaseInstanceBef
         return tenantId;
     }
 
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
     public String getOwnerId() {
         return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public String getAssigneeId() {
         return assigneeId;
     }
 
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
+    public void setAssigneeId(String assigneeId) {
+        this.assigneeId = assigneeId;
     }
 
     public String getInitiatorVariableName() {
