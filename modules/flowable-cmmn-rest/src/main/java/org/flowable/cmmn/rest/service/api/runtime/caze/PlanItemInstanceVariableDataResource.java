@@ -50,7 +50,7 @@ public class PlanItemInstanceVariableDataResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request, HttpServletResponse response) {
 
-        PlanItemInstance planItemInstance = getPlanItemFromRequest(planItemInstanceId);
+        PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(planItemInstanceId);
         return getVariableDataByteArray(planItemInstance, variableName, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, response);
     }
 }

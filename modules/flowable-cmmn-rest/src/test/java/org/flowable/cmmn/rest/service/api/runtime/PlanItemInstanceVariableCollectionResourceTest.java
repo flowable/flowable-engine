@@ -36,16 +36,17 @@ import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 /**
- * Test for all REST-operations related to a single plan item variable resource.
+ * Test for all REST-operations related to a single plan item instance variable resource.
  *
  * @author Christopher Welsch
  */
-public class PlanItemVariableCollectionResourceTest extends BaseSpringRestTestCase {
+public class PlanItemInstanceVariableCollectionResourceTest extends BaseSpringRestTestCase {
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testCreatePlanItemInstanceVariable() throws Exception {
@@ -56,78 +57,47 @@ public class PlanItemVariableCollectionResourceTest extends BaseSpringRestTestCa
         PlanItemInstance planItem = planItems.get(0);
 
         String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLES, planItem.getId());
-        ObjectNode body = objectMapper.createObjectNode();
+        ArrayNode requestNode = objectMapper.createArrayNode();
+        ObjectNode body = requestNode.addObject();
 
         body.put("name", "testLocalVar");
         body.put("value", "newTestValue");
         body.put("type", "string");
 
         HttpPost postRequest = new HttpPost(url);
-        postRequest.setEntity(new StringEntity(body.toString()));
-        CloseableHttpResponse response = executeRequest(postRequest, HttpStatus.SC_OK);
+        postRequest.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(postRequest, HttpStatus.SC_CREATED);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo("{"
+                .isEqualTo("[{"
                         + "   value: 'newTestValue',"
                         + "   scope: 'local'"
-                        + "}");
+                        + "}]");
         // Check resulting instance
         assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testFailedVariableInstanceCreation() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+    public void testPlanItemInstanceNotFound() throws Exception {
 
-        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(planItems).hasSize(1);
-        PlanItemInstance planItem = planItems.get(0);
-        runtimeService.setLocalVariable(planItem.getId(), "testLocalVar", "newTestValue");
-
-        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLES, planItem.getId());
-        ObjectNode body = objectMapper.createObjectNode();
-
-        body.put("name", "testLocalVar");
-        body.put("value", "newTestValue");
-        body.put("type", "string");
-
-        HttpPost postRequest = new HttpPost(url);
-        postRequest.setEntity(new StringEntity(body.toString()));
-        CloseableHttpResponse response = executeRequest(postRequest, HttpStatus.SC_CONFLICT);
-
-        url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLES, planItem.getId());
-        body = objectMapper.createObjectNode();
-
-        body.put("wrongNameAttribute", "testLocalVar");
-        body.put("value", "newTestValue");
-        body.put("type", "string");
-
-        postRequest = new HttpPost(url);
-        postRequest.setEntity(new StringEntity(body.toString()));
-        response = executeRequest(postRequest, HttpStatus.SC_BAD_REQUEST);
-
-    }
-
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testPlanItemNotFound() throws Exception {
-
-        ObjectNode body = objectMapper.createObjectNode();
+        ArrayNode requestNode = objectMapper.createArrayNode();
+        ObjectNode body = requestNode.addObject();
 
         body.put("name", "testLocalVar");
         body.put("value", "newTestValue");
         body.put("type", "string");
 
         HttpPost postRequest = new HttpPost(buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLES, "notExistingTestID"));
-        postRequest.setEntity(new StringEntity(body.toString()));
+        postRequest.setEntity(new StringEntity(requestNode.toString()));
         executeRequest(postRequest, HttpStatus.SC_NOT_FOUND);
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateBinaryCaseVariable() throws Exception {
+    public void testCreateBinaryPlanItemInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
                 .variables(Collections.singletonMap("overlappingVariable", (Object) "processValue")).start();
 
