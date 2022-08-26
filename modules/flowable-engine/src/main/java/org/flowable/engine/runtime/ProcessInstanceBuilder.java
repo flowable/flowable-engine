@@ -115,6 +115,20 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder predefineProcessInstanceId(String processInstanceId);
 
     /**
+     * Set the owner of the process instance to be created to the given user id.
+     * @param userId the id of the user to become the owner of the process instance
+     * @return the process instance builder for method chaining
+     */
+    ProcessInstanceBuilder owner(String userId);
+
+    /**
+     * Set the assignee of the process instance to be created to the given user id.
+     * @param userId the id of the user to become the owner of the process instance
+     * @return the process instance builder for method chaining
+     */
+    ProcessInstanceBuilder assignee(String userId);
+
+    /**
      * Sets the process variables
      */
     ProcessInstanceBuilder variables(Map<String, Object> variables);
