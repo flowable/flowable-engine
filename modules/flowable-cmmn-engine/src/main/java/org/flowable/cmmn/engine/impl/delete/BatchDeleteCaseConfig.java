@@ -175,6 +175,10 @@ public class BatchDeleteCaseConfig {
                 case "caseInstanceIds":
                     query.caseInstanceIds(asStringSet(value));
                     break;
+                case "caseInstanceName":
+                    query.caseInstanceName(value.textValue());
+                case "caseInstanceNameLike":
+                    query.caseInstanceNameLike(value.textValue());
                 case "caseInstanceNameLikeIgnoreCase":
                     query.caseInstanceNameLikeIgnoreCase(value.textValue());
                     break;

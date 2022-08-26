@@ -479,7 +479,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public HistoricProcessInstanceQuery withJobException() {
-        this.withJobException = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withJobException = true;
+        } else {
+            this.withJobException = true;
+        }
         return this;
     }
 

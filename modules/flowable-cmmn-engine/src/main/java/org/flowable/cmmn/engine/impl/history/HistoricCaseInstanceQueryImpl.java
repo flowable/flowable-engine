@@ -1020,6 +1020,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return caseInstanceId;
     }
 
+    public String getCaseInstanceName() {
+        return caseInstanceName;
+    }
+
+    public String getCaseInstanceNameLike() {
+        return caseInstanceNameLike;
+    }
+
     public String getCaseInstanceNameLikeIgnoreCase() {
         return caseInstanceNameLikeIgnoreCase;
     }
