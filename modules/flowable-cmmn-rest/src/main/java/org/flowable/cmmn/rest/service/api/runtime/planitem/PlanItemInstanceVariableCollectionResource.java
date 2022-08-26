@@ -19,15 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
-import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.runtime.caze.BaseVariableResource;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -49,7 +45,7 @@ public class PlanItemInstanceVariableCollectionResource extends BaseVariableReso
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Create a variable on a plan item", tags = { "Plan Item Instances" }, nickname = "updatePlanItemInstanceVariable",
+    @ApiOperation(value = "Create a variable on a plan item", tags = { "Plan Item Instances" }, nickname = "createPlanItemInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
                     + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
@@ -78,7 +74,7 @@ public class PlanItemInstanceVariableCollectionResource extends BaseVariableReso
             HttpServletRequest request, HttpServletResponse response) {
 
         PlanItemInstance planItem = getPlanItemInstanceFromRequest(planItemInstanceId);
-        return  createVariable(planItem,CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, request, response);
+        return createVariable(planItem, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, request, response);
 
     }
 }

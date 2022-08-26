@@ -188,11 +188,11 @@ public class BaseVariableResource {
     }
 
     protected Object createVariable(CaseInstance caseInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(caseInstance.getId(),variableType, request, response, RestVariableScope.GLOBAL);
+        return createVariable(caseInstance.getId(), variableType, request, response, RestVariableScope.GLOBAL);
     }
 
     protected Object createVariable(PlanItemInstance planItemInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(planItemInstance.getId(),variableType, request, response, RestVariableScope.LOCAL);
+        return createVariable(planItemInstance.getId(), variableType, request, response, RestVariableScope.LOCAL);
     }
 
     protected Object createVariable(String instanceId, int variableType, HttpServletRequest request, HttpServletResponse response, RestVariableScope scope) {
