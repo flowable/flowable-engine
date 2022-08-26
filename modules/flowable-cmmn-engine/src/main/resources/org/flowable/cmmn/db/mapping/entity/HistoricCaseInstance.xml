@@ -597,9 +597,6 @@
               #{caseInstanceId}
             </foreach>
         </if>
-        <if test="caseInstanceNameLikeIgnoreCase != null">
-            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
-        </if>
         <if test="caseDefinitionId != null">
             and ${queryTablePrefix}CASE_DEF_ID_ = #{caseDefinitionId}
         </if>
@@ -614,6 +611,15 @@
         </if>
         <if test="withoutCaseInstanceParentId">
             and ${queryTablePrefix}PARENT_ID_ is null
+        </if>
+        <if test="caseInstanceName != null">
+            and ${queryTablePrefix}NAME_ = #{caseInstanceName}
+        </if>
+        <if test="caseInstanceNameLike != null">
+            and ${queryTablePrefix}NAME_ like #{caseInstanceNameLike}${wildcardEscapeClause}
+        </if>
+        <if test="caseInstanceNameLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
         </if>
         <if test="businessKey != null">
             and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
@@ -740,6 +746,15 @@
         </if>
         <if test="orQueryObject.withoutCaseInstanceParentId">
             or ${queryTablePrefix}PARENT_ID_ is null
+        </if>
+        <if test="orQueryObject.caseInstanceName != null">
+            or ${queryTablePrefix}NAME_ = #{orQueryObject.caseInstanceName}
+        </if>
+        <if test="orQueryObject.caseInstanceNameLike != null">
+            or ${queryTablePrefix}NAME_ like #{orQueryObject.caseInstanceNameLike}${wildcardEscapeClause}
+        </if>
+        <if test="orQueryObject.caseInstanceNameLikeIgnoreCase != null">
+            or lower(${queryTablePrefix}NAME_) LIKE lower(#{orQueryObject.caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
         </if>
         <if test="orQueryObject.businessKey != null">
             or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}

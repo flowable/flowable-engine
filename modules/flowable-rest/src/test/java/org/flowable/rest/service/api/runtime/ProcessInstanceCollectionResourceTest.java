@@ -122,6 +122,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
         String id = processInstance.getId();
         runtimeService.addUserIdentityLink(id, "kermit", "whatever");
+        runtimeService.setProcessInstanceName(processInstance.getId(), "myProcessInstance");
 
         // Test without any parameters
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION);
@@ -132,6 +133,25 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInDataResponse(url, id);
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?id=anotherId";
+        assertResultsPresentInDataResponse(url);
+        
+        // Process instance name
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?name=myProcessInstance";
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?name=otherName";
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?nameLike=" + encode("my%Instance");
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?nameLike=" + encode("other%");
+        assertResultsPresentInDataResponse(url);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?nameLikeIgnoreCase=" + encode("MY%instance");
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?nameLikeIgnoreCase=" + encode("OTHER%");
         assertResultsPresentInDataResponse(url);
 
         // Process instance business key

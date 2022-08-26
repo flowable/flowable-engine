@@ -111,6 +111,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskNameLike() != null) {
             query.taskNameLike(queryRequest.getTaskNameLike());
         }
+        if (queryRequest.getTaskNameLikeIgnoreCase() != null) {
+            query.taskNameLikeIgnoreCase(queryRequest.getTaskNameLikeIgnoreCase());
+        }
         if (queryRequest.getTaskDescription() != null) {
             query.taskDescription(queryRequest.getTaskDescription());
         }
