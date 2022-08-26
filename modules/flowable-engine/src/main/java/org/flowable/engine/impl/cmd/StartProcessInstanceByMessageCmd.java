@@ -45,19 +45,30 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
     protected String referenceId;
     protected String referenceType;
     protected String tenantId;
+    protected String ownerId;
+    protected String assigneeId;
 
     public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId) {
+        this(messageName, businessKey, processVariables, tenantId, null, null);
+    }
+
+    public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId,
+        String ownerId, String assigneeId) {
         this.messageName = messageName;
         this.businessKey = businessKey;
         this.processVariables = processVariables;
         this.tenantId = tenantId;
+        this.ownerId = ownerId;
+        this.assigneeId = assigneeId;
     }
 
     public StartProcessInstanceByMessageCmd(ProcessInstanceBuilderImpl processInstanceBuilder) {
         this(processInstanceBuilder.getMessageName(),
                 processInstanceBuilder.getBusinessKey(),
                 processInstanceBuilder.getVariables(),
-                processInstanceBuilder.getTenantId());
+                processInstanceBuilder.getTenantId(),
+                processInstanceBuilder.getOwnerId(),
+                processInstanceBuilder.getAssigneeId());
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
@@ -95,7 +106,8 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
         ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition,
-                messageName, businessKey, businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType);
+                messageName, businessKey, businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType,
+                ownerId, assigneeId);
 
         return processInstance;
     }

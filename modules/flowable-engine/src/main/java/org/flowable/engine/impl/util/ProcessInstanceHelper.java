@@ -62,6 +62,7 @@ import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -73,15 +74,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ProcessInstanceHelper {
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String businessStatus, String processInstanceName,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+            Map<String, Object> variables, Map<String, Object> transientVariables, String ownerId, String assigneeId) {
 
         return createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName, null, null,
-                variables, transientVariables, null, null, null, null, null, false);
+                variables, transientVariables, null, null, null, null, ownerId, assigneeId, null, false);
     }
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String businessStatus, String processInstanceName,
             String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables,
-            String callbackId, String callbackType, String referenceId, String referenceType, String stageInstanceId, boolean startProcessInstance) {
+            String callbackId, String callbackType, String referenceId, String referenceType, String ownerId, String assigneeId,
+            String stageInstanceId, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -109,12 +111,12 @@ public class ProcessInstanceHelper {
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, processInstanceName,
                 overrideDefinitionTenantId,
                 predefinedProcessInstanceId, initialFlowElement, process, variables, transientVariables,
-                callbackId, callbackType, referenceId, referenceType, stageInstanceId, startProcessInstance);
+                callbackId, callbackType, referenceId, referenceType, ownerId, assigneeId, stageInstanceId, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey,
             String businessStatus, Map<String, Object> variables, Map<String, Object> transientVariables, String callbackId, String callbackType,
-            String referenceId, String referenceType) {
+            String referenceId, String referenceType, String ownerId, String assigneeId) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -153,16 +155,17 @@ public class ProcessInstanceHelper {
         }
 
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, null, null, null, initialFlowElement,
-                process, variables, transientVariables, callbackId, callbackType, referenceId, referenceType, null, true);
+                process, variables, transientVariables, callbackId, callbackType, referenceId, referenceType, ownerId, assigneeId, null, true);
     }
     
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
             String businessKey, String businessStatus, String processInstanceName, FlowElement initialFlowElement, Process process,
             Map<String, Object> variables,
-            Map<String, Object> transientVariables, boolean startProcessInstance) {
+            Map<String, Object> transientVariables, String ownerId, String assigneeId, boolean startProcessInstance) {
         
         return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, businessStatus, processInstanceName, null, null,
-                initialFlowElement, process, variables, transientVariables, null, null, null, null, null, startProcessInstance);
+                initialFlowElement, process, variables, transientVariables, null, null, null, null,
+                ownerId, assigneeId, null, startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
@@ -170,7 +173,7 @@ public class ProcessInstanceHelper {
             String overrideDefinitionTenantId, String predefinedProcessInstanceId,
             FlowElement initialFlowElement, Process process,
             Map<String, Object> variables, Map<String, Object> transientVariables,
-            String callbackId, String callbackType, String referenceId, String referenceType,
+            String callbackId, String callbackType, String referenceId, String referenceType, String ownerId, String assigneeId,
             String stageInstanceId, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
@@ -190,7 +193,7 @@ public class ProcessInstanceHelper {
         
         StartProcessInstanceBeforeContext startInstanceBeforeContext = new StartProcessInstanceBeforeContext(businessKey, businessStatus, processInstanceName,
                 callbackId, callbackType, referenceId, referenceType,
-                variables, transientVariables, tenantId, initiatorVariableName, initialFlowElement.getId(),
+                variables, transientVariables, tenantId, ownerId, assigneeId, initiatorVariableName, initialFlowElement.getId(),
                 initialFlowElement, process, processDefinition, overrideDefinitionTenantId, predefinedProcessInstanceId);
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -210,6 +213,14 @@ public class ProcessInstanceHelper {
         
         if (processEngineConfiguration.isLoggingSessionEnabled()) {
             BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_PROCESS_STARTED, "Started process instance with id " + processInstance.getId(), processInstance);
+        }
+
+        // add owner and assignee identity links, if set
+        if (ownerId != null) {
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, ownerId, null, IdentityLinkType.OWNER);
+        }
+        if (assigneeId != null) {
+            IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, assigneeId, null, IdentityLinkType.ASSIGNEE);
         }
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();

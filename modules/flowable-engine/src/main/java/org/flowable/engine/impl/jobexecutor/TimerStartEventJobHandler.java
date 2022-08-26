@@ -69,7 +69,7 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
                     }
                     ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
                     processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinitionEntity, null, null, null, flowElement, process
-                            , null, null, true);
+                            , null, null, null, null, true);
                 } else {
                     new StartProcessInstanceCmd(processDefinitionEntity.getKey(), null, null, null, job.getTenantId()).execute(commandContext);
                 }
