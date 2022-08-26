@@ -48,7 +48,7 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Plan Item Instance" }, description = "Manage Plan Item Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class PlanItemVariableResource extends BaseVariableResource {
+public class PlanItemInstanceVariableResource extends BaseVariableResource {
 
     @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
@@ -80,7 +80,7 @@ public class PlanItemVariableResource extends BaseVariableResource {
     public RestVariable updateVariable(@ApiParam(name = "planItemInstanceId") @PathVariable("planItemInstanceId") String planItemInstanceId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request) {
 
-        PlanItemInstance planItem = getPlanItemFromRequest(planItemInstanceId);
+        PlanItemInstance planItem = getPlanItemInstanceFromRequest(planItemInstanceId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -123,7 +123,7 @@ public class PlanItemVariableResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletResponse response) {
 
-        PlanItemInstance planItem = getPlanItemFromRequest(planItemInstanceId);
+        PlanItemInstance planItem = getPlanItemInstanceFromRequest(planItemInstanceId);
 
         if (!runtimeService.hasLocalVariable(planItem.getId(), variableName)) {
             throw new FlowableObjectNotFoundException(
