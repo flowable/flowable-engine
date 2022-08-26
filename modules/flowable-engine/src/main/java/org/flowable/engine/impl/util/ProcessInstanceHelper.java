@@ -216,10 +216,10 @@ public class ProcessInstanceHelper {
         }
 
         // add owner and assignee identity links, if set
-        if (ownerId != null) {
+        if (startInstanceBeforeContext.getOwnerId() != null) {
             IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, ownerId, null, IdentityLinkType.OWNER);
         }
-        if (assigneeId != null) {
+        if (startInstanceBeforeContext.getAssigneeId() != null) {
             IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, assigneeId, null, IdentityLinkType.ASSIGNEE);
         }
 
