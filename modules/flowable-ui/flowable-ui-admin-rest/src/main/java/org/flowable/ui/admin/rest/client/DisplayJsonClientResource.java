@@ -253,8 +253,9 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
     protected void processProcessElements(ServerConfig config, BpmnModel pojoModel, ObjectNode displayNode, GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) throws Exception {
 
-        if (pojoModel.getLocationMap().isEmpty())
+        if (pojoModel.getLocationMap().isEmpty()) {
             return;
+        }
 
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode flowArray = objectMapper.createArrayNode();

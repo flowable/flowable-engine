@@ -101,8 +101,9 @@ public class IdmProfileResource {
             byte[] buffer = new byte[32384];
             while (true) {
                 int count = picture.getRight().read(buffer);
-                if (count == -1)
+                if (count == -1) {
                     break;
+                }
                 servletOutputStream.write(buffer, 0, count);
             }
 
