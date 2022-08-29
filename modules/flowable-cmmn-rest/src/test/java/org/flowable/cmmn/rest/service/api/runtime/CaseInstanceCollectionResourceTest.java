@@ -68,6 +68,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         identityService.setAuthenticatedUserId("kermit");
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
+                .name("myCaseInstanceName")
                 .businessKey("myBusinessKey")
                 .businessStatus("myBusinessStatus")
                 .start();
@@ -83,6 +84,25 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, id);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=anotherId";
+        assertResultsPresentInDataResponse(url);
+        
+        // Case instance name
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?name=myCaseInstanceName";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?name=anotherName";
+        assertResultsPresentInDataResponse(url);
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?nameLike=" + encode("%InstanceName");
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?nameLike=" + encode("another%");
+        assertResultsPresentInDataResponse(url);
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?nameLikeIgnoreCase=" + encode("%INSTANCEName");
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?nameLikeIgnoreCase=" + encode("ANOTHER%");
         assertResultsPresentInDataResponse(url);
 
         // Case instance business key

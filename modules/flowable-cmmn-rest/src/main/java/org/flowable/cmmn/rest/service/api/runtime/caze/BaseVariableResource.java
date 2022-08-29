@@ -38,6 +38,7 @@ import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVaria
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class BaseVariableResource {
         return caseInstance;
     }
     
-    protected PlanItemInstance getPlanItemFromRequest(String planItemInstanceId) {
+    protected PlanItemInstance getPlanItemInstanceFromRequest(String planItemInstanceId) {
         PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).singleResult();
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a plan item instance with id '" + planItemInstanceId + "'.");
@@ -187,10 +188,18 @@ public class BaseVariableResource {
     }
 
     protected Object createVariable(CaseInstance caseInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(caseInstance.getId(), variableType, request, response, RestVariableScope.GLOBAL);
+    }
+
+    protected Object createVariable(PlanItemInstance planItemInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(planItemInstance.getId(), variableType, request, response, RestVariableScope.LOCAL);
+    }
+
+    protected Object createVariable(String instanceId, int variableType, HttpServletRequest request, HttpServletResponse response, RestVariableScope scope) {
 
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, caseInstance.getId(), variableType, true);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, instanceId, variableType, true, scope);
         } else {
 
             List<RestVariable> inputVariables = new ArrayList<>();
@@ -221,11 +230,15 @@ public class BaseVariableResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, RestVariableScope.GLOBAL, caseInstance.getId(), variableType, false));
+                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, scope, instanceId, variableType, false));
             }
 
             if (!variablesToSet.isEmpty()) {
-                runtimeService.setVariables(caseInstance.getId(), variablesToSet);
+                if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM || scope == RestVariableScope.LOCAL) {
+                    runtimeService.setLocalVariables(instanceId, variablesToSet);
+                } else {
+                    runtimeService.setVariables(instanceId, variablesToSet);
+                }
             }
         }
         response.setStatus(HttpStatus.CREATED.value());
@@ -345,6 +358,10 @@ public class BaseVariableResource {
 
     protected void setVariable(String instanceId, String name, Object value, RestVariableScope scope, boolean isNew) {
         if (RestVariableScope.LOCAL == scope) {
+            //the guard is only added here, because this whole block is new
+            if (isNew && runtimeService.hasLocalVariable(instanceId, name)) {
+                throw new FlowableConflictException("Local variable '" + name + "' is already present on plan item instance '" + instanceId + "'.");
+            }
             runtimeService.setLocalVariable(instanceId, name, value);
         } else {
             runtimeService.setVariable(instanceId, name, value);

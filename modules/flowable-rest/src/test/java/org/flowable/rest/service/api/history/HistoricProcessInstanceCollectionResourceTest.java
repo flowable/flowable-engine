@@ -68,12 +68,16 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey", processVariables);
 
+        runtimeService.setProcessInstanceName(processInstance.getId(), "myProcessInstance");
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         startTime.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey2");
+        
+        runtimeService.setProcessInstanceName(processInstance2.getId(), "otherProcessInstance");
 
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES);
 
@@ -86,6 +90,15 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId() + "&finished=true", processInstance.getId());
 
         assertResultsPresentInDataResponse(url + "?processDefinitionKey=oneTaskProcess", processInstance.getId(), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceName=myProcessInstance", processInstance.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceName=otherProcessInstance", processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("%ProcessInstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("other%Instance"), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("%proceSSinstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("OTHER%Instance"), processInstance2.getId());
         
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey", processInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey2", processInstance2.getId());

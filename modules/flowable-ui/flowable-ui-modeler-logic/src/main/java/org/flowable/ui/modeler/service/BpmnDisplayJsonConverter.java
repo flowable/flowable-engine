@@ -102,8 +102,9 @@ public class BpmnDisplayJsonConverter {
             }
         }
 
-        if (pojoModel == null || pojoModel.getLocationMap().isEmpty())
+        if (pojoModel == null || pojoModel.getLocationMap().isEmpty()) {
             return;
+        }
 
         ArrayNode elementArray = objectMapper.createArrayNode();
         ArrayNode flowArray = objectMapper.createArrayNode();

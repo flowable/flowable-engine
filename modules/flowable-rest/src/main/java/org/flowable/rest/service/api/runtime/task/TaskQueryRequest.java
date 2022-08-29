@@ -30,6 +30,7 @@ public class TaskQueryRequest extends PaginateRequest {
 
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String description;
     protected String descriptionLike;
     protected Integer priority;
@@ -102,6 +103,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setNameLike(String nameLike) {
         this.nameLike = nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
+    public void setNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
     }
 
     public String getDescription() {

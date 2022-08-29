@@ -15,13 +15,21 @@ package org.flowable.form.engine.test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
 import org.flowable.form.api.FormInfo;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.junit.Test;
 
 /**
@@ -48,6 +56,123 @@ public class ProcessInstanceBuilderFormTest extends AbstractFlowableFormEngineCo
                         entry("intVar", 42L),
                         entry("form_simpleIntForm_outcome", "simple")
                 );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/form/engine/test/deployment/oneTaskProcess.bpmn20.xml",
+            "org/flowable/form/engine/test/deployment/simpleInt.form"
+    })
+    public void startProcessInstanceWithFormVariablesAndOwner() {
+        RuntimeService runtimeService = flowableRule.getProcessEngine().getRuntimeService();
+        FormInfo formInfo = formRepositoryService.getFormModelByKey("simpleIntForm");
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .formVariables(Collections.singletonMap("intVar", "42"), formInfo, "simple")
+                .owner("kermit")
+                .start()
+                .getId();
+
+        assertThat(runtimeService.getVariables(procId))
+                .containsOnly(
+                        entry("intVar", 42L),
+                        entry("form_simpleIntForm_outcome", "simple")
+                );
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(procId);
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.OWNER, "kermit", null, procId)
+            );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, getProcessEngineConfiguration())) {
+            List<HistoricIdentityLink> historicIdentityLinks = getProcessEngineConfiguration().getHistoryService().getHistoricIdentityLinksForProcessInstance(procId);
+            assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactly(
+                    tuple(IdentityLinkType.OWNER, "kermit", null, procId)
+                );
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/form/engine/test/deployment/oneTaskProcess.bpmn20.xml",
+            "org/flowable/form/engine/test/deployment/simpleInt.form"
+    })
+    public void startProcessInstanceWithFormVariablesAndAssignee() {
+        RuntimeService runtimeService = flowableRule.getProcessEngine().getRuntimeService();
+        FormInfo formInfo = formRepositoryService.getFormModelByKey("simpleIntForm");
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .formVariables(Collections.singletonMap("intVar", "42"), formInfo, "simple")
+                .assignee("kermit")
+                .start()
+                .getId();
+
+        assertThat(runtimeService.getVariables(procId))
+                .containsOnly(
+                        entry("intVar", 42L),
+                        entry("form_simpleIntForm_outcome", "simple")
+                );
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(procId);
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactly(
+                tuple(IdentityLinkType.ASSIGNEE, "kermit", null, procId)
+            );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, getProcessEngineConfiguration())) {
+            List<HistoricIdentityLink> historicIdentityLinks = getProcessEngineConfiguration().getHistoryService().getHistoricIdentityLinksForProcessInstance(procId);
+            assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactly(
+                    tuple(IdentityLinkType.ASSIGNEE, "kermit", null, procId)
+                );
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/form/engine/test/deployment/oneTaskProcess.bpmn20.xml",
+            "org/flowable/form/engine/test/deployment/simpleInt.form"
+    })
+    public void startProcessInstanceWithFormVariablesAndOwnerAndAssignee() {
+        RuntimeService runtimeService = flowableRule.getProcessEngine().getRuntimeService();
+        FormInfo formInfo = formRepositoryService.getFormModelByKey("simpleIntForm");
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .formVariables(Collections.singletonMap("intVar", "42"), formInfo, "simple")
+                .owner("kermit")
+                .assignee("denise")
+                .start()
+                .getId();
+
+        assertThat(runtimeService.getVariables(procId))
+                .containsOnly(
+                        entry("intVar", 42L),
+                        entry("form_simpleIntForm_outcome", "simple")
+                );
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(procId);
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactlyInAnyOrder(
+                tuple(IdentityLinkType.OWNER, "kermit", null, procId),
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, procId)
+            );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, getProcessEngineConfiguration())) {
+            List<HistoricIdentityLink> historicIdentityLinks = getProcessEngineConfiguration().getHistoryService().getHistoricIdentityLinksForProcessInstance(procId);
+            assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                    tuple(IdentityLinkType.OWNER, "kermit", null, procId),
+                    tuple(IdentityLinkType.ASSIGNEE, "denise", null, procId)
+                );
+        }
     }
 
     @Test

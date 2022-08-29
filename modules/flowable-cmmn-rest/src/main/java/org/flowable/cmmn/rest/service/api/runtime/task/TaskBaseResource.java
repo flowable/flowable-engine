@@ -147,6 +147,9 @@ public class TaskBaseResource {
         if (request.getNameLike() != null) {
             taskQuery.taskNameLike(request.getNameLike());
         }
+        if (request.getNameLikeIgnoreCase() != null) {
+            taskQuery.taskNameLikeIgnoreCase(request.getNameLikeIgnoreCase());
+        }
         if (request.getDescription() != null) {
             taskQuery.taskDescription(request.getDescription());
         }

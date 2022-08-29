@@ -1158,7 +1158,7 @@
         and ${queryTablePrefix}NAME_ like #{taskNameLike}${wildcardEscapeClause}
       </if>
       <if test="taskNameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like #{taskNameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
       <if test="taskNameList != null &amp;&amp; !taskNameList.empty">
         and ${queryTablePrefix}NAME_ IN

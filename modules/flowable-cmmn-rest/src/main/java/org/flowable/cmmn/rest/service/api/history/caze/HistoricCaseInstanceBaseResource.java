@@ -89,6 +89,15 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
+        if (queryRequest.getCaseInstanceName() != null) {
+            query.caseInstanceName(queryRequest.getCaseInstanceName());
+        }
+        if (queryRequest.getCaseInstanceNameLike() != null) {
+            query.caseInstanceNameLike(queryRequest.getCaseInstanceNameLike());
+        }
+        if (queryRequest.getCaseInstanceNameLikeIgnoreCase() != null) {
+            query.caseInstanceNameLikeIgnoreCase(queryRequest.getCaseInstanceNameLikeIgnoreCase());
+        }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }

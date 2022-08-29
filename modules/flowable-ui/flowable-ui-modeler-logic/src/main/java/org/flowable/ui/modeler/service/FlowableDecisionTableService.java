@@ -151,8 +151,9 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             byte[] buffer = new byte[8096];
             while (true) {
                 int count = in.read(buffer);
-                if (count == -1)
+                if (count == -1) {
                     break;
+                }
                 servletOutputStream.write(buffer, 0, count);
             }
 

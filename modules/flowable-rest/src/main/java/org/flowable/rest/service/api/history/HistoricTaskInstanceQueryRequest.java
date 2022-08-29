@@ -42,6 +42,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String executionId;
     protected String taskName;
     protected String taskNameLike;
+    protected String taskNameLikeIgnoreCase;
     protected String taskDescription;
     protected String taskDescriptionLike;
     protected String taskDefinitionKey;
@@ -200,6 +201,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskNameLike(String taskNameLike) {
         this.taskNameLike = taskNameLike;
+    }
+
+    public String getTaskNameLikeIgnoreCase() {
+        return taskNameLikeIgnoreCase;
+    }
+
+    public void setTaskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        this.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase;
     }
 
     public String getTaskDescription() {

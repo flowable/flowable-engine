@@ -50,8 +50,12 @@ public final class BreakpointRepresentation extends AbstractRepresentation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BreakpointRepresentation that = (BreakpointRepresentation) o;
 

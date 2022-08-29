@@ -85,7 +85,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
             String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES);
 
-            assertResultsPresentInDataResponse(url, 3, task.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url, 3, task.getId(), task1.getId(), task2.getId());
 
             assertResultsPresentInDataResponse(url + "?taskMinPriority=" + "0", 3, task.getId());
 
@@ -119,6 +119,15 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?taskOwnerLike=" + encode("t%"), 1, task.getId());
 
             assertResultsPresentInDataResponse(url + "?taskInvolvedUser=test", 1, task.getId());
+            
+            assertResultsPresentInDataResponse(url + "?taskName=" + encode("Task One"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskName=none");
+            
+            assertResultsPresentInDataResponse(url + "?taskNameLike=" + encode("Task%"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskNameLike=none");
+            
+            assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=" + encode("TASK%"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=NONE");
 
             assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
 
