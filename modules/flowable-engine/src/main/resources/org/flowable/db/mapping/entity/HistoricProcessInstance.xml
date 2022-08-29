@@ -850,7 +850,7 @@
         and ${queryTablePrefix}NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
   </sql>
   
@@ -981,7 +981,7 @@
         or ${queryTablePrefix}NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.nameLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
+        or lower(${queryTablePrefix}NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
   </sql>
   

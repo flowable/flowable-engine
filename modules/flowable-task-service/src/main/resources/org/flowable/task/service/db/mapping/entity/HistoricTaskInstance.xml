@@ -1158,7 +1158,7 @@
         and ${queryTablePrefix}NAME_ like #{taskNameLike}${wildcardEscapeClause}
       </if>
       <if test="taskNameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase}${wildcardEscapeClause})
+        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
       <if test="taskNameList != null &amp;&amp; !taskNameList.empty">
         and ${queryTablePrefix}NAME_ IN
@@ -1171,7 +1171,7 @@
         and lower(${queryTablePrefix}NAME_) IN
         <foreach item="taskName" index="index" collection="taskNameListIgnoreCase"
                  open="(" separator="," close=")">
-          lower(#{taskName})
+          #{taskName}
         </foreach>
       </if>
       <if test="taskParentTaskId != null">
@@ -1435,7 +1435,7 @@
         or ${queryTablePrefix}NAME_ like #{orQueryObject.taskNameLike}${wildcardEscapeClause}
       </if>
        <if test="orQueryObject.taskNameLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}NAME_) like lower(#{orQueryObject.taskNameLikeIgnoreCase}${wildcardEscapeClause})
+        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.taskNameLikeIgnoreCase}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskNameList != null &amp;&amp; !orQueryObject.taskNameList.empty">
         or ${queryTablePrefix}NAME_ IN
@@ -1448,7 +1448,7 @@
         or lower(${queryTablePrefix}NAME_) IN
         <foreach item="taskName" index="index" collection="orQueryObject.taskNameListIgnoreCase"
                  open="(" separator="," close=")">
-          lower(#{taskName})
+          #{taskName}
         </foreach>
       </if>
       <if test="orQueryObject.taskParentTaskId != null">

@@ -391,7 +391,7 @@
                 and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
             </if>
             <if test="nameLikeIgnoreCase != null">
-                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
             </if>
             <if test="businessKey != null">
                 and RES.BUSINESS_KEY_ = #{businessKey}
@@ -624,7 +624,7 @@
                         or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
                     </if>
                     <if test="orQueryObject.nameLikeIgnoreCase != null">
-                        or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause})
+                        or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
                     </if>
                     <if test="orQueryObject.businessKey != null">
                         or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
