@@ -25,6 +25,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
     protected String referenceId;
     protected String referenceType;
     protected String tenantId;
+    protected String ownerId;
+    protected String assigneeId;
     protected String initiatorVariableName;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
@@ -35,7 +37,7 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
         
     public StartProcessInstanceBeforeContext(String businessKey, String businessStatus, String processInstanceName,
             String callbackId, String callbackType, String referenceId, String referenceType,
-            Map<String, Object> variables, Map<String, Object> transientVariables, String tenantId,
+            Map<String, Object> variables, Map<String, Object> transientVariables, String tenantId, String ownerId, String assigneeId,
             String initiatorVariableName, String initialActivityId, FlowElement initialFlowElement, Process process,
             ProcessDefinition processDefinition, String overrideDefinitionTenantId, String predefinedProcessInstanceId) {
         
@@ -47,6 +49,8 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
         this.referenceId = referenceId;
         this.referenceType = referenceType;
         this.tenantId = tenantId;
+        this.ownerId = ownerId;
+        this.assigneeId = assigneeId;
         this.initiatorVariableName = initiatorVariableName;
         this.overrideDefinitionTenantId = overrideDefinitionTenantId;
         this.predefinedProcessInstanceId = predefinedProcessInstanceId;
@@ -90,6 +94,22 @@ public class StartProcessInstanceBeforeContext extends AbstractStartProcessInsta
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getAssigneeId() {
+        return assigneeId;
+    }
+
+    public void setAssigneeId(String assigneeId) {
+        this.assigneeId = assigneeId;
     }
 
     public String getInitiatorVariableName() {
