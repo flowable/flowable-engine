@@ -47,16 +47,20 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for finding and executing error handlers for BPMN Errors.
- *
+ * <p>
  * Possible error handlers include Error Intermediate Events and Error Event Sub-Processes.
  *
  * @author Tijs Rademakers
  * @author Saeid Mirzaei
  */
 public class ErrorPropagation {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPropagation.class);
 
     public static void propagateError(BpmnError error, DelegateExecution execution) {
         propagateError(error.getErrorCode(), execution);
@@ -249,16 +253,20 @@ public class ErrorPropagation {
 
         } else {
             ExecutionEntity boundaryExecution = null;
-            List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
-            for (ExecutionEntity childExecution : childExecutions) {
-                if (childExecution != null
-                        && childExecution.getActivityId() != null
-                        && childExecution.getActivityId().equals(event.getId())) {
-                    boundaryExecution = childExecution;
+            if (!parentExecution.getExecutions().isEmpty()) {
+                List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
+                for (ExecutionEntity childExecution : childExecutions) {
+                    if (childExecution != null
+                            && childExecution.getActivityId() != null
+                            && childExecution.getActivityId().equals(event.getId())) {
+                        boundaryExecution = childExecution;
+                    }
                 }
+                injectErrorContext(event, boundaryExecution, errorCode);
+                LOGGER.debug("Planing triggerExecutionOperation for boundaryExecution {} as result of error propagation for errorCode {}", boundaryExecution,
+                        errorCode);
+                CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
             }
-            injectErrorContext(event, boundaryExecution, errorCode);
-            CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
         }
     }
 

@@ -146,11 +146,6 @@ public class ContinueProcessOperation extends AbstractOperation {
     protected void executeSynchronous(FlowNode flowNode) {
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
 
-        // Execution listener: event 'start'
-        if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-        }
-
         // Create any boundary events, sub process boundary events will be created from the activity behavior
         List<ExecutionEntity> boundaryEventExecutions = null;
         List<BoundaryEvent> boundaryEvents = null;
@@ -160,16 +155,26 @@ public class ContinueProcessOperation extends AbstractOperation {
                 boundaryEventExecutions = createBoundaryEvents(boundaryEvents, execution);
             }
         }
+        // Execution listener: event 'start'
+        boolean listenerSuccessNoBpmnException = true;
+        if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
+            listenerSuccessNoBpmnException = executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+        }
 
         // Execute actual behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
 
-        if (activityBehavior != null) {
+        if (activityBehavior != null && listenerSuccessNoBpmnException) {
             executeActivityBehavior(activityBehavior, flowNode);
             executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
         } else {
             executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
-            LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
+            if (listenerSuccessNoBpmnException) {
+                LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
+            } else {
+                LOGGER.debug("Skipping activityBehavior on activity '{}' with execution {} because 'start' listener threw BpmnException", flowNode.getId(),
+                        execution.getId());
+            }
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
     }

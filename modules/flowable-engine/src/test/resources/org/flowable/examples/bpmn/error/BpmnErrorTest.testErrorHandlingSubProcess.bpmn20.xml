@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="errorHandlingSubProcess" name="errorHandlingSubProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+            </extensionElements>
+        </startEvent>
+        <scriptTask id="scriptTask4" name="Script task" scriptFormat="groovy" flowable:autoStoreVariables="false">
+            <script><![CDATA[if (execution.getVariable('throwErrorCode') != null){
+ throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorCode'));
+}]]></script>
+        </scriptTask>
+        <sequenceFlow id="sequenceFlow10" sourceRef="startnoneevent1" targetRef="scriptTask4">
+        </sequenceFlow>
+        <endEvent id="endNoneEvent2">
+        </endEvent>
+        <sequenceFlow id="sequenceFlow11" sourceRef="scriptTask4" targetRef="endNoneEvent2">
+        </sequenceFlow>
+
+        <subProcess id="eventSubprocess1" name="Error Handler" triggeredByEvent="true">
+            <startEvent id="startErrorEvent1" isInterrupting="true">
+                <errorEventDefinition flowable:errorVariableName="error_code"></errorEventDefinition>
+            </startEvent>
+            <scriptTask id="scriptTask3" name="Handle Other" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('handled_error', execution.getVariable('error_code'));]]></script>
+            </scriptTask>
+            <exclusiveGateway id="exclusive_gateway_join">
+            </exclusiveGateway>
+            <endEvent id="endNoneEvent1">
+                <extensionElements>
+                    <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+                </extensionElements>
+            </endEvent>
+            <scriptTask id="scriptTask2" name="Handle Error B" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('handled_error', execution.getVariable('error_code')+"_special");]]></script>
+            </scriptTask>
+            <scriptTask id="scriptTask1" name="Handle Error A" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('handled_error', execution.getVariable('error_code')+"_special");]]></script>
+            </scriptTask>
+            <exclusiveGateway id="exclusive_gateway_split" default="toErrorOther">
+            </exclusiveGateway>
+            <sequenceFlow id="sequenceFlow1" sourceRef="startErrorEvent1" targetRef="exclusive_gateway_split">
+            </sequenceFlow>
+            <sequenceFlow id="toErrorA" sourceRef="exclusive_gateway_split" targetRef="scriptTask1">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[${error_code eq 'ERROR_A'}]]></conditionExpression>
+            </sequenceFlow>
+            <sequenceFlow id="toErrorOther" sourceRef="exclusive_gateway_split" targetRef="scriptTask3">
+            </sequenceFlow>
+            <sequenceFlow id="sequenceFlow6" sourceRef="scriptTask2" targetRef="exclusive_gateway_join">
+            </sequenceFlow>
+            <sequenceFlow id="sequenceFlow5" sourceRef="scriptTask1" targetRef="exclusive_gateway_join">
+            </sequenceFlow>
+            <sequenceFlow id="sequenceFlow7" sourceRef="scriptTask3" targetRef="exclusive_gateway_join">
+            </sequenceFlow>
+            <sequenceFlow id="sequenceFlow8" sourceRef="exclusive_gateway_join" targetRef="endNoneEvent1">
+            </sequenceFlow>
+            <sequenceFlow id="toErrorB" sourceRef="exclusive_gateway_split" targetRef="scriptTask2">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[${error_code eq 'ERROR_B'}]]></conditionExpression>
+            </sequenceFlow>
+        </subProcess>
+
+    </process>
+
+</definitions>

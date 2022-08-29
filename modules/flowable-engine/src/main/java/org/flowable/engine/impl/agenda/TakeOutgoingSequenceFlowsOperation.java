@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
@@ -144,11 +145,14 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     }
 
     protected void handleFlowNode(FlowNode flowNode) {
-
+        boolean executionListenerSuccessNoBpmnError = true;
+        if (!execution.isProcessInstanceType()) {
+            executionListenerSuccessNoBpmnError = notifyEndListeners(flowNode);
+        }
         handleActivityEnd(flowNode);
         if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
             handleAdhocSubProcess(flowNode);
-        } else {
+        } else if (executionListenerSuccessNoBpmnError) {
             leaveFlowNode(flowNode);
         }
     }
@@ -157,11 +161,6 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         // a process instance execution can never leave a flow node, but it can pass here whilst cleaning up
         // hence the check for NOT being a process instance
         if (!execution.isProcessInstanceType()) {
-
-            if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
-            }
-
             if (execution.isActive()
                     && !flowNode.getOutgoingFlows().isEmpty()
                     && !(flowNode instanceof ParallelGateway) // Parallel gw takes care of its own history
@@ -175,7 +174,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             if (!(execution.getCurrentFlowElement() instanceof SubProcess) &&
                     !(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics())) {
-                
+
                 ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
                 CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
@@ -184,7 +183,14 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             }
         }
     }
-    
+
+    private boolean notifyEndListeners(FlowNode flowNode) {
+        if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
+            return executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+        }
+        return true;
+    }
+
     protected void leaveFlowNode(FlowNode flowNode) {
 
         LOGGER.debug("Leaving flow node {} with id '{}' by following it's {} outgoing sequenceflow",
@@ -370,8 +376,9 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 List<String> notToDeleteEvents = new ArrayList<>();
                 for (BoundaryEvent event : activity.getBoundaryEvents()) {
                     if (CollectionUtil.isNotEmpty(event.getEventDefinitions()) &&
-                            event.getEventDefinitions().get(0) instanceof CancelEventDefinition) {
-                        
+                            (event.getEventDefinitions().get(0) instanceof CancelEventDefinition ||
+                                    event.getEventDefinitions().get(0) instanceof ErrorEventDefinition)) {
+
                         notToDeleteEvents.add(event.getId());
                     }
                 }

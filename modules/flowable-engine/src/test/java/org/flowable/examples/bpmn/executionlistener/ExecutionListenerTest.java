@@ -32,6 +32,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -231,5 +232,143 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         Task task = assertDoesNotThrow(() -> taskService.createTaskQuery().singleResult(), "Only one task 'Production Manager' must be returned.");
         assertThat(task.getName()).isEqualTo("Production Manager");
         assertThat(myActions).isEqualTo("Start executionListener,ProductionManager taskListener");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchOnSubprocess.bpmn20.xml")
+    public void testThrowBpmnErrorCatchOnSubprocessStart() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorStartListener", "MY_ERROR");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("handled_error", "MY_ERROR")
+                .doesNotContainKey("_script_task");
+        assertThat(processVariables)
+                .containsEntry("handled_error", "MY_ERROR")
+                .doesNotContainKey("error_code");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchOnSubprocess.bpmn20.xml")
+    public void testThrowBpmnErrorCatchOnSubprocessEnd() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorEndListener", "MY_ERROR");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("handled_error", "MY_ERROR")
+                .containsEntry("_script_task", "executed");
+        assertThat(processVariables)
+                .containsEntry("handled_error", "MY_ERROR")
+                .containsEntry("_script_task", "executed");
+    }
+
+    @Test
+    @Deployment
+    public void testThrowBpmnErrorCatchBoundaryEventStart() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorCode", "EXECUTION_LISTENER_BPMN_ERROR");
+        vars.put("eventType", "start");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
+
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("error_handled", "true")
+                .doesNotContainKey("_script_task");
+        assertThat(processVariables)
+                .containsEntry("error_handled", "true")
+                .doesNotContainKey("_script_task");
+
+        List<HistoricTaskInstance> allTasks = historyService.createHistoricTaskInstanceQuery().list();
+        // Why is this empty? Shouldn't we have the sub-process task 'handleErrorOther' here? Same behavior on main.
+        assertThat(allTasks).isEmpty();
+    }
+
+    @Test
+    @Deployment
+    public void testThrowBpmnErrorCatchBoundaryEventEnd() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorCode", "EXECUTION_LISTENER_BPMN_ERROR");
+        vars.put("eventType", "start");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
+
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("error_handled", "true")
+                .containsEntry("_script_task", "executed");
+        assertThat(processVariables)
+                .containsEntry("error_handled", "true")
+                .containsEntry("_script_task", "executed");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml"})
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessStart() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR");
+        vars.put("direction", "subprocess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessErrorHandling", vars);
+
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("direction", "subprocess")
+                .containsEntry("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .containsEntry("error_handled", "true")
+                .doesNotContainKey("endListener");
+
+        assertThat(processVariables)
+                .containsEntry("direction", "subprocess")
+                .containsEntry("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .containsEntry("error_handled", "true")
+                .doesNotContainKey("endListener");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml"})
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessEnd() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR");
+        vars.put("direction", "subprocess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessErrorHandling", vars);
+
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables().singleResult()
+                .getProcessVariables();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("direction", "subprocess")
+                .containsEntry("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .containsEntry("error_handled", "true")
+                .containsEntry("startListener", "executed");
+
+        assertThat(processVariables)
+                .containsEntry("direction", "subprocess")
+                .containsEntry("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .containsEntry("error_handled", "true")
+                .containsEntry("startListener", "executed");
     }
 }

@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -64,17 +65,23 @@ public abstract class AbstractOperation implements Runnable {
 
     /**
      * Executes the execution listeners defined on the given element, with the given event type. Uses the {@link #execution} of this operation instance as argument for the execution listener.
+     *
+     * @return true in case of success. false when any execution listener has thrown a BPMN error.
+     * @see org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper#executeExecutionListeners(HasExecutionListeners, DelegateExecution, String)
      */
-    protected void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, String eventType) {
-        executeExecutionListeners(elementWithExecutionListeners, execution, eventType);
+    protected boolean executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, String eventType) {
+        return executeExecutionListeners(elementWithExecutionListeners, execution, eventType);
     }
 
     /**
      * Executes the execution listeners defined on the given element, with the given event type, and passing the provided execution to the {@link ExecutionListener} instances.
+     *
+     * @return true in case of success. false when any execution listener has thrown a BPMN error.
+     * @see org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper#executeExecutionListeners(HasExecutionListeners, DelegateExecution, String)
      */
-    protected void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners,
+    protected boolean executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners,
             ExecutionEntity executionEntity, String eventType) {
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
+        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
                 .executeExecutionListeners(elementWithExecutionListeners, executionEntity, eventType);
     }
 
