@@ -619,7 +619,7 @@
             and ${queryTablePrefix}NAME_ like #{caseInstanceNameLike}${wildcardEscapeClause}
         </if>
         <if test="caseInstanceNameLikeIgnoreCase != null">
-            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
+            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase})${wildcardEscapeClause}
         </if>
         <if test="businessKey != null">
             and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
@@ -754,7 +754,7 @@
             or ${queryTablePrefix}NAME_ like #{orQueryObject.caseInstanceNameLike}${wildcardEscapeClause}
         </if>
         <if test="orQueryObject.caseInstanceNameLikeIgnoreCase != null">
-            or lower(${queryTablePrefix}NAME_) LIKE lower(#{orQueryObject.caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
+            or lower(${queryTablePrefix}NAME_) LIKE lower(#{orQueryObject.caseInstanceNameLikeIgnoreCase})${wildcardEscapeClause}
         </if>
         <if test="orQueryObject.businessKey != null">
             or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}

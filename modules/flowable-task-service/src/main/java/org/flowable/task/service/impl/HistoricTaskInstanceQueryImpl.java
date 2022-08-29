@@ -760,6 +760,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery taskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        if (taskNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Task name is null");
+        }
+        
         if (inOrStatement) {
             this.currentOrQueryObject.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase.toLowerCase();
         } else {
