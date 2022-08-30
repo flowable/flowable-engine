@@ -265,6 +265,7 @@ public class ErrorPropagation {
                 injectErrorContext(event, boundaryExecution, errorCode);
                 LOGGER.debug("Planing triggerExecutionOperation for boundaryExecution {} as result of error propagation for errorCode {}", boundaryExecution,
                         errorCode);
+                boundaryExecution.setEnded(false);
                 CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
             }
         }

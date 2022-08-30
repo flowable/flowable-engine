@@ -20,7 +20,6 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
-import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
@@ -376,8 +375,8 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 List<String> notToDeleteEvents = new ArrayList<>();
                 for (BoundaryEvent event : activity.getBoundaryEvents()) {
                     if (CollectionUtil.isNotEmpty(event.getEventDefinitions()) &&
-                            (event.getEventDefinitions().get(0) instanceof CancelEventDefinition ||
-                                    event.getEventDefinitions().get(0) instanceof ErrorEventDefinition)) {
+                            (event.getEventDefinitions().get(0) instanceof CancelEventDefinition /*||
+                                    event.getEventDefinitions().get(0) instanceof ErrorEventDefinition*/)) {
 
                         notToDeleteEvents.add(event.getId());
                     }
