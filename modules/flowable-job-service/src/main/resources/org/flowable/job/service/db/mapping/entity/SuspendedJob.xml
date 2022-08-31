@@ -391,7 +391,7 @@
     </update>
     
     <update id="updateSuspendedJob" parameterType="org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl">
-        update ${prefix}ACT_RU_JOB
+        update ${prefix}ACT_RU_SUSPENDED_JOB
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.retries != retries">
