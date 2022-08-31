@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionList
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -321,7 +323,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml" })
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessStart() {
         Map<String, Object> vars = new HashMap<>();
         vars.put("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR");
@@ -347,7 +349,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml"})
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcess.bpmn20.xml" })
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessEnd() {
         Map<String, Object> vars = new HashMap<>();
         vars.put("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR");
@@ -361,14 +363,242 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance.getProcessVariables())
                 .containsEntry("direction", "subprocess")
-                .containsEntry("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
                 .containsEntry("error_handled", "true")
                 .containsEntry("startListener", "executed");
 
         assertThat(processVariables)
                 .containsEntry("direction", "subprocess")
-                .containsEntry("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
                 .containsEntry("error_handled", "true")
                 .containsEntry("startListener", "executed");
     }
+
+    @Test
+    @Deployment(resources =
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceSequential.bpmn20.xml")
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceSequentialStart() {
+        {
+            // SubProcess ExecutionListener
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .transientVariable("direction", "subprocess")
+                    .start();
+
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .hasSize(1)
+                    .doesNotContainKey("startListener_element_1")
+                    .doesNotContainKey("element_1")
+                    .doesNotContainKey("element_2")
+                    .doesNotContainKey("element_3");
+        }
+        {
+            // SubProcess Activity ExecutionListener throws BpmnError (element 2)
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("throwErrorSubProcessTaskStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .transientVariable("direction", "subprocess")
+                    .start();
+
+            // element 2 throws the exception and interrupts execution of other items.
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .containsEntry("endListener_element_1", "executed")
+                    .containsEntry("endProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .hasSize(8)
+                    .doesNotContainKeys("endProcessListener_null");
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceSequential.bpmn20.xml" })
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceSequentialEnd() {
+        {
+            // SubProcess ExecutionListener
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("direction", "subprocess")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("throwErrorSubProcessEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .start();
+
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .containsEntry("endListener_element_1", "executed")
+                    .containsEntry("endProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startListener_element_2", "executed")
+                    .containsEntry("element_2", "executed")
+                    .containsEntry("endListener_element_2", "executed")
+                    .containsEntry("endProcessListener_2", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startListener_element_3", "executed")
+                    .containsEntry("element_3", "executed")
+                    .containsEntry("endListener_element_3", "executed")
+                    .containsEntry("endProcessListener_3", "executed")
+                    .containsEntry("error_handled", "true")
+                    .hasSize(17)
+                    .doesNotContainKey("endProcessListener_null");
+        }
+        {
+            // SubProcess Activity ExecutionListener
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("direction", "subprocess")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("throwErrorSubProcessTaskEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .start();
+
+            // element 2 throws the exception and interrupts execution of other items.
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .containsEntry("endListener_element_1", "executed")
+                    .containsEntry("endProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startListener_element_2", "executed")
+                    .containsEntry("element_2", "executed")
+                    .hasSize(10)
+                    .doesNotContainKey("endProcessListener_null");
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallel.bpmn20.xml" })
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelStart() {
+        {
+            // SubProcess ExecutionListener
+            Map<String, Object> vars = new HashMap<>();
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("direction", "subprocess")
+                    .start();
+
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .hasSize(1);
+        }
+        {
+            // SubProcess Activity ExecutionListener
+            Map<String, Object> vars = new HashMap<>();
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("throwErrorSubProcessTaskStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .transientVariable("direction", "subprocess")
+                    .start();
+
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    /* This is different to sequential: Process executionListeners are executed, for all instances*/
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startProcessListener_3", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .hasSize(7)
+                    /* this is different to 'sequential'. End listeners of element_1 are NOT called, because element_2 throws the error in
+                        the start listener before the node of element_1 is left. */
+                    .doesNotContainKey("endProcessListener_null");
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallel.bpmn20.xml" })
+    public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelEnd() {
+        {
+            // SubProcess ExecutionListener
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                    .transientVariable("throwErrorSubProcessEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                    .transientVariable("direction", "subprocess")
+                    .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                    .start();
+
+            assertThat(processInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startProcessListener_3", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .containsEntry("startListener_element_2", "executed")
+                    .containsEntry("element_2", "executed")
+                    .containsEntry("startListener_element_3", "executed")
+                    .containsEntry("element_3", "executed")
+                    .containsEntry("endListener_element_1", "executed")
+                    .containsEntry("endListener_element_2", "executed")
+                    .containsEntry("endListener_element_3", "executed")
+                    .hasSize(14);
+        }
+        {
+                // SubProcess Activity ExecutionListener
+                ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
+                        .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                        .transientVariable("throwErrorSubProcessTaskEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                        .transientVariable("direction", "subprocess")
+                        .start();
+
+                // element 2 throws the exception and interrupts execution of other items.
+                assertThat(processInstance.getProcessVariables())
+                        .containsEntry("error_handled", "true")
+                        .containsEntry("startProcessListener_null", "executed")
+                        .containsEntry("startProcessListener_1", "executed")
+                        .containsEntry("startListener_element_1", "executed")
+                        .containsEntry("element_1", "executed")
+                        .containsEntry("endListener_element_1", "executed")
+                        // Those look a bit unexpected at first. But we throw the error in the endListener.
+                        // Therefore, for parallel multi instance execution the actual tasks have already been executed.
+                        .containsEntry("startProcessListener_2", "executed")
+                        .containsEntry("startListener_element_2", "executed")
+                        .containsEntry("element_2", "executed")
+                        .containsEntry("startListener_element_3", "executed")
+                        .containsEntry("startProcessListener_3", "executed")
+                        .containsEntry("element_3", "executed")
+                        .hasSize(12);
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelStart.bpmn20.xml" })
+    @Ignore("FIXME Must be fixed")
+    // FIXME does not yet work
+    public void testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelStart() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("multiInstanceTest")
+                .variables(vars)
+                .transientVariable("direction", "")
+                .transientVariable("elements", Arrays.asList("1", "2", "3")).start();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("error_handled", "true")
+                .containsEntry("startListener_element_1", "executed")
+                .containsEntry("element_1", "executed")
+                .doesNotContainKey("endListener_element_1");
+        System.out.println("PROCESS INSTANCE VARS: " + processInstance.getProcessVariables());
+    }
+
+
+    // FIXME continue adding more test cases
+    /*
+     * Add sequenceFlow executionListener tests
+     * Add asynchronous multi instance tests
+     * Add test scenario with multi instance error boundary event on activity
+     * Add test scenario with two matching error handlers
+     */
 }

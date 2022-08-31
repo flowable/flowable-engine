@@ -99,7 +99,7 @@ public class ErrorPropagation {
 
     protected static void executeCatch(Map<String, List<Event>> eventMap, DelegateExecution delegateExecution, String errorId) {
         Set<String> toDeleteProcessInstanceIds = new HashSet<>();
-
+        LOGGER.debug("Executing error catch for error={}, execution={}, eventMap={}", errorId, delegateExecution, eventMap);
         Event matchingEvent = null;
         ExecutionEntity currentExecution = (ExecutionEntity) delegateExecution;
         ExecutionEntity parentExecution = null;
@@ -230,10 +230,16 @@ public class ErrorPropagation {
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
             if (parentExecution.isProcessInstanceType()) {
+                LOGGER.debug(
+                        "Ending and deleting child executions for parent execution '{}'. Reason: Parent Execution is processIntanceType. Current Execution '{}'",
+                        parentExecution, currentExecution);
                 executionEntityManager.deleteChildExecutions(parentExecution, null, true);
             } else if (!currentExecution.getParentId().equals(parentExecution.getId())) {
+                LOGGER.debug("Planing destroyScopeOperation for execution {}. Reason: {}. Parent execution: {}", currentExecution,
+                        "Current execution parentId odes not match parentExecution id", parentExecution);
                 CommandContextUtil.getAgenda().planDestroyScopeOperation(currentExecution);
             } else {
+                LOGGER.debug("Deleting execution and related data for execution {}.", currentExecution, "Parent Execution is processIntanceType");
                 executionEntityManager.deleteExecutionAndRelatedData(currentExecution, null, false);
             }
 
@@ -244,14 +250,20 @@ public class ErrorPropagation {
                 CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(eventSubProcessExecution);
                 ExecutionEntity subProcessStartEventExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
                 subProcessStartEventExecution.setCurrentFlowElement(event);
+                LOGGER.debug("Error StartEvent SubProcess handler {}{} for errorCode {} continueProcessOperation with execution {}", event,
+                        event.getSubProcess(), errorCode,
+                        subProcessStartEventExecution);
                 CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessStartEventExecution);
 
             } else {
+                LOGGER.debug("Error StartEvent handler {} for errorCode {} continueProcessOperation with execution {}", event, errorCode,
+                        eventSubProcessExecution);
                 eventSubProcessExecution.setCurrentFlowElement(event);
                 CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
             }
 
         } else {
+            // boundary event
             ExecutionEntity boundaryExecution = null;
             if (!parentExecution.getExecutions().isEmpty()) {
                 List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
@@ -263,8 +275,10 @@ public class ErrorPropagation {
                     }
                 }
                 injectErrorContext(event, boundaryExecution, errorCode);
-                LOGGER.debug("Planing triggerExecutionOperation for boundaryExecution {} as result of error propagation for errorCode {}", boundaryExecution,
-                        errorCode);
+                LOGGER.debug("Error BoundaryEvent handler {} for errorCode {}. Planning triggerExecutionOperation for boundaryExecution {}", event, errorCode,
+                        boundaryExecution);
+                // The underlying execution has already been ended in case BpmnError has been thrown in 'end' ExecutionListener.
+                // Reactivate it, so that the triggerExecutionOperation is actually executed.
                 boundaryExecution.setEnded(false);
                 CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
             }

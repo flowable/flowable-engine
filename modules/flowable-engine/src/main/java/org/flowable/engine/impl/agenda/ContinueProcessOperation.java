@@ -197,8 +197,9 @@ public class ContinueProcessOperation extends AbstractOperation {
     protected void executeMultiInstanceSynchronous(FlowNode flowNode) {
 
         // Execution listener: event 'start'
+        boolean listenerSuccessNoBpmnException = true;
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            listenerSuccessNoBpmnException = executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
         }
         
         if (!hasMultiInstanceRootExecution(execution, flowNode)) {
@@ -209,8 +210,10 @@ public class ContinueProcessOperation extends AbstractOperation {
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
 
         if (activityBehavior != null) {
-            executeActivityBehavior(activityBehavior, flowNode);
-            
+            if (listenerSuccessNoBpmnException) {
+                executeActivityBehavior(activityBehavior, flowNode);
+            }
+
             if (execution.isMultiInstanceRoot() && !execution.isDeleted() && !execution.isEnded()) {
                 // Create any boundary events, sub process boundary events will be created from the activity behavior
                 List<ExecutionEntity> boundaryEventExecutions = null;

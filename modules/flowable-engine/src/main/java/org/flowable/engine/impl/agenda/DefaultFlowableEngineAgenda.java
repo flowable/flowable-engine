@@ -50,13 +50,21 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     @Override
     public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
         operations.add(operation);
-        LOGGER.debug("Operation {} added to agenda", operation.getClass());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Operation {} added to agenda. Execution: {}", operation.getClass(), getExecution(operation));
+        }
 
         if (executionEntity != null) {
             CommandContextUtil.addInvolvedExecution(commandContext, executionEntity);
         }
     }
 
+    private static Object getExecution(Runnable r) {
+        if (r instanceof AbstractOperation) {
+            return ((AbstractOperation) r).getExecution();
+        }
+        return null;
+    }
     /* SPECIFIC operations */
 
     @Override

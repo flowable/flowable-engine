@@ -124,8 +124,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             if (operation.getExecution() == null || !operation.getExecution().isEnded()) {
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Executing operation {} on flow element {}", operation.getClass(),
-                            operation.getExecution() != null ? operation.getExecution().getCurrentFlowElement() : "null");
+                    LOGGER.debug("Executing operation {} with execution {}", operation.getClass(), operation.getExecution());
                 }
 
                 agendaOperationRunner.executeOperation(commandContext, operation);

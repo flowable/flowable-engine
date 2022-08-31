@@ -196,10 +196,14 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         inactivateExecution(execution, processEngineConfiguration);
 
-        callActivityEndListeners(execution);
+        boolean endListenersSuccessNoBpmnError = callActivityEndListeners(execution);
 
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
-
+        if (!endListenersSuccessNoBpmnError) {
+            LOGGER.debug("At least one end Listener of {} threw BpmnError. Skipping leave. Error handling takes over.",
+                    execution.getCurrentFlowElement().getName());
+            return;
+        }
         if (zeroNrOfInstances) {
             return;
         }
