@@ -29,6 +29,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
@@ -256,6 +257,10 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("withoutProcessInstanceId", true);
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), finishedTaskCase1.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("planItemInstanceId", finishedTaskCase1.getSubScopeId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })

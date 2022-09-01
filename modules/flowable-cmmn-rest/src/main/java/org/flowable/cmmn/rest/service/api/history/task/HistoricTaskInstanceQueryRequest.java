@@ -36,6 +36,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Collection<String> caseDefinitionKeys;
+    protected String planItemInstanceId;
     protected String propagatedStageInstanceId;
     protected Boolean withoutScopeId;
     protected String taskName;
@@ -505,5 +506,13 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
         this.ignoreTaskAssignee = ignoreTaskAssignee;
+    }
+
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
     }
 }
