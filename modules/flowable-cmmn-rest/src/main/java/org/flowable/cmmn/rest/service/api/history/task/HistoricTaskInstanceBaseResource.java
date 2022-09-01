@@ -78,6 +78,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskId() != null) {
             query.taskId(queryRequest.getTaskId());
         }
+        if (queryRequest.getPlanItemInstanceId() != null) {
+            query.planItemInstanceId(queryRequest.getPlanItemInstanceId());
+        }
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }

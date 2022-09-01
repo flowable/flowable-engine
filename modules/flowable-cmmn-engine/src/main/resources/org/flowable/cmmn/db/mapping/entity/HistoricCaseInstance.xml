@@ -787,13 +787,13 @@
             or ${queryTablePrefix}STATE_ = #{orQueryObject.state}
         </if>
         <if test="orQueryObject.lastReactivatedBefore != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}
+            or ${queryTablePrefix}LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
         </if>
         <if test="orQueryObject.lastReactivatedAfter != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &gt;= #{lastReactivatedAfter}
+            or ${queryTablePrefix}LAST_REACTIVATION_TIME_ &gt;= #{lastReactivatedAfter}
         </if>
         <if test="orQueryObject.lastReactivatedBy != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_USER_ID_ = #{lastReactivatedBy}
+            or ${queryTablePrefix}LAST_REACTIVATION_USER_ID_ = #{lastReactivatedBy}
         </if>
         <if test="orQueryObject.callbackId != null">
             or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId}

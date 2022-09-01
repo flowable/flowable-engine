@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.MultiValuePart;
 import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
 import org.flowable.http.common.impl.HttpClientConfig;
@@ -33,7 +34,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import io.netty.channel.ChannelOption;
@@ -175,6 +178,24 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
 
             requestBodySpec.bodyValue(requestInfo.getBody());
+        } else if (requestInfo.getMultiValueParts() != null) {
+            MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+            for (MultiValuePart part : requestInfo.getMultiValueParts()) {
+                String name = part.getName();
+                Object value = part.getBody();
+
+
+                if (value instanceof byte[]) {
+                    value = new ByteArrayResourceWithFileName((byte[]) value, part.getFilename());
+                }
+
+                MultipartBodyBuilder.PartBuilder partBuilder = multipartBodyBuilder.part(name, value);
+                if (StringUtils.isNotEmpty(part.getFilename())) {
+                    partBuilder.filename(part.getFilename());
+                }
+            }
+
+            requestBodySpec.body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()));
         }
     }
 
@@ -230,5 +251,20 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                     .toFuture();
         }
 
+    }
+
+    protected static class ByteArrayResourceWithFileName extends ByteArrayResource {
+
+        protected final String filename;
+
+        public ByteArrayResourceWithFileName(byte[] byteArray, String filename) {
+            super(byteArray);
+            this.filename = filename;
+        }
+
+        @Override
+        public String getFilename() {
+            return filename;
+        }
     }
 }

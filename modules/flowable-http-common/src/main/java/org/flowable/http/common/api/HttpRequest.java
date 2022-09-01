@@ -12,7 +12,11 @@
  */
 package org.flowable.http.common.api;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
+
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 
 /**
  * @author Harsha Teja Kanna.
@@ -24,6 +28,7 @@ public class HttpRequest {
     protected HttpHeaders httpHeaders;
     protected String body;
     protected String bodyEncoding;
+    protected Collection<MultiValuePart> multiValueParts;
     protected int timeout;
     protected boolean noRedirects;
     protected Set<String> failCodes;
@@ -69,6 +74,9 @@ public class HttpRequest {
     }
 
     public void setBody(String body) {
+        if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        }
         this.body = body;
     }
 
@@ -78,6 +86,20 @@ public class HttpRequest {
 
     public void setBodyEncoding(String bodyEncoding) {
         this.bodyEncoding = bodyEncoding;
+    }
+
+    public Collection<MultiValuePart> getMultiValueParts() {
+        return multiValueParts;
+    }
+
+    public void addMultiValuePart(MultiValuePart part) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        }
+        if (multiValueParts == null) {
+            multiValueParts = new ArrayList<>();
+        }
+        multiValueParts.add(part);
     }
 
     public int getTimeout() {
