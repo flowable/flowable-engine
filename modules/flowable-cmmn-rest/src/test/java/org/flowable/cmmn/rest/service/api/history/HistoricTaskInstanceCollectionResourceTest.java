@@ -157,6 +157,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             // Without process instance id
             assertResultsPresentInDataResponse(url + "?withoutProcessInstanceId=true", 3, task.getId(), task1.getId(), task2.getId());
 
+            assertResultsPresentInDataResponse(url + "?planItemInstanceId=" + task1.getSubScopeId(), 1, task1.getId());
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }

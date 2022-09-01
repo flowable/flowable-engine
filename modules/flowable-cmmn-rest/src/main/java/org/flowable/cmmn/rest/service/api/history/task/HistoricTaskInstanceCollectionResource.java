@@ -87,6 +87,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
         @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
         @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns historic task instances without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
+        @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "The plan item instance instance id of the historic task instance.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
@@ -278,6 +279,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.valueOf(allRequestParams.get("ignoreTaskAssignee"))) {
             queryRequest.setIgnoreTaskAssignee(true);
+        }
+
+        if (allRequestParams.get("planItemInstanceId") != null) {
+            queryRequest.setPlanItemInstanceId(allRequestParams.get("planItemInstanceId"));
         }
 
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/cmmn-history/historic-task-instances", ""));
