@@ -19,12 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -85,7 +88,10 @@ public class HttpServiceTaskTestServer {
         try {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
-            contextHandler.addServlet(new ServletHolder(new HttpServiceTaskTestServlet()), "/api/*");
+            MultipartConfigElement multipartConfig = new MultipartConfigElement((String) null);
+            ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet());
+            httpServiceTaskServletHolder.getRegistration().setMultipartConfig(multipartConfig);
+            contextHandler.addServlet(httpServiceTaskServletHolder, "/api/*");
             contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
             contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
@@ -234,7 +240,17 @@ public class HttpServiceTaskTestServer {
                 data.getHeaders().put(headerName, headerList.toArray(new String[]{}));
             }
 
-            data.setBody(IOUtils.toString(req.getReader()));
+            if (StringUtils.startsWith(req.getContentType(), "multipart/form-data")) {
+                for (Part part : req.getParts()) {
+                    data.getParts().computeIfAbsent(part.getName(), k -> new ArrayList<>()).add(HttpTestData.HttpTestPart.fromPart(part));
+                }
+
+            } else {
+
+                data.setBody(IOUtils.toString(req.getReader()));
+
+            }
+
 
             if (data.getDelay() > 0) {
                 try {
