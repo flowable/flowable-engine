@@ -26,6 +26,7 @@ public class HistoricVariableInstanceResponse {
     protected String processInstanceId;
     protected String processInstanceUrl;
     protected String taskId;
+    protected String executionId;
     protected RestVariable variable;
 
     @ApiModelProperty(example = "14")
@@ -70,5 +71,12 @@ public class HistoricVariableInstanceResponse {
 
     public void setVariable(RestVariable variable) {
         this.variable = variable;
+    }
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
     }
 }

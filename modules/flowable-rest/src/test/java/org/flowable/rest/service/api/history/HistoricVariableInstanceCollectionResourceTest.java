@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -34,6 +35,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic variable instance query resource.
@@ -121,6 +124,125 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
 
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId(), 5, "varLocal3", "test5");
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance.getId() + "&excludeLocalVariables=true", 2, "var2", "test4");
+
+    }
+
+    /**
+     * Test querying variable instance and check response for scope value
+     */
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/VariableInstanceCollectionResourceTest.testQueryVariableInstances.bpmn20.xml")
+    public void testVariableInstanceScopeIsPresent() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
+
+        List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test4");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test5");
+
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 5,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + execution.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal2',"
+                + "             value:'test3',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + execution.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal3',"
+                + "             value:'test5',"
+                + "             scope:'local'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId()
+                + "&excludeLocalVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 2,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
 
     }
 
