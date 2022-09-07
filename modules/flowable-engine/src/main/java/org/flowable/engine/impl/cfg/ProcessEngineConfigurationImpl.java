@@ -841,6 +841,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean eventRegistryStartProcessInstanceAsync = false;
 
     /**
+     * Whether the check for unique process instances should be done with a lock.
+     * We do not recommend changing this property, unless you have been explicitly asked by a Flowable maintainer.
+     */
+    protected boolean eventRegistryUniqueProcessInstanceCheckWithLock = true;
+
+    /**
+     * The amount of time for the lock of a unique start event.
+     */
+    protected Duration eventRegistryUniqueProcessInstanceStartLockTime = Duration.ofMinutes(10);
+
+    /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
      * <p>
      * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence the reason why it is disabled by default. If your platform allows the use of StaxSource during XML parsing,
@@ -1538,6 +1549,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.eventSubscriptionServiceConfiguration.setEventSubscriptionLockTime(this.eventRegistryUniqueProcessInstanceStartLockTime);
         
         this.eventSubscriptionServiceConfiguration.init();
         
@@ -4001,6 +4013,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEventRegistryStartProcessInstanceAsync(boolean eventRegistryStartProcessInstanceAsync) {
         this.eventRegistryStartProcessInstanceAsync = eventRegistryStartProcessInstanceAsync;
+        return this;
+    }
+
+    public boolean isEventRegistryUniqueProcessInstanceCheckWithLock() {
+        return eventRegistryUniqueProcessInstanceCheckWithLock;
+    }
+
+    public ProcessEngineConfigurationImpl setEventRegistryUniqueProcessInstanceCheckWithLock(boolean eventRegistryUniqueProcessInstanceCheckWithLock) {
+        this.eventRegistryUniqueProcessInstanceCheckWithLock = eventRegistryUniqueProcessInstanceCheckWithLock;
+        return this;
+    }
+
+    public Duration getEventRegistryUniqueProcessInstanceStartLockTime() {
+        return eventRegistryUniqueProcessInstanceStartLockTime;
+    }
+
+    public ProcessEngineConfigurationImpl setEventRegistryUniqueProcessInstanceStartLockTime(Duration eventRegistryUniqueProcessInstanceStartLockTime) {
+        this.eventRegistryUniqueProcessInstanceStartLockTime = eventRegistryUniqueProcessInstanceStartLockTime;
         return this;
     }
 

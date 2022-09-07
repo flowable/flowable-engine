@@ -257,6 +257,8 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
         conf.setEventRegistryStartProcessInstanceAsync(processProperties.isEventRegistryStartProcessInstanceAsync());
+        conf.setEventRegistryUniqueProcessInstanceCheckWithLock(processProperties.isEventRegistryUniqueProcessInstanceCheckWithLock());
+        conf.setEventRegistryUniqueProcessInstanceStartLockTime(processProperties.getEventRegistryUniqueProcessInstanceStartLockTime());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
         
