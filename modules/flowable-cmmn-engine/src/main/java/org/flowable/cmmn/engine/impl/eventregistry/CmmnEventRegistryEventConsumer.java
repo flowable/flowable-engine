@@ -23,15 +23,11 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.eventregistry.api.EventConsumerInfo;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -50,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
@@ -128,36 +124,35 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                         return;
 
-                    } else {
+                    } else if (cmmnEngineConfiguration.isEventRegistryUniqueCaseInstanceCheckWithLock()) {
 
                         /*
                          * When multiple threads/transactions are querying concurrently, it could happen
                          * that multiple times zero is returned as result of the count.
                          *
-                         * To make sure only one unique instance is created, the event subscription
-                         * is locked first, which means that the current logic can now act on it when that's succesful.
+                         * To make sure only one unique instance is created, a lock is acquired for the reference correlation value,
+                         * which means that the current logic can now act on it when that's successful.
                          *
                          * Once the lock is acquired, the query is repeated (similar reasoning as when using synchronized methods).
                          * If the result is again zero, the case instance can be started.
                          *
-                         * Transactionally, there are 4 transactions at play here:
-                         * - tx 1 for locking the event subscription
+                         * Transitionally, there are 4 transactions at play here:
+                         * - tx 1 for acquiring a lock
                          * - tx 2 for doing the case instance count
                          * - tx 3 for starting the case instance (if tx 1 was successful and tx 2 returned 0)
                          * - tx 4 for unlocking (if tx 1 was successful)
                          *
-                         * The counting + case instance starting happens exclusively for a given event subscription
+                         * The counting + case instance starting happens exclusively for a given event correlation value
                          * and due to using separate transactions for the count and the start, it's guaranteed
                          * other engine nodes or other threads will always see any other instance started.
                          */
 
-                        CmmnManagementServiceImpl cmmnManagementService = (CmmnManagementServiceImpl) cmmnEngineConfiguration.getCmmnManagementService();
-                        boolean eventLocked = cmmnManagementService.executeCommand(
-                                new CommandConfig(false, TransactionPropagation.REQUIRES_NEW),
-                                commandContext -> CommandContextUtil.getEventSubscriptionService(commandContext)
-                                        .lockEventSubscription(eventSubscription.getId()));
+                        String countLockName = "celock" + correlationKeyWithAllParameters.getValue() + caseDefinition.getKey() ;
+                        LockManager lockManager = cmmnEngineConfiguration.getLockManager(countLockName);
 
-                        if (eventLocked) {
+                        boolean lockAcquired = lockManager.acquireLock(cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionLockTime());
+
+                        if (lockAcquired) {
 
                             try {
 
@@ -165,7 +160,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                 if (caseInstanceCount > 0) {
                                     // Returning, no new instance should be started
                                     eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
-                                    LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
+                                    LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                                     return;
                                 }
 
@@ -173,20 +168,21 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                 return;
 
                             } finally {
-                                cmmnManagementService.executeCommand(
-                                        new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), (Command<Void>) commandContext -> {
-                                            CommandContextUtil.getEventSubscriptionService(commandContext)
-                                                    .unlockEventSubscription(eventSubscription.getId());
-                                            return null;
-                                        });
+                                lockManager.releaseAndDeleteLock();
 
                             }
 
                         } else {
+                            LOGGER.info(
+                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.",
+                                    countLockName);
                             return;
 
                         }
 
+                    } else {
+                        startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
+                        return;
                     }
 
                 }
