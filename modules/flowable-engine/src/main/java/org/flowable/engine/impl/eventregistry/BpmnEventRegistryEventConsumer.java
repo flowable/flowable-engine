@@ -25,13 +25,10 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
@@ -128,35 +125,35 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                         LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
                         return;
 
-                    } else {
+                    } else if (processEngineConfiguration.isEventRegistryUniqueProcessInstanceCheckWithLock()) {
 
                         /*
                          * When multiple threads/transactions are querying concurrently, it could happen
                          * that multiple times zero is returned as result of the count.
                          *
-                         * To make sure only one unique instance is created, the event subscription
-                         * is locked first, which means that the current logic can now act on it when that's succesful.
+                         * To make sure only one unique instance is created, a lock is acquired for the reference correlation value,
+                         * which means that the current logic can now act on it when that's successful.
                          *
                          * Once the lock is acquired, the query is repeated (similar reasoning as when using synchronized methods).
                          * If the result is again zero, the process instance can be started.
                          *
-                         * Transactionally, there are 4 transactions at play here:
-                         * - tx 1 for locking the event subscription
+                         * Transitionally, there are 4 transactions at play here:
+                         * - tx 1 for acquiring a lock
                          * - tx 2 for doing the process instance count
                          * - tx 3 for starting the process instance (if tx 1 was successful and tx 2 returned 0)
                          * - tx 4 for unlocking (if tx 1 was successful)
                          *
-                         * The counting + process instance starting happens exclusively for a given event subscription
+                         * The counting + process instance starting happens exclusively for a given event correlation value
                          * and due to using separate transactions for the count and the start, it's guaranteed
                          * other engine nodes or other threads will always see any other instance started.
                          */
 
-                        boolean eventLocked = processEngineConfiguration.getManagementService().executeCommand(
-                                new CommandConfig(false, TransactionPropagation.REQUIRES_NEW),
-                                commandContext -> CommandContextUtil.getEventSubscriptionService(commandContext)
-                                        .lockEventSubscription(eventSubscription.getId()));
+                        String countLockName = "belock" + correlationKeyWithAllParameters.getValue() + processDefinition.getKey();
+                        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager(countLockName);
+                        boolean lockAcquired = lockManager.acquireLock(
+                                processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionLockTime());
 
-                        if (eventLocked) {
+                        if (lockAcquired) {
 
                             try {
 
@@ -172,20 +169,22 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                 return;
 
                             } finally {
-                                processEngineConfiguration.getManagementService().executeCommand(
-                                        new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), (Command<Void>) commandContext -> {
-                                            CommandContextUtil.getEventSubscriptionService(commandContext)
-                                                    .unlockEventSubscription(eventSubscription.getId());
-                                            return null;
-                                        });
+                                lockManager.releaseLock();
 
                             }
 
                         } else {
+                            LOGGER.info(
+                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new process instance. Ignoring this one.",
+                                    countLockName);
                             return;
 
                         }
 
+
+                    } else {
+                        startProcessInstance(processInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_PROCESS);
+                        return;
                     }
 
                 }

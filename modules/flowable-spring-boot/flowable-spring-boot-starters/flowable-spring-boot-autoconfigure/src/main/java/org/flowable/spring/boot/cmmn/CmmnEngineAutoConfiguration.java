@@ -225,6 +225,8 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setEnableSafeCmmnXml(cmmnProperties.isEnableSafeXml());
         configuration.setEventRegistryStartCaseInstanceAsync(cmmnProperties.isEventRegistryStartCaseInstanceAsync());
+        configuration.setEventRegistryUniqueCaseInstanceCheckWithLock(cmmnProperties.isEventRegistryUniqueCaseInstanceCheckWithLock());
+        configuration.setEventRegistryUniqueCaseInstanceStartLockTime(cmmnProperties.getEventRegistryUniqueCaseInstanceStartLockTime());
 
         configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 

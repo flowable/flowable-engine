@@ -14,11 +14,13 @@ package org.flowable.cmmn.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -27,6 +29,7 @@ import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class EventSubscriptionLockingTest extends AbstractCmmnEventRegistryConsumerTest {
 
@@ -68,28 +71,82 @@ public class EventSubscriptionLockingTest extends AbstractCmmnEventRegistryConsu
     @Test
     @CmmnDeployment
     public void testConcurrentStarts() throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        for (int i = 0; i < 100; i++) {
-            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
-        }
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
 
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.MINUTES);
 
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").includeCaseVariables().list())
+                .extracting(instance -> instance.getCaseVariables().get("customerId"))
+                .containsExactlyInAnyOrder("testCustomer");
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(1);
 
-        executorService = Executors.newFixedThreadPool(32);
+        executorService = Executors.newFixedThreadPool(4);
 
-        for (int i = 0; i < 100; i++) {
-            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
-        }
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
 
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.MINUTES);
 
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").includeCaseVariables().list())
+                .extracting(instance -> instance.getCaseVariables().get("customerId"))
+                .containsExactlyInAnyOrder("testCustomer", "otherCustomer");
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(2);
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/EventSubscriptionLockingTest.testConcurrentStarts.cmmn")
+    public void testConcurrentStartsWithoutLocking() throws Exception {
+        // When locking is disabled then in a parallel scenario multi-thread scenario
+        // multiple case instances can be started for the same event, since both threads will see the count as 0
+        boolean originalEventRegistryUniqueCaseInstanceCheckWithLock = cmmnEngineConfiguration.isEventRegistryUniqueCaseInstanceCheckWithLock();
+        try {
+            cmmnEngineConfiguration.setEventRegistryUniqueCaseInstanceCheckWithLock(false);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+
+            executorService.shutdown();
+            executorService.awaitTermination(5, TimeUnit.MINUTES);
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").includeCaseVariables().list())
+                    .extracting(instance -> instance.getCaseVariables().get("customerId"))
+                    .containsExactlyInAnyOrder("testCustomer", "testCustomer", "otherCustomer", "otherCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(4);
+        } finally {
+            cmmnEngineConfiguration.setEventRegistryUniqueCaseInstanceCheckWithLock(originalEventRegistryUniqueCaseInstanceCheckWithLock);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/EventSubscriptionLockingTest.testConcurrentStarts.cmmn")
+    public void testConcurrentStartsMultipleEvents() throws Exception {
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("kermit"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("kermit"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("fozzie"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("fozzie"));
+        executorService.shutdown();
+        executorService.awaitTermination(5, TimeUnit.MINUTES);
+
+        List<CaseInstance> instances = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("testCaseStartEvent")
+                .includeCaseVariables()
+                .list();
+
+        assertThat(instances)
+                .extracting(instance -> instance.getCaseVariables().get("customerId"))
+                .containsExactlyInAnyOrder("kermit", "fozzie");
     }
 
 }

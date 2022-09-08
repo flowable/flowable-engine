@@ -16,6 +16,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Duration;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.cfg.TransactionPropagation;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 public class LockManagerImpl implements LockManager {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(LockManagerImpl.class);
+    protected static final int LOCK_NAME_MAX_LENGTH = 64;
 
     protected CommandExecutor commandExecutor;
     protected String lockName;
@@ -49,7 +51,13 @@ public class LockManagerImpl implements LockManager {
 
     public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, Duration forceAcquireAfter, String engineType) {
         this.commandExecutor = commandExecutor;
-        this.lockName = lockName;
+        if (lockName.length() > 64) {
+            this.lockName = StringUtils.substring(lockName, 0, LOCK_NAME_MAX_LENGTH);
+            LOGGER.info("Lock name {} was longer than {} characters. Using abbreviated lock name {}", lockName, LOCK_NAME_MAX_LENGTH, this.lockName);
+        } else {
+
+            this.lockName = lockName;
+        }
         this.lockPollRate = lockPollRate;
         this.engineType = engineType;
         this.lockCommandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
@@ -79,6 +87,11 @@ public class LockManagerImpl implements LockManager {
 
     @Override
     public boolean acquireLock() {
+        return acquireLock(lockForceAcquireAfter);
+    }
+
+    @Override
+    public boolean acquireLock(Duration lockForceAcquireAfter) {
         if (hasAcquiredLock) {
             return true;
         }
@@ -114,8 +127,15 @@ public class LockManagerImpl implements LockManager {
 
     @Override
     public void releaseLock() {
-        executeCommand(new ReleaseLockCmd(lockName, engineType));
+        executeCommand(new ReleaseLockCmd(lockName, engineType, false));
         LOGGER.debug("successfully released lock {}", lockName);
+        hasAcquiredLock = false;
+    }
+
+    @Override
+    public void releaseAndDeleteLock() {
+        executeCommand(new ReleaseLockCmd(lockName, engineType, true));
+        LOGGER.debug("successfully released and deleted lock {}", lockName);
         hasAcquiredLock = false;
     }
 

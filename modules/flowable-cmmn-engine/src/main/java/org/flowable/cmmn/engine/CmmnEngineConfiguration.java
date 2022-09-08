@@ -734,6 +734,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected boolean eventRegistryStartCaseInstanceAsync = false;
 
+    /**
+     * Whether the check for unique case instances should be done with a lock.
+     * We do not recommend changing this property, unless you have been explicitly asked by a Flowable maintainer.
+     */
+    protected boolean eventRegistryUniqueCaseInstanceCheckWithLock = true;
+
+    /**
+     * The amount of time for the lock of a unique start event.
+     */
+    protected Duration eventRegistryUniqueCaseInstanceStartLockTime = Duration.ofMinutes(10);
+
     protected BusinessCalendarManager businessCalendarManager;
 
     /**
@@ -1678,6 +1689,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.eventSubscriptionServiceConfiguration.setIdGenerator(this.idGenerator);
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.eventSubscriptionServiceConfiguration.setEventSubscriptionLockTime(this.eventRegistryUniqueCaseInstanceStartLockTime);
         
         this.eventSubscriptionServiceConfiguration.init();
 
@@ -3264,6 +3276,24 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEventRegistryStartCaseInstanceAsync(boolean eventRegistryStartCaseInstanceAsync) {
         this.eventRegistryStartCaseInstanceAsync = eventRegistryStartCaseInstanceAsync;
+        return this;
+    }
+
+    public boolean isEventRegistryUniqueCaseInstanceCheckWithLock() {
+        return eventRegistryUniqueCaseInstanceCheckWithLock;
+    }
+
+    public CmmnEngineConfiguration setEventRegistryUniqueCaseInstanceCheckWithLock(boolean eventRegistryUniqueCaseInstanceCheckWithLock) {
+        this.eventRegistryUniqueCaseInstanceCheckWithLock = eventRegistryUniqueCaseInstanceCheckWithLock;
+        return this;
+    }
+
+    public Duration getEventRegistryUniqueCaseInstanceStartLockTime() {
+        return eventRegistryUniqueCaseInstanceStartLockTime;
+    }
+
+    public CmmnEngineConfiguration setEventRegistryUniqueCaseInstanceStartLockTime(Duration eventRegistryUniqueCaseInstanceStartLockTime) {
+        this.eventRegistryUniqueCaseInstanceStartLockTime = eventRegistryUniqueCaseInstanceStartLockTime;
         return this;
     }
 

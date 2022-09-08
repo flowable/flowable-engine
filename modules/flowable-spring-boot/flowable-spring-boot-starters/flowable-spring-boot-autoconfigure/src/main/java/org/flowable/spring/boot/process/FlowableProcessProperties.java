@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.boot.process;
 
+import java.time.Duration;
+
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -52,6 +54,17 @@ public class FlowableProcessProperties {
      */
     private boolean eventRegistryStartProcessInstanceAsync = false;
 
+    /**
+     * Whether the check for unique process instances should be done with a lock.
+     * We do not recommend changing this property, unless you have been explicitly asked by a Flowable maintainer.
+     */
+    private boolean eventRegistryUniqueProcessInstanceCheckWithLock = true;
+
+    /**
+     * The amount of time for the lock of a unique start event.
+     */
+    private Duration eventRegistryUniqueProcessInstanceStartLockTime = Duration.ofMinutes(10);
+
     public FlowableServlet getServlet() {
         return servlet;
     }
@@ -86,6 +99,22 @@ public class FlowableProcessProperties {
 
     public void setEventRegistryStartProcessInstanceAsync(boolean eventRegistryStartProcessInstanceAsync) {
         this.eventRegistryStartProcessInstanceAsync = eventRegistryStartProcessInstanceAsync;
+    }
+
+    public boolean isEventRegistryUniqueProcessInstanceCheckWithLock() {
+        return eventRegistryUniqueProcessInstanceCheckWithLock;
+    }
+
+    public void setEventRegistryUniqueProcessInstanceCheckWithLock(boolean eventRegistryUniqueProcessInstanceCheckWithLock) {
+        this.eventRegistryUniqueProcessInstanceCheckWithLock = eventRegistryUniqueProcessInstanceCheckWithLock;
+    }
+
+    public Duration getEventRegistryUniqueProcessInstanceStartLockTime() {
+        return eventRegistryUniqueProcessInstanceStartLockTime;
+    }
+
+    public void setEventRegistryUniqueProcessInstanceStartLockTime(Duration eventRegistryUniqueProcessInstanceStartLockTime) {
+        this.eventRegistryUniqueProcessInstanceStartLockTime = eventRegistryUniqueProcessInstanceStartLockTime;
     }
 
     public static class AsyncHistory {
