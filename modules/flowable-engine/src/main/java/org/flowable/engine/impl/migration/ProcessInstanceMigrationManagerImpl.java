@@ -26,14 +26,17 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
@@ -480,7 +483,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         return (isDirectCallActivityExecutionMigration(currentFlowElement, newFlowElement) ||
                 isDirectUserTaskExecutionMigration(currentFlowElement, newFlowElement) ||
-                isDirectReceiveTaskExecutionMigration(currentFlowElement, newFlowElement)) &&
+                isDirectReceiveTaskExecutionMigration(currentFlowElement, newFlowElement) ||
+                isDirectExternalWorkerServiceTaskExecutionMigration(currentFlowElement, newFlowElement)) &&
                 (!getFlowElementMultiInstanceParentId(currentFlowElement).isPresent() && !getFlowElementMultiInstanceParentId(newFlowElement).isPresent());
     }
 
@@ -503,6 +507,15 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 newFlowElement instanceof ReceiveTask &&
                 ((Task) currentFlowElement).getLoopCharacteristics() == null &&
                 ((Task) newFlowElement).getLoopCharacteristics() == null;
+    }
+
+    protected boolean isDirectExternalWorkerServiceTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        //The current and new external worker service task must be equal to support direct execution migration
+        return currentFlowElement instanceof ExternalWorkerServiceTask &&
+                newFlowElement instanceof ExternalWorkerServiceTask &&
+                ((Task) currentFlowElement).getLoopCharacteristics() == null &&
+                ((Task) newFlowElement).getLoopCharacteristics() == null &&
+                EqualsBuilder.reflectionEquals(currentFlowElement, newFlowElement, false, ServiceTask.class, true, null);
     }
 
     protected void executeScript(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, Script script, CommandContext commandContext) {
