@@ -511,11 +511,20 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     protected boolean isDirectExternalWorkerServiceTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
         //The current and new external worker service task must be equal to support direct execution migration
-        return currentFlowElement instanceof ExternalWorkerServiceTask &&
-                newFlowElement instanceof ExternalWorkerServiceTask &&
-                ((Task) currentFlowElement).getLoopCharacteristics() == null &&
-                ((Task) newFlowElement).getLoopCharacteristics() == null &&
-                EqualsBuilder.reflectionEquals(currentFlowElement, newFlowElement, false, ServiceTask.class, true, null);
+        if (currentFlowElement instanceof ExternalWorkerServiceTask && newFlowElement instanceof ExternalWorkerServiceTask) {
+            ExternalWorkerServiceTask currentExternalWorkerServiceTask = (ExternalWorkerServiceTask) currentFlowElement;
+            ExternalWorkerServiceTask newExternalWorkerServiceTask = (ExternalWorkerServiceTask) newFlowElement;
+            return currentExternalWorkerServiceTask.getLoopCharacteristics() == null &&
+                    newExternalWorkerServiceTask.getLoopCharacteristics() == null &&
+                    new EqualsBuilder()
+                            .append(currentExternalWorkerServiceTask.getId(), newExternalWorkerServiceTask.getId())
+                            .append(currentExternalWorkerServiceTask.getName(), newExternalWorkerServiceTask.getName())
+                            .append(currentExternalWorkerServiceTask.getTopic(), newExternalWorkerServiceTask.getTopic())
+                            .append(currentExternalWorkerServiceTask.isExclusive(), newExternalWorkerServiceTask.isExclusive())
+                            .append(currentExternalWorkerServiceTask.isAsynchronous(), newExternalWorkerServiceTask.isAsynchronous())
+                            .isEquals();
+        }
+        return false;
     }
 
     protected void executeScript(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, Script script, CommandContext commandContext) {
