@@ -502,7 +502,19 @@ public abstract class AbstractEngineConfiguration {
 
             // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
             if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
+                String dbVersionQuery = "select version() as version;";
+                if ("oracle".equalsIgnoreCase(databaseType)) {
+                    dbVersionQuery = "select version from product_component_version where rownum=1;";
+                } else if ("mssql".equalsIgnoreCase(databaseType)) {
+                    dbVersionQuery = "select @@version as version;";
+                } else if ("db2".equalsIgnoreCase(databaseType)) {
+                    dbVersionQuery = "select service_level as version from sysibmadm.env_inst_info;";
+                } else if ("h2".equalsIgnoreCase(databaseType)) {
+                    dbVersionQuery = "select value as version from information_schema.settings where name = 'info.VERSION';";
+                } else if ("hsql".equalsIgnoreCase(databaseType)) {
+                    dbVersionQuery = "select character_value as version from information_schema.sql_implementation_info where implementation_info_name = 'DBMS VERSION';";
+                }
+                try (PreparedStatement preparedStatement = connection.prepareStatement(dbVersionQuery);
                         ResultSet resultSet = preparedStatement.executeQuery()) {
                     String version = null;
                     if (resultSet.next()) {
