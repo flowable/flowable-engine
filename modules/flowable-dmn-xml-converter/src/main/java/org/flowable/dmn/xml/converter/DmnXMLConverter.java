@@ -230,6 +230,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
 
+        if (xif.isPropertySupported(XMLInputFactory.IS_COALESCING)) {
+            xif.setProperty(XMLInputFactory.IS_COALESCING, true);
+        }
+
         if (validateSchema) {
             try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
                 if (!enableSafeDmnXml) {

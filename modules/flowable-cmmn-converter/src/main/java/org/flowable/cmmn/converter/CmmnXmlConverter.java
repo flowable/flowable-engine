@@ -171,6 +171,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         if (xif.isPropertySupported(XMLInputFactory.SUPPORT_DTD)) {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
+        if (xif.isPropertySupported(XMLInputFactory.IS_COALESCING)) {
+            xif.setProperty(XMLInputFactory.IS_COALESCING, true);
+        }
 
         if (encoding == null) {
             encoding = DEFAULT_ENCODING;
