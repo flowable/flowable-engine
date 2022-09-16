@@ -131,15 +131,13 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
         addElementConverter(new CmmnDiExtensionXmlConverter());
-
-        addTextConverter(new StandardEventXmlConverter());
-        addTextConverter(new ProcessRefExpressionXmlConverter());
-        addTextConverter(new CaseRefExpressionXmlConverter());
-        addTextConverter(new DecisionRefExpressionXmlConverter());
-        addTextConverter(new ConditionXmlConverter());
-        addTextConverter(new TimerExpressionXmlConverter());
-        addTextConverter(new TextXmlConverter());
-
+        addElementConverter(new StandardEventXmlConverter());
+        addElementConverter(new ProcessRefExpressionXmlConverter());
+        addElementConverter(new CaseRefExpressionXmlConverter());
+        addElementConverter(new DecisionRefExpressionXmlConverter());
+        addElementConverter(new ConditionXmlConverter());
+        addElementConverter(new TimerExpressionXmlConverter());
+        addElementConverter(new TextXmlConverter());
         addElementConverter(new ExtensionElementsXMLConverter());
     }
 
@@ -229,11 +227,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     currentXmlElement = null;
                     if (elementConverters.containsKey(xtr.getLocalName())) {
                         elementConverters.get(xtr.getLocalName()).elementEnd(xtr, conversionHelper);
-                    }
-
-                } else if ((xtr.isCharacters() || xtr.getEventType() == XMLStreamReader.CDATA) && currentXmlElement != null) {
-                    if (textConverters.containsKey(currentXmlElement)) {
-                        textConverters.get(currentXmlElement).convertToCmmnModel(xtr, conversionHelper);
                     }
 
                 }

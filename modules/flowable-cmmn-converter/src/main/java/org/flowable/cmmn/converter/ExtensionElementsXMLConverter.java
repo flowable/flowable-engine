@@ -168,10 +168,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     xtr.next();
                     if (xtr.isStartElement()) {
                         if (CmmnXmlConstants.ELEMENT_CONDITION.equals(xtr.getLocalName())) {
-                            xtr.next();
-                            if (xtr.isCharacters()) {
-                                completionNeutralRule.setCondition(xtr.getElementText());
-                            }
+                            completionNeutralRule.setCondition(xtr.getElementText());
                             break;
                         }
 
