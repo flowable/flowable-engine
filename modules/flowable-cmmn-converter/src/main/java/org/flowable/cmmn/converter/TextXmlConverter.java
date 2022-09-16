@@ -12,10 +12,12 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.TextAnnotation;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -35,9 +37,13 @@ public class TextXmlConverter extends BaseCmmnXmlConverter {
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-        if (currentCmmnElement instanceof TextAnnotation) {
-            TextAnnotation textAnnotation = (TextAnnotation) currentCmmnElement;
-            textAnnotation.setText(xtr.getText());
+        try {
+            if (currentCmmnElement instanceof TextAnnotation) {
+                TextAnnotation textAnnotation = (TextAnnotation) currentCmmnElement;
+                textAnnotation.setText(xtr.getElementText());
+            }
+        } catch (XMLStreamException e) {
+            throw new FlowableException("Error converting text annotation", e);
         }
 
         return null;
