@@ -37,6 +37,7 @@ import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.VariableServiceConfigurationVariableValueProvider;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -51,6 +52,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected IdmIdentityService idmIdentityService;
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected String taskId;
     protected Collection<String> taskIds;
@@ -151,14 +153,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected TaskQueryImpl currentOrQueryObject;
 
     private Collection<String> cachedCandidateGroups;
-
     public TaskQueryImpl() {
     }
 
     public TaskQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration,
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
-        super(commandContext, variableServiceConfiguration);
+        super(commandContext, new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration));
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -166,7 +168,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration,
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
-        super(commandExecutor, variableServiceConfiguration);
+        super(commandExecutor, new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration));
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -174,7 +177,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQueryImpl(CommandExecutor commandExecutor, String databaseType, TaskServiceConfiguration taskServiceConfiguration,
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
-        super(commandExecutor, variableServiceConfiguration);
+        super(commandExecutor, new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration));
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.databaseType = databaseType;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
@@ -1802,7 +1806,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     protected void ensureVariablesInitialized() {
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(variableServiceConfiguration);
+            var.initialize(variableValueProvider);
         }
 
         for (TaskQueryImpl orQueryObject : orQueryObjects) {
