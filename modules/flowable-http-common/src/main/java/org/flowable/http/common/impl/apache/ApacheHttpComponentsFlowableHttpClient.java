@@ -43,7 +43,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -52,9 +55,11 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.MultiValuePart;
 import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.impl.HttpClientConfig;
@@ -68,10 +73,24 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
 
     // Implements HttpClient in order to be backwards compatible for the deprecated HttpRequestHandler
 
+    private static final boolean MULTIPART_ENTITY_BUILDER_PRESENT;
     private static final Pattern PLUS_CHARACTER_PATTERN = Pattern.compile("\\+");
     private static final String ENCODED_PLUS_CHARACTER = "%2B";
     private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
     private static final String ENCODED_SPACE_CHARACTER = "%20";
+
+    static {
+        ClassLoader loader = ApacheHttpComponentsFlowableHttpClient.class.getClassLoader();
+        boolean multipartEntityBuilderPresent = false;
+        try {
+            Class.forName("org.apache.http.entity.mime.MultipartEntityBuilder", false, loader);
+            multipartEntityBuilderPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+
+        MULTIPART_ENTITY_BUILDER_PRESENT = multipartEntityBuilderPresent;
+
+    }
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -192,6 +211,28 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
             } else {
                 requestBase.setEntity(new StringEntity(requestInfo.getBody()));
             }
+        } else if (requestInfo.getMultiValueParts() != null) {
+            if (MULTIPART_ENTITY_BUILDER_PRESENT) {
+                MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+                entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                for (MultiValuePart part : requestInfo.getMultiValueParts()) {
+                    String name = part.getName();
+                    Object value = part.getBody();
+                    if (value instanceof byte[]) {
+                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                    } else if (value instanceof String) {
+                        entityBuilder.addTextBody(name, (String) value);
+                    } else if (value != null) {
+                        throw new FlowableIllegalArgumentException("Value of type " + value.getClass() + " is not supported as multi part content");
+                    }
+                }
+                requestBase.setEntity(entityBuilder.build());
+            } else {
+                throw new FlowableException("org.apache.http.entity.mime.MultipartEntityBuilder is not present on the classpath."
+                        + " Multi value parts cannot be used."
+                        + " If you want to use, please make sure that the org.apache.httpcomponents:httpmime dependency is available");
+            }
+
         }
     }
 

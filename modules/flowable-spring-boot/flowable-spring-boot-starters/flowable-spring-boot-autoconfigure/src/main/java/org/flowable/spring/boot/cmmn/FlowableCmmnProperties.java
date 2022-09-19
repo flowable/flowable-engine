@@ -12,6 +12,7 @@
  */
 package org.flowable.spring.boot.cmmn;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,6 +67,22 @@ public class FlowableCmmnProperties {
      * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. marking the start of the case as async
      */
     private boolean eventRegistryStartCaseInstanceAsync = false;
+
+    /**
+     * Whether case instances should be started asynchronously from an event registry.
+     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. marking the start of the case as async
+     */
+
+    /**
+     * Whether the check for unique case instances should be done with a lock.
+     * We do not recommend changing this property, unless you have been explicitly asked by a Flowable maintainer.
+     */
+    private boolean eventRegistryUniqueCaseInstanceCheckWithLock = true;
+
+    /**
+     * The amount of time for the lock of a unique start event.
+     */
+    private Duration eventRegistryUniqueCaseInstanceStartLockTime = Duration.ofMinutes(10);
 
     /**
      * The servlet configuration for the CMMN Rest API.
@@ -127,6 +144,22 @@ public class FlowableCmmnProperties {
 
     public void setEventRegistryStartCaseInstanceAsync(boolean eventRegistryStartCaseInstanceAsync) {
         this.eventRegistryStartCaseInstanceAsync = eventRegistryStartCaseInstanceAsync;
+    }
+
+    public boolean isEventRegistryUniqueCaseInstanceCheckWithLock() {
+        return eventRegistryUniqueCaseInstanceCheckWithLock;
+    }
+
+    public void setEventRegistryUniqueCaseInstanceCheckWithLock(boolean eventRegistryUniqueCaseInstanceCheckWithLock) {
+        this.eventRegistryUniqueCaseInstanceCheckWithLock = eventRegistryUniqueCaseInstanceCheckWithLock;
+    }
+
+    public Duration getEventRegistryUniqueCaseInstanceStartLockTime() {
+        return eventRegistryUniqueCaseInstanceStartLockTime;
+    }
+
+    public void setEventRegistryUniqueCaseInstanceStartLockTime(Duration eventRegistryUniqueCaseInstanceStartLockTime) {
+        this.eventRegistryUniqueCaseInstanceStartLockTime = eventRegistryUniqueCaseInstanceStartLockTime;
     }
 
     public FlowableServlet getServlet() {

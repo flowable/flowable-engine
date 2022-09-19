@@ -12,9 +12,13 @@
  */
 package org.flowable.http;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.flowable.http.common.api.HttpHeaders;
+import org.flowable.http.common.api.MultiValuePart;
 
 /**
  * @author Harsha Teja Kanna.
@@ -127,6 +131,20 @@ public class HttpRequest extends org.flowable.http.common.api.HttpRequest {
             delegate.setBodyEncoding(bodyEncoding);
         } else {
             super.setBodyEncoding(bodyEncoding);
+        }
+    }
+
+    @Override
+    public Collection<MultiValuePart> getMultiValueParts() {
+        return delegate != null ? delegate.getMultiValueParts() : super.getMultiValueParts();
+    }
+
+    @Override
+    public void addMultiValuePart(MultiValuePart part) {
+        if (delegate != null) {
+            delegate.addMultiValuePart(part);
+        } else {
+            super.addMultiValuePart(part);
         }
     }
 
