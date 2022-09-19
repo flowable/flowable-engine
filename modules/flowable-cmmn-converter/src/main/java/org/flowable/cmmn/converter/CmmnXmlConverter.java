@@ -90,7 +90,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseCmmnXmlConverter> elementConverters = new HashMap<>();
-    protected static Map<String, BaseCmmnXmlConverter> textConverters = new HashMap<>();
 
     protected ClassLoader classloader;
 
@@ -143,10 +142,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
         elementConverters.put(converter.getXMLElementName(), converter);
-    }
-
-    public static void addTextConverter(BaseCmmnXmlConverter converter) {
-        textConverters.put(converter.getXMLElementName(), converter);
     }
 
     public CmmnModel convertToCmmnModel(InputStreamProvider inputStreamProvider) {
