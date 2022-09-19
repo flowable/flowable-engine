@@ -90,7 +90,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseCmmnXmlConverter> elementConverters = new HashMap<>();
-    protected static Map<String, BaseCmmnXmlConverter> textConverters = new HashMap<>();
 
     protected ClassLoader classloader;
 
@@ -131,24 +130,18 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
         addElementConverter(new CmmnDiExtensionXmlConverter());
-
-        addTextConverter(new StandardEventXmlConverter());
-        addTextConverter(new ProcessRefExpressionXmlConverter());
-        addTextConverter(new CaseRefExpressionXmlConverter());
-        addTextConverter(new DecisionRefExpressionXmlConverter());
-        addTextConverter(new ConditionXmlConverter());
-        addTextConverter(new TimerExpressionXmlConverter());
-        addTextConverter(new TextXmlConverter());
-
+        addElementConverter(new StandardEventXmlConverter());
+        addElementConverter(new ProcessRefExpressionXmlConverter());
+        addElementConverter(new CaseRefExpressionXmlConverter());
+        addElementConverter(new DecisionRefExpressionXmlConverter());
+        addElementConverter(new ConditionXmlConverter());
+        addElementConverter(new TimerExpressionXmlConverter());
+        addElementConverter(new TextXmlConverter());
         addElementConverter(new ExtensionElementsXMLConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
         elementConverters.put(converter.getXMLElementName(), converter);
-    }
-
-    public static void addTextConverter(BaseCmmnXmlConverter converter) {
-        textConverters.put(converter.getXMLElementName(), converter);
     }
 
     public CmmnModel convertToCmmnModel(InputStreamProvider inputStreamProvider) {
@@ -229,11 +222,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     currentXmlElement = null;
                     if (elementConverters.containsKey(xtr.getLocalName())) {
                         elementConverters.get(xtr.getLocalName()).elementEnd(xtr, conversionHelper);
-                    }
-
-                } else if ((xtr.isCharacters() || xtr.getEventType() == XMLStreamReader.CDATA) && currentXmlElement != null) {
-                    if (textConverters.containsKey(currentXmlElement)) {
-                        textConverters.get(currentXmlElement).convertToCmmnModel(xtr, conversionHelper);
                     }
 
                 }
