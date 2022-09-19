@@ -286,38 +286,9 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     }
 
     protected void addVariable(String name, Object value, QueryOperator operator, String scopeType, boolean localScope) {
-        if (name == null) {
-            throw new FlowableIllegalArgumentException("name is null");
+        if (validateVariableParameters(name, value, operator, scopeType, localScope)) {
+            queryVariableValues.add(new QueryVariableValue(name, value, operator, localScope, scopeType));
         }
-        if (value == null || isBoolean(value)) {
-            // Null-values and booleans can only be used in EQUALS, NOT_EQUALS, EXISTS and NOT_EXISTS
-            switch (operator) {
-                case GREATER_THAN:
-                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than' condition");
-                case LESS_THAN:
-                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than' condition");
-                case GREATER_THAN_OR_EQUAL:
-                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
-                case LESS_THAN_OR_EQUAL:
-                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
-                default:
-                    break;
-            }
-
-            if (operator == QueryOperator.EQUALS_IGNORE_CASE && !(value instanceof String)) {
-                throw new FlowableIllegalArgumentException("Only string values can be used with 'equals ignore case' condition");
-            }
-
-            if (operator == QueryOperator.NOT_EQUALS_IGNORE_CASE && !(value instanceof String)) {
-                throw new FlowableIllegalArgumentException("Only string values can be used with 'not equals ignore case' condition");
-            }
-
-            if ((operator == QueryOperator.LIKE || operator == QueryOperator.LIKE_IGNORE_CASE) && !(value instanceof String)) {
-                throw new FlowableIllegalArgumentException("Only string values can be used with 'like' condition");
-            }
-        }
-
-        queryVariableValues.add(new QueryVariableValue(name, value, operator, localScope, scopeType));
     }
 
     protected boolean isBoolean(Object value) {
@@ -366,4 +337,37 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
         return false;
     }
 
+    protected boolean validateVariableParameters(String name, Object value, QueryOperator operator, String scopeType, boolean localScope) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("name is null");
+        }
+        if (value == null || isBoolean(value)) {
+            // Null-values and booleans can only be used in EQUALS, NOT_EQUALS, EXISTS and NOT_EXISTS
+            switch (operator) {
+                case GREATER_THAN:
+                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than' condition");
+                case LESS_THAN:
+                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than' condition");
+                case GREATER_THAN_OR_EQUAL:
+                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
+                case LESS_THAN_OR_EQUAL:
+                    throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
+                default:
+                    break;
+            }
+
+            if (operator == QueryOperator.EQUALS_IGNORE_CASE && !(value instanceof String)) {
+                throw new FlowableIllegalArgumentException("Only string values can be used with 'equals ignore case' condition");
+            }
+
+            if (operator == QueryOperator.NOT_EQUALS_IGNORE_CASE && !(value instanceof String)) {
+                throw new FlowableIllegalArgumentException("Only string values can be used with 'not equals ignore case' condition");
+            }
+
+            if ((operator == QueryOperator.LIKE || operator == QueryOperator.LIKE_IGNORE_CASE) && !(value instanceof String)) {
+                throw new FlowableIllegalArgumentException("Only string values can be used with 'like' condition");
+            }
+        }
+        return true;
+    }
 }
