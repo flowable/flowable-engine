@@ -32,7 +32,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     private static final long serialVersionUID = 1L;
     
-    protected VariableServiceConfiguration variableServiceConfiguration;
+    protected VariableValueProvider variableValueProvider;
 
     protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
@@ -41,12 +41,23 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     public AbstractVariableQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
-        this.variableServiceConfiguration = variableServiceConfiguration;
+        this.variableValueProvider = new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration);
     }
 
     public AbstractVariableQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
-        this.variableServiceConfiguration = variableServiceConfiguration;
+        this.variableValueProvider = new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration);
+    }
+
+    public AbstractVariableQueryImpl(CommandContext commandContext, VariableValueProvider variableValueProvider) {
+        super(commandContext);
+        this.variableValueProvider = variableValueProvider;
+
+    }
+
+    public AbstractVariableQueryImpl(CommandExecutor commandExecutor, VariableValueProvider variableValueProvider) {
+        super(commandExecutor);
+        this.variableValueProvider = variableValueProvider;
     }
 
     @Override
@@ -330,7 +341,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     protected void ensureVariablesInitialized() {
         if (!queryVariableValues.isEmpty()) {
             for (QueryVariableValue queryVariableValue : queryVariableValues) {
-                queryVariableValue.initialize(variableServiceConfiguration);
+                queryVariableValue.initialize(variableValueProvider);
             }
         }
     }

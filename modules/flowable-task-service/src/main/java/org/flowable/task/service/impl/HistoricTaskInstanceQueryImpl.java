@@ -1440,7 +1440,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     protected void ensureVariablesInitialized() {
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(variableServiceConfiguration);
+            var.initialize(variableValueProvider);
         }
 
         for (HistoricTaskInstanceQueryImpl orQueryObject : orQueryObjects) {
