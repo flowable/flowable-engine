@@ -26,7 +26,6 @@ import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
-import org.flowable.variable.service.impl.VariableServiceConfigurationVariableValueProvider;
 
 /**
  * @author Joram Barrez

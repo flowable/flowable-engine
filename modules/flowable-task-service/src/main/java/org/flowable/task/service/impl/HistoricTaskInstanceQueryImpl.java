@@ -36,7 +36,6 @@ import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
-import org.flowable.variable.service.impl.VariableServiceConfigurationVariableValueProvider;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**

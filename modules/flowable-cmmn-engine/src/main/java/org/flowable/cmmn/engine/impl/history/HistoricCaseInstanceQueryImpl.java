@@ -38,7 +38,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
-import org.flowable.variable.service.impl.VariableServiceConfigurationVariableValueProvider;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
