@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.PlanItemRule;
 import org.flowable.cmmn.model.SentryIfPart;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -36,14 +38,18 @@ public class ConditionXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String condition = xtr.getText();
-        if (StringUtils.isNotEmpty(condition)) {
-            CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-            if (currentCmmnElement instanceof SentryIfPart) {
-                ((SentryIfPart) currentCmmnElement).setCondition(condition);
-            } else if (currentCmmnElement instanceof PlanItemRule) {
-                ((PlanItemRule) currentCmmnElement).setCondition(condition);
+        try {
+            String condition = xtr.getElementText();
+            if (StringUtils.isNotEmpty(condition)) {
+                CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+                if (currentCmmnElement instanceof SentryIfPart) {
+                    ((SentryIfPart) currentCmmnElement).setCondition(condition);
+                } else if (currentCmmnElement instanceof PlanItemRule) {
+                    ((PlanItemRule) currentCmmnElement).setCondition(condition);
+                }
             }
+        } catch (XMLStreamException e) {
+            throw new FlowableException("Error converting condition", e);
         }
         return null;
     }

@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author martin.grofcik
@@ -35,10 +37,14 @@ public class DecisionRefExpressionXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String expression = xtr.getText();
-        if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof DecisionTask) {
-            DecisionTask decisionTask = (DecisionTask) conversionHelper.getCurrentCmmnElement();
-            decisionTask.setDecisionRefExpression(expression);
+        try {
+            String expression = xtr.getElementText();
+            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof DecisionTask) {
+                DecisionTask decisionTask = (DecisionTask) conversionHelper.getCurrentCmmnElement();
+                decisionTask.setDecisionRefExpression(expression);
+            }
+        } catch (XMLStreamException e) {
+            throw new FlowableException("Error converting decision reference expression", e);
         }
         return null;
     }
