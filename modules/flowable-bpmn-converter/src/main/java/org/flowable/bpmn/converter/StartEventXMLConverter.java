@@ -114,7 +114,8 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
             writeQualifiedAttribute(ATTRIBUTE_SAME_DEPLOYMENT, "false", xtw);
         }
 
-        if (startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) {
+        if ((startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) ||
+                (startEvent.getExtensionElements() != null && startEvent.getExtensionElements().containsKey(ELEMENT_EVENT_TYPE))) {
             writeDefaultAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);
         }
     }
