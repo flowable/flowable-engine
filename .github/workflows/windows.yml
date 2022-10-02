@@ -7,6 +7,9 @@ env:
     -B -V --no-transfer-progress
     -D http.keepAlive=false -D maven.wagon.http.pool=false -D maven.wagon.httpconnectionManager.ttlSeconds=120
 
+permissions:
+  contents: read
+
 jobs:
   windows:
     name: 'Windows'

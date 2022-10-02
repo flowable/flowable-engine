@@ -7,6 +7,9 @@ env:
     -B -V --no-transfer-progress
     -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
+permissions:
+  contents: read
+
 jobs:
   test_jdk:
     name: Linux (JDK ${{ matrix.java }})

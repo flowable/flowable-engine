@@ -2,6 +2,9 @@ name: Flowable 5 Build
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   test_jdk:
     name: Flowable 5 Tests
