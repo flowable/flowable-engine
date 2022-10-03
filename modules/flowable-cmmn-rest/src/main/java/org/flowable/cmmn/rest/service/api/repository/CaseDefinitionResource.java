@@ -130,9 +130,14 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         Case caze = cmmnModel.getCaseById(caseDefinition.getKey());
         Stage stage = caze.getPlanModel();
         if (StringUtils.isNotEmpty(stage.getFormKey())) {
-            CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
-            formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(stage.getFormKey(),
-                            deployment.getParentDeploymentId(), caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
+            if (stage.isSameDeployment()) {
+                CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
+                formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(stage.getFormKey(),
+                                deployment.getParentDeploymentId(), caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
+            } else {
+                formInfo = formRepositoryService.getFormModelByKey(stage.getFormKey(), caseDefinition.getTenantId(),
+                        cmmnEngineConfiguration.isFallbackToDefaultTenant());
+            }
         }
 
         if (formInfo == null) {
