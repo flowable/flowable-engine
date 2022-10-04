@@ -1208,11 +1208,11 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
             .flatMap(rootProcess -> runtimeService.createExecutionQuery().processInstanceId(rootProcess.getId()).onlyChildExecutions().list().stream())
             .collect(Collectors.toList());
         //1x MultiInstance root, 2x parallel MultiInstance, 2x CalledActivitySubProcesses and 4x UserTasks executions
-        assertThat(childExecutions).hasSize(9);
+        assertThat(childExecutions).hasSize(10);
         classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
         assertThat(classifiedExecutions)
                 .containsKeys("multiInstanceSubProcess", "callActivity", "taskInclusive1", "taskInclusive2", "taskInclusive3");
-        assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(3);
+        assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(4);
         assertThat(classifiedExecutions.get("callActivity")).hasSize(2);
         assertThat(classifiedExecutions.get("taskInclusive1")).hasSize(1);
         assertThat(classifiedExecutions.get("taskInclusive2")).hasSize(2);
