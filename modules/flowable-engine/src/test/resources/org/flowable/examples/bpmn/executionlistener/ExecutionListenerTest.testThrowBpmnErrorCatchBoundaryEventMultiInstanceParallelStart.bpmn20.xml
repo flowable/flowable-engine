@@ -11,26 +11,39 @@
                 <flowable:executionListener type="script" event="start">
                     <flowable:script language="groovy">
                         <![CDATA[
+                          execution.setVariable("startListener_element_"+execution.getVariable('element'), "executed");
                             if (execution.getVariable('throwErrorStartListener') != null && "2".equals(execution.getVariable('element'))){
-                            throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorStartListener'));
-                        }]]>
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorStartListener'));
+                            } else {
+                              execution.setVariable("startListener_element_"+execution.getVariable('element'), "executed");
+                            }
+                        ]]>
                     </flowable:script>
                 </flowable:executionListener>
                 <flowable:executionListener type="script" event="end">
                     <flowable:script language="groovy">
                         <![CDATA[
+                           execution.setVariable("endListener_element_"+execution.getVariable('element'), "executed");
                             if (execution.getVariable('throwErrorEndListener') != null && "2".equals(execution.getVariable('element'))){
-                            throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorEndListener'));
-                        }]]>
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorEndListener'));
+                            }
+                            ]]>
                     </flowable:script>
                 </flowable:executionListener>
             </extensionElements>
             <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${elements}" flowable:elementVariable="element"/>
             <script>
                 <![CDATA[
-                    System.out.println("Element:"+execution.getVariable('element'));
                     def element = execution.getVariable('element');
                     execution.setVariable("element_${element}", "executed");
+                    execution.getVariable("executionStack")?.add("element_${element}");
+                ]]>
+            </script>
+        </scriptTask>
+        <scriptTask id="errorHandlingTask" name="Error Handling Script Task" scriptFormat="groovy" flowable:autoStoreVariables="false">
+            <script>
+                <![CDATA[
+                    execution.setVariable("error_handled", "true");
                 ]]>
             </script>
         </scriptTask>
@@ -41,6 +54,7 @@
             <errorEventDefinition></errorEventDefinition>
         </boundaryEvent>
         <endEvent id="errorEnd"/>
-        <sequenceFlow id="handleError_to_ErrorEnd" sourceRef="handleError" targetRef="errorEnd"/>
+        <sequenceFlow id="handleError_to_errorHandlingTask" sourceRef="handleError" targetRef="errorHandlingTask"/>
+        <sequenceFlow id="handleErrorTask_to_ErrorEnd" sourceRef="errorHandlingTask" targetRef="errorEnd"/>
     </process>
 </definitions>

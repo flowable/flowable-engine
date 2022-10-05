@@ -34,7 +34,6 @@ import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionList
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -575,30 +574,58 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = {
             "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelStart.bpmn20.xml" })
-    @Ignore("FIXME Must be fixed")
-    // FIXME does not yet work
     public void testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelStart() {
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR");
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("multiInstanceTest")
-                .variables(vars)
-                .transientVariable("direction", "")
-                .transientVariable("elements", Arrays.asList("1", "2", "3")).start();
+                .variable("throwErrorStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                .start();
+
+        assertThat(processInstance.getProcessVariables())
+                 .containsEntry("error_handled", "true")
+                .containsEntry("startListener_element_1", "executed")
+                .containsEntry("element_1", "executed")
+                .containsEntry("endListener_element_1", "executed")
+
+                .containsEntry("startListener_element_3", "executed")
+                .containsEntry("element_3", "executed")
+                .containsEntry("endListener_element_3", "executed")
+
+                .containsEntry("startListener_element_2", "executed")
+                .doesNotContainKey("element_2")
+                .doesNotContainKey("endListener_element_2");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/examples/bpmn/executionlistener/ExecutionListenerTest.testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelStart.bpmn20.xml" })
+    public void testThrowBpmnErrorCatchBoundaryEventMultiInstanceParallelEnd() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("multiInstanceTest")
+                .variable("throwErrorEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
+                .transientVariable("elements", Arrays.asList("1", "2", "3"))
+                .start();
 
         assertThat(processInstance.getProcessVariables())
                 .containsEntry("error_handled", "true")
                 .containsEntry("startListener_element_1", "executed")
                 .containsEntry("element_1", "executed")
-                .doesNotContainKey("endListener_element_1");
-        System.out.println("PROCESS INSTANCE VARS: " + processInstance.getProcessVariables());
+                .containsEntry("endListener_element_1", "executed")
+
+                .containsEntry("startListener_element_3", "executed")
+                .containsEntry("element_3", "executed")
+                .containsEntry("endListener_element_3", "executed")
+
+                .containsEntry("startListener_element_2", "executed")
+                .containsEntry("element_2", "executed")
+                .containsEntry("endListener_element_2", "executed");
     }
 
 
     // FIXME continue adding more test cases
     /*
-     * Add sequenceFlow executionListener tests
+     * Add sequenceFlow executionListener tests?
      * Add asynchronous multi instance tests
-     * Add test scenario with multi instance error boundary event on activity
+     * Add test scenario with multi instance error boundary event on activity -> in progress
+     *
      * Add test scenario with two matching error handlers
      */
 }

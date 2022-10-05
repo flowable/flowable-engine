@@ -166,7 +166,6 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
             } else {
                 internalLeave(execution, zeroNrOfInstances);
-
             }
 
         } else {
@@ -200,9 +199,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
         if (!endListenersSuccessNoBpmnError) {
-            LOGGER.debug("At least one end Listener of {} threw BpmnError. Skipping leave. Error handling takes over.",
+            LOGGER.debug("At least one end Listener of {} threw BpmnError. Skipping leave.",
                     execution.getCurrentFlowElement().getName());
-            return;
         }
         if (zeroNrOfInstances) {
             return;
@@ -227,10 +225,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             aggregateVariablesForChildExecution(execution, miRootExecution);
 
             boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
-            if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
-                leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied);
+            if ((nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) && endListenersSuccessNoBpmnError) {
+                leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, endListenersSuccessNoBpmnError);
 
-            } else if (asyncLeave) {
+            } else if (asyncLeave && endListenersSuccessNoBpmnError) {
                 JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
                 JobEntity job = JobUtil.createJob(executionEntity, ParallelMultiInstanceActivityCompletionJobHandler.TYPE, processEngineConfiguration);
 
@@ -269,13 +267,13 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES);
         boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
         if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
-            leave(execution, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied);
+            leave(execution, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, true);
             return true;
         }
         return false;
     }
 
-    protected void leave(ExecutionEntity execution, int nrOfInstances, int nrOfCompletedInstances, boolean isCompletionConditionSatisfied) {
+    protected void leave(ExecutionEntity execution, int nrOfInstances, int nrOfCompletedInstances, boolean isCompletionConditionSatisfied, boolean noBpmnErrorInListener) {
         DelegateExecution miRootExecution = getMultiInstanceRootExecution(execution);
         ExecutionEntity leavingExecution = null;
         if (nrOfInstances > 0) {
@@ -315,8 +313,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         else {
             sendCompletedEvent(leavingExecution);
         }
-
-        super.leave(leavingExecution);
+        if (noBpmnErrorInListener) {
+            super.leave(leavingExecution);
+        }
     }
 
     protected Activity verifyCompensation(DelegateExecution execution, ExecutionEntity executionToUse, Activity activity) {

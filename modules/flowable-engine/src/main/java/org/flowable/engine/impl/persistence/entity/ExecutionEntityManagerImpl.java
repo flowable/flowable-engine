@@ -810,7 +810,9 @@ public class ExecutionEntityManagerImpl
     
     @Override
     public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase) {
-        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Ending and deleting execution {} Reason: {}", executionEntity, deleteReason);
+        }
         // To start, deactivate the current incoming execution
         executionEntity.setEnded(true);
         executionEntity.setActive(false);
