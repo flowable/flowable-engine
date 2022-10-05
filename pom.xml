@@ -14,7 +14,7 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.7.3</spring.boot.version>
+		<spring.boot.version>2.7.4</spring.boot.version>
 		<spring.framework.version>5.3.23</spring.framework.version>
 		<spring.security.version>5.7.3</spring.security.version>
 		<spring.amqp.version>2.4.7</spring.amqp.version>
