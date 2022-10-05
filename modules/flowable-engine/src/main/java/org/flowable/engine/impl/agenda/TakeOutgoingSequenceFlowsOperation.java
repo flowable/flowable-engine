@@ -33,9 +33,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.UelExpressionCondition;
@@ -144,14 +146,14 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     }
 
     protected void handleFlowNode(FlowNode flowNode) {
-        boolean executionListenerSuccessNoBpmnError = true;
+        boolean executionListenerBpmnError = false;
         if (!execution.isProcessInstanceType()) {
-            executionListenerSuccessNoBpmnError = notifyEndListeners(flowNode);
+            executionListenerBpmnError = notifyEndListeners(flowNode);
         }
         handleActivityEnd(flowNode);
         if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
             handleAdhocSubProcess(flowNode);
-        } else if (executionListenerSuccessNoBpmnError) {
+        } else if (!executionListenerBpmnError) {
             leaveFlowNode(flowNode);
         }
     }
@@ -184,10 +186,13 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     }
 
     private boolean notifyEndListeners(FlowNode flowNode) {
-        if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            return executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+        try {
+            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+            return false;
+        } catch (BpmnError e) {
+            ErrorPropagation.propagateError(e, execution);
+            return true;
         }
-        return true;
     }
 
     protected void leaveFlowNode(FlowNode flowNode) {

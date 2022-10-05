@@ -29,9 +29,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityWithMigrationContextBehavior;
@@ -156,25 +158,30 @@ public class ContinueProcessOperation extends AbstractOperation {
             }
         }
         // Execution listener: event 'start'
-        boolean listenerSuccessNoBpmnException = true;
+        boolean listenerBpmnException = false;
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            listenerSuccessNoBpmnException = executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+                listenerBpmnException = true;
+            }
         }
 
         // Execute actual behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
 
-        if (activityBehavior != null && listenerSuccessNoBpmnException) {
+        if (activityBehavior != null && !listenerBpmnException) {
             executeActivityBehavior(activityBehavior, flowNode);
             executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
         } else {
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
-            if (listenerSuccessNoBpmnException) {
-                LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
-            } else {
+            if (listenerBpmnException) {
                 LOGGER.debug("Skipping activityBehavior on activity '{}' with execution {} because 'start' listener threw BpmnException", flowNode.getId(),
                         execution.getId());
+            } else {
+                LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
             }
+            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
     }
@@ -197,9 +204,14 @@ public class ContinueProcessOperation extends AbstractOperation {
     protected void executeMultiInstanceSynchronous(FlowNode flowNode) {
 
         // Execution listener: event 'start'
-        boolean listenerSuccessNoBpmnException = true;
+        boolean listenerBpmnException = false;
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            listenerSuccessNoBpmnException = executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+                listenerBpmnException = true;
+            }
         }
         
         if (!hasMultiInstanceRootExecution(execution, flowNode)) {
@@ -210,7 +222,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
 
         if (activityBehavior != null) {
-            if (listenerSuccessNoBpmnException) {
+            if (!listenerBpmnException) {
                 executeActivityBehavior(activityBehavior, flowNode);
             }
 

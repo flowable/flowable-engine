@@ -66,22 +66,20 @@ public abstract class AbstractOperation implements Runnable {
     /**
      * Executes the execution listeners defined on the given element, with the given event type. Uses the {@link #execution} of this operation instance as argument for the execution listener.
      *
-     * @return true in case of success. false when any execution listener has thrown a BPMN error.
      * @see org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper#executeExecutionListeners(HasExecutionListeners, DelegateExecution, String)
      */
-    protected boolean executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, String eventType) {
-        return executeExecutionListeners(elementWithExecutionListeners, execution, eventType);
+    protected void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, String eventType) {
+        executeExecutionListeners(elementWithExecutionListeners, execution, eventType);
     }
 
     /**
      * Executes the execution listeners defined on the given element, with the given event type, and passing the provided execution to the {@link ExecutionListener} instances.
      *
-     * @return true in case of success. false when any execution listener has thrown a BPMN error.
      * @see org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper#executeExecutionListeners(HasExecutionListeners, DelegateExecution, String)
      */
-    protected boolean executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners,
+    protected void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners,
             ExecutionEntity executionEntity, String eventType) {
-        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
                 .executeExecutionListeners(elementWithExecutionListeners, executionEntity, eventType);
     }
 

@@ -33,7 +33,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -294,10 +293,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertThat(processVariables)
                 .containsEntry("error_handled", "true")
                 .doesNotContainKey("_script_task");
-
-        List<HistoricTaskInstance> allTasks = historyService.createHistoricTaskInstanceQuery().list();
-        // Why is this empty? Shouldn't we have the sub-process task 'handleErrorOther' here? Same behavior on main.
-        assertThat(allTasks).isEmpty();
     }
 
     @Test

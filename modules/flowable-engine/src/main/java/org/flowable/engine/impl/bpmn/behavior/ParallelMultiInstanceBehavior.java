@@ -26,7 +26,9 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -195,10 +197,16 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         inactivateExecution(execution, processEngineConfiguration);
 
-        boolean endListenersSuccessNoBpmnError = callActivityEndListeners(execution);
+        boolean listenerBpmnError = false;
+        try {
+            callActivityEndListeners(execution);
+        } catch (BpmnError bpmnError) {
+            ErrorPropagation.propagateError(bpmnError, execution);
+            listenerBpmnError = true;
+        }
 
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
-        if (!endListenersSuccessNoBpmnError) {
+        if (listenerBpmnError) {
             LOGGER.debug("At least one end Listener of {} threw BpmnError. Skipping leave.",
                     execution.getCurrentFlowElement().getName());
         }
@@ -225,10 +233,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             aggregateVariablesForChildExecution(execution, miRootExecution);
 
             boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
-            if ((nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) && endListenersSuccessNoBpmnError) {
-                leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, endListenersSuccessNoBpmnError);
+            if ((nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) && !listenerBpmnError) {
+                leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, listenerBpmnError);
 
-            } else if (asyncLeave && endListenersSuccessNoBpmnError) {
+            } else if (asyncLeave && !listenerBpmnError) {
                 JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
                 JobEntity job = JobUtil.createJob(executionEntity, ParallelMultiInstanceActivityCompletionJobHandler.TYPE, processEngineConfiguration);
 
@@ -267,13 +275,13 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES);
         boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
         if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
-            leave(execution, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, true);
+            leave(execution, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied, false);
             return true;
         }
         return false;
     }
 
-    protected void leave(ExecutionEntity execution, int nrOfInstances, int nrOfCompletedInstances, boolean isCompletionConditionSatisfied, boolean noBpmnErrorInListener) {
+    protected void leave(ExecutionEntity execution, int nrOfInstances, int nrOfCompletedInstances, boolean isCompletionConditionSatisfied, boolean bpmnErrorInListener) {
         DelegateExecution miRootExecution = getMultiInstanceRootExecution(execution);
         ExecutionEntity leavingExecution = null;
         if (nrOfInstances > 0) {
@@ -313,7 +321,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         else {
             sendCompletedEvent(leavingExecution);
         }
-        if (noBpmnErrorInListener) {
+        if (!bpmnErrorInListener) {
             super.leave(leavingExecution);
         }
     }

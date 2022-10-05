@@ -78,16 +78,17 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
         
         // Execution listener
-        boolean executionListenersSuccessNoBpmnError = true;
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executionListenersSuccessNoBpmnError = executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError e) {
+                LOGGER.debug("Execution start Listener of {} threw BpmnError. Skipping activity behavior. Error handling takes over.",
+                        execution.getCurrentFlowElement().getName());
+                ErrorPropagation.propagateError(e, execution);
+                return;
+            }
         }
-        if (!executionListenersSuccessNoBpmnError) {
-            LOGGER.debug("At least one start Listener of {} threw BpmnError. Skipping activity behavior. Error handling takes over.",
-                    execution.getCurrentFlowElement().getName());
-            return;
-        }
-        
+
         // Execute actual behavior
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());

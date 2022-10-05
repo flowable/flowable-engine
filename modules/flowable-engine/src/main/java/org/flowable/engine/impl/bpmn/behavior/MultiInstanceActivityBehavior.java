@@ -567,11 +567,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * Since no transitions are followed when leaving the inner activity, it is needed to call the end listeners yourself.
-     *
-     * @return true in case of success. false when any execution listener has thrown a BPMN error.
      */
-    protected boolean callActivityEndListeners(DelegateExecution execution) {
-        return CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
+    protected void callActivityEndListeners(DelegateExecution execution) {
+        CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
                 .executeExecutionListeners(activity, execution, ExecutionListener.EVENTNAME_END);
     }
 

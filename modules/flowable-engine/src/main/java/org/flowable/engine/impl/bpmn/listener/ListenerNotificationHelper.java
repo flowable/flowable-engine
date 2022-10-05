@@ -33,7 +33,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
-import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -55,9 +54,8 @@ public class ListenerNotificationHelper {
      * @param elementWithExecutionListeners the element carrying execution listeners
      * @param execution the execution
      * @param eventType the event type
-     * @return true in case of success. false when any execution listener has thrown a BPMN error.
      */
-    public boolean executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, DelegateExecution execution, String eventType) {
+    public void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, DelegateExecution execution, String eventType) {
         List<FlowableListener> listeners = elementWithExecutionListeners.getExecutionListeners();
         if (listeners != null && listeners.size() > 0) {
             ListenerFactory listenerFactory = CommandContextUtil.getProcessEngineConfiguration().getListenerFactory();
@@ -91,25 +89,14 @@ public class ListenerNotificationHelper {
                             execution.setEventName(
                                     eventType); // eventName is used to differentiate the event when reusing an execution listener for various events
                             execution.setCurrentFlowableListener(listener);
-                            try {
-                                ((ExecutionListener) executionListener).notify(execution);
-                            } catch (BpmnError e) {
-                                try {
-                                    ErrorPropagation.propagateError(e, execution);
-                                    return false;
-                                } catch (RuntimeException ex) {
-                                    throw new RuntimeException("Error while propagating BpmnError " + e.getErrorCode(), ex);
-                                }
-                            } finally {
-                                execution.setEventName(null);
-                                execution.setCurrentFlowableListener(null);
-                            }
+                            ((ExecutionListener) executionListener).notify(execution);
+                            execution.setEventName(null);
+                            execution.setCurrentFlowableListener(null);
                         }
                     }
                 }
             }
         }
-        return true;
     }
 
     protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, 
