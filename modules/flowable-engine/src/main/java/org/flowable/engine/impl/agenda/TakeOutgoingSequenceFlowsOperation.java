@@ -33,9 +33,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.UelExpressionCondition;
@@ -144,22 +146,30 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
     }
 
     protected void handleFlowNode(FlowNode flowNode) {
-
-        handleActivityEnd(flowNode);
-        if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
-            handleAdhocSubProcess(flowNode);
-        } else {
-            leaveFlowNode(flowNode);
+        boolean continueNormally = handleActivityEnd(flowNode);
+        if (continueNormally) {
+            // Only continue here, when no BpmnException has been thrown by end listeners.
+            if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
+                handleAdhocSubProcess(flowNode);
+            } else {
+                leaveFlowNode(flowNode);
+            }
         }
     }
 
-    protected void handleActivityEnd(FlowNode flowNode) {
+    protected boolean handleActivityEnd(FlowNode flowNode) {
         // a process instance execution can never leave a flow node, but it can pass here whilst cleaning up
         // hence the check for NOT being a process instance
+        boolean continueNormally = true;
         if (!execution.isProcessInstanceType()) {
-
             if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+                try {
+                    executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+                } catch (BpmnError bpmnError) {
+                    ErrorPropagation.propagateError(bpmnError, execution);
+                    // We don't return here immediately, because the activity needs to be ended properly and the event dispatched
+                    continueNormally = false;
+                }
             }
 
             if (execution.isActive()
@@ -183,6 +193,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                         processEngineConfiguration.getEngineCfgKey());
             }
         }
+        return continueNormally;
     }
     
     protected void leaveFlowNode(FlowNode flowNode) {

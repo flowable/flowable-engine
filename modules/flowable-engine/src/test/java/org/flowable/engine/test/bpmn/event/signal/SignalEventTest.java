@@ -28,6 +28,7 @@ import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -1034,6 +1035,19 @@ public class SignalEventTest extends PluggableFlowableTestCase {
                         "Task in process A",
                         "Task in process A"
                 );
+    }
+
+    @Test
+    @Deployment
+    public void testSignalPublishExecutionEndListener() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .variable("throwSignal", "alertSignal")
+                .processDefinitionKey("signalProcess").start();
+        assertThat(processInstance.getProcessVariables()).containsEntry("script_task_executed", "true").containsEntry("signal_handled", "true");
+
+        HistoricActivityInstance scriptTask = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("scriptTask1").singleResult();
+        assertThat(scriptTask.getEndTime()).isNotNull();
     }
 
 

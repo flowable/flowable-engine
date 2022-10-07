@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <process id="subProcessErrorHandling" name="subProcessErrorHandling" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startEventMainProcess"/>
+        <subProcess id="subProcess" name="Subprocess">
+            <extensionElements>
+                <flowable:executionListener type="script" event="start">
+                    <flowable:script language="groovy">
+                        <![CDATA[
+                            if(execution.getVariable('throwErrorSubProcessStartListener') != null && execution.getVariable('element') == null)
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessStartListener'));
+                             else
+                                 execution.setVariable("startProcessListener_"+execution.getVariable('element'), 'executed');
+
+                                  execution.getVariable("executionStack")?.add("startProcessListener_"+execution.getVariable('element'));
+                            ]]>
+                    </flowable:script>
+                </flowable:executionListener>
+                <flowable:executionListener type="script" event="end">
+                    <flowable:script language="groovy">
+                        <![CDATA[
+                            if(execution.getVariable('throwErrorSubProcessEndListener') != null && execution.getVariable('element') == null)
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessEndListener'));
+                             else
+                                 execution.setVariable("endProcessListener_"+execution.getVariable('element'), 'executed');
+
+                                execution.getVariable("executionStack")?.add("endProcessListener_"+execution.getVariable('element'));
+                            ]]>
+                    </flowable:script>
+                </flowable:executionListener>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="${elements}" flowable:elementVariable="element">
+            </multiInstanceLoopCharacteristics>
+            <scriptTask id="subProcessTask" name="Subprocess Script task" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <extensionElements>
+                    <flowable:executionListener type="script" event="start">
+                        <flowable:script language="groovy">
+                            <![CDATA[
+                            if(execution.getVariable('throwErrorSubProcessTaskStartListener') != null && "2".equals(execution.getVariable('element')))
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessTaskStartListener'));
+                             else
+                                 execution.setVariable("startListener_element_${element}", 'executed');
+
+                                execution.getVariable("executionStack")?.add("startListener_element_"+execution.getVariable('element'));
+                            ]]>
+                        </flowable:script>
+                    </flowable:executionListener>
+                    <flowable:executionListener type="script" event="end">
+                        <flowable:script language="groovy">
+                            <![CDATA[
+                            if(execution.getVariable('throwErrorSubProcessTaskEndListener') != null && "2".equals(execution.getVariable('element')))
+                                throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessTaskEndListener'));
+                             else
+                                 execution.setVariable('endListener_element_${element}', 'executed');
+
+                             execution.getVariable("executionStack")?.add("endListener_element_"+execution.getVariable('element'));
+                            ]]>
+                        </flowable:script>
+                    </flowable:executionListener>
+                </extensionElements>
+                <script>
+                    <![CDATA[
+                    def element = execution.getVariable('element');
+                    execution.setVariable("element_${element}", "executed");
+
+                    execution.getVariable("executionStack")?.add("element_"+execution.getVariable('element'));
+                ]]>
+                </script>
+            </scriptTask>
+            <startEvent id="startEventSubProcess"/>
+            <sequenceFlow id="sequenceFlow6" sourceRef="startEventSubProcess" targetRef="subProcessTask"/>
+        </subProcess>
+        <subProcess id="errorHandlingSubProcess" name="subProcess" triggeredByEvent="true">
+            <startEvent id="startErrorHandlingEvent" isInterrupting="true">
+                <errorEventDefinition></errorEventDefinition>
+            </startEvent>
+            <scriptTask id="handleError" name="Handle Error" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('error_handled', 'true');]]></script>
+            </scriptTask>
+            <endEvent id="endHandleError"/>
+            <sequenceFlow id="sequenceFlow7" sourceRef="startErrorHandlingEvent" targetRef="handleError"/>
+            <sequenceFlow id="sequenceFlow8" sourceRef="handleError" targetRef="endHandleError"/>
+        </subProcess>
+        <scriptTask id="scriptTask2" name="Script task" scriptFormat="groovy" flowable:autoStoreVariables="false">
+            <script><![CDATA[execution.setVariable('defaultTask', 'executed');]]></script>
+        </scriptTask>
+        <exclusiveGateway id="exclusiveGateway" default="sequenceFlow4"/>
+        <sequenceFlow id="sequenceFlow2" sourceRef="startEventMainProcess" targetRef="exclusiveGateway"/>
+        <sequenceFlow id="sequenceFlow3" sourceRef="exclusiveGateway" targetRef="subProcess">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${direction eq 'subprocess'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow4" sourceRef="exclusiveGateway" targetRef="scriptTask2"/>
+        <endEvent id="endEventNormal"/>
+        <sequenceFlow id="sequenceFlow5" sourceRef="scriptTask2" targetRef="endEventNormal"/>
+        <sequenceFlow id="sequenceFlow9" sourceRef="subProcess" targetRef="endEventNormal"/>
+    </process>
+</definitions>
