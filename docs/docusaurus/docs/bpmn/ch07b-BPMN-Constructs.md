@@ -3710,9 +3710,9 @@ Execution listeners also support using a delegateExpression, [similar to a servi
     <flowable:executionListener event="start" delegateExpression="${myExecutionListenerBean}" />
 
 A while back, we also introduced a new type of execution listener, the org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener. This script execution listener allows you to execute a piece of script logic for an execution listener event.
+
     <flowable:executionListener event="start"
         class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener">
-
       <flowable:field name="script">
         <flowable:string>
           def bar = "BAR";  // local variable
@@ -3724,6 +3724,18 @@ A while back, we also introduced a new type of execution listener, the org.flowa
       <flowable:field name="language" stringValue="groovy" />
       <flowable:field name="resultVariable" stringValue="myVar" />
 
+    </flowable:executionListener>
+
+Since Flowable 6.8.0 scriptable execution listeners became a first-class citizen using a more compact syntax, avoiding
+to hard-code the class name:
+
+    <flowable:executionListener event="start" type="script">
+      <flowable:script language="groovy">
+        <![CDATA[
+          def bar = "BAR";  // local variable
+          execution.setVariable("var1", "test"); // test access to execution instance
+        ]]>
+        </flowable:script>
     </flowable:executionListener>
 
 #### Field injection on execution listeners
