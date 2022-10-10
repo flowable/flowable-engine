@@ -3710,7 +3710,6 @@ Execution listeners also support using a delegateExpression, [similar to a servi
     <flowable:executionListener event="start" delegateExpression="${myExecutionListenerBean}" />
 
 A while back, we also introduced a new type of execution listener, the org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener. This script execution listener allows you to execute a piece of script logic for an execution listener event.
-
     <flowable:executionListener event="start"
         class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener">
 
@@ -3786,6 +3785,23 @@ The class ExampleFieldInjectedExecutionListener concatenates the two injected fi
     }
 
 Note that the same rules with regards to thread-safety apply to service tasks. Please read the [relevant section](bpmn/ch07b-BPMN-Constructs.md#field-injection-and-thread-safety) for more information.
+
+#### Throwing BPMN Error in Execution Listeners
+It is possible to throw BPMN Errors out of execution listener code, which is caught by a matching [error boundary event](bpmn/ch07b-BPMN-Constructs.md#error-boundary-event) or [error start event](bpmn/ch07b-BPMN-Constructs.md#error-start-event) in the model. 
+This can be done using the Flowable `org.flowable.engine.delegate.BpmnError` class. See section [throwing BPMN Errors](bpmn/ch07b-BPMN-Constructs.md#throwing-bpmn-errors) for
+examples and further description.
+
+It is important to note, that BPMN Errors thrown in Execution Listeners are only caught on _parent scoped_ error boundary events, not on the boundary event of the activity.
+
+The following image illustrates that: 
+![bpmn.executionlistener.bpmnerror](assets/bpmn/bpmn.executionlistener.bpmnerror.png)
+
+Given that _A Task_ has an execution listener defined, which throws a BpmnError at some point: 
+The error is only caught if the error boundary event on the _Subprocess_ matches (the red one in the image). 
+The error boundary event on the _A Task_ is ignored in this case.
+This is a recommended practice anyway.
+
+The reason for this is: When execution listeners are called, the activity is either not yet fully initialized (for _start_ listeners) or the scope was already destroyed (for _end_ listeners).
 
 ### Task listener
 
