@@ -43,6 +43,8 @@ import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
+
 public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnEventRegistryEventConsumer.class);
@@ -103,6 +105,10 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 .processDefinitionId(eventSubscription.getProcessDefinitionId())
                 .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
+            if (StringUtils.isNotEmpty(eventSubscription.getActivityId())) {
+                processInstanceBuilder.startEventId(eventSubscription.getActivityId());
+            }
+            
             if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
                 processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
             }

@@ -56,6 +56,11 @@ public interface ProcessInstanceBuilder {
      * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
      */
     ProcessInstanceBuilder messageName(String messageName);
+    
+    /**
+     * Set the start event in case of an event registry start event that is triggered to start the process instance.
+     */
+    ProcessInstanceBuilder startEventId(String startEventId);
 
     /**
      * Set the name of process instance

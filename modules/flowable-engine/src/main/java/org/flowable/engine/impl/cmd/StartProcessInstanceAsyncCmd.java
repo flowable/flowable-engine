@@ -43,7 +43,7 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
         ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration, commandContext);
         processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ExecutionEntity processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, businessKey, businessStatus,
-                processInstanceName, overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType,
+                processInstanceName, startEventId, overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType,
                 referenceId, referenceType, stageInstanceId, false);
         ExecutionEntity execution = processInstance.getExecutions().get(0);
         Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
