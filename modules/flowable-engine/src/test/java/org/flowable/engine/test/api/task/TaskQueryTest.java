@@ -1823,12 +1823,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         taskService.setAssignee(kermitAssigneeTask.getId(), "kermit");
         createdTasks.add(kermitAssigneeTask.getId());
 
-        Task magementTask = taskService.newTask();
-        magementTask.setName("new management task");
-        taskService.saveTask(magementTask);
-        taskService.setAssignee(magementTask.getId(), "gozzie");
-        taskService.addCandidateGroup(magementTask.getId(), "management");
-        createdTasks.add(magementTask.getId());
+        Task managementTask = taskService.newTask();
+        managementTask.setName("new management task");
+        taskService.saveTask(managementTask);
+        taskService.setAssignee(managementTask.getId(), "gozzie");
+        taskService.addCandidateGroup(managementTask.getId(), "management");
+        createdTasks.add(managementTask.getId());
 
 
         List<Task> kermitCandidateTasks = taskService.createTaskQuery()
@@ -1850,6 +1850,31 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .ignoreAssigneeValue()
                 .list();
         assertThat(tasks).hasSize(12);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("management")
+                .ignoreAssigneeValue()
+                .list();
+        assertThat(tasks).hasSize(4);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("management")
+                .list();
+        assertThat(tasks).hasSize(3);
+        
+        List<String> candidateGroups = new ArrayList<>();
+        candidateGroups.add("management");
+        candidateGroups.add("accountancy");
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroupIn(candidateGroups)
+                .ignoreAssigneeValue()
+                .list();
+        assertThat(tasks).hasSize(6);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroupIn(candidateGroups)
+                .list();
+        assertThat(tasks).hasSize(5);
 
         tasks = taskService.createTaskQuery()
                 .taskCandidateOrAssigned("kermit")
