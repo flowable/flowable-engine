@@ -25,6 +25,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventregistry.api.EventDeployment;
@@ -33,6 +35,7 @@ import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -44,7 +47,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @BpmnJmsEventTest
 @TestPropertySource(properties = {
-        "application.test.jms-queue=test-queue"
+        "application.test.jms-queue=test-bpmn-queue",
+        "application.test.another-jms-queue=another-bpmn-queue"
 })
 public class ProcessWithEventRegistryTest {
     
@@ -65,6 +69,94 @@ public class ProcessWithEventRegistryTest {
     
     @Autowired
     protected JmsTemplate jmsTemplate;
+    
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testMultipleStartEvents.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one.event",
+            "org/flowable/eventregistry/integrationtest/another.event",
+            "org/flowable/eventregistry/integrationtest/one.channel",
+            "org/flowable/eventregistry/integrationtest/another.channel"})
+    public void testMultipleStartEvents() {
+        try {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("multipleStartEvents").singleResult();
+            List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processDefinitionId(processDefinition.getId()).list();
+            
+            EventSubscription eventSubscriptionOne = null;
+            EventSubscription eventSubscriptionAnother = null;
+            for (EventSubscription eventSubscription : eventSubscriptions) {
+                if ("start1".equals(eventSubscription.getActivityId())) {
+                    eventSubscriptionOne = eventSubscription;
+                } else if ("start2".equals(eventSubscription.getActivityId())) {
+                    eventSubscriptionAnother = eventSubscription;
+                }
+            }
+            assertThat(eventSubscriptionAnother).isNotNull();
+            assertThat(eventSubscriptionAnother.getActivityId()).isEqualTo("start2");
+            assertThat(eventSubscriptionAnother.getEventType()).isEqualTo("another");
+            
+            assertThat(eventSubscriptionOne).isNotNull();
+            assertThat(eventSubscriptionOne.getActivityId()).isEqualTo("start1");
+            assertThat(eventSubscriptionOne.getEventType()).isEqualTo("one");
+            
+            jmsTemplate.convertAndSend("another-bpmn-queue", "{"
+                + "    \"payload1\": \"kermit\","
+                + "    \"payload2\": 123"
+                + "}", messageProcessor -> {
+                    
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> {
+                    assertThat(runtimeService.createExecutionQuery().processDefinitionKey("multipleStartEvents").activityId("receive2").count()).isEqualTo(1);
+                });
+            
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("multipleStartEvents").singleResult();
+            Object varValue1 = runtimeService.getVariable(processInstance.getId(), "anotherValue1");
+            assertThat(varValue1).isEqualTo("kermit");
+            Object varValue2 = runtimeService.getVariable(processInstance.getId(), "anotherValue2");
+            assertThat(varValue2).isEqualTo(123);
+            
+            Execution execution = runtimeService.createExecutionQuery().processDefinitionKey("multipleStartEvents").activityId("receive2").singleResult();
+            runtimeService.trigger(execution.getId());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+            
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                + "    \"payload1\": \"fozzie\","
+                + "    \"payload2\": 456"
+                + "}", messageProcessor -> {
+                    
+                messageProcessor.setStringProperty("headerProperty1", "456b");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> {
+                    assertThat(runtimeService.createExecutionQuery().processDefinitionKey("multipleStartEvents").activityId("receive1").count()).isEqualTo(1);
+                });
+            
+            processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("multipleStartEvents").singleResult();
+            varValue1 = runtimeService.getVariable(processInstance.getId(), "value1");
+            assertThat(varValue1).isEqualTo("fozzie");
+            varValue2 = runtimeService.getVariable(processInstance.getId(), "value2");
+            assertThat(varValue2).isEqualTo(456);
+            
+            execution = runtimeService.createExecutionQuery().processDefinitionKey("multipleStartEvents").activityId("receive1").singleResult();
+            runtimeService.trigger(execution.getId());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndPayload.bpmn20.xml",
@@ -76,7 +168,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
@@ -105,7 +197,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "456b")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"fozzie\","
                 + "    \"payload2\": 456"
                 + "}", messageProcessor -> {
@@ -129,7 +221,7 @@ public class ProcessWithEventRegistryTest {
             
             nonMatchingEventConsumer.setNonMatchingEvent(null);
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"fozzie\","
                 + "    \"payload2\": 456"
                 + "}", messageProcessor -> {
@@ -171,7 +263,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
@@ -215,7 +307,7 @@ public class ProcessWithEventRegistryTest {
                     .variable("customerIdVar", "123a")
                     .start();
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
