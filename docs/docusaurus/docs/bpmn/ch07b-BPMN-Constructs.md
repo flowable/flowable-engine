@@ -3881,6 +3881,20 @@ It is also possible to use [field injection](bpmn/ch07b-BPMN-Constructs.md#field
       <flowable:field name="resultVariable" stringValue="myVar" />
     </flowable:taskListener>
 
+- Since Flowable 6.8.0 scriptable task listeners became a first-class citizen using a more compact syntax, avoiding to hard-code the class name:
+
+<!-- -->
+
+    <flowable:taskListener event="complete" type="script">
+      <flowable:script language="groovy" resultVariable="myVar">
+        <![CDATA[
+          def bar = "BAR";  // local variable
+          task.setOwner("kermit"); // test access to task instance
+          bar // implicit return value
+        ]]>
+      </flowable:script>
+    </flowable:taskListener>
+
 #### Throwing BPMN Error in Task Listeners
 
 Jump to section [Throwing BPMN Error in Execution Listeners](bpmn/ch07b-BPMN-Constructs.md#throwing-bpmn-error-in-execution-listeners) as the same rules apply for task listeners.
