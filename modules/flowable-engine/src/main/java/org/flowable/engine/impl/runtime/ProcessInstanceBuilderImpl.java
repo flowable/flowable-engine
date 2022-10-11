@@ -33,6 +33,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String processDefinitionKey;
     protected String processDefinitionParentDeploymentId;
     protected String messageName;
+    protected String startEventId;
     protected String processInstanceName;
     protected String businessKey;
     protected String businessStatus;
@@ -80,6 +81,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder messageName(String messageName) {
         this.messageName = messageName;
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceBuilder startEventId(String startEventId) {
+        this.startEventId = startEventId;
         return this;
     }
 
@@ -277,6 +284,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getMessageName() {
         return messageName;
+    }
+
+    public String getStartEventId() {
+        return startEventId;
     }
 
     public String getProcessInstanceName() {

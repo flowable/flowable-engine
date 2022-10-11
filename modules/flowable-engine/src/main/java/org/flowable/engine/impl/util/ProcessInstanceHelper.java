@@ -76,12 +76,12 @@ public class ProcessInstanceHelper {
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String businessStatus, String processInstanceName,
             Map<String, Object> variables, Map<String, Object> transientVariables, String ownerId, String assigneeId) {
 
-        return createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName, null, null,
+        return createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName, null, null, null,
                 variables, transientVariables, null, null, null, null, ownerId, assigneeId, null, false);
     }
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String businessStatus, String processInstanceName,
-            String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables,
+            String startEventId, String overrideDefinitionTenantId, String predefinedProcessInstanceId, Map<String, Object> variables, Map<String, Object> transientVariables,
             String callbackId, String callbackType, String referenceId, String referenceType, String ownerId, String assigneeId,
             String stageInstanceId, boolean startProcessInstance) {
 
@@ -102,8 +102,24 @@ public class ProcessInstanceHelper {
         if (process == null) {
             throw new FlowableException("Cannot start process instance. Process model " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") could not be found");
         }
-
-        FlowElement initialFlowElement = process.getInitialFlowElement();
+        
+        FlowElement initialFlowElement = null;
+        if (StringUtils.isNotEmpty(startEventId)) {
+            FlowElement startEventFlowElement = process.getFlowElement(startEventId);
+            if (startEventFlowElement == null) {
+                throw new FlowableException("No start element found with id " + startEventId + " for process definition " + processDefinition.getId());
+            }
+            
+            if (!(startEventFlowElement instanceof StartEvent)) {
+                throw new FlowableException("Provide start event id is not a start event " + startEventId + " for process definition " + processDefinition.getId());
+            }
+            
+            initialFlowElement = startEventFlowElement;
+            
+        } else {
+            initialFlowElement = process.getInitialFlowElement();
+        }
+        
         if (initialFlowElement == null) {
             throw new FlowableException("No start element found for process definition " + processDefinition.getId());
         }
