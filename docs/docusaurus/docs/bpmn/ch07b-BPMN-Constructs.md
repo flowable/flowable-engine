@@ -3881,6 +3881,10 @@ It is also possible to use [field injection](bpmn/ch07b-BPMN-Constructs.md#field
       <flowable:field name="resultVariable" stringValue="myVar" />
     </flowable:taskListener>
 
+#### Throwing BPMN Error in Task Listeners
+
+Jump to section [Throwing BPMN Error in Execution Listeners](bpmn/ch07b-BPMN-Constructs.md#throwing-bpmn-error-in-execution-listeners) as the same rules apply for task listeners.
+
 ### Multi-instance (for each)
 
 #### Description
