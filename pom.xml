@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<name>Flowable</name>
@@ -15,7 +15,7 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.7.4</spring.boot.version>
-		<spring.framework.version>5.3.23</spring.framework.version>
+		<spring.framework.version>4.3.29.RELEASE</spring.framework.version>
 		<spring.security.version>5.7.3</spring.security.version>
 		<spring.amqp.version>2.4.7</spring.amqp.version>
 		<spring.kafka.version>2.8.9</spring.kafka.version>
@@ -44,15 +44,15 @@
 		<argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>
 
 		<!-- OSGi bundles properties -->
-		<flowable.artifact />
+		<flowable.artifact/>
 		<flowable.osgi.import.flowable.version>version="[$(version;==;${flowable.osgi.version.clean}),$(version;=+;${flowable.osgi.version.clean}))"</flowable.osgi.import.flowable.version>
 		<flowable.osgi.import.strict.version>version="[$(version;===;${flowable.osgi.version.clean}),$(version;==+;${flowable.osgi.version.clean}))"</flowable.osgi.import.strict.version>
 		<flowable.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</flowable.osgi.import.default.version>
 		<flowable.osgi.import.defaults>
 		</flowable.osgi.import.defaults>
-		<flowable.osgi.import.before.defaults />
-		<flowable.osgi.import.additional />
-		<flowable.osgi.export.additional />
+		<flowable.osgi.import.before.defaults/>
+		<flowable.osgi.import.additional/>
+		<flowable.osgi.export.additional/>
 		<flowable.osgi.import.pkg>
 			org.flowable.*;${flowable.osgi.import.flowable.version},
 			${flowable.osgi.import.before.defaults},
@@ -60,7 +60,7 @@
 			${flowable.osgi.import.additional},
 			*
 		</flowable.osgi.import.pkg>
-		<flowable.osgi.activator />
+		<flowable.osgi.activator/>
 		<flowable.osgi.failok>false</flowable.osgi.failok>
 		<flowable.osgi.export>${flowable.osgi.export.pkg};${flowable.osgi.version};-noimport:=true</flowable.osgi.export>
 		<!-- <flowable.osgi.export.pkg>!*.impl;${flowable.artifact}*</flowable.osgi.export.pkg>
@@ -69,16 +69,16 @@
 			${flowable.artifact}*,
 			${flowable.osgi.export.additional}
 		</flowable.osgi.export.pkg>
-		<flowable.osgi.private.pkg></flowable.osgi.private.pkg>
+		<flowable.osgi.private.pkg/>
 		<flowable.osgi.version>version=${project.version}</flowable.osgi.version>
 		<flowable.osgi.split.pkg>-split-package:=first</flowable.osgi.split.pkg>
 		<flowable.osgi.import>${flowable.osgi.import.pkg}</flowable.osgi.import>
-		<flowable.osgi.dynamic />
+		<flowable.osgi.dynamic/>
 		<flowable.osgi.symbolic.name>${flowable.artifact}</flowable.osgi.symbolic.name>
 		<flowable.osgi.exclude.dependencies>false</flowable.osgi.exclude.dependencies>
 		<flowable.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</flowable.osgi.remove.headers>
 		<flowable.osgi.include.resource>{maven-resources}</flowable.osgi.include.resource>
-		<flowable.osgi.embed></flowable.osgi.embed>
+		<flowable.osgi.embed/>
 	</properties>
 
 	<dependencyManagement>
@@ -1319,7 +1319,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
