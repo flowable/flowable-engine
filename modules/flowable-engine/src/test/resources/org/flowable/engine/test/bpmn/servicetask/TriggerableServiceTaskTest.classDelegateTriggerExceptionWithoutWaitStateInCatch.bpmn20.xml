@@ -9,8 +9,8 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="service1" />
     
-    <serviceTask id="service1" flowable:delegateExpression="${triggerableServiceTask}" flowable:triggerable="true"/>
-    <sequenceFlow sourceRef="service1" targetRef="usertask1" />
+    <serviceTask id="service1" flowable:class="org.flowable.engine.test.bpmn.servicetask.ThrowBpmnErrorTriggerableServiceTask" flowable:triggerable="true"/>
+    <sequenceFlow sourceRef="service1" targetRef="usertask1" flowable:expression="${throw.Exception()}"/>
 
     <userTask id="usertask1" name="Task A"/>
     <sequenceFlow sourceRef="usertask1" targetRef="theEnd" />
@@ -22,7 +22,9 @@
         <errorEventDefinition /> <!-- no errorCode: catch any error -->
       </startEvent>
       <sequenceFlow id="flow3" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
-      <userTask id="taskAfterErrorCatch" name="Escalated Task" />
+      <serviceTask id="taskAfterErrorCatch" name="set escalated variable" flowable:expression="${execution.setVariable('escalatedVar', true)}"/>
+      <sequenceFlow sourceRef="taskAfterErrorCatch" targetRef="catchEnd" />
+      <endEvent id="catchEnd"/>
     </subProcess>
   </process>
 

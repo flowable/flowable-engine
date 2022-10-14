@@ -9,7 +9,7 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="service1" />
     
-    <serviceTask id="service1" flowable:delegateExpression="${triggerableServiceTask}" flowable:triggerable="true"/>
+    <serviceTask id="service1" flowable:class="org.flowable.engine.test.bpmn.servicetask.ThrowBpmnErrorTriggerableServiceTask" flowable:triggerable="true"/>
     <sequenceFlow sourceRef="service1" targetRef="usertask1" />
 
     <userTask id="usertask1" name="Task A"/>

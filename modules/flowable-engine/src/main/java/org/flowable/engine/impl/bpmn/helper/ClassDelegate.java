@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Falko Menge
  * @author Saeid Mirzaei
  * @author Yvo Swillens
+ * @author martin.grofcik
  */
 public class ClassDelegate extends AbstractClassDelegate implements TaskListener, ExecutionListener, TransactionDependentExecutionListener, TransactionDependentTaskListener, SubProcessActivityBehavior, CustomPropertiesResolver {
 
@@ -206,11 +207,18 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance();
         }
-
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
-            ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-            if (triggerable) {
-                leave(execution);
+            try {
+                ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+                if (triggerable) {
+                    leave(execution);
+                }
+            } catch (BpmnError error) {
+                ErrorPropagation.propagateError(error, execution);
+            } catch (RuntimeException e) {
+                if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                    throw e;
+                }
             }
         } else {
             throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance");

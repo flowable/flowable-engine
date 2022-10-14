@@ -24,6 +24,7 @@
       <sequenceFlow id="flow3" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
       <userTask id="taskAfterErrorCatch" name="Escalated Task" />
     </subProcess>
+
   </process>
 
 </definitions>
