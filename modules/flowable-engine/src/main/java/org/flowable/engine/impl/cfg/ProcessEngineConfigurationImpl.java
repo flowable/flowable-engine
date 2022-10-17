@@ -2764,6 +2764,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             // Only shutdown if it was created by this configuration
             asyncHistoryTaskExecutor.shutdown();
         }
+
+        httpClientConfig.close();
     }
 
 

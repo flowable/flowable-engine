@@ -2083,6 +2083,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             // Only shutdown if it was created by this configuration
             asyncHistoryTaskExecutor.shutdown();
         }
+
+        httpClientConfig.close();
     }
 
     @Override
