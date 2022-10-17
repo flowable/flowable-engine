@@ -26,6 +26,8 @@ import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
@@ -152,6 +154,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
         @Cmmn ObjectProvider<AsyncListenableTaskExecutor> cmmnTaskExecutor,
         @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
+        @Qualifier("flowableAsyncTaskInvokerTaskExecutor") ObjectProvider<AsyncTaskExecutor> asyncTaskInvokerTaskExecutor,
         ObjectProvider<FlowableHttpClient> flowableHttpClient,
         ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
@@ -186,6 +189,10 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             configuration.setAsyncHistoryTaskExecutor(flowableTaskExecutor);
         }
 
+        AsyncTaskExecutor taskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor.getIfAvailable();
+        if (taskInvokerTaskExecutor != null) {
+            configuration.setAsyncTaskInvokerTaskExecutor(taskInvokerTaskExecutor);
+        }
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);

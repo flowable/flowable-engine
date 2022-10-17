@@ -34,6 +34,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
+import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -48,12 +49,12 @@ import org.junit.Test;
 public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestCase {
 
     protected AsyncTaskInvoker originalAsyncTaskInvoker;
-    protected AsyncTaskExecutor originalAsyncTaskExecutor;
+    protected AsyncTaskExecutor originalAsyncTaskInvokerTaskExecutor;
 
     @Before
     public void setUp() {
         this.originalAsyncTaskInvoker = this.cmmnEngineConfiguration.getAsyncTaskInvoker();
-        this.originalAsyncTaskExecutor = this.cmmnEngineConfiguration.getAsyncTaskExecutor();
+        this.originalAsyncTaskInvokerTaskExecutor = this.cmmnEngineConfiguration.getAsyncTaskInvokerTaskExecutor();
     }
 
     @After
@@ -62,13 +63,13 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
             this.cmmnEngineConfiguration.setAsyncTaskInvoker(this.originalAsyncTaskInvoker);
         }
 
-        AsyncTaskExecutor currentAsyncTaskExecutor = this.cmmnEngineConfiguration.getAsyncTaskExecutor();
+        AsyncTaskExecutor currentAsyncTaskExecutor = this.cmmnEngineConfiguration.getAsyncTaskInvokerTaskExecutor();
 
-        if (this.originalAsyncTaskExecutor != null) {
-            this.cmmnEngineConfiguration.setAsyncTaskExecutor(this.originalAsyncTaskExecutor);
+        if (this.originalAsyncTaskInvokerTaskExecutor != null) {
+            this.cmmnEngineConfiguration.setAsyncTaskInvokerTaskExecutor(this.originalAsyncTaskInvokerTaskExecutor);
         }
 
-        if (this.originalAsyncTaskExecutor != currentAsyncTaskExecutor) {
+        if (this.originalAsyncTaskInvokerTaskExecutor != currentAsyncTaskExecutor) {
             // If they are different shut down the current one
             currentAsyncTaskExecutor.shutdown();
         }
@@ -78,12 +79,14 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
     @CmmnDeployment
     public void testDelegateExpression() {
 
-        DefaultAsyncTaskExecutor asyncTaskExecutor = new DefaultAsyncTaskExecutor();
-        asyncTaskExecutor.setCorePoolSize(4);
-        asyncTaskExecutor.setMaxPoolSize(4);
-        asyncTaskExecutor.setQueueSize(1);
+        AsyncTaskExecutorConfiguration executorConfiguration = new AsyncTaskExecutorConfiguration();
+        executorConfiguration.setCorePoolSize(4);
+        executorConfiguration.setMaxPoolSize(4);
+        executorConfiguration.setQueueSize(1);
+        executorConfiguration.setThreadNamePrefix("flowable-async-task-invoker-thread-");
+        DefaultAsyncTaskExecutor asyncTaskExecutor = new DefaultAsyncTaskExecutor(executorConfiguration);
         asyncTaskExecutor.start();
-        cmmnEngineConfiguration.setAsyncTaskExecutor(asyncTaskExecutor);
+        cmmnEngineConfiguration.setAsyncTaskInvokerTaskExecutor(asyncTaskExecutor);
         cmmnEngineConfiguration.setAsyncTaskInvoker(new DefaultAsyncTaskInvoker(asyncTaskExecutor));
 
         String currentThreadName = Thread.currentThread().getName();
@@ -110,10 +113,10 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
                     "executionThread7", "executionThread8", "executionThread9"
                 )
                 .containsValues(
-                    "flowable-async-job-executor-thread-1",
-                    "flowable-async-job-executor-thread-2",
-                    "flowable-async-job-executor-thread-3",
-                    "flowable-async-job-executor-thread-4",
+                    "flowable-async-task-invoker-thread-1",
+                    "flowable-async-task-invoker-thread-2",
+                    "flowable-async-task-invoker-thread-3",
+                    "flowable-async-task-invoker-thread-4",
                     currentThreadName
                 );
         }
@@ -127,12 +130,12 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
         asyncTaskExecutor.setMaxPoolSize(4);
         asyncTaskExecutor.setQueueSize(1);
         asyncTaskExecutor.start();
-        cmmnEngineConfiguration.setAsyncTaskExecutor(asyncTaskExecutor);
+        cmmnEngineConfiguration.setAsyncTaskInvokerTaskExecutor(asyncTaskExecutor);
         cmmnEngineConfiguration.setAsyncTaskInvoker(new AsyncTaskInvoker() {
 
             @Override
             public <T> CompletableFuture<T> submit(Callable<T> task) {
-                return cmmnEngineConfiguration.getAsyncTaskExecutor().submit(task);
+                return cmmnEngineConfiguration.getAsyncTaskInvokerTaskExecutor().submit(task);
             }
         });
 
