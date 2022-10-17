@@ -27,6 +27,7 @@ import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -119,6 +120,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected AsyncExecutor asyncExecutor;
     protected AsyncTaskExecutor asyncTaskExecutor;
     protected boolean shutdownAsyncTaskExecutor;
+    protected AsyncTaskExecutor asyncTaskInvokerTaskExecutor;
+    protected boolean shutdownAsyncTaskInvokerTaskExecutor;
     protected AsyncTaskInvoker asyncTaskInvoker;
 
     protected AsyncExecutor asyncHistoryExecutor;
@@ -734,6 +737,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
+    public AsyncTaskExecutor getAsyncTaskInvokerTaskExecutor() {
+        return asyncTaskInvokerTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskInvokerTaskExecutor(AsyncTaskExecutor asyncTaskInvokerTaskExecutor) {
+        this.asyncTaskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor;
         return this;
     }
 
