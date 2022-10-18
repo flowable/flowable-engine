@@ -769,7 +769,7 @@
                                                     </when>
                                                 </choose>
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.TEXT_ is null
+                                                    or V.TEXT_ is null
                                                 </if>
                                                 )
                                             </if>
@@ -791,7 +791,7 @@
                                                 <include refid="variableOperator"/>
                                                 #{queryVariableValue.longValue}
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.LONG_ is null
+                                                    or V.LONG_ is null
                                                 </if>
                                                 )
                                             </if>
@@ -800,7 +800,7 @@
                                                 <include refid="variableOperator"/>
                                                 #{queryVariableValue.doubleValue}
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.DOUBLE_ is null
+                                                    or V.DOUBLE_ is null
                                                 </if>
                                                 )
                                             </if>
