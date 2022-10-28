@@ -95,7 +95,6 @@ import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;

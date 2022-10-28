@@ -36,7 +36,6 @@ import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ReceiveTask;
-import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;

@@ -27,7 +27,6 @@ import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymen
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
-import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
