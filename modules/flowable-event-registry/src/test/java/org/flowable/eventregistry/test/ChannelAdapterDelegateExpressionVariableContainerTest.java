@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
@@ -163,22 +162,16 @@ public class ChannelAdapterDelegateExpressionVariableContainerTest extends Abstr
 
     private static class TestInboundEventProcessingPipeline implements InboundEventProcessingPipeline {
 
-        public AtomicInteger counter = new AtomicInteger(0);
-
         @Override
         public Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent rawEvent) {
-            counter.incrementAndGet();
             return Collections.emptyList();
         }
     }
 
     private static class TestOutboundEventProcessingPipeline implements OutboundEventProcessingPipeline<String> {
 
-        public AtomicInteger counter = new AtomicInteger(0);
-
         @Override
         public String run(EventInstance eventInstance) {
-            counter.incrementAndGet();
             return "test";
         }
     }
