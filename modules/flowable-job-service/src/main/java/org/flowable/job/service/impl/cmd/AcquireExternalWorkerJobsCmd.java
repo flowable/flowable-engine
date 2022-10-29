@@ -15,8 +15,10 @@ package org.flowable.job.service.impl.cmd;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -73,22 +75,26 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
 
         int lockTimeInMillis = (int) builder.getLockDuration().abs().toMillis();
         List<AcquiredExternalWorkerJob> acquiredJobs = new ArrayList<>(jobs.size());
+        Set<String> lockedProcessInstances = new HashSet<>();
 
         for (ExternalWorkerJobEntity job : jobs) {
-            lockJob(commandContext, job, lockTimeInMillis);
-            Map<String, Object> variables = null;
-            if (internalJobManager != null) {
-                VariableScope variableScope = internalJobManager.resolveVariableScope(job);
-                if (variableScope != null) {
-                    variables = variableScope.getVariables();
+            if (!job.isExclusive() || (job.isExclusive() && !lockedProcessInstances.contains(job.getProcessInstanceId()))) {
+                lockJob(commandContext, job, lockTimeInMillis);
+                Map<String, Object> variables = null;
+                if (internalJobManager != null) {
+                    VariableScope variableScope = internalJobManager.resolveVariableScope(job);
+                    if (variableScope != null) {
+                        variables = variableScope.getVariables();
+                    }
+
+                    if (job.isExclusive()) {
+                        internalJobManager.lockJobScope(job);
+                        lockedProcessInstances.add(job.getProcessInstanceId());
+                    }
                 }
 
-                if (job.isExclusive()) {
-                    internalJobManager.lockJobScope(job);
-                }
+                acquiredJobs.add(new AcquiredExternalWorkerJobImpl(job, variables));
             }
-
-            acquiredJobs.add(new AcquiredExternalWorkerJobImpl(job, variables));
         }
 
         return acquiredJobs;

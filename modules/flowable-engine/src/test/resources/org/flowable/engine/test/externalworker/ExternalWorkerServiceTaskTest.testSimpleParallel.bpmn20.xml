@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+>
+
+    <process id="simpleParallelExternalWorker">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart" targetRef="parallelGateway1"/>
+
+        <parallelGateway id="parallelGateway1"></parallelGateway>
+
+        <sequenceFlow sourceRef="parallelGateway1" targetRef="externalWorkerTask1"/>
+
+        <serviceTask id="externalWorkerTask1" flowable:type="external-worker" flowable:topic="simple"/>
+
+        <sequenceFlow sourceRef="parallelGateway1" targetRef="externalWorkerTask2"/>
+
+        <serviceTask id="externalWorkerTask2" flowable:type="external-worker" flowable:topic="simple"/>
+
+        <sequenceFlow sourceRef="externalWorkerTask1" targetRef="parallelGateway2"/>
+
+        <sequenceFlow sourceRef="externalWorkerTask2" targetRef="parallelGateway2"/>
+
+        <parallelGateway id="parallelGateway2"></parallelGateway>
+
+        <sequenceFlow sourceRef="parallelGateway2" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>
