@@ -75,10 +75,10 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
 
         int lockTimeInMillis = (int) builder.getLockDuration().abs().toMillis();
         List<AcquiredExternalWorkerJob> acquiredJobs = new ArrayList<>(jobs.size());
-        Set<String> lockedProcessInstances = new HashSet<>();
+        Set<String> jobLockIds = new HashSet<>();
 
         for (ExternalWorkerJobEntity job : jobs) {
-            if (!job.isExclusive() || (job.isExclusive() && !lockedProcessInstances.contains(job.getProcessInstanceId()))) {
+            if (hasUnLockedJobScope(internalJobManager, job, jobLockIds)) {
                 lockJob(commandContext, job, lockTimeInMillis);
                 Map<String, Object> variables = null;
                 if (internalJobManager != null) {
@@ -89,7 +89,10 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
 
                     if (job.isExclusive()) {
                         internalJobManager.lockJobScope(job);
-                        lockedProcessInstances.add(job.getProcessInstanceId());
+                        String jobLockId = internalJobManager.resolveJobLockId(job);
+                        if (jobLockId != null) {
+                            jobLockIds.add(jobLockId);
+                        }
                     }
                 }
 
@@ -98,6 +101,16 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
         }
 
         return acquiredJobs;
+    }
+
+    protected boolean hasUnLockedJobScope(InternalJobManager internalJobManager, ExternalWorkerJobEntity job, Set<String> jobLockIds) {
+        if (internalJobManager != null && job.isExclusive()) {
+            String jobLockId = internalJobManager.resolveJobLockId(job);
+            if (jobLockId != null && jobLockIds.contains(jobLockId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {

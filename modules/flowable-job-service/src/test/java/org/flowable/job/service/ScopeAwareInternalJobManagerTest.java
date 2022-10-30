@@ -205,6 +205,7 @@ class ScopeAwareInternalJobManagerTest {
     private static class TestScopeAwareInternalJobManager extends ScopeAwareInternalJobManager {
 
         protected Map<Job, VariableScope> variableScopeByJob = new HashMap<>();
+        protected Map<Job, String> lockIdByJob = new HashMap<>();
         protected Map<Job, Boolean> insertJobInternalByJob = new HashMap<>();
         protected Job jobDeleteInternal;
         protected Job lockJobScopeInternal;
@@ -219,6 +220,12 @@ class ScopeAwareInternalJobManagerTest {
         protected VariableScope resolveVariableScopeInternal(Job job) {
             invokedMethods.add("resolveVariableScopeInternal");
             return variableScopeByJob.get(job);
+        }
+
+        @Override
+        protected String resolveJobLockIdInternal(Job job) {
+            invokedMethods.add("resolveJobLockIdInternal");
+            return lockIdByJob.get(job);
         }
 
         @Override

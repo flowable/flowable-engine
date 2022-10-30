@@ -70,6 +70,11 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     }
 
     @Override
+    protected String resolveJobLockIdInternal(Job job){
+        return job.getProcessInstanceId();
+    }
+
+    @Override
     protected boolean handleJobInsertInternal(Job job) {
         // add link to execution
         if (job.getExecutionId() != null) {

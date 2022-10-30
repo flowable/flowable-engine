@@ -26,6 +26,8 @@ public interface InternalJobManager {
     void registerScopedInternalJobManager(String scopeType, InternalJobManager internalJobManager);
 
     VariableScope resolveVariableScope(Job job);
+
+    String resolveJobLockId(Job job);
     
     boolean handleJobInsert(Job job);
     
