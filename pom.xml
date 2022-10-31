@@ -16,7 +16,7 @@
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.7.5</spring.boot.version>
 		<spring.framework.version>5.3.23</spring.framework.version>
-		<spring.security.version>5.7.4</spring.security.version>
+		<spring.security.version>5.7.5</spring.security.version>
 		<spring.amqp.version>2.4.7</spring.amqp.version>
 		<spring.kafka.version>2.8.10</spring.kafka.version>
 		<reactor-netty.version>1.0.20</reactor-netty.version>
