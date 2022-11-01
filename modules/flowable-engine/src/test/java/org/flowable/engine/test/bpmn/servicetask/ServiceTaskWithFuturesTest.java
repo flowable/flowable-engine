@@ -271,14 +271,14 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
             assertThat(historicVariables.get("executionThreadName1"))
                     .asInstanceOf(STRING)
                     .isNotEqualTo(currentThreadName)
-                    .startsWith("flowable-async-job-executor-thread-");
+                    .startsWith("flowable-async-task-invoker-thread-");
 
             assertThat(historicVariables.get("executionThreadName2"))
                     .asInstanceOf(STRING)
                     .isNotEqualTo(currentThreadName)
                     // The executions should be done on different threads
                     .isNotEqualTo(historicVariables.get("executionThreadName1"))
-                    .startsWith("flowable-async-job-executor-thread-");
+                    .startsWith("flowable-async-task-invoker-thread-");
         }
     }
 
@@ -519,14 +519,14 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
             assertThat(historicVariables.get("executionThreadName1"))
                     .asInstanceOf(STRING)
                     .isNotEqualTo(currentThreadName)
-                    .startsWith("flowable-async-job-executor-thread-");
+                    .startsWith("flowable-async-task-invoker-thread-");
 
             assertThat(historicVariables.get("executionThreadName2"))
                     .asInstanceOf(STRING)
                     .isNotEqualTo(currentThreadName)
                     // The executions should be done on different threads
                     .isNotEqualTo(historicVariables.get("executionThreadName1"))
-                    .startsWith("flowable-async-job-executor-thread-");
+                    .startsWith("flowable-async-task-invoker-thread-");
         }
     }
 

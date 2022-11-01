@@ -19,6 +19,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
@@ -180,6 +181,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
             ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
             @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
+            @Qualifier("flowableAsyncTaskInvokerTaskExecutor") ObjectProvider<AsyncTaskExecutor> asyncTaskInvokerTaskExecutor,
             ObjectProvider<FlowableHttpClient> flowableHttpClient,
             ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
@@ -217,6 +219,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         if (springAsyncHistoryExecutor != null) {
             conf.setAsyncHistoryEnabled(true);
             conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
+        }
+
+        AsyncTaskExecutor taskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor.getIfAvailable();
+        if (taskInvokerTaskExecutor != null) {
+            conf.setAsyncTaskInvokerTaskExecutor(taskInvokerTaskExecutor);
         }
 
         ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();

@@ -415,7 +415,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(executionsCount).isEqualTo(5);
+        assertThat(executionsCount).isEqualTo(6);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
         assertThat(parallelSubProcessCount).isEqualTo(2);
         subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
@@ -429,7 +429,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         changeActivityStateBuilder.changeState();
 
         executionsCount = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(executionsCount).isEqualTo(5);
+        assertThat(executionsCount).isEqualTo(6);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
         assertThat(parallelSubProcessCount).isEqualTo(2);
         subTask1Executions = runtimeService.createExecutionQuery().activityId("subTask1").list();
@@ -553,7 +553,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(23);
+        assertThat(totalChildExecutions).isEqualTo(24);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
         assertThat(parallelSubProcessCount).isEqualTo(3);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
@@ -569,7 +569,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         changeActivityStateBuilder.changeState();
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(23);
+        assertThat(totalChildExecutions).isEqualTo(24);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
         assertThat(parallelSubProcessCount).isEqualTo(3);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
@@ -848,7 +848,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(23);
+        assertThat(totalChildExecutions).isEqualTo(24);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
         assertThat(parallelSubProcessCount).isEqualTo(3);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
@@ -948,7 +948,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //One less task execution and one less nested instance
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(23);
+        assertThat(totalChildExecutions).isEqualTo(24);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcessOuter").count();
         assertThat(parallelSubProcessCount).isEqualTo(3);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelNestedSubProcess").count();
@@ -1044,7 +1044,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(1).getId());
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(5);
+        assertThat(totalChildExecutions).isEqualTo(6);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
         assertThat(parallelSubProcessCount).isEqualTo(2);
         postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();
@@ -1123,7 +1123,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(1).getId());
 
         totalChildExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count();
-        assertThat(totalChildExecutions).isEqualTo(5);
+        assertThat(totalChildExecutions).isEqualTo(6);
         parallelSubProcessCount = runtimeService.createExecutionQuery().activityId("parallelSubProcess").count();
         assertThat(parallelSubProcessCount).isEqualTo(2);
         postForkTaskExecutions = runtimeService.createExecutionQuery().activityId("postForkTask").list();

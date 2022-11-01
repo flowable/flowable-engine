@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <process id="multipleStartEvents">
+
+        <startEvent id="start1">
+            <extensionElements>
+                <flowable:eventType>one</flowable:eventType>
+                <flowable:eventOutParameter source="headerProperty1" target="headerValue1"/>
+                <flowable:eventOutParameter source="headerProperty2" target="headerValue2"/>
+                <flowable:eventOutParameter source="payload1" target="value1" />
+                <flowable:eventOutParameter source="payload2" target="value2" />
+            </extensionElements>
+        </startEvent>
+        
+        <sequenceFlow sourceRef="start1" targetRef="receive1"/>
+
+        <receiveTask id="receive1" />
+        
+        <startEvent id="start2">
+            <extensionElements>
+                <flowable:eventType>another</flowable:eventType>
+                <flowable:eventOutParameter source="headerProperty1" target="anotherHeaderValue1"/>
+                <flowable:eventOutParameter source="headerProperty2" target="anotherHeaderValue2"/>
+                <flowable:eventOutParameter source="payload1" target="anotherValue1" />
+                <flowable:eventOutParameter source="payload2" target="anotherValue2" />
+            </extensionElements>
+        </startEvent>
+        
+        <sequenceFlow sourceRef="start2" targetRef="receive2"/>
+
+        <receiveTask id="receive2" />
+
+        <sequenceFlow sourceRef="receive1" targetRef="theEnd"/>
+        
+        <sequenceFlow sourceRef="receive2" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

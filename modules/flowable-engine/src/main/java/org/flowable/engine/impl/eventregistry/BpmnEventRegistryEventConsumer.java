@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
@@ -104,6 +105,10 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                     .processDefinitionId(eventSubscription.getProcessDefinitionId())
                     .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
+            if (StringUtils.isNotEmpty(eventSubscription.getActivityId())) {
+                processInstanceBuilder.startEventId(eventSubscription.getActivityId());
+            }
+            
             if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
                 processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
             }

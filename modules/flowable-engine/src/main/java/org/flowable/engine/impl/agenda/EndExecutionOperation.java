@@ -199,7 +199,7 @@ public class EndExecutionOperation extends AbstractOperation {
 
         // When ending an execution in a multi instance subprocess , special care is needed
         if (isEndEventOrImpliedEndEventInMultiInstanceSubprocess(execution)) {
-            handleMultiInstanceSubProcess(executionEntityManager, parentExecution, execution);
+            handleMultiInstanceSubProcess(processEngineConfiguration, executionEntityManager, parentExecution, execution);
             return;
         }
 
@@ -389,7 +389,7 @@ public class EndExecutionOperation extends AbstractOperation {
         return executionToContinue;
     }
 
-    protected void handleMultiInstanceSubProcess(ExecutionEntityManager executionEntityManager,
+    protected void handleMultiInstanceSubProcess(ProcessEngineConfigurationImpl processEngineConfiguration, ExecutionEntityManager executionEntityManager,
             ExecutionEntity parentExecution, ExecutionEntity currentExecution) {
 
         // Special case: will be handled by the ParallelMultiInstanceWithNoWaitStateCompletionJobHandler asynchronously
@@ -415,10 +415,17 @@ public class EndExecutionOperation extends AbstractOperation {
             // Destroy the current scope (subprocess) and leave via the subprocess
 
             ScopeUtil.createCopyOfSubProcessExecutionForCompensation(parentExecution);
-            agenda.planDestroyScopeOperation(parentExecution);
 
             SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
             MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) subProcess.getBehavior();
+            
+            // For a parallel multi instance with async leave, the scope will be destroyed during job execution.
+            // The scope shouldn't be destroyed here, or the variable resolvement (e.g. completed instances) won't be correct anymore.
+            if (!(multiInstanceBehavior instanceof ParallelMultiInstanceBehavior)
+                    || !processEngineConfiguration.isParallelMultiInstanceAsyncLeave()) {
+                agenda.planDestroyScopeOperation(parentExecution);
+            }
+            
             parentExecution.setCurrentFlowElement(subProcess);
             multiInstanceBehavior.leave(parentExecution);
         }

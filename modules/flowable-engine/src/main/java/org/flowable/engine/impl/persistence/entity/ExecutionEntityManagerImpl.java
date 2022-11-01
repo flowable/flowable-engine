@@ -748,7 +748,7 @@ public class ExecutionEntityManagerImpl
               eventDispatcher.dispatchEvent(
                       FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                               execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                              execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity),
+                              execution.getProcessDefinitionId(), getActivityType(execution.getCurrentFlowElement()), cancelActivity),
                       engineConfiguration.getEngineCfgKey());
         }
 
@@ -761,12 +761,12 @@ public class ExecutionEntityManagerImpl
             eventDispatcher.dispatchEvent(
                 FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                     execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                    execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity),
+                    execution.getProcessDefinitionId(), getActivityType(execution.getCurrentFlowElement()), cancelActivity),
                 engineConfiguration.getEngineCfgKey());
         }
     }
 
-    protected String getActivityType(FlowNode flowNode) {
+    protected String getActivityType(FlowElement flowNode) {
         String elementType = flowNode.getClass().getSimpleName();
         elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
         return elementType;
@@ -810,7 +810,9 @@ public class ExecutionEntityManagerImpl
     
     @Override
     public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase) {
-        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Ending and deleting execution {} Reason: {}", executionEntity, deleteReason);
+        }
         // To start, deactivate the current incoming execution
         executionEntity.setEnded(true);
         executionEntity.setActive(false);

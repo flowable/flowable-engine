@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.event.error;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -306,7 +307,7 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnCallActivity.bpmn20.xml",
             "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess2ndLevel.bpmn20.xml", "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
-    public void testCatchErrorThrownByCallActivityOnCallActivity() throws InterruptedException {
+    public void testCatchErrorThrownByCallActivityOnCallActivity() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity2ndLevel").getId();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -570,6 +571,28 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getName()).isEqualTo(expectedEscalatedTaskName);
+    }
+
+    @Test
+    @Deployment
+    public void catchErrorThrownByTriggerableFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCatchErrorThrownByFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask")
+                .transientVariable("bpmnErrorBean", new TriggerBpmnErrorFutureDelegate())
+                .start()
+                .getId();
+
+        // The service task will throw an error event,
+        runtimeService.trigger(getWaitingExecutionId(processInstanceId), Collections.emptyMap(), Collections.singletonMap("bpmnErrorBean", new TriggerBpmnErrorFutureDelegate()));
+
+        // which is caught on the service task boundary
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Triggered Escalated Task");
+    }
+
+    protected String getWaitingExecutionId(String processInstanceId) {
+        return runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().activityId("serviceTask").singleResult().getId();
     }
 
     static Stream<Arguments> argumentsForCatchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode() {

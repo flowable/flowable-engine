@@ -739,15 +739,15 @@
         "ERRORVARIABLEPACKAGE" : {
           "ERRORVARIABLENAME" : {
             "TITLE" : "Error variable name",
-            "DESCRIPTION" : "Define the error variable name."
+            "DESCRIPTION" : "Stores the bpmn error code to a variable with the given name."
           },          
           "ERRORVARIABLETRANSIENT" : {
-            "TITLE" : "Store as transient variable",
-            "DESCRIPTION" : "Flag defines whether a variable will be stored transiently."
+            "TITLE" : "Error variable transient",
+            "DESCRIPTION" : "Flag defines whether the defined error variable will be stored transiently."
           },
           "ERRORVARIABLELOCALSCOPE" : {
-            "TITLE" : "Store to a local scope",
-            "DESCRIPTION" : "Flag defines whether variable will be stored to a local scope."
+            "TITLE" : "Error variable local scope",
+            "DESCRIPTION" : "Flag defines whether defined error variable will be stored to a local scope."
           }          
         },
         "ESCALATIONREFPACKAGE" : {

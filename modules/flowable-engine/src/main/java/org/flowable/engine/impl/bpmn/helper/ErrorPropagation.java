@@ -47,16 +47,20 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for finding and executing error handlers for BPMN Errors.
- *
+ * <p>
  * Possible error handlers include Error Intermediate Events and Error Event Sub-Processes.
  *
  * @author Tijs Rademakers
  * @author Saeid Mirzaei
  */
 public class ErrorPropagation {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPropagation.class);
 
     public static void propagateError(BpmnError error, DelegateExecution execution) {
         propagateError(error.getErrorCode(), execution);
@@ -95,12 +99,21 @@ public class ErrorPropagation {
 
     protected static void executeCatch(Map<String, List<Event>> eventMap, DelegateExecution delegateExecution, String errorId) {
         Set<String> toDeleteProcessInstanceIds = new HashSet<>();
-
+        LOGGER.debug("Executing error catch for error={}, execution={}, eventMap={}", errorId, delegateExecution, eventMap);
         Event matchingEvent = null;
         ExecutionEntity currentExecution = (ExecutionEntity) delegateExecution;
         ExecutionEntity parentExecution = null;
 
-        if (eventMap.containsKey(currentExecution.getActivityId() + "#" + currentExecution.getProcessDefinitionId())) {
+        /* Only use boundary event, when error handling is not being executed as result of listener invocation.
+         * The reason is the lifecycle of 'executions':
+         * For example, when the 'end' execution listeners are invoked, the corresponding
+         * boundary execution has already been deleted / ended.
+         * For the 'start' listener, the corresponding boundary executions might not have been created yet.
+         * Therefore, when a BPMNError is thrown out listeners, we only search parent executions for a matching
+         * error handler.
+         * When an BPMNError is thrown as a result of a list
+         *  */
+        if (delegateExecution.getCurrentFlowableListener() == null && eventMap.containsKey(currentExecution.getActivityId() + "#" + currentExecution.getProcessDefinitionId())) {
             // Check for multi instance
             if (currentExecution.getParentId() != null && currentExecution.getParent().isMultiInstanceRoot()) {
                 parentExecution = currentExecution.getParent();
@@ -226,10 +239,16 @@ public class ErrorPropagation {
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
             if (parentExecution.isProcessInstanceType()) {
+                LOGGER.debug(
+                        "Ending and deleting child executions for parent execution '{}'. Reason: Parent Execution is processIntanceType. Current Execution '{}'",
+                        parentExecution, currentExecution);
                 executionEntityManager.deleteChildExecutions(parentExecution, null, true);
             } else if (!currentExecution.getParentId().equals(parentExecution.getId())) {
+                LOGGER.debug("Planing destroyScopeOperation for execution {}. Reason: {}. Parent execution: {}", currentExecution,
+                        "Current execution parentId odes not match parentExecution id", parentExecution);
                 CommandContextUtil.getAgenda().planDestroyScopeOperation(currentExecution);
             } else {
+                LOGGER.debug("Deleting execution and related data for execution {}.", currentExecution);
                 executionEntityManager.deleteExecutionAndRelatedData(currentExecution, null, false);
             }
 
@@ -240,14 +259,20 @@ public class ErrorPropagation {
                 CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(eventSubProcessExecution);
                 ExecutionEntity subProcessStartEventExecution = executionEntityManager.createChildExecution(eventSubProcessExecution);
                 subProcessStartEventExecution.setCurrentFlowElement(event);
+                LOGGER.debug("Error StartEvent SubProcess handler {}{} for errorCode {} continueProcessOperation with execution {}", event,
+                        event.getSubProcess(), errorCode,
+                        subProcessStartEventExecution);
                 CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessStartEventExecution);
 
             } else {
+                LOGGER.debug("Error StartEvent handler {} for errorCode {} continueProcessOperation with execution {}", event, errorCode,
+                        eventSubProcessExecution);
                 eventSubProcessExecution.setCurrentFlowElement(event);
                 CommandContextUtil.getAgenda().planContinueProcessOperation(eventSubProcessExecution);
             }
 
         } else {
+            // boundary event
             ExecutionEntity boundaryExecution = null;
             List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
             for (ExecutionEntity childExecution : childExecutions) {
