@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
@@ -42,8 +43,6 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import liquibase.repackaged.org.apache.commons.lang3.StringUtils;
 
 public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
