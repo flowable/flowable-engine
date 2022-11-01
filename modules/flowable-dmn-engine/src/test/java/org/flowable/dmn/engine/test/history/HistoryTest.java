@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
 import org.flowable.dmn.engine.test.DmnDeployment;
 
@@ -395,7 +396,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
                 .executeWithAuditTrail();
 
         List<DmnHistoricDecisionExecution> decisionExecutions = historyService.createNativeHistoricDecisionExecutionQuery()
-                .sql("SELECT * FROM act_dmn_hi_decision_execution").list();
+                .sql("SELECT * FROM " + managementService.getTableName(HistoricDecisionExecutionEntity.class)).list();
 
         assertThat(decisionExecutions.size()).isEqualTo(1);
         DmnHistoricDecisionExecution decisionExecution = decisionExecutions.get(0);
