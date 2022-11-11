@@ -511,7 +511,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelStart() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .transientVariable("elements", Arrays.asList("1", "2", "3"))
@@ -551,7 +550,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelStartAsync() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .transientVariable("elements", Arrays.asList("1", "2", "3"))
@@ -595,7 +593,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelEndAsync() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .variable("throwErrorSubProcessEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .variable("elements", Arrays.asList("1", "2", "3"))
