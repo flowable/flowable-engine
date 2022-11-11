@@ -867,6 +867,8 @@ public abstract class AbstractEngineConfiguration {
             } finally {
                 IoUtil.closeSilently(inputStream);
             }
+        } else {
+            initCustomMybatisCustomizations(sqlSessionFactory.getConfiguration());
         }
     }
 
@@ -898,7 +900,9 @@ public abstract class AbstractEngineConfiguration {
     public void initCustomMybatisMappers(Configuration configuration) {
         if (getCustomMybatisMappers() != null) {
             for (Class<?> clazz : getCustomMybatisMappers()) {
-                configuration.addMapper(clazz);
+                if (!configuration.hasMapper(clazz)) {
+                    configuration.addMapper(clazz);
+                }
             }
         }
     }
@@ -1000,6 +1004,24 @@ public abstract class AbstractEngineConfiguration {
         // see XMLConfigBuilder.mapperElement()
         XMLMapperBuilder mapperParser = new XMLMapperBuilder(getResourceAsStream(resource), configuration, resource, configuration.getSqlFragments());
         mapperParser.parse();
+    }
+
+    protected void initCustomMybatisCustomizations(Configuration configuration) {
+        initCustomMybatisMappers(configuration);
+
+        if (dependentEngineMybatisTypeAliasConfigs != null) {
+            for (MybatisTypeAliasConfigurator typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
+                typeAliasConfig.configure(configuration.getTypeAliasRegistry());
+            }
+        }
+        if (dependentEngineMybatisTypeHandlerConfigs != null) {
+            for (MybatisTypeHandlerConfigurator typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
+                typeHandlerConfig.configure(configuration.getTypeHandlerRegistry());
+            }
+        }
+
+        parseDependentEngineMybatisXMLMappers(configuration);
+        parseCustomMybatisXMLMappers(configuration);
     }
 
     protected InputStream getResourceAsStream(String resource) {
