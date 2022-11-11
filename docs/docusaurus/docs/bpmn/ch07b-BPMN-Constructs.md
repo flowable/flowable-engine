@@ -3726,7 +3726,7 @@ A while back, we also introduced a new type of execution listener, the org.flowa
 
     </flowable:executionListener>
 
-Since Flowable 6.8.0 scriptable execution listeners became a first-class citizen using a more compact syntax, avoiding
+Scriptable execution listeners became a first-class citizen using a more compact syntax, avoiding
 to hard-code the class name:
 
     <flowable:executionListener event="start" type="script">
@@ -3881,7 +3881,7 @@ It is also possible to use [field injection](bpmn/ch07b-BPMN-Constructs.md#field
       <flowable:field name="resultVariable" stringValue="myVar" />
     </flowable:taskListener>
 
-- Since Flowable 6.8.0 scriptable task listeners became a first-class citizen using a more compact syntax, avoiding to hard-code the class name:
+- Scriptable task listeners became a first-class citizen using a more compact syntax, avoiding to hard-code the class name:
 
 <!-- -->
 
