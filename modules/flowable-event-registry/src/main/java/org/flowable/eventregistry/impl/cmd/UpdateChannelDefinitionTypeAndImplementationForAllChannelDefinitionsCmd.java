@@ -42,6 +42,9 @@ public class UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinition
         String encoding = configuration.getXmlEncoding();
         Charset encodingCharset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
         for (ChannelDefinition channelDefinition : channelDefinitions) {
+            // We are explicitly not using EventRepositoryService#getChannelModelById.
+            // When the repository service is used, then it will trigger a deployment of the channel.
+            // However, a channel should not be deployed that early during the update
             ChannelModel model;
             try (InputStream stream = repositoryService.getResourceAsStream(channelDefinition.getDeploymentId(), channelDefinition.getResourceName())) {
                 model = configuration.getChannelJsonConverter().convertToChannelModel(IOUtils.toString(stream, encodingCharset));
