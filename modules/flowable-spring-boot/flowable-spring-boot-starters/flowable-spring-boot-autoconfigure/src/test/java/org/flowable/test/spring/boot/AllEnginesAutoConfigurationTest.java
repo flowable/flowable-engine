@@ -17,6 +17,9 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDeployments;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.flowable.app.engine.AppEngine;
@@ -31,8 +34,13 @@ import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
+import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -40,6 +48,7 @@ import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -55,6 +64,7 @@ import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -79,6 +89,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Filip Hrisafov
@@ -233,6 +245,30 @@ public class AllEnginesAutoConfigurationTest {
     }
 
     @Test
+    public void usingAllAutoConfigurationsEachWithCustomMyBatisXmlMapperShouldWork() {
+        contextRunner
+                .withUserConfiguration(CustomMyBatisXmlMapperConfiguration.class)
+                .run(context -> {
+                    ManagementService managementService = context.getBean(ManagementService.class);
+
+                    assertThat(managementService.executeCommand((Command<Object>) commandContext -> commandContext.getSession(DbSqlSession.class)
+                            .selectOne("customSelectProcessDefinitionDeploymentIdByKey", "dummy")))
+                            .isNull();
+
+                    assertThat(managementService.executeCommand((Command<Object>) commandContext -> commandContext.getSession(DbSqlSession.class)
+                            .selectOne("customSelectCaseDefinitionDeploymentIdByKey", "dummy")))
+                            .isNull();
+
+                    deleteDeployments(context.getBean(AppEngine.class));
+                    deleteDeployments(context.getBean(CmmnEngine.class));
+                    deleteDeployments(context.getBean(DmnEngine.class));
+                    deleteDeployments(context.getBean(FormEngine.class));
+                    deleteDeployments(context.getBean(ProcessEngine.class));
+                });
+
+    }
+
+    @Test
     public void testInclusiveGatewayProcessTask() {
         contextRunner.run((context -> {
             SpringCmmnEngineConfiguration cmmnEngineConfiguration = context.getBean(SpringCmmnEngineConfiguration.class);
@@ -273,5 +309,51 @@ public class AllEnginesAutoConfigurationTest {
                     .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
                     .containsExactly(tuple("Task Two", PlanItemInstanceState.ENABLED));
         }));
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomMyBatisXmlMapperConfiguration {
+
+        @Bean
+        EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
+            return engineConfiguration -> {
+                engineConfiguration.addConfigurator(new CustomMyBatisMapperConfigurator("mappers/CustomMybatisBpmnXmlMapper.xml"));
+            };
+        }
+
+        @Bean
+        EngineConfigurationConfigurer<SpringCmmnEngineConfiguration> cmmnEngineConfigurer() {
+            return engineConfiguration -> {
+                engineConfiguration.addConfigurator(new CustomMyBatisMapperConfigurator("mappers/CustomMybatisCmmnXmlMapper.xml"));
+            };
+        }
+
+    }
+
+    static class CustomMyBatisMapperConfigurator implements EngineConfigurator {
+
+        Collection<String> mappers;
+
+        CustomMyBatisMapperConfigurator(String mapper) {
+            this.mappers = Collections.singleton(mapper);
+        }
+
+        @Override
+        public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
+            if (engineConfiguration.getCustomMybatisXMLMappers() == null) {
+                engineConfiguration.setCustomMybatisXMLMappers(new LinkedHashSet<>());
+            }
+            engineConfiguration.getCustomMybatisXMLMappers().addAll(mappers);
+        }
+
+        @Override
+        public void configure(AbstractEngineConfiguration engineConfiguration) {
+
+        }
+
+        @Override
+        public int getPriority() {
+            return 0;
+        }
     }
 }
