@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,11 +14,13 @@
 package org.flowable.engine.test.bpmn.usertask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -38,6 +40,10 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -59,7 +65,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(task.getProcessDefinitionId()).isNotNull();
         assertThat(task.getTaskDefinitionKey()).isNotNull();
         assertThat(task.getCreateTime()).isNotNull();
-        
+
         // the next test verifies that if an execution creates a task, that no events are created during creation of the task.
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             assertThat(taskService.getTaskEvents(task.getId())).isEmpty();
@@ -154,7 +160,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Complete task and verify history
         taskService.complete(task.getId());
-            
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertThat(historicTaskInstance.getCategory()).isEqualTo(newCategory);
@@ -189,7 +195,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         assertThat(task.getFormKey()).isEqualTo("test123");
     }
-    
+
     @Test
     @Deployment
     public void testEmptyAssignmentExpression() {
@@ -199,27 +205,27 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         variableMap.put("candidateGroups", null);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         assertThat(processInstance).isNotNull();
-        
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getAssignee()).isNull();
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
         assertThat(identityLinks).isEmpty();
-        
+
         variableMap = new HashMap<>();
         variableMap.put("assignee", "");
         variableMap.put("candidateUsers", "");
         variableMap.put("candidateGroups", "");
         processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         assertThat(processInstance).isNotNull();
-        
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getAssignee()).isNull();
         identityLinks = taskService.getIdentityLinksForTask(task.getId());
         assertThat(identityLinks).isEmpty();
     }
-    
+
     @Test
     @Deployment
     public void testNonStringProperties() {
@@ -233,7 +239,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         vars.put("taskCandidateGroups", 7);
         vars.put("taskCandidateUsers", 8);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonStringProperties", vars);
-        
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("1");
         assertThat(task.getDescription()).isEqualTo("2");
@@ -241,7 +247,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(task.getFormKey()).isEqualTo("4");
         assertThat(task.getAssignee()).isEqualTo("5");
         assertThat(task.getOwner()).isEqualTo("6");
-        
+
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
         assertThat(identityLinks).hasSize(4);
         int candidateIdentityLinkCount = 0;
@@ -257,13 +263,46 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
         assertThat(candidateIdentityLinkCount).isEqualTo(2);
     }
-    
+
+    @Test
+    @Deployment
+    public void testUnsupportedPropertyType() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.set("integer", objectMapper.convertValue(1, JsonNode.class));
+        objectNode.set("string", objectMapper.convertValue("string", JsonNode.class));
+
+        assertErrorForProperty("unsupportedPropertyType", false, "user1",
+                "Value of type boolean is not supported for expression '${taskCandidateGroups}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", 5.21f, "user1",
+                "Value of type float is not supported for expression '${taskCandidateGroups}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", 0.55d, "user1",
+                "Value of type double is not supported for expression '${taskCandidateGroups}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", objectNode, "user1",
+                "Value of type objectNode is not supported for expression '${taskCandidateGroups}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", "group1", false,
+                "Value of type boolean is not supported for expression '${taskCandidateUsers}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", "group1", 5.21f,
+                "Value of type float is not supported for expression '${taskCandidateUsers}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", "group1", 0.55d,
+                "Value of type double is not supported for expression '${taskCandidateUsers}'.");
+
+        assertErrorForProperty("unsupportedPropertyType", "group1", objectNode,
+                "Value of type objectNode is not supported for expression '${taskCandidateUsers}'.");
+    }
+
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.testTaskPropertiesNotNull.bpmn20.xml")
     public void testCreateUserTaskInterceptor() throws Exception {
         TestCreateUserTaskInterceptor testCreateUserTaskInterceptor = new TestCreateUserTaskInterceptor();
         processEngineConfiguration.setCreateUserTaskInterceptor(testCreateUserTaskInterceptor);
-        
+
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -272,10 +311,10 @@ public class UserTaskTest extends PluggableFlowableTestCase {
             assertThat(task.getName()).isEqualTo("my task");
             assertThat(task.getDescription()).isEqualTo("Very important");
             assertThat(task.getCategory()).isEqualTo("testCategory");
-            
+
             assertThat(testCreateUserTaskInterceptor.getBeforeCreateUserTaskCounter()).isEqualTo(1);
             assertThat(testCreateUserTaskInterceptor.getAfterCreateUserTaskCounter()).isEqualTo(1);
-            
+
         } finally {
             processEngineConfiguration.setCreateUserTaskInterceptor(null);
         }
@@ -303,11 +342,53 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.testNonStringProperties.bpmn20.xml")
+    public void testNormalizeCandidates() {
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("taskAssignee", "testAssignee");
+        vars.put("taskOwner", "testOwner");
+        vars.put("taskCandidateGroups", "group1, group2, group3, ,group3");
+        vars.put("taskCandidateUsers", "user1, , user2, user3, user4, user1");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonStringProperties", vars);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertThat(identityLinks).hasSize(9);
+        int candidateGroupIdentityLinkCount = 0;
+        int candidateUserIdentityLinkCount = 0;
+
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getType().equals(IdentityLinkType.CANDIDATE)) {
+                if (identityLink.getGroupId() != null) {
+                    candidateGroupIdentityLinkCount++;
+                } else {
+                    candidateUserIdentityLinkCount++;
+                }
+            }
+        }
+        assertThat(candidateGroupIdentityLinkCount).isEqualTo(3);
+        assertThat(candidateUserIdentityLinkCount).isEqualTo(4);
+    }
+
+    protected void assertErrorForProperty(String processDefinitionKey, Object candidateGroupsValue, Object candidateUsersValue, String expectedMessage) {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("taskCandidateGroups", candidateGroupsValue);
+        variableMap.put("taskCandidateUsers", candidateUsersValue);
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey(processDefinitionKey, variableMap))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining(expectedMessage);
+    }
+
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
-        
+
         protected int beforeCreateUserTaskCounter = 0;
         protected int afterCreateUserTaskCounter = 0;
-        
+
         @Override
         public void beforeCreateUserTask(CreateUserTaskBeforeContext context) {
             beforeCreateUserTaskCounter++;
