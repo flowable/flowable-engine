@@ -17,15 +17,25 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.impl.DefaultInboundEvent;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.task.api.Event;
 import org.flowable.task.api.Task;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -555,6 +565,65 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
                         tuple("myEvent", caseDefinitionAfterRedeploy.getId(), ScopeTypes.CMMN, null),
                         tuple("myEvent", caseDefinitionAfterRedeploy.getId(), ScopeTypes.CMMN, caseInstance.getId())
                 );
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testEventListenerInRepeatableStage.cmmn"
+    })
+    public void testEventListenerInRepeatableStage() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
+
+
+        getEventRepositoryService().createEventModelBuilder()
+                .key("stopEvent")
+                .resourceName("stopEvent.event")
+                .correlationParameter("corr", EventPayloadTypes.STRING)
+                .deploy();
+
+        getEventRepositoryService().createEventModelBuilder()
+                .key("startEvent")
+                .resourceName("startEvent.event")
+                .payload("eventField1", EventPayloadTypes.STRING)
+                .deploy();
+
+        CaseInstance myCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testEventListenerInRepeatableStage")
+                .start();
+
+        ObjectNode eventJson = objectMapper.createObjectNode();
+        eventJson.put("type", "startEvent");
+        eventJson.put("eventField1", "abc");
+
+        inboundEventChannelAdapter.triggerTestEventWithJson(eventJson);
+
+        eventJson = objectMapper.createObjectNode();
+        eventJson.put("type", "startEvent");
+        eventJson.put("eventField1", "def");
+
+        inboundEventChannelAdapter.triggerTestEventWithJson(eventJson);
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemeventListener2").list();
+        List<EventSubscription> eventSubscriptions = cmmnRuntimeService.createEventSubscriptionQuery().eventType("stopEvent").list();
+
+        assertThat(planItemInstances.size()).isEqualTo(2);
+        assertThat(eventSubscriptions.size()).isEqualTo(2);
+
+        eventJson = objectMapper.createObjectNode();
+        eventJson.put("type", "stopEvent");
+        eventJson.put("corr", "abc");
+
+        inboundEventChannelAdapter.triggerTestEventWithJson(eventJson);
+
+        planItemInstances =  cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemeventListener2").list();
+        eventSubscriptions = cmmnRuntimeService.createEventSubscriptionQuery().eventType("stopEvent").list();
+
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        assertThat(eventSubscriptions.size()).isEqualTo(1);
+
+        cmmnRuntimeService.terminateCaseInstance(myCase.getId());
     }
 
 }
