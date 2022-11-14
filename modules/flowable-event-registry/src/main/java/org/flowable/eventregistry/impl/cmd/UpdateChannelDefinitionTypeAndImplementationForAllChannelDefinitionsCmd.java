@@ -12,8 +12,13 @@
  */
 package org.flowable.eventregistry.impl.cmd;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.ChannelDefinition;
@@ -34,8 +39,15 @@ public class UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinition
         EventRepositoryService repositoryService = configuration.getEventRepositoryService();
         List<ChannelDefinition> channelDefinitions = repositoryService.createChannelDefinitionQuery().list();
         ChannelDefinitionEntityManager entityManager = configuration.getChannelDefinitionEntityManager();
+        String encoding = configuration.getXmlEncoding();
+        Charset encodingCharset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
         for (ChannelDefinition channelDefinition : channelDefinitions) {
-            ChannelModel model = repositoryService.getChannelModelById(channelDefinition.getId());
+            ChannelModel model;
+            try (InputStream stream = repositoryService.getResourceAsStream(channelDefinition.getDeploymentId(), channelDefinition.getResourceName())) {
+                model = configuration.getChannelJsonConverter().convertToChannelModel(IOUtils.toString(stream, encodingCharset));
+            } catch (IOException e) {
+                throw new FlowableException("Failed to close resource", e);
+            }
             entityManager.updateChannelDefinitionTypeAndImplementation(channelDefinition.getId(), model.getChannelType(), model.getType());
         }
 
