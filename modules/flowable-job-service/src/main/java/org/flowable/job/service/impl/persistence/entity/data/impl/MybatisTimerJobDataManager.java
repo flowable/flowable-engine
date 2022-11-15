@@ -16,11 +16,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
@@ -113,7 +114,14 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
         }
-        return getDbSqlSession().selectList("selectTimerJobsToExecute", params, page);
+        
+        ListQueryParameterObject p = new ListQueryParameterObject();
+        p.setParameter(params);
+        p.setFirstResult(page.getFirstResult());
+        p.setMaxResults(page.getMaxResults());
+        p.addOrder("DUEDATE_", Direction.ASCENDING.getName(), null);
+
+        return getDbSqlSession().selectList("selectTimerJobsToExecute", p);
     }
 
     @Override
