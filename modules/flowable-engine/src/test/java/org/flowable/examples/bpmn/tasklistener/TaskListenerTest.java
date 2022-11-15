@@ -328,7 +328,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     public void testInvalidTypeEventListener() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess3"))
                 .isInstanceOf(FlowableIllegalStateException.class)
-                .hasMessageContaining("Script content is null or evaluated to null for listener of type 'script'");
+                .hasMessageContaining("The field 'script' should be set on ScriptTypeTaskListener");
     }
 
     @Test
@@ -336,7 +336,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     public void testTaskListenerTypeScript() {
         Map<String, Object> vars = new HashMap<>();
         vars.put("scriptLanguageAsExpression", "groovy");
-        vars.put("scriptPayloadAsExpression", "def foo = \"usertask2ReturnVal\"; return foo");
         vars.put("resultVarAsExpression", "task2ScriptListenerResult");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerTypeScriptProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -361,6 +360,9 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         Object scriptVar = runtimeService.getVariable(processInstance.getId(), "scriptVar");
         assertThat(scriptVar).as("Could not find the 'scriptVar' variable in variable scope").isEqualTo("scriptVarValue");
+
+        Object groovyExpressionSyntaxString = runtimeService.getVariable(processInstance.getId(), "groovyExpressionSyntaxString");
+        assertThat(groovyExpressionSyntaxString).as("Expected groovy expression syntax evaluated").isEqualTo("This is a FOO and this is a BAR");
 
         // Expect evaluation of script supports expressions for language, payload and resultVariable
         Object task2ScriptListenerResult = runtimeService.getVariable(processInstance.getId(), "task2ScriptListenerResult");

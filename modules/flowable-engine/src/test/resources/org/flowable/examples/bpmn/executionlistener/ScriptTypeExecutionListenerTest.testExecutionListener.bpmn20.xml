@@ -13,8 +13,9 @@
                     <activiti:script language="groovy" resultVariable="myVar">
                         <![CDATA[
                         def bar = "BAR"; // local variable
-                        foo = "FOO"; // pushes variable to execution context
+                        String groovyScriptSyntaxString = "This is a FOO and this is a ${bar}"; // pushes variable to execution context
                         execution.setVariable('varSetInScript', 'yes'); // test access to execution instance
+                        execution.setVariable('groovyScriptSyntaxString', groovyScriptSyntaxString); // test access to execution instance
                         bar // implicit return value
                         ]]>
                     </activiti:script>

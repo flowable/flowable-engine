@@ -11,12 +11,17 @@
             <extensionElements>
                 <flowable:taskListener event="create" type="script">
                     <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
                         def localVariable = "User Task 2 name defined in script";
-                        task.setVariable('scriptVar', "scriptVarValue"); // pushes variable to execution context
+                        def bar = "BAR";
+                        task.setVariable("scriptVar", "scriptVarValue"); // pushes variable to execution context
+                        String groovyScriptSyntaxString = "This is a FOO and this is a ${bar}";
+                        task.setVariable("groovyExpressionSyntaxString", groovyScriptSyntaxString);
                         task.setOwner("kermit"); // test access to task instance
                         task.setVariable("scriptLanguageAsExpression", "groovy");
                         taskService.saveTask(task);
-                        localVariable // implicit return
+                        localVariable; // implicit return
+                        ]]>
                     </flowable:script>
                 </flowable:taskListener>
             </extensionElements>
@@ -28,7 +33,7 @@
             <extensionElements>
                 <flowable:taskListener event="create" type="script">
                     <flowable:script language="${scriptLanguageAsExpression}" resultVariable="${resultVarAsExpression}">
-                        ${scriptPayloadAsExpression}
+                        def foo = "usertask2ReturnVal"; return foo
                     </flowable:script>
                 </flowable:taskListener>
             </extensionElements>

@@ -201,8 +201,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     }
 
     protected ScriptHttpHandler createScriptHttpHandler(ExpressionManager expressionManager, ScriptInfo scriptInfo) {
-        ScriptHttpHandler scriptHttpHandler = new ScriptHttpHandler(createExpression(expressionManager, scriptInfo.getLanguage()),
-                createExpression(expressionManager, scriptInfo.getScript()));
+        ScriptHttpHandler scriptHttpHandler = new ScriptHttpHandler(createExpression(expressionManager, scriptInfo.getLanguage()), scriptInfo.getScript());
         if (scriptInfo.getResultVariable() != null) {
             scriptHttpHandler.setResultVariable(createExpression(expressionManager, scriptInfo.getResultVariable()));
         }

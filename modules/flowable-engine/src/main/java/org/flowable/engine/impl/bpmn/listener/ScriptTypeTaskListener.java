@@ -30,7 +30,7 @@ public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements T
 
     private static final long serialVersionUID = -8915149072830499057L;
 
-    public ScriptTypeTaskListener(Expression language, Expression script) {
+    public ScriptTypeTaskListener(Expression language, String script) {
         this.script = script;
         this.language = language;
     }

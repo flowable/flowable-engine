@@ -30,9 +30,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class ScriptHttpHandler extends AbstractScriptEvaluator implements HttpRequestHandler, HttpResponseHandler {
 
-    public ScriptHttpHandler(Expression language, Expression script) {
-        this.script = script;
-        this.language = language;
+    public ScriptHttpHandler(Expression language, String script) {
+        super(language, script);
     }
 
     @Override
