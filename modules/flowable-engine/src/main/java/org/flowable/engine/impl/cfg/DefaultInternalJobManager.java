@@ -84,14 +84,11 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                 CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
                 
                 if (job instanceof TimerJobEntity) {
-                    TimerJobEntity timerJobEntity = (TimerJobEntity) job;
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() + 1);
                     }
                     
                 } else if (job instanceof JobEntity) {
-                    JobEntity jobEntity = (JobEntity) job;
-
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
                     }
@@ -148,20 +145,24 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
-            String lockOwner;
-            Date lockExpirationTime;
+            String lockOwner = null;
+            Date lockExpirationTime = null;
 
             if (job instanceof JobInfoEntity) {
                 lockOwner = ((JobInfoEntity) job).getLockOwner();
                 lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
-            } else {
+            }
+
+            if (lockExpirationTime == null) {
                 int lockMillis = processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
                 GregorianCalendar lockCal = new GregorianCalendar();
                 lockCal.setTime(processEngineConfiguration.getClock().getCurrentTime());
                 lockCal.add(Calendar.MILLISECOND, lockMillis);
-
-                lockOwner = processEngineConfiguration.getAsyncExecutor().getLockOwner();
                 lockExpirationTime = lockCal.getTime();
+            }
+
+            if (lockOwner == null) {
+                lockOwner = processEngineConfiguration.getAsyncExecutor().getLockOwner();
             }
 
             executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId(), lockOwner, lockExpirationTime);
