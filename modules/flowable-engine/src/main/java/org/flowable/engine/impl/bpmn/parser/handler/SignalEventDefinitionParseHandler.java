@@ -33,10 +33,7 @@ public class SignalEventDefinitionParseHandler extends AbstractBpmnParseHandler<
     @Override
     protected void executeParse(BpmnParse bpmnParse, SignalEventDefinition signalDefinition) {
 
-        Signal signal = null;
-        if (bpmnParse.getBpmnModel().containsSignalId(signalDefinition.getSignalRef())) {
-            signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
-        }
+        Signal signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
 
         if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
             IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();

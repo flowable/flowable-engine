@@ -1196,9 +1196,8 @@ public abstract class AbstractDynamicStateManager {
                     if (eventDefinition instanceof SignalEventDefinition && (eventSubscriptions == null || eventSubscriptions.isEmpty())) {
                         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
                         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(eventSubProcessExecution.getProcessDefinitionId());
-                        Signal signal = null;
-                        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-                            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+                        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+                        if (signal != null) {
                             signalEventDefinition.setSignalRef(signal.getName());
                         }
 
