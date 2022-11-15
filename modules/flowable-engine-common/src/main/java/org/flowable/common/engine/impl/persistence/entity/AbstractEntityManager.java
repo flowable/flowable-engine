@@ -92,7 +92,9 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     @Override
     public void delete(String id) {
         EntityImpl entity = findById(id);
-        delete(entity);
+        if (entity != null) {
+            delete(entity);
+        }
     }
 
     @Override
