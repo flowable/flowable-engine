@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+						 xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+						 xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+						 expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+
+		<signal id="mySignal" name="Signal" />
+
+		<process id="signalThrowExecution">
+				<startEvent id="theStart" />
+				<sequenceFlow sourceRef="theStart" targetRef="eventSubProcess" />
+
+				<subProcess id="eventSubProcess">
+						<startEvent id="subStart" />
+						<sequenceFlow sourceRef="subStart" targetRef="subTask" />
+						<userTask id="subTask" />
+						<sequenceFlow sourceRef="subTask" targetRef="subEnd" />
+						<endEvent id="subEnd" />
+				</subProcess>
+
+				<boundaryEvent id="boundary" attachedToRef="eventSubProcess" cancelActivity="false">
+						<signalEventDefinition signalRef="mySignal" />
+				</boundaryEvent>
+				<sequenceFlow sourceRef="boundary" targetRef="boundaryTask" />
+
+				<userTask id="boundaryTask" />
+				<sequenceFlow sourceRef="eventSubProcess" targetRef="end" />
+
+				<endEvent id="end" />
+
+		</process>
+
+</definitions>

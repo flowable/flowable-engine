@@ -18,6 +18,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
@@ -156,8 +157,12 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return taskDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public TaskServiceConfiguration setTaskDataManager(TaskDataManager taskDataManager) {
         this.taskDataManager = taskDataManager;
+        if (this.taskEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , TaskDataManager>) this.taskEntityManager).setDataManager(taskDataManager);
+        }
         return this;
     }
 

@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.UUID;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionServiceImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityManagerImpl;
@@ -33,23 +34,24 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
     // /////////////////////////////////////////////////////////////////
 
     protected EventSubscriptionService eventSubscriptionService = new EventSubscriptionServiceImpl(this);
-   
+
     // DATA MANAGERS
     // /////////////////////////////////////////////////
 
     protected EventSubscriptionDataManager eventSubscriptionDataManager;
-    
+
     // ENTITY MANAGERS
     // ///////////////////////////////////////////////
-    
+
     protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
 
     // LOCKING
     // //////////////////////////////////////////////
 
     /**
-     * The amount of time an event subscription is locked.
-     * A lock on an event subscription is used when using the 'unique process/case instance on start' feature.
+     * The amount of time an event subscription is locked. A lock on an event
+     * subscription is used when using the 'unique process/case instance on
+     * start' feature.
      */
     private Duration eventSubscriptionLockTime = Duration.ofMinutes(10);
 
@@ -57,9 +59,9 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
      * The value that should be used when locking eventsubscriptions.
      */
     private String lockOwner = UUID.randomUUID().toString();
-    
+
     protected ObjectMapper objectMapper;
-    
+
     public EventSubscriptionServiceConfiguration(String engineName) {
         super(engineName);
     }
@@ -93,7 +95,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
     public EventSubscriptionServiceConfiguration getIdentityLinkServiceConfiguration() {
         return this;
     }
-    
+
     public EventSubscriptionService getEventSubscriptionService() {
         return eventSubscriptionService;
     }
@@ -102,16 +104,20 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
         this.eventSubscriptionService = eventSubscriptionService;
         return this;
     }
-    
+
     public EventSubscriptionDataManager getEventSubscriptionDataManager() {
         return eventSubscriptionDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public EventSubscriptionServiceConfiguration setEventSubscriptionDataManager(EventSubscriptionDataManager eventSubscriptionDataManager) {
         this.eventSubscriptionDataManager = eventSubscriptionDataManager;
+        if (this.eventSubscriptionEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , EventSubscriptionDataManager>) this.eventSubscriptionEntityManager).setDataManager(eventSubscriptionDataManager);
+        }
         return this;
     }
-    
+
     public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return eventSubscriptionEntityManager;
     }
@@ -120,7 +126,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
         this.eventSubscriptionEntityManager = eventSubscriptionEntityManager;
         return this;
     }
-    
+
     @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;

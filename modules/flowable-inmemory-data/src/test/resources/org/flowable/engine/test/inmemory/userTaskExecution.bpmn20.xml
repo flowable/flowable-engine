@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+						 xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+						 xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+						 expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+		<process id="userTaskExecution">
+				<startEvent id="theStart" />
+				<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+				<userTask id="task" flowable:assignee="testUser" />
+				<sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
+				<endEvent id="theEnd" />
+		</process>
+</definitions>

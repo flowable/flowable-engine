@@ -430,7 +430,11 @@ public class ExecutionEntityManagerImpl
         List<String> processInstanceIds = dataManager.findProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
 
         for (String processInstanceId : processInstanceIds) {
-            deleteProcessInstanceCascade(findById(processInstanceId), deleteReason, cascade, true);
+            ExecutionEntity execution = findById(processInstanceId);
+            if (execution == null) {
+                continue;
+            }
+            deleteProcessInstanceCascade(execution, deleteReason, cascade, true);
         }
 
         if (cascade) {

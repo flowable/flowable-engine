@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.job.service.impl.HistoryJobServiceImpl;
 import org.flowable.job.service.impl.JobServiceImpl;
 import org.flowable.job.service.impl.TimerJobServiceImpl;
@@ -312,8 +313,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return jobDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public JobServiceConfiguration setJobDataManager(JobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
+        if (this.jobEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , JobDataManager>) this.jobEntityManager).setDataManager(jobDataManager);
+        }
         return this;
     }
 
@@ -321,8 +326,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return deadLetterJobDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public JobServiceConfiguration setDeadLetterJobDataManager(DeadLetterJobDataManager deadLetterJobDataManager) {
         this.deadLetterJobDataManager = deadLetterJobDataManager;
+        if (this.deadLetterJobEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , DeadLetterJobDataManager>) this.deadLetterJobEntityManager).setDataManager(deadLetterJobDataManager);
+        }
         return this;
     }
 
@@ -330,8 +339,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return suspendedJobDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public JobServiceConfiguration setSuspendedJobDataManager(SuspendedJobDataManager suspendedJobDataManager) {
         this.suspendedJobDataManager = suspendedJobDataManager;
+        if (this.suspendedJobEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , SuspendedJobDataManager>) this.suspendedJobEntityManager).setDataManager(suspendedJobDataManager);
+        }
         return this;
     }
 
@@ -339,8 +352,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return timerJobDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public JobServiceConfiguration setTimerJobDataManager(TimerJobDataManager timerJobDataManager) {
         this.timerJobDataManager = timerJobDataManager;
+        if (this.timerJobEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , TimerJobDataManager>) this.timerJobEntityManager).setDataManager(timerJobDataManager);
+        }
         return this;
     }
 
@@ -357,8 +374,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return externalWorkerJobDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public JobServiceConfiguration setExternalWorkerJobDataManager(ExternalWorkerJobDataManager externalWorkerJobDataManager) {
         this.externalWorkerJobDataManager = externalWorkerJobDataManager;
+        if (this.externalWorkerJobEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , ExternalWorkerJobDataManager>) this.externalWorkerJobEntityManager).setDataManager(externalWorkerJobDataManager);
+        }
         return this;
     }
 

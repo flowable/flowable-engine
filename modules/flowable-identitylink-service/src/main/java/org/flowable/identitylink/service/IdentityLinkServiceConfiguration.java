@@ -14,6 +14,7 @@ package org.flowable.identitylink.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
@@ -134,8 +135,12 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         return identityLinkDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public IdentityLinkServiceConfiguration setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
         this.identityLinkDataManager = identityLinkDataManager;
+        if (this.identityLinkEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , IdentityLinkDataManager>) this.identityLinkEntityManager).setDataManager(identityLinkDataManager);
+        }
         return this;
     }
     

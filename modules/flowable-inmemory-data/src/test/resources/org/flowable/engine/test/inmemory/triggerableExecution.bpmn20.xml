@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+						 xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+						 xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+						 expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+		<process id="triggerableExecution" name="Triggerable Execution">
+				<startEvent id="theStart" />
+				<sequenceFlow id="theStart_service1" sourceRef="theStart" targetRef="service1" />
+				<serviceTask id="service1" flowable:class="org.flowable.engine.data.inmemory.TriggerableServiceTask" flowable:triggerable="true"/>
+				<sequenceFlow id="service1_theEnd" sourceRef="service1" targetRef="theEnd" />
+				<endEvent id="theEnd" />
+		</process>
+</definitions>

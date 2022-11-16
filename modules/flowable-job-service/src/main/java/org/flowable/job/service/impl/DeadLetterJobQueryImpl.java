@@ -446,6 +446,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public String getHandlerType() {
         return handlerType;
     }
+    
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
 
     public boolean getExecutable() {
         return executable;
@@ -558,4 +562,5 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public Date getDuedateLowerThanOrEqual() {
         return duedateLowerThanOrEqual;
     }
+
 }

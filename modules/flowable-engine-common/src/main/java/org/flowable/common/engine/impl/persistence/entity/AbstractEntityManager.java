@@ -125,7 +125,13 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
         return dataManager;
     }
 
-    protected void setDataManager(DM dataManager) {
+    /**
+     * Set the DataManager of this EntityManager
+     * 
+     * @param dataManager
+     *            The new DataManager of this entity manager
+     */
+    public void setDataManager(DM dataManager) {
         this.dataManager = dataManager;
     }
 

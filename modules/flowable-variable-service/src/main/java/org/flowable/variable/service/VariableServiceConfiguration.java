@@ -14,6 +14,7 @@ package org.flowable.variable.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
@@ -137,8 +138,12 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         return variableInstanceDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public VariableServiceConfiguration setVariableInstanceDataManager(VariableInstanceDataManager variableInstanceDataManager) {
         this.variableInstanceDataManager = variableInstanceDataManager;
+        if (this.variableInstanceEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , VariableInstanceDataManager>) this.variableInstanceEntityManager).setDataManager(variableInstanceDataManager);
+        }
         return this;
     }
     

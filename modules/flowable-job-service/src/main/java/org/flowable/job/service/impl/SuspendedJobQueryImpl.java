@@ -484,6 +484,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     public String getHandlerType() {
         return handlerType;
     }
+    
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
 
     public boolean getRetriesLeft() {
         return retriesLeft;

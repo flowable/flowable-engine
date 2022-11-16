@@ -45,7 +45,6 @@ create table ACT_HI_TSK_LOG (
     SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
     TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
 );
 
 create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);

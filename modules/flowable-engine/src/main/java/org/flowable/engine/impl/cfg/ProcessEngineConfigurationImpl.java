@@ -25,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -97,6 +96,7 @@ import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
@@ -4120,9 +4120,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ProcessEngineConfigurationImpl setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
         this.byteArrayDataManager = byteArrayDataManager;
+        if (this.byteArrayEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , ByteArrayDataManager>) this.byteArrayEntityManager).setDataManager(byteArrayDataManager);
+        }
         return this;
     }
 
@@ -4157,8 +4161,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return executionDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public ProcessEngineConfigurationImpl setExecutionDataManager(ExecutionDataManager executionDataManager) {
         this.executionDataManager = executionDataManager;
+        if (this.executionEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , ExecutionDataManager>) this.executionEntityManager).setDataManager(executionDataManager);
+        }
         return this;
     }
 
@@ -4166,8 +4174,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return activityInstanceDataManager;
     }
 
+    @SuppressWarnings("unchecked")
     public ProcessEngineConfigurationImpl setActivityInstanceDataManager(ActivityInstanceDataManager activityInstanceDataManager) {
         this.activityInstanceDataManager = activityInstanceDataManager;
+        if (this.activityInstanceEntityManager instanceof AbstractEntityManager) {
+            ((AbstractEntityManager< ? , ActivityInstanceDataManager>) this.activityInstanceEntityManager).setDataManager(activityInstanceDataManager);
+        }
         return this;
     }
 
