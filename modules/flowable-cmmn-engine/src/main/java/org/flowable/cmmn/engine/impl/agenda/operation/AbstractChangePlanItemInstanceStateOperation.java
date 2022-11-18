@@ -86,7 +86,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
     protected abstract void internalExecute();
 
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
-        return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
+        return new PlanItemLifeCycleEvent(planItemInstanceEntity, getLifeCycleTransition());
     }
 
     public abstract String getNewState();
@@ -116,18 +116,18 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         if (planItem != null) {
             stringBuilder.append(planItem);
-        } else {
-            stringBuilder.append(planItemInstanceEntity);
         }
 
-        stringBuilder.append(", ");
+        stringBuilder.append(" (PlanItemInstance id: ");
+        stringBuilder.append(planItemInstanceEntity.getId());
+        stringBuilder.append("), ");
 
         String currentState = planItemInstanceEntity.getState();
         String newState = getNewState();
 
         if (!Objects.equals(currentState, newState)) {
 
-            stringBuilder.append("new state: [").append(getNewState()).append("]");
+            stringBuilder.append("from [").append(currentState).append("] to new state: [").append(getNewState()).append("]");
             stringBuilder.append(" with transition [");
             stringBuilder.append(getLifeCycleTransition());
             stringBuilder.append("]");
