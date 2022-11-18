@@ -24,7 +24,7 @@ public class ScriptTypeExecutionListener extends AbstractScriptEvaluator impleme
 
     private static final long serialVersionUID = 1L;
 
-    public ScriptTypeExecutionListener(Expression language, Expression script) {
+    public ScriptTypeExecutionListener(Expression language, String script) {
         super(language, script);
     }
 

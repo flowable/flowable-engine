@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -543,7 +544,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
-                    if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+                    if (sentryOnPartMatchesCurrentLifeCycleEvent(entityWithSentryPartInstances, sentryOnPart)) {
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
@@ -594,7 +595,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 // Verify if the onParts which are not yet satisfied, become satisfied due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
-                        if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+                        if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(entityWithSentryPartInstances, sentryOnPart)) {
 
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug("{}: onPart matches life cycle event [{}]", criterion, planItemLifeCycleEvent);
@@ -690,9 +691,49 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         return true;
     }
 
-    public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {
-        return planItemLifeCycleEvent.getPlanItem().getId().equals(sentryOnPart.getSourceRef())
+    public boolean sentryOnPartMatchesCurrentLifeCycleEvent(EntityWithSentryPartInstances entityWithSentryPartInstances, SentryOnPart sentryOnPart) {
+
+        // Sentries match based on the planItemLifeCycleEvent comparing the transition and the plan item involved.
+        // When dealing with repetition of parent stages however, an additional check is needed: the plan item instance that is associated
+        // with the sentry and the plan item associated with the planItemLifeCycleEvent need to be part of the same scope (=stage).
+        // Otherwise, a sentry would fire for all repeated plan item instances.
+        //
+        // See CmmnEventRegistryConsumerTest#testEventListenerInRepeatableStage: without the code below all plan item instances
+        // would match and be terminated by the exit sentry.
+
+        // Setting it by default to true for backwards compatibility,
+        // as this check wasn't done earlier and might break old instances otherwise
+        boolean parentMatches = true;
+        if (hasSameParentInModel(entityWithSentryPartInstances, sentryOnPart)) {
+            parentMatches = Objects.equals(planItemLifeCycleEvent.getPlanItemInstanceEntity().getStageInstanceId(),
+                ((PlanItemInstanceEntity) entityWithSentryPartInstances).getStageInstanceId());
+        }
+
+        return parentMatches
+            && planItemLifeCycleEvent.getPlanItem().getId().equals(sentryOnPart.getSourceRef())
             && planItemLifeCycleEvent.getTransition().equals(sentryOnPart.getStandardEvent());
+    }
+
+    protected boolean hasSameParentInModel(EntityWithSentryPartInstances entityWithSentryPartInstances, SentryOnPart sentryOnPart) {
+        if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
+
+            PlanItem evaluatedPlanItem = ((PlanItemInstanceEntity) entityWithSentryPartInstances).getPlanItem();
+            if (evaluatedPlanItem != null) {
+
+                Stage evaluatedPlanItemParenStage = evaluatedPlanItem.getParentStage();
+
+                PlanItem sentrySourcePlanItem = sentryOnPart.getSource();
+                if (sentrySourcePlanItem != null) {
+                    Stage sentrySourcePlanItemParenStage = sentrySourcePlanItem.getParentStage();
+                    if (sentrySourcePlanItemParenStage != null && evaluatedPlanItemParenStage != null) {
+                        return Objects.equals(sentrySourcePlanItemParenStage.getId(), evaluatedPlanItemParenStage.getId());
+                    }
+                }
+
+            }
+
+        }
+        return false;
     }
 
     protected List<PlanItemInstanceEntity> findChangedEventListenerInstances(PlanItemInstanceContainer planItemInstanceContainer, String state, boolean conditionValueToChange) {

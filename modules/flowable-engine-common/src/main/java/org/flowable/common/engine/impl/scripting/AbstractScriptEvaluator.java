@@ -42,7 +42,7 @@ public abstract class AbstractScriptEvaluator {
      * <p/>
      * Must not be or evaluate to <code>null</code> to null.
      */
-    protected Expression script;
+    protected String script;
 
     /**
      * The name of the result variable to store the result of the script evaluation in the
@@ -53,7 +53,7 @@ public abstract class AbstractScriptEvaluator {
     public AbstractScriptEvaluator() {
     }
 
-    public AbstractScriptEvaluator(Expression language, Expression script) {
+    public AbstractScriptEvaluator(Expression language, String script) {
         this.script = script;
         this.language = language;
     }
@@ -71,13 +71,9 @@ public abstract class AbstractScriptEvaluator {
         if (language == null) {
             throw new FlowableIllegalStateException("'language' evaluated to null for listener of type 'script'");
         }
-        String script = Objects.toString(this.script.getValue(variableContainer), null);
-        if (script == null) {
-            throw new FlowableIllegalStateException("Script content is null or evaluated to null for listener of type 'script'");
-        }
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder();
 
-        return builder.language(language).script(script).variableContainer(variableContainer);
+        return builder.language(language).script(getScript()).variableContainer(variableContainer);
     }
 
     protected Object evaluateScriptRequest(ScriptEngineRequest.Builder requestBuilder) {
@@ -100,18 +96,31 @@ public abstract class AbstractScriptEvaluator {
 
     protected void validateParameters() {
         if (script == null) {
-            throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");
+            throw new FlowableIllegalStateException("The field 'script' should be set on " + getClass().getSimpleName());
         }
 
         if (language == null) {
-            throw new IllegalArgumentException("The field 'language' should be set on the TaskListener");
+            throw new FlowableIllegalStateException("The field 'language' should be set on " + getClass().getSimpleName());
         }
     }
 
     protected abstract ScriptingEngines getScriptingEngines();
 
-    public void setScript(Expression script) {
+    public void setScript(String script) {
         this.script = script;
+    }
+
+    /**
+     * Sets the script as Expression for backwards compatibility.
+     * Requires to for 'field' injection of scripts.
+     * Expression is not evaluated
+     */
+    public void setScript(Expression script) {
+        this.script = script.getExpressionText();
+    }
+
+    public String getScript() {
+        return script;
     }
 
     public void setLanguage(Expression language) {

@@ -66,7 +66,7 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
     }
 
     /**
-     * Tests error trace enhacement by {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer} and
+     * Tests error trace enhancement by {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer} and
      * {@link org.flowable.engine.impl.bpmn.listener.ScriptTaskListener}
      */
     @Test

@@ -43,6 +43,7 @@ public class ScriptTypeExecutionListenerTest extends PluggableFlowableTestCase {
                     .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
                     .containsExactlyInAnyOrder(
                             tuple("varSetInScript", "yes"),
+                            tuple("groovyScriptSyntaxString", "This is a FOO and this is a BAR"),
                             tuple("myVar", "BAR")
                     );
         }

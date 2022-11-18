@@ -128,6 +128,15 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
                 throw new RuntimeException(e);
             }
         }
+
+        public void triggerTestEventWithJson(ObjectNode eventJson) {
+            try {
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventJson));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         
         protected ObjectNode createTestEventNode(String customerId, String orderId) {
             ObjectNode json = objectMapper.createObjectNode();

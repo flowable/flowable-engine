@@ -41,13 +41,11 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.EventListener;
-import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.RepetitionRule;
-import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
@@ -55,8 +53,6 @@ import org.flowable.cmmn.model.VariableAggregationDefinitions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.eventsubscription.service.EventSubscriptionService;
-import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -141,8 +137,6 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 aggregateVariablesForAllInstances(planItemInstanceEntity, aggregations);
             }
             
-            cleanupRepetitionPlanItemInstances(isRepeatingOnDelete, isWaitingForRepetitionPlanItemInstanceExists, cmmnEngineConfiguration);
-
             removeSentryRelatedData();
         }
     }
@@ -175,58 +169,6 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
     @Override
     protected abstract void internalExecute();
     
-    protected void cleanupRepetitionPlanItemInstances(boolean isRepeatingOnDelete, boolean isWaitingForRepetitionPlanItemInstanceExists,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
-        
-        PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-        if (planItem != null && planItemDefinition instanceof EventListener && !(planItemDefinition instanceof TimerEventListener) && 
-                !(planItemDefinition instanceof ReactivateEventListener)) {
-            
-            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem) && !hasMaxInstanceCount(planItem)) 
-                    || !hasRepetitionRule(planItem)) {
-                
-                List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndPlanItemId(
-                        planItemInstanceEntity.getCaseInstanceId(), planItem.getId());
-                for (PlanItemInstanceEntity planItemInstanceEntry : planItemInstances) {
-                    if (!PlanItemInstanceState.isInTerminalState(planItemInstanceEntry)) {
-                        planItemInstanceEntry.setState(PlanItemInstanceState.COMPLETED);
-                        planItemInstanceEntry.setEndedTime(getCurrentTime(commandContext));
-                        planItemInstanceEntry.setCompletedTime(planItemInstanceEntry.getEndedTime());
-                        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntry);
-                        
-                        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
-                                commandContext, planItemInstanceEntry, PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.COMPLETED);
-                        
-                        if (planItemDefinition instanceof GenericEventListener) {
-                            GenericEventListener genericEventListener = (GenericEventListener) planItemDefinition;
-                            if (StringUtils.isNotEmpty(genericEventListener.getEventType())) {
-                                
-                                EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-                                String eventDefinitionKey = resolveEventDefinitionKey(genericEventListener.getEventType(), planItemInstanceEntry,
-                                        cmmnEngineConfiguration);
-    
-                                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntry.getId());
-                                for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                                    if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
-                                        eventSubscriptionService.deleteEventSubscription(eventSubscription);
-                                    }
-                                }
-                            }
-                        
-                        } else if (planItemDefinition instanceof SignalEventListener) {
-                            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-                            List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntry.getId());
-                            for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                                eventSubscriptionService.deleteEventSubscription(eventSubscription);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public boolean isRepeatingOnDelete(String originalState, String newState) {
         
         // If there are no entry criteria and the repetition rule evaluates to true: a new instance needs to be created.
