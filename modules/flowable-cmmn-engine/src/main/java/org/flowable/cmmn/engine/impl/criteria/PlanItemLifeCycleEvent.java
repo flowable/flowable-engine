@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.criteria;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.PlanItem;
 
 /**
@@ -20,35 +21,35 @@ import org.flowable.cmmn.model.PlanItem;
  * @author Joram Barrez
  */
 public class PlanItemLifeCycleEvent {
-    
-    protected PlanItem planItem;
+
+    protected PlanItemInstanceEntity planItemInstanceEntity;
     protected String transition;
     
-    public PlanItemLifeCycleEvent(PlanItem planItem, String transition) {
-        this.planItem = planItem;
+    public PlanItemLifeCycleEvent(PlanItemInstanceEntity planItemInstanceEntity, String transition) {
+        this.planItemInstanceEntity = planItemInstanceEntity;
         this.transition = transition;
     }
 
-    public PlanItem getPlanItem() {
-        return planItem;
+    public PlanItemInstanceEntity getPlanItemInstanceEntity() {
+        return planItemInstanceEntity;
     }
 
-    public void setPlanItem(PlanItem planItem) {
-        this.planItem = planItem;
+    public PlanItem getPlanItem() {
+        return planItemInstanceEntity.getPlanItem();
     }
 
     public String getTransition() {
         return transition;
     }
 
-    public void setTransition(String transition) {
-        this.transition = transition;
-    }
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("PlanItem lifecycle event for plan item [").append(planItem).append("]");
+        stringBuilder.append("PlanItem lifecycle event for plan item instance [")
+                     .append(planItemInstanceEntity.getId())
+                     .append("] with plan item [")
+                     .append(getPlanItem())
+                     .append("]");
         if (transition != null) {
             stringBuilder.append(" and transition '").append(transition).append("'");
         }

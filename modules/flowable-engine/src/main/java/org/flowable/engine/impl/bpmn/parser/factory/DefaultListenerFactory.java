@@ -110,7 +110,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
         if (listener.getScriptInfo() != null) {
             ScriptTypeTaskListener scriptListener = new ScriptTypeTaskListener(
                     createExpression(listener.getScriptInfo().getLanguage()),
-                    createExpression(listener.getScriptInfo().getScript()));
+                    listener.getScriptInfo().getScript());
             Optional.ofNullable(listener.getScriptInfo().getResultVariable())
                     .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
             return scriptListener;
@@ -144,7 +144,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
         if (listener.getScriptInfo() != null) {
             ScriptTypeExecutionListener scriptListener = new ScriptTypeExecutionListener(
                     createExpression(listener.getScriptInfo().getLanguage()),
-                    createExpression(listener.getScriptInfo().getScript()));
+                    listener.getScriptInfo().getScript());
             Optional.ofNullable(listener.getScriptInfo().getResultVariable())
                     .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
             return scriptListener;

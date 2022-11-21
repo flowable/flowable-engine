@@ -1045,9 +1045,11 @@ public class SignalEventTest extends PluggableFlowableTestCase {
                 .processDefinitionKey("signalProcess").start();
         assertThat(processInstance.getProcessVariables()).containsEntry("script_task_executed", "true").containsEntry("signal_handled", "true");
 
-        HistoricActivityInstance scriptTask = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
-                .activityId("scriptTask1").singleResult();
-        assertThat(scriptTask.getEndTime()).isNotNull();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricActivityInstance scriptTask = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+                    .activityId("scriptTask1").singleResult();
+            assertThat(scriptTask.getEndTime()).isNotNull();
+        }
     }
 
 

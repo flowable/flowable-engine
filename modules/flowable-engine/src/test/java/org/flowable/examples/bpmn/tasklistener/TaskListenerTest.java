@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,14 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
@@ -325,7 +328,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     public void testInvalidTypeEventListener() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess3"))
                 .isInstanceOf(FlowableIllegalStateException.class)
-                .hasMessageContaining("Script content is null or evaluated to null for listener of type 'script'");
+                .hasMessageContaining("The field 'script' should be set on ScriptTypeTaskListener");
     }
 
     @Test
@@ -333,7 +336,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     public void testTaskListenerTypeScript() {
         Map<String, Object> vars = new HashMap<>();
         vars.put("scriptLanguageAsExpression", "groovy");
-        vars.put("scriptPayloadAsExpression", "def foo = \"usertask2ReturnVal\"; return foo");
         vars.put("resultVarAsExpression", "task2ScriptListenerResult");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerTypeScriptProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -359,9 +361,256 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         Object scriptVar = runtimeService.getVariable(processInstance.getId(), "scriptVar");
         assertThat(scriptVar).as("Could not find the 'scriptVar' variable in variable scope").isEqualTo("scriptVarValue");
 
+        Object groovyExpressionSyntaxString = runtimeService.getVariable(processInstance.getId(), "groovyExpressionSyntaxString");
+        assertThat(groovyExpressionSyntaxString).as("Expected groovy expression syntax evaluated").isEqualTo("This is a FOO and this is a BAR");
+
         // Expect evaluation of script supports expressions for language, payload and resultVariable
         Object task2ScriptListenerResult = runtimeService.getVariable(processInstance.getId(), "task2ScriptListenerResult");
         assertThat(task2ScriptListenerResult).as("Expected 'task2ScriptListenerResult' variable in variable scope").isEqualTo("usertask2ReturnVal");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorCreate() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerCreate", "MY_ERROR_CODE")
+                .start();
+
+        assertThat(processInstance.getProcessVariables()).containsEntry("taskListenerCreate", "executed").containsEntry("error_handled_sub_process", "true");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorAssignment() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerAssignment", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.setAssignee(task.getId(), "kermit");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerAssignment", "executed")
+                    .containsEntry("error_handled_sub_process", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorComplete() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerComplete", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.complete(task.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerComplete", "executed")
+                    .containsEntry("error_handled_sub_process", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorDelete() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerDelete", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.complete(task.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerDelete", "executed")
+                    .containsEntry("error_handled_sub_process", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorDeleteProcessInstance() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerDelete", "MY_ERROR_CODE")
+                .start();
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "unit test");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerDelete", "executed")
+                    .containsEntry("error_handled_sub_process", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcessMultiInstance.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorCompleteMultiInstance() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerComplete", "MY_ERROR_CODE")
+                .variable("elements", Arrays.asList("1", "2", "3"))
+                .start();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsEntry("taskListenerCreate_1", "executed")
+                .containsEntry("taskListenerCreate_2", "executed")
+                .containsEntry("taskListenerCreate_3", "executed");
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+        for (Task task : tasks) {
+            Task t = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+            if (t != null) {
+                taskService.complete(t.getId());
+            }
+        }
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerComplete_1", "executed")
+                    .containsEntry("taskListenerComplete_2", "executed")
+                    .containsEntry("taskListenerCreate_1", "executed")
+                    .containsEntry("taskListenerCreate_2", "executed")
+                    .containsEntry("taskListenerCreate_3", "executed")
+                    .containsEntry("taskListenerDelete_1", "executed")
+                    .containsEntry("taskListenerDelete_2", "executed")
+                    .containsEntry("taskListenerDelete_3", "executed")
+                    .containsEntry("error_handled_sub_process", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchParentBoundaryEvent.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorAssignmentParentBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerAssignment", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.setAssignee(task.getId(), "kermit");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerAssignment", "executed")
+                    .containsEntry("error_handled_boundary_event", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchParentBoundaryEvent.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorCompleteParentBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerComplete", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.complete(task.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerComplete", "executed")
+                    .containsEntry("error_handled_boundary_event", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchParentBoundaryEvent.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorDeleteParentBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerDelete", "MY_ERROR_CODE")
+                .start();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.complete(task.getId());
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerDelete", "executed")
+                    .containsEntry("error_handled_boundary_event", "true");
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchParentBoundaryEvent.bpmn20.xml" })
+    public void testTaskListenerThrowBpmnErrorDeleteProcessInstanceParentBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorHandlingProcess")
+                .variable("throwErrorCodeTaskListenerDelete", "MY_ERROR_CODE")
+                .start();
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "unit test");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .includeProcessVariables()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("taskListenerCreate", "executed")
+                    .containsEntry("taskListenerDelete", "executed")
+                    /* Note executed, because the boundary event is attached to the
+                       subprocess instance execution which gets deleted. Therefore, the error boundary event on the subprocess
+                       is not executed. */
+                    .doesNotContainKey("error_handled_boundary_event");
+        }
     }
 
     /**

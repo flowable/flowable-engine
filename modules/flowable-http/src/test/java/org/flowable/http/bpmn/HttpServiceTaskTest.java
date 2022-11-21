@@ -161,6 +161,27 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(proc.getId());
     }
 
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerGroovy() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptRequestHandlerResult");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(scriptRequestHandlerResult).isEqualTo("http://localhost:1111/bla");
+
+        String requestHeaders = (String) proc.getProcessVariables().get("requestHeaders");
+        assertThat(requestHeaders).isEqualTo("Headers: Content-Type: application/json");
+
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptRequestHandlerResult", "httpGetResponseBody", "originalUrl", "requestHeaders");
+        assertThatJson(variables.stream().filter(v -> v.getVariableName().equals("httpGetResponseBody")).findFirst().map(HistoricVariableInstance::getValue)
+                .orElse(null))
+                .isNotNull()
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertProcessEnded(proc.getId());
+    }
+
     /**
      * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
      * together with {@link org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler#handleHttpRequest(VariableContainer, HttpRequest, FlowableHttpClient)}

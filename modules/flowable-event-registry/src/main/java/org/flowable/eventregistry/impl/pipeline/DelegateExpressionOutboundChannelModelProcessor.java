@@ -55,16 +55,19 @@ public class DelegateExpressionOutboundChannelModelProcessor implements ChannelM
             boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof DelegateExpressionOutboundChannelModel) {
-            registerChannelModel((DelegateExpressionOutboundChannelModel) channelModel);
+            registerChannelModel((DelegateExpressionOutboundChannelModel) channelModel, tenantId);
         }
     }
 
-    protected void registerChannelModel(DelegateExpressionOutboundChannelModel channelModel) {
+    protected void registerChannelModel(DelegateExpressionOutboundChannelModel channelModel, String tenantId) {
         String delegateExpression = channelModel.getAdapterDelegateExpression();
         if (StringUtils.isNotEmpty(delegateExpression)) {
+            VariableContainerWrapper variableContainer = new VariableContainerWrapper(Collections.emptyMap());
+            variableContainer.setVariable("tenantId", tenantId);
+            variableContainer.setTenantId(tenantId);
             Object channelAdapter = engineConfiguration.getExpressionManager()
                 .createExpression(delegateExpression)
-                .getValue(new VariableContainerWrapper(Collections.emptyMap()));
+                .getValue(variableContainer);
             if (!(channelAdapter instanceof OutboundEventChannelAdapter)) {
                 throw new FlowableException(
                     "DelegateExpression outbound channel model with key " + channelModel.getKey() + " resolved channel adapter delegate expression to "

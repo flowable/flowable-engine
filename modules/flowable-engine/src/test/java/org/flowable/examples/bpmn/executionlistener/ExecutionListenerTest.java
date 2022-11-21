@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -345,17 +347,18 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         vars.put("throwErrorStartListener", "MY_ERROR");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
-        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .includeProcessVariables().singleResult()
-                .getProcessVariables();
-
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables().singleResult()
+                    .getProcessVariables();
+            assertThat(processVariables)
+                    .containsEntry("handled_error", "MY_ERROR")
+                    .doesNotContainKey("error_code");
+        }
         assertThat(processInstance.getProcessVariables())
                 .containsEntry("handled_error", "MY_ERROR")
                 .doesNotContainKey("_script_task");
-        assertThat(processVariables)
-                .containsEntry("handled_error", "MY_ERROR")
-                .doesNotContainKey("error_code");
     }
 
     @Test
@@ -365,15 +368,17 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         vars.put("throwErrorEndListener", "MY_ERROR");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("errorHandlingSubProcess", vars);
-        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstance.getId())
-                .includeProcessVariables().singleResult()
-                .getProcessVariables();
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables().singleResult()
+                    .getProcessVariables();
+            assertThat(processVariables)
+                    .containsEntry("handled_error", "MY_ERROR")
+                    .containsEntry("_script_task", "executed");
+        }
 
         assertThat(processInstance.getProcessVariables())
-                .containsEntry("handled_error", "MY_ERROR")
-                .containsEntry("_script_task", "executed");
-        assertThat(processVariables)
                 .containsEntry("handled_error", "MY_ERROR")
                 .containsEntry("_script_task", "executed");
     }
@@ -511,7 +516,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelStart() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .transientVariable("elements", Arrays.asList("1", "2", "3"))
@@ -551,7 +555,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelStartAsync() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .transientVariable("throwErrorSubProcessStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .transientVariable("elements", Arrays.asList("1", "2", "3"))
@@ -579,14 +582,16 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
                 }
             });
         }
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
-                .processInstanceId(processInstance.getId()).singleResult();
-        assertThat(historicProcessInstance.getProcessVariables())
-                .containsEntry("error_handled", "true")
-                .containsEntry("startProcessListener_null", "executed")
-                .containsEntry("startProcessListener_1", "executed")
-                .containsEntry("startProcessListener_2", "executed")
-                .doesNotContainKey("endProcessListener_null");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                    .processInstanceId(processInstance.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .doesNotContainKey("endProcessListener_null");
+        }
     }
 
     @Test
@@ -595,7 +600,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowBpmnErrorCatchBoundaryEventSubProcessMultiInstanceParallelEndAsync() {
         {
             // SubProcess ExecutionListener
-            Map<String, Object> vars = new HashMap<>();
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .variable("throwErrorSubProcessEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
                     .variable("elements", Arrays.asList("1", "2", "3"))
@@ -612,11 +616,14 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
                     }
                 });
             }
-            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
-                    .processInstanceId(processInstance.getId()).singleResult();
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+                HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                        .processInstanceId(processInstance.getId()).singleResult();
 
-            assertThat(historicProcessInstance.getProcessVariables())
-                    .containsEntry("error_handled", "true");
+                assertThat(historicProcessInstance.getProcessVariables())
+                        .containsEntry("error_handled", "true");
+            }
+
         }
 
         // SubProcess Activity ExecutionListener
@@ -635,16 +642,19 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
                 }
             });
         }
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
-                .processInstanceId(processInstance.getId()).singleResult();
-        assertThat(historicProcessInstance.getProcessVariables())
-                .containsEntry("error_handled", "true")
-                .containsEntry("startProcessListener_null", "executed")
-                .containsEntry("startProcessListener_1", "executed")
-                .containsEntry("startProcessListener_2", "executed")
-                .containsEntry("startListener_element_1", "executed")
-                .containsEntry("element_1", "executed")
-                .doesNotContainKey("endProcessListener_null");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                    .processInstanceId(processInstance.getId()).singleResult();
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .containsEntry("error_handled", "true")
+                    .containsEntry("startProcessListener_null", "executed")
+                    .containsEntry("startProcessListener_1", "executed")
+                    .containsEntry("startProcessListener_2", "executed")
+                    .containsEntry("startListener_element_1", "executed")
+                    .containsEntry("element_1", "executed")
+                    .doesNotContainKey("endProcessListener_null");
+        }
     }
 
     @Test

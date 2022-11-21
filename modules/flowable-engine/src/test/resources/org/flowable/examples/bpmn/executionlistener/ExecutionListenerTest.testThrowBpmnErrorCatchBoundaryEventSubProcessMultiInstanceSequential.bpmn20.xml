@@ -14,9 +14,9 @@
                             if(execution.getVariable('throwErrorSubProcessStartListener') != null && execution.getVariable('element') == null)
                                 throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessStartListener'));
                              else
-                                 execution.setVariable("startProcessListener_"+execution.getVariable('element'), 'executed');
+                                 execution.setVariable("startProcessListener_${execution.getVariable('element')}", 'executed');
 
-                                  execution.getVariable("executionStack")?.add("startProcessListener_"+execution.getVariable('element'));
+                                  execution.getVariable("executionStack")?.add("startProcessListener_${execution.getVariable('element')}");
                             ]]>
                     </flowable:script>
                 </flowable:executionListener>
@@ -26,9 +26,9 @@
                             if(execution.getVariable('throwErrorSubProcessEndListener') != null && execution.getVariable('element') == null)
                                 throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessEndListener'));
                              else
-                                 execution.setVariable("endProcessListener_"+execution.getVariable('element'), 'executed');
+                                 execution.setVariable("endProcessListener_${execution.getVariable('element')}", 'executed');
 
-                                execution.getVariable("executionStack")?.add("endProcessListener_"+execution.getVariable('element'));
+                                execution.getVariable("executionStack")?.add("endProcessListener_${execution.getVariable('element')}");
                             ]]>
                     </flowable:script>
                 </flowable:executionListener>
@@ -43,9 +43,9 @@
                             if(execution.getVariable('throwErrorSubProcessTaskStartListener') != null && "2".equals(execution.getVariable('element')))
                                 throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessTaskStartListener'));
                              else
-                                 execution.setVariable("startListener_element_${element}", 'executed');
+                                 execution.setVariable("startListener_element_${execution.getVariable('element')}", 'executed');
 
-                                execution.getVariable("executionStack")?.add("startListener_element_"+execution.getVariable('element'));
+                                execution.getVariable("executionStack")?.add("startListener_element_${execution.getVariable('element')}");
                             ]]>
                         </flowable:script>
                     </flowable:executionListener>
@@ -55,9 +55,9 @@
                             if(execution.getVariable('throwErrorSubProcessTaskEndListener') != null && "2".equals(execution.getVariable('element')))
                                 throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorSubProcessTaskEndListener'));
                              else
-                                 execution.setVariable('endListener_element_${element}', 'executed');
+                                 execution.setVariable("endListener_element_${execution.getVariable('element')}", 'executed');
 
-                             execution.getVariable("executionStack")?.add("endListener_element_"+execution.getVariable('element'));
+                             execution.getVariable("executionStack")?.add("endListener_element_${execution.getVariable('element')}");
                             ]]>
                         </flowable:script>
                     </flowable:executionListener>
@@ -65,9 +65,9 @@
                 <script>
                     <![CDATA[
                     def element = execution.getVariable('element');
-                    execution.setVariable("element_${element}", "executed");
+                    execution.setVariable("element_${execution.getVariable('element')}", "executed");
 
-                    execution.getVariable("executionStack")?.add("element_"+execution.getVariable('element'));
+                    execution.getVariable("executionStack")?.add("element_${execution.getVariable('element')}");
                 ]]>
                 </script>
             </scriptTask>
