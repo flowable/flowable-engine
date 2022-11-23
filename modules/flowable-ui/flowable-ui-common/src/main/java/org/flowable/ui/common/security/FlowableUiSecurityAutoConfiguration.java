@@ -43,7 +43,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
@@ -55,6 +54,7 @@ import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInit
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.security.web.context.NullSecurityContextRepository;
@@ -153,9 +153,8 @@ public class FlowableUiSecurityAutoConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
     @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "idm", matchIfMissing = true)
-    public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    public static class FormLoginWebSecurityConfigurerAdapter {
 
         @Autowired
         protected ObjectProvider<RememberMeServices> rememberMeServicesObjectProvider;
@@ -163,8 +162,9 @@ public class FlowableUiSecurityAutoConfiguration {
         @Autowired
         protected FlowableCommonAppProperties commonAppProperties;
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
+        public SecurityFilterChain defaultSecurity(HttpSecurity http) throws Exception {
             RememberMeServices rememberMeServices = rememberMeServicesObjectProvider.getIfAvailable();
             String key = null;
             if (rememberMeServices instanceof AbstractRememberMeServices) {
@@ -197,13 +197,14 @@ public class FlowableUiSecurityAutoConfiguration {
 
             http.formLogin().disable();
             http.apply(new FlowableUiCustomFormLoginConfigurer<>());
+
+            return http.build();
         }
     }
 
     @Configuration(proxyBeanMethods = false)
-    @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
     @ConditionalOnProperty(prefix = "flowable.common.app.security", name = "type", havingValue = "oauth2")
-    public static class OAuthWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    public static class OAuthWebSecurityConfigurerAdapter {
 
         private static final Pattern PASSWORD_ALGORITHM_PATTERN = Pattern.compile("^\\{.+}.*$");
 
@@ -216,14 +217,15 @@ public class FlowableUiSecurityAutoConfiguration {
             this.passwordEncoder = passwordEncoder;
         }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(SecurityConstants.FORM_LOGIN_SECURITY_ORDER)
+        public SecurityFilterChain oauthSecurity(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
             // Do not disable session, otherwise OAuth does not work
             http
                     .logout(logout -> {
                         DEFAULT_LOGOUT.customize(logout);
                         OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
-                                getApplicationContext().getBean(ClientRegistrationRepository.class));
+                                clientRegistrationRepository);
                         logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
                         logout.logoutSuccessHandler(logoutSuccessHandler);
                     })
@@ -234,6 +236,8 @@ public class FlowableUiSecurityAutoConfiguration {
 
             http.oauth2Login();
             http.oauth2Client();
+
+            return http.build();
         }
 
         @Bean
@@ -315,8 +319,7 @@ public class FlowableUiSecurityAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(EndpointRequest.class)
-    @Order(SecurityConstants.ACTUATOR_SECURITY_ORDER)
-    public static class ActuatorWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public static class ActuatorWebSecurityConfigurationAdapter {
 
         protected final ApiHttpSecurityCustomizer apiHttpSecurityCustomizer;
 
@@ -324,8 +327,9 @@ public class FlowableUiSecurityAutoConfiguration {
             this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(SecurityConstants.ACTUATOR_SECURITY_ORDER)
+        public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
 
             http
                     .sessionManagement()
@@ -341,6 +345,8 @@ public class FlowableUiSecurityAutoConfiguration {
                     .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN);
 
             apiHttpSecurityCustomizer.customize(http);
+
+            return http.build();
         }
     }
 

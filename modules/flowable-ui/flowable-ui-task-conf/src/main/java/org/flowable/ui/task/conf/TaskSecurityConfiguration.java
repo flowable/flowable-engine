@@ -17,11 +17,12 @@ import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
 import org.flowable.ui.common.security.SecurityConstants;
 import org.flowable.ui.task.properties.FlowableTaskAppProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
@@ -37,9 +38,8 @@ public class TaskSecurityConfiguration {
     // BASIC AUTH
     //
 
-    @Configuration
-    @Order(SecurityConstants.TASK_API_SECURITY_ORDER)
-    public static class TaskApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    @Configuration(proxyBeanMethods = false)
+    public static class TaskApiWebSecurityConfigurationAdapter {
 
         protected final FlowableRestAppProperties restAppProperties;
         protected final FlowableTaskAppProperties taskAppProperties;
@@ -52,8 +52,9 @@ public class TaskSecurityConfiguration {
             this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(SecurityConstants.TASK_API_SECURITY_ORDER)
+        public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
             http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -75,6 +76,7 @@ public class TaskSecurityConfiguration {
                 
             }
                    
+            return http.build();
         }
     }
 

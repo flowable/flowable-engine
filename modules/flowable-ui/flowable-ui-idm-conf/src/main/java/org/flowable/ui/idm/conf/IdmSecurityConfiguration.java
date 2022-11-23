@@ -24,8 +24,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
@@ -59,9 +59,8 @@ public class IdmSecurityConfiguration {
     // BASIC AUTH
     //
 
-    @Configuration
-    @Order(SecurityConstants.IDM_API_SECURITY_ORDER)
-    public static class IdmApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    @Configuration(proxyBeanMethods = false)
+    public static class IdmApiWebSecurityConfigurationAdapter {
 
         protected final FlowableRestAppProperties restAppProperties;
         protected final FlowableIdmAppProperties idmAppProperties;
@@ -74,8 +73,9 @@ public class IdmSecurityConfiguration {
             this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(SecurityConstants.IDM_API_SECURITY_ORDER)
+        public SecurityFilterChain idmApiSecurity(HttpSecurity http) throws Exception {
 
             http
                     .sessionManagement()
@@ -99,7 +99,8 @@ public class IdmSecurityConfiguration {
                 http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").denyAll();
                 
             }
-            
+
+            return http.build();
         }
     }
 }
