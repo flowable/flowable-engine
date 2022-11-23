@@ -13,15 +13,15 @@
 package org.flowable.ui.task.conf;
 
 import org.flowable.ui.task.properties.FlowableTaskAppProperties;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.task.TaskExecutorCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(FlowableTaskAppProperties.class)
 @ComponentScan(basePackages = {
         "org.flowable.ui.task.conf",

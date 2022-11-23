@@ -20,29 +20,25 @@ import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
 import org.flowable.ui.idm.service.keycloak.KeycloakConfiguration;
 import org.flowable.ui.idm.service.keycloak.KeycloakIdentityServiceImpl;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.ldap.LdapAutoConfiguration;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Filip Hrisafov
  */
-@AutoConfigureBefore({
+@AutoConfiguration(before = {
         FlowableSecurityAutoConfiguration.class,
         IdmEngineServicesAutoConfiguration.class,
         ProcessEngineServicesAutoConfiguration.class,
-})
-@AutoConfigureAfter({
+}, after = {
         LdapAutoConfiguration.class
 })
 @ConditionalOnProperty(prefix = "flowable.idm.app.keycloak", name = "enabled", havingValue = "true")
 @ConditionalOnMissingBean(name = "ldapIdmEngineConfigurer") // should only be activated if ldap is not enabled
-@Configuration(proxyBeanMethods = false)
 public class KeycloakIdmAutoConfiguration {
 
     protected final FlowableIdmAppProperties properties;

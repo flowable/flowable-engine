@@ -17,13 +17,12 @@ import org.flowable.ui.common.service.idm.RemoteIdmServiceImpl;
 import org.flowable.ui.idm.properties.FlowableIdmAppProperties;
 import org.flowable.ui.idm.servlet.ApiDispatcherServletConfiguration;
 import org.flowable.ui.idm.servlet.AppDispatcherServletConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
@@ -32,9 +31,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(FlowableIdmAppProperties.class)
-@AutoConfigureBefore({
+@AutoConfiguration(before = {
         FlowableSecurityAutoConfiguration.class,
 })
 @ComponentScan(basePackages = {

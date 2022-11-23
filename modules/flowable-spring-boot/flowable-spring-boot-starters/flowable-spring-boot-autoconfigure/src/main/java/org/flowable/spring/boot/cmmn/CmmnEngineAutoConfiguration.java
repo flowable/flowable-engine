@@ -55,10 +55,10 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -75,7 +75,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnCmmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
@@ -87,13 +86,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
     FlowableAppProperties.class,
     FlowableHttpProperties.class
 })
-@AutoConfigureAfter(value = {
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
-}, name = {
-    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
-})
-@AutoConfigureBefore({
+    TaskExecutionAutoConfiguration.class
+}, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class
 })

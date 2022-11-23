@@ -29,8 +29,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.condition.ConditionalOnContentEngine;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -43,17 +42,15 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnContentEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableContentProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
-})
-@AutoConfigureBefore({
+}, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
 })

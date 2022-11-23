@@ -26,7 +26,7 @@ import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,13 +39,12 @@ import org.springframework.context.annotation.Configuration;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableFormProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     FormEngineAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class

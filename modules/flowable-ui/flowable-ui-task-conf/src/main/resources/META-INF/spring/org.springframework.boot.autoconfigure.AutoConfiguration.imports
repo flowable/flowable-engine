@@ -1,0 +1,2 @@
+org.flowable.ui.task.conf.ApplicationConfiguration
+org.flowable.ui.task.servlet.AppDispatcherServletConfiguration

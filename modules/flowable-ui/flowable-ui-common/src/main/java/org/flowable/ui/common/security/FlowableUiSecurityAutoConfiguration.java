@@ -31,8 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.info.InfoEndpoint;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -64,11 +63,9 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 /**
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
         IdmEngineServicesAutoConfiguration.class,
-})
-@AutoConfigureBefore({
+}, before = {
         FlowableSecurityAutoConfiguration.class,
         OAuth2ClientAutoConfiguration.class,
 })

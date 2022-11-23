@@ -17,13 +17,13 @@ import javax.servlet.MultipartConfigElement;
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
@@ -32,7 +32,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ComponentScan(basePackages = {
     "org.flowable.ui.admin.repository",
     "org.flowable.ui.common.repository",

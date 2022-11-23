@@ -1129,11 +1129,10 @@ This can be done in the following manner
 
 Note that when using Spring Boot the configuration class can be under your own package and not under some Flowable package.
 
-In order to make this class an auto configuration class a file named `spring.factories` should be created in the `META-INF` folder of your jar.
+In order to make this class an auto configuration class a file named `org.springframework.boot.autoconfigure.AutoConfiguration.imports` should be created in the `META-INF/spring` folder of your jar.
 In this file you should add
 
-    org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-      com.your.own.package.configuration.YourOwnCustomConfiguration
+    com.your.own.package.configuration.YourOwnCustomConfiguration
 
 In order to use this approach you would need to include your jar in the `WEB-INF/lib` folder of the exploded war.
 Placing this jar in the lib folder of the servlet container (e.g. Tomcat) is not going to work due to the way Spring proxies the `@Configuration` classes.

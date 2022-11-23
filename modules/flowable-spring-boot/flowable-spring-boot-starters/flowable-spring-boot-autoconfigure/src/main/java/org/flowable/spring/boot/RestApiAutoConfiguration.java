@@ -56,7 +56,7 @@ import org.flowable.spring.boot.job.ExternalJobRestConfiguration;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.ProcessEngineRestConfiguration;
 import org.flowable.spring.boot.rest.BaseRestApiConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -76,10 +76,9 @@ import org.springframework.context.annotation.Configuration;
  * @author Vedran Pavic
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ContentTypeResolver.class)
 @ConditionalOnWebApplication
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     MultipartAutoConfiguration.class,
     FlowableSecurityAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,

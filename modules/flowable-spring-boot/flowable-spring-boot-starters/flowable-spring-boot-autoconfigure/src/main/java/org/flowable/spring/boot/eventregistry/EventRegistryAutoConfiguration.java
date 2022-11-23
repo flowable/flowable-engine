@@ -50,8 +50,7 @@ import org.flowable.spring.boot.condition.ConditionalOnEventRegistry;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -75,21 +74,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Auto configuration for the event registry.
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnEventRegistry
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableEventRegistryProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
     KafkaAutoConfiguration.class,
     JmsAutoConfiguration.class,
     RabbitAutoConfiguration.class,
-})
-@AutoConfigureBefore({
+}, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
 })

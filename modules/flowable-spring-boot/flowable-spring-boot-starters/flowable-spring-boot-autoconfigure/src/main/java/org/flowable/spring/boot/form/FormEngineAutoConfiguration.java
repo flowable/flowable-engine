@@ -41,8 +41,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnFormEngine;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -59,18 +58,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filip Hrisafov
  * @author Javier Casal
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnFormEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableFormProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
-})
-@AutoConfigureBefore({
+}, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
 })
