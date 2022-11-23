@@ -13,8 +13,8 @@
 package org.flowable.spring.boot.cmmn;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -155,7 +155,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
         @Qualifier("flowableAsyncTaskInvokerTaskExecutor") ObjectProvider<AsyncTaskExecutor> asyncTaskInvokerTaskExecutor,
         ObjectProvider<FlowableHttpClient> flowableHttpClient,
-        ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
+        ObjectProvider<AutoDeploymentStrategy<CmmnEngine>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
         SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
@@ -188,17 +188,11 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             configuration.setAsyncHistoryTaskExecutor(flowableTaskExecutor);
         }
 
-        AsyncTaskExecutor taskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor.getIfAvailable();
-        if (taskInvokerTaskExecutor != null) {
-            configuration.setAsyncTaskInvokerTaskExecutor(taskInvokerTaskExecutor);
-        }
+        asyncTaskInvokerTaskExecutor.ifAvailable(configuration::setAsyncTaskInvokerTaskExecutor);
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
-        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
-        if (objectMapper != null) {
-            configuration.setObjectMapper(objectMapper);
-        }
+        objectMapperProvider.ifAvailable(configuration::setObjectMapper);
 
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 
@@ -236,11 +230,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configuration.setFormFieldValidationEnabled(flowableProperties.isFormFieldValidationEnabled());
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.getIfAvailable();
-        if (deploymentStrategies == null) {
-            deploymentStrategies = new ArrayList<>();
-        }
+        List<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = cmmnAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.CMMN);
         // Always add the out of the box auto deployment strategies as last
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));

@@ -13,8 +13,8 @@
 package org.flowable.spring.boot.dmn;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -89,7 +89,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @ConditionalOnMissingBean
     public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         ObjectProvider<ObjectMapper> objectMapperProvider,
-        ObjectProvider<List<AutoDeploymentStrategy<DmnEngine>>> dmnAutoDeploymentStrategies) throws IOException {
+        ObjectProvider<AutoDeploymentStrategy<DmnEngine>> dmnAutoDeploymentStrategies) throws IOException {
         SpringDmnEngineConfiguration configuration = new SpringDmnEngineConfiguration();
 
         List<Resource> resources = this.discoverDeploymentResources(
@@ -105,20 +105,13 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
-        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
-        if (objectMapper != null) {
-            configuration.setObjectMapper(objectMapper);
-        }
+        objectMapperProvider.ifAvailable(configuration::setObjectMapper);
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());
         configuration.setStrictMode(dmnProperties.isStrictMode());
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = dmnAutoDeploymentStrategies.getIfAvailable();
-        if (deploymentStrategies == null) {
-            deploymentStrategies = new ArrayList<>();
-        }
+        List<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = dmnAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.DMN);
         // Always add the out of the box auto deployment strategies as last
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));

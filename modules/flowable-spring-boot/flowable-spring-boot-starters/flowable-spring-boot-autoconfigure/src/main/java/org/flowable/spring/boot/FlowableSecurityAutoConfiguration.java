@@ -55,10 +55,7 @@ public class FlowableSecurityAutoConfiguration {
     public static class SpringSecurityAuthenticationContextConfiguration {
 
         public SpringSecurityAuthenticationContextConfiguration(ObjectProvider<AuthenticationContext> authenticationContext) {
-            AuthenticationContext context = authenticationContext.getIfAvailable();
-            if (context == null) {
-                context = new SpringSecurityAuthenticationContext();
-            }
+            AuthenticationContext context = authenticationContext.getIfAvailable(SpringSecurityAuthenticationContext::new);
 
             Authentication.setAuthenticationContext(context);
         }

@@ -13,8 +13,8 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -183,7 +183,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
             @Qualifier("flowableAsyncTaskInvokerTaskExecutor") ObjectProvider<AsyncTaskExecutor> asyncTaskInvokerTaskExecutor,
             ObjectProvider<FlowableHttpClient> flowableHttpClient,
-            ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
+            ObjectProvider<AutoDeploymentStrategy<ProcessEngine>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -221,15 +221,9 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
         }
 
-        AsyncTaskExecutor taskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor.getIfAvailable();
-        if (taskInvokerTaskExecutor != null) {
-            conf.setAsyncTaskInvokerTaskExecutor(taskInvokerTaskExecutor);
-        }
+        asyncTaskInvokerTaskExecutor.ifAvailable(conf::setAsyncTaskInvokerTaskExecutor);
 
-        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
-        if (objectMapper != null) {
-            conf.setObjectMapper(objectMapper);
-        }
+        objectMapperProvider.ifAvailable(conf::setObjectMapper);
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 
@@ -286,11 +280,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         }
         conf.setIdGenerator(idGenerator);
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = processEngineAutoDeploymentStrategies.getIfAvailable();
-        if (deploymentStrategies == null) {
-            deploymentStrategies = new ArrayList<>();
-        }
+        List<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = processEngineAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.BPMN);
 
         // Always add the out of the box auto deployment strategies as last

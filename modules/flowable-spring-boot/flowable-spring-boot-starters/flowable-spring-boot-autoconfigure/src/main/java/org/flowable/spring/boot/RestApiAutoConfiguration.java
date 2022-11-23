@@ -61,6 +61,7 @@ import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -79,8 +80,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(ContentTypeResolver.class)
 @ConditionalOnWebApplication
 @AutoConfigureAfter({
-    //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartAutoConfiguration (the package is changed)
-    //MultipartAutoConfiguration.class,
+    MultipartAutoConfiguration.class,
     FlowableSecurityAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
