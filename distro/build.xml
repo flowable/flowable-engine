@@ -339,9 +339,6 @@
 			<fileset dir="../modules/flowable-cxf/target">
 				<include name="flowable-cxf-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-mule/target">
-				<include name="flowable-mule-*.jar" />
-			</fileset>
 			<fileset dir="../modules/flowable-http-common/target">
 				<include name="flowable-http-common-*.jar" />
 			</fileset>

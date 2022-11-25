@@ -243,7 +243,6 @@
         <enumeration value="camel"/>
         <enumeration value="http"/>
         <enumeration value="mail"/>
-        <enumeration value="mule"/>
         <enumeration value="shell"/>
         <enumeration value="dmn"/>
         <enumeration value="case"/>

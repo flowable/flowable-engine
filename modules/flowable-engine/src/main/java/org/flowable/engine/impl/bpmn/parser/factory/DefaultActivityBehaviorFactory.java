@@ -256,31 +256,6 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         return new DmnActivityBehavior(sendTask);
     }
 
-    // We do not want a hard dependency on Mule, hence we return
-    // ActivityBehavior and instantiate the delegate instance using a string instead of the Class itself.
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask) {
-        return createMuleActivityBehavior(serviceTask, serviceTask.getFieldExtensions());
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(SendTask sendTask) {
-        return createMuleActivityBehavior(sendTask, sendTask.getFieldExtensions());
-    }
-
-    protected ActivityBehavior createMuleActivityBehavior(TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions) {
-        try {
-
-            Class<?> theClass = Class.forName("org.flowable.mule.MuleSendActivityBehavior");
-            List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(fieldExtensions);
-            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(
-                    theClass, fieldDeclarations);
-
-        } catch (ClassNotFoundException e) {
-            throw new FlowableException("Could not find org.flowable.mule.MuleSendActivityBehavior: ", e);
-        }
-    }
-
     // We do not want a hard dependency on Camel, hence we return
     // ActivityBehavior and instantiate the delegate instance using a string instead of the Class itself.
     @Override

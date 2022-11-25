@@ -109,8 +109,6 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 stencilId = STENCIL_TASK_MAIL;
             } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                 stencilId = STENCIL_TASK_CAMEL;
-            } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
-                stencilId = STENCIL_TASK_MULE;
             } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
                 stencilId = STENCIL_TASK_HTTP;
             } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {

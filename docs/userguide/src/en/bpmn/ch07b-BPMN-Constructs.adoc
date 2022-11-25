@@ -3807,62 +3807,6 @@ Below are few examples for exception handling and retry for http task.
 ====== Exception mapping
 Refer <<exceptionMapping, Exception mapping>>
 
-[[bpmnMuleTask]]
-
-
-==== Mule Task
-
-The mule task allows you to send messages to Mule, enhancing the integration features of Flowable. Note that the Mule task is *not* an 'official' task of the BPMN 2.0 spec (and doesn't have a dedicated icon as a consequence). Hence, in Flowable the mule task is implemented as a dedicated service task.
-
-[[bpmnMuleTaskUsage]]
-
-
-===== Defining an Mule Task
-
-The Mule task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>> and is defined by setting _'mule'_ for the _type_ of the service task.
-
-[source,xml,linenums]
-----
-<serviceTask id="sendMule" flowable:type="mule">
-----
-
-The Mule task is configured by <<serviceTaskFieldInjection,field injection>>. All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
-
-[options="header"]
-|===============
-|Property|Required?|Description
-|endpointUrl|yes|The Mule endpoint you want to invoke.
-|language|yes|The language you want to use to evaluate the payloadExpression field.
-|payloadExpression|yes|An expression that will be the message's payload.
-|resultVariable|no|The name of the variable which will store the result of the invocation.
-
-|===============
-
-[[bpmnMuleTaskExampleUsage]]
-
-
-===== Example usage
-
-The following XML snippet shows an example of using the Mule Task.
-
-[source,xml,linenums]
-----
-<extensionElements>
-  <flowable:field name="endpointUrl">
-    <flowable:string>vm://in</flowable:string>
-  </flowable:field>
-  <flowable:field name="language">
-    <flowable:string>juel</flowable:string>
-  </flowable:field>
-  <flowable:field name="payloadExpression">
-    <flowable:string>"hi"</flowable:string>
-  </flowable:field>
-  <flowable:field name="resultVariable">
-    <flowable:string>theVariable</flowable:string>
-  </flowable:field>
-</extensionElements>
-----
-
 [[bpmnCamelTask]]
 
 

@@ -161,12 +161,6 @@ public interface ActivityBehaviorFactory {
 
     MailActivityBehavior createMailActivityBehavior(SendTask sendTask);
 
-    // We do not want a hard dependency on the Mule module, hence we return
-    // ActivityBehavior and instantiate the delegate instance using a string instead of the Class itself.
-    ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask);
-
-    ActivityBehavior createMuleActivityBehavior(SendTask sendTask);
-
     ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask);
 
     ActivityBehavior createCamelActivityBehavior(SendTask sendTask);

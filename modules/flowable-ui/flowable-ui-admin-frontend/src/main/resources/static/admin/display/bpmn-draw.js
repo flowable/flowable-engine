@@ -176,9 +176,6 @@ function _drawServiceTask(element, isMigrationModelElement, currentPaper)
 	} else if (element.taskType === "camel") {
         _drawCamelTaskIcon(currentPaper, element.x + 4, element.y + 4);
         
-    } else if (element.taskType === "mule") {
-        _drawMuleTaskIcon(currentPaper, element.x + 4, element.y + 4);
-        
     } else if (element.taskType === "http") {
         _drawHttpTaskIcon(currentPaper, element.x + 4, element.y + 4);
         

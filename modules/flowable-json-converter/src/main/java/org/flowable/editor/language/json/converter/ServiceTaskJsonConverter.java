@@ -75,12 +75,6 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
         } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
             setPropertyFieldValue(PROPERTY_CAMELTASK_CAMELCONTEXT, "camelContext", serviceTask, propertiesNode);
 
-        } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
-            setPropertyFieldValue(PROPERTY_MULETASK_ENDPOINT_URL, "endpointUrl", serviceTask, propertiesNode);
-            setPropertyFieldValue(PROPERTY_MULETASK_LANGUAGE, "language", serviceTask, propertiesNode);
-            setPropertyFieldValue(PROPERTY_MULETASK_PAYLOAD_EXPRESSION, "payloadExpression", serviceTask, propertiesNode);
-            setPropertyFieldValue(PROPERTY_MULETASK_RESULT_VARIABLE, "resultVariable", serviceTask, propertiesNode);
-
         } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
                 if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {

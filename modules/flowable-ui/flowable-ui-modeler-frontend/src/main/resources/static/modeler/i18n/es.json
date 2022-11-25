@@ -632,30 +632,6 @@
             "DESCRIPTION" : "Definición opcional del contexto Camel. Si se deja vacío se utiliza el predeterminado."
           }
         },
-        "MULETASKENDPOINTURLPACKAGE" : {
-          "MULETASKENDPOINTURL" : {
-            "TITLE" : "URL del endpoint",
-            "DESCRIPTION" : "Se requiere la url del endpoint para enviar los mensajes a Mule."
-          }
-        },
-        "MULETASKLANGUAGEPACKAGE" : {
-          "MULETASKLANGUAGE" : {
-            "TITLE" : "Lenguaje",
-            "DESCRIPTION" : "Se requiere la definición del lenguaje para resolver la expresión de la carga útil, como juel."
-          }
-        },
-        "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
-          "MULETASKPAYLOADEXPRESSION" : {
-            "TITLE" : "Expresión de la carga útil",
-            "DESCRIPTION" : "Se requiere la definición de la carga útil del mensaje a ser enviado a Mule."
-          }
-        },
-        "MULETASKRESULTVARIABLEPACKAGE" : {
-          "MULETASKRESULTVARIABLE" : {
-            "TITLE" : "Variable de resultado",
-            "DESCRIPTION" : "Una variable de resultado opcional para la carga útil recibida."
-          }
-        },
         "CONDITIONSEQUENCEFLOWPACKAGE" : {
           "CONDITIONSEQUENCEFLOWPACKAGE" : {
             "TITLE" : "Condición del flujo",
@@ -1034,10 +1010,6 @@
         "HTTPTASK" : {
           "TITLE" : "Tarea de HTTP",
           "DESCRIPTION" : "Una tarea que usa HTTP"
-        },
-        "MULETASK" : {
-          "TITLE" : "Tarea de Mule",
-          "DESCRIPTION" : "Una tarea que envía un mensaje a Mule"
         },
         "SENDTASK" : {
           "TITLE" : "Tarea de envío",

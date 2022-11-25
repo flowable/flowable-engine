@@ -213,10 +213,6 @@ function _drawServiceTask(element)
 	{
 		_drawCamelTaskIcon(paper, element.x + 4, element.y + 4);
 	}
-	else if (element.taskType === "mule")
-	{
-		_drawMuleTaskIcon(paper, element.x + 4, element.y + 4);
-	}
     else if (element.taskType === "http")
     {
         _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);

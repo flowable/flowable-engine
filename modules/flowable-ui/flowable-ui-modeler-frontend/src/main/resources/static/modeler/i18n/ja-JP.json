@@ -627,30 +627,6 @@
           "DESCRIPTION": "追加のCamelコンテクスト定義。空の場合は規定値が使われる。"
         }
       },
-      "MULETASKENDPOINTURLPACKAGE": {
-        "MULETASKENDPOINTURL": {
-          "TITLE": "エンドポイントURL",
-          "DESCRIPTION": "Muleにメッセージを送る場合に必要なエンドポイントURL。"
-        }
-      },
-      "MULETASKLANGUAGEPACKAGE": {
-        "MULETASKLANGUAGE": {
-          "TITLE": "言語",
-          "DESCRIPTION": "ペイロード式を解決する言語の定義。"
-        }
-      },
-      "MULETASKPAYLOADEXPRESSIONPACKAGE": {
-        "MULETASKPAYLOADEXPRESSION": {
-          "TITLE": "ペイロード式",
-          "DESCRIPTION": "Muleに送るメッセージの定義。"
-        }
-      },
-      "MULETASKRESULTVARIABLEPACKAGE": {
-        "MULETASKRESULTVARIABLE": {
-          "TITLE": "結果変数",
-          "DESCRIPTION": "ペイロードの返値を格納する変数。"
-        }
-      },
       "CONDITIONSEQUENCEFLOWPACKAGE": {
         "CONDITIONSEQUENCEFLOWPACKAGE": {
           "TITLE": "フロー条件",
@@ -1044,10 +1020,6 @@
       "HTTPTASK": {
         "TITLE": "HTTPタスク",
         "DESCRIPTION": "HTTPタスク"
-      },
-      "MULETASK": {
-        "TITLE": "Muleタスク",
-        "DESCRIPTION": "Muleへメッセージを送るタスク"
       },
       "SENDTASK": {
         "TITLE": "送信タスク",

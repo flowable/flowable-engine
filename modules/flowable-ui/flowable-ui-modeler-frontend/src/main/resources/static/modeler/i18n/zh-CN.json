@@ -602,30 +602,6 @@
           "DESCRIPTION" : "可选的Camel 上下文定义,若为空，则使用系统缺省的."
         }
       },
-      "MULETASKENDPOINTURLPACKAGE" : {
-        "MULETASKENDPOINTURL" : {
-          "TITLE" : "终端url",
-          "DESCRIPTION" : "发送消息到Mule的必须的端点URL"
-        }
-      },
-      "MULETASKLANGUAGEPACKAGE" : {
-        "MULETASKLANGUAGE" : {
-          "TITLE" : "语言",
-          "DESCRIPTION" : "必须的语言定义来解析装载的表达式，如JUEL."
-        }
-      },
-      "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
-        "MULETASKPAYLOADEXPRESSION" : {
-          "TITLE" : "有效载荷表达式",
-          "DESCRIPTION" : "发送至Mule的必须执行的消息定义"
-        }
-      },
-      "MULETASKRESULTVARIABLEPACKAGE" : {
-        "MULETASKRESULTVARIABLE" : {
-          "TITLE" : "返回变量",
-          "DESCRIPTION" : "可选的装载返回的结果的变量"
-        }
-      },
       "CONDITIONSEQUENCEFLOWPACKAGE" : {
         "CONDITIONSEQUENCEFLOWPACKAGE" : {
           "TITLE" : "流条件",
@@ -1006,10 +982,6 @@
       "HTTPTASK" : {
         "TITLE" : "Http任务",
         "DESCRIPTION" : "Http任务"
-      },
-      "MULETASK" : {
-        "TITLE" : "Mule任务",
-        "DESCRIPTION" : "An task that sends a message to Mule"
       },
       "SENDTASK" : {
         "TITLE" : "发送任务",

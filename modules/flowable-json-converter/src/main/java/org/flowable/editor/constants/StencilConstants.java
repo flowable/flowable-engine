@@ -54,7 +54,6 @@ public interface StencilConstants {
     final String STENCIL_TASK_SERVICE = "ServiceTask";
     final String STENCIL_TASK_USER = "UserTask";
     final String STENCIL_TASK_CAMEL = "CamelTask";
-    final String STENCIL_TASK_MULE = "MuleTask";
     final String STENCIL_TASK_HTTP = "HttpTask";
     final String STENCIL_TASK_SEND_EVENT = "SendEventTask";
     final String STENCIL_TASK_EXTERNAL_WORKER = "ExternalWorkerTask";
@@ -285,11 +284,6 @@ public interface StencilConstants {
     final String PROPERTY_IOPARAMETER_TARGET = "target";
 
     final String PROPERTY_CAMELTASK_CAMELCONTEXT = "cameltaskcamelcontext";
-
-    final String PROPERTY_MULETASK_ENDPOINT_URL = "muletaskendpointurl";
-    final String PROPERTY_MULETASK_LANGUAGE = "muletasklanguage";
-    final String PROPERTY_MULETASK_PAYLOAD_EXPRESSION = "muletaskpayloadexpression";
-    final String PROPERTY_MULETASK_RESULT_VARIABLE = "muletaskresultvariable";
 
     final String PROPERTY_SEQUENCEFLOW_DEFAULT = "defaultflow";
     final String PROPERTY_SEQUENCEFLOW_CONDITION = "conditionsequenceflow";

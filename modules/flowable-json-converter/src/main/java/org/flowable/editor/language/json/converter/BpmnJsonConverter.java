@@ -105,7 +105,6 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         UserTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         CallActivityJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         CamelTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
-        MuleTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         HttpTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         SendTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -197,7 +196,6 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_TASK_SERVICE);
         DI_RECTANGLES.add(STENCIL_TASK_USER);
         DI_RECTANGLES.add(STENCIL_TASK_CAMEL);
-        DI_RECTANGLES.add(STENCIL_TASK_MULE);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
         DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);

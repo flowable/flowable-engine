@@ -22,7 +22,6 @@
 		<reactor-netty.version>1.0.25</reactor-netty.version>
 		<jackson.version>2.13.4.20221013</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
-		<mule.version>3.8.0</mule.version>
         <camel.version>3.14.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
 		<slf4j.version>1.7.36</slf4j.version>
@@ -686,11 +685,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-mule</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
 				<artifactId>flowable-http</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -818,16 +812,6 @@
 				<version>7.63.0.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.mule.modules</groupId>
-				<artifactId>mule-module-cxf</artifactId>
-				<version>${mule.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mule.tests</groupId>
-				<artifactId>mule-tests-functional</artifactId>
-				<version>${mule.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis</groupId>
@@ -1462,7 +1446,6 @@
 				<module>modules/flowable5-spring-compatibility</module>
 				<module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-cxf</module>
-				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-camel</module>
@@ -1583,13 +1566,6 @@
                 <module>modules/flowable-http-common</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>checkmule</id>
-			<modules>
-				<module>modules/flowable-cxf</module>
-				<module>modules/flowable-mule</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1719,7 +1695,6 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-camel</module>
-				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-cdi</module>

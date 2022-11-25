@@ -634,30 +634,6 @@
             "DESCRIPTION" : "An optional camel context definition, if left empty the default is used."
           }
         },
-        "MULETASKENDPOINTURLPACKAGE" : {
-          "MULETASKENDPOINTURL" : {
-            "TITLE" : "Endpoint url",
-            "DESCRIPTION" : "A required endpoint url to sent the message to Mule."
-          }
-        },
-        "MULETASKLANGUAGEPACKAGE" : {
-          "MULETASKLANGUAGE" : {
-            "TITLE" : "Language",
-            "DESCRIPTION" : "A required definition for the language to resolve the payload expression, like juel."
-          }
-        },
-        "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
-          "MULETASKPAYLOADEXPRESSION" : {
-            "TITLE" : "Payload expression",
-            "DESCRIPTION" : "A required definition for the payload of the message sent to Mule."
-          }
-        },
-        "MULETASKRESULTVARIABLEPACKAGE" : {
-          "MULETASKRESULTVARIABLE" : {
-            "TITLE" : "Result variable",
-            "DESCRIPTION" : "An optional result variable for the payload returned."
-          }
-        },
         "CONDITIONSEQUENCEFLOWPACKAGE" : {
           "CONDITIONSEQUENCEFLOWPACKAGE" : {
             "TITLE" : "Flow condition",
@@ -1096,10 +1072,6 @@
         "HTTPTASK" : {
           "TITLE" : "Http task",
           "DESCRIPTION" : "A HTTP task"
-        },
-        "MULETASK" : {
-          "TITLE" : "Mule task",
-          "DESCRIPTION" : "An task that sends a message to Mule"
         },
         "SENDTASK" : {
           "TITLE" : "Send task",

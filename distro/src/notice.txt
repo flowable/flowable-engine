@@ -58,7 +58,6 @@ flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
 flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
 flowable-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-ldap<version><.jar | -source.jar | -javadoc.jar>
-flowable-mule<version><.jar | -source.jar | -javadoc.jar>
 flowable-osgi<version><.jar | -source.jar | -javadoc.jar>
 flowable-process-validation<version><.jar | -source.jar | -javadoc.jar>
 flowable-rest<version><.jar | -source.jar | -javadoc.jar>
