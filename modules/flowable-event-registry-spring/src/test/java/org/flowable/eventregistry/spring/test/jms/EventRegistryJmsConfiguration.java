@@ -13,14 +13,26 @@
 package org.flowable.eventregistry.spring.test.jms;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.api.core.TransportConfiguration;
+import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
+import org.apache.activemq.artemis.api.core.client.ServerLocator;
+import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
+import org.apache.activemq.artemis.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory;
+import org.apache.activemq.artemis.core.remoting.impl.invm.TransportConstants;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.test.config.EventRegistryEngineTestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -38,6 +50,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Import(EventRegistryEngineTestConfiguration.class)
 @EnableJms
 public class EventRegistryJmsConfiguration {
+
+    private static final AtomicInteger serverIdCounter = new AtomicInteger();
+
+    protected final int serverId = serverIdCounter.getAndIncrement();
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -67,13 +83,27 @@ public class EventRegistryJmsConfiguration {
         return template;
     }
 
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public EmbeddedActiveMQ embeddedActiveMQ() {
+        ConfigurationImpl configuration = new ConfigurationImpl();
+        configuration.setSecurityEnabled(false);
+        configuration.setPersistenceEnabled(false);
+        TransportConfiguration transportConfiguration = new TransportConfiguration(InVMAcceptorFactory.class.getName(), generateTransportParameter());
+        configuration.getAcceptorConfigurations().add(transportConfiguration);
+        configuration.setClusterPassword("flowable");
+        EmbeddedActiveMQ embeddedActiveMQ = new EmbeddedActiveMQ();
+        embeddedActiveMQ.setConfiguration(configuration);
+
+        return embeddedActiveMQ;
+    }
+
     @Bean
+    @DependsOn("embeddedActiveMQ")
     public CachingConnectionFactory cachingJmsConnectionFactory() {
         // configuration properties are Spring Boot defaults
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-        activeMQConnectionFactory.setCloseTimeout((int) Duration.ofSeconds(15).toMillis());
-        activeMQConnectionFactory.setNonBlockingRedelivery(false);
-        activeMQConnectionFactory.setSendTimeout(0); // wait forever
+        TransportConfiguration transportConfiguration = new TransportConfiguration(InVMConnectorFactory.class.getName(), generateTransportParameter());
+        ServerLocator serverLocator = ActiveMQClient.createServerLocatorWithoutHA(transportConfiguration);
+        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(serverLocator);
 
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(activeMQConnectionFactory);
         cachingConnectionFactory.setCacheConsumers(false);
@@ -81,6 +111,12 @@ public class EventRegistryJmsConfiguration {
         cachingConnectionFactory.setSessionCacheSize(1);
 
         return cachingConnectionFactory;
+    }
+
+    protected Map<String, Object> generateTransportParameter() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(TransportConstants.SERVER_ID_PROP_NAME, serverId);
+        return parameters;
     }
 
     @Bean

@@ -69,7 +69,7 @@ public class FlowableUiAppEventRegistryCondition extends SpringBootCondition
         Map<String, ConditionOutcome> conditions = new HashMap<>();
 
         if (!jmsEnabled) {
-            conditions.put("org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration",
+            conditions.put("org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration",
                 ConditionOutcome.noMatch("Property flowable.task.app.jms-enabled was not set to true")
             );
         }

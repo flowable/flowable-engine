@@ -141,14 +141,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-client</artifactId>
-            <version>5.16.4</version>
+            <artifactId>artemis-jms-client</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <version>5.16.4</version>
+            <artifactId>artemis-jms-server</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
