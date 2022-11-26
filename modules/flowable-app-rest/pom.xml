@@ -810,8 +810,8 @@
             <artifactId>groovy-jsr223</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId> <!-- Needed for swagger doc generation -->
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId> <!-- Needed for swagger doc generation -->
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
