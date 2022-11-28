@@ -176,10 +176,9 @@
 				<version>1.6.2</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>javax.persistence-api</artifactId>
-				<version>2.2</version>
-				<scope>provided</scope>
+				<groupId>jakarta.persistence</groupId>
+				<artifactId>jakarta.persistence-api</artifactId>
+				<version>2.2.3</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.enterprise.concurrent</groupId>
