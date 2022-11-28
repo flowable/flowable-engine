@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +40,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Tijs Rademakers
  */
-public class BaseVariableResource {
+public class BaseVariableResource implements InitializingBean {
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -71,8 +71,8 @@ public class BaseVariableResource {
     
     protected boolean isSerializableVariableAllowed;
 
-    @PostConstruct
-    protected void postConstruct() {
+    @Override
+    public void afterPropertiesSet() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
     }
     

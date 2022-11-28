@@ -15,9 +15,8 @@ package org.flowable.ui.common.service.idm.cache;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.flowable.ui.common.properties.FlowableCommonAppProperties;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -35,7 +34,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public abstract class BaseUserCache implements UserCache {
+public abstract class BaseUserCache implements UserCache, InitializingBean {
 
     protected final FlowableCommonAppProperties properties;
 
@@ -45,7 +44,11 @@ public abstract class BaseUserCache implements UserCache {
         this.properties = properties;
     }
 
-    @PostConstruct
+    @Override
+    public void afterPropertiesSet() {
+        initCache();
+    }
+
     protected void initCache() {
         FlowableCommonAppProperties.Cache cache = properties.getCacheUsers();
         long userCacheMaxSize = cache.getMaxSize();
