@@ -181,10 +181,9 @@
 				<version>2.2.3</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.enterprise.concurrent</groupId>
-				<artifactId>javax.enterprise.concurrent-api</artifactId>
-				<version>1.0</version>
-				<scope>provided</scope>
+				<groupId>jakarta.enterprise.concurrent</groupId>
+				<artifactId>jakarta.enterprise.concurrent-api</artifactId>
+				<version>1.1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.enterprise</groupId>
