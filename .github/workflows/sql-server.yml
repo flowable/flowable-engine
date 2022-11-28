@@ -48,7 +48,7 @@ jobs:
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
       - uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 17
       - name: Test
         # use localhost for the host here because we have specified a vm for the job.
         # If we were running the job on a container this would be mssql
@@ -98,7 +98,7 @@ jobs:
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
       - uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 17
       - name: Test
         # use localhost for the host here because we have specified a vm for the job.
         # If we were running the job on a container this would be mssql
@@ -149,7 +149,7 @@ jobs:
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
       - uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 17
       - name: Test
         # use localhost for the host here because we have specified a vm for the job.
         # If we were running the job on a container this would be mssql
