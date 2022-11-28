@@ -95,7 +95,7 @@
             org.flowable.variable.service.db.mapping.entity
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            javax.persistence*;resolution:=optional,
+            jakarta.persistence*;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 

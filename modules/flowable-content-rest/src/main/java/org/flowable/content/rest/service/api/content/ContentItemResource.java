@@ -12,7 +12,7 @@
  */
 package org.flowable.content.rest.service.api.content;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;

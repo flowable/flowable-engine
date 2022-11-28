@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -312,7 +312,7 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         Object dateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "dateIdJPAEntity");
         assertThat(dateIdResult).isInstanceOf(DateIdJPAEntity.class);
-        assertThat(((DateIdJPAEntity) dateIdResult).getDateId()).isEqualTo(dateIdJPAEntity.getDateId());
+        assertThat(new java.util.Date(((DateIdJPAEntity) dateIdResult).getDateId().getTime())).isEqualTo(dateIdJPAEntity.getDateId());
 
         Object sqlDateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "sqlDateIdJPAEntity");
         assertThat(sqlDateIdResult).isInstanceOf(SQLDateIdJPAEntity.class);

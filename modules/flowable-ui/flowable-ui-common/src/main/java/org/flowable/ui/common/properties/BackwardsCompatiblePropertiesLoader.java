@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -39,7 +39,7 @@ import org.springframework.core.io.support.PropertySourceFactory;
  */
 public class BackwardsCompatiblePropertiesLoader implements EnvironmentPostProcessor, Ordered {
 
-    public static final int DEFAULT_ORDER = ConfigFileApplicationListener.DEFAULT_ORDER - 1;
+    public static final int DEFAULT_ORDER = ConfigDataEnvironmentPostProcessor.ORDER - 1;
 
     private static final PropertySourceFactory DEFAULT_PROPERTY_SOURCE_FACTORY = new DefaultPropertySourceFactory();
 

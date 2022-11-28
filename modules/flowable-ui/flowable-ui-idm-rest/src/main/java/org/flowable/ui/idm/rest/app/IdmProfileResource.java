@@ -15,8 +15,8 @@ package org.flowable.ui.idm.rest.app;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Group;

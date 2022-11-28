@@ -12,7 +12,7 @@
  */
 package org.flowable.form.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormDefinition;

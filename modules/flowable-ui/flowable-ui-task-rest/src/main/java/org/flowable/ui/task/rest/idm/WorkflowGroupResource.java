@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.task.rest.idm;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.idm.api.Group;

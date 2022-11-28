@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.task.service.runtime;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentService;

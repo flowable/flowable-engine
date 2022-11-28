@@ -193,7 +193,8 @@ public class SpringAutoDeployTest {
         properties.put("deploymentMode", "default");
         properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(FlowableException.class)
+            .cause()
+            .isInstanceOf(FlowableException.class)
             .hasMessageContaining("Error parsing form definition JSON")
             .hasRootCauseInstanceOf(JsonParseException.class);
         assertThat(repositoryService).isNull();
@@ -234,7 +235,8 @@ public class SpringAutoDeployTest {
         properties.put("deploymentMode", "single-resource");
         properties.put("deploymentResources", DEFAULT_INVALID_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(FlowableException.class)
+            .cause()
+            .isInstanceOf(FlowableException.class)
             .hasMessageContaining("Error parsing form definition JSON")
             .hasRootCauseInstanceOf(JsonParseException.class);
         assertThat(repositoryService).isNull();
@@ -275,7 +277,8 @@ public class SpringAutoDeployTest {
         properties.put("deploymentMode", "resource-parent-folder");
         properties.put("deploymentResources", DEFAULT_INVALID_DIRECTORY_DEPLOYMENT_RESOURCES);
         assertThatThrownBy(() -> createAppContext(properties))
-            .hasCauseInstanceOf(FlowableException.class)
+            .cause()
+            .isInstanceOf(FlowableException.class)
             .hasMessageContaining("Error parsing form definition JSON")
             .hasRootCauseInstanceOf(JsonParseException.class);
         assertThat(repositoryService).isNull();

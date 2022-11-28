@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,7 +57,7 @@ public class KeycloakUserQueryImpl extends UserQueryImpl {
         URI uri = builder.buildAndExpand(keycloakConfiguration.getRealm()).toUri();
 
         ResponseEntity<Long> response = keycloakConfiguration.getRestTemplate().getForEntity(uri, Long.class);
-        HttpStatus statusCode = response.getStatusCode();
+        HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is2xxSuccessful()) {
             LOGGER.debug("Successful response from keycloak");
             Long usersCount = response.getBody();
@@ -94,7 +94,7 @@ public class KeycloakUserQueryImpl extends UserQueryImpl {
         ResponseEntity<List<KeycloakUserRepresentation>> response = keycloakConfiguration.getRestTemplate()
                 .exchange(uri, HttpMethod.GET, null, KEYCLOAK_LIST_OF_USERS);
 
-        HttpStatus statusCode = response.getStatusCode();
+        HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is2xxSuccessful()) {
             LOGGER.debug("Successful response from keycloak");
             List<KeycloakUserRepresentation> keycloakUsers = response.getBody();

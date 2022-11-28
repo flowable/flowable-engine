@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 /**
  * @author Filip Hrisafov
  */
-@ConditionalOnBean(type = "javax.persistence.EntityManagerFactory")
+@ConditionalOnBean(type = "jakarta.persistence.EntityManagerFactory")
 @ConditionalOnClass(SpringProcessEngineConfiguration.class)
 @AutoConfiguration(after = {
     HibernateJpaAutoConfiguration.class

@@ -77,7 +77,7 @@ Configuration properties:
 
 -   jpaPersistenceUnitName: The name of the persistence-unit to use. (Make sure the persistence-unit is available on the classpath. According to the spec, the default location is /META-INF/persistence.xml). Use either jpaEntityManagerFactory or jpaPersistenceUnitName.
 
--   jpaEntityManagerFactory: An reference to a bean implementing javax.persistence.EntityManagerFactory that will be used to load the Entities and flushing the updates. Use either *jpaEntityManagerFactory* or *jpaPersistenceUnitName*.
+-   jpaEntityManagerFactory: An reference to a bean implementing jakarta.persistence.EntityManagerFactory that will be used to load the Entities and flushing the updates. Use either *jpaEntityManagerFactory* or *jpaPersistenceUnitName*.
 
 -   jpaHandleTransaction: Flag indicating that the engine should begin and commit/rollback the transaction on the used *EntityManager* instances. Set to false when *Java Transaction API (JTA)* is used.
 

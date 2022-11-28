@@ -12,7 +12,7 @@
  */
 package org.flowable.spring.boot.rest;
 
-import javax.servlet.MultipartConfigElement;
+import jakarta.servlet.MultipartConfigElement;
 
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.beans.factory.annotation.Autowired;

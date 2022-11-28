@@ -12,9 +12,9 @@
  */
 package org.flowable.spring.executor.jms;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobInfo;

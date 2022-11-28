@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;

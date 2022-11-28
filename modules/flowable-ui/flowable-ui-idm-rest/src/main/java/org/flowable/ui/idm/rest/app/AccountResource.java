@@ -15,7 +15,7 @@ package org.flowable.ui.idm.rest.app;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.idm.api.Group;
 import org.flowable.ui.common.model.GroupRepresentation;

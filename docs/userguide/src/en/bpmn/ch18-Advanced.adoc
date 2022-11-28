@@ -73,7 +73,7 @@ When a new async job is created by the engine, a message is put on a message que
 The implementation consists of two classes:
 
 * An implementation of the _org.flowable.engine.impl.asyncexecutor.JobManager_ interface that puts a message on a message queue instead of passing it to the thread pool.
-* A _javax.jms.MessageListener_ implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
+* A _jakarta.jms.MessageListener_ implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
 
 First of all, add the _flowable-jms-spring-executor_ dependency to your project:
 

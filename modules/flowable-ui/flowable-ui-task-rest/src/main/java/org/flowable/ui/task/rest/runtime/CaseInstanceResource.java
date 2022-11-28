@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;

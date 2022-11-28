@@ -14,7 +14,7 @@ package org.flowable.ui.modeler.rest.app;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;

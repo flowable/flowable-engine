@@ -39,7 +39,7 @@
         <flowable.osgi.import.additional>
             org.junit.jupiter.api*;resolution:=optional,
             org.springframework*;resolution:=optional,
-            javax.transaction;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
             org.flowable.db.mapping;resolution:=optional,
             org.flowable.idm.engine.impl.persistence;resolution:=optional,
             org.flowable.common.db;resolution:=optional,

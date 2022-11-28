@@ -13,8 +13,8 @@
 
 package org.flowable.engine.impl.cfg;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 /**
  * @author Tom Baeyens

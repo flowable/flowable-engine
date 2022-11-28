@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -60,7 +60,7 @@ public class KeycloakGroupQueryImpl extends GroupQueryImpl {
         URI uri = builder.buildAndExpand(keycloakConfiguration.getRealm()).toUri();
 
         ResponseEntity<JsonNode> response = keycloakConfiguration.getRestTemplate().getForEntity(uri, JsonNode.class);
-        HttpStatus statusCode = response.getStatusCode();
+        HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is2xxSuccessful()) {
             LOGGER.debug("Successful response from keycloak");
             JsonNode groupsCountNode = response.getBody();
@@ -114,7 +114,7 @@ public class KeycloakGroupQueryImpl extends GroupQueryImpl {
         ResponseEntity<List<KeycloakGroupRepresentation>> response = keycloakConfiguration.getRestTemplate()
                 .exchange(uri, HttpMethod.GET, null, KEYCLOAK_LIST_OF_GROUPS);
 
-        HttpStatus statusCode = response.getStatusCode();
+        HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is2xxSuccessful()) {
             LOGGER.debug("Successful response from keycloak");
             List<KeycloakGroupRepresentation> keycloakGroups = response.getBody();

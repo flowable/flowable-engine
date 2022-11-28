@@ -14,7 +14,7 @@ package org.flowable.ui.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.junit.jupiter.api.Test;
@@ -48,6 +48,7 @@ public class FlowableUiApplicationWithEnabledRabbitTest {
             .extracting(PropertySource::getName)
             .containsExactly(
                 "configurationProperties",
+                "test",
                 "Inlined Test Properties",
                 "servletConfigInitParams",
                 "servletContextInitParams",

@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;

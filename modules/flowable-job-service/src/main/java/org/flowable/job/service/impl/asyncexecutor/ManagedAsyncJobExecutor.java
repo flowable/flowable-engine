@@ -14,7 +14,7 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.enterprise.concurrent.ManagedThreadFactory;
+import jakarta.enterprise.concurrent.ManagedThreadFactory;
 
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.slf4j.Logger;

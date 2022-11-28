@@ -14,7 +14,7 @@ package org.flowable.ui.modeler.rest.app;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.ui.modeler.model.FormSaveRepresentation;
 import org.flowable.ui.modeler.model.form.FormRepresentation;

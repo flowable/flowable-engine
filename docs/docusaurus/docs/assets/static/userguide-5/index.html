@@ -13244,7 +13244,7 @@ This code retrieves the list of process definitions which can be initiated by th
 <p><code>jpaPersistenceUnitName</code>: The name of the persistence-unit to use. (Make sure the persistence-unit is available on the classpath. According to the spec, the default location is <code>/META-INF/persistence.xml</code>). Use either <code>jpaEntityManagerFactory</code> or <code>jpaPersistenceUnitName</code>.</p>
 </li>
 <li>
-<p><code>jpaEntityManagerFactory</code>: An reference to a bean implementing <code>javax.persistence.EntityManagerFactory</code> that will be used to load the Entities and flushing the updates. Use either <em>jpaEntityManagerFactory</em> or <em>jpaPersistenceUnitName</em>.</p>
+<p><code>jpaEntityManagerFactory</code>: An reference to a bean implementing <code>jakarta.persistence.EntityManagerFactory</code> that will be used to load the Entities and flushing the updates. Use either <em>jpaEntityManagerFactory</em> or <em>jpaPersistenceUnitName</em>.</p>
 </li>
 <li>
 <p><code>jpaHandleTransaction</code>: Flag indicating that the engine should begin and commit/rollback the transaction on the used <em>EntityManager</em> instances. Set to false when <em>Java Transaction API (JTA)</em> is used.</p>

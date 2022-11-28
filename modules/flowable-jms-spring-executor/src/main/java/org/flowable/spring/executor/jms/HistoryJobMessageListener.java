@@ -12,8 +12,8 @@
  */
 package org.flowable.spring.executor.jms;
 
-import javax.jms.Message;
-import javax.jms.TextMessage;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
@@ -22,7 +22,7 @@ import org.flowable.job.service.impl.asyncexecutor.UnacquireAsyncHistoryJobExcep
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HistoryJobMessageListener implements javax.jms.MessageListener {
+public class HistoryJobMessageListener implements jakarta.jms.MessageListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoryJobMessageListener.class);
 

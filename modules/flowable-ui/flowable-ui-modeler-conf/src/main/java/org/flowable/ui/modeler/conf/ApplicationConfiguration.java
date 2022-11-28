@@ -12,7 +12,7 @@
  */
 package org.flowable.ui.modeler.conf;
 
-import javax.servlet.MultipartConfigElement;
+import jakarta.servlet.MultipartConfigElement;
 
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.flowable.ui.modeler.service.FlowableModelQueryService;
