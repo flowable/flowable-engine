@@ -693,11 +693,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-crystalball</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
 				<artifactId>flowable-app-rest</artifactId>
 				<type>war</type>
 				<version>${project.version}</version>
@@ -1717,7 +1712,6 @@
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-crystalball</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
