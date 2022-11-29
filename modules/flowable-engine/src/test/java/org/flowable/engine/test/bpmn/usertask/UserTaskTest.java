@@ -303,6 +303,26 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
+    /**
+     * Test for Issue <a href="https://github.com/flowable/flowable-engine/issues/3467">#3467</a>
+     */
+    @Deployment
+    @Test
+    void testIdentityLinkNotDuplicate() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("employee", "John Doe");
+        variables.put("nrOfHolidays", 10);
+        variables.put("description", "I want to go to Hawaii");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("holidayRequest", variables);
+        Task task = taskService.createTaskQuery().taskCandidateGroup("managers").singleResult();
+        List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask(task.getId());
+
+        assertThat(identityLinksForTask).singleElement().satisfies(e -> assertThat(e.getType()).isEqualTo("candidate"));
+        // Identity link variables are added in TestListener.java. Only one expected
+        assertThat(processInstance.getProcessVariables()).describedAs("Expected only one identity link")
+                .containsOnlyKeys("identityLinks_0", "employee", "nrOfHolidays", "description");
+    }
+
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
         
         protected int beforeCreateUserTaskCounter = 0;

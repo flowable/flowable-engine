@@ -904,5 +904,9 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     public void setSubTaskCount(int subTaskCount) {
         this.subTaskCount = subTaskCount;
     }
-    
+
+    @Override
+    public boolean isIdentityLinksInitialized() {
+        return isIdentityLinksInitialized;
+    }
 }

@@ -79,8 +79,16 @@ public class IdentityLinkUtil {
 
         logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
 
-        taskEntity.getIdentityLinks().add(identityLinkEntity);
-        
+
+        if (taskEntity.isIdentityLinksInitialized()) {
+            /*
+             * If the links have been initialized prior to creating the link, it would not have been added to the list and that is why we need to add it.
+             * If the list is not initialized then the link will be fetched from the cache when we fetch the links from the DB
+             */
+            List<IdentityLinkEntity> identityLinks = taskEntity.getIdentityLinks();
+            identityLinks.add(identityLinkEntity);
+        }
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleAddIdentityLinkToTask(taskEntity, identityLinkEntity);

@@ -600,8 +600,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseSelects("AddIdentityLinkCmd", 
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, 
                     "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
-                    "selectIdentityLinksByTaskId", 2L,
-                    "selectExecutionsWithSameRootProcessInstanceId", 2L, 
+                    "selectExecutionsWithSameRootProcessInstanceId", 2L,
                     "selectIdentityLinksByProcessInstance", 2L);
             assertDatabaseUpdates("AddIdentityLinkCmd", 
                     "org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
@@ -654,7 +653,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 "IdentityLinkEntityImpl", 2L,
                 "HistoricIdentityLinkEntityImpl", 2L
             );
-            assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, "selectIdentityLinksByTaskId", 2L);
+            assertDatabaseSelects("AddIdentityLinkCmd", "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
             assertDatabaseUpdates("AddIdentityLinkCmd", "org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L);
 
             // Check "DeleteIdentityLinkCmd"
