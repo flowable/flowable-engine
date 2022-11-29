@@ -152,6 +152,7 @@
                         <artifactId>swagger-maven-plugin</artifactId>
                         <version>3.1.6</version>
                         <configuration>
+                            <skipSwaggerGeneration>true</skipSwaggerGeneration>
                             <apiSources>
                                 <apiSource>
                                     <springmvc>true</springmvc>

@@ -34,6 +34,11 @@ public class FlowableServlet {
      */
     private int loadOnStartup = -1;
 
+    // Until https://github.com/spring-projects/spring-boot/issues/33409 is fixed
+    protected FlowableServlet() {
+
+    }
+
     public FlowableServlet(String path, String name) {
         this.path = path;
         this.name = name;
