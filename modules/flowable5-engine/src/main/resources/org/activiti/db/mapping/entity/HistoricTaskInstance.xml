@@ -995,7 +995,7 @@
                 #{queryVar.longValue}
               </if>
               <if test="queryVar.doubleValue != null">
-                and A_OR${orIndex}_${index}.DOUBLE_ 
+                and A_${orLocal}OR${orIndex}.DOUBLE_
                 <include refid="executionVariableOperator" />
                 #{queryVar.doubleValue}
               </if>
