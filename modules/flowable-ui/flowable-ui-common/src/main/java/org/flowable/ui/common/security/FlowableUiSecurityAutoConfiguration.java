@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.common.security;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -43,7 +45,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -71,18 +73,35 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 })
 public class FlowableUiSecurityAutoConfiguration {
 
-    private static final Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> DEFAULT_AUTHORIZE_REQUESTS = requests -> {
-        requests.antMatchers("/app/rest/account").authenticated()
-                .antMatchers("/app/rest/runtime/app-definitions").authenticated()
-                .antMatchers("/idm-app/rest/authenticate").authenticated()
-                .antMatchers("/idm-app/rest/account").authenticated()
-                .antMatchers("/app/rest/**", "/workflow/").hasAuthority(DefaultPrivileges.ACCESS_TASK)
-                .antMatchers("/admin-app/**", "/admin/").hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
-                .antMatchers("/idm-app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM)
-                .antMatchers("/modeler-app/**", "/modeler/").hasAuthority(DefaultPrivileges.ACCESS_MODELER)
-                .antMatchers("/").authenticated()
-                .antMatchers("/app/authentication").permitAll()
-                .antMatchers("/idm").permitAll();
+    private static final Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> DEFAULT_AUTHORIZE_REQUESTS = requests -> {
+        requests.requestMatchers(
+                        antMatcher("/app/rest/account"),
+                        antMatcher("/app/rest/runtime/app-definitions"),
+                        antMatcher("/idm-app/rest/authenticate"),
+                        antMatcher("/idm-app/rest/account")
+                ).authenticated()
+                .requestMatchers(
+                        antMatcher("/app/rest/**"),
+                        antMatcher("/workflow/")
+                ).hasAuthority(DefaultPrivileges.ACCESS_TASK)
+                .requestMatchers(
+                        antMatcher("/admin-app/**"),
+                        antMatcher("/admin/")
+                ).hasAuthority(DefaultPrivileges.ACCESS_ADMIN)
+                .requestMatchers(
+                        antMatcher("/idm-app/**")
+                ).hasAuthority(DefaultPrivileges.ACCESS_IDM)
+                .requestMatchers(
+                        antMatcher("/modeler-app/**"),
+                        antMatcher("/modeler/")
+                ).hasAuthority(DefaultPrivileges.ACCESS_MODELER)
+                .requestMatchers(
+                        antMatcher("/")
+                ).authenticated()
+                .requestMatchers(
+                        antMatcher("/app/authentication"),
+                        antMatcher("/idm")
+                ).permitAll();
     };
 
     private static final Customizer<LogoutConfigurer<HttpSecurity>> DEFAULT_LOGOUT = logout -> {
@@ -192,7 +211,7 @@ public class FlowableUiSecurityAutoConfiguration {
                     // Never persist the security context
                     .securityContext().securityContextRepository(new NullSecurityContextRepository())
                     .and()
-                    .authorizeRequests(DEFAULT_AUTHORIZE_REQUESTS)
+                    .authorizeHttpRequests(DEFAULT_AUTHORIZE_REQUESTS)
             ;
 
             http.formLogin().disable();
@@ -232,7 +251,7 @@ public class FlowableUiSecurityAutoConfiguration {
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
                     .headers(DEFAULT_HEADERS)
-                    .authorizeRequests(DEFAULT_AUTHORIZE_REQUESTS);
+                    .authorizeHttpRequests(DEFAULT_AUTHORIZE_REQUESTS);
 
             http.oauth2Login();
             http.oauth2Client();
@@ -339,8 +358,8 @@ public class FlowableUiSecurityAutoConfiguration {
                     .disable();
 
             http
-                    .requestMatcher(new ActuatorRequestMatcher())
-                    .authorizeRequests()
+                    .securityMatcher(new ActuatorRequestMatcher())
+                    .authorizeHttpRequests()
                     .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
                     .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(DefaultPrivileges.ACCESS_ADMIN);
 

@@ -52,7 +52,7 @@ public class SecurityConfiguration {
         http.authenticationProvider(authenticationProvider)
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().csrf().disable()
-            .authorizeRequests()
+            .authorizeHttpRequests()
             .anyRequest()
             .authenticated().and().httpBasic();
 

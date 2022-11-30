@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.task.conf;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
 import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -60,19 +63,23 @@ public class TaskSecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable();
 
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl taskHttpRequestsConfigurer = http
+                    .securityMatcher(antMatcher("/*-api/**"))
+                    .authorizeHttpRequests()
+                    .requestMatchers(antMatcher("/*-api/**"));
             if (taskAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
+                    taskHttpRequestsConfigurer.hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").authenticated();
+                    taskHttpRequestsConfigurer.authenticated();
                     
                 }
 
                 apiHttpSecurityCustomizer.customize(http);
                 
             } else {
-                http.antMatcher("/*-api/**").authorizeRequests().antMatchers("/*-api/**").denyAll();
+                taskHttpRequestsConfigurer.denyAll();
                 
             }
                    

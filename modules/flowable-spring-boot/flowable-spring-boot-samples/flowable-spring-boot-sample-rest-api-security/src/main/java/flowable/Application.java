@@ -12,6 +12,8 @@
  */
 package flowable;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
@@ -40,8 +42,8 @@ public class Application {
         @Order(99)
         public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
-                    .antMatcher("/api/**")
-                    .authorizeRequests()
+                    .securityMatcher(antMatcher("/api/**"))
+                    .authorizeHttpRequests()
                     .anyRequest().authenticated()
                     .and()
                     .httpBasic();
@@ -117,7 +119,7 @@ public class Application {
             http
                 .authenticationProvider(authenticationProvider)
                 .csrf().disable()
-                .authorizeRequests()
+                .authorizeHttpRequests()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

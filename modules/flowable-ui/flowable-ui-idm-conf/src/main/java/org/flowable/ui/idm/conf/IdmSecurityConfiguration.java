@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.idm.conf;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
 import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
@@ -23,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -82,20 +85,24 @@ public class IdmSecurityConfiguration {
                     .csrf()
                     .disable();
 
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl idmHttpRequestsConfigurer = http
+                    .securityMatcher(antMatcher("/api/idm/**"))
+                    .authorizeHttpRequests()
+                    .requestMatchers(antMatcher("/api/idm/**"));
             if (idmAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
+                    idmHttpRequestsConfigurer.hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").authenticated();
-                    
+                    idmHttpRequestsConfigurer.authenticated();
+
                 }
 
                 apiHttpSecurityCustomizer.customize(http);
                 
             } else {
-                http.antMatcher("/api/idm/**").authorizeRequests().antMatchers("/api/idm/**").denyAll();
-                
+                idmHttpRequestsConfigurer.denyAll();
+
             }
 
             return http.build();

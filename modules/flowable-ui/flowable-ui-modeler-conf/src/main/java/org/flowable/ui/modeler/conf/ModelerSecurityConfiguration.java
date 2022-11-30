@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.modeler.conf;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.ui.common.properties.FlowableRestAppProperties;
 import org.flowable.ui.common.security.ApiHttpSecurityCustomizer;
 import org.flowable.ui.common.security.DefaultPrivileges;
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -65,19 +68,23 @@ public class ModelerSecurityConfiguration {
                     .csrf()
                     .disable();
 
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl modelerHttpRequestsConfigurer = http
+                    .securityMatcher(antMatcher("/api/editor/**"))
+                    .authorizeHttpRequests()
+                    .requestMatchers(antMatcher("/api/editor/**"));
             if (modelerAppProperties.isRestEnabled()) {
 
                 if (restAppProperties.isVerifyRestApiPrivilege()) {
-                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").hasAuthority(DefaultPrivileges.ACCESS_REST_API);
+                    modelerHttpRequestsConfigurer.hasAuthority(DefaultPrivileges.ACCESS_REST_API);
                 } else {
-                    http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").authenticated();
+                    modelerHttpRequestsConfigurer.authenticated();
                     
                 }
 
                 apiHttpSecurityCustomizer.customize(http);
                 
             } else {
-                http.antMatcher("/api/editor/**").authorizeRequests().antMatchers("/api/editor/**").denyAll();
+                modelerHttpRequestsConfigurer.denyAll();
                 
             }
 

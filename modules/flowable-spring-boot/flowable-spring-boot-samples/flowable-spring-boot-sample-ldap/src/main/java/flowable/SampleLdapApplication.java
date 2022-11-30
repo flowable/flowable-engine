@@ -12,6 +12,8 @@
  */
 package flowable;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.springframework.boot.CommandLineRunner;
@@ -43,10 +45,10 @@ public class SampleLdapApplication {
         @Order(99)
         public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
-                .antMatcher("/process-api/**")
-                .authorizeRequests()
-                .antMatchers("/process-api/repository/**").hasAnyAuthority("repository-privilege")
-                .antMatchers("/process-api/management/**").hasAnyAuthority("management-privilege")
+                .securityMatcher(antMatcher("/process-api/**"))
+                .authorizeHttpRequests()
+                .requestMatchers(antMatcher("/process-api/repository/**")).hasAnyAuthority("repository-privilege")
+                .requestMatchers(antMatcher("/process-api/management/**")).hasAnyAuthority("management-privilege")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
