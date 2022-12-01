@@ -399,4 +399,14 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         parentScopeExecution.forceUpdate();
     }
+
+    @Override
+    protected void internalInterrupted(DelegateExecution execution) {
+        // When the activity is interrupted we need to update the number of completed / active instances
+        // to only be primitive values based on their current values
+        setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES));
+        setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES));
+
+        super.internalInterrupted(execution);
+    }
 }
