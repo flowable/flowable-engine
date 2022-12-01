@@ -540,6 +540,14 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
         assertThat(reviewsVarInstance).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
     }
 
     @Test
@@ -962,6 +970,68 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
         }
 
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithProcessDeletion() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 3)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: null },"
+                            + "{ userId: null },"
+                            + "{ userId: null }"
+                            + "]");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                            + "{ userId: 'userTwo' },"
+                            + "{ userId: 'userThree' }"
+                            + "]");
+        }
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "for testing");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
     }
 
     @Test
