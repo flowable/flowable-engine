@@ -68,6 +68,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
         try {
             taskExecutor.execute(runnable);
+            checkPressureAndPauseOrResume();
             return true;
 
         } catch (RejectedExecutionException e) {

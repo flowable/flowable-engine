@@ -57,4 +57,6 @@ public interface AsyncTaskExecutor {
     void shutdown();
 
     int getRemainingCapacity();
+
+    double getPressure();
 }

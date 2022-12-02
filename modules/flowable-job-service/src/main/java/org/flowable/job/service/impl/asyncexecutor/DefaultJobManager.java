@@ -886,7 +886,7 @@ public class DefaultJobManager implements JobManager {
     }
     
     protected boolean isExecutorActive(AsyncExecutor asyncExecutor) {
-        return asyncExecutor != null && asyncExecutor.isActive();
+        return asyncExecutor != null && asyncExecutor.isActive() && !asyncExecutor.isPaused();
     }
 
     protected CommandContext getCommandContext() {

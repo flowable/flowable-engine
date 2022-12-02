@@ -14,6 +14,8 @@ package org.flowable.common.engine.impl.async;
 
 import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -245,5 +247,17 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
     @Override
     public int getRemainingCapacity() {
         return threadPoolQueue.remainingCapacity();
+    }
+
+    @Override
+    public double getPressure() {
+        int waiting = threadPoolQueue.size();
+        if (waiting == 0) {
+            return 0;
+        }
+
+        int remainingCapacity = threadPoolQueue.remainingCapacity();
+        int totalQueueSize = remainingCapacity + waiting;
+        return BigDecimal.valueOf(remainingCapacity).divide(BigDecimal.valueOf(totalQueueSize), RoundingMode.HALF_UP).doubleValue();
     }
 }

@@ -32,6 +32,10 @@ public interface AsyncExecutor {
      */
     void shutdown();
 
+    void pauseJobAcquiring();
+
+    void resumeJobAcquiring();
+
     /**
      * Offers the provided {@link JobInfo} to this {@link AsyncExecutor} instance to execute. If the offering does not work for some reason, false will be returned (For example when the job queue is
      * full in the {@link DefaultAsyncJobExecutor}).
@@ -49,6 +53,8 @@ public interface AsyncExecutor {
     void setAutoActivate(boolean isAutoActivate);
 
     boolean isActive();
+
+    boolean isPaused();
 
     String getLockOwner();
 

@@ -47,6 +47,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected boolean isAutoActivate;
     protected boolean isActive;
+    protected boolean isPaused;
     protected boolean isMessageQueueMode;
 
     // Job queue used when async executor is not yet started and jobs are already added.
@@ -188,6 +189,16 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected abstract void shutdownAdditionalComponents();
 
+    @Override
+    public void pauseJobAcquiring() {
+        isPaused = true;
+    }
+
+    @Override
+    public void resumeJobAcquiring() {
+        isPaused = false;
+    }
+
     /* getters and setters */
 
     @Override
@@ -213,6 +224,28 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     @Override
     public boolean isActive() {
         return isActive;
+    }
+
+    @Override
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    protected void checkPressureAndPauseOrResume() {
+        double pressure = getTaskExecutor().getPressure();
+        if (isPaused) {
+            if (pressure < configuration.getAsyncJobAcquireResumeThreshold()) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("async job acquisition for engine {}, pressure {} reached, pausing executor", getJobServiceConfiguration().getEngineName(), pressure);
+                }
+                resumeJobAcquiring();
+            }
+        } else if (pressure > configuration.getAsyncJobAcquirePauseThreshold()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("async job acquisition for engine {}, pressure {} reached, pausing", getJobServiceConfiguration().getEngineName(), pressure);
+            }
+            pauseJobAcquiring();
+        }
     }
 
     public boolean isMessageQueueMode() {

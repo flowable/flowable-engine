@@ -80,6 +80,9 @@ public class AsyncJobExecutorConfiguration {
      */
     private Duration defaultQueueSizeFullWaitTime = Duration.ofSeconds(5);
 
+    private double asyncJobAcquirePauseThreshold = 0.5;
+    private double asyncJobAcquireResumeThreshold = 0.25;
+
     /**
      * The value that should be used when locking async / timer jobs.
      * <p>
@@ -280,6 +283,22 @@ public class AsyncJobExecutorConfiguration {
     @Deprecated
     public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis) {
         this.defaultQueueSizeFullWaitTime = Duration.ofMillis(defaultQueueSizeFullWaitTimeInMillis);
+    }
+
+    public double getAsyncJobAcquirePauseThreshold() {
+        return asyncJobAcquirePauseThreshold;
+    }
+
+    public void setAsyncJobAcquirePauseThreshold(double asyncJobAcquirePauseThreshold) {
+        this.asyncJobAcquirePauseThreshold = asyncJobAcquirePauseThreshold;
+    }
+
+    public double getAsyncJobAcquireResumeThreshold() {
+        return asyncJobAcquireResumeThreshold;
+    }
+
+    public void setAsyncJobAcquireResumeThreshold(double asyncJobAcquireResumeThreshold) {
+        this.asyncJobAcquireResumeThreshold = asyncJobAcquireResumeThreshold;
     }
 
     public String getLockOwner() {

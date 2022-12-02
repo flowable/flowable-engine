@@ -60,6 +60,7 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     public boolean executeAsyncJob(JobInfo job) {
         try {
             taskExecutor.execute(createRunnableForJob(job));
+            checkPressureAndPauseOrResume();
             return true;
         } catch (RejectedExecutionException e) {
             sendRejectedEvent(job);

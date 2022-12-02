@@ -12,6 +12,9 @@
  */
 package org.flowable.common.spring.async;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
@@ -62,14 +65,39 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
     @Override
     public int getRemainingCapacity() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = getThreadPoolTaskExecutor();
+        if (threadPoolTaskExecutor != null) {
+            return threadPoolTaskExecutor.getThreadPoolExecutor().getQueue().remainingCapacity();
+        } else {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    protected ThreadPoolTaskExecutor getThreadPoolTaskExecutor() {
         Object executor = asyncTaskExecutor;
         if (isAsyncTaskExecutorAopProxied) {
             executor = AopProxyUtils.getSingletonTarget(asyncTaskExecutor);
         }
         if (executor instanceof ThreadPoolTaskExecutor) {
-            return ((ThreadPoolTaskExecutor) executor).getThreadPoolExecutor().getQueue().remainingCapacity();
-        } else {
-            return Integer.MAX_VALUE;
+            return (ThreadPoolTaskExecutor) executor;
         }
+    }
+
+    @Override
+    public double getPressure() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = getThreadPoolTaskExecutor();
+        if (threadPoolTaskExecutor != null) {
+            BlockingQueue<Runnable> queue = threadPoolTaskExecutor.getThreadPoolExecutor().getQueue();
+
+            int waiting = queue.size();
+            if (waiting == 0) {
+                return 0;
+            }
+
+            int remainingCapacity = queue.remainingCapacity();
+            int totalQueueSize = remainingCapacity + waiting;
+            return BigDecimal.valueOf(remainingCapacity).divide(BigDecimal.valueOf(totalQueueSize), RoundingMode.HALF_UP).doubleValue();
+        }
+        return 0;
     }
 }
