@@ -110,8 +110,12 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         long millisToWait = 0L;
         while (!isInterrupted) {
-            while (asyncExecutor.isPaused()) {
+            while (asyncExecutor.isPaused() && !isInterrupted) {
                 sleep(asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis());
+            }
+
+            if (isInterrupted) {
+                break;
             }
 
             if (configuration.isGlobalAcquireLockEnabled()) {

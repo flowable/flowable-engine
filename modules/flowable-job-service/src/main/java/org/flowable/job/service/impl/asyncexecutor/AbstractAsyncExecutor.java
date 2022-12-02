@@ -90,11 +90,20 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     protected Runnable createRunnableForJob(final JobInfo job) {
+        Runnable runnable;
         if (executeAsyncRunnableFactory == null) {
-            return new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler);
+            runnable = new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler);
         } else {
-            return executeAsyncRunnableFactory.createExecuteAsyncRunnable(job, jobServiceConfiguration);
+            runnable =  executeAsyncRunnableFactory.createExecuteAsyncRunnable(job, jobServiceConfiguration);
         }
+
+        return () -> {
+            try {
+                runnable.run();
+            } finally {
+                checkPressureAndPauseOrResume();
+            }
+        };
     }
 
     /** Starts the async executor */
