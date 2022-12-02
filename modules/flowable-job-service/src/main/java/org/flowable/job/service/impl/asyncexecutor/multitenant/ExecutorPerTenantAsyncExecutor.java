@@ -157,6 +157,21 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     }
 
     @Override
+    public void pauseJobAcquiring() {
+
+    }
+
+    @Override
+    public void resumeJobAcquiring() {
+
+    }
+
+    @Override
+    public boolean isPaused() {
+        return false;
+    }
+
+    @Override
     public void start() {
         for (String tenantId : tenantExecutors.keySet()) {
             startTenantExecutor(tenantId);
