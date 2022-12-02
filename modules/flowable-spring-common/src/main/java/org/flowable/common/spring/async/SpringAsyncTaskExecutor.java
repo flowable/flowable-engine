@@ -81,6 +81,8 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
         if (executor instanceof ThreadPoolTaskExecutor) {
             return (ThreadPoolTaskExecutor) executor;
         }
+
+        return null;
     }
 
     @Override
