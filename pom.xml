@@ -273,11 +273,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-camel-cdi</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
 				<artifactId>flowable-bpmn-model</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -1462,7 +1457,6 @@
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-camel</module>
-				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-cmmn-cdi</module>
 				<module>modules/flowable-osgi</module>
@@ -1712,7 +1706,6 @@
 				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-cmmn-cdi</module>
-				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>

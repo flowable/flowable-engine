@@ -333,9 +333,6 @@
 			<fileset dir="../modules/flowable-cdi/target">
 				<include name="flowable-cdi*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-camel-cdi/target">
-                <include name="flowable-camel-cdi-*.jar" />
-            </fileset>
 			<fileset dir="../modules/flowable-cxf/target">
 				<include name="flowable-cxf-*.jar" />
 			</fileset>
