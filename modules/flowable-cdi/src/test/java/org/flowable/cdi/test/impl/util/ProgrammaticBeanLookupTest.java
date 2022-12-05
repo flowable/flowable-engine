@@ -14,8 +14,8 @@ package org.flowable.cdi.test.impl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.inject.Alternative;
-import javax.inject.Named;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Named;
 
 import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
