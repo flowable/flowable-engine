@@ -64,20 +64,6 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `ingress.class`                               | Ingress class name                  | `nginx`
 | `ingress.clusterIssuer`                               | Ingress cert manager cluster issuer                  | ``
 |<br/>|
-| `ui.enabled`                                | Enables Flowable UI (either enable Flowable UI or Flowable REST)                                                  | `false`                        |
-| `ui.replicas`                               | Number of replicated pods                                                                                             | `1`                           |
-| `ui.service.name`                           | Kubernetes service name                                                                                               | `flowable-ui`               |
-| `ui.contextPath`                             | Tomcat servlet mapping                                                                                                | `/`                           |
-| `ui.ingressPath`                            | Ingress path mapping                                                                                                  | `flowable-ui`               |
-| `ui.image.repository`                       | Docker image name                                                                                                     | `flowable/flowable-ui`      |
-| `ui.image.tag`                              | Docker tag name                                                                                                       | `latest`                      |
-| `ui.image.pullPolicy`                       | Docker pull policy                                                                                                    | `Always`                      |
-| `ui.resources.requests.cpu`                 | Kubernetes CPU request                                                                                                | `100m`                        |
-| `ui.resources.requests.memory`              | Kubernetes memory request                                                                                             | `1Gi`                         |
-| `ui.resources.limits.cpu`                   | Kubernetes CPU limit                                                                                                  | `1`                           |
-| `ui.resources.limits.memory`                | Kubernetes memory limit                                                                                               | `1Gi`                         |
-| `ui.resources.javaOpts`                     | JVM options                                                                                                           | `-Xmx1g -Xms1g`               |
-|<br/>|
 | `rest.enabled`                                | Enables Flowable REST (either enable Flowable UI or Flowable REST)                                                  | `true`                       |
 | `rest.replicas`                               | Number of replicated pods                                                                                             | `1`                           |
 | `rest.service.name`                           | Kubernetes service name                                                                                               | `flowable-rest`               |

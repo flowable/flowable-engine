@@ -75,7 +75,7 @@ helm install nginx ingress-nginx/ingress-nginx \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-dns-label-name"=<dns label>
 ```
 
-*Replace `<dns label>` with something of your own liking. The cluster (and Flowable application) will be reachable on https://`<dns label>`.westeurope.cloudapp.azure.com/flowable-ui*
+*Replace `<dns label>` with something of your own liking. The cluster (and Flowable application) will be reachable on https://`<dns label>`.westeurope.cloudapp.azure.com/flowable-rest*
 
 #### Check the deployment status; LoadBalancer IP availability 
 
@@ -143,7 +143,7 @@ kubectl get pods -n flowable -w
 
 When all pods are active and ready the application will be available on; 
 
-https://\<dns-label\>.westeurope.cloudapp.azure.com/flowable-ui
+https://\<dns-label\>.westeurope.cloudapp.azure.com/flowable-rest
 
 ### Default credentials
 

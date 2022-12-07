@@ -24,7 +24,7 @@ jobs:
         run: |
           mvn clean package -B -Dstyle.color=always  \
           -P dockerDeps,dockerPublish \
-          -pl :flowable-ui-app,:flowable-app-rest \
+          -pl :flowable-app-rest \
           -D docker.publisher.user=${{ secrets.DOCKER_USER }} \
           -D docker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
 
@@ -46,10 +46,6 @@ jobs:
         env:
           COSIGN_PASSWORD: ""
         run: |
-          cosign sign --key cosign.key \
-            -a "repo=${{ github.repository }}" \
-            -a "ref=${{ github.sha }}" \
-            flowable/flowable-ui:${{ steps.meta.outputs.version }}
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \

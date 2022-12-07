@@ -5,7 +5,7 @@ Flowable (V6)
     ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
 
 [Docker Images:  
-    ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-ui)](https://hub.docker.com/u/flowable/)
+    ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/u/flowable/flowable-rest)
 
 [License:  
 	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)

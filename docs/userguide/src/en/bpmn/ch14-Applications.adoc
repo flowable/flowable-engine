@@ -2,84 +2,11 @@
 
 == Flowable applications
 
-Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:
+Flowable provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the <<restApiChapter, REST API>> chapter.
 
-* Flowable IDM: an Identity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
-* Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
-* Flowable Task: a runtime task application that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.
-* Flowable Admin: an administrative application that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin application connects to the engines through the REST API that is deployed together with the Flowable Task app and the Flowable REST app.
-
-The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
-
-Flowable also provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the <<restApiChapter, REST API>> chapter.
-
-The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
+The application is a Spring Boot 3.0 based application, which means that the WAR files are actually executable and can be run as a normal standalone application.
 See  https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging[The Executable Jar Format] in the Spring Boot reference documentation.
 
-
-[[uiAppInstallation]]
-
-=== Flowable UI Applications installation
-
-As mentioned before, all four UI apps can be deployed together on the same Tomcat server, and to get started this is probably the easiest approach. You can choose to only install the Modeler app, for example, but make sure the Flowable IDM app is always running/deployed as well. For this installation guide we'll describe the installation of all four apps to a Tomcat server.
-
-1. Download a recent stable version of link:$$http://tomcat.apache.org$$[Apache Tomcat].
-2. Download the latest stable link:$$http://www.flowable.org/downloads.html$$[Flowable 6 version].
-3. Copy the flowable-admin.war, flowable-idm.war, flowable-modeler.war and flowable-task.war files from the Flowable distribution __wars__ folder to the Tomcat webapps folder.
-4. Startup the Tomcat server by running the bin/startup.sh (Mac OS and Linux) or bin/startup.bat (Windows) script.
-5. Open a web browser and go to link:$$http://localhost:8080/flowable-modeler$$[http://localhost:8080/flowable-modeler].
-
-All Flowable UI apps should now be running with an H2 in-memory database and the following login screen should be shown in your web browser:
-
-image::images/flowable_idm_login_screen.png[align="center"]
-
-By default, the Flowable IDM application will create an admin user that has privileges to all the Flowable UI apps. You can login with admin/test and the browser should redirect to the Flowable Modeler application:
-
-image::images/flowable_modeler_startup_screen.png[align="center"]
-
-Since the UI apps are Spring Boot executable apps it is possible to run them as standalone applications without the need of an application server.
-Starting single application looks like:
-
-```
-java -jar flowable-idm.war
-```
-
-Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration.
-You can do this per app by changing the application.properties file in the _WEB-INF/classes/_ directory of each app.
-However, it is easier to use the Spring Boot https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html[Externalized Configuration].
-An example configuration can be found on link:$$https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/flowable-default.properties$$[Github]
-To change the default configuration to MySQL the following changes are needed to the properties file:
-
-[source,linenums]
-----
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8
-spring.datasource.username=flowable
-spring.datasource.password=flowable
-----
-
-This configuration will expect a flowable database to be present in the MySQL server and the UI apps will automatically generate the necessary database tables. For Postgres the following changes are necessary:
-
-[source,linenums]
-----
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=jdbc:postgresql://localhost:5432/flowable
-spring.datasource.username=flowable
-spring.datasource.password=flowable
-----
-
-In addition to changing the configuration, make sure the database driver is available on the classpath. Again, you could do this for every web application separately by adding the driver JAR file to the WEB-INF/lib folder, but you can also copy the JAR file once to the Tomcat lib folder. For MySQL and Postgres the database drivers can be downloaded from:
-
-* MySQL: link:$$https://dev.mysql.com/downloads/connector/j$$[https://dev.mysql.com/downloads/connector/j]
-* Postgres: link:$$https://jdbc.postgresql.org/$$[https://jdbc.postgresql.org/]
-
-When running the apps as standalone applications the database driver can be added by using the `loader.path` property.
-
-```
-java -Dloader.path=/location/to/your/driverfolder -jar flowable-idm.war
-```
-
-See the https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar-property-launcher-features[`PropertiesLauncher` Features] in the Spring Boot reference documentation for more information.
 
 === Flowable UI Applications Configurations
 
@@ -99,72 +26,6 @@ You can also use YAML based properties.
 |Default value
 |Description
 
-|flowable.common.app.idm-url
-|idm.app.url
-|-
-|The URL to the IDM application, used for the user info and token info REST GET calls. It's also used as a fallback for the redirect url to the login page in the UI apps.
-
-|flowable.common.app.idm-redirect-url
-|idm.app.redirect.url
-|-
-|The redirect URL to the IDM application, used for the login redirect when the cookie isn't set or is invalid.
-
-|flowable.common.app.redirect-on-auth-success
-|app.redirect.url.on.authsuccess
-|-
-|The URL to which the redirect should occur after a successful authentication.
-
-|flowable.common.app.role-prefix
-|-
-|ROLE_
-|The default role prefix that needs to be used by Spring Security.
-
-|flowable.common.app.tenant-id
-|-
-|-
-|The static tenant id used for the DefaultTenantProvider. The modeler app uses this to determine under which tenant id to store and publish models.
- When not provided, empty or only contains whitespace it defaults to the user's tenant id if available otherwise it uses no tenant id.
-
-|flowable.common.app.cache-login-tokens.max-age
-|cache.login-tokens.max.age
-|30
-|The max age in seconds after which the entry should be invalidated.
-
-|flowable.common.app.cache-login-tokens.max-size
-|cache.login-tokens.max.size
-|2048
-|The maximum number of entries that the cache should contain.
-
-|flowable.common.app.cache-login-users.max-age
-|cache.login-users.max.age
-|30
-|The max age in seconds after which the entry should be invalidated.
-
-|flowable.common.app.cache-login-users.max-size
-|cache.login-users.max.size
-|2048
-|The maximum number of entries that the cache should contain.
-
-|flowable.common.app.cache-users.max-age
-|cache.users.max.age
-|30
-|The max age in seconds after which the entry should be invalidated.
-
-|flowable.common.app.cache-users.max-size
-|cache.users.max.size
-|2048
-|The maximum number of entries that the cache should contain.
-
-|flowable.common.app.idm-admin.password
-|idm.admin.password
-|-
-|The password used for executing the REST calls (with basic auth) to the IDM REST services. Default is test.
-
-|flowable.common.app.idm-admin.user
-|idm.admin.user
-|admin
-|The username used for executing the REST calls (with basic auth) to the IDM REST services. Default is admin
-
 |flowable.rest.app.authentication-mode
 |rest.authentication.mode
 |verify-privilege
@@ -172,6 +33,8 @@ You can also use YAML based properties.
  'any-user' : the user needs to exist and the password need to match. Any user is allowed to do the call (this is the pre 6.3.0 behavior)
  'verify-privilege' : the user needs to exist, the password needs to match and the user needs to have the 'rest-api' privilege
  If nothing set, defaults to 'verify-privilege'
+
+
 |===============
 
 
