@@ -40,10 +40,6 @@
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
 			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/flowable-ui" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
-		</exec>
 	</target>
 
 	<target name="copy.static.resources">
@@ -345,14 +341,6 @@
 			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
 				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui/">
-				<include name="**/flowable-spring-boot-starter-ui-*.jar" />
-				<include name="**/flowable-ui-common-*.jar" />
-				<include name="**/flowable-ui-*-conf-*.jar" />
-				<include name="**/flowable-ui-*-frontend-*.jar" />
-				<include name="**/flowable-ui-*-logic-*.jar" />
-				<include name="**/flowable-ui-*-rest-*.jar" />
-			</fileset>
 			<fileset dir="../modules/flowable-osgi/target">
 				<include name="flowable-osgi-*.jar" />
 			</fileset>
@@ -369,14 +357,10 @@
 	<target name="copy.webapps">
 		<mkdir dir="${target.distro.root}/wars" />
 		<copy todir="${target.distro.root}/wars">
-			<fileset dir="../modules/flowable-ui/flowable-ui-app/target">
-				<include name="flowable-ui.war" />
-			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">
 				<include name="flowable-rest*.war" />
 			</fileset>
 		</copy>
-		<move file="${target.distro.root}/wars/flowable-ui.war" tofile="${target.distro.root}/wars/flowable-ui.war"/>
 		<move file="${target.distro.root}/wars/flowable-rest.war" tofile="${target.distro.root}/wars/flowable-rest.war"/>
 	</target>
 

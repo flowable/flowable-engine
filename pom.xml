@@ -1377,15 +1377,8 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>ui</id>
-			<modules>
-				<module>modules/flowable-ui</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>dockerDeps</id>
 			<modules>
-				<module>modules/flowable-ui</module>
 				<module>modules/flowable-app-rest</module>
 			</modules>
 		</profile>
@@ -1464,7 +1457,6 @@
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>

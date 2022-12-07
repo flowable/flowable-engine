@@ -1,4 +1,4 @@
-package org.flowable.rest.app;/* Licensed under the Apache License, Version 2.0 (the "License");
+/* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,6 +10,7 @@ package org.flowable.rest.app;/* Licensed under the Apache License, Version 2.0 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.rest.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,9 +32,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 /**
  * @author Filip Hrisafov
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+    "flowable.rest.app.jms-enabled=true",
+    "flowable.rest.app.kafka-enabled=true",
+    "flowable.rest.app.rabbit-enabled=true"
+})
 @AutoConfigureObservability
-public class FlowableRestApplicationTest {
+public class FlowableRestApplicationWithEnabledJmsKafkaAndRabbitTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -42,7 +47,7 @@ public class FlowableRestApplicationTest {
     protected ApplicationContext applicationContext;
 
     @Test
-    public void contextShouldLoadPropertiesInACorrectOrder() {
+    public void contextShouldLoad() {
         assertThat(environment.getPropertySources())
             .extracting(PropertySource::getName)
             .containsExactly(
@@ -62,30 +67,34 @@ public class FlowableRestApplicationTest {
             );
 
         assertThat(applicationContext.getBeanProvider(JmsTemplate.class).getIfAvailable())
-                .as("JmsTemplate Bean")
-                .isNull();
+            .as("JmsTemplate Bean")
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConnectionFactory.class).getIfAvailable())
-                .as("Jms ConnectionFactory Bean")
-                .isNull();
+            .as("Jms ConnectionFactory Bean")
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
-                .as("Rabbit ConnectionFactory Bean")
-                .isNull();
+            .as("Rabbit ConnectionFactory Bean")
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(RabbitTemplate.class).getIfAvailable())
-                .as("RabbitTemplate Bean")
-                .isNull();
+            .as("RabbitTemplate Bean")
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
-                .as("Kafka ConsumerFactory Bean")
-                .isNull();
+            .as("Kafka ConsumerFactory Bean")
+            .isNotNull();
 
         assertThat(applicationContext.getBeanProvider(KafkaTemplate.class).getIfAvailable())
-                .as("KafkaTemplate Bean")
-                .isNull();
+            .as("KafkaTemplate Bean")
+            .isNotNull();
 
-        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class))
+            .containsOnlyKeys(
+                "jmsChannelDefinitionProcessor",
+                "kafkaChannelDefinitionProcessor",
+                "rabbitChannelDefinitionProcessor"
+            );
     }
-
 }

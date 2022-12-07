@@ -67,16 +67,6 @@ flowable-spring-boot-starter-actuator<version><.jar | -source.jar | -javadoc.jar
 flowable-spring-boot-starter-basic<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-integration<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-rest-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-common<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-rest<version><.jar | -source.jar | -javadoc.jar>
 
 
 
