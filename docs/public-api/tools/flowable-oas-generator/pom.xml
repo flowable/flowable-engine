@@ -247,10 +247,6 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-json-converter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-rest</artifactId>
         </dependency>
         <dependency>

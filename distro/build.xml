@@ -149,9 +149,6 @@
 			<fileset dir="../modules/flowable-cmmn-image-generator/target">
                 <include name="flowable-cmmn-image-generator-*.jar" />
             </fileset>
-			<fileset dir="../modules/flowable-cmmn-json-converter/target">
-                <include name="flowable-cmmn-json-converter-*.jar" />
-            </fileset>
 			<fileset dir="../modules/flowable-cmmn-model/target">
                 <include name="flowable-cmmn-model-*.jar" />
             </fileset>
@@ -178,9 +175,6 @@
             </fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-dmn-json-converter/target">
-				<include name="flowable-dmn-json-converter-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-dmn-xml-converter/target">
 				<include name="flowable-dmn-xml-converter-*.jar" />
@@ -307,9 +301,6 @@
 			</fileset>
 			<fileset dir="../modules/flowable-image-generator/target">
 				<include name="flowable-image-generator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-json-converter/target">
-				<include name="flowable-json-converter-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-ldap/target">
 				<include name="flowable-ldap*.jar" />

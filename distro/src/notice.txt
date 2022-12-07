@@ -27,7 +27,6 @@ flowable-cxf<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-api<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-engine<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-dmn-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-model<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-spring<version><.jar | -source.jar | -javadoc.jar>
@@ -56,7 +55,6 @@ flowable-http<version><.jar | -source.jar | -javadoc.jar>
 flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
 flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
 flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
-flowable-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-ldap<version><.jar | -source.jar | -javadoc.jar>
 flowable-osgi<version><.jar | -source.jar | -javadoc.jar>
 flowable-process-validation<version><.jar | -source.jar | -javadoc.jar>
