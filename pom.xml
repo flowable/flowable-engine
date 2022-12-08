@@ -1178,6 +1178,7 @@
 					<target>${jdk.version}</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
+					<parameters>true</parameters>
 				</configuration>
 			</plugin>
 			<plugin>
