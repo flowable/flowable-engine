@@ -35,6 +35,8 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     @Override
     List<IdentityLinkEntity> getIdentityLinks();
 
+    boolean isIdentityLinksInitialized();
+
     void setCreateTime(Date createTime);
 
     void setTaskDefinitionId(String taskDefinitionId);
