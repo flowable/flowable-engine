@@ -32,7 +32,7 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     protected String milestoneVariable;
     protected String businessStatusUpdate;
 
-    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable,String businessStatusUpdate) {
+    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable, String businessStatusUpdate) {
         this.milestoneNameExpression = milestoneNameExpression;
         this.milestoneVariable = milestoneVariable;
         this.businessStatusUpdate = businessStatusUpdate;
@@ -42,16 +42,22 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(planItemInstanceEntity, commandContext);
 
+        ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+
         if (StringUtils.isNotEmpty(milestoneVariable)) {
-            ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
             Expression milestoneVariableExpression = expressionManager.createExpression(milestoneVariable);
             String actualMilestoneVariable = (String) milestoneVariableExpression.getValue(planItemInstanceEntity);
             if (StringUtils.isNotEmpty(actualMilestoneVariable)) {
                 planItemInstanceEntity.setVariable(actualMilestoneVariable, true);
             }
         }
+
         if (StringUtils.isNotEmpty(businessStatusUpdate)) {
-            CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(milestoneInstanceEntity.getCaseInstanceId(), businessStatusUpdate);
+            Expression businessStatusUpdateExpression = expressionManager.createExpression(businessStatusUpdate);
+            String actualBusinessStatusUpdate = (String) businessStatusUpdateExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatusUpdate)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(milestoneInstanceEntity.getCaseInstanceId(), actualBusinessStatusUpdate);
+            }
         }
 
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordMilestoneReached(milestoneInstanceEntity);
