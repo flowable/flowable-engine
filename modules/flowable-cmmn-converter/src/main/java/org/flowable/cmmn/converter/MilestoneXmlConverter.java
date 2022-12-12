@@ -55,6 +55,10 @@ public class MilestoneXmlConverter extends PlanItemDefinitionXmlConverter {
             mileStone.setMilestoneVariable(milestoneVariable);
         }
         
+        String updateBusinessStatus = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_BUSINESS_STATUS_UPDATE);
+        if (StringUtils.isNotEmpty(updateBusinessStatus)) {
+            mileStone.setBusinessStatusUpdate(updateBusinessStatus);
+        }
         return mileStone;
     }
     
