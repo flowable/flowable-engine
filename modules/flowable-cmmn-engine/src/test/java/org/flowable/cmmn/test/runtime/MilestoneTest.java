@@ -81,6 +81,19 @@ public class MilestoneTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getBusinessStatus()).isEqualTo("businessStatusAfterMilestone");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testMilestoneUpdatesBusinessStatusWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMilestoneUpdatesBusinessStatus")
+                .businessStatus("testStatusBeforeUpdate").variable("testVariableForExpression", "testVariableValue").start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        // Completing the task will reach the one milestone and update the businessStatus
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isEqualTo("testVariableValue");
+    }
+
     public void assertMilestoneState(String caseInstanceId, int nrOfExpectedCompletedMilestones) {
         Assert.assertEquals(nrOfExpectedCompletedMilestones, cmmnRuntimeService.createMilestoneInstanceQuery().count());
 
