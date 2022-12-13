@@ -129,7 +129,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
     String ATTRIBUTE_MILESTONE_VARIABLE = "milestoneVariable";
-
+    String ATTRIBUTE_BUSINESS_STATUS = "businessStatus";
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
