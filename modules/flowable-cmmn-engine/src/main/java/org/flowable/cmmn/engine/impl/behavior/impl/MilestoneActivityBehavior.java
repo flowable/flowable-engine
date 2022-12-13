@@ -32,10 +32,10 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     protected String milestoneVariable;
     protected String businessStatus;
 
-    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable, String businessStatusUpdate) {
+    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable, String businessStatus) {
         this.milestoneNameExpression = milestoneNameExpression;
         this.milestoneVariable = milestoneVariable;
-        this.businessStatus = businessStatusUpdate;
+        this.businessStatus = businessStatus;
     }
     
     @Override
@@ -53,10 +53,10 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
         }
 
         if (StringUtils.isNotEmpty(businessStatus)) {
-            Expression businessStatusUpdateExpression = expressionManager.createExpression(businessStatus);
-            String actualBusinessStatusUpdate = (String) businessStatusUpdateExpression.getValue(planItemInstanceEntity);
-            if (StringUtils.isNotEmpty(actualBusinessStatusUpdate)) {
-                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(milestoneInstanceEntity.getCaseInstanceId(), actualBusinessStatusUpdate);
+            Expression businessStatusExpression = expressionManager.createExpression(businessStatus);
+            String actualBusinessStatus = (String) businessStatusExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatus)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(milestoneInstanceEntity.getCaseInstanceId(), actualBusinessStatus);
             }
         }
 

@@ -239,5 +239,4 @@ public interface CmmnStencilConstants {
 
     String PROPERTY_MILESTONE_VARIABLE = "milestonevariable";
 
-    String ATTRIBUTE_BUSINESS_STATUS_UPDATE = "businessStatusUpdate";
 }

@@ -30,7 +30,7 @@
           <standardEvent>occur</standardEvent>
         </planItemOnPart>
       </sentry>
-      <milestone id="milestone1" name="Milestone" flowable:milestoneVariable="Milestone" flowable:businessStatusUpdate="businessStatusAfterMilestone">
+      <milestone id="milestone1" name="Milestone" flowable:milestoneVariable="Milestone" flowable:businessStatus="businessStatusAfterMilestone">
         <extensionElements>
           <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
           <design:stencilid><![CDATA[Milestone]]></design:stencilid>
