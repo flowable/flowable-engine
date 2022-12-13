@@ -82,7 +82,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         } else if (StringUtils.isNotEmpty(milestone.getName())) {
             name = milestone.getName();
         }
-        return new MilestoneActivityBehavior(expressionManager.createExpression(name), milestone.getMilestoneVariable(), milestone.getBusinessStatusUpdate());
+        return new MilestoneActivityBehavior(expressionManager.createExpression(name), milestone.getMilestoneVariable(), milestone.getBusinessStatus());
     }
 
     @Override
