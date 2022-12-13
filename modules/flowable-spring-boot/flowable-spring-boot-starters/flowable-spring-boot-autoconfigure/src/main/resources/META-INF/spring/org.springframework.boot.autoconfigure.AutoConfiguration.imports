@@ -6,8 +6,6 @@ org.flowable.spring.boot.app.AppEngineAutoConfiguration
 org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration
 org.flowable.spring.boot.ProcessEngineAutoConfiguration
 org.flowable.spring.boot.FlowableJpaAutoConfiguration
-org.flowable.spring.boot.content.ContentEngineAutoConfiguration
-org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration
 org.flowable.spring.boot.dmn.DmnEngineAutoConfiguration
 org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration
 org.flowable.spring.boot.idm.IdmEngineAutoConfiguration

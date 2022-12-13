@@ -18,8 +18,6 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.resolver.DefaultContentTypeResolver;
-import org.flowable.content.engine.ContentEngine;
-import org.flowable.content.rest.ContentRestUrls;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.engine.ProcessEngine;
@@ -35,9 +33,6 @@ import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.cmmn.CmmnEngineRestConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.cmmn.FlowableCmmnProperties;
-import org.flowable.spring.boot.content.ContentEngineRestConfiguration;
-import org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration;
-import org.flowable.spring.boot.content.FlowableContentProperties;
 import org.flowable.spring.boot.dmn.DmnEngineRestConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.dmn.FlowableDmnProperties;
@@ -79,7 +74,6 @@ import org.springframework.context.annotation.Configuration;
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
     CmmnEngineServicesAutoConfiguration.class,
-    ContentEngineServicesAutoConfiguration.class,
     DmnEngineServicesAutoConfiguration.class,
     EventRegistryServicesAutoConfiguration.class,
     IdmEngineServicesAutoConfiguration.class
@@ -156,17 +150,6 @@ public class RestApiAutoConfiguration {
         @Bean
         public ServletRegistrationBean cmmnServlet(FlowableCmmnProperties properties) {
             return registerServlet(properties.getServlet(), CmmnEngineRestConfiguration.class);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(ContentRestUrls.class)
-    @ConditionalOnBean(ContentEngine.class)
-    public static class ContentEngineRestApiConfiguration extends BaseRestApiConfiguration {
-
-        @Bean
-        public ServletRegistrationBean contentServlet(FlowableContentProperties properties) {
-            return registerServlet(properties.getServlet(), ContentEngineRestConfiguration.class);
         }
     }
 

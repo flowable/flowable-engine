@@ -981,11 +981,6 @@ For example to use the Process, CMMN, Form and IDM engine and use LDAP you need 
     </dependency>
     <dependency>
         <groupId>org.flowable</groupId>
-        <artifactId>flowable-content-spring-configurator</artifactId>
-        <version>${flowable.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.flowable</groupId>
         <artifactId>flowable-ldap</artifactId>
         <version>${flowable.version}</version>
     </dependency>

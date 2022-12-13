@@ -20,7 +20,7 @@
                     <flowable:string>This is a test</flowable:string>
                 </flowable:field>
                 <flowable:field name="attachments">
-                    <flowable:expression>#{testAttachmentBean.getAttachment()}</flowable:expression>
+                    <flowable:expression>#{attachment}</flowable:expression>
                 </flowable:field>
             </extensionElements>
         </sendTask>

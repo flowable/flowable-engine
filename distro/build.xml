@@ -251,21 +251,6 @@
 			<fileset dir="../modules/flowable-content-api/target">
 				<include name="flowable-content-api-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-content-engine/target">
-				<include name="flowable-content-engine-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-content-engine-configurator/target">
-				<include name="flowable-content-engine-configurator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-content-spring/target">
-				<include name="flowable-content-spring-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-content-spring-configurator/target">
-				<include name="flowable-content-spring-configurator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-content-rest/target">
-				<include name="flowable-content-rest-*.jar" />
-			</fileset>
 			<fileset dir="../modules/flowable5-compatibility/target">
 				<include name="flowable5-compatibility-*.jar" />
 			</fileset>

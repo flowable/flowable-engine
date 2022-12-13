@@ -181,24 +181,6 @@
       }
     },
     {
-      "name": "contentstorage.fs.root-folder",
-      "type": "java.lang.String",
-      "deprecation": {
-        "level": "error",
-        "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.content.storage.root-folder"
-      }
-    },
-    {
-      "name": "contentstorage.fs.create-root",
-      "type": "java.lang.Boolean",
-      "deprecation": {
-        "level": "error",
-        "reason": "Using improved setup for Spring Boot.",
-        "replacement": "flowable.content.storage.create-root"
-      }
-    },
-    {
       "name": "datasource.jndi.name",
       "type": "java.lang.String",
       "deprecation": {
@@ -514,23 +496,6 @@
       "name": "flowable.cmmn.servlet.path",
       "defaultValue": "/cmmn-api",
       "description": "The context path for the CMMN rest servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.content.servlet.load-on-startup",
-      "description": "Load on startup of the Content dispatcher servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.content.servlet.name",
-      "defaultValue": "Flowable Content Rest API",
-      "description": "The name of the Content servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.content.servlet.path",
-      "defaultValue": "/content-api",
-      "description": "The context path for the Content rest servlet."
     },
     {
       "sourceType": "org.flowable.spring.boot.FlowableServlet",

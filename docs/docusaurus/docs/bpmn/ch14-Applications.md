@@ -141,18 +141,6 @@ Some of the old properties have been moved to be managed by the Flowable Spring 
 <td><p>The context path for the Process rest servlet.</p></td>
 </tr>
 <tr class="even">
-<td><p>flowable.content.storage.create-root</p></td>
-<td><p>contentstorage.fs.create-root</p></td>
-<td><p>true</p></td>
-<td><p>If the root folder doesn’t exist, should it be created?</p></td>
-</tr>
-<tr class="odd">
-<td><p>flowable.content.storage.root-folder</p></td>
-<td><p>contentstorage.fs.root-folder</p></td>
-<td><p>-</p></td>
-<td><p>Root folder location where content files will be stored, for example, task attachments or form file uploads.</p></td>
-</tr>
-<tr class="even">
 <td><p>flowable.idm.enabled</p></td>
 <td><p>flowable.db-identity-used</p></td>
 <td><p>true</p></td>

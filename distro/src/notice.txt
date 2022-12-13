@@ -18,11 +18,6 @@ flowable-camel<version><.jar | -source.jar | -javadoc.jar>
 flowable-cdi<version><.jar | -source.jar | -javadoc.jar>
 flowable-common-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-content-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-engine<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-spring<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-cxf<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-api<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-engine<version><.jar | -source.jar | -javadoc.jar>

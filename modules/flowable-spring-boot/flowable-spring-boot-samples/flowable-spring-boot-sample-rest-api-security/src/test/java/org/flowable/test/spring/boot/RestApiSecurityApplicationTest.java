@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.content.rest.service.api.content.ContentItemResponse;
 import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
@@ -149,24 +148,6 @@ public class RestApiSecurityApplicationTest {
         assertThat(defResponse.getUrl()).startsWith("http://localhost:" + serverPort + "/cmmn-api/cmmn-repository/case-definitions/");
     }
 
-    @Test
-    public void testContentRestApiIntegrationWithAuthentication() {
-        String processDefinitionsUrl = "http://localhost:" + serverPort + "/content-api/content-service/content-items";
-
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
-        ResponseEntity<DataResponse<ContentItemResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<ContentItemResponse>>() {
-            });
-
-        assertThat(response.getStatusCode())
-            .as("Status code")
-            .isEqualTo(HttpStatus.OK);
-        DataResponse<ContentItemResponse> contentItems = response.getBody();
-        assertThat(contentItems).isNotNull();
-        assertThat(contentItems.getData())
-            .isEmpty();
-        assertThat(contentItems.getTotal()).isZero();
-    }
     @Test
     public void testDmnRestApiIntegrationWithAuthentication() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/dmn-api/dmn-repository/deployments";
