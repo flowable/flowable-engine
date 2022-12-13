@@ -61,11 +61,6 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
             milestone.setMilestoneVariable(milestoneVariable);
         }
 
-        String updateBusinessStatus = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_MILESTONE_VARIABLE, elementNode);
-        if (StringUtils.isNotEmpty(updateBusinessStatus)) {
-            milestone.setBusinessStatusUpdate(updateBusinessStatus);
-        }
-
         return milestone;
     }
 
@@ -77,9 +72,6 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
        
         if (StringUtils.isNotEmpty(milestone.getMilestoneVariable())) {
             propertiesNode.put(PROPERTY_MILESTONE_VARIABLE, milestone.getMilestoneVariable());
-        }
-        if (StringUtils.isNotEmpty(milestone.getBusinessStatusUpdate())) {
-            propertiesNode.put(ATTRIBUTE_BUSINESS_STATUS_UPDATE, milestone.getBusinessStatusUpdate());
         }
     }
 }
