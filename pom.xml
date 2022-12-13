@@ -468,36 +468,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-json-converter</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-engine</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-engine-configurator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-spring</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-spring-configurator</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
-				<artifactId>flowable-form-rest</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.flowable</groupId>
 				<artifactId>flowable-content-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -1144,9 +1114,6 @@
 		<module>modules/flowable-idm-engine-configurator</module>
 		<module>modules/flowable-form-model</module>
 		<module>modules/flowable-form-api</module>
-        <module>modules/flowable-form-json-converter</module>
-        <module>modules/flowable-form-engine</module>
-        <module>modules/flowable-form-engine-configurator</module>
 		<module>modules/flowable-dmn-model</module>
 		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-dmn-xml-converter</module>
@@ -1404,12 +1371,6 @@
                 <module>modules/flowable-cmmn-rest</module>
 				<module>modules/flowable-external-job-rest</module>
 				<module>modules/flowable-form-model</module>
-				<module>modules/flowable-form-json-converter</module>
-				<module>modules/flowable-form-engine</module>
-				<module>modules/flowable-form-engine-configurator</module>
-				<module>modules/flowable-form-spring</module>
-				<module>modules/flowable-form-spring-configurator</module>
-				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>
 				<module>modules/flowable-content-spring</module>
@@ -1508,16 +1469,10 @@
 				<module>modules/flowable-rest</module>
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-secure-javascript</module>
-				<module>modules/flowable-form-json-converter</module>
                 <module>modules/flowable-engine-configurator</module>
                 <module>modules/flowable-spring-configurator</module>
                 <module>modules/flowable-app-engine-spring</module>
                 <module>modules/flowable-app-engine-rest</module>
-				<module>modules/flowable-form-engine</module>
-				<module>modules/flowable-form-engine-configurator</module>
-				<module>modules/flowable-form-spring</module>
-				<module>modules/flowable-form-spring-configurator</module>
-				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-dmn-engine</module>
 				<module>modules/flowable-dmn-model</module>
 				<module>modules/flowable-dmn-xml-converter</module>
@@ -1620,12 +1575,6 @@
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
                 <module>modules/flowable-form-model</module>
-                <module>modules/flowable-form-json-converter</module>
-                <module>modules/flowable-form-engine</module>
-                <module>modules/flowable-form-engine-configurator</module>
-                <module>modules/flowable-form-spring</module>
-                <module>modules/flowable-form-spring-configurator</module>
-                <module>modules/flowable-form-rest</module>
                 <module>modules/flowable-idm-engine-configurator</module>
                 <module>modules/flowable-idm-spring</module>
                 <module>modules/flowable-idm-spring-configurator</module>
@@ -1718,7 +1667,6 @@
 			<modules>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-api</module>
-				<module>modules/flowable-form-engine</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1785,7 +1733,6 @@
 			<modules>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-api</module>
-				<module>modules/flowable-form-engine</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1866,12 +1813,6 @@
 				<module>modules/flowable-dmn-rest</module>
 				<module>modules/flowable-form-model</module>
 				<module>modules/flowable-form-api</module>
-				<module>modules/flowable-form-engine</module>
-				<module>modules/flowable-form-engine-configurator</module>
-				<module>modules/flowable-form-spring</module>
-				<module>modules/flowable-form-spring-configurator</module>
-				<module>modules/flowable-form-json-converter</module>
-				<module>modules/flowable-form-rest</module>
 				<module>modules/flowable-content-api</module>
 				<module>modules/flowable-content-engine</module>
 				<module>modules/flowable-content-engine-configurator</module>

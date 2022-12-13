@@ -148,12 +148,12 @@ When an error occurs (both client and server, 4XX and 5XX status-codes) the resp
 
 #### URL fragments
 
-Parameters that are part of the URL (for example, the deploymentId parameter in http://host/flowable-rest/form-api/form-repository/deployments/{deploymentId})
+Parameters that are part of the URL (for example, the deploymentId parameter in http://host/flowable-rest/event-registry-api/event-registry-repository/deployments/{deploymentId})
 need to be properly escaped (see [URL-encoding or Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding)) in case the segment contains special characters. Most frameworks have this functionality built in, but it should be taken into account. Especially for segments that can contain forward-slashes (for example, deployment resource), this is required.
 
 #### Rest URL query parameters
 
-Parameters added as query-string in the URL (for example, the name parameter used in http://host/flowable-rest/form-api/form-repository/deployments?name=Deployment) can have the following types and are mentioned in the corresponding REST-API documentation:
+Parameters added as query-string in the URL (for example, the name parameter used in http://host/flowable-rest/event-registry-api/event-registry-repository/deployments?name=Deployment) can have the following types and are mentioned in the corresponding REST-API documentation:
 
 <table>
 <caption>URL query parameter types</caption>
@@ -227,7 +227,7 @@ Parameters added as query-string in the URL (for example, the name parameter use
 
 #### Paging and sorting
 
-Paging and order parameters can be added as query-string in the URL (for example, the name parameter used in http://host/flowable-rest/form-api/form-repository/deployments?sort=name).
+Paging and order parameters can be added as query-string in the URL (for example, the name parameter used in http://host/flowable-rest/event-registry-api/event-registry-repository/deployments?sort=name).
 
 <table>
 <caption>Variable query JSON parameters</caption>

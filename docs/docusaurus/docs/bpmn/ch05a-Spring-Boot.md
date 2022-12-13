@@ -65,7 +65,6 @@ You will see an output like this:
     o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 3085 ms
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet dispatcherServlet mapped to [/]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable IDM Rest API mapped to [/idm-api/*]
-    o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Form Rest API mapped to [/form-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable DMN Rest API mapped to [/dmn-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Content Rest API mapped to [/content-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable CMMN Rest API mapped to [/cmmn-api/*]
@@ -649,16 +648,6 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.dmn.servlet.path=/dmn-api # The context path for the DMN rest servlet.
     flowable.dmn.strict-mode=true # Set this to false if you want to ignore the decision table hit policy validity checks to result in an failed decision table state. A result is that intermediate results created up to the point the validation error occurs are returned.
 
-    # Form https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/form/FlowableFormProperties.java
-    flowable.form.deploy-resources=true # Whether to perform deployment of resources, default is true.
-    flowable.form.deployment-name=SpringBootAutoDeployment # The name of the deployment for the form resources.
-    flowable.form.enabled=true # Whether the form engine needs to be started.
-    flowable.form.resource-location=classpath*:/forms/ # The location where the form resources are located.
-    flowable.form.resource-suffixes=**.form # The suffixes for the resources that need to be scanned.
-    flowable.form.servlet.load-on-startup=-1 # Load on startup of the Form dispatcher servlet.
-    flowable.form.servlet.name=Flowable Form Rest API # The name of the Form servlet.
-    flowable.form.servlet.path=/form-api # The context path for the Form rest servlet.
-
     # IDM https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/FlowableIdmProperties.java
     flowable.idm.enabled=true # Whether the idm engine needs to be started.
     flowable.idm.password-encoder= # The type of the password encoder that needs to be used.
@@ -993,11 +982,6 @@ For example to use the Process, CMMN, Form and IDM engine and use LDAP you need 
     <dependency>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-content-spring-configurator</artifactId>
-        <version>${flowable.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.flowable</groupId>
-        <artifactId>flowable-form-spring-configurator</artifactId>
         <version>${flowable.version}</version>
     </dependency>
     <dependency>

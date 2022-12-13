@@ -26,8 +26,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.external.job.rest.service.api.ExternalJobRestUrls;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.rest.FormRestUrls;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.rest.service.api.RestUrls;
@@ -46,9 +44,6 @@ import org.flowable.spring.boot.dmn.FlowableDmnProperties;
 import org.flowable.spring.boot.eventregistry.EventRegistryRestConfiguration;
 import org.flowable.spring.boot.eventregistry.EventRegistryServicesAutoConfiguration;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
-import org.flowable.spring.boot.form.FlowableFormProperties;
-import org.flowable.spring.boot.form.FormEngineRestConfiguration;
-import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.idm.IdmEngineRestConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
@@ -87,7 +82,6 @@ import org.springframework.context.annotation.Configuration;
     ContentEngineServicesAutoConfiguration.class,
     DmnEngineServicesAutoConfiguration.class,
     EventRegistryServicesAutoConfiguration.class,
-    FormEngineServicesAutoConfiguration.class,
     IdmEngineServicesAutoConfiguration.class
 })
 public class RestApiAutoConfiguration {
@@ -195,17 +189,6 @@ public class RestApiAutoConfiguration {
         @Bean
         public ServletRegistrationBean eventRegistryServlet(FlowableEventRegistryProperties properties) {
             return registerServlet(properties.getServlet(), EventRegistryRestConfiguration.class);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(FormRestUrls.class)
-    @ConditionalOnBean(FormEngine.class)
-    public static class FormEngineRestApiConfiguration extends BaseRestApiConfiguration {
-
-        @Bean
-        public ServletRegistrationBean formServlet(FlowableFormProperties properties) {
-            return registerServlet(properties.getServlet(), FormEngineRestConfiguration.class);
         }
     }
 

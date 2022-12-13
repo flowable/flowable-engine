@@ -245,26 +245,8 @@
 			<fileset dir="../modules/flowable-form-model/target">
 				<include name="flowable-form-model-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-form-json-converter/target">
-				<include name="flowable-form-json-converter-*.jar" />
-			</fileset>
 			<fileset dir="../modules/flowable-form-api/target">
 				<include name="flowable-form-api-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-form-engine/target">
-				<include name="flowable-form-engine-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-form-engine-configurator/target">
-				<include name="flowable-form-engine-configurator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-form-spring/target">
-				<include name="flowable-form-spring-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-form-spring-configurator/target">
-				<include name="flowable-form-spring-configurator-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-form-rest/target">
-				<include name="flowable-form-rest-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-content-api/target">
 				<include name="flowable-content-api-*.jar" />

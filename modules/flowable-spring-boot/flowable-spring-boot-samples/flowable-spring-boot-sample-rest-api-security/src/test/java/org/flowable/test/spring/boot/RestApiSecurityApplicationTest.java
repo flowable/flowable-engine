@@ -25,7 +25,6 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.content.rest.service.api.content.ContentItemResponse;
 import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
-import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -185,24 +184,6 @@ public class RestApiSecurityApplicationTest {
         assertThat(deployments.getData())
             .isEmpty();
         assertThat(deployments.getTotal()).isZero();
-    }
-    @Test
-    public void testFormRestApiIntegrationWithAuthentication() {
-        String processDefinitionsUrl = "http://localhost:" + serverPort + "/form-api/form-repository/form-definitions";
-
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
-        ResponseEntity<DataResponse<FormDefinitionResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<FormDefinitionResponse>>() {
-            });
-
-        assertThat(response.getStatusCode())
-            .as("Status code")
-            .isEqualTo(HttpStatus.OK);
-        DataResponse<FormDefinitionResponse> formDefinitions = response.getBody();
-        assertThat(formDefinitions).isNotNull();
-        assertThat(formDefinitions.getData())
-            .isEmpty();
-        assertThat(formDefinitions.getTotal()).isZero();
     }
     @Test
     public void testIdmRestApiIntegrationWithAuthentication() {

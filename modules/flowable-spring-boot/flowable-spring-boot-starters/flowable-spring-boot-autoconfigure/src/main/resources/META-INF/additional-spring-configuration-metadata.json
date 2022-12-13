@@ -551,23 +551,6 @@
     },
     {
       "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.form.servlet.load-on-startup",
-      "description": "Load on startup of the Form dispatcher servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.form.servlet.name",
-      "defaultValue": "Flowable Form Rest API",
-      "description": "The name of the Form servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
-      "name": "flowable.form.servlet.path",
-      "defaultValue": "/form-api",
-      "description": "The context path for the Form rest servlet."
-    },
-    {
-      "sourceType": "org.flowable.spring.boot.FlowableServlet",
       "name": "flowable.idm.servlet.load-on-startup",
       "description": "Load on startup of the IDM dispatcher servlet."
     },
@@ -830,10 +813,6 @@
         {
           "value": "dmn",
           "description": "DMN engine."
-        },
-        {
-          "value": "form",
-          "description": "Form engine."
         },
         {
           "value": "app",

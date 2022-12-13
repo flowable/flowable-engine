@@ -44,13 +44,7 @@ flowable-event-registry-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-event-registry-spring<version><.jar | -source.jar | -javadoc.jar>
 flowable-event-registry-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-engine<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-model<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-spring<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-http<version><.jar | -source.jar | -javadoc.jar>
 flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
 flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
