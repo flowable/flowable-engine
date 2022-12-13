@@ -14,10 +14,11 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -29,7 +30,11 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.form.api.FormDeployment;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.mockito.Mock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,6 +47,12 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Tijs Rademakers
  */
 public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
 
     /**
      * Test getting a single process definition. GET cmmn-repository/case-definitions/{caseDefinitionResource}
@@ -170,12 +181,24 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
 
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/repository/caseWithStartForm.cmmn",
-            "org/flowable/cmmn/rest/service/api/repository/testForm.form",
     })
     public void testGetCaseDefinitionStartForm() throws Exception {
 
-        try {
+        runUsingMocks(() -> {
+            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+
             CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
+
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", caseDefinition.getDeploymentId(), caseDefinition.getTenantId(),
+                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
             HttpGet httpGet = new HttpGet(
                     SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
@@ -185,44 +208,36 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " id: '${json-unit.any-string}',"
-                            + " key: 'testFormKey',"
-                            + " name: 'My first form',"
-                            + " version: 1"
+                            + " id: 'formDefId',"
+                            + " key: 'formDefKey',"
+                            + " name: 'Form Definition Name',"
+                            + " type: 'startForm',"
+                            + " definitionKey: 'caseWithStartForm'"
                             + "}");
-
-            FormDeployment formDeployment = formRepositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/testForm.form")
-                    .deploy();
-
-            response = executeRequest(httpGet, HttpStatus.SC_OK);
-            responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " id: '${json-unit.any-string}',"
-                            + " key: 'testFormKey',"
-                            + " name: 'My first form',"
-                            + " version: 1"
-                            + "}");
-        } finally {
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-            for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-            }
-        }
+        });
 
     }
 
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/repository/caseWithStartFormSameDeploymentFalse.cmmn",
-            "org/flowable/cmmn/rest/service/api/repository/testForm.form",
     })
-    public void testGetCaseDefinitionStartFormWithSameDeploymentFalse() throws Exception {
-        try {
+    public void testGetCaseDefinitionStartFormWithSameDeploymentFalse() {
+
+        runUsingMocks(() -> {
+            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
             CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
+
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", null, caseDefinition.getTenantId(),
+                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
             HttpGet httpGet = new HttpGet(
                     SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
@@ -232,34 +247,14 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " id: '${json-unit.any-string}',"
-                            + " key: 'testFormKey',"
-                            + " name: 'My first form',"
-                            + " version: 1"
+                            + " id: 'formDefId',"
+                            + " key: 'formDefKey',"
+                            + " name: 'Form Definition Name',"
+                            + " type: 'startForm',"
+                            + " definitionKey: 'caseWithStartForm'"
                             + "}");
-
-            formRepositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/testForm.form")
-                    .deploy();
-
-            response = executeRequest(httpGet, HttpStatus.SC_OK);
-            responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " id: '${json-unit.any-string}',"
-                            + " key: 'testFormKey',"
-                            + " name: 'My first form',"
-                            + " version: 2"
-                            + "}");
-        } finally {
-
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-            for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-            }
-        }
+        });
 
     }
+
 }

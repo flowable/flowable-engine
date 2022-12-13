@@ -15,10 +15,13 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -32,6 +35,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricDetail;
@@ -45,10 +49,15 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormService;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Frederik Heremans
@@ -1414,6 +1423,39 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         )
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
                 .hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @MockitoSettings
+    public void testStartProcessInstanceByProcessInstanceBuilderWithFormVariables(
+            @Mock FormEngineConfigurationApi formEngineConfiguration,
+            @Mock FormService formService
+    ) {
+        try {
+            Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+
+            FormInfo formInfo = new FormInfo();
+            when(formEngineConfiguration.getFormService()).thenReturn(formService);
+            Map<String, Object> formVariables = Collections.singletonMap("intVar", 42);
+            when(formService.getVariablesFromFormSubmission(formInfo, formVariables, "simple"))
+                    .thenReturn(Collections.singletonMap("otherIntVar", 150));
+
+            String procId = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneTaskProcess")
+                    .formVariables(formVariables, formInfo, "simple")
+                    .start()
+                    .getId();
+
+            assertThat(runtimeService.getVariables(procId))
+                    .containsOnly(
+                            entry("otherIntVar", 150)
+                    );
+        } finally {
+            processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+        }
     }
 
 }

@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +63,7 @@ import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
@@ -70,6 +72,11 @@ import org.flowable.idm.api.User;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.function.ThrowingRunnable;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.MockitoSession;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -115,8 +122,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected static CmmnHistoryService historyService;
     protected static CmmnManagementService managementService;
     protected static IdmIdentityService identityService;
-    protected static FormRepositoryService formRepositoryService;
-    protected static org.flowable.form.api.FormService formEngineFormService;
 
     protected static CloseableHttpClient client;
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
@@ -140,8 +145,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         historyService = appContext.getBean(CmmnHistoryService.class);
         managementService = appContext.getBean(CmmnManagementService.class);
         identityService = appContext.getBean(IdmIdentityService.class);
-        formRepositoryService = appContext.getBean(FormRepositoryService.class);
-        formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
 
         // Create http client for all tests
         CredentialsProvider provider = new BasicCredentialsProvider();
@@ -479,5 +482,22 @@ public abstract class BaseSpringRestTestCase extends TestCase {
 
     protected String buildUrl(String[] fragments, Object... arguments) {
         return URL_BUILDER.buildUrl(fragments, arguments);
+    }
+
+    protected void runUsingMocks(ThrowingRunnable runnable) {
+        MockitoSession mockitoSession = Mockito.mockitoSession()
+                .name(getName())
+                .strictness(Strictness.STRICT_STUBS)
+                .initMocks(this)
+                .startMocking();
+
+        try (AutoCloseable ignored = MockitoAnnotations.openMocks(this)) {
+            runnable.run();
+            mockitoSession.finishMocking();
+        } catch (Throwable exception) {
+            mockitoSession.finishMocking(exception);
+        } finally {
+            cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+        }
     }
 }

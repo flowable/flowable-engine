@@ -14,23 +14,39 @@ package org.flowable.cmmn.test.validate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.test.AbstractProcessEngineIntegrationTest;
-import org.flowable.form.api.FormDefinition;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.engine.FlowableFormValidationException;
-import org.flowable.form.engine.FormEngines;
+import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * @author martin.grofcik
@@ -60,17 +76,34 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             + "    </case>\n"
             + "</definitions>\n";
 
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formService;
+
+    @Mock
     protected FormRepositoryService formRepositoryService;
 
+    @Mock
+    protected FormFieldHandler formFieldHandler;
+
+    protected FormFieldHandler originalFormFieldHandler;
+
     @Before
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void initialize() {
+        originalFormFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
+        cmmnEngineConfiguration.setFormFieldHandler(formFieldHandler);
         cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
 
-        formRepositoryService = FormEngines.getDefaultFormEngine().getFormRepositoryService();
-        formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/simple.form")
-                .deploy();
+        Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+
         cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
 
         cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
@@ -80,15 +113,12 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 )
                 .deploy();
         SideEffectTaskListener.reset();
-        TestValidationFormEngineConfigurator.ThrowExceptionOnValidationFormService.activate();
     }
 
     @After
     public void cleanDeployments() {
-        TestValidationFormEngineConfigurator.ThrowExceptionOnValidationFormService.deactivate();
-        formRepositoryService.createDeploymentQuery().list().forEach(
-                formDeployment -> formRepositoryService.deleteDeployment(formDeployment.getId(), true)
-        );
+        cmmnEngineConfiguration.setFormFieldHandler(originalFormFieldHandler);
+        cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         cmmnRepositoryService.createDeploymentQuery().list().forEach(
                 cmmnDeployment -> cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true)
@@ -101,12 +131,26 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     public void startCaseWithForm() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("oneTaskCaseWithForm")
+                .singleResult();
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                .thenReturn(formInfo);
+
+        doThrow(new RuntimeException("Validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, Collections.singletonMap("variable", "VariableValue"));
+
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .startFormVariables(Collections.singletonMap("variable", "VariableValue"))
                 .startWithForm())
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -117,7 +161,6 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey(task.getFormKey()).singleResult();
 
         task.setName("newName");
         task.setPriority(0);
@@ -129,7 +172,21 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         cmmnTaskService.addGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUser", IdentityLinkType.PARTICIPANT);
         cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
-        cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("doNotThrowException", ""));
+
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        Map<String, Object> completeVariables = Collections.singletonMap("doNotThrowException", "");
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+
+        doNothing()
+                .when(formService)
+                .validateFormFields(formInfo, completeVariables);
+
+        cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(11);
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_CREATED.name()).count())
@@ -157,17 +214,43 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     public void startCaseAsyncWithForm() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("oneTaskCaseWithForm")
+                .singleResult();
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                .thenReturn(formInfo);
+
+        doThrow(new RuntimeException("Validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, Collections.singletonMap("variable", "VariableValue"));
+
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .startFormVariables(Collections.singletonMap("variable", "VariableValue"))
                 .startWithForm())
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
     @Test
     public void startCaseWithFormWithDisabledValidationOnEngineLevel() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("oneTaskCaseWithForm")
+                .singleResult();
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                .thenReturn(formInfo);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("variable", "VariableValue"), null))
+                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+
         cmmnEngineConfiguration.setFormFieldValidationEnabled(false);
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
@@ -176,6 +259,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                     .startWithForm();
 
             assertThat(caseInstance).isNotNull();
+            assertThat(caseInstance.getCaseVariables())
+                    .containsOnly(entry("completeVar2", "Testing"));
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         } finally {
             cmmnEngineConfiguration.setFormFieldValidationEnabled(true);
@@ -184,11 +269,24 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     public void startCaseWithFormWithoutVariables() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("oneTaskCaseWithForm")
+                .singleResult();
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                .thenReturn(formInfo);
+        doThrow(new RuntimeException("Validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, null);
+
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .startWithForm())
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -196,16 +294,30 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
     public void completeCaseTaskWithFormWithValidationDisabledOnConfigLevel() {
         cmmnEngineConfiguration.setFormFieldValidationEnabled(false);
         try {
+            when(formEngineConfiguration.getFormService()).thenReturn(formService);
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+            FormInfo formInfo = new FormInfo();
+            Map<String, Object> completeVariables = Collections.singletonMap("var", "value");
+            when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+            when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+                    .thenReturn(Collections.singletonMap("var2", "value2"));
+
             CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("oneTaskCaseWithForm")
                     .start();
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
             SideEffectTaskListener.reset();
 
-            cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("var", "value"));
+            cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
+
+            verify(formService).saveFormInstanceWithScopeId(completeVariables, formInfo, task.getId(), caze.getId(), ScopeTypes.CMMN,
+                    caze.getCaseDefinitionId(), caze.getTenantId(), "__COMPLETE");
+
+            verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), null, caze.getId(), ScopeTypes.CMMN,
+                    Collections.singletonMap("var2", "value2"), caze.getTenantId());
         } finally {
             cmmnEngineConfiguration.setFormFieldValidationEnabled(true);
         }
@@ -213,32 +325,48 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     public void completeCaseTaskWithForm() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        doThrow(new RuntimeException("validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, Collections.singletonMap("var", "value"));
+
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
         assertThatThrownBy(
-                () -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", Collections.singletonMap("var", "value")))
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+                () -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", Collections.singletonMap("var", "value")))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
     @Test
     public void completeCaseTaskWithFormWithoutVariables() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        doThrow(new RuntimeException("validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, null);
+
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
-        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null))
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -254,29 +382,53 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
 
-        cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null);
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+
+        cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
+
+        verify(formService).saveFormInstanceWithScopeId(completeVariables, formInfo, task.getId(), caze.getId(), ScopeTypes.CMMN,
+                caze.getCaseDefinitionId(), caze.getTenantId(), "__COMPLETE");
+
+        verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), null, caze.getId(), ScopeTypes.CMMN,
+                Collections.singletonMap("completeVar2", "Testing"), caze.getTenantId());
     }
 
     @Test
     public void completeTaskWithoutValidationOnModelLevelExpression() {
-        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
+        CmmnDeployment deployment = cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
                 .addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE
                         .replace("CASE_VALIDATE_VALUE", "${true}")
                         .replace("TASK_VALIDATE_VALUE", "${allowValidation}")
                 )
                 .deploy();
 
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", deployment.getParentDeploymentId()))
+                .thenReturn(formInfo);
+        doThrow(new RuntimeException("validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, Collections.singletonMap("allowValidation", true));
+
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .startFormVariables(Collections.singletonMap("allowValidation", true))
                 .startWithForm())
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
 
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
@@ -287,16 +439,26 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         SideEffectTaskListener.reset();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
 
-        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null))
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        doThrow(new RuntimeException("validation failed for task"))
+                .when(formService)
+                .validateFormFields(formInfo, null);
+
+        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed for task");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
     @Test
     public void completeTaskWithoutValidationOnModelLevelBadExpression() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+
         cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
                 .addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE
                         .replace("CASE_VALIDATE_VALUE", "true")
@@ -308,11 +470,10 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
 
-        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null))
+        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageStartingWith("Unknown property used in expression: ${BAD_EXPRESSION}");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
@@ -327,22 +488,40 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 )
                 .deploy();
 
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+
+        doThrow(new RuntimeException("validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, null);
+
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
 
-        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null))
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
     @Test
     public void completeTaskWithoutValidationOnMissingModelLevel() {
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+
+        FormInfo formInfo = new FormInfo();
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        doThrow(new RuntimeException("validation failed"))
+                .when(formService)
+                .validateFormFields(formInfo, null);
+
         cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
                 .addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE
                         .replace("flowable:formFieldValidation=\"CASE_VALIDATE_VALUE\"", "")
@@ -354,13 +533,12 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
-        FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
 
-        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), formDefinition.getId(), "__COMPLETE", null))
-                .isInstanceOf(FlowableFormValidationException.class)
-                .hasMessageStartingWith("Validation failed by default");
+        assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("validation failed");
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 

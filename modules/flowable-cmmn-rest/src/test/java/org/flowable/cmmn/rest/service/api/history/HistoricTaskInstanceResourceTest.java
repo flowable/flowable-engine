@@ -15,9 +15,10 @@ package org.flowable.cmmn.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +32,14 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormService;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.mockito.Mock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -47,6 +51,12 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
 
     /**
      * Test getting a single task, spawned by a case. GET cmmn-history/historic-task-instances/{taskId}
@@ -188,18 +198,27 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         }
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn",
-            "org/flowable/cmmn/rest/service/api/runtime/simple.form" })
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn" })
     public void testCompletedTaskForm() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
-            try {
-                FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-                assertThat(formDefinition).isNotNull();
+            runUsingMocks(() -> {
+                Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+                engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
+                CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
                 CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
                 Task task = taskService.createTaskQuery().scopeId(caseInstance.getId()).singleResult();
                 String taskId = task.getId();
+
+                FormInfo formInfo = new FormInfo();
+                formInfo.setId("formDefId");
+                formInfo.setKey("formDefKey");
+                formInfo.setName("Form Definition Name");
+
+                when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+                when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId(), taskId,
+                        Collections.emptyMap(), task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                        .thenReturn(formInfo);
 
                 String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
                 CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -208,55 +227,14 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 assertThatJson(responseNode)
                         .when(Option.IGNORING_EXTRA_FIELDS)
                         .isEqualTo("{"
-                                + " id: '" + formDefinition.getId() + "',"
-                                + " key: '" + formDefinition.getKey() + "',"
-                                + " name: '" + formDefinition.getName() + "'"
+                                + "  id: 'formDefId',"
+                                + "  name: 'Form Definition Name',"
+                                + "  key: 'formDefKey',"
+                                + "  type: 'historicTaskForm',"
+                                + "  historicTaskId: '" + taskId +"'"
                                 + "}");
+            });
 
-                assertThat(responseNode.get("fields")).hasSize(2);
-
-                Map<String, Object> variables = new HashMap<>();
-                variables.put("user", "First value");
-                variables.put("number", 789);
-                taskService.completeTaskWithForm(taskId, formDefinition.getId(), null, variables);
-
-                assertThat(taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNull();
-
-                response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS)
-                        .isEqualTo("{"
-                                + " id: '" + formDefinition.getId() + "',"
-                                + " key: '" + formDefinition.getKey() + "',"
-                                + " name: '" + formDefinition.getName() + "'"
-                                + "}");
-
-                assertThat(responseNode.get("fields")).hasSize(2);
-
-                JsonNode fields = responseNode.get("fields");
-                assertThatJson(fields)
-                        .when(Option.IGNORING_EXTRA_FIELDS)
-                        .isEqualTo("["
-                                + "  {"
-                                + "    id: 'user',"
-                                + "    value: 'First value'"
-                                + "  },"
-                                + "  {"
-                                + "    id: 'number',"
-                                + "    value: 789"
-                                + "  }"
-                                + "]");
-
-            } finally {
-                formEngineFormService.deleteFormInstancesByScopeDefinition(caseDefinition.getId());
-
-                List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-                for (FormDeployment formDeployment : formDeployments) {
-                    formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-                }
-            }
         }
     }
 }
