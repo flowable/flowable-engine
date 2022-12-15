@@ -238,11 +238,17 @@ public class EventDeploymentManager {
             removeChannelDefinitionFromCache(channelDefinition);
         }
     }
-    
+
     public void removeChannelDefinitionFromCache(ChannelDefinition channelDefinition) {
-        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinition.getId());
-        
+        removeChannelDefinitionFromCache(channelDefinition.getId());
+    }
+
+    public ChannelDefinition removeChannelDefinitionFromCache(String channelDefinitionId) {
+        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinitionId);
+        ChannelDefinition channelDefinition = null;
+
         if (cacheEntry != null) {
+            channelDefinition = cacheEntry.getChannelDefinitionEntity();
             ChannelModel channelModel = cacheEntry.getChannelModel();
             for (ChannelModelProcessor channelModelProcessor : engineConfig.getChannelModelProcessors()) {
                 if (channelModelProcessor.canProcess(channelModel)) {
@@ -252,9 +258,12 @@ public class EventDeploymentManager {
                     channelModelProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), engineConfig.getEventRepositoryService());
                 }
             }
+
         }
         
-        channelDefinitionCache.remove(channelDefinition.getId());
+        channelDefinitionCache.remove(channelDefinitionId);
+
+        return channelDefinition;
     }
 
     public List<Deployer> getDeployers() {

@@ -13,9 +13,11 @@
 package org.flowable.eventregistry.integrationtest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -29,12 +31,14 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +70,9 @@ public class ProcessWithEventRegistryTest {
     
     @Autowired
     protected TaskService taskService;
+
+    @Autowired
+    protected EventRegistryEngineConfiguration eventEngineConfiguration;
     
     @Autowired
     protected JmsTemplate jmsTemplate;
@@ -334,7 +341,176 @@ public class ProcessWithEventRegistryTest {
             }
         }
     }
-    
+
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndFullPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-fullpayload.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testFullPayloadEventWithDuplicateDeploymentWithChangeDetectionRun() throws InterruptedException {
+        try {
+            repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndFullPayload.bpmn20.xml")
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/one-fullpayload.event")
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/one.channel")
+                .deploy();
+
+            EventRepositoryService eventRepositoryService = eventEngineConfiguration.getEventRepositoryService();
+            List<ChannelDefinition> channels = eventRepositoryService.createChannelDefinitionQuery()
+                    .list();
+
+            channels.sort(Comparator.comparing(ChannelDefinition::getVersion).reversed());
+
+            eventRepositoryService.getChannelModelById(channels.get(0).getId());
+            eventRepositoryService.getChannelModelById(channels.get(1).getId());
+
+
+            eventEngineConfiguration.getEventRegistryChangeDetectionManager().detectChanges();
+
+            Thread.sleep(1000);
+
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+
+
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                + "    \"payload1\": \"kermit\","
+                + "    \"payload2\": 123"
+                + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> {
+                    assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+                });
+
+            ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
+            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
+
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-header-correlation.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testChannelDeployedMultipleTimes() {
+        try {
+            ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                    + "    \"payload1\": \"kermit\","
+                    + "    \"payload2\": 123"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance1.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance1.getId()))
+                    .contains(
+                            entry("value1", "kermit"),
+                            entry("value2", 123)
+                    );
+
+            taskService.complete(taskService.createTaskQuery().processInstanceId(instance1.getId()).singleResult().getId());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(instance1.getId()).count()).isZero();
+
+            repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/one-v2.channel")
+                .deploy();
+
+            ProcessInstance instance2 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123b")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue-v2", "{"
+                    + "    \"payload1\": \"fozzie\","
+                    + "    \"payload2\": 124"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123b");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance2.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance2.getId()))
+                    .contains(
+                            entry("value1", "fozzie"),
+                            entry("value2", 124)
+                    );
+
+            taskService.complete(taskService.createTaskQuery().processInstanceId(instance2.getId()).singleResult().getId());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(instance2.getId()).count()).isZero();
+
+            ChannelDefinition channel1 = getEventRepositoryService().createChannelDefinitionQuery().channelVersion(1).singleResult();
+            ChannelModel channelModel = getEventRepositoryService().getChannelModelById(channel1.getId());
+            assertThat(channelModel).isNotNull();
+
+            ProcessInstance instance3 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123c")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue-v2", "{"
+                    + "    \"payload1\": \"piggie\","
+                    + "    \"payload2\": 125"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123c");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance3.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance3.getId()))
+                    .contains(
+                            entry("value1", "piggie"),
+                            entry("value2", 125)
+                    );
+
+            taskService.complete(taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult().getId());
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(instance3.getId()).count()).isZero();
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
     @Test
     @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testStartProcessWithSystemEvent.bpmn20.xml",
             "org/flowable/eventregistry/integrationtest/testSendSystemEvent.bpmn20.xml",

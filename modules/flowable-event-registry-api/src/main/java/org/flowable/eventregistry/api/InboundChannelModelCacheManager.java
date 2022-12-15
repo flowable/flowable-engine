@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.api;
 
+import java.util.Collection;
+
 import org.flowable.eventregistry.model.InboundChannelModel;
 
 public interface InboundChannelModelCacheManager {
@@ -21,4 +23,15 @@ public interface InboundChannelModelCacheManager {
     void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
     void cleanChannelModels();
+
+    RegisteredChannel findRegisteredChannel(ChannelDefinition channelDefinition);
+
+    Collection<RegisteredChannel> getRegisteredChannels();
+
+    interface RegisteredChannel {
+
+        int getChannelDefinitionVersion();
+
+        String getChannelDefinitionId();
+    }
 }
