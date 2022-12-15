@@ -764,7 +764,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             super(engineConfiguration);
         }
 
-        protected Map<CacheKey, String> getCache() {
+        protected Map<CacheKey, CacheValue> getCache() {
             return cache;
         }
     }

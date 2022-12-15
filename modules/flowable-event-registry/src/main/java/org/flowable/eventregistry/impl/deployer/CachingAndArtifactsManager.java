@@ -74,7 +74,7 @@ public class CachingAndArtifactsManager {
         }
     }
     
-    protected void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
+    public void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
         String channelDefinitionKey = channelModel.getKey();
         if (StringUtils.isEmpty(channelDefinitionKey)) {
             throw new FlowableIllegalArgumentException("No key set for channel model");

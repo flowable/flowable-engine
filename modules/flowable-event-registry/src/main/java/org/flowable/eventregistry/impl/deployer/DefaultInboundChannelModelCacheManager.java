@@ -12,7 +12,11 @@
  */
 package org.flowable.eventregistry.impl.deployer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,7 +28,7 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 public class DefaultInboundChannelModelCacheManager implements InboundChannelModelCacheManager {
 
     protected final EventRegistryEngineConfiguration engineConfiguration;
-    protected final Map<CacheKey, String> cache = new HashMap<>();
+    protected final Map<CacheKey, CacheValue> cache = new HashMap<>();
 
     public DefaultInboundChannelModelCacheManager(EventRegistryEngineConfiguration engineConfiguration) {
         this.engineConfiguration = engineConfiguration;
@@ -33,14 +37,21 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
     @Override
     public boolean registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
         String json = engineConfiguration.getChannelJsonConverter().convertToJson(channelModel);
-        CacheKey key = new CacheKey(channelModel, channelDefinition);
-        String registeredJson = cache.get(key);
-        if (registeredJson == null || !registeredJson.equals(json)) {
+        CacheKey key = new CacheKey(channelDefinition);
+        CacheValue cacheValue = cache.get(key);
+        if (cacheValue == null) {
             // When the cache does not contain mapping for the key
-            // or the mapping is different, then we need to register the new mapping
+            // then we need to register the new mapping
             // and return true (that we did the registration)
-            cache.put(key, json);
+            cache.put(key, new CacheValue(json, channelDefinition));
             return true;
+        } else if (cacheValue.version < channelDefinition.getVersion()) {
+            // When the latest version of the cache is less than the channel being deployed
+            // then we need to check the json and update the cache
+            cache.put(key, new CacheValue(json, channelDefinition));
+
+            // When the registered json is different of the newer json then we should not register the channel model
+            return !cacheValue.json.equals(json);
         }
 
         return false;
@@ -48,7 +59,7 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
 
     @Override
     public void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
-        cache.remove(new CacheKey(channelModel, channelDefinition));
+        cache.remove(new CacheKey(channelDefinition));
     }
 
     @Override
@@ -56,15 +67,32 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
         cache.clear();
     }
 
+    @Override
+    public RegisteredChannel findRegisteredChannel(ChannelDefinition channelDefinition) {
+        CacheValue cacheValue = cache.get(new CacheKey(channelDefinition));
+        return cacheValue != null ? new CacheRegisteredChannel(cacheValue) : null;
+    }
+
+    @Override
+    public Collection<RegisteredChannel> getRegisteredChannels() {
+        if (cache.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<RegisteredChannel> registeredChannels = new ArrayList<>(cache.size());
+        for (Map.Entry<CacheKey, CacheValue> entry : cache.entrySet()) {
+            registeredChannels.add(new CacheRegisteredChannel(entry.getValue()));
+        }
+
+        return registeredChannels;
+    }
+
     protected static class CacheKey {
 
-        protected final String modelType;
         protected final String modelKey;
         protected final String tenantId;
 
-        protected CacheKey(InboundChannelModel model, ChannelDefinition definition) {
-            this.modelType = model.getType();
-            this.modelKey = model.getKey();
+        protected CacheKey(ChannelDefinition definition) {
+            this.modelKey = definition.getKey();
             this.tenantId = definition.getTenantId();
         }
 
@@ -77,12 +105,44 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
                 return false;
             }
             CacheKey cacheKey = (CacheKey) o;
-            return Objects.equals(modelType, cacheKey.modelType) && Objects.equals(modelKey, cacheKey.modelKey) && Objects.equals(tenantId, cacheKey.tenantId);
+            return Objects.equals(modelKey, cacheKey.modelKey) && Objects.equals(tenantId, cacheKey.tenantId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(modelType, modelKey, tenantId);
+            return Objects.hash(modelKey, tenantId);
+        }
+    }
+
+    protected static class CacheValue {
+
+        protected final String json;
+        protected final int version;
+        protected final String definitionId;
+
+        public CacheValue(String json, ChannelDefinition definition) {
+            this.json = json;
+            this.version = definition.getVersion();
+            this.definitionId = definition.getId();
+        }
+    }
+
+    protected static class CacheRegisteredChannel implements RegisteredChannel {
+
+        protected final CacheValue value;
+
+        protected CacheRegisteredChannel(CacheValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public int getChannelDefinitionVersion() {
+            return value.version;
+        }
+
+        @Override
+        public String getChannelDefinitionId() {
+            return value.definitionId;
         }
     }
 }
