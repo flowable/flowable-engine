@@ -96,7 +96,7 @@ public class BpmnWithEventRegistryTestConfiguration {
 
         channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
 
-        engineConfiguration.setEnableEventRegistryChangeDetection(true);
+        engineConfiguration.setEnableEventRegistryChangeDetection(false);
 
         return engineConfiguration;
     }
