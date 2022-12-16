@@ -18,7 +18,7 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 
 public interface InboundChannelModelCacheManager {
 
-    boolean registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
+    ChannelRegistration registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
     void unregisterChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition);
     
@@ -33,5 +33,14 @@ public interface InboundChannelModelCacheManager {
         int getChannelDefinitionVersion();
 
         String getChannelDefinitionId();
+    }
+
+    interface ChannelRegistration {
+
+        boolean registered();
+
+        RegisteredChannel previousChannel();
+
+        void rollback();
     }
 }
