@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.integrationtest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.awaitility.Awaitility.await;
 
@@ -503,6 +504,124 @@ public class ProcessWithEventRegistryTest {
             taskService.complete(taskService.createTaskQuery().processInstanceId(instance3.getId()).singleResult().getId());
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(instance3.getId()).count()).isZero();
 
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-header-correlation.event"
+    })
+    public void testChannelDeploymentFailsOnFirstTry() {
+        assertThatThrownBy(() -> getEventRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/integrationtest/invalid.channel")
+                .deploy()
+        ).hasMessageContaining("Invalid concurrency value [dummy]");
+        try {
+            getEventRepositoryService().createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/integrationtest/one.channel")
+                    .deploy();
+
+            ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                    + "    \"payload1\": \"kermit\","
+                    + "    \"payload2\": 123"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance1.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance1.getId()))
+                    .contains(
+                            entry("value1", "kermit"),
+                            entry("value2", 123)
+                    );
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/eventregistry/integrationtest/testReceiveEventTaskWithCorrelationAndPayload.bpmn20.xml",
+            "org/flowable/eventregistry/integrationtest/one-header-correlation.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"
+    })
+    public void testChannelDeploymentFailsWhenAlreadyExistingChannelIsDeployed() {
+        try {
+            ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123a")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                    + "    \"payload1\": \"kermit\","
+                    + "    \"payload2\": 123"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123a");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance1.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance1.getId()))
+                    .contains(
+                            entry("value1", "kermit"),
+                            entry("value2", 123)
+                    );
+
+            assertThatThrownBy(() -> getEventRepositoryService().createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/integrationtest/invalid.channel")
+                    .deploy()
+            ).hasMessageContaining("Invalid concurrency value [dummy]");
+
+            ProcessInstance instance2 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("process")
+                    .variable("customerIdVar", "123b")
+                    .start();
+
+            jmsTemplate.convertAndSend("test-bpmn-queue", "{"
+                    + "    \"payload1\": \"fozzie\","
+                    + "    \"payload2\": 124"
+                    + "}", messageProcessor -> {
+
+                messageProcessor.setStringProperty("headerProperty1", "123b");
+                return messageProcessor;
+            });
+
+            await("receive events")
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> {
+                        assertThat(taskService.createTaskQuery().processInstanceId(instance2.getId()).count()).isEqualTo(1);
+                    });
+
+            assertThat(runtimeService.getVariables(instance2.getId()))
+                    .contains(
+                            entry("value1", "fozzie"),
+                            entry("value2", 124)
+                    );
         } finally {
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
             for (EventDeployment eventDeployment : eventDeployments) {

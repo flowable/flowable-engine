@@ -35,7 +35,7 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
     }
 
     @Override
-    public boolean registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
+    public ChannelRegistration registerChannelModel(InboundChannelModel channelModel, ChannelDefinition channelDefinition) {
         String json = engineConfiguration.getChannelJsonConverter().convertToJson(channelModel);
         CacheKey key = new CacheKey(channelDefinition);
         CacheValue cacheValue = cache.get(key);
@@ -44,17 +44,17 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
             // then we need to register the new mapping
             // and return true (that we did the registration)
             cache.put(key, new CacheValue(json, channelDefinition));
-            return true;
-        } else if (cacheValue.version < channelDefinition.getVersion()) {
+            return new ChannelRegistrationImpl(true, null, key);
+        } else if (cacheValue.version <= channelDefinition.getVersion()) {
             // When the latest version of the cache is less than the channel being deployed
             // then we need to check the json and update the cache
             cache.put(key, new CacheValue(json, channelDefinition));
 
             // When the registered json is different of the newer json then we should not register the channel model
-            return !cacheValue.json.equals(json);
+            return new ChannelRegistrationImpl(!cacheValue.json.equals(json), new CacheRegisteredChannel(cacheValue), key);
         }
 
-        return false;
+        return new ChannelRegistrationImpl(false, new CacheRegisteredChannel(cacheValue), key);
     }
 
     @Override
@@ -143,6 +143,39 @@ public class DefaultInboundChannelModelCacheManager implements InboundChannelMod
         @Override
         public String getChannelDefinitionId() {
             return value.definitionId;
+        }
+    }
+
+    protected class ChannelRegistrationImpl implements ChannelRegistration {
+
+        protected final boolean registered;
+        protected final CacheRegisteredChannel previousChannel;
+        protected final CacheKey cacheKey;
+
+        public ChannelRegistrationImpl(boolean registered, CacheRegisteredChannel previousChannel, CacheKey cacheKey) {
+            this.registered = registered;
+            this.previousChannel = previousChannel;
+            this.cacheKey = cacheKey;
+        }
+
+        @Override
+        public boolean registered() {
+            return registered;
+        }
+
+        @Override
+        public RegisteredChannel previousChannel() {
+            return previousChannel;
+        }
+
+        @Override
+        public void rollback() {
+            CacheValue cacheValue = previousChannel != null ? previousChannel.value : null;
+            if (cacheValue == null) {
+                cache.remove(cacheKey);
+            } else {
+                cache.put(cacheKey, cacheValue);
+            }
         }
     }
 }
