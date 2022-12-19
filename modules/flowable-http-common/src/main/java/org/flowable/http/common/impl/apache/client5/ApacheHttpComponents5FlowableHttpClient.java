@@ -170,7 +170,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                 }
                 case "DELETE": {
                     request = AsyncRequestBuilder.delete(uri);
-                    setRequestEntity(requestInfo,request);
+                    setRequestEntity(requestInfo, request);
                     break;
                 }
                 default: {
