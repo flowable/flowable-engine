@@ -32,7 +32,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
@@ -178,7 +177,9 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                     break;
                 }
                 case "DELETE": {
-                    request = new HttpDelete(uri);
+                    HttpDeleteWithBody delete = new HttpDeleteWithBody(uri);
+                    setRequestEntity(requestInfo, delete);
+                    request = delete;
                     break;
                 }
                 default: {
@@ -375,6 +376,24 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
             } catch (IOException ex) {
                 throw new FlowableException("IO exception occurred", ex);
             }
+        }
+    }
+    
+    /**
+     * A HttpDelete alternative that extends {@link HttpEntityEnclosingRequestBase} to allow DELETE with a request body
+     * 
+     * @author ikaakkola
+     */
+    protected static class HttpDeleteWithBody extends HttpEntityEnclosingRequestBase {
+
+        public HttpDeleteWithBody(URI uri) {
+            super();
+            setURI(uri);
+        }
+
+        @Override
+        public String getMethod() {
+            return "DELETE";
         }
     }
 }

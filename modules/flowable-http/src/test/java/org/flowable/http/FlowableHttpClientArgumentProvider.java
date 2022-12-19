@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import org.flowable.http.common.impl.HttpClientConfig;
 import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.apache.client5.ApacheHttpComponents5FlowableHttpClient;
 import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,7 +33,8 @@ public class FlowableHttpClientArgumentProvider implements ArgumentsProvider {
         HttpClientConfig config = createClientConfig();
         return Stream.of(
                 Arguments.of(new SpringWebClientFlowableHttpClient(config)),
-                Arguments.of(new ApacheHttpComponentsFlowableHttpClient(config))
+                Arguments.of(new ApacheHttpComponentsFlowableHttpClient(config)),
+                Arguments.of(new ApacheHttpComponents5FlowableHttpClient(config))
         );
     }
 

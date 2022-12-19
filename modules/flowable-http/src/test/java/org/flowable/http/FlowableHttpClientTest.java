@@ -157,4 +157,41 @@ class FlowableHttpClientTest {
                 .containsExactly("application/json");
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void deleteWithoutBody(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test");
+        request.setMethod("DELETE");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  body: \"\""
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void deleteWithBody(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test");
+        request.setMethod("DELETE");
+        request.setBody("{ body: 'kermit' }");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  body: \"{ body: 'kermit' }\""
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
 }
