@@ -265,6 +265,18 @@
             "CREATE-TIME": "Created",
             "END-TIME": "Ended",
             "STATUS": "Status"
+        },
+        "ACTION": {
+            "DELETE":"Delete process instance(s)"
+        },
+        "POPUP": {
+            "DELETE":{
+                "TITLE": "Delete process instance(s)",
+                "MESSAGE-DELETE":"Are you sure you want to delete {{total}} process instances",
+                "CONFIRM-DELETE": "Delete process instance(s)",
+                "DELETE-REASON": "Terminated and removed in bulk",
+                "DELETE-FAILED": "Termination or removal of process instances failed"
+            }
         }
     },
     "TASK": {
@@ -809,6 +821,10 @@
         "PROCESS-INSTANCE": {
             "DELETED": "Process instance '{{id}}' deleted successfully.",
             "TERMINATED": "Process instance '{{id}}' terminated successfully."
+        },
+        "PROCESS-INSTANCES": {
+            "DELETED": "{{count}} Processes  deleted successfully.",
+            "TERMINATED": "{{count}} Processes terminated successfully."
         },
         "TASK": {
             "DELETED": "Task '{{id}}' deleted successfully.",

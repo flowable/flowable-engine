@@ -1,5 +1,5 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,25 @@
 
 /* Controllers */
 
-flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http', '$timeout', '$location', '$translate', '$q', 'gridConstants',
-    function ($rootScope, $scope, $http, $timeout, $location, $translate, $q, gridConstants) {
+flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope', '$http','$route', '$timeout', '$location', '$modal', '$translate', '$q', 'gridConstants',
+    function ($rootScope, $scope, $http, $route, $timeout, $location, $modal, $translate, $q, gridConstants) {
 
 		$rootScope.navigation = {main: 'process-engine', sub: 'instances'};
-		
+
 		$scope.filter = {};
 		$scope.processInstances = {};
 		$scope.definitionCacheLoaded = false;
 
 		$scope.variableFilterTypes = FlowableAdmin.Utils.variableFilterTypes;
 		$scope.variableFilterOperators = FlowableAdmin.Utils.variableFilterOperators;
+
+		$scope.moveToInstanceButtonTemplate = `
+			<div class="ui-grid-cell-contents d-flex justify-content-center">
+			<button type="button" class="btn btn-default btn-sm" ng-click="processInstanceSelected(row.entity.id)">
+					<i class="glyphicon glyphicon-pencil"></i>
+			</button>
+			</div>
+		`
 
 	    var filterConfig = {
 	    	url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances',
@@ -58,7 +66,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
                 {name: 'PROCESS-INSTANCES.SORT.ID', id: 'processInstanceId'},
                 {name: 'PROCESS-INSTANCES.SORT.START-TIME', id: 'startTime'}
             ],
-            
+
             options: {
                 finished: [
                     {name: 'PROCESS-INSTANCES.FILTER.STATUS-ANY', value: ''},
@@ -101,10 +109,10 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
             $rootScope.filters.instanceFilter = $scope.filter;
 	    }
 
-	    $scope.processInstanceSelected = function(processInstance) {
-        if (processInstance && processInstance.getProperty('id')) {
-            $location.path('/process-instance/' + processInstance.getProperty('id'));
-        }
+	    $scope.processInstanceSelected = function(id) {
+            if(!id) return;
+
+            $location.path('/process-instance/' + id);
       };
 
 	    if(!$scope.filter.properties.variables) {
@@ -225,16 +233,18 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
               data: 'processInstances.data',
               enableRowReordering: true,
               enableColumnResize: true,
-              multiSelect: false,
-              keepLastSelected : false,
+              showSelectionCheckbox: true,
+              selectWithCheckboxOnly: false,
+              selectedItems: [],
               rowHeight: 36,
-              afterSelectionChange: $scope.processInstanceSelected,
               columnDefs: [
                   { field: 'id', displayName: headers[0], cellTemplate: gridConstants.defaultTemplate},
                   { field: 'businessKey', displayName: headers[1], cellTemplate: gridConstants.defaultTemplate},
                   { field: 'processDefinition.name', displayName: headers[2], cellTemplate: gridConstants.defaultTemplate},
                   { field: 'startTime', displayName: headers[3], cellTemplate: gridConstants.dateTemplate},
-                  { field: 'endTime', displayName: headers[4], cellTemplate: gridConstants.dateTemplate}]
+                  { field: 'endTime', displayName: headers[4], cellTemplate: gridConstants.dateTemplate},
+				  { field: 'actions', displayName: "", cellTemplate: $scope.moveToInstanceButtonTemplate, width: 40}
+			   ]
           };
         });
 
@@ -256,7 +266,7 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
         	if ($scope.filter.processDefinition && $scope.filter.processDefinition !== '-1') {
         		$scope.filter.properties.processDefinitionId = $scope.filter.processDefinition;
         		$scope.filter.refresh();
-        		
+
         	} else {
         		var tempProcessDefinitionId = $scope.filter.properties.processDefinitionId;
         		$scope.filter.properties.processDefinitionId = null;
@@ -270,4 +280,102 @@ flowableAdminApp.controller('ProcessInstancesController', ['$rootScope', '$scope
             $scope.filter.refresh();
         });
 
-    }]);
+        // Dialogs
+        $scope.deleteProcessInstances = function () {
+            var action = "delete";
+
+            var modalInstance = $modal.open({
+                templateUrl: 'views/process-instances-delete-popup.html',
+                controller: 'DeleteProcessesModalInstanceCtrl',
+                resolve: {
+                    processes: function () {
+                        return $scope.gridInstances.selectedItems;
+                    },
+                    action: function () {
+                        return action;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (deleteProcessInstances) {
+                if (deleteProcessInstances) {
+                    $scope.addAlert($translate.instant('ALERT.PROCESS-INSTANCES.DELETED', $scope.gridInstances.selectedItems.length), 'info');
+                    $route.reload();
+                }
+            });
+        };
+}]);
+
+flowableAdminApp.controller('DeleteProcessesModalInstanceCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', '$translate', '$window', 'processes', 'action',
+    function ($rootScope, $scope, $modalInstance, $http, $translate, $window, processes, action) {
+
+    $scope.processes = processes;
+    $scope.action = action;
+    $scope.status = {
+                        loading: false,
+                        progress: 0,
+                        successfullyTerminated: [],
+                        successfullyDeleted: [],
+                        failed: []
+                    };
+    $scope.model = {};
+    $scope.openInNewWindow = function(absUrl, id) {
+        var url = absUrl + id;
+        $window.open(url, "_blank");
+    }
+
+    $scope.ok = async function () {
+        $scope.status.loading = true;
+        var dataForPost = {action: "terminate", deleteReason: $translate.instant('PROCESS-INSTANCES.POPUP.DELETE.DELETE-REASON')};
+
+        // terminate, not allready terminated processes
+        var terminatedPromises = Promise.all(
+            $scope.processes.filter(process => !process.endTime).map( async process => {
+                await $http({
+                    method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances/' + process.id,
+                    data: dataForPost
+                }).success(function (data, status, headers, config) {
+                    $scope.status.successfullyTerminated.push(process);
+                }).error(function (data, status, headers, config) {
+                    $scope.status.failed.push(process);
+                });
+            })
+        )
+        await terminatedPromises;
+
+        // add processes that were allready terminated
+        $scope.status.successfullyTerminated = $scope.status.successfullyTerminated.concat($scope.processes.filter(process => process.endTime))
+
+        // delete all succesfully terminated
+        dataForPost.action = "delete"
+        var deletedPromises = Promise.all(
+            $scope.status.successfullyTerminated.map(async process => {
+                await $http({
+                    method: 'POST', url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/process-instances/' + process.id,
+                    data: dataForPost
+                }).success(function (data, status, headers, config) {
+                    $scope.status.successfullyDeleted.push(process);
+                    $scope.status.progress = parseInt(
+                                                (parseInt($scope.status.successfullyDeleted.length) /
+                                                parseInt($scope.processes.length) * 100).toFixed(0)
+                                            );
+                }).error(function (data, status, headers, config) {
+                    $scope.status.failed.push(process);
+                });
+            })
+        )
+        await deletedPromises;
+        $scope.status.loading = false;
+
+        if($scope.status.failed.length == 0){
+            $modalInstance.close(true);
+        }
+    };
+
+    $scope.cancel = function () {
+        if (!$scope.status.loading) {
+            $modalInstance.dismiss('cancel');
+        }
+    };
+}]);
