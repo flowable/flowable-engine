@@ -13,13 +13,16 @@
 
 package org.flowable.cmmn.engine.test.impl;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +89,14 @@ public class CmmnHistoryTestHelper {
                     timer.cancel();
                 }
                 if (areJobsAvailable) {
-                    throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+                    List<HistoryJob> historyJobs = managementService.createHistoryJobQuery().list();
+                    String jobData = historyJobs.stream()
+                            .map(job -> String.format(
+                                    "Job id=%s, handlerType=%s, retries=%d, exceptionMessage=%s, handlerConfiguration=%s, advancedJobHandlerConfiguration=%s",
+                                    job.getId(), job.getJobHandlerType(), job.getRetries(), job.getExceptionMessage(), job.getJobHandlerConfiguration(),
+                                    managementService.getHistoryJobHistoryJson(job.getId())))
+                            .collect(Collectors.joining("\n"));
+                    throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded. Remaining, unprocessed jobs:\n" + jobData);
                 }
 
             } finally {
