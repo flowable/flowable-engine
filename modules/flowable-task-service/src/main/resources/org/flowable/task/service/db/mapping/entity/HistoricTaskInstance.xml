@@ -526,13 +526,6 @@
       <include refid="commonTaskInstanceQuerySql">
         <property name="queryTablePrefix" value="RES."/>
       </include>
-      <if test="taskIdList != null &amp;&amp; !taskIdList.empty">
-        and RES.ID_ IN
-        <foreach item="id" index="index" collection="taskIdList"
-                 open="(" separator="," close=")">
-          #{id}
-        </foreach>
-      </if>
       <if test="processDefinitionKey != null || processDefinitionKeyLike != null || processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; !processCategoryInList.empty) || (processCategoryNotInList != null &amp;&amp; !processCategoryNotInList.empty) || (processDefinitionKeys != null &amp;&amp; !processDefinitionKeys.empty) || deploymentId != null || (deploymentIds != null &amp;&amp; !deploymentIds.empty)">
         and exists (
             select 1
@@ -1043,6 +1036,13 @@
       <if test="taskId != null">
         ${queryTablePrefix}ID_ = #{taskId}
       </if>
+      <if test="taskIdList != null &amp;&amp; !taskIdList.empty">
+        and ${queryTablePrefix}ID_ IN
+        <foreach item="id" index="index" collection="taskIdList"
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
       <if test="taskDefinitionId != null">
         and ${queryTablePrefix}TASK_DEF_ID_ = #{taskDefinitionId}
       </if>
@@ -1303,6 +1303,13 @@
       <if test="orQueryObject.taskId != null">
         ${queryTablePrefix}ID_ = #{orQueryObject.taskId}
       </if>
+       <if test="orQueryObject.taskIdList != null &amp;&amp; !orQueryObject.taskIdList.empty">
+         or ${queryTablePrefix}ID_ IN
+         <foreach item="id" index="index" collection="orQueryObject.taskIdList"
+                  open="(" separator="," close=")">
+           #{id}
+         </foreach>
+       </if>
       <if test="orQueryObject.taskDefinitionId != null">
         or ${queryTablePrefix}TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
       </if>

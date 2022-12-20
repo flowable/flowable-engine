@@ -475,6 +475,13 @@
       <if test="taskId != null">
         RES.ID_ = #{taskId}
       </if>
+      <if test="taskIdList != null &amp;&amp; !taskIdList.empty">
+          and RES.ID_ IN
+          <foreach item="id" index="index" collection="taskIdList"
+                   open="(" separator="," close=")">
+              #{id}
+          </foreach>
+      </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
@@ -489,13 +496,6 @@
         <foreach item="name" index="index" collection="nameList"
                  open="(" separator="," close=")">
           #{name}
-        </foreach>
-      </if>
-      <if test="taskIdList != null &amp;&amp; !taskIdList.empty">
-        and RES.ID_ IN
-        <foreach item="id" index="index" collection="taskIdList"
-                 open="(" separator="," close=")">
-          #{id}
         </foreach>
       </if>
       <if test="nameListIgnoreCase != null &amp;&amp; !nameListIgnoreCase.empty">
@@ -1020,6 +1020,13 @@
         <trim prefix="(" prefixOverrides="OR" suffix=")">
             <if test="orQueryObject.taskId != null">
               RES.ID_ = #{orQueryObject.taskId}
+            </if>
+            <if test="orQueryObject.taskIdList != null &amp;&amp; !orQueryObject.taskIdList.empty">
+                or RES.ID_ IN
+                <foreach item="id" index="index" collection="orQueryObject.taskIdList"
+                         open="(" separator="," close=")">
+                    #{id}
+                </foreach>
             </if>
             <if test="orQueryObject.name != null">
               or RES.NAME_ = #{orQueryObject.name}

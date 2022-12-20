@@ -42,6 +42,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -119,6 +120,69 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.singleResult()).isNotNull();
         assertThat(query.list()).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void testQueryByTaskIdIn() {
+        TaskQuery query = taskService.createTaskQuery().taskIdIn(Arrays.asList(taskIds.get(0), "dummy"));
+        assertThat(query.singleResult()).isNotNull();
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0));
+        assertThat(query.count()).isEqualTo(1);
+
+        query = taskService.createTaskQuery().taskIdIn(Arrays.asList(taskIds.get(0), taskIds.get(1)));
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+        assertThat(query.count()).isEqualTo(2);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.TASK, processEngineConfiguration)) {
+            HistoricTaskInstanceQuery historyQuery = historyService.createHistoricTaskInstanceQuery().taskIdIn(Arrays.asList(taskIds.get(0), "dummy"));
+            assertThat(historyQuery.singleResult()).isNotNull();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0));
+            assertThat(historyQuery.count()).isEqualTo(1);
+
+            historyQuery = historyService.createHistoricTaskInstanceQuery().taskIdIn(Arrays.asList(taskIds.get(0), taskIds.get(1)));
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+            assertThat(historyQuery.count()).isEqualTo(2);
+        }
+
+    }
+
+    @Test
+    public void testQueryByTaskIdInOr() {
+        TaskQuery query = taskService.createTaskQuery().or().taskIdIn(Arrays.asList(taskIds.get(0), "dummy")).taskName("INVALID NAME").endOr();
+        assertThat(query.singleResult()).isNotNull();
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0));
+        assertThat(query.count()).isEqualTo(1);
+
+        query = taskService.createTaskQuery().or().taskIdIn(Arrays.asList(taskIds.get(0), taskIds.get(1))).taskName("INVALID NAME").endOr();
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+        assertThat(query.count()).isEqualTo(2);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.TASK, processEngineConfiguration)) {
+            HistoricTaskInstanceQuery historyQuery = historyService.createHistoricTaskInstanceQuery().or().taskIdIn(Arrays.asList(taskIds.get(0), "dummy")).taskName("INVALID NAME").endOr();
+            assertThat(historyQuery.singleResult()).isNotNull();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0));
+            assertThat(historyQuery.count()).isEqualTo(1);
+
+            historyQuery = historyService.createHistoricTaskInstanceQuery().or().taskIdIn(Arrays.asList(taskIds.get(0), taskIds.get(1))).taskName("INVALID NAME").endOr();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+            assertThat(historyQuery.count()).isEqualTo(2);
+        }
     }
 
     @Test

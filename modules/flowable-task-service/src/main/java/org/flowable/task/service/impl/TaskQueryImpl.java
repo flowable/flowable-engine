@@ -53,11 +53,11 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected IdmIdentityService idmIdentityService;
 
     protected String taskId;
+    protected Collection<String> taskIdList;
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
     protected Collection<String> nameList;
-    protected Collection<String> taskIdList;
     protected Collection<String> nameListIgnoreCase;
     protected String description;
     protected String descriptionLike;
@@ -192,6 +192,24 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery taskIdIn(Collection<String> taskIds) {
+        if (taskIds == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+
+        if (orActive) {
+            currentOrQueryObject.taskIdList = taskIds;
+        } else {
+            this.taskIdList = taskIds;
+        }
+
+        return this;
+    }
+
+    @Override
     public TaskQueryImpl taskName(String name) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("Task name is null");
@@ -234,25 +252,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         } else {
             this.nameList = nameList;
         }
-        return this;
-    }
-
-    /**
-     * Only select tasks with a id that is in the given list
-     *
-     * @param taskIdList
-     * @throws FlowableIllegalArgumentException When passed id list is empty or <code>null</code> or contains <code>null String</code>.
-     */
-    @Override
-    public TaskQuery taskIdIn(Collection<String> taskIdList) {
-        if (taskIdList == null) {
-            throw new FlowableIllegalArgumentException("Task id list is null");
-        }
-        if (taskIdList.isEmpty()) {
-            throw new FlowableIllegalArgumentException("Task id list is empty");
-        }
-
-        this.taskIdList=taskIdList;
         return this;
     }
 
@@ -2074,6 +2073,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Collection<String> getTaskIdList() {
+        return taskIdList;
     }
 
     @Override
