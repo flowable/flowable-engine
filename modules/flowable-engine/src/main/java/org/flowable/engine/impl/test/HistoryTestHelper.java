@@ -95,9 +95,11 @@ public class HistoryTestHelper {
                 if (areJobsAvailable) {
                     List<HistoryJob> historyJobs = managementService.createHistoryJobQuery().list();
                     String jobData = historyJobs.stream()
-                            .map(job -> String.format("Job id=%s, handlerType=%s, retries=%d, exceptionMessage=%s", job.getId(),
-                                    job.getJobHandlerType(), job.getRetries(), job.getExceptionMessage())).collect(
-                                    Collectors.joining("\n"));
+                            .map(job -> String.format(
+                                    "Job id=%s, handlerType=%s, retries=%d, exceptionMessage=%s, handlerConfiguration=%s, advancedJobHandlerConfiguration=%s",
+                                    job.getId(), job.getJobHandlerType(), job.getRetries(), job.getExceptionMessage(), job.getJobHandlerConfiguration(),
+                                    managementService.getHistoryJobHistoryJson(job.getId())))
+                            .collect(Collectors.joining("\n"));
                     throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded. Remaining, unprocessed jobs:\n" + jobData);
                 }
     
