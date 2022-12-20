@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.standalone.testing.helpers.ServiceTaskTestMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,6 +30,11 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author Saeid Mirzaei
  */
 public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
+
+    @BeforeEach
+    void setUp() {
+        ServiceTaskTestMock.CALL_COUNT.set(0);
+    }
 
     // exception matches the only mapping, directly
     @Test
