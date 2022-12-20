@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -131,7 +132,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                     break;
                 }
                 case "DELETE": {
-                    headersSpec = webClient.delete().uri(uri);
+                    WebClient.RequestBodySpec delete = webClient.method(HttpMethod.DELETE).uri(uri);
+                    setRequestEntity(requestInfo, delete);
+                    headersSpec = delete;
                     break;
                 }
                 default: {
