@@ -32,6 +32,7 @@
 
 <ul>
 	<li>Added support for using scripts in task and execution listeners and HTTP request and response handlers.</li>
+	<li>Added support for new task and instance history levels to provide more options to reduce the amount of historic data stored.</li>
 	<li>Added support to throw BPMN errors in scripts.</li>
 	<li>Added support for headers in an event model that can be used with event registry events in case and process definitions.</li>
 	<li>Improved support for starting case and process instances with the unique feature enabled on event registry start events.
@@ -39,11 +40,16 @@
 	<li>Added support for async leave in addition to the already long existing async (before) attribute for async tasks in BPMN and CMMN. 
 	An async job will be created to execute the leave of a task when the async leave attribute is set to true.</li>
 	<li>Improved support for parallel repeatable event listeners in case definitions.</li>
+	<li>Added interface to provide an implementation for non-matching events that are received in the event registry.</li>
+	<li>Added support to query directly on runtime variable instances both in the Java API and REST API.</li>
 	<li>Improved housekeeping logic to reduce the throughput time.</li>
+	<li>Added support for retries in Kafka channels in the event registry.</li>
+	<li>Expose topic, partitions and offset consumer record for inbound Kafka channel and provide custom partition support for outbound Kafka channel.</li>
 	<li>Added bulk support for deleting case and process instances, terminating case instances and moving deadletter jobs to executable.</li>
 	<li>Added activity instance REST API query support.</li>
 	<li>Fixed issue with event listeners in a repeatable stage in a case definition.</li>
 	<li>Fixed issue with having multiple event registry start events in a process definition.</li>
+	<li>Add dedicated task executor for the task invoker. This is fixing an issue with a potential deadlock when using the "true parallel" HTTP task feature.</li>
 	<li>Improved channel definition caching logic to prevent channels from getting unregistered when they should not.</li>
 	<li>Added support for providing an owner and assignee when starting a case or process instance.</li>
 	<li>Upgrade to Spring Boot 2.7.6.</li>
