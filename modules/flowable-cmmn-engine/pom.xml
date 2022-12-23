@@ -218,13 +218,13 @@
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
-            javax.persistence*;resolution:=optional,
+            jakarta.persistence*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
-            javax.transaction;resolution:=optional,
-            javax.enterprise.concurrent;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
+            jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 

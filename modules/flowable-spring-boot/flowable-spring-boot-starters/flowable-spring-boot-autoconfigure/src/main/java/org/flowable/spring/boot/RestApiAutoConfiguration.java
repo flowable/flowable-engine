@@ -18,16 +18,12 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.resolver.DefaultContentTypeResolver;
-import org.flowable.content.engine.ContentEngine;
-import org.flowable.content.rest.ContentRestUrls;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.external.job.rest.service.api.ExternalJobRestUrls;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.rest.FormRestUrls;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.rest.service.api.IdmRestResponseFactory;
 import org.flowable.rest.service.api.RestUrls;
@@ -37,18 +33,12 @@ import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.cmmn.CmmnEngineRestConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.cmmn.FlowableCmmnProperties;
-import org.flowable.spring.boot.content.ContentEngineRestConfiguration;
-import org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration;
-import org.flowable.spring.boot.content.FlowableContentProperties;
 import org.flowable.spring.boot.dmn.DmnEngineRestConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.dmn.FlowableDmnProperties;
 import org.flowable.spring.boot.eventregistry.EventRegistryRestConfiguration;
 import org.flowable.spring.boot.eventregistry.EventRegistryServicesAutoConfiguration;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
-import org.flowable.spring.boot.form.FlowableFormProperties;
-import org.flowable.spring.boot.form.FormEngineRestConfiguration;
-import org.flowable.spring.boot.form.FormEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.idm.IdmEngineRestConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
@@ -56,11 +46,12 @@ import org.flowable.spring.boot.job.ExternalJobRestConfiguration;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.ProcessEngineRestConfiguration;
 import org.flowable.spring.boot.rest.BaseRestApiConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -75,20 +66,16 @@ import org.springframework.context.annotation.Configuration;
  * @author Vedran Pavic
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(ContentTypeResolver.class)
 @ConditionalOnWebApplication
-@AutoConfigureAfter({
-    //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartAutoConfiguration (the package is changed)
-    //MultipartAutoConfiguration.class,
+@AutoConfiguration(after = {
+    MultipartAutoConfiguration.class,
     FlowableSecurityAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
     CmmnEngineServicesAutoConfiguration.class,
-    ContentEngineServicesAutoConfiguration.class,
     DmnEngineServicesAutoConfiguration.class,
     EventRegistryServicesAutoConfiguration.class,
-    FormEngineServicesAutoConfiguration.class,
     IdmEngineServicesAutoConfiguration.class
 })
 public class RestApiAutoConfiguration {
@@ -167,17 +154,6 @@ public class RestApiAutoConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(ContentRestUrls.class)
-    @ConditionalOnBean(ContentEngine.class)
-    public static class ContentEngineRestApiConfiguration extends BaseRestApiConfiguration {
-
-        @Bean
-        public ServletRegistrationBean contentServlet(FlowableContentProperties properties) {
-            return registerServlet(properties.getServlet(), ContentEngineRestConfiguration.class);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(DmnRestUrls.class)
     @ConditionalOnBean(DmnEngine.class)
     public static class DmnEngineRestApiConfiguration extends BaseRestApiConfiguration {
@@ -196,17 +172,6 @@ public class RestApiAutoConfiguration {
         @Bean
         public ServletRegistrationBean eventRegistryServlet(FlowableEventRegistryProperties properties) {
             return registerServlet(properties.getServlet(), EventRegistryRestConfiguration.class);
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(FormRestUrls.class)
-    @ConditionalOnBean(FormEngine.class)
-    public static class FormEngineRestApiConfiguration extends BaseRestApiConfiguration {
-
-        @Bean
-        public ServletRegistrationBean formServlet(FlowableFormProperties properties) {
-            return registerServlet(properties.getServlet(), FormEngineRestConfiguration.class);
         }
     }
 

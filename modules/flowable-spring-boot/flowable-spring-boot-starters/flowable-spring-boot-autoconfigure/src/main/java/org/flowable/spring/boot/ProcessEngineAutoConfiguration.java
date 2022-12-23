@@ -13,8 +13,8 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -51,11 +51,11 @@ import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -75,7 +75,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Javier Casal
  * @author Joram Barrez
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnProcessEngine
 @EnableConfigurationProperties({
     FlowableAutoDeploymentProperties.class,
@@ -87,13 +86,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
     FlowableIdmProperties.class,
     FlowableEventRegistryProperties.class
 })
-@AutoConfigureAfter(value = {
+@AutoConfiguration(after = {
     FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
-}, name = {
-    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
-})
-@AutoConfigureBefore({
+    TaskExecutionAutoConfiguration.class
+}, before = {
     AppEngineServicesAutoConfiguration.class,
 })
 @Import({
@@ -183,7 +180,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
             @Qualifier("flowableAsyncTaskInvokerTaskExecutor") ObjectProvider<AsyncTaskExecutor> asyncTaskInvokerTaskExecutor,
             ObjectProvider<FlowableHttpClient> flowableHttpClient,
-            ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
+            ObjectProvider<AutoDeploymentStrategy<ProcessEngine>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -221,15 +218,9 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
         }
 
-        AsyncTaskExecutor taskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor.getIfAvailable();
-        if (taskInvokerTaskExecutor != null) {
-            conf.setAsyncTaskInvokerTaskExecutor(taskInvokerTaskExecutor);
-        }
+        asyncTaskInvokerTaskExecutor.ifAvailable(conf::setAsyncTaskInvokerTaskExecutor);
 
-        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
-        if (objectMapper != null) {
-            conf.setObjectMapper(objectMapper);
-        }
+        objectMapperProvider.ifAvailable(conf::setObjectMapper);
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 
@@ -286,11 +277,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         }
         conf.setIdGenerator(idGenerator);
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = processEngineAutoDeploymentStrategies.getIfAvailable();
-        if (deploymentStrategies == null) {
-            deploymentStrategies = new ArrayList<>();
-        }
+        List<AutoDeploymentStrategy<ProcessEngine>> deploymentStrategies = processEngineAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.BPMN);
 
         // Always add the out of the box auto deployment strategies as last

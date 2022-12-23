@@ -39,7 +39,7 @@
         <flowable.osgi.import.additional>
             org.junit.jupiter.api*;resolution:=optional,
             org.springframework*;resolution:=optional,
-            javax.transaction;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
             org.flowable.db.mapping;resolution:=optional,
             org.flowable.idm.engine.impl.persistence;resolution:=optional,
             org.flowable.common.db;resolution:=optional,
@@ -170,13 +170,13 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -25,11 +25,8 @@
         <module>flowable-spring-boot-sample-integration</module>
         <module>flowable-spring-boot-sample-custom-mybatis-mapper</module>
         <module>flowable-spring-boot-sample-dmn</module>
-        <module>flowable-spring-boot-sample-form</module>
-        <module>flowable-spring-boot-sample-content</module>
         <module>flowable-spring-boot-sample-cmmn</module>
         <module>flowable-spring-boot-sample-ldap</module>
-        <module>flowable-spring-boot-sample-rest-1.5.x</module>
         <module>flowable-spring-boot-sample-starter</module>
     </modules>
     <dependencies>

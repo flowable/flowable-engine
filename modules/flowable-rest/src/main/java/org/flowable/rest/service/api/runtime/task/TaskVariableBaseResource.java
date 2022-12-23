@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -30,6 +28,7 @@ import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +37,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 /**
  * @author Frederik Heremans
  */
-public class TaskVariableBaseResource extends TaskBaseResource {
+public class TaskVariableBaseResource extends TaskBaseResource implements InitializingBean {
 
     @Autowired
     protected Environment env;
@@ -48,8 +47,8 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
     protected boolean isSerializableVariableAllowed;
 
-    @PostConstruct
-    protected void postConstruct() {
+    @Override
+    public void afterPropertiesSet() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
     }
 

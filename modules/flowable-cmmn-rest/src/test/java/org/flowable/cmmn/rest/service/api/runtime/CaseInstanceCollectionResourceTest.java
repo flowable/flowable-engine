@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -39,11 +40,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
-import org.flowable.form.api.FormInstance;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 import org.flowable.task.api.Task;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -59,6 +63,15 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Jose Antonio Alvarez
  */
 public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
+
+    @Mock
+    protected FormService formEngineFormService;
 
     /**
      * Test getting a list of case instance, using all possible filters.
@@ -548,16 +561,23 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         assertThat(caseInstance.getTenantId()).isEqualTo("tenant2");
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn",
-            "org/flowable/cmmn/rest/service/api/runtime/simple.form" })
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
     public void testStartCaseWithForm() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
-        try {
-            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertThat(formDefinition).isNotNull();
 
-            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
-            assertThat(formInstance).isNull();
+        runUsingMocks(() -> {
+            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
+
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId(), caseDefinition.getTenantId(),
+                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
             String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_START_FORM, caseDefinition.getId());
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -566,11 +586,12 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
-                            + " id: '" + formDefinition.getId() + "',"
-                            + " key: '" + formDefinition.getKey() + "',"
-                            + " name: '" + formDefinition.getName() + "'"
+                            + " id: 'formDefId',"
+                            + " key: 'formDefKey',"
+                            + " name: 'Form Definition Name',"
+                            + " type: 'startForm',"
+                            + " definitionKey: 'oneHumanTaskCase'"
                             + "}");
-            assertThat(responseNode.get("fields")).hasSize(2);
 
             ArrayNode formVariablesNode = objectMapper.createArrayNode();
 
@@ -591,6 +612,12 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             requestNode.put("caseDefinitionKey", "oneHumanTaskCase");
             requestNode.set("startFormVariables", formVariablesNode);
 
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                    .thenReturn(formInfo);
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "simple string value", "number", 1234), null))
+                    .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             response = executeRequest(httpPost, HttpStatus.SC_CREATED);
@@ -598,30 +625,9 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().singleResult();
             assertThat(caseInstance).isNotNull();
 
-            assertThat(runtimeService.getVariable(caseInstance.getId(), "user")).isEqualTo("simple string value");
-            assertThat(runtimeService.getVariable(caseInstance.getId(), "number")).isEqualTo(1234);
-
-            formInstance = formEngineFormService.createFormInstanceQuery().formDefinitionId(formDefinition.getId()).singleResult();
-            assertThat(formInstance).isNotNull();
-            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
-            assertThat(valuesBytes).isNotNull();
-            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
-            JsonNode valuesNode = instanceNode.get("values");
-            assertThatJson(valuesNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " user: 'simple string value',"
-                            + " number: '1234'"
-                            + "}");
-
-        } finally {
-            formEngineFormService.deleteFormInstancesByScopeDefinition(caseDefinition.getId());
-
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-            for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-            }
-        }
+            assertThat(runtimeService.getVariable(caseInstance.getId(), "user")).isEqualTo("simple string value return");
+            assertThat(runtimeService.getVariable(caseInstance.getId(), "number")).isEqualTo(1234L);
+        });
     }
 
     @CmmnDeployment(resources = {

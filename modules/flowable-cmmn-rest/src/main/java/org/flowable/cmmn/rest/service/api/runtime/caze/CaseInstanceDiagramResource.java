@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRepositoryService;

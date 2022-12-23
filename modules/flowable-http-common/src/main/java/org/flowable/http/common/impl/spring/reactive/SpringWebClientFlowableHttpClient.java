@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -211,8 +213,11 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     protected HttpResponse toFlowableHttpResponse(ResponseEntity<ByteArrayResource> response) {
         HttpResponse responseInfo = new HttpResponse();
 
-        responseInfo.setStatusCode(response.getStatusCodeValue());
-        responseInfo.setReason(response.getStatusCode().getReasonPhrase());
+        HttpStatusCode statusCode = response.getStatusCode();
+        responseInfo.setStatusCode(statusCode.value());
+        if (statusCode instanceof HttpStatus httpStatus) {
+            responseInfo.setReason(httpStatus.getReasonPhrase());
+        }
 
         responseInfo.setHttpHeaders(toFlowableHeaders(response.getHeaders()));
 

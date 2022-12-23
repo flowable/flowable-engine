@@ -14,44 +14,67 @@ package org.flowable.cmmn.test.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.AbstractProcessEngineIntegrationTest;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.engine.FormEngines;
+import org.flowable.form.api.FormService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * @author Filip Hrisafov
  */
 public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEngineIntegrationTest {
 
-    protected FormRepositoryService formRepositoryService;
-    protected String formDeploymentId;
     protected String processDeploymentId;
 
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formService;
+
+    @Mock
+    protected FormFieldHandler formFieldHandler;
+
+    protected FormFieldHandler originalFormFieldHandler;
+
     @Before
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setUp() {
-        FormEngine formEngine = FormEngines.getDefaultFormEngine();
-        this.formRepositoryService = formEngine.getFormRepositoryService();
+        originalFormFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
+        cmmnEngineConfiguration.setFormFieldHandler(formFieldHandler);
+        Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
     @After
     public void tearDown() {
-        if (this.formDeploymentId != null) {
-            this.formRepositoryService.deleteDeployment(this.formDeploymentId, true);
-        }
-
+        cmmnEngineConfiguration.setFormFieldHandler(originalFormFieldHandler);
+        cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         if (processDeploymentId != null) {
             this.processEngineRepositoryService.deleteDeployment(processDeploymentId, true);
         }
@@ -64,12 +87,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNotNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "50"), "testOutcome"))
+                .thenReturn(Map.of(
+                        "intVar", 50L,
+                        "form_transitionForm_outcome", "testOutcome"
+                ));
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
@@ -86,6 +110,10 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("intVar", 50L),
                         entry("form_transitionForm_outcome", "testOutcome")
                 );
+
+        verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), ScopeTypes.CMMN,
+                Map.of("intVar", 50L, "form_transitionForm_outcome", "testOutcome"),
+                caseInstance.getTenantId());
     }
 
     @Test
@@ -94,12 +122,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "100"), "test"))
+                .thenReturn(Map.of(
+                        "intVar", 100L,
+                        "form_transitionForm_outcome", "test"
+                ));
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
@@ -126,12 +155,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "150"), "transition"))
+                .thenReturn(Map.of(
+                        "intVar", 150L,
+                        "form_transitionForm_outcome", "transition"
+                ));
 
         // Need to enable before disabling
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
@@ -162,12 +192,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "15"), "anotherTest"))
+                .thenReturn(Map.of(
+                        "intVar", 15L,
+                        "form_transitionForm_outcome", "anotherTest"
+                ));
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
@@ -199,12 +230,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult()).isNull();
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "135"), "child"))
+                .thenReturn(Map.of(
+                        "intVar", 135L,
+                        "form_transitionForm_outcome", "child"
+                ));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -239,12 +271,13 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "500"), "childForm"))
+                .thenReturn(Map.of(
+                        "intVar", 500L,
+                        "form_transitionForm_outcome", "childForm"
+                ));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -279,17 +312,18 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult()).isNull();
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "77"), "childProcess"))
+                .thenReturn(Map.of(
+                        "intVar", 77L,
+                        "form_transitionForm_outcome", "childProcess"
+                ));
 
         processDeploymentId = processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
                 .deploy()
                 .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -321,17 +355,18 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).isEmpty();
 
-        formDeploymentId = formRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/form/PlanItemInstanceTransitionBuilderFormTest.transitionForm.form")
-                .deploy()
-                .getId();
+        FormInfo formInfo = new FormInfo();
+        when(formEngineConfiguration.getFormService()).thenReturn(formService);
+        when(formService.getVariablesFromFormSubmission(formInfo, Collections.singletonMap("intVar", "42"), "childProcessForm"))
+                .thenReturn(Map.of(
+                        "intVar", 42L,
+                        "form_transitionForm_outcome", "childProcessForm"
+                ));
 
         processDeploymentId = processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
                 .deploy()
                 .getId();
-
-        FormInfo formInfo = formRepositoryService.getFormModelByKey("transitionForm");
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);

@@ -144,7 +144,7 @@ The implementation consists of two classes:
 
 -   An implementation of the *org.flowable.engine.impl.asyncexecutor.JobManager* interface that puts a message on a message queue instead of passing it to the thread pool.
 
--   A *javax.jms.MessageListener* implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
+-   A *jakarta.jms.MessageListener* implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
 
 First of all, add the *flowable-jms-spring-executor* dependency to your project:
 

@@ -159,11 +159,6 @@ public class EngineConfiguration {
     }
     
     @Bean
-    public EventRegistryEngineConfiguration eventRegistryEngineConfiguration(ProcessEngine processEngine) {
-        return getEventRegistryEngineConfiguration(processEngine);
-    }
-    
-    @Bean
     public IdmIdentityService idmIdentityService(ProcessEngine processEngine) {
         return getIdmEngineConfiguration(processEngine).getIdmIdentityService();
     }

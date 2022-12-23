@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.48.v20220622</jetty.version>
+        <jetty.version>11.0.2</jetty.version>
         <flowable.osgi.import.pkg>*</flowable.osgi.import.pkg>
         <flowable.artifact>
             org.flowable.http
@@ -157,8 +157,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

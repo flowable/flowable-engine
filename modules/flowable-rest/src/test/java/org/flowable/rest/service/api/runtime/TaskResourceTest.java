@@ -16,9 +16,12 @@ package org.flowable.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,20 +31,28 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
-import org.flowable.form.api.FormInstance;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -56,6 +67,29 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Frederik Heremans
  */
 public class TaskResourceTest extends BaseSpringRestTestCase {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
+
+    @Before
+    public void initializeMocks() {
+        Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @After
+    public void resetMocks() {
+        processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
 
     /**
      * Test getting a single task, spawned by a process. GET runtime/tasks/{taskId}
@@ -536,86 +570,75 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment
     public void testCompleteTaskWithForm() throws Exception {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
-        try {
-            formRepositoryService.createDeployment().addClasspathResource("org/flowable/rest/service/api/runtime/simple.form").deploy();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        String taskId = task.getId();
 
-            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertThat(formDefinition).isNotNull();
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId("formDefId");
+        formInfo.setKey("formDefKey");
+        formInfo.setName("Form Definition Name");
 
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            String taskId = task.getId();
+        when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+        when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", processInstance.getDeploymentId(), taskId,
+                Collections.emptyMap(), task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant()))
+                .thenReturn(formInfo);
 
-            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_FORM, taskId);
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + "id : '" + formDefinition.getId() + "',"
-                            + "key: '" + formDefinition.getKey() + "',"
-                            + "name: '" + formDefinition.getName() + "'"
-                            + "}");
-            assertThat(responseNode.get("fields")).hasSize(2);
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_FORM, taskId);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: 'formDefId',"
+                        + "name: 'Form Definition Name',"
+                        + "key: 'formDefKey',"
+                        + "type: 'taskForm',"
+                        + "taskId: '" + taskId + "'"
+                        + "}");
 
-            ObjectNode requestNode = objectMapper.createObjectNode();
-            ArrayNode variablesNode = objectMapper.createArrayNode();
-            requestNode.put("action", "complete");
-            requestNode.put("formDefinitionId", formDefinition.getId());
-            requestNode.set("variables", variablesNode);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode variablesNode = objectMapper.createArrayNode();
+        requestNode.put("action", "complete");
+        requestNode.put("formDefinitionId", "formDefId");
+        requestNode.set("variables", variablesNode);
 
-            ObjectNode var1 = objectMapper.createObjectNode();
-            variablesNode.add(var1);
-            var1.put("name", "user");
-            var1.put("value", "First value");
-            ObjectNode var2 = objectMapper.createObjectNode();
-            variablesNode.add(var2);
-            var2.put("name", "number");
-            var2.put("value", 789);
+        ObjectNode var1 = objectMapper.createObjectNode();
+        variablesNode.add(var1);
+        var1.put("name", "user");
+        var1.put("value", "First value");
+        ObjectNode var2 = objectMapper.createObjectNode();
+        variablesNode.add(var2);
+        var2.put("name", "number");
+        var2.put("value", 789);
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
-            httpPost.setEntity(new StringEntity(requestNode.toString()));
-            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "First value", "number", 789), null))
+                .thenReturn(Map.of("user", "First value return", "number", 789L));
 
-            task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            assertThat(task).isNull();
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().taskId(taskId).singleResult();
-            assertThat(formInstance).isNotNull();
-            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
-            assertThat(valuesBytes).isNotNull();
-            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
-            JsonNode valuesNode = instanceNode.get("values");
-            assertThatJson(valuesNode)
-                    .isEqualTo("{"
-                            + "  user: 'First value',"
-                            + "  number: '789'"
-                            + "}");
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        assertThat(task).isNull();
 
-            if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-                assertThat(historicTaskInstance).isNotNull();
-                List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
-                        .list();
-                assertThat(variables).isNotNull();
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertThat(historicTaskInstance).isNotNull();
+            List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                    .list();
+            assertThat(variables).isNotNull();
 
-                assertThat(variables)
-                        .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
-                        .containsExactlyInAnyOrder(
-                                tuple("user", "First value"),
-                                tuple("number", 789));
-            }
-
-        } finally {
-            formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
-
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-            for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-            }
+            assertThat(variables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("user", "First value return"),
+                            tuple("number", 789L));
         }
+
     }
 
     /**

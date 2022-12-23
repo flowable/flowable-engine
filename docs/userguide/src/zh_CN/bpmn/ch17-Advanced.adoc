@@ -77,7 +77,7 @@ Flowable有两种作业类型：定时器（例如边界事件或用户任务中
 
 * __org.flowable.engine.impl.asyncexecutor.JobManager__接口的实现，将消息发送至消息队列而不是线程池。
 
-* __javax.jms.MessageListener__接口的实现。从消息队列中消费消息，并使用消息中的作业标识获取及执行该作业。
+* __jakarta.jms.MessageListener__接口的实现。从消息队列中消费消息，并使用消息中的作业标识获取及执行该作业。
 
 首先添加__flowable-jms-spring-executor__依赖：
 

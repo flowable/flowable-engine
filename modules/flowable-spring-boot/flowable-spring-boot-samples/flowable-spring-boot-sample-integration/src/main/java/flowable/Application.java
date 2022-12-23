@@ -24,9 +24,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.integration.core.GenericHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.handler.GenericHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -67,7 +66,7 @@ public class Application {
 
     @Bean
     IntegrationFlow inboundProcess(FlowableInboundGateway inboundGateway) {
-        return IntegrationFlows
+        return IntegrationFlow
                 .from(inboundGateway)
                 .handle(new GenericHandler<DelegateExecution>() {
                     @Override

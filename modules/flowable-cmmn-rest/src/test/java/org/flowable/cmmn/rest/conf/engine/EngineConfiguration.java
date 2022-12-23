@@ -24,16 +24,10 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.rest.conf.MockFormHandlerRestApiInterceptor;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.FormEngines;
-import org.flowable.form.engine.configurator.FormEngineConfigurator;
-import org.flowable.form.spring.SpringFormEngineConfiguration;
-import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +35,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -85,8 +81,7 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "cmmnEngineConfiguration")
-    public CmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
-        FormEngineConfigurator formEngineConfigurator) {
+    public CmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
         SpringCmmnEngineConfiguration cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
         cmmnEngineConfiguration.setDataSource(dataSource);
         cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -94,35 +89,9 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
-        cmmnEngineConfiguration.addConfigurator(formEngineConfigurator);
         return cmmnEngineConfiguration;
     }
     
-    @Bean
-    public SpringFormEngineConfigurator formEngineConfigurator(FormEngineConfiguration formEngineConfiguration) {
-        SpringFormEngineConfigurator formEngineConfigurator =  new SpringFormEngineConfigurator();
-        formEngineConfigurator.setFormEngineConfiguration(formEngineConfiguration);
-        return formEngineConfigurator;
-    }
-    
-    @Bean(name = "formEngineConfiguration")
-    public FormEngineConfiguration formEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
-        SpringFormEngineConfiguration formEngineConfiguration = new SpringFormEngineConfiguration();
-        formEngineConfiguration.setDataSource(dataSource);
-        formEngineConfiguration.setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        formEngineConfiguration.setTransactionManager(transactionManager);
-        return formEngineConfiguration;
-    }
-
-    @Bean
-    public FormEngine formEngine(@SuppressWarnings("unused") CmmnEngine cmmnEngine) {
-        // The cmmn engine needs to be injected, as otherwise it won't be initialized, which means that the FormEngine is not initialized yet
-        if (!FormEngines.isInitialized()) {
-            throw new IllegalStateException("form engine has not been initialized");
-        }
-        return FormEngines.getDefaultFormEngine();
-    }
-
     @Bean
     public CmmnRepositoryService cmmnRepositoryService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnRepositoryService();
@@ -157,14 +126,9 @@ public class EngineConfiguration {
     public IdmIdentityService idmIdentityService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnEngineConfiguration().getIdmIdentityService();
     }
-    
+
     @Bean
-    public FormRepositoryService formRepositoryService(FormEngine formEngine) {
-        return formEngine.getFormRepositoryService();
-    }
-    
-    @Bean
-    public org.flowable.form.api.FormService formEngineFormService(FormEngine formEngine) {
-        return formEngine.getFormService();
+    public MockFormHandlerRestApiInterceptor formHandlerRestApiInterceptor(ObjectMapper objectMapper) {
+        return new MockFormHandlerRestApiInterceptor(objectMapper);
     }
 }

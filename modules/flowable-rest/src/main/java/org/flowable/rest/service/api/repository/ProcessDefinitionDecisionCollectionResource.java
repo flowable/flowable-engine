@@ -14,7 +14,7 @@ package org.flowable.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.repository.ProcessDefinition;

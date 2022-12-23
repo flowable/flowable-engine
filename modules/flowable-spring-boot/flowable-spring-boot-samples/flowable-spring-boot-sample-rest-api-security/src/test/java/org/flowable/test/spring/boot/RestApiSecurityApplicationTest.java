@@ -22,17 +22,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.common.rest.api.DataResponse;
-import org.flowable.content.rest.service.api.content.ContentItemResponse;
 import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
-import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -151,24 +149,6 @@ public class RestApiSecurityApplicationTest {
     }
 
     @Test
-    public void testContentRestApiIntegrationWithAuthentication() {
-        String processDefinitionsUrl = "http://localhost:" + serverPort + "/content-api/content-service/content-items";
-
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
-        ResponseEntity<DataResponse<ContentItemResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<ContentItemResponse>>() {
-            });
-
-        assertThat(response.getStatusCode())
-            .as("Status code")
-            .isEqualTo(HttpStatus.OK);
-        DataResponse<ContentItemResponse> contentItems = response.getBody();
-        assertThat(contentItems).isNotNull();
-        assertThat(contentItems.getData())
-            .isEmpty();
-        assertThat(contentItems.getTotal()).isZero();
-    }
-    @Test
     public void testDmnRestApiIntegrationWithAuthentication() {
         String processDefinitionsUrl = "http://localhost:" + serverPort + "/dmn-api/dmn-repository/deployments";
 
@@ -185,24 +165,6 @@ public class RestApiSecurityApplicationTest {
         assertThat(deployments.getData())
             .isEmpty();
         assertThat(deployments.getTotal()).isZero();
-    }
-    @Test
-    public void testFormRestApiIntegrationWithAuthentication() {
-        String processDefinitionsUrl = "http://localhost:" + serverPort + "/form-api/form-repository/form-definitions";
-
-        HttpEntity<?> request = new HttpEntity<>(createHeaders("filiphr", "password"));
-        ResponseEntity<DataResponse<FormDefinitionResponse>> response = restTemplate
-            .exchange(processDefinitionsUrl, HttpMethod.GET, request, new ParameterizedTypeReference<DataResponse<FormDefinitionResponse>>() {
-            });
-
-        assertThat(response.getStatusCode())
-            .as("Status code")
-            .isEqualTo(HttpStatus.OK);
-        DataResponse<FormDefinitionResponse> formDefinitions = response.getBody();
-        assertThat(formDefinitions).isNotNull();
-        assertThat(formDefinitions.getData())
-            .isEmpty();
-        assertThat(formDefinitions.getTotal()).isZero();
     }
     @Test
     public void testIdmRestApiIntegrationWithAuthentication() {

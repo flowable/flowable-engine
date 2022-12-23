@@ -19,8 +19,8 @@ import static org.awaitility.Awaitility.await;
 import java.time.Duration;
 import java.util.List;
 
-import javax.jms.Message;
-import javax.jms.TextMessage;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;

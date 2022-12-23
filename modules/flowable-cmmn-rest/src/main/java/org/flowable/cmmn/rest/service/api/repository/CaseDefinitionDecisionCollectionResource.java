@@ -14,7 +14,7 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.dmn.api.DmnDecision;

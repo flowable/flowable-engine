@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -26,6 +26,8 @@ import org.flowable.cmmn.rest.service.api.CmmnFormHandlerRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.FormModelResponse;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.model.SimpleFormModel;
@@ -52,9 +54,6 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
     
     @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    
-    @Autowired(required=false)
-    protected FormRepositoryService formRepositoryService;
     
     @Autowired(required=false)
     protected CmmnFormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
@@ -110,12 +109,18 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/start-form", produces = "application/json")
     public String getProcessDefinitionStartForm(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
+        FormEngineConfigurationApi formEngineConfiguration = (FormEngineConfigurationApi) cmmnEngineConfiguration.getEngineConfigurations().get(
+                EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+        if (formEngineConfiguration == null) {
+            return null;
+        }
+        FormRepositoryService formRepositoryService = formEngineConfiguration.getFormRepositoryService();
         if (formRepositoryService == null) {
             return null;
         }
         
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
-        FormInfo formInfo = getStartForm(caseDefinition);
+        FormInfo formInfo = getStartForm(formRepositoryService, caseDefinition);
         if (formHandlerRestApiInterceptor != null) {
             return formHandlerRestApiInterceptor.convertStartFormInfo(formInfo, caseDefinition);
         } else {
@@ -124,7 +129,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         }
     }
     
-    protected FormInfo getStartForm(CaseDefinition caseDefinition) {
+    protected FormInfo getStartForm(FormRepositoryService formRepositoryService, CaseDefinition caseDefinition) {
         FormInfo formInfo = null;
         CmmnModel cmmnModel = repositoryService.getCmmnModel(caseDefinition.getId());
         Case caze = cmmnModel.getCaseById(caseDefinition.getKey());

@@ -15,9 +15,9 @@ package org.flowable.cdi.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
@@ -25,7 +25,7 @@ import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 
 /**
- * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.
+ * Resolver wrapping an instance of jakarta.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.
  *
  * This {@link ELResolver} implementation performs lazy lookup of the Cdi-BeanManager and can thus be configured using the spring-based configuration of the process engine:
  *
@@ -44,10 +44,10 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
  */
 public class CdiResolver extends ELResolver {
 
-    protected javax.el.ELContext context;
+    protected jakarta.el.ELContext context;
 
     public CdiResolver() {
-        context = new javax.el.ELContext() {
+        context = new jakarta.el.ELContext() {
 
             @Override
             public VariableMapper getVariableMapper() {
@@ -60,7 +60,7 @@ public class CdiResolver extends ELResolver {
             }
 
             @Override
-            public javax.el.ELResolver getELResolver() {
+            public jakarta.el.ELResolver getELResolver() {
                 return getWrappedResolver();
             }
         };
@@ -70,9 +70,9 @@ public class CdiResolver extends ELResolver {
         return BeanManagerLookup.getBeanManager();
     }
 
-    protected javax.el.ELResolver getWrappedResolver() {
+    protected jakarta.el.ELResolver getWrappedResolver() {
         BeanManager beanManager = getBeanManager();
-        javax.el.ELResolver resolver = beanManager.getELResolver();
+        jakarta.el.ELResolver resolver = beanManager.getELResolver();
         return resolver;
     }
 

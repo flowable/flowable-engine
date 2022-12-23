@@ -43,13 +43,13 @@
             <artifactId>joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.enterprise.concurrent</groupId>
-            <artifactId>javax.enterprise.concurrent-api</artifactId>
+			<groupId>jakarta.enterprise.concurrent</groupId>
+			<artifactId>jakarta.enterprise.concurrent-api</artifactId>
             <scope>provided</scope>
         </dependency>
 		<dependency>
@@ -105,7 +105,7 @@
 			org.flowable.job.service.db.mapping.entity
 		</flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            javax.enterprise.concurrent;resolution:=optional,
+            jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
 	</properties>
 

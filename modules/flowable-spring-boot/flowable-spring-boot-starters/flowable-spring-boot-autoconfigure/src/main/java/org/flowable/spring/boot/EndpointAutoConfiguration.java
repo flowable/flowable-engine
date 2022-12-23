@@ -18,17 +18,17 @@ import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineMvcEndpoint;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * The idea behind this module is that Spring Security could talk to the {@link org.flowable.engine.IdentityService} as required.
  *
  * @author Josh Long
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnClass(Endpoint.class)
 @ConditionalOnProcessEngine
 public class EndpointAutoConfiguration {

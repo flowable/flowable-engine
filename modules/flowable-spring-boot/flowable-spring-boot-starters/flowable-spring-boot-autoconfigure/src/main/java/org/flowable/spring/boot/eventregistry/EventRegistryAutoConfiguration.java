@@ -13,8 +13,8 @@
 package org.flowable.spring.boot.eventregistry;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -50,8 +50,7 @@ import org.flowable.spring.boot.condition.ConditionalOnEventRegistry;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -75,21 +74,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Auto configuration for the event registry.
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnEventRegistry
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableEventRegistryProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
     KafkaAutoConfiguration.class,
     JmsAutoConfiguration.class,
     RabbitAutoConfiguration.class,
-})
-@AutoConfigureBefore({
+}, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
 })
@@ -112,9 +109,8 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
         ObjectProvider<ObjectMapper> objectMapperProvider,
-        ObjectProvider<List<ChannelModelProcessor>> channelModelProcessors,
-        ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies,
-        ObjectProvider<TaskScheduler> taskScheduler,
+        ObjectProvider<ChannelModelProcessor> channelModelProcessors,
+        ObjectProvider<AutoDeploymentStrategy<EventRegistryEngine>> eventAutoDeploymentStrategies,
         ObjectProvider<EventRegistryChangeDetectionExecutor> eventRegistryChangeDetectionExecutor
     ) throws IOException {
 
@@ -133,16 +129,9 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
-        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
-        if (objectMapper != null) {
-            configuration.setObjectMapper(objectMapper);
-        }
+        objectMapperProvider.ifAvailable(configuration::setObjectMapper);
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = eventAutoDeploymentStrategies.getIfAvailable();
-        if (deploymentStrategies == null) {
-            deploymentStrategies = new ArrayList<>();
-        }
+        List<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = eventAutoDeploymentStrategies.orderedStream().collect(Collectors.toList());
 
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.EVENT_REGISTRY);
         // Always add the out of the box auto deployment strategies as last
@@ -151,19 +140,15 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         configuration.setDeploymentStrategies(deploymentStrategies);
 
-        // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
-        List<ChannelModelProcessor> channelProcessors = channelModelProcessors.getIfAvailable();
-        if (channelProcessors != null && channelProcessors.size() > 0) {
+        List<ChannelModelProcessor> channelProcessors = channelModelProcessors.orderedStream().collect(Collectors.toList());
+        if (channelProcessors.size() > 0) {
             for (ChannelModelProcessor channelModelProcessor : channelProcessors) {
                 configuration.addChannelModelProcessor(channelModelProcessor);
             }
         }
 
         configuration.setEnableEventRegistryChangeDetection(eventProperties.isEnableChangeDetection());
-        EventRegistryChangeDetectionExecutor changeDetectionExecutor = eventRegistryChangeDetectionExecutor.getIfAvailable();
-        if (changeDetectionExecutor != null) {
-            configuration.setEventRegistryChangeDetectionExecutor(changeDetectionExecutor);
-        }
+        eventRegistryChangeDetectionExecutor.ifAvailable(configuration::setEventRegistryChangeDetectionExecutor);
 
         return configuration;
     }

@@ -17,7 +17,7 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
