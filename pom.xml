@@ -8,7 +8,7 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>6.8.0</version>
+	<version>6.8.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
