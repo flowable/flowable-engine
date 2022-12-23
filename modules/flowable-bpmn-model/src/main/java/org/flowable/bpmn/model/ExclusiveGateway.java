@@ -14,10 +14,11 @@ package org.flowable.bpmn.model;
 
 /**
  * @author Tijs Rademakers
+ * @author Dominik Simmen
  */
 public class ExclusiveGateway extends Gateway {
 
-    protected boolean markerVisible;
+    protected boolean markerVisible = true;
 
     public boolean isMarkerVisible() {
         return markerVisible;

@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.ExtensionAttribute;
 
 /**
  * @author Tijs Rademakers
+ * @author Dominik Simmen
  */
 public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
 
@@ -49,7 +50,10 @@ public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
         ExclusiveGateway gateway = new ExclusiveGateway();
         BpmnXMLUtil.addXMLLocation(gateway, xtr);
         
-        gateway.setMarkerVisible(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, xtr)));
+        String isMarkerVisibleAttribute = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, xtr);
+        if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(isMarkerVisibleAttribute)) {
+            gateway.setMarkerVisible(false);
+        }
 
         BpmnXMLUtil.addCustomAttributes(xtr, gateway, defaultElementAttributes, defaultActivityAttributes, defaultExclusiveGatewayAttributes);
         
@@ -60,8 +64,9 @@ public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         ExclusiveGateway gateway = (ExclusiveGateway) element;
-        if (gateway.isMarkerVisible()) {
-            writeQualifiedAttribute(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, "true", xtw);
+        if (!gateway.isMarkerVisible()) {
+            // default value is true
+            writeQualifiedAttribute(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, "false", xtw);
         }
     }
 
