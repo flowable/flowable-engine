@@ -58,7 +58,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,mssql
-          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -108,7 +108,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -Pdmn,mssql
-          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
