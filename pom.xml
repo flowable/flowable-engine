@@ -907,7 +907,7 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>4.17.2</version>
+				<version>4.9.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>javax.xml.bind</groupId>
