@@ -806,7 +806,7 @@
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
       <if test="activeActivityId != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
@@ -1087,7 +1087,7 @@
             or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.nameLikeIgnoreCase != null">
-            or lower(RES.NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
+            or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.activeActivityId != null">
 	        or EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{orQueryObject.activeActivityId} and A.END_TIME_ is null)

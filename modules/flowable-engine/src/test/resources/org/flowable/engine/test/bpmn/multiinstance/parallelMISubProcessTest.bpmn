@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <process id="parallelSubprocessTest" name="Parallel Subprocess Test" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false" />
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="variableActivity1" />
+    <serviceTask id="variableActivity1" name="Initialize variables" flowable:async="true" flowable:expression="${true}" />
+    <sequenceFlow id="sequenceFlow6" sourceRef="variableActivity1" targetRef="expandedSubProcess1" />
+    <subProcess id="expandedSubProcess1" name="Subprocess" flowable:async="true" flowable:exclusive="false">
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="array" flowable:elementVariable="el">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="startNoneEvent2" flowable:initiator="initiator" flowable:formFieldValidation="false" />
+      <callActivity id="callActivity1" name="Call activity" calledElement="testSubproc" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+        <extensionElements>
+          <flowable:in source="el" target="el"></flowable:in>
+        </extensionElements>
+      </callActivity>
+      <endEvent id="endNoneEvent1" />
+      <sequenceFlow id="sequenceFlow2" sourceRef="startNoneEvent2" targetRef="callActivity1" />
+      <sequenceFlow id="sequenceFlow3" sourceRef="callActivity1" targetRef="endNoneEvent1" />
+    </subProcess>
+    <userTask id="formTask1" flowable:assignee="${initiator}" flowable:formFieldValidation="false" />
+    <sequenceFlow id="sequenceFlow4" sourceRef="expandedSubProcess1" targetRef="formTask1" />
+    <endEvent id="endNoneEvent2" />
+    <sequenceFlow id="sequenceFlow5" sourceRef="formTask1" targetRef="endNoneEvent2" />
+  </process>
+</definitions>

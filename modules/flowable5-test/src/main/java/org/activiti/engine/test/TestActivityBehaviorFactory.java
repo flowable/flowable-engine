@@ -210,16 +210,6 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
-    public ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(serviceTask, bpmnModel);
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(sendTask, bpmnModel);
-    }
-
-    @Override
     public ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
         return wrappedActivityBehaviorFactory.createCamelActivityBehavior(serviceTask, bpmnModel);
     }

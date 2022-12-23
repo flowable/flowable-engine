@@ -17,10 +17,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
-import org.flowable.variable.api.delegate.VariableScope;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -37,38 +38,32 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope) {
-        return super.evaluateWithEvaluationResult(script, language, variableScope);
+    public ScriptEvaluation evaluate(ScriptEngineRequest request) {
+        return super.evaluate(request);
     }
 
     @Override
-    public ScriptEvaluation evaluateWithEvaluationResult(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return super.evaluateWithEvaluationResult(script, language, variableScope, storeScriptVariables);
+    public Object evaluate(String script, String language, VariableContainer variableContainer) {
+        return super.evaluate(script, language, variableContainer);
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope) {
-        return super.evaluate(script, language, variableScope);
+    public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
+        return super.evaluate(script, language, variableContainer, storeScriptVariables);
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return super.evaluate(script, language, variableScope, storeScriptVariables);
-    }
-
-    @Override
-    protected Object evaluate(String script, String language, Bindings bindings) {
+    protected Object evaluate(ScriptEngineRequest request, Bindings bindings) {
         ScriptEngine scriptEngine = null;
         try {
-            scriptEngine = Extender.resolveScriptEngine(language);
+            scriptEngine = Extender.resolveScriptEngine(request.getLanguage());
         } catch (InvalidSyntaxException e) {
             throw new FlowableException("problem resolving scripting engine: " + e.getMessage(), e);
         }
 
         if (scriptEngine == null) {
-            return super.evaluate(script, language, bindings);
+            return super.evaluate(request, bindings);
         }
-
-        return evaluate(scriptEngine, script, bindings);
+        return evaluate(scriptEngine, request, bindings);
     }
 }

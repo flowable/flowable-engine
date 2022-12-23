@@ -6,6 +6,7 @@
             <planItem id="planItem2" name="Expression" definitionRef="sid-36995D0E-BAB2-44F2-ADD4-FD9070AFD6CA"></planItem>
             <planItem id="planItem3" name="DelegateExpression" definitionRef="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65A"></planItem>
             <planItem id="planItem4" name="Keepalive" definitionRef="sid-2AE0D6C4-4B00-4050-812D-D2892FE7FC78"></planItem>
+            <planItem id="planItem5" name="ScriptJavascript " definitionRef="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65B"></planItem>
             <humanTask id="sid-76EE6CD0-6531-48D6-ACDE-5F20A7E90000" name="Class">
                 <extensionElements>
                     <flowable:taskListener event="complete" class="org.flowable.cmmn.test.listener.TestTaskListener"></flowable:taskListener>
@@ -22,6 +23,18 @@
                 </extensionElements>
             </humanTask>
             <humanTask id="sid-2AE0D6C4-4B00-4050-812D-D2892FE7FC78" name="Keepalive"></humanTask>
+            <humanTask id="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65B" name="ScriptJavascript">
+                <extensionElements>
+                    <flowable:taskListener event="complete" type="script">
+                        <flowable:script language="javascript" resultVariable="javascriptResult">
+                            var scriptLocalVar = "XXXHello World from JavaScript";
+                            task.setVariable('javaScriptVariable', 'setInJavaScript');
+                            var retVal = scriptLocalVar.substring(3);
+                            retVal;
+                        </flowable:script>
+                    </flowable:taskListener>
+                </extensionElements>
+            </humanTask>
         </casePlanModel>
     </case>
     <cmmndi:CMMNDI>

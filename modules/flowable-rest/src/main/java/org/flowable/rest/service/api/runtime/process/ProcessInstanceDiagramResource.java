@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import java.io.InputStream;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;

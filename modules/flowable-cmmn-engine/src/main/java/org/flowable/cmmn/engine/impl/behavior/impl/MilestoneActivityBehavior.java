@@ -30,22 +30,33 @@ public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     
     protected Expression milestoneNameExpression;
     protected String milestoneVariable;
-    
-    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable) {
+    protected String businessStatus;
+
+    public MilestoneActivityBehavior(Expression milestoneNameExpression, String milestoneVariable, String businessStatus) {
         this.milestoneNameExpression = milestoneNameExpression;
         this.milestoneVariable = milestoneVariable;
+        this.businessStatus = businessStatus;
     }
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(planItemInstanceEntity, commandContext);
 
+        ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+
         if (StringUtils.isNotEmpty(milestoneVariable)) {
-            ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
             Expression milestoneVariableExpression = expressionManager.createExpression(milestoneVariable);
             String actualMilestoneVariable = (String) milestoneVariableExpression.getValue(planItemInstanceEntity);
             if (StringUtils.isNotEmpty(actualMilestoneVariable)) {
                 planItemInstanceEntity.setVariable(actualMilestoneVariable, true);
+            }
+        }
+
+        if (StringUtils.isNotEmpty(businessStatus)) {
+            Expression businessStatusExpression = expressionManager.createExpression(businessStatus);
+            String actualBusinessStatus = (String) businessStatusExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatus)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(milestoneInstanceEntity.getCaseInstanceId(), actualBusinessStatus);
             }
         }
 

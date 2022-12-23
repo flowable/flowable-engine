@@ -12,7 +12,7 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;

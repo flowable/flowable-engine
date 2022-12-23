@@ -15,7 +15,7 @@ package org.flowable.spring.boot.environment;
 import java.util.List;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.env.PropertySourceLoader;
 import org.springframework.core.Ordered;
@@ -31,7 +31,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  */
 public class FlowableDefaultPropertiesEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    public static final int DEFAULT_ORDER = ConfigFileApplicationListener.DEFAULT_ORDER + 10;
+    public static final int DEFAULT_ORDER = ConfigDataEnvironmentPostProcessor.ORDER + 10;
 
     private static final String DEFAULT_NAME = "flowable-default";
 

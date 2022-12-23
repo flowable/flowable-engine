@@ -318,7 +318,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
         }
 
-        this.onlyTimers = true;
+        this.onlyExternalWorkers = true;
         return this;
     }
 

@@ -738,7 +738,19 @@ public class RestResponseFactory {
             result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, variableInstance.getProcessInstanceId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
+        result.setExecutionId(variableInstance.getExecutionId());
+
+        RestVariableScope scope;
+        if (variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId())
+                || variableInstance.getTaskId() != null) {
+            scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
+        }
+
+        result.setVariable(
+                createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false,
+                        urlBuilder));
         return result;
     }
 
@@ -982,8 +994,18 @@ public class RestResponseFactory {
         if (variableInstance.getProcessInstanceId() != null) {
             result.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, variableInstance.getProcessInstanceId()));
         }
+
+        RestVariableScope scope;
+        if (variableInstance.getExecutionId() != null && !variableInstance.getExecutionId().equals(variableInstance.getProcessInstanceId())
+                || variableInstance.getTaskId() != null) {
+            scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
+        }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
+        result.setExecutionId(variableInstance.getExecutionId());
+        result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), scope, variableInstance.getId(),
+                VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
         return result;
     }
 

@@ -30,8 +30,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -103,7 +105,18 @@ public class TaskHelper {
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        boolean bpmnErrorPropagated = false;
+        try {
+            processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        } catch (BpmnError bpmnError) {
+            if (taskEntity.getExecutionId() != null) {
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                if (execution != null) {
+                    ErrorPropagation.propagateError(bpmnError, execution);
+                    bpmnErrorPropagated = true;
+                }
+            }
+        }
 
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
@@ -154,7 +167,7 @@ public class TaskHelper {
         deleteTask(taskEntity, null, false, true, true);
 
         // Continue process (if not a standalone task)
-        if (taskEntity.getExecutionId() != null) {
+        if (taskEntity.getExecutionId() != null && !bpmnErrorPropagated) {
             ExecutionEntity executionEntity = processEngineConfiguration.getExecutionEntityManager().findById(taskEntity.getExecutionId());
             CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
         }
@@ -319,8 +332,15 @@ public class TaskHelper {
             fireEvents = fireEvents && eventDispatcher != null && eventDispatcher.isEnabled();
 
             if (fireTaskListener) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
-                        .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
+                try {
+                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
+                            .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
+                } catch (BpmnError bpmnError) {
+                    ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
+                    if (execution != null) {
+                        ErrorPropagation.propagateError(bpmnError, execution);
+                    }
+                }
             }
 
             task.setDeleted(true);
@@ -603,7 +623,11 @@ public class TaskHelper {
 
     protected static void fireAssignmentEvents(TaskEntity taskEntity) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+        try {
+            processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+        } catch (BpmnError e) {
+            ErrorPropagation.propagateError(e, CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId()));
+        }
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {

@@ -19,7 +19,7 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.HasScriptInfo;
 import org.flowable.bpmn.model.ScriptInfo;
 
 /**
@@ -34,7 +34,7 @@ public class ScriptInfoParser extends BaseChildElementParser {
 
     @Override
     public boolean accepts(BaseElement element) {
-        return element instanceof FlowableListener;
+        return element instanceof HasScriptInfo;
     }
 
     @Override
@@ -54,10 +54,10 @@ public class ScriptInfoParser extends BaseChildElementParser {
             String elementText = xtr.getElementText();
 
             if (StringUtils.isNotEmpty(elementText)) {
-                script.setScript(elementText);
+                script.setScript(StringUtils.trim(elementText));
             }
-            if (parentElement instanceof FlowableListener) {
-                ((FlowableListener) parentElement).setScriptInfo(script);
+            if (parentElement instanceof HasScriptInfo) {
+                ((HasScriptInfo) parentElement).setScriptInfo(script);
             }
         }
     }

@@ -15,7 +15,7 @@ package org.flowable.eventregistry.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.eventregistry.api.EventDeployment;

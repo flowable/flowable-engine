@@ -168,10 +168,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     xtr.next();
                     if (xtr.isStartElement()) {
                         if (CmmnXmlConstants.ELEMENT_CONDITION.equals(xtr.getLocalName())) {
-                            xtr.next();
-                            if (xtr.isCharacters()) {
-                                completionNeutralRule.setCondition(xtr.getText());
-                            }
+                            completionNeutralRule.setCondition(xtr.getElementText());
                             break;
                         }
 
@@ -332,7 +329,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         }
     }
 
-    protected void readTaskListener(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+    protected void readTaskListener(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         BaseElement currentCmmnElement = conversionHelper.getCurrentCmmnElement(); // needs to be captured before setting the flowable listeners as this will change the current element
 
         FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
@@ -348,7 +345,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         conversionHelper.setCurrentCmmnElement(flowableListener);
     }
 
-    protected void readLifecycleListener(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+    protected void readLifecycleListener(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
         BaseElement currentCmmnElement = conversionHelper.getCurrentCmmnElement(); // needs to be captured before setting the flowable listeners as this will change the current element
 
         FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
@@ -404,7 +401,6 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         } else {
             LOGGER.warn("Unsupported eventType detected for element {}", currentCmmnElement);
-
         }
     }
 

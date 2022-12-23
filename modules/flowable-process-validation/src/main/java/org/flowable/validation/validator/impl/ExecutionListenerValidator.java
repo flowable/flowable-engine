@@ -41,11 +41,15 @@ public class ExecutionListenerValidator extends ProcessLevelValidator {
     protected void validateListeners(Process process, FlowElement flowElement, List<FlowableListener> listeners, List<ValidationError> errors) {
         if (listeners != null) {
             for (FlowableListener listener : listeners) {
-                if (listener.getImplementation() == null || listener.getImplementationType() == null) {
-                    addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, flowElement, listener, "Element 'class' or 'expression' is mandatory on executionListener");
-                }
-                if (listener.getOnTransaction() != null && ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(listener.getImplementationType())) {
-                    addError(errors, Problems.EXECUTION_LISTENER_INVALID_IMPLEMENTATION_TYPE, process, flowElement, listener, "Expression cannot be used when using 'onTransaction'");
+
+                if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+                    if (listener.getScriptInfo() == null) {
+                        addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, listener,
+                                "executionListener of type 'script' expects a <script> child element.");
+                    }
+                } else if (listener.getImplementation() == null || listener.getImplementationType() == null) {
+                    addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, flowElement, listener,
+                            "Element 'class' or 'expression' or type=\"script\" is mandatory on executionListener");
                 }
             }
         }

@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;

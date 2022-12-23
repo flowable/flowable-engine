@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,17 +65,17 @@ public class UserBean {
     // getters and setters
     // //////////////////////////////////////////////////////
 
-    @Required
+    @Autowired
     public void setRuntimeService(RuntimeService runtimeService) {
         this.runtimeService = runtimeService;
     }
 
-    @Required
+    @Autowired
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
     }
 
-    @Required
+    @Autowired
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }

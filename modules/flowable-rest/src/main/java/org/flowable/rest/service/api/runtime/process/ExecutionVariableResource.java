@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -145,7 +145,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
 
         if (!hasVariableOnScope(execution, variableName, variableScope)) {
             throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable '" + variableName + "' in scope " + variableScope.name().toLowerCase(),
-                    VariableInstanceEntity.class);
+                    VariableInstance.class);
         }
 
         if (variableScope == RestVariableScope.LOCAL) {

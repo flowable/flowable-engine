@@ -68,6 +68,8 @@ public class ListenerNotificationHelper {
                         }
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
                         executionListener = (ExecutionListener) listener.getInstance();
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+                        executionListener = listenerFactory.createScriptTypeExecutionListener(listener);
                     }
 
                     if (executionListener != null) {

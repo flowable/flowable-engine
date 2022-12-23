@@ -12,8 +12,8 @@
  */
 package org.flowable.spring.executor.jms;
 
-import javax.jms.Message;
-import javax.jms.TextMessage;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Joram Barrez
  */
-public class JobMessageListener implements javax.jms.MessageListener {
+public class JobMessageListener implements jakarta.jms.MessageListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobMessageListener.class);
 

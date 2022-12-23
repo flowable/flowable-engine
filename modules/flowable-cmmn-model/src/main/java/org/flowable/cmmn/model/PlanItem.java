@@ -227,9 +227,9 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("PlanItem ");
+        StringBuilder stringBuilder = new StringBuilder("PlanItem");
         if (getName() != null) {
-            stringBuilder.append("'").append(getName()).append("'");
+            stringBuilder.append(" '").append(getName()).append("'");
         }
 
         stringBuilder.append(" (id: ");

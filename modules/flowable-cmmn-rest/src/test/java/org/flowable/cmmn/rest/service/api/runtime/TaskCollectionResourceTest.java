@@ -183,6 +183,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Name like filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLike=" + encode("%one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLike=none";
+            assertResultsPresentInDataResponse(url);
+            
+            // Name like ignore case filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLikeIgnoreCase=" + encode("%ONE");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLikeIgnoreCase=none";
+            assertResultsPresentInDataResponse(url);
 
             // Description filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description one");

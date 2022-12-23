@@ -43,6 +43,7 @@ import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
+import org.flowable.engine.impl.delegate.InterruptibleActivityBehaviour;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
@@ -483,6 +484,16 @@ public class ExecutionEntityManagerImpl
 
         List<ExecutionEntity> childExecutions = collectChildren(execution.getProcessInstance());
         for (ExecutionEntity subExecutionEntity : childExecutions) {
+            // We are treating the deletion of a process instance similar to an interruption
+            // The reason for that is that there might be variables that have to be persisted differently
+            // i.e. nrOfCompletedInstances / nrOfActiveInstance or variable aggregations
+            FlowElement subExecutionFlowElement = subExecutionEntity.getCurrentFlowElement();
+            if (subExecutionFlowElement instanceof FlowNode) {
+                Object behavior = ((FlowNode) subExecutionFlowElement).getBehavior();
+                if (behavior instanceof InterruptibleActivityBehaviour) {
+                    ((InterruptibleActivityBehaviour) behavior).interrupted(subExecutionEntity);
+                }
+            }
             if (subExecutionEntity.isMultiInstanceRoot()) {
                 for (ExecutionEntity miExecutionEntity : subExecutionEntity.getExecutions()) {
                     if (miExecutionEntity.getSubProcessInstance() != null) {
@@ -748,7 +759,7 @@ public class ExecutionEntityManagerImpl
               eventDispatcher.dispatchEvent(
                       FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                               execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                              execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity),
+                              execution.getProcessDefinitionId(), getActivityType(execution.getCurrentFlowElement()), cancelActivity),
                       engineConfiguration.getEngineCfgKey());
         }
 
@@ -761,12 +772,12 @@ public class ExecutionEntityManagerImpl
             eventDispatcher.dispatchEvent(
                 FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                     execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                    execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity),
+                    execution.getProcessDefinitionId(), getActivityType(execution.getCurrentFlowElement()), cancelActivity),
                 engineConfiguration.getEngineCfgKey());
         }
     }
 
-    protected String getActivityType(FlowNode flowNode) {
+    protected String getActivityType(FlowElement flowNode) {
         String elementType = flowNode.getClass().getSimpleName();
         elementType = elementType.substring(0, 1).toLowerCase() + elementType.substring(1);
         return elementType;
@@ -810,7 +821,9 @@ public class ExecutionEntityManagerImpl
     
     @Override
     public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase) {
-        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Ending and deleting execution {} Reason: {}", executionEntity, deleteReason);
+        }
         // To start, deactivate the current incoming execution
         executionEntity.setEnded(true);
         executionEntity.setActive(false);

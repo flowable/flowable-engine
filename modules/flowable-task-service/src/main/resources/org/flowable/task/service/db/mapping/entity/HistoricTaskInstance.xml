@@ -1089,6 +1089,13 @@
       <if test="taskId != null">
         ${queryTablePrefix}ID_ = #{taskId}
       </if>
+      <if test="taskIds != null &amp;&amp; !taskIds.empty">
+        and ${queryTablePrefix}ID_ IN
+        <foreach item="taskId" index="index" collection="taskIds"
+                 open="(" separator="," close=")">
+          #{taskId}
+        </foreach>
+      </if>
       <if test="taskDefinitionId != null">
         and ${queryTablePrefix}TASK_DEF_ID_ = #{taskDefinitionId}
       </if>
@@ -1158,7 +1165,7 @@
         and ${queryTablePrefix}NAME_ like #{taskNameLike}${wildcardEscapeClause}
       </if>
       <if test="taskNameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like #{taskNameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
       <if test="taskNameList != null &amp;&amp; !taskNameList.empty">
         and ${queryTablePrefix}NAME_ IN
@@ -1366,6 +1373,13 @@
       <if test="orQueryObject.taskId != null">
         ${queryTablePrefix}ID_ = #{orQueryObject.taskId}
       </if>
+       <if test="orQueryObject.taskIds != null &amp;&amp; !orQueryObject.taskIds.empty">
+         or ${queryTablePrefix}ID_ IN
+         <foreach item="taskId" index="index" collection="orQueryObject.taskIds"
+                  open="(" separator="," close=")">
+           #{taskId}
+         </foreach>
+       </if>
       <if test="orQueryObject.taskDefinitionId != null">
         or ${queryTablePrefix}TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
       </if>

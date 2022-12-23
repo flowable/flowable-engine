@@ -36,14 +36,11 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
     @Override
     protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
 
-        // Email, Mule, Http and Shell service tasks
+        // Email, Http and Shell service tasks
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
             if ("mail".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
-
-            } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(serviceTask));
 
             } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask));

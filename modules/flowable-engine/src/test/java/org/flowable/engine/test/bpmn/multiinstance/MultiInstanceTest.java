@@ -2180,6 +2180,158 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(((Number) runtimeService.getVariable(processInstance.getId(), "counter")).intValue()).isEqualTo(20);
     }
 
+    @Test
+    @Deployment
+    public void testLoopVariablesWithSubprocessWhenProcessIsDeleted() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("ModelWithSubProcess")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "bpmnParallelMultiInstanceCompleted", 3),
+                            tuple("nrOfCompletedInstances", "bpmnParallelMultiInstanceCompleted", 0)
+                    );
+        }
+
+        runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "For test");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "integer", 3),
+                            tuple("nrOfCompletedInstances", "integer", 0)
+                    );
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testLoopVariablesWithSubprocessWhenProcessIsDeleted.bpmn20.xml")
+    public void testLoopVariablesWithSubprocessWhenProcessIsDeletedAndHasSomeCompletedInstances() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("ModelWithSubProcess")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "bpmnParallelMultiInstanceCompleted", 3),
+                            tuple("nrOfCompletedInstances", "bpmnParallelMultiInstanceCompleted", 0)
+                    );
+        }
+
+        Task task = taskService.createTaskQuery().taskName("Task #1").singleResult();
+        assertThat(task).isNotNull();
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "bpmnParallelMultiInstanceCompleted", 2),
+                            tuple("nrOfCompletedInstances", "bpmnParallelMultiInstanceCompleted", 1)
+                    );
+        }
+
+        runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "For test");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "integer", 2),
+                            tuple("nrOfCompletedInstances", "integer", 1)
+                    );
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testLoopVariablesWithBoundaryOnSubprocess() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("ModelWithSubProcess")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "bpmnParallelMultiInstanceCompleted", 3),
+                            tuple("nrOfCompletedInstances", "bpmnParallelMultiInstanceCompleted", 0)
+                    );
+        }
+
+        Task task = taskService.createTaskQuery().taskName("Task #1").singleResult();
+        assertThat(task).isNotNull();
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery()
+                    .list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "bpmnParallelMultiInstanceCompleted", 2),
+                            tuple("nrOfCompletedInstances", "bpmnParallelMultiInstanceCompleted", 1)
+                    );
+        }
+
+        runtimeService.signalEventReceived("cancelSubProcess");
+
+        task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Cancelled Sub Process");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricVariableInstanceQuery().list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getVariableTypeName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("loopCounter", "integer", 0),
+                            tuple("loopCounter", "integer", 1),
+                            tuple("loopCounter", "integer", 2),
+                            tuple("nrOfInstances", "integer", 3),
+                            tuple("nrOfActiveInstances", "integer", 2),
+                            tuple("nrOfCompletedInstances", "integer", 1)
+                    );
+        }
+    }
+
     protected void resetTestCounts() {
         TestStartExecutionListener.countWithLoopCounter.set(0);
         TestStartExecutionListener.countWithoutLoopCounter.set(0);

@@ -16,8 +16,8 @@ package org.flowable.variable.service.impl.types;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import org.flowable.common.engine.api.FlowableException;
 

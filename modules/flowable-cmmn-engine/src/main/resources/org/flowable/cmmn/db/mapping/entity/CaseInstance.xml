@@ -384,6 +384,15 @@
             <if test="caseInstanceParentId != null">
                 and RES.PARENT_ID_ = #{caseInstanceParentId}
             </if>
+            <if test="name != null">
+                and RES.NAME_ = #{name}
+            </if>
+            <if test="nameLike != null">
+                and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+            </if>
+            <if test="nameLikeIgnoreCase != null">
+                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+            </if>
             <if test="businessKey != null">
                 and RES.BUSINESS_KEY_ = #{businessKey}
             </if>
@@ -608,6 +617,15 @@
                     <if test="orQueryObject.caseInstanceParentId != null">
                         or RES.PARENT_ID_ = #{orQueryObject.caseInstanceParentId}
                     </if>
+                    <if test="orQueryObject.name != null">
+                        or RES.NAME_ = #{orQueryObject.name}
+                    </if>
+                    <if test="orQueryObject.nameLike != null">
+                        or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
+                    </if>
+                    <if test="orQueryObject.nameLikeIgnoreCase != null">
+                        or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
+                    </if>
                     <if test="orQueryObject.businessKey != null">
                         or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
                     </if>
@@ -751,7 +769,7 @@
                                                     </when>
                                                 </choose>
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.TEXT_ is null
+                                                    or V.TEXT_ is null
                                                 </if>
                                                 )
                                             </if>
@@ -773,7 +791,7 @@
                                                 <include refid="variableOperator"/>
                                                 #{queryVariableValue.longValue}
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.LONG_ is null
+                                                    or V.LONG_ is null
                                                 </if>
                                                 )
                                             </if>
@@ -782,7 +800,7 @@
                                                 <include refid="variableOperator"/>
                                                 #{queryVariableValue.doubleValue}
                                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                                    or A_OR${index}.DOUBLE_ is null
+                                                    or V.DOUBLE_ is null
                                                 </if>
                                                 )
                                             </if>

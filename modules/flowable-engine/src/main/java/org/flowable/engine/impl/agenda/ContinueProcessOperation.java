@@ -29,9 +29,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityWithMigrationContextBehavior;
@@ -148,7 +150,12 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         // Execution listener: event 'start'
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+                return;
+            }
         }
 
         // Create any boundary events, sub process boundary events will be created from the activity behavior
@@ -193,7 +200,12 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         // Execution listener: event 'start'
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+               return;
+            }
         }
         
         if (!hasMultiInstanceRootExecution(execution, flowNode)) {
@@ -297,9 +309,14 @@ public class ContinueProcessOperation extends AbstractOperation {
     protected void continueThroughSequenceFlow(SequenceFlow sequenceFlow) {
         // Execution listener. Sequenceflow only 'take' makes sense ... but we've supported all three since the beginning
         if (CollectionUtil.isNotEmpty(sequenceFlow.getExecutionListeners())) {
-            executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_START);
-            executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_TAKE);
-            executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_END);
+            try {
+                executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_START);
+                executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_TAKE);
+                executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_END);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+                return;
+            }
         }
 
         // Firing event that transition is being taken

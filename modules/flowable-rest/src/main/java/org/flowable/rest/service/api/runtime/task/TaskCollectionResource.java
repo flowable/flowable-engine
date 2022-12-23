@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -60,6 +60,7 @@ public class TaskCollectionResource extends TaskBaseResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return tasks with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
             @ApiImplicitParam(name = "priority", dataType = "string", value = "Only return tasks with the given priority.", paramType = "query"),
             @ApiImplicitParam(name = "minimumPriority", dataType = "string", value = "Only return tasks with a priority greater than the given value.", paramType = "query"),
@@ -130,6 +131,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("nameLike")) {
             request.setNameLike(requestParams.get("nameLike"));
+        }
+        
+        if (requestParams.containsKey("nameLikeIgnoreCase")) {
+            request.setNameLikeIgnoreCase(requestParams.get("nameLikeIgnoreCase"));
         }
 
         if (requestParams.containsKey("description")) {

@@ -13,54 +13,24 @@
 
 package org.flowable.engine.impl.bpmn.listener;
 
-import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.AbstractScriptEvaluator;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-public class ScriptExecutionListener implements ExecutionListener {
+public class ScriptExecutionListener extends AbstractScriptEvaluator implements ExecutionListener {
 
     private static final long serialVersionUID = 1L;
 
-    protected Expression script;
-
-    protected Expression language;
-
-    protected Expression resultVariable;
+    protected ScriptingEngines getScriptingEngines() {
+        return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+    }
 
     @Override
     public void notify(DelegateExecution execution) {
-
-        validateParameters();
-
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        Object result = scriptingEngines.evaluate(script.getExpressionText(), language.getExpressionText(), execution);
-
-        if (resultVariable != null) {
-            execution.setVariable(resultVariable.getExpressionText(), result);
-        }
-    }
-
-    protected void validateParameters() {
-        if (script == null) {
-            throw new IllegalArgumentException("The field 'script' should be set on the ExecutionListener");
-        }
-
-        if (language == null) {
-            throw new IllegalArgumentException("The field 'language' should be set on the ExecutionListener");
-        }
-    }
-
-    public void setScript(Expression script) {
-        this.script = script;
-    }
-
-    public void setLanguage(Expression language) {
-        this.language = language;
-    }
-
-    public void setResultVariable(Expression resultVariable) {
-        this.resultVariable = resultVariable;
+        evaluateScriptRequest(createScriptRequest(execution)
+                .traceEnhancer(trace -> trace.addTraceTag("type", "executionListener"))
+                .storeScriptVariables());
     }
 }

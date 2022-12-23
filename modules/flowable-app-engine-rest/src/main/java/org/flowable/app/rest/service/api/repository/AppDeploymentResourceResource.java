@@ -15,7 +15,7 @@ package org.flowable.app.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;

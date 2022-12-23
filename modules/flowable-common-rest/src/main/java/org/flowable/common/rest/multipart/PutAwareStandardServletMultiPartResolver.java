@@ -12,7 +12,7 @@
  */
 package org.flowable.common.rest.multipart;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;

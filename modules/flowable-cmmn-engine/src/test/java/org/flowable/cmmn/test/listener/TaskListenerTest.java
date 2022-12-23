@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -26,6 +27,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -56,10 +58,18 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
     @Test
     @CmmnDeployment
     public void testCreateEvent() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("scriptLanguage", "groovy");
+        vars.put("scriptResultVariable", "myScriptResultVar");
+        vars.put("scriptPayload", "task.setVariable('groovyVar', 'setInGroovy'); def foo = \"bar\"; return foo;");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().variables(vars).caseDefinitionKey("testTaskListeners").start();
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
+        assertVariable(caseInstance, "groovyVar", "setInGroovy");
+        assertVariable(caseInstance, "myScriptResultVar", "bar");
     }
 
     @Test
@@ -75,6 +85,8 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
     }
 
 
@@ -91,6 +103,8 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
+        assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
     }
 
     @Test
@@ -178,6 +192,21 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
             .caseDefinitionKey("testTaskListeners")
             .start();
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello from field");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testListenerWithScriptThrowsNonFlowableException() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("testTaskListeners").singleResult();
+
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testTaskListeners");
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("javascript script evaluation failed: 'ReferenceError: \"scriptError\" is not defined in <eval> at line number 2' "
+                        + "Trace: scopeType=cmmn, scopeDefinitionKey=testTaskListeners, scopeDefinitionId=" + caseDefinition.getId() + ","
+                        + " subScopeDefinitionKey=sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65B, type=taskListener");
     }
 
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {

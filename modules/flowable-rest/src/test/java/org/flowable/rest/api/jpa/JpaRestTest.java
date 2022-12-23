@@ -48,7 +48,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
     public void testGetJpaVariableViaTaskVariablesCollections() throws Exception {
 
         // Get JPA managed entity through the repository
-        Message message = messageRepository.findOne(1L);
+        Message message = messageRepository.findById(1L).orElse(null);
         assertThat(message).isNotNull();
         assertThat(message.getText()).isEqualTo("Hello World");
 
@@ -85,7 +85,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
     public void testGetJpaVariableViaTaskCollection() throws Exception {
 
         // Get JPA managed entity through the repository
-        Message message = messageRepository.findOne(1L);
+        Message message = messageRepository.findById(1L).orElse(null);
         assertThat(message).isNotNull();
         assertThat(message.getText()).isEqualTo("Hello World");
 
@@ -126,7 +126,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
     public void testGetJpaVariableViaHistoricProcessCollection() throws Exception {
 
         // Get JPA managed entity through the repository
-        Message message = messageRepository.findOne(1L);
+        Message message = messageRepository.findById(1L).orElse(null);
         assertThat(message).isNotNull();
         assertThat(message.getText()).isEqualTo("Hello World");
 
@@ -169,7 +169,7 @@ public class JpaRestTest extends BaseJPARestTestCase {
     public void testGetJpaVariableViaHistoricVariablesCollections() throws Exception {
 
         // Get JPA managed entity through the repository
-        Message message = messageRepository.findOne(1L);
+        Message message = messageRepository.findById(1L).orElse(null);
         assertThat(message).isNotNull();
         assertThat(message.getText()).isEqualTo("Hello World");
 

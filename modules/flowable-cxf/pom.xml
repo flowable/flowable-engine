@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.7.3-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -170,13 +170,22 @@
         <version>2.3.5</version>
     </dependency>
     <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <!--
+        CXF still uses javax jakarta.
+        Therefore, we need to downgrade the version for CXF
+        -->
+      <version>2.3.3</version>
+    </dependency>
+    <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-xjc</artifactId>
         <version>2.3.5</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
       <dependency>

@@ -16,8 +16,8 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -68,6 +68,9 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return case instances with the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return case instances like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
             @ApiImplicitParam(name = "parentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
@@ -116,6 +119,18 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         
         if (allRequestParams.containsKey("caseDefinitionName")) {
             queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
+        
+        if (allRequestParams.containsKey("name")) {
+            queryRequest.setCaseInstanceName(allRequestParams.get("name"));
+        }
+        
+        if (allRequestParams.containsKey("nameLike")) {
+            queryRequest.setCaseInstanceNameLike(allRequestParams.get("nameLike"));
+        }
+        
+        if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
+            queryRequest.setCaseInstanceNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("businessKey")) {

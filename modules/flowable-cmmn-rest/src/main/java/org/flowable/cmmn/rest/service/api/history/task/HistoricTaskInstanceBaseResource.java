@@ -78,6 +78,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskId() != null) {
             query.taskId(queryRequest.getTaskId());
         }
+        if (queryRequest.getPlanItemInstanceId() != null) {
+            query.planItemInstanceId(queryRequest.getPlanItemInstanceId());
+        }
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
@@ -110,6 +113,9 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getTaskNameLike() != null) {
             query.taskNameLike(queryRequest.getTaskNameLike());
+        }
+        if (queryRequest.getTaskNameLikeIgnoreCase() != null) {
+            query.taskNameLikeIgnoreCase(queryRequest.getTaskNameLikeIgnoreCase());
         }
         if (queryRequest.getTaskDescription() != null) {
             query.taskDescription(queryRequest.getTaskDescription());

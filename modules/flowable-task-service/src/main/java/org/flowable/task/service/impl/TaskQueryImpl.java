@@ -51,6 +51,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected IdmIdentityService idmIdentityService;
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected String taskId;
     protected Collection<String> taskIds;
@@ -159,6 +160,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandContext, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -167,6 +169,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandExecutor, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -175,6 +178,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandExecutor, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.databaseType = databaseType;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
@@ -1802,7 +1806,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     protected void ensureVariablesInitialized() {
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(variableServiceConfiguration);
+            var.initialize(variableValueProvider);
         }
 
         for (TaskQueryImpl orQueryObject : orQueryObjects) {
@@ -2117,6 +2121,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Collection<String> getTaskIds() {
+        return taskIds;
     }
 
     @Override

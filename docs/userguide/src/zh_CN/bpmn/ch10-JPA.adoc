@@ -83,7 +83,7 @@ ProcessEngine processEngine = ProcessEngineConfiguration
 Configuration properties:
 
 * ++jpaPersistenceUnitName++: The name of the persistence-unit to use. (Make sure the persistence-unit is available on the classpath. According to the spec, the default location is ++/META-INF/persistence.xml++). Use either +jpaEntityManagerFactory+ or +jpaPersistenceUnitName+.
-* ++jpaEntityManagerFactory++: An reference to a bean implementing +javax.persistence.EntityManagerFactory+ that will be used to load the Entities and flushing the updates. Use either _jpaEntityManagerFactory_ or _jpaPersistenceUnitName_.
+* ++jpaEntityManagerFactory++: An reference to a bean implementing +jakarta.persistence.EntityManagerFactory+ that will be used to load the Entities and flushing the updates. Use either _jpaEntityManagerFactory_ or _jpaPersistenceUnitName_.
 * ++jpaHandleTransaction++: Flag indicating that the engine should begin and commit/rollback the transaction on the used _EntityManager_ instances. Set to false when _Java Transaction API (JTA)_ is used.
 * ++jpaCloseEntityManager++: Flag indicating that the engine should close the +EntityManager+ instance that was obtained from the +EntityManagerFactory+. Set to false when the _EntityManager_ is container-managed (e.g. when using an Extended Persistence Context which isn't scoped to a single transaction').
 

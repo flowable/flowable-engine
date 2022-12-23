@@ -70,6 +70,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         identityService.setAuthenticatedUserId("kermit");
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
+                .name("myCaseInstanceName")
                 .businessKey("myBusinessKey")
                 .businessStatus("myBusinessStatus")
                 .variables(caseVariables).start();
@@ -81,6 +82,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
+                .name("anotherCaseInstanceName")
                 .businessKey("anotherBusinessKey")
                 .businessStatus("anotherBusinessStatus")
                 .start();
@@ -100,6 +102,17 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?caseDefinitionKey=oneHumanTaskCase", caseInstance.getId(), caseInstance2.getId());
 
         assertResultsPresentInDataResponse(url + "?caseDefinitionName=" + encode("One Human Task Case"), caseInstance.getId(), caseInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?name=myCaseInstanceName", caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?name=none");
+        
+        assertResultsPresentInDataResponse(url + "?nameLike=" + encode("%CaseInstanceName"), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?nameLike=" + encode("my%InstanceName"), caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?nameLike=none");
+        
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=" + encode("%CASEInstanceName"), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=" + encode("my%INSTANCEName"), caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=NONE");
         
         assertResultsPresentInDataResponse(url + "?businessKey=myBusinessKey", caseInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=none");

@@ -491,7 +491,6 @@ class JmsChannelDefinitionProcessorTest {
             .header("testIntHeader", EventPayloadTypes.INTEGER)
             .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
             .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
-            .header("testCustomerHeader", "custom")
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
@@ -504,9 +503,6 @@ class JmsChannelDefinitionProcessorTest {
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        Map<String, String> customerObj = new HashMap<>();
-        customerObj.put("name", "John Doe");
-
         jmsTemplate.convertAndSend("test-customer", "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog\""
@@ -517,7 +513,6 @@ class JmsChannelDefinitionProcessorTest {
             messageProcessor.setIntProperty("testIntHeader", 123);
             messageProcessor.setBooleanProperty("testBooleanHeader", true);
             messageProcessor.setDoubleProperty("testDoubleHeader", 12.3);
-            messageProcessor.setObjectProperty("testCustomerHeader", customerObj);
             return messageProcessor;
         });
 
@@ -539,8 +534,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("testLongHeader", 123l),
                 tuple("testIntHeader", 123),
                 tuple("testBooleanHeader", true),
-                tuple("testDoubleHeader", 12.3),
-                tuple("testCustomerHeader", customerObj)
+                tuple("testDoubleHeader", 12.3)
             );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
     }

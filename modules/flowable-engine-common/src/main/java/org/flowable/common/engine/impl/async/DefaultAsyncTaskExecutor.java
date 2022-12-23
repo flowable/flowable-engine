@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.async;
 
 import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 
+import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -24,6 +25,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.slf4j.Logger;
@@ -38,6 +40,8 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected final AsyncTaskExecutorConfiguration configuration;
+
     /**
      * The executor service used for task execution.
      */
@@ -49,54 +53,26 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
      */
     protected boolean executorNeedsShutdown;
 
-    // Configuration properties
-
-    /**
-     * The minimal number of threads that are kept alive in the threadpool for
-     * job execution
-     */
-    protected int corePoolSize = 8;
-
-    /**
-     * The maximum number of threads that are kept alive in the threadpool for
-     * job execution
-     */
-    protected int maxPoolSize = 8;
-
-    /**
-     * The time (in milliseconds) a thread used for job execution must be kept
-     * alive before it is destroyed. Default setting is 0. Having a non-default
-     * setting of 0 takes resources, but in the case of many job executions it
-     * avoids creating new threads all the time.
-     */
-    protected long keepAliveTime = 5000L;
-
-    /**
-     * The size of the queue on which jobs to be executed are placed
-     */
-    protected int queueSize = 100;
-
-    /**
-     * Whether or not core threads can time out (which is needed to scale down the threads)
-     */
-    protected boolean allowCoreThreadTimeout = true;
-
-    /**
-     * The time (in seconds) that is waited to gracefully shut down the
-     * threadpool used for job execution
-     */
-    protected long secondsToWaitOnShutdown = 60L;
-
     /**
      * The queue used for job execution work
      */
     protected BlockingQueue<Runnable> threadPoolQueue;
 
-    protected String threadPoolNamingPattern = "flowable-async-job-executor-thread-%d";
-
     protected ThreadFactory threadFactory;
 
     protected RejectedExecutionHandler rejectedExecutionHandler;
+
+    public DefaultAsyncTaskExecutor() {
+        this(new AsyncTaskExecutorConfiguration());
+        this.configuration.setThreadPoolNamingPattern("flowable-async-job-executor-thread-%d");
+    }
+
+    public DefaultAsyncTaskExecutor(AsyncTaskExecutorConfiguration configuration) {
+        this.configuration = configuration;
+        if (StringUtils.isEmpty(this.configuration.getThreadPoolNamingPattern())) {
+            this.configuration.setThreadPoolNamingPattern("flowable-async-job-executor-thread-%d");
+        }
+    }
 
     @Override
     public void execute(Runnable task) {
@@ -135,6 +111,7 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
 
             // Waits for the configured time to finish all currently executing jobs
             try {
+                long secondsToWaitOnShutdown = configuration.getAwaitTerminationPeriod().getSeconds();
                 if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
                     logger.warn(
                             "Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.",
@@ -151,20 +128,25 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
 
     protected ExecutorService initializeExecutor() {
         if (threadPoolQueue == null) {
+            int queueSize = getQueueSize();
             logger.info("Creating thread pool queue of size {}", queueSize);
             threadPoolQueue = new ArrayBlockingQueue<>(queueSize);
         }
 
         if (threadFactory == null) {
+            String threadPoolNamingPattern = getThreadPoolNamingPattern();
             logger.info("Creating thread factory with naming pattern {}", threadPoolNamingPattern);
             threadFactory = new BasicThreadFactory.Builder().namingPattern(threadPoolNamingPattern).build();
 
         }
 
+        int corePoolSize = getCorePoolSize();
+        int maxPoolSize = getMaxPoolSize();
+        long keepAliveTime = getKeepAliveTime();
         logger.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
                 TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
-        threadPoolExecutor.allowCoreThreadTimeOut(allowCoreThreadTimeout);
+        threadPoolExecutor.allowCoreThreadTimeOut(isAllowCoreThreadTimeout());
 
         if (rejectedExecutionHandler != null) {
             logger.info("Using rejectedExecutionHandler {}", rejectedExecutionHandler);
@@ -176,52 +158,56 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
 
     }
 
+    public AsyncTaskExecutorConfiguration getConfiguration() {
+        return configuration;
+    }
+
     public int getCorePoolSize() {
-        return corePoolSize;
+        return getConfiguration().getCorePoolSize();
     }
 
     public void setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
+        getConfiguration().setCorePoolSize(corePoolSize);
     }
 
     public int getMaxPoolSize() {
-        return maxPoolSize;
+        return getConfiguration().getMaxPoolSize();
     }
 
     public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
+        getConfiguration().setMaxPoolSize(maxPoolSize);
     }
 
     public long getKeepAliveTime() {
-        return keepAliveTime;
+        return getConfiguration().getKeepAlive().toMillis();
     }
 
     public void setKeepAliveTime(long keepAliveTime) {
-        this.keepAliveTime = keepAliveTime;
+        getConfiguration().setKeepAlive(Duration.ofMillis(keepAliveTime));
     }
 
     public int getQueueSize() {
-        return queueSize;
+        return getConfiguration().getQueueSize();
     }
 
     public void setQueueSize(int queueSize) {
-        this.queueSize = queueSize;
+        getConfiguration().setQueueSize(queueSize);
     }
 
     public boolean isAllowCoreThreadTimeout() {
-        return allowCoreThreadTimeout;
+        return getConfiguration().isAllowCoreThreadTimeout();
     }
 
     public void setAllowCoreThreadTimeout(boolean allowCoreThreadTimeout) {
-        this.allowCoreThreadTimeout = allowCoreThreadTimeout;
+        getConfiguration().setAllowCoreThreadTimeout(allowCoreThreadTimeout);
     }
 
     public long getSecondsToWaitOnShutdown() {
-        return secondsToWaitOnShutdown;
+        return getConfiguration().getAwaitTerminationPeriod().getSeconds();
     }
 
     public void setSecondsToWaitOnShutdown(long secondsToWaitOnShutdown) {
-        this.secondsToWaitOnShutdown = secondsToWaitOnShutdown;
+        getConfiguration().setAwaitTerminationPeriod(Duration.ofSeconds(secondsToWaitOnShutdown));
     }
 
     public BlockingQueue<Runnable> getThreadPoolQueue() {
@@ -233,11 +219,11 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
     }
 
     public String getThreadPoolNamingPattern() {
-        return threadPoolNamingPattern;
+        return getConfiguration().getThreadPoolNamingPattern();
     }
 
     public void setThreadPoolNamingPattern(String threadPoolNamingPattern) {
-        this.threadPoolNamingPattern = threadPoolNamingPattern;
+        getConfiguration().setThreadPoolNamingPattern(threadPoolNamingPattern);
     }
 
     public ThreadFactory getThreadFactory() {

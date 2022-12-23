@@ -15,7 +15,7 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -52,6 +52,9 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return historic case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return historic case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return historic case instances with the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return historic case instances like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic case instance.", paramType = "query"),
@@ -102,6 +105,18 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         
         if (allRequestParams.get("caseDefinitionName") != null) {
             queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
+        
+        if (allRequestParams.get("name") != null) {
+            queryRequest.setCaseInstanceName(allRequestParams.get("name"));
+        }
+        
+        if (allRequestParams.get("nameLike") != null) {
+            queryRequest.setCaseInstanceNameLike(allRequestParams.get("nameLike"));
+        }
+        
+        if (allRequestParams.get("nameLikeIgnoreCase") != null) {
+            queryRequest.setCaseInstanceNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
 
         if (allRequestParams.get("businessKey") != null) {

@@ -26,7 +26,9 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -166,7 +168,6 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
             } else {
                 internalLeave(execution, zeroNrOfInstances);
-
             }
 
         } else {
@@ -196,7 +197,12 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         inactivateExecution(execution, processEngineConfiguration);
 
-        callActivityEndListeners(execution);
+        try {
+            callActivityEndListeners(execution);
+        } catch (BpmnError bpmnError) {
+            ErrorPropagation.propagateError(bpmnError, execution);
+            return;
+        }
 
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
 
@@ -392,5 +398,15 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         }
 
         parentScopeExecution.forceUpdate();
+    }
+
+    @Override
+    protected void internalInterrupted(DelegateExecution execution) {
+        // When the activity is interrupted we need to update the number of completed / active instances
+        // to only be primitive values based on their current values
+        setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES));
+        setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES));
+
+        super.internalInterrupted(execution);
     }
 }

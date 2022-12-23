@@ -69,7 +69,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -127,8 +126,6 @@ public class BaseSpringRestTestCase {
     protected IdentityService identityService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
-    protected FormRepositoryService formRepositoryService;
-    protected org.flowable.form.api.FormService formEngineFormService;
     protected ProcessMigrationService processInstanceMigrationService;
 
     protected static CloseableHttpClient client;
@@ -176,8 +173,6 @@ public class BaseSpringRestTestCase {
         identityService = appContext.getBean(IdentityService.class);
         managementService = appContext.getBean(ManagementService.class);
         dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
-        formRepositoryService = appContext.getBean(FormRepositoryService.class);
-        formEngineFormService = appContext.getBean(org.flowable.form.api.FormService.class);
         processInstanceMigrationService = appContext.getBean(ProcessMigrationService.class);
         
         if (server == null) {

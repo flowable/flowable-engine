@@ -15,7 +15,7 @@ package org.flowable.eventregistry.spring.jms;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import javax.jms.MessageListener;
+import jakarta.jms.MessageListener;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;

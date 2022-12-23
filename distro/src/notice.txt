@@ -18,16 +18,10 @@ flowable-camel<version><.jar | -source.jar | -javadoc.jar>
 flowable-cdi<version><.jar | -source.jar | -javadoc.jar>
 flowable-common-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-content-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-engine<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-spring<version><.jar | -source.jar | -javadoc.jar>
-flowable-content-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-cxf<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-api<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-engine<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-dmn-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-model<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-dmn-spring<version><.jar | -source.jar | -javadoc.jar>
@@ -45,20 +39,12 @@ flowable-event-registry-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-event-registry-spring<version><.jar | -source.jar | -javadoc.jar>
 flowable-event-registry-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-engine<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-model<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-spring<version><.jar | -source.jar | -javadoc.jar>
-flowable-form-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
 flowable-http<version><.jar | -source.jar | -javadoc.jar>
 flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
 flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
 flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
-flowable-json-converter<version><.jar | -source.jar | -javadoc.jar>
 flowable-ldap<version><.jar | -source.jar | -javadoc.jar>
-flowable-mule<version><.jar | -source.jar | -javadoc.jar>
 flowable-osgi<version><.jar | -source.jar | -javadoc.jar>
 flowable-process-validation<version><.jar | -source.jar | -javadoc.jar>
 flowable-rest<version><.jar | -source.jar | -javadoc.jar>
@@ -68,16 +54,6 @@ flowable-spring-boot-starter-actuator<version><.jar | -source.jar | -javadoc.jar
 flowable-spring-boot-starter-basic<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-integration<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-rest-api<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-common<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-idm-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-modeler-rest<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-conf<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-logic<version><.jar | -source.jar | -javadoc.jar>
-flowable-ui-task-rest<version><.jar | -source.jar | -javadoc.jar>
 
 
 
@@ -96,12 +72,12 @@ Quartz
 This software includes unchanged copies of the following libraries:
 
 aopalliance                     aopalliance                 1.0             Public Domain
-com.fasterxml.jackson.core      jackson-annotations         2.13.1          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-core                2.13.1          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-databind            2.13.1          The Apache Software License, Version 2.0
-com.fasterxml.jackson.datatype  jackson-datatype-joda       2.13.1          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-annotations         2.13.4          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-core                2.13.4          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-databind            2.13.4          The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype  jackson-datatype-joda       2.13.4          The Apache Software License, Version 2.0
 com.google.guava                guava                       31.0.1-jre      The Apache Software License, Version 2.0
-com.h2database                  h2                          1.4.200         The H2 License, Version 1.0
+com.h2database                  h2                          2.1.214         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
 com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
 commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
@@ -118,7 +94,6 @@ de.odysseus.juel                juel-spi                    2.2.7           The 
 io.swagger                      swagger-annotations         1.6.2           Apache License 2.0
 io.swagger                      swagger-models              1.6.2           Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 joda-time                       joda-time                   2.10.13         Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
@@ -136,22 +111,22 @@ org.mvel                        mvel2                       2.2.6.Final     The 
 org.slf4j                       jcl-over-slf4j              1.7.36          MIT License
 org.slf4j                       slf4j-api                   1.7.36          MIT License
 org.slf4j                       slf4j-log4j12               1.7.36          MIT License
-org.springframework             spring-beans                5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-context              5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-context-support      5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-tx                   5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-web                  5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-aop                  5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-expression           5.3.21          The Apache Software License, Version 2.0
-org.springframework             spring-orm                  5.3.21          The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      5.7.2           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        5.7.2           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      5.7.2           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         5.7.2           The Apache Software License, Version 2.0
+org.springframework             spring-beans                5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-context              5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-context-support      5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-tx                   5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-web                  5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-aop                  5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-expression           5.3.24          The Apache Software License, Version 2.0
+org.springframework             spring-orm                  5.3.24          The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      5.8.1           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        5.8.1           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      5.8.1           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         5.8.1           The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0

@@ -660,8 +660,8 @@ public class DeploymentTest extends AbstractFlowableEventTest {
                 .singleResult();
         assertThat(channelDefinition2.getName()).isEqualTo("My channel2");
 
-        assertThat(channelDefinitionCache.size()).isEqualTo(1);
-        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNull();
+        assertThat(channelDefinitionCache.size()).isEqualTo(2);
+        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNotNull();
         assertThat(channelDefinitionCache.get(channelDefinition2.getId())).isNotNull();
 
         repositoryService.deleteDeployment(channelDefinition1.getDeploymentId());
@@ -764,7 +764,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             super(engineConfiguration);
         }
 
-        protected Map<CacheKey, String> getCache() {
+        protected Map<CacheKey, CacheValue> getCache() {
             return cache;
         }
     }

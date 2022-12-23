@@ -84,6 +84,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Collection<String> caseDefinitionKeys;
     protected String taskId;
+    protected Collection<String> taskIds;
     protected String taskName;
     protected String taskNameLike;
     protected String taskNameLikeIgnoreCase;
@@ -674,6 +675,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery taskIds(Collection<String> taskIds) {
+        if (taskIds == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.taskIds = taskIds;
+        } else {
+            this.taskIds = taskIds;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskName(String taskName) {
         if (inOrStatement) {
             this.currentOrQueryObject.taskName = taskName;
@@ -760,6 +777,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery taskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        if (taskNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Task name is null");
+        }
+        
         if (inOrStatement) {
             this.currentOrQueryObject.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase.toLowerCase();
         } else {
@@ -1436,7 +1457,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     protected void ensureVariablesInitialized() {
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(variableServiceConfiguration);
+            var.initialize(variableValueProvider);
         }
 
         for (HistoricTaskInstanceQueryImpl orQueryObject : orQueryObjects) {
@@ -2293,6 +2314,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Collection<String> getTaskIds() {
+        return taskIds;
     }
 
     @Override

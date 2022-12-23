@@ -29,6 +29,7 @@ import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
 import org.flowable.bpmn.converter.export.MapExceptionExport;
+import org.flowable.bpmn.converter.export.ScriptInfoExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.AbstractFlowableHttpHandler;
 import org.flowable.bpmn.model.BaseElement;
@@ -518,6 +519,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_CLASS, httpHandler.getImplementation());
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(httpHandler.getImplementationType())) {
             xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, httpHandler.getImplementation());
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(httpHandler.getImplementationType())) {
+            xtw.writeAttribute(ATTRIBUTE_TYPE, httpHandler.getImplementationType());
+        }
+        if (httpHandler.getScriptInfo() != null) {
+            ScriptInfoExport.writeScriptInfo(xtw, httpHandler.getScriptInfo());
         }
     }
 }

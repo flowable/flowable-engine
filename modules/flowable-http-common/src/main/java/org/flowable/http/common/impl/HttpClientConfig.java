@@ -18,6 +18,7 @@ import java.util.Objects;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.apache.client5.ApacheHttpComponents5FlowableHttpClient;
 import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
 
 /**
@@ -26,6 +27,7 @@ import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttp
 public class HttpClientConfig {
 
     protected static final boolean isApacheHttpComponentsPresent;
+    protected static final boolean isApacheHttpComponents5Present;
     protected static final boolean isSpringWebClientPresent;
     protected static final boolean isReactorHttpClientPresent;
 
@@ -39,6 +41,15 @@ public class HttpClientConfig {
         }
 
         isApacheHttpComponentsPresent = httpClientBuilderPresent;
+
+        boolean httpClient5BuilderPresent = false;
+        try {
+            Class.forName("org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder", false, loader);
+            httpClient5BuilderPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+
+        isApacheHttpComponents5Present = httpClient5BuilderPresent;
 
         boolean springWebClientBuilderPresent = false;
         try {
@@ -82,6 +93,7 @@ public class HttpClientConfig {
     protected boolean useSystemProperties = false;
 
     protected FlowableHttpClient httpClient;
+    protected Runnable closeRunnable;
 
     /**
      * How the Http Task should perform the HTTP requests in case no parallelInSameTransaction is defined in the XML.
@@ -188,6 +200,7 @@ public class HttpClientConfig {
 
     public void setHttpClient(FlowableHttpClient httpClient) {
         this.httpClient = httpClient;
+        this.closeRunnable = null;
     }
 
     public FlowableHttpClient determineHttpClient() {
@@ -200,7 +213,13 @@ public class HttpClientConfig {
         } else if (isSpringWebClientPresent && isReactorHttpClientPresent) {
             this.httpClient = new SpringWebClientFlowableHttpClient(this);
             return httpClient;
-        } else {
+        } else if (isApacheHttpComponents5Present) {
+            ApacheHttpComponents5FlowableHttpClient httpClient = new ApacheHttpComponents5FlowableHttpClient(this);
+            this.httpClient = httpClient;
+            this.closeRunnable = httpClient::close;
+            return this.httpClient;
+        }
+        else {
             throw new FlowableException("Failed to determine FlowableHttpClient");
         }
     }
@@ -211,5 +230,11 @@ public class HttpClientConfig {
 
     public void setDefaultParallelInSameTransaction(boolean defaultParallelInSameTransaction) {
         this.defaultParallelInSameTransaction = defaultParallelInSameTransaction;
+    }
+
+    public void close() {
+        if (closeRunnable != null) {
+            closeRunnable.run();
+        }
     }
 }

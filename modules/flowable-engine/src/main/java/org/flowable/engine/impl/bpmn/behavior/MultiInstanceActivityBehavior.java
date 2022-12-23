@@ -337,6 +337,13 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void interrupted(DelegateExecution execution) {
+        if (execution.isMultiInstanceRoot()) {
+            // We are only performing the interrupt logic for multi instance root executions
+            internalInterrupted(execution);
+        }
+    }
+
+    protected void internalInterrupted(DelegateExecution execution) {
         if (hasVariableAggregationDefinitions(execution)) {
             Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(execution, aggregations.getOverviewAggregations(),
                     CommandContextUtil.getProcessEngineConfiguration());
@@ -577,7 +584,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
                     execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : "", custom, loopCounter,
-                    nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
+                    nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances, execution);
         }
     }
 

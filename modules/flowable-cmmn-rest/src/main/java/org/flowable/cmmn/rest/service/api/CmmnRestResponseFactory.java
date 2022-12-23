@@ -102,6 +102,7 @@ public class CmmnRestResponseFactory {
     public static final int VARIABLE_HISTORY_TASK = 5;
     public static final int VARIABLE_HISTORY_CASE = 6;
     public static final int VARIABLE_HISTORY_VARINSTANCE = 7;
+    public static final int VARIABLE_PLAN_ITEM = 8;
 
     public static final String BYTE_ARRAY_VARIABLE_TYPE = "binary";
     public static final String SERIALIZABLE_VARIABLE_TYPE = "serializable";
@@ -325,13 +326,15 @@ public class CmmnRestResponseFactory {
                     restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, id, name));
                 } else if (variableType == VARIABLE_HISTORY_CASE) {
                     restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, id, name));
+                } else if (variableType == VARIABLE_PLAN_ITEM) {
+                    restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, id, name));
                 }
             }
         }
         return restVar;
     }
 
-    public RestVariable createBinaryRestVariable(String name, RestVariableScope scope, String type, String taskId, String caseInstanceId) {
+    public RestVariable createBinaryRestVariable(String name, RestVariableScope scope, String type, String instanceId, int responseVariableType) {
 
         RestUrlBuilder urlBuilder = createUrlBuilder();
         RestVariable restVar = new RestVariable();
@@ -339,11 +342,12 @@ public class CmmnRestResponseFactory {
         restVar.setName(name);
         restVar.setType(type);
 
-        if (taskId != null) {
-            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, taskId, name));
-        }
-        if (caseInstanceId != null) {
-            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, name));
+        if (responseVariableType == VARIABLE_TASK) {
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, instanceId, name));
+        } else if (responseVariableType == VARIABLE_CASE) {
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, instanceId, name));
+        } else if (responseVariableType == VARIABLE_PLAN_ITEM) {
+            restVar.setValueUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, instanceId, name));
         }
 
         return restVar;
@@ -597,7 +601,18 @@ public class CmmnRestResponseFactory {
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, variableInstance.getScopeId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
+        result.setPlanItemInstanceId(variableInstance.getSubScopeId());
+
+        RestVariableScope scope;
+        if (variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId()) ||  variableInstance.getTaskId() != null) {
+            scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
+        }
+
+        result.setVariable(
+                createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false,
+                        urlBuilder));
         return result;
     }
     
@@ -778,7 +793,18 @@ public class CmmnRestResponseFactory {
             result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, variableInstance.getScopeId()));
         }
         result.setTaskId(variableInstance.getTaskId());
-        result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), null, variableInstance.getId(), VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
+        result.setPlanItemInstanceId(variableInstance.getSubScopeId());
+
+        RestVariableScope scope;
+        if (variableInstance.getSubScopeId() != null && !variableInstance.getSubScopeId().equals(variableInstance.getScopeId())
+                || variableInstance.getTaskId() != null) {
+            scope = RestVariableScope.LOCAL;
+        } else {
+            scope = RestVariableScope.GLOBAL;
+        }
+
+        result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), scope, variableInstance.getId(),
+                VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
         return result;
     }
 

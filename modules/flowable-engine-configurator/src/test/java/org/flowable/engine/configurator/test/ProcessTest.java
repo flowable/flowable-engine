@@ -14,7 +14,9 @@ package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +43,48 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * @author Tijs Rademakers
  */
 public class ProcessTest extends FlowableAppTestCase {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
+
+    @Before
+    public void initializeMocks() {
+        Map engineConfigurations = appEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @After
+    public void resetMocks() {
+        appEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
     
     @Test
     public void testCompleteTask() throws Exception {
@@ -99,12 +133,10 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
-        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
-        
+
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
-            .addClasspathResource("org/flowable/engine/configurator/test/simple.form").deploy();
+            .deploy();
         
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
@@ -117,12 +149,17 @@ public class ProcessTest extends FlowableAppTestCase {
             assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
             assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
             
-            FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertThat(formDefinition).isNotNull();
-            
             Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
-            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
+
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            FormInfo formInfo = new FormInfo();
+            when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, variables, null))
+                    .thenReturn(Collections.emptyMap());
+
+            taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
 
             assertThatThrownBy(() -> runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
                     .isInstanceOf(FlowableObjectNotFoundException.class);
@@ -139,11 +176,6 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
-            formEngineConfiguration.getFormRepositoryService()
-                    .createDeploymentQuery()
-                    .parentDeploymentId(deployment.getId())
-                    .list()
-                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
 
@@ -153,13 +185,10 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
-        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
-            .addClasspathResource("org/flowable/engine/configurator/test/another.form")
-            .addClasspathResource("org/flowable/engine/configurator/test/simple.form").deploy();
+            .deploy();
 
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
@@ -172,12 +201,16 @@ public class ProcessTest extends FlowableAppTestCase {
             assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
             assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
 
-            FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("anotherForm").singleResult();
-            assertThat(formDefinition).isNotNull();
-
             Map<String, Object> variables = new HashMap<>();
             variables.put("anotherInput", "test");
-            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            FormInfo formInfo = new FormInfo();
+            when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, variables, null))
+                    .thenReturn(Collections.emptyMap());
+
+            taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
 
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -189,11 +222,6 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
-            formEngineConfiguration.getFormRepositoryService()
-                    .createDeploymentQuery()
-                    .parentDeploymentId(deployment.getId())
-                    .list()
-                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
     

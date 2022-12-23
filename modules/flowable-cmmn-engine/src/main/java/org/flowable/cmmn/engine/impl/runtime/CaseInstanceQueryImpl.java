@@ -49,6 +49,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String caseDefinitionCategory;
     protected String caseDefinitionName;
     protected Integer caseDefinitionVersion;
+    protected String name;
+    protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String businessKey;
     protected String businessStatus;
     protected String caseInstanceId;
@@ -200,6 +203,45 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
         } else {
             this.caseInstanceIds = caseInstanceIds;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceName(String name) {
+        if (name == null) {
+            throw new FlowableIllegalArgumentException("Name is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.name = name;
+        } else {
+            this.name = name;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceNameLike(String nameLike) {
+        if (nameLike == null) {
+            throw new FlowableIllegalArgumentException("Name like is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.nameLike = nameLike;
+        } else {
+            this.nameLike = nameLike;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Name like ignore case is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.nameLikeIgnoreCase = nameLikeIgnoreCase;
+        } else {
+            this.nameLikeIgnoreCase = nameLikeIgnoreCase;
         }
         return this;
     }

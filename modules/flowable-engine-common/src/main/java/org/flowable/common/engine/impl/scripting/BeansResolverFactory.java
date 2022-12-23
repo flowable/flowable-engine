@@ -13,8 +13,8 @@
 
 package org.flowable.common.engine.impl.scripting;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -24,7 +24,7 @@ public class BeansResolverFactory implements ResolverFactory, Resolver {
     protected AbstractEngineConfiguration engineConfiguration;
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration processEngineConfiguration, VariableScope variableScope) {
+    public Resolver createResolver(AbstractEngineConfiguration processEngineConfiguration, VariableContainer variableContainer) {
         this.engineConfiguration = processEngineConfiguration;
         return this;
     }

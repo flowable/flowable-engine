@@ -450,6 +450,36 @@ public interface RuntimeService {
     // ///////////////////////////////////////////////////////////////
 
     /**
+     * Set the new owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new owner
+     * @param userId the id of the user to set as the new owner
+     */
+    void setOwner(String processInstanceId, String userId);
+
+    /**
+     * Removes the owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the owner from
+     */
+    void removeOwner(String processInstanceId);
+
+    /**
+     * Set the new assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new assignee
+     * @param userId the id of the user to set as the new assignee
+     */
+    void setAssignee(String processInstanceId, String userId);
+
+    /**
+     * Removes the assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the assignee from
+     */
+    void removeAssignee(String processInstanceId);
+
+    /**
      * Involves a user with a process instance. The type of identity link is defined by the given identityLinkType.
      *
      * @param processInstanceId

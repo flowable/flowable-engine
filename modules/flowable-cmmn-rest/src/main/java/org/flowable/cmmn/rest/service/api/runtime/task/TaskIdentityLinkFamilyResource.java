@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;

@@ -28,15 +28,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
 @Configuration(proxyBeanMethods = false)
-public class BootstrapConfiguration {
+public class BootstrapConfiguration implements EnvironmentAware {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BootstrapConfiguration.class);
 
@@ -45,6 +47,8 @@ public class BootstrapConfiguration {
     protected final IdmIdentityService idmIdentityService;
 
     protected final RestAppProperties restAppProperties;
+
+    protected Environment environment;
 
     public BootstrapConfiguration(RepositoryService repositoryService, IdmIdentityService idmIdentityService, RestAppProperties restAppProperties) {
         this.repositoryService = repositoryService;
@@ -60,7 +64,11 @@ public class BootstrapConfiguration {
     public CommandLineRunner initDefaultAdminUserAndPrivilegesRunner() {
         return args -> {
             if (StringUtils.isNotEmpty(restAppProperties.getAdmin().getUserId())) {
-                createDefaultAdminUserAndPrivileges(restAppProperties.getAdmin().getUserId());
+                if (environment.getProperty("flowable.idm.ldap.enabled", Boolean.class, false)) {
+                    initializeDefaultPrivileges(restAppProperties.getAdmin().getUserId());
+                } else {
+                    createDefaultAdminUserAndPrivileges(restAppProperties.getAdmin().getUserId());
+                }
             }
         };
     }
@@ -153,5 +161,9 @@ public class BootstrapConfiguration {
                 .deploy();
         }
     }
-    
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 }

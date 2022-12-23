@@ -60,6 +60,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
+    protected String caseInstanceName;
+    protected String caseInstanceNameLike;
     protected String caseInstanceNameLikeIgnoreCase;
     protected String businessKey;
     protected String businessStatus;
@@ -221,6 +223,36 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
         } else {
             this.caseInstanceIds = caseInstanceIds;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceName(String name) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceName = name;
+        } else {
+            this.caseInstanceName = name;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceNameLike(String nameLike) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceNameLike = nameLike;
+        } else {
+            this.caseInstanceNameLike = nameLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
+        } else {
+            this.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
         }
         return this;
     }
@@ -870,17 +902,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
-    public HistoricCaseInstanceQueryImpl caseInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
-        } else {
-            this.caseInstanceNameLikeIgnoreCase = nameLikeIgnoreCase;
-        }
-        return this;
-    }
-
-
-    @Override
     public HistoricCaseInstanceQuery variableValueGreaterThan(String name, Object value) {
         if (inOrStatement) {
             currentOrQueryObject.variableValueGreaterThan(name, value, false);
@@ -997,6 +1018,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public String getId() {
         return caseInstanceId;
+    }
+
+    public String getCaseInstanceName() {
+        return caseInstanceName;
+    }
+
+    public String getCaseInstanceNameLike() {
+        return caseInstanceNameLike;
     }
 
     public String getCaseInstanceNameLikeIgnoreCase() {

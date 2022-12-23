@@ -12,6 +12,8 @@
  */
 package flowable;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 
@@ -36,20 +38,22 @@ public class SampleLdapApplication {
         SpringApplication.run(SampleLdapApplication.class, args);
     }
 
-    @Order(99)
-    @Configuration
-    class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    @Configuration(proxyBeanMethods = false)
+    class ApiWebSecurityConfigurationAdapter {
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(99)
+        public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
-                .antMatcher("/process-api/**")
-                .authorizeRequests()
-                .antMatchers("/process-api/repository/**").hasAnyAuthority("repository-privilege")
-                .antMatchers("/process-api/management/**").hasAnyAuthority("management-privilege")
+                .securityMatcher(antMatcher("/process-api/**"))
+                .authorizeHttpRequests()
+                .requestMatchers(antMatcher("/process-api/repository/**")).hasAnyAuthority("repository-privilege")
+                .requestMatchers(antMatcher("/process-api/management/**")).hasAnyAuthority("management-privilege")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
+
+            return http.build();
         }
     }
 

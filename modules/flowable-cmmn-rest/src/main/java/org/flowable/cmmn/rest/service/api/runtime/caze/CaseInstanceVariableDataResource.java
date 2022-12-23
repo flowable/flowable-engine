@@ -13,10 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +41,7 @@ public class CaseInstanceVariableDataResource extends BaseVariableResource {
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Case Instance Variables" }, nickname = "getCaseInstanceVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested case was not found or the case does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @ResponseBody
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}/data")
@@ -49,6 +50,6 @@ public class CaseInstanceVariableDataResource extends BaseVariableResource {
             HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
-        return getVariableDataByteArray(caseInstance, variableName, response);
+        return getVariableDataByteArray(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, response);
     }
 }

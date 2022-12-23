@@ -218,7 +218,7 @@
     </where>
   </sql>
 
-  <select id="selectHistoricDecisionExecutionByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
+  <select id="selectHistoricDecisionExecutionsByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
     <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 

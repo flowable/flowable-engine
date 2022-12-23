@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
@@ -61,7 +62,7 @@ class EventListenerConverterTest {
     }
 
     @BpmnXmlConverterTest(value = "eventlistenerscript.bpmn20.xml")
-    void validateEventListenerScriptParsing(BpmnModel model) {
+    void validateTaskListenerScriptParsing(BpmnModel model) {
         Process process = model.getMainProcess();
         UserTask userTask = (UserTask) process.getFlowElement("userTask");
         assertThat(userTask).isNotNull();
@@ -85,8 +86,27 @@ class EventListenerConverterTest {
         assertThat(scriptTaskListenerType.getImplementationType()).isEqualTo("script");
         assertThat(scriptTaskListenerType.getImplementation()).isNull();
         assertThat(scriptTaskListenerType.getScriptInfo()).isNotNull();
-        assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains(" task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
         assertThat(scriptTaskListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
         assertThat(scriptTaskListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
+    }
+
+    @BpmnXmlConverterTest(value = "eventlistenerscript.bpmn20.xml")
+    void validateExecutionListenerScriptParsing(BpmnModel model) {
+        Process process = model.getMainProcess();
+        SequenceFlow flow = (SequenceFlow) process.getFlowElement("flow10");
+        assertThat(flow).isNotNull();
+        assertThat(flow.getExecutionListeners()).hasSize(1);
+
+        List<FlowableListener> taskListeners = flow.getExecutionListeners();
+
+        FlowableListener scriptListenerType = taskListeners.get(0);
+        assertThat(scriptListenerType.getEvent()).isEqualTo("take");
+        assertThat(scriptListenerType.getImplementationType()).isEqualTo("script");
+        assertThat(scriptListenerType.getImplementation()).isNull();
+        assertThat(scriptListenerType.getScriptInfo()).isNotNull();
+        assertThat(scriptListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
+        assertThat(scriptListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
     }
 }

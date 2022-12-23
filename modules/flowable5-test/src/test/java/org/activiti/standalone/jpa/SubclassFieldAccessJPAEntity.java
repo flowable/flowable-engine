@@ -13,8 +13,8 @@
 
 package org.activiti.standalone.jpa;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
 /**
  * @author Frederik Heremans

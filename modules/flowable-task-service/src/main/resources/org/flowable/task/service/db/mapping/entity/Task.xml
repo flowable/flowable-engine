@@ -488,7 +488,7 @@
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
       <if test="nameList != null &amp;&amp; !nameList.empty">
         and RES.NAME_ IN
@@ -1037,6 +1037,13 @@
             <if test="orQueryObject.taskId != null">
               RES.ID_ = #{orQueryObject.taskId}
             </if>
+            <if test="orQueryObject.taskIds != null &amp;&amp; !orQueryObject.taskIds.empty">
+                or RES.ID_ IN
+                <foreach item="taskId" index="index" collection="orQueryObject.taskIds"
+                         open="(" separator="," close=")">
+                    #{taskId}
+                </foreach>
+            </if>
             <if test="orQueryObject.name != null">
               or RES.NAME_ = #{orQueryObject.name}
             </if>
@@ -1044,7 +1051,7 @@
               or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
             </if>
             <if test="orQueryObject.nameLikeIgnoreCase != null">
-              or lower(RES.NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
+              or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
             </if>
             <if test="orQueryObject.nameList != null &amp;&amp; !orQueryObject.nameList.empty">
               or RES.NAME_ IN

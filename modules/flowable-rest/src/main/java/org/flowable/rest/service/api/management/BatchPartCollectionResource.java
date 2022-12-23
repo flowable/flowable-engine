@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.management;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
