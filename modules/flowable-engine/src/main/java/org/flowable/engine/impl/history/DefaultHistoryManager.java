@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -61,6 +62,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultHistoryManager extends AbstractHistoryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
+    
+    public static final int MAX_SUB_PROCESS_INSTANCES = 1000;
 
     public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -181,7 +184,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
             List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
             if (subProcessInstanceIds != null && !subProcessInstanceIds.isEmpty()) {
-                processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(subProcessInstanceIds);
+                List<List<String>> partitionedSubProcessInstanceIds = CollectionUtil.partition(subProcessInstanceIds, MAX_SUB_PROCESS_INSTANCES);
+                for (List<String> batchSubProcessInstanceIds : partitionedSubProcessInstanceIds) {
+                    processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(batchSubProcessInstanceIds);
+                }
             }
         }
     }
