@@ -92,6 +92,7 @@
                                 <JAVA_OPTS>-Xmx512M</JAVA_OPTS>
                                 <SERVER_PORT>8080</SERVER_PORT>
                             </environment>
+                            <user>flowable:flowable</user>
                             <entrypoint>
                                 <entrypoint>/flowable-entrypoint.sh</entrypoint>
                             </entrypoint>
@@ -102,7 +103,7 @@
                             <permissions>
                                 <permission>
                                     <file>/flowable-entrypoint.sh</file>
-                                    <mode>544</mode> <!-- Read/execute for owner, read for group/other -->
+                                    <mode>555</mode> <!-- Read/execute for all -->
                                 </permission>
                             </permissions>
                         </extraDirectories>
