@@ -138,6 +138,20 @@ public class HttpResponse extends org.flowable.http.common.api.HttpResponse {
     }
 
     @Override
+    public byte[] getBodyBytes() {
+        return delegate != null ? delegate.getBodyBytes() : super.getBodyBytes();
+    }
+
+    @Override
+    public void setBodyBytes(byte[] bodyBytes) {
+        if (delegate != null) {
+            delegate.setBodyBytes(bodyBytes);
+        } else {
+            super.setBodyBytes(bodyBytes);
+        }
+    }
+
+    @Override
     public boolean isBodyResponseHandled() {
         return delegate != null ? delegate.isBodyResponseHandled() : super.isBodyResponseHandled();
     }

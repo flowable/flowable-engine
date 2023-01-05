@@ -15,8 +15,11 @@ package org.flowable.http;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
@@ -26,6 +29,7 @@ import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.springframework.core.io.ClassPathResource;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -57,6 +61,23 @@ class FlowableHttpClientTest {
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getHttpHeaders().get("Content-Type"))
                 .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void getImage(FlowableHttpClient httpClient) throws IOException {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/resource?resource=org/flowable/http/images/flowable-logo.png");
+        request.setMethod("GET");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        byte[] imageBytes;
+        try (InputStream stream = new ClassPathResource("org/flowable/http/images/flowable-logo.png").getInputStream()) {
+            imageBytes = IOUtils.toByteArray(stream);
+        }
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(imageBytes);
     }
 
     @ParameterizedTest

@@ -269,12 +269,14 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
         if (body != null) {
             if (body.isText()) {
                 responseInfo.setBody(body.getBodyText());
+                responseInfo.setBodyBytes(body.getBodyBytes());
             } else {
                 try {
                     // We are creating a fake entity in order to rely on the creation of a String using the EntityUtils
                     // They contain some special logic for picking the default charset based on the content type
                     // (in case the content type doesn't have a charset)
                     responseInfo.setBody(EntityUtils.toString(new ByteArrayEntity(body.getBodyBytes(), body.getContentType())));
+                    responseInfo.setBodyBytes(body.getBodyBytes());
                 } catch (IOException | ParseException e) {
                     throw new FlowableException("Failed to read body");
                 }

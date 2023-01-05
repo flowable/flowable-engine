@@ -13,6 +13,7 @@
 package org.flowable.http.bpmn;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -98,6 +100,7 @@ public class HttpServiceTaskTestServer {
             contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
+            contextHandler.addServlet(new ServletHolder(new ClasspathResourceServlet()), "/resource");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -329,6 +332,22 @@ public class HttpServiceTaskTestServer {
             resp.setStatus(200);
         }
 
+    }
+
+    protected static class ClasspathResourceServlet extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            String resource = req.getParameter("resource");
+            if (StringUtils.isNotEmpty(resource)) {
+                resp.setStatus(200);
+                try (InputStream resourceStream = new ClassPathResource(resource).getInputStream()) {
+                    resp.getOutputStream().write(IOUtils.toByteArray(resourceStream));
+                }
+            } else {
+                resp.sendError(400, "resource not provided");
+            }
+        }
     }
 
     public static void setUp() {
