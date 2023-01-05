@@ -226,6 +226,8 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             } else {
                 responseInfo.setBody(new String(bodyBytes));
             }
+
+            responseInfo.setBodyBytes(bodyBytes);
         }
 
         return responseInfo;
