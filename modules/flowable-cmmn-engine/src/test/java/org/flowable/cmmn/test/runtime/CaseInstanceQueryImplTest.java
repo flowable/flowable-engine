@@ -37,10 +37,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CaseLocalizationManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.junit.Before;
@@ -579,6 +583,31 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId")
                 .caseInstanceReferenceType("testReferenceType").count()).isEqualTo(4);
+    }
+
+    @Test
+    public void updateAndGetCaseInstanceByReferenceIdAndType() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        // Test update for referenceId and referenceType
+        CommandExecutor commandExecutor = cmmnEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) caseInstance;
+                caseInstanceEntity.setReferenceId("testReferenceId");
+                caseInstanceEntity.setReferenceType("testReferenceType");
+                cmmnEngineConfiguration.getCaseInstanceEntityManager().update(caseInstanceEntity);
+
+                return null;
+            }
+        });
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceReferenceId("testReferenceId")
+                .caseInstanceReferenceType("testReferenceType").count()).isEqualTo(1);
     }
 
     @Test
