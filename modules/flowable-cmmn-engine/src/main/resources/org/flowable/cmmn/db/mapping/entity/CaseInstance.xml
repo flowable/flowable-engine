@@ -117,10 +117,10 @@
                 CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.referenceId != referenceId">
-                REFERENCE_ID_ = ${referenceId, jdbcType=VARCHAR},
+                REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.referenceType != referenceType">
-                REFERENCE_TYPE_ = ${referenceType, jdbcType=VARCHAR},
+                REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.completeable != completeable">
                 IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR},
