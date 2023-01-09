@@ -215,4 +215,31 @@ class FlowableHttpClientTest {
                 .containsExactly("application/json");
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void simpleHead(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/test");
+        request.setMethod("HEAD");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getBody()).isNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void simpleOptions(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/test");
+        request.setMethod("OPTIONS");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Allow"))
+                .first()
+                .isEqualTo("GET, HEAD, TRACE, OPTIONS");
+    }
+
+
 }

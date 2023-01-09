@@ -139,6 +139,14 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                     headersSpec = delete;
                     break;
                 }
+                case "HEAD": {
+                    headersSpec = webClient.head().uri(uri);
+                    break;
+                }
+                case "OPTIONS": {
+                    headersSpec = webClient.options().uri(uri);
+                    break;
+                }
                 default: {
                     throw new FlowableException(requestInfo.getMethod() + " HTTP method not supported");
                 }
