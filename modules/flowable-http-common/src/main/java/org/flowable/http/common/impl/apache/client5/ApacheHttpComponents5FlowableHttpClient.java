@@ -173,6 +173,14 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                     setRequestEntity(requestInfo, request);
                     break;
                 }
+                case "HEAD": {
+                    request = AsyncRequestBuilder.head(uri);
+                    break;
+                }
+                case "OPTIONS": {
+                    request = AsyncRequestBuilder.options(uri);
+                    break;
+                }
                 default: {
                     throw new FlowableException(requestInfo.getMethod() + " HTTP method not supported");
                 }

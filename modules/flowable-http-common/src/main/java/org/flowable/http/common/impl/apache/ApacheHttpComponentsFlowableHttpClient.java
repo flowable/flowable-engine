@@ -35,6 +35,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -184,6 +186,13 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                     request = delete;
                     break;
                 }
+                case "HEAD": {
+                    request = new HttpHead(uri);
+                    break;
+                }
+                case "OPTIONS":
+                    request = new HttpOptions(uri);
+                    break;
                 default: {
                     throw new FlowableException(requestInfo.getMethod() + " HTTP method not supported");
                 }
