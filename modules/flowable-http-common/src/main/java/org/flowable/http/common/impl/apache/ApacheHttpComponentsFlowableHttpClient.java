@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
@@ -104,6 +105,10 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
 
     @SuppressWarnings("unused") // Used by HttpClientConfig determineHttpClient
     public ApacheHttpComponentsFlowableHttpClient(HttpClientConfig config) {
+        this(config, clientBuilder -> {});
+    }
+
+    public ApacheHttpComponentsFlowableHttpClient(HttpClientConfig config, Consumer<HttpClientBuilder> clientBuilderCustomizer) {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings
@@ -136,6 +141,8 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
         if (config.isUseSystemProperties()) {
             httpClientBuilder.useSystemProperties();
         }
+
+        clientBuilderCustomizer.accept(httpClientBuilder);
 
         this.clientBuilder = httpClientBuilder;
 
