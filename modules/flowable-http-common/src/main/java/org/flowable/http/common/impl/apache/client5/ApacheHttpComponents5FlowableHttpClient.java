@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,7 @@ import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
 import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.io.ModalCloseable;
+import org.apache.hc.core5.reactor.IOReactorConfig;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import org.flowable.common.engine.api.FlowableException;
@@ -87,6 +89,10 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
     protected int connectionRequestTimeout;
 
     public ApacheHttpComponents5FlowableHttpClient(HttpClientConfig config) {
+        this(config, clientBuilder -> {});
+    }
+
+    public ApacheHttpComponents5FlowableHttpClient(HttpClientConfig config, Consumer<HttpAsyncClientBuilder> clientBuilderCustomizer) {
         HttpAsyncClientBuilder httpClientBuilder = HttpAsyncClients.custom();
 
         PoolingAsyncClientConnectionManagerBuilder managerBuilder = PoolingAsyncClientConnectionManagerBuilder.create()
@@ -110,6 +116,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             retryCount = config.getRequestRetryLimit();
         }
         httpClientBuilder.setRetryStrategy(new DefaultHttpRequestRetryStrategy(retryCount, TimeValue.ZERO_MILLISECONDS));
+        clientBuilderCustomizer.accept(httpClientBuilder);
 
         // system settings
         if (config.isUseSystemProperties()) {
