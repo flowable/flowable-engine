@@ -85,12 +85,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
         }
 
-        httpClient = httpClient.tcpConfiguration(tcpClient -> {
-            tcpClient = tcpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout());
-            tcpClient = tcpClient.doOnConnected(conn -> conn
-                    .addHandlerLast(new ReadTimeoutHandler(config.getSocketTimeout(), TimeUnit.MILLISECONDS)));
-            return tcpClient;
-        });
+        httpClient = httpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
+                .doOnConnected(conn -> conn
+                        .addHandlerLast(new ReadTimeoutHandler(config.getSocketTimeout(), TimeUnit.MILLISECONDS)));
 
         WebClient.Builder webClientBuilder = WebClient.builder();
         webClientBuilder = webClientBuilder.clientConnector(new ReactorClientHttpConnector(httpClient));
