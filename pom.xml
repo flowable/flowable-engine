@@ -15,7 +15,7 @@
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>3.0.1</spring.boot.version>
-		<spring.framework.version>6.0.3</spring.framework.version>
+		<spring.framework.version>6.0.4</spring.framework.version>
 		<spring.security.version>6.0.1</spring.security.version>
 		<spring.amqp.version>3.0.0</spring.amqp.version>
 		<spring.kafka.version>3.0.1</spring.kafka.version>
