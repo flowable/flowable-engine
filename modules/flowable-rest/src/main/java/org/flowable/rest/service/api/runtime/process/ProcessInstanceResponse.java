@@ -47,6 +47,7 @@ public class ProcessInstanceResponse {
     protected String startUserId;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
+    protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
@@ -180,6 +181,15 @@ public class ProcessInstanceResponse {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+    
+    @ApiModelProperty(example = "3")
+    public String getSuperProcessInstanceId() {
+        return superProcessInstanceId;
+    }
+
+    public void setSuperProcessInstanceId(String superProcessInstanceId) {
+        this.superProcessInstanceId = superProcessInstanceId;
     }
 
     public List<RestVariable> getVariables() {

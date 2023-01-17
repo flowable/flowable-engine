@@ -24,10 +24,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,6 +83,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"
                         + "referenceType: 'testReferenceType',"
+                        + "superProcessInstanceId: null, "
                         + "propagatedStageInstanceId: 'testStageInstanceId',"
                         + "suspended: false,"
                         + "tenantId: '',"
@@ -99,6 +102,56 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("tenantId").textValue()).isEqualTo("myTenant");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testGetProcessInstanceWithParentInstance() throws Exception {
+        Authentication.setAuthenticatedUserId("testUser");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processOne")
+                .businessKey("myBusinessKey")
+                .start();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstance).isNotNull();
+        
+        ProcessDefinition subProcessDefinition = repositoryService.getProcessDefinition(subProcessInstance.getProcessDefinitionId());
+        
+        Authentication.setAuthenticatedUserId(null);
+
+        String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, subProcessInstance.getId());
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        // Check resulting instance
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + subProcessInstance.getId() + "',"
+                        + "startTime: '${json-unit.any-string}',"
+                        + "startUserId: '" + subProcessInstance.getStartUserId() + "',"
+                        + "processDefinitionId: '" + subProcessInstance.getProcessDefinitionId() + "',"
+                        + "processDefinitionName: '" + subProcessDefinition.getName() + "', "
+                        + "businessKey: null,"
+                        + "businessStatus: null,"
+                        + "callbackId: null,"
+                        + "callbackType: null,"
+                        + "referenceId: null,"
+                        + "referenceType: null,"
+                        + "superProcessInstanceId: '" + processInstance.getId() + "', "
+                        + "propagatedStageInstanceId: null,"
+                        + "suspended: false,"
+                        + "tenantId: '',"
+                        + "url: '" + url + "',"
+                        + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, subProcessInstance.getProcessDefinitionId()) + "'"
+                        + "}"
+                );
     }
 
     /**
