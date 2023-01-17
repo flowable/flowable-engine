@@ -13,20 +13,17 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.ProcessMigrationService;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +42,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -55,9 +54,6 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     
     @Autowired
     protected DynamicBpmnService dynamicBpmnService;
-    
-    @Autowired
-    protected RepositoryService repositoryService;
 
     @Autowired
     protected ProcessMigrationService migrationService;
@@ -69,13 +65,21 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}", produces = "application/json")
     public ProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        ProcessInstanceResponse processInstanceResponse = restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
+        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstanceResponse processInstanceResponse = restResponseFactory.createProcessInstanceResponse(processInstance);
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
         
         if (processDefinition != null) {
             processInstanceResponse.setProcessDefinitionName(processDefinition.getName());
             processInstanceResponse.setProcessDefinitionDescription(processDefinition.getDescription());
+        }
+        
+        if (StringUtils.isNotEmpty(processInstance.getSuperExecutionId())) {
+            Execution parentProcessExecution = runtimeService.createExecutionQuery().executionId(processInstance.getSuperExecutionId()).singleResult();
+            if (parentProcessExecution != null) {
+                processInstanceResponse.setSuperProcessInstanceId(parentProcessExecution.getProcessInstanceId());
+            }
         }
         
         return processInstanceResponse;
