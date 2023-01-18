@@ -20,7 +20,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -34,7 +33,7 @@ public class FlowableJobConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AsyncListenableTaskExecutor taskExecutor() {
+    public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(8);
         executor.setMaxPoolSize(8);

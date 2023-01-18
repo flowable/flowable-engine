@@ -18,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -27,11 +26,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
-    protected final AsyncListenableTaskExecutor asyncTaskExecutor;
+    protected final AsyncTaskExecutor asyncTaskExecutor;
 
     protected final boolean isAsyncTaskExecutorAopProxied;
 
-    public SpringAsyncTaskExecutor(AsyncListenableTaskExecutor asyncTaskExecutor) {
+    public SpringAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
         this.isAsyncTaskExecutorAopProxied = AopUtils.isAopProxy(asyncTaskExecutor); // no need to repeat this every time, done once in constructor
     }
@@ -43,12 +42,12 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
     @Override
     public CompletableFuture<?> submit(Runnable task) {
-        return asyncTaskExecutor.submitListenable(task).completable();
+        return asyncTaskExecutor.submit(task);
     }
 
     @Override
     public <T> CompletableFuture<T> submit(Callable<T> task) {
-        return asyncTaskExecutor.submitListenable(task).completable();
+        return asyncTaskExecutor.submit(task);
     }
 
     @Override
@@ -56,7 +55,7 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
         // This uses spring resources passed in the constructor, therefore there is nothing to shutdown here
     }
 
-    public AsyncListenableTaskExecutor getAsyncTaskExecutor() {
+    public AsyncTaskExecutor getAsyncTaskExecutor() {
         return asyncTaskExecutor;
     }
 
