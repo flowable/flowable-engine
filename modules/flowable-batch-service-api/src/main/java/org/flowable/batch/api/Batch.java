@@ -18,6 +18,8 @@ public interface Batch {
 
     String PROCESS_MIGRATION_TYPE = "processMigration";
 
+    String CASE_MIGRATION_TYPE = "caseMigration";
+
     String HISTORIC_PROCESS_DELETE_TYPE = "historicProcessDelete";
 
     String HISTORIC_CASE_DELETE_TYPE = "historicCaseDelete";
