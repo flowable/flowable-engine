@@ -805,7 +805,7 @@ It’s used as follows:
       <flowable:field name="language" stringValue="javascript" />
     </flowable:executionListener>
 
-For examples that demonstrate unsecure scripts and how they are made secure by the *secure scripting* feature, please check the [unit tests on Github](https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources)
+For examples that demonstrate unsecure scripts and how they are made secure by the *secure scripting* feature, please check the [unit tests on Github](https://github.com/Flowable/Flowable/tree/main/modules/flowable-secure-javascript/src/test/resources)
 
 ## Logging Sessions \[Experimental\]
 
