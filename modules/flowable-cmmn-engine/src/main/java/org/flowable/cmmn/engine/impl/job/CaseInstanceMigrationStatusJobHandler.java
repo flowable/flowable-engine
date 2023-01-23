@@ -44,14 +44,9 @@ public class CaseInstanceMigrationStatusJobHandler extends AbstractCaseInstanceM
 
         List<BatchPart> batchParts = batchService.findBatchPartsByBatchId(batchId);
         int completedBatchParts = 0;
-        int failedBatchParts = 0;
         for (BatchPart batchPart : batchParts) {
             if (batchPart.getCompleteTime() != null) {
                 completedBatchParts++;
-
-                if (CaseInstanceBatchMigrationResult.RESULT_FAIL.equals(batchPart.getStatus())) {
-                    failedBatchParts++;
-                }
             }
         }
         if (completedBatchParts == batchParts.size()) {
