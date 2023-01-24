@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
+import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
@@ -141,6 +142,10 @@ public class CmmnJobTestHelper {
                 asyncExecutor.shutdown();
             }
         }
+    }
+
+    public static boolean areJobsAvailable(CmmnManagementService managementService) {
+        return !managementService.createJobQuery().list().isEmpty();
     }
 
     public static class InterruptTask extends TimerTask {
