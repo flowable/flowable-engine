@@ -134,6 +134,8 @@ import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkIntercep
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncLeaveActivePlanItemInstanceJobHandler;
+import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationJobHandler;
+import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationStatusJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
@@ -1678,6 +1680,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
         jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
+        addJobHandler(new CaseInstanceMigrationJobHandler());
+        addJobHandler(new CaseInstanceMigrationStatusJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceIdsJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceStatusJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsJobHandler());
