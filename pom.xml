@@ -14,22 +14,22 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.0.1</spring.boot.version>
+		<spring.boot.version>3.0.2</spring.boot.version>
 		<spring.framework.version>6.0.4</spring.framework.version>
 		<spring.security.version>6.0.1</spring.security.version>
-		<spring.amqp.version>3.0.0</spring.amqp.version>
-		<spring.kafka.version>3.0.1</spring.kafka.version>
+		<spring.amqp.version>3.0.1</spring.amqp.version>
+		<spring.kafka.version>3.0.2</spring.kafka.version>
 		<reactor-netty.version>1.1.1</reactor-netty.version>
 		<jackson.version>2.14.1</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>3.19.0</camel.version>
 		<cxf.version>3.5.4</cxf.version>
 		<slf4j.version>2.0.6</slf4j.version>
-		<groovy.version>4.0.3</groovy.version>
+		<groovy.version>4.0.7</groovy.version>
 		<jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.9.1</junit.jupiter.version>
+		<junit.jupiter.version>5.9.2</junit.jupiter.version>
 		<hikari.version>4.0.3</hikari.version>
 		<maven.deploy.plugin.version>3.0.0</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
@@ -234,7 +234,7 @@
 			<dependency>
 				<groupId>com.mysql</groupId>
 				<artifactId>mysql-connector-j</artifactId>
-				<version>8.0.31</version>
+				<version>8.0.32</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
