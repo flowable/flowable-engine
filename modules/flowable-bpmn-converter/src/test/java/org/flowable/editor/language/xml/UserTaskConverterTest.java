@@ -41,6 +41,7 @@ class UserTaskConverterTest {
                     assertThat(userTask.isSameDeployment()).isTrue();
                     assertThat(userTask.getPriority()).isEqualTo("40");
                     assertThat(userTask.getTaskIdVariableName()).isEqualTo("myTaskId");
+                    assertThat(userTask.getTaskCompleterVariableName()).isEqualTo("completer");
                     assertThat(userTask.getDueDate()).isEqualTo("2012-11-01");
 
                     assertThat(userTask.getBusinessCalendarName()).isEqualTo("customCalendarName");
@@ -86,7 +87,7 @@ class UserTaskConverterTest {
                                     FlowableListener::getCustomPropertiesResolverImplementation)
                             .containsExactly(tuple("end", "before-commit", "org.test.TestResolverClass"));
                 });
-        
+
         assertThat(model.getEdgeInfo("flow2")).isNotNull();
         BpmnDiEdge edgeInfo = model.getEdgeInfo("flow2");
         assertThat(edgeInfo.getSourceDockerInfo().getX()).isEqualTo(50.0);
@@ -94,7 +95,7 @@ class UserTaskConverterTest {
         assertThat(edgeInfo.getTargetDockerInfo().getX()).isEqualTo(40.0);
         assertThat(edgeInfo.getTargetDockerInfo().getY()).isEqualTo(30.0);
         assertThat(edgeInfo.getWaypoints()).hasSize(2);
-        
+
         assertThat(model.getEdgeInfo("flow1")).isNull();
     }
 
