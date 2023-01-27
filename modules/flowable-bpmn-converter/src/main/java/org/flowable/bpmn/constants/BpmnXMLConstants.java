@@ -228,6 +228,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_USER_PRIORITY = "priority";
     public static final String ATTRIBUTE_TASK_USER_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
+    public static final String ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME = "taskCompleterVariableName";
 
     public static final String ATTRIBUTE_TASK_RULE_VARIABLES_INPUT = "ruleVariablesInput";
     public static final String ATTRIBUTE_TASK_RULE_RESULT_VARIABLE = "resultVariable";
@@ -341,7 +342,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
     public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
-    
+
     public static final String ELEMENT_EVENT_VARIABLELISTENERDEFINITION = "variableListenerEventDefinition";
     public static final String ATTRIBUTE_VARIABLE_NAME = "variableName";
     public static final String ATTRIBUTE_VARIABLE_CHANGE_TYPE = "variableChangeType";

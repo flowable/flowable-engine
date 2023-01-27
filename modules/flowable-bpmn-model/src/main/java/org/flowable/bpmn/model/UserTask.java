@@ -40,6 +40,7 @@ public class UserTask extends Task {
     protected String skipExpression;
     protected String validateFormFields;
     protected String taskIdVariableName;
+    protected String taskCompleterVariableName;
 
     protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<>();
     protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<>();
@@ -224,6 +225,14 @@ public class UserTask extends Task {
         this.taskIdVariableName = taskIdVariableName;
     }
 
+    public String getTaskCompleterVariableName() {
+        return taskCompleterVariableName;
+    }
+
+    public void setTaskCompleterVariableName(String taskCompleterVariableName) {
+        this.taskCompleterVariableName = taskCompleterVariableName;
+    }
+
     @Override
     public UserTask clone() {
         UserTask clone = new UserTask();
@@ -241,6 +250,7 @@ public class UserTask extends Task {
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
         setTaskIdVariableName(otherElement.getTaskIdVariableName());
+        setTaskCompleterVariableName(otherElement.getTaskCompleterVariableName());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
         setValidateFormFields(otherElement.getValidateFormFields());
