@@ -926,4 +926,12 @@
       </documentation>
     </annotation>
   </attribute>
+
+  <attribute name="taskCompleterVariableName" type="string" default="">
+    <annotation>
+      <documentation>
+        Allows to specify a variable name on a user task where the completer's user ID will be stored.
+      </documentation>
+    </annotation>
+  </attribute>
 </schema>

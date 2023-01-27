@@ -57,7 +57,8 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION),
-            new ExtensionAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME));
+            new ExtensionAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME));
 
     public UserTaskXMLConverter() {
         HumanPerformerParser humanPerformerParser = new HumanPerformerParser();
@@ -102,6 +103,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         userTask.setOwner(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_OWNER, xtr));
         userTask.setPriority(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_PRIORITY, xtr));
         userTask.setTaskIdVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_ID_VARIABLE_NAME, xtr));
+        userTask.setTaskCompleterVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME, xtr));
 
         String sameDeploymentAttribute = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr);
         if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(sameDeploymentAttribute)) {
@@ -161,6 +163,9 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
         if (userTask.getTaskIdVariableName() != null) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME, userTask.getTaskIdVariableName(), xtw);
+        }
+        if (userTask.getTaskCompleterVariableName() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME, userTask.getTaskCompleterVariableName(), xtw);
         }
         // write custom attributes
         BpmnXMLUtil.writeCustomAttributes(userTask.getAttributes().values(), xtw, defaultElementAttributes,
