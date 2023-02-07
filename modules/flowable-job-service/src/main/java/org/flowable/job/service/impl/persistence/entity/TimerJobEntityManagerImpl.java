@@ -197,6 +197,8 @@ public class TimerJobEntityManagerImpl
         newTimerEntity.setSubScopeId(te.getSubScopeId());
         newTimerEntity.setScopeDefinitionId(te.getScopeDefinitionId());
         newTimerEntity.setScopeType(te.getScopeType());
+        newTimerEntity.setElementId(te.getElementId());
+        newTimerEntity.setElementName(te.getElementId());
 
         // Inherit tenant
         newTimerEntity.setTenantId(te.getTenantId());
