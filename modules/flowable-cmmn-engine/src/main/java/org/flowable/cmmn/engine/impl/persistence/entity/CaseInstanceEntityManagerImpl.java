@@ -103,7 +103,7 @@ public class CaseInstanceEntityManagerImpl
         List<VariableInstanceEntity> variableInstances = getVariableInstanceEntityManager()
                 .createInternalVariableInstanceQuery()
                 .scopeId(caseInstanceEntity.getId())
-                .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                .scopeTypes(engineConfiguration.getDependentScopeTypes())
                 .list();
         boolean deleteVariableInstances = !variableInstances.isEmpty();
 
@@ -114,7 +114,7 @@ public class CaseInstanceEntityManagerImpl
         }
 
         if (deleteVariableInstances) {
-            getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, ScopeTypes.CMMN_DEPENDENT);
+            getVariableInstanceEntityManager().deleteByScopeIdAndScopeTypes(caseInstanceId, engineConfiguration.getDependentScopeTypes());
         }
 
         // Identity links
