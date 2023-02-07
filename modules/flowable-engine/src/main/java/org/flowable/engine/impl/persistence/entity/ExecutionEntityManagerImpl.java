@@ -948,7 +948,7 @@ public class ExecutionEntityManagerImpl
             List<VariableInstanceEntity> variableInstances = engineConfiguration.getVariableServiceConfiguration().getVariableService()
                     .createInternalVariableInstanceQuery()
                     .subScopeId(executionEntity.getId())
-                    .scopeTypes(ScopeTypes.BPMN_DEPENDENT)
+                    .scopeTypes(engineConfiguration.getDependentScopeTypes())
                     .list();
             boolean deleteVariableInstances = !variableInstances.isEmpty();
 
@@ -970,7 +970,7 @@ public class ExecutionEntityManagerImpl
 
             if (deleteVariableInstances) {
                 engineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager()
-                        .deleteBySubScopeIdAndScopeTypes(executionEntity.getId(), ScopeTypes.BPMN_DEPENDENT);
+                        .deleteBySubScopeIdAndScopeTypes(executionEntity.getId(), engineConfiguration.getDependentScopeTypes());
             }
 
         }
