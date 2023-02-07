@@ -50,6 +50,7 @@ import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 /**
@@ -875,6 +876,32 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getEndTime()).isNotNull();
             assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testTerminateCaseInstanceWithPlanItemVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        assertThat(cmmnRuntimeService.createVariableInstanceQuery().list())
+                .extracting(VariableInstance::getName)
+                .isEmpty();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionId("theTask")
+                .singleResult();
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "caseVar", "test");
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "localVar", "test");
+
+        assertThat(cmmnRuntimeService.createVariableInstanceQuery().list())
+                .extracting(VariableInstance::getName)
+                .containsExactlyInAnyOrder("caseVar", "localVar");
+
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createVariableInstanceQuery().list())
+                .extracting(VariableInstance::getName)
+                .isEmpty();
     }
     
     @Test

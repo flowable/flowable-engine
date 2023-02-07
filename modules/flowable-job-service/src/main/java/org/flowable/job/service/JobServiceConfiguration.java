@@ -13,12 +13,15 @@
 package org.flowable.job.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.ServiceConfigurator;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -31,6 +34,8 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExcepti
 import org.flowable.job.service.impl.asyncexecutor.DefaultJobManager;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.asyncexecutor.TimerJobScheduler;
+import org.flowable.job.service.impl.asyncexecutor.TimerJobSchedulerImpl;
 import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
@@ -79,6 +84,9 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected HistoryJobService historyJobService = new HistoryJobServiceImpl(this);
 
     protected JobManager jobManager;
+
+    protected TimerJobScheduler timerJobScheduler;
+    protected Collection<ServiceConfigurator<JobServiceConfiguration>> configurators;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -142,9 +150,26 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        List<ServiceConfigurator<JobServiceConfiguration>> configurators;
+        if (this.configurators != null) {
+            configurators = new ArrayList<>(this.configurators);
+            configurators.sort(Comparator.comparingInt(ServiceConfigurator::getPriority));
+        } else {
+            configurators = Collections.emptyList();
+        }
+
+        for (ServiceConfigurator<JobServiceConfiguration> configurator : configurators) {
+            configurator.beforeInit(this);
+        }
+
+        initTimerJobScheduler();
         initJobManager();
         initDataManagers();
         initEntityManagers();
+
+        for (ServiceConfigurator<JobServiceConfiguration> configurator : configurators) {
+            configurator.afterInit(this);
+        }
     }
 
     @Override
@@ -162,6 +187,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             logger.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
+    }
+
+    protected void initTimerJobScheduler() {
+        if (timerJobScheduler == null) {
+            timerJobScheduler = new TimerJobSchedulerImpl(this);
+        }
     }
 
     // Job manager ///////////////////////////////////////////////////////////
@@ -259,6 +290,22 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
+    }
+
+    public TimerJobScheduler getTimerJobScheduler() {
+        return timerJobScheduler;
+    }
+
+    public void setTimerJobScheduler(TimerJobScheduler timerJobScheduler) {
+        this.timerJobScheduler = timerJobScheduler;
+    }
+
+    public Collection<ServiceConfigurator<JobServiceConfiguration>> getConfigurators() {
+        return configurators;
+    }
+
+    public void setConfigurators(Collection<ServiceConfigurator<JobServiceConfiguration>> configurators) {
+        this.configurators = configurators;
     }
 
     public JobDataManager getJobDataManager() {
