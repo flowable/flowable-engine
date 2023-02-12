@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Joram Barrez
  */
@@ -33,6 +35,7 @@ public class CmmnModel {
     protected String exporterVersion;
     protected String author;
     protected Date creationDate;
+    protected Map<String, List<ExtensionAttribute>> definitionsAttributes = new LinkedHashMap<>();
 
     protected List<Case> cases = new ArrayList<>();
 
@@ -356,4 +359,36 @@ public class CmmnModel {
     public Map<String, String> getNamespaces() {
         return namespaceMap;
     }
+
+    public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
+        return definitionsAttributes;
+    }
+
+    public String getDefinitionsAttributeValue(String namespace, String name) {
+        List<ExtensionAttribute> attributes = getDefinitionsAttributes().get(name);
+        if (attributes != null && !attributes.isEmpty()) {
+            for (ExtensionAttribute attribute : attributes) {
+                if (namespace.equals(attribute.getNamespace())) {
+                    return attribute.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public void addDefinitionsAttribute(ExtensionAttribute attribute) {
+        if (attribute != null && StringUtils.isNotEmpty(attribute.getName())) {
+            List<ExtensionAttribute> attributeList = null;
+            if (!this.definitionsAttributes.containsKey(attribute.getName())) {
+                attributeList = new ArrayList<>();
+                this.definitionsAttributes.put(attribute.getName(), attributeList);
+            }
+            this.definitionsAttributes.get(attribute.getName()).add(attribute);
+        }
+    }
+
+    public void setDefinitionsAttributes(Map<String, List<ExtensionAttribute>> attributes) {
+        this.definitionsAttributes = attributes;
+    }
+
 }
