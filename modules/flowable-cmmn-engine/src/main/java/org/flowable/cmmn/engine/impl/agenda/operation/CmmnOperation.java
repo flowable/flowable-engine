@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -107,7 +108,8 @@ public abstract class CmmnOperation implements Runnable {
      * @return the list of created plan item instances for this stage or plan model
      */
     protected List<PlanItemInstanceEntity> createPlanItemInstancesForNewOrReactivatedStage(CommandContext commandContext, Case caseModel, List<PlanItem> planItems,
-        List<PlanItem> directlyReactivatedPlanItems, CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
+            List<PlanItem> directlyReactivatedPlanItems, CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
+        
         List<PlanItemInstanceEntity> newPlanItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
 
@@ -146,7 +148,7 @@ public abstract class CmmnOperation implements Runnable {
      * @param newPlanItemInstances the array where the new plan item instance will be added, if it was created
      */
     protected void createPlanItemInstanceIfNeeded(CommandContext commandContext, PlanItem planItem, Case caseModel, CaseInstanceEntity caseInstanceEntity,
-        PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId, List<PlanItemInstanceEntity> newPlanItemInstances) {
+            PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId, List<PlanItemInstanceEntity> newPlanItemInstances) {
 
         // In some cases (e.g. cross-border triggering of a sentry, the child plan item instance has been activated already
         // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
@@ -177,8 +179,19 @@ public abstract class CmmnOperation implements Runnable {
                     // local variables might not yet be available
                     .silentNameExpressionEvaluation(ExpressionUtil.hasRepetitionOnCollection(planItem))
                     .create();
-
+                
+                PlanItemEvaluationResult evaluationResult = null;
+                if (creationType.isTypeActivate()) {
+                    evaluationResult = new PlanItemEvaluationResult();
+                    PlanItemInstanceUtil.evaluateRepetitionRule(childPlanItemInstance, null, stagePlanItemInstanceEntity,
+                            evaluationResult, commandContext);
+                }
+                
                 newPlanItemInstances.add(childPlanItemInstance);
+                
+                if (creationType.isTypeActivate() && evaluationResult.getNewChildPlanItemInstances() != null && !evaluationResult.getNewChildPlanItemInstances().isEmpty()) {
+                    newPlanItemInstances.addAll(evaluationResult.getNewChildPlanItemInstances());
+                }
 
                 // for default or activate creation type, we need to plan for the create operation
                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
@@ -226,8 +239,8 @@ public abstract class CmmnOperation implements Runnable {
      * @param parentPlanItemInstance the parent plan item (e.g. stage or plan model) of the plan item
      * @return the plan item creation type according all the rules for creation and reactivation
      */
-    protected PlanItemCreationType getPlanItemCreationOrReactivationType(CaseInstanceEntity caseInstanceEntity, Case caseModel, PlanItem planItem,
-        VariableContainer parentPlanItemInstance) {
+    protected PlanItemCreationType getPlanItemCreationOrReactivationType(CaseInstanceEntity caseInstanceEntity, Case caseModel, 
+            PlanItem planItem, VariableContainer parentPlanItemInstance) {
 
         // if the case was never reactivated, we can directly return as there is no special rules to be considered during creation of plan items
         if (caseInstanceEntity.getLastReactivationTime() == null) {
