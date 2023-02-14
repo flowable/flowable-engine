@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 
+import java.util.Collection;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -28,6 +30,7 @@ import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskBeforeContext;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -71,17 +74,21 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
         
         if (beforeContext.getCandidateUsers() != null && !beforeContext.getCandidateUsers().isEmpty()) {
             for (String candidateUser : beforeContext.getCandidateUsers()) {
-                IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, 
-                                getExpressionValue(candidateUser, planItemInstanceEntity, expressionManager), 
-                                null, IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
+                Collection<String> candidateValues = getExpressionListValue(candidateUser, planItemInstanceEntity, expressionManager);
+                for (String candidate : candidateValues) {
+                    IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, 
+                            candidate, null, IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
+                }
             }
         }
         
         if (beforeContext.getCandidateGroups() != null && !beforeContext.getCandidateGroups().isEmpty()) {
             for (String candidateGroup : beforeContext.getCandidateGroups()) {
-                IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, null,
-                                getExpressionValue(candidateGroup, planItemInstanceEntity, expressionManager), 
-                                IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
+                Collection<String> candidateValues = getExpressionListValue(candidateGroup, planItemInstanceEntity, expressionManager);
+                for (String candidate : candidateValues) {
+                    IdentityLinkUtil.createPlanItemInstanceIdentityLink(planItemInstanceEntity, null,
+                            candidate, IdentityLinkType.CANDIDATE, cmmnEngineConfiguration);
+                }
             }
         }
 
@@ -116,5 +123,11 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
         }
         
         throw new FlowableException("Unable to resolve expression value for " + value);
+    }
+    
+    protected Collection<String> getExpressionListValue(String value, PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager) {
+        Object expressionValue = expressionManager.createExpression(value).getValue(planItemInstanceEntity);
+        Collection<String> candidates = CandidateUtil.extractCandidates(expressionValue);
+        return candidates;
     }
 }
