@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -59,6 +60,12 @@ public class DeleteHistoricCaseInstanceIdsJobHandler implements JobHandler {
         BatchPart batchPart = batchService.getBatchPart(configuration);
         if (batchPart == null) {
             throw new FlowableIllegalArgumentException("There is no batch part with the id " + configuration);
+        }
+
+        Batch batch = batchService.getBatch(batchPart.getBatchId());
+        if (DeleteCaseInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteCaseInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
         }
 
         CmmnManagementService managementService = engineConfiguration.getCmmnManagementService();

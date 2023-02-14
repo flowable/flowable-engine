@@ -60,6 +60,11 @@ public class DeleteHistoricCaseInstancesSequentialJobHandler implements JobHandl
             return;
         }
 
+        if (DeleteCaseInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteCaseInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
+        }
+
         int batchSize = config.getBatchSize();
 
         HistoricCaseInstanceQuery query = config.getQuery();

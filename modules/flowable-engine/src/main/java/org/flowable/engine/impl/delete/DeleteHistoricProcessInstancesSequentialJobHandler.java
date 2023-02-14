@@ -60,6 +60,11 @@ public class DeleteHistoricProcessInstancesSequentialJobHandler implements JobHa
             return;
         }
 
+        if (DeleteProcessInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
+        }
+
         int batchSize = config.getBatchSize();
 
         HistoricProcessInstanceQuery query = config.getQuery();

@@ -21,6 +21,7 @@ public interface DeleteCaseInstanceBatchConstants {
     String STATUS_WAITING = "waiting";
     String STATUS_COMPLETED = "completed";
     String STATUS_FAILED = "failed";
+    String STATUS_STOPPED = "stopped";
 
     String BATCH_PART_COMPUTE_IDS_TYPE = "computeDeleteCaseInstanceIds";
     String BATCH_PART_DELETE_CASE_INSTANCES_TYPE = "deleteCase";
