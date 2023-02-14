@@ -21,6 +21,7 @@ public interface DeleteProcessInstanceBatchConstants {
     String STATUS_WAITING = "waiting";
     String STATUS_COMPLETED = "completed";
     String STATUS_FAILED = "failed";
+    String STATUS_STOPPED = "stopped";
 
     String BATCH_PART_COMPUTE_IDS_TYPE = "computeDeleteProcessInstanceIds";
     String BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE = "deleteProcess";
