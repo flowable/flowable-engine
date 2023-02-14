@@ -57,6 +57,11 @@ public class ComputeDeleteHistoricCaseInstanceIdsJobHandler implements JobHandle
             return;
         }
 
+        if (DeleteCaseInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteCaseInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
+        }
+
         int batchSize = config.getBatchSize();
         int batchPartNumber = Integer.parseInt(batchPart.getSearchKey());
         // The first result is the batch part number multiplied by the batch size
