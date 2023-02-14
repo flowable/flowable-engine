@@ -56,6 +56,11 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
             return;
         }
 
+        if (DeleteProcessInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
+        }
+
         int batchSize = config.getBatchSize();
         int batchPartNumber = Integer.parseInt(batchPart.getSearchKey());
         // The first result is the batch part number multiplied by the batch size

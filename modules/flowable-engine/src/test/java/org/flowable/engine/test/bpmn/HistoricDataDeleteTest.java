@@ -54,6 +54,7 @@ import org.flowable.engine.impl.delete.DeleteProcessInstanceBatchConstants;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.history.SerializableVariable;
@@ -1448,5 +1449,126 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     .forEach(job -> managementService.deleteTimerJob(job.getId()));
         }
     }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeleteHistoricInstancesUsingBatchWithStoppedBatch() {
+        List<String> processInstanceIds = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+            processInstanceIds.add(processInstance.getId());
+            runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+
+            for (int i = 0; i < 10; i++) {
+                Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
+                taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.complete(task.getId());
+            }
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+            Calendar cal = new GregorianCalendar();
+            cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
+            query.finishedBefore(cal.getTime());
+            String batchId = query.deleteSequentiallyUsingBatch(5, "Test Deletion");
+            batchesToRemove.add(batchId);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(80);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(20);
+
+            Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+            assertThat(batch).isNotNull();
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
+            assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+
+            assertThat(managementService.createBatchPartQuery().list())
+                    .hasSize(1)
+                    .allSatisfy(part -> {
+                        assertThat(part.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_WAITING);
+                        assertThat(part.getType()).isEqualTo(DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE);
+                    });
+
+            assertThat(managementService.createJobQuery().list())
+                    .hasSize(1)
+                    .allSatisfy(job -> {
+                        assertThat(job.getJobHandlerType()).isEqualTo(DeleteHistoricProcessInstancesSequentialJobHandler.TYPE);
+                    });
+
+            Job job = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+
+            assertThat(managementService.createBatchPartQuery().list())
+                    .extracting(BatchPart::getStatus, BatchPart::getType)
+                    .containsExactlyInAnyOrder(
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
+                    );
+
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getBatchService(commandContext)
+                        .completeBatch(batchId, DeleteProcessInstanceBatchConstants.STATUS_STOPPED);
+                return null;
+            });
+
+            job = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            assertThat(managementService.createTimerJobQuery().list()).isEmpty();
+            assertThat(managementService.createBatchPartQuery().list())
+                    .extracting(BatchPart::getStatus, BatchPart::getType)
+                    .containsExactlyInAnyOrder(
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_STOPPED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
+                    );
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(15);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(55);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(15);
+
+            for (int i = 0; i < 20; i++) {
+                if (i < 5) {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    }
+
+                } else if (i < 10) {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(2);
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(5);
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(5);
+                    }
+                } else {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(1);
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    }
+                }
+            }
+        }
+    }
+
 
 }
