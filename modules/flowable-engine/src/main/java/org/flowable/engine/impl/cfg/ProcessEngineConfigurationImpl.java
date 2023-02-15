@@ -364,6 +364,8 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefin
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
+import org.flowable.engine.impl.repository.DeploymentProcessDefinitionDeletionManager;
+import org.flowable.engine.impl.repository.DeploymentProcessDefinitionDeletionManagerImpl;
 import org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -524,6 +526,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
     protected ResourceEntityManager resourceEntityManager;
+
+    protected DeploymentProcessDefinitionDeletionManager processDefinitionDeploymentDeletionManager;
 
     // Candidate Manager
 
@@ -996,6 +1000,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initSessionFactories();
         initDataManagers();
         initEntityManagers();
+        initProcessDefinitionDeploymentDeletionManager();
         initCandidateManager();
         initVariableAggregator();
         initDependentScopeTypes();
@@ -1285,6 +1290,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (resourceEntityManager == null) {
             resourceEntityManager = new ResourceEntityManagerImpl(this, resourceDataManager);
+        }
+    }
+
+    public void initProcessDefinitionDeploymentDeletionManager() {
+        if (processDefinitionDeploymentDeletionManager == null) {
+            processDefinitionDeploymentDeletionManager = new DeploymentProcessDefinitionDeletionManagerImpl(this);
         }
     }
 
@@ -4355,6 +4366,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setResourceEntityManager(ResourceEntityManager resourceEntityManager) {
         this.resourceEntityManager = resourceEntityManager;
+        return this;
+    }
+
+    public DeploymentProcessDefinitionDeletionManager getProcessDefinitionDeploymentDeletionManager() {
+        return processDefinitionDeploymentDeletionManager;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessDefinitionDeploymentDeletionManager(
+            DeploymentProcessDefinitionDeletionManager processDefinitionDeploymentDeletionManager) {
+        this.processDefinitionDeploymentDeletionManager = processDefinitionDeploymentDeletionManager;
         return this;
     }
 
