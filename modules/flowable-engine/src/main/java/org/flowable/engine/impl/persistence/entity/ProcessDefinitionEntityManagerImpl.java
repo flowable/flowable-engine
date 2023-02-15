@@ -16,6 +16,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,6 +35,13 @@ public class ProcessDefinitionEntityManagerImpl
 
     public ProcessDefinitionEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ProcessDefinitionDataManager processDefinitionDataManager) {
         super(processEngineConfiguration, processDefinitionDataManager);
+    }
+
+    @Override
+    public void delete(ProcessDefinitionEntity entity, boolean fireDeleteEvent) {
+        // There is no delete statement for deleting a single ProcessDefinition
+        // process definitions are deleted as part of a deployment
+        throw new FlowableException("Deleting a single process definition is not supported");
     }
 
     @Override
