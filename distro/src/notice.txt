@@ -51,9 +51,7 @@ flowable-rest<version><.jar | -source.jar | -javadoc.jar>
 flowable-secure-javascript<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-actuator<version><.jar | -source.jar | -javadoc.jar>
-flowable-spring-boot-starter-basic<version><.jar | -source.jar | -javadoc.jar>
 flowable-spring-boot-starter-integration<version><.jar | -source.jar | -javadoc.jar>
-flowable-spring-boot-starter-rest-api<version><.jar | -source.jar | -javadoc.jar>
 
 
 

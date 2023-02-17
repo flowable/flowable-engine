@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>flowable-spring-boot-autoconfigure</module>
-        <module>flowable-spring-boot-starter-basic</module>
         <module>flowable-spring-boot-starter-integration</module>
         <module>flowable-spring-boot-starter-actuator</module>
         <module>flowable-spring-boot-starter</module>
@@ -27,7 +26,6 @@
         <module>flowable-spring-boot-starter-process-rest</module>
         <module>flowable-spring-boot-starter-app</module>
         <module>flowable-spring-boot-starter-app-rest</module>
-        <module>flowable-spring-boot-starter-rest-api</module>
         <module>flowable-spring-boot-starter-rest</module>
     </modules>
     <dependencies>
