@@ -12,6 +12,10 @@
 
     <artifactId>flowable-spring-boot-samples</artifactId>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <packaging>pom</packaging>
     <modules>
     	<module>flowable-spring-boot-sample-app</module>
