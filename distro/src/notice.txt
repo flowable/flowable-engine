@@ -70,10 +70,10 @@ Quartz
 This software includes unchanged copies of the following libraries:
 
 aopalliance                     aopalliance                 1.0             Public Domain
-com.fasterxml.jackson.core      jackson-annotations         2.13.4          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-core                2.13.4          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-databind            2.13.4          The Apache Software License, Version 2.0
-com.fasterxml.jackson.datatype  jackson-datatype-joda       2.13.4          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-annotations         2.14.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-core                2.14.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-databind            2.14.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype  jackson-datatype-joda       2.14.2          The Apache Software License, Version 2.0
 com.google.guava                guava                       31.0.1-jre      The Apache Software License, Version 2.0
 com.h2database                  h2                          2.1.214         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
@@ -109,22 +109,22 @@ org.mvel                        mvel2                       2.2.6.Final     The 
 org.slf4j                       jcl-over-slf4j              1.7.36          MIT License
 org.slf4j                       slf4j-api                   1.7.36          MIT License
 org.slf4j                       slf4j-log4j12               1.7.36          MIT License
-org.springframework             spring-beans                6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-context              6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-context-support      6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-tx                   6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-web                  6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-aop                  6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-expression           6.0.4          The Apache Software License, Version 2.0
-org.springframework             spring-orm                  6.0.4          The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      6.0.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        6.0.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      6.0.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         6.0.1           The Apache Software License, Version 2.0
+org.springframework             spring-beans                6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-context              6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-context-support      6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-tx                   6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-web                  6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-aop                  6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-expression           6.0.5          The Apache Software License, Version 2.0
+org.springframework             spring-orm                  6.0.5          The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      6.0.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        6.0.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      6.0.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         6.0.2           The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0
