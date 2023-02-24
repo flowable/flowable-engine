@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -115,5 +116,84 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
         commandExecutor.execute(new BulkMoveTimerJobsToExecutableJobsCmd(processEngineConfiguration.getJobServiceConfiguration().getJobManager(), timerJobs));
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
         assertThat(managementService.createJobQuery().count()).isEqualTo(NR_OF_TIMER_JOBS);
+    }
+
+    @Test
+    public void testBulkDeleteWithByteArrays() {
+
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(commandContext -> {
+
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                    .getJobServiceConfiguration()
+                    .getTimerJobService();
+
+            Date now = new Date();
+            for (int i = 0; i < NR_OF_TIMER_JOBS; i++) {
+                TimerJobEntity timer = createTweetTimer("Timer " + i, now);
+                timer.setExceptionStacktrace("test");
+                timerJobService.scheduleTimerJob(timer);
+            }
+
+            return null;
+        });
+
+        ManagementService managementService = processEngineConfiguration.getManagementService();
+        List<Job> jobs = managementService.createTimerJobQuery().list();
+        assertThat(jobs.size()).isEqualTo(NR_OF_TIMER_JOBS);
+
+        // As there are more than AbstractDataManager.MAX_ENTRIES_IN_CLAUSE timer jobs, the logic should split it up into multiple updates
+        List<TimerJobEntity> timerJobs = new ArrayList<>();
+        for (Job job : jobs) {
+            timerJobs.add((TimerJobEntity) job);
+        }
+
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+
+                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
+                assertThat(arr.size()).isEqualTo(NR_OF_TIMER_JOBS);
+
+                return null;
+            }
+
+        });
+
+        // Test bulk delete
+        commandExecutor.execute(new BulkMoveTimerJobsToExecutableJobsCmd(processEngineConfiguration.getJobServiceConfiguration().getJobManager(), timerJobs));
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
+        assertThat(managementService.createJobQuery().count()).isEqualTo(NR_OF_TIMER_JOBS);
+
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+
+                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
+                assertThat(arr.size()).isEqualTo(NR_OF_TIMER_JOBS);
+
+                return null;
+            }
+
+        });
+
+        for (Job job : processEngineConfiguration.getManagementService().createJobQuery().list()) {
+            processEngineConfiguration.getManagementService().deleteJob(job.getId());
+        }
+
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+
+                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
+                assertThat(arr.size()).isEqualTo(0);
+
+                return null;
+            }
+
+        });
     }
 }

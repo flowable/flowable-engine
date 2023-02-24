@@ -13,6 +13,7 @@
 
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -178,6 +180,22 @@ public class TimerJobEntityManagerImpl
         }
 
         dataManager.bulkDeleteWithoutRevision(timerJobEntities);
+
+        List<ByteArrayRef> ExceptionByteArrayRefs = new ArrayList<>();
+        List<ByteArrayRef> CustomValuesByteArrayRefs = new ArrayList<>();
+
+        for (TimerJobEntity timerJobEntity : timerJobEntities) {
+            if (timerJobEntity.getExceptionByteArrayRef() != null) {
+                ExceptionByteArrayRefs.add(timerJobEntity.getExceptionByteArrayRef());
+            }
+
+            if (timerJobEntity.getCustomValuesByteArrayRef() != null) {
+                CustomValuesByteArrayRefs.add(timerJobEntity.getCustomValuesByteArrayRef());
+            }
+        }
+
+        bulkDeleteByteArrayRefs(ExceptionByteArrayRefs);
+        bulkDeleteByteArrayRefs(CustomValuesByteArrayRefs);
     }
 
     protected TimerJobEntity createTimer(JobEntity te) {

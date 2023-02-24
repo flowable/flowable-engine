@@ -12,8 +12,14 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -39,6 +45,26 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
     protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef != null) {
             jobByteArrayRef.delete(serviceConfiguration.getEngineName());
+        }
+    }
+
+    protected void bulkDeleteByteArrayRefs(List<ByteArrayRef> jobByteArrayRefs) {
+        if (jobByteArrayRefs != null && jobByteArrayRefs.size() > 0) {
+
+            List<String> byteArraysIdsToDelete = new ArrayList<>();
+            for (ByteArrayRef jobByteArrayRef : jobByteArrayRefs) {
+                if (!jobByteArrayRef.isDeleted() && jobByteArrayRef.getId() != null) {
+                    byteArraysIdsToDelete.add(jobByteArrayRef.getId());
+                }
+            }
+
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                AbstractEngineConfiguration abstractEngineConfiguration = commandContext.getEngineConfigurations().get(serviceConfiguration.getEngineName());
+                abstractEngineConfiguration.getByteArrayEntityManager().bulkDeleteByteArraysById(byteArraysIdsToDelete);
+            } else {
+                throw new IllegalStateException("Could not bulk delete byte arrays. Was not able to get Command Context");
+            }
         }
     }
 }
