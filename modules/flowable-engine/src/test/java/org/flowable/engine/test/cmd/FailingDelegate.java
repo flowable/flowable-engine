@@ -12,24 +12,37 @@
  */
 package org.flowable.engine.test.cmd;
 
+import java.util.function.Supplier;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
 /**
  * @author Saeid Mirzaei
+ * @author Filip Hrisafov
  */
 public class FailingDelegate implements JavaDelegate {
 
     public static final String EXCEPTION_MESSAGE = "Expected exception.";
+    protected static final Supplier<RuntimeException> ORIGNAL_SUPPLIER = () -> new RuntimeException(EXCEPTION_MESSAGE);
+    protected static Supplier<RuntimeException> exceptionSupplier = ORIGNAL_SUPPLIER;
 
     @Override
     public void execute(DelegateExecution execution) {
         Boolean fail = (Boolean) execution.getVariable("fail");
 
         if (fail == null || fail) {
-            throw new FlowableException(EXCEPTION_MESSAGE);
+            throw exceptionSupplier.get();
         }
 
+    }
+
+    public static void setExceptionSupplier(Supplier<RuntimeException> exceptionSupplier) {
+        FailingDelegate.exceptionSupplier = exceptionSupplier;
+    }
+
+    public static void resetExceptionSupplier() {
+        FailingDelegate.exceptionSupplier = ORIGNAL_SUPPLIER;
     }
 }

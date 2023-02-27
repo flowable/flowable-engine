@@ -10,26 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.util;
+package org.flowable.job.api;
+
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Filip Hrisafov
  */
-public class ExceptionUtil {
+public class FlowableUnrecoverableJobException extends FlowableException {
 
-    public static <E extends Throwable> void sneakyThrow(Throwable t) throws E {
-        throw (E) t;
+    public FlowableUnrecoverableJobException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public static boolean containsCause(Throwable chain, Class<? extends Throwable> exceptionType) {
-        Throwable exception = chain;
-        while (exception != null) {
-            if (exceptionType.isInstance(exception)) {
-                return true;
-            }
-            exception = exception.getCause();
-        }
-        return false;
+    public FlowableUnrecoverableJobException(String message) {
+        super(message);
     }
-
 }
