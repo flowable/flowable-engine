@@ -181,21 +181,22 @@ public class TimerJobEntityManagerImpl
 
         dataManager.bulkDeleteWithoutRevision(timerJobEntities);
 
-        List<ByteArrayRef> ExceptionByteArrayRefs = new ArrayList<>();
-        List<ByteArrayRef> CustomValuesByteArrayRefs = new ArrayList<>();
+        // Delete ByteArrays related with timer jobs
+        List<String> byteArrayIdsToDelete = new ArrayList<>(timerJobEntities.size() * 2);
 
         for (TimerJobEntity timerJobEntity : timerJobEntities) {
-            if (timerJobEntity.getExceptionByteArrayRef() != null) {
-                ExceptionByteArrayRefs.add(timerJobEntity.getExceptionByteArrayRef());
+            ByteArrayRef exceptionByteArrayRef = timerJobEntity.getExceptionByteArrayRef();
+            if (exceptionByteArrayRef != null && !exceptionByteArrayRef.isDeleted() && exceptionByteArrayRef.getId() != null) {
+                byteArrayIdsToDelete.add(exceptionByteArrayRef.getId());
             }
 
-            if (timerJobEntity.getCustomValuesByteArrayRef() != null) {
-                CustomValuesByteArrayRefs.add(timerJobEntity.getCustomValuesByteArrayRef());
+            ByteArrayRef customValuesByteArrayRef = timerJobEntity.getExceptionByteArrayRef();
+            if (customValuesByteArrayRef != null && !customValuesByteArrayRef.isDeleted() && customValuesByteArrayRef.getId() != null) {
+                byteArrayIdsToDelete.add(customValuesByteArrayRef.getId());
             }
         }
 
-        bulkDeleteByteArrayRefs(ExceptionByteArrayRefs);
-        bulkDeleteByteArrayRefs(CustomValuesByteArrayRefs);
+        bulkDeleteByteArraysById(byteArrayIdsToDelete);
     }
 
     protected TimerJobEntity createTimer(JobEntity te) {

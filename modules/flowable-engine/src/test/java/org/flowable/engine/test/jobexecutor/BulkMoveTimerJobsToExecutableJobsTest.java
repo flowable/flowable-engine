@@ -148,50 +148,32 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
             timerJobs.add((TimerJobEntity) job);
         }
 
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-
-            @Override
-            public Void execute(CommandContext commandContext) {
-
-                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
-                assertThat(arr.size()).isEqualTo(NR_OF_TIMER_JOBS);
-
-                return null;
-            }
-
-        });
+        List<ByteArrayEntity> byteArrayEntities = getByteArrays();
+        assertThat(byteArrayEntities.size()).isEqualTo(NR_OF_TIMER_JOBS);
 
         // Test bulk delete
         commandExecutor.execute(new BulkMoveTimerJobsToExecutableJobsCmd(processEngineConfiguration.getJobServiceConfiguration().getJobManager(), timerJobs));
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
         assertThat(managementService.createJobQuery().count()).isEqualTo(NR_OF_TIMER_JOBS);
 
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-
-            @Override
-            public Void execute(CommandContext commandContext) {
-
-                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
-                assertThat(arr.size()).isEqualTo(NR_OF_TIMER_JOBS);
-
-                return null;
-            }
-
-        });
+        byteArrayEntities = getByteArrays();
+        assertThat(byteArrayEntities.size()).isEqualTo(NR_OF_TIMER_JOBS);
 
         for (Job job : processEngineConfiguration.getManagementService().createJobQuery().list()) {
             processEngineConfiguration.getManagementService().deleteJob(job.getId());
         }
 
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+        byteArrayEntities = getByteArrays();
+        assertThat(byteArrayEntities.size()).isEqualTo(0);
+    }
+
+    protected List<ByteArrayEntity> getByteArrays() {
+        return processEngineConfiguration.getCommandExecutor().execute(new Command<List<ByteArrayEntity>>() {
 
             @Override
-            public Void execute(CommandContext commandContext) {
+            public List<ByteArrayEntity> execute(CommandContext commandContext) {
+                return processEngineConfiguration.getByteArrayEntityManager().findAll();
 
-                List<ByteArrayEntity> arr = processEngineConfiguration.getByteArrayEntityManager().findAll();
-                assertThat(arr.size()).isEqualTo(0);
-
-                return null;
             }
 
         });

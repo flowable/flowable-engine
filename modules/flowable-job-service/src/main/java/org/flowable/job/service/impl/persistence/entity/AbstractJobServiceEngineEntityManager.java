@@ -48,20 +48,12 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
         }
     }
 
-    protected void bulkDeleteByteArrayRefs(List<ByteArrayRef> jobByteArrayRefs) {
-        if (jobByteArrayRefs != null && jobByteArrayRefs.size() > 0) {
-
-            List<String> byteArraysIdsToDelete = new ArrayList<>();
-            for (ByteArrayRef jobByteArrayRef : jobByteArrayRefs) {
-                if (!jobByteArrayRef.isDeleted() && jobByteArrayRef.getId() != null) {
-                    byteArraysIdsToDelete.add(jobByteArrayRef.getId());
-                }
-            }
-
+    protected void bulkDeleteByteArraysById(List<String> byteArrayIds) {
+        if (byteArrayIds != null && byteArrayIds.size() > 0) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
                 AbstractEngineConfiguration abstractEngineConfiguration = commandContext.getEngineConfigurations().get(serviceConfiguration.getEngineName());
-                abstractEngineConfiguration.getByteArrayEntityManager().bulkDeleteByteArraysById(byteArraysIdsToDelete);
+                abstractEngineConfiguration.getByteArrayEntityManager().bulkDeleteByteArraysById(byteArrayIds);
             } else {
                 throw new IllegalStateException("Could not bulk delete byte arrays. Was not able to get Command Context");
             }
