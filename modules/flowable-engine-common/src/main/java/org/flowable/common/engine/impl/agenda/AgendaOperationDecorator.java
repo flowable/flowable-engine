@@ -10,26 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.util;
+package org.flowable.common.engine.impl.agenda;
 
 /**
  * @author Filip Hrisafov
  */
-public class ExceptionUtil {
+@FunctionalInterface
+public interface AgendaOperationDecorator {
 
-    public static <E extends Throwable> void sneakyThrow(Throwable t) throws E {
-        throw (E) t;
-    }
-
-    public static boolean containsCause(Throwable chain, Class<? extends Throwable> exceptionType) {
-        Throwable exception = chain;
-        while (exception != null) {
-            if (exceptionType.isInstance(exception)) {
-                return true;
-            }
-            exception = exception.getCause();
-        }
-        return false;
-    }
+    Runnable decorate(Runnable operation);
 
 }

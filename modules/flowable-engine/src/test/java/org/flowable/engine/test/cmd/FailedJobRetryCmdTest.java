@@ -13,18 +13,23 @@
 package org.flowable.engine.test.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.job.api.Job;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei
+ * @author Filip Hrisafov
  */
 public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
 
@@ -108,6 +113,85 @@ public class FailedJobRetryCmdTest extends PluggableFlowableTestCase {
         Job failedJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(failedJob).isNotNull();
         assertThat(failedJob.getRetries()).isEqualTo(10); // 11 - 1 -> the variable is used
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTaskWithUnrecoverableException.bpmn20.xml" })
+    public void testFailedServiceTaskWithUnrecoverableException() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
+        assertThat(pi).isNotNull();
+
+        Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
+        try {
+            FailingDelegate.setExceptionSupplier(() -> new FlowableUnrecoverableJobException("Test message"));
+            assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                    .isInstanceOf(FlowableUnrecoverableJobException.class);
+        } finally {
+            FailingDelegate.resetExceptionSupplier();
+        }
+
+        String correlationId = job.getCorrelationId();
+        Job deadLetterJob = managementService.createDeadLetterJobQuery().jobId(job.getId()).singleResult();
+        assertThat(deadLetterJob.getRetries()).isZero();
+        assertThat(deadLetterJob.getCorrelationId()).isEqualTo(correlationId);
+        assertThat(managementService.createDeadLetterJobQuery().withException().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTaskWithUnrecoverableException.bpmn20.xml" })
+    public void testFailedServiceTaskWithUnrecoverableExceptionAsCause() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
+        assertThat(pi).isNotNull();
+
+        Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
+        try {
+            FailingDelegate.setExceptionSupplier(() -> new FlowableException("Test normal", new FlowableUnrecoverableJobException("Test cause message")));
+            assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Test normal")
+                    .cause()
+                    .isInstanceOf(FlowableUnrecoverableJobException.class)
+                    .hasMessage("Test cause message");
+        } finally {
+            FailingDelegate.resetExceptionSupplier();
+        }
+
+        String correlationId = job.getCorrelationId();
+        Job deadLetterJob = managementService.createDeadLetterJobQuery().jobId(job.getId()).singleResult();
+        assertThat(deadLetterJob.getRetries()).isZero();
+        assertThat(deadLetterJob.getCorrelationId()).isEqualTo(correlationId);
+        assertThat(managementService.createDeadLetterJobQuery().withException().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/cmd/FailedJobRetryCmdTest.testFailedServiceTaskWithUnrecoverableExceptionAndTimeCycleValue.bpmn20.xml" })
+    public void testFailedServiceTaskWithUnrecoverableExceptionAndTimeCycleValue() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
+        assertThat(pi).isNotNull();
+
+        Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
+        try {
+            FailingDelegate.setExceptionSupplier(() -> new FlowableUnrecoverableJobException("Test message"));
+            assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                    .isInstanceOf(FlowableUnrecoverableJobException.class);
+        } finally {
+            FailingDelegate.resetExceptionSupplier();
+        }
+
+        String correlationId = job.getCorrelationId();
+        Job deadLetterJob = managementService.createDeadLetterJobQuery().jobId(job.getId()).singleResult();
+        assertThat(deadLetterJob.getRetries()).isZero();
+        assertThat(deadLetterJob.getCorrelationId()).isEqualTo(correlationId);
+        assertThat(managementService.createDeadLetterJobQuery().withException().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(managementService.createTimerJobQuery().count()).isZero();
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
     }
 
     protected void waitForExecutedJobWithRetriesLeft(final int retriesLeft) {
