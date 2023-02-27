@@ -21,6 +21,8 @@ import java.util.GregorianCalendar;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
+import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -51,7 +53,7 @@ public class JobRetryCmd implements Command<Object> {
         }
 
         AbstractRuntimeJobEntity newJobEntity = null;
-        if (job.getRetries() <= 1) {
+        if (job.getRetries() <= 1 || isUnrecoverableException()) {
             newJobEntity = jobService.moveJobToDeadLetterJob(job);
         } else {
             newJobEntity = timerJobService.moveJobToTimerJob(job);
@@ -90,6 +92,10 @@ public class JobRetryCmd implements Command<Object> {
         StringWriter stringWriter = new StringWriter();
         exception.printStackTrace(new PrintWriter(stringWriter));
         return stringWriter.toString();
+    }
+
+    protected boolean isUnrecoverableException() {
+        return ExceptionUtil.containsCause(exception, FlowableUnrecoverableJobException.class);
     }
 
 }
