@@ -69,7 +69,7 @@ public class CountingEntityUtil {
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
             }
-        } else if (ScopeTypes.BPMN_DEPENDENT.contains(variableInstance.getScopeType()) && isExecutionRelatedEntityCountEnabledGlobally()) {
+        } else if (processEngineConfiguration.getDependentScopeTypes().contains(variableInstance.getScopeType()) && isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(variableInstance.getSubScopeId());
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);

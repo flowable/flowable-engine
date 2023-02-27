@@ -10,19 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.delete;
+package org.flowable.cmmn.test.delegate;
 
-/**
- * @author Filip Hrisafov
- */
-public interface DeleteCaseInstanceBatchConstants {
+import java.util.ArrayList;
+import java.util.List;
 
-    String STATUS_IN_PROGRESS = "inProgress";
-    String STATUS_WAITING = "waiting";
-    String STATUS_COMPLETED = "completed";
-    String STATUS_FAILED = "failed";
-    String STATUS_STOPPED = "stopped";
+public class AssignmentBean {
 
-    String BATCH_PART_COMPUTE_IDS_TYPE = "computeDeleteCaseInstanceIds";
-    String BATCH_PART_DELETE_CASE_INSTANCES_TYPE = "deleteCase";
+    public List<String> candidates(String candidate1, String candidate2) {
+        List<String> values = new ArrayList<>();
+        values.add(candidate1);
+        values.add(candidate2);
+        return values;
+    }
+    
 }

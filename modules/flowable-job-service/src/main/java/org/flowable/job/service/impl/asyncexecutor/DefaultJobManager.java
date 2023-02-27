@@ -36,15 +36,11 @@ import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.HistoryJobProcessorContext;
 import org.flowable.job.service.JobHandler;
-import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobProcessorContext;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
-import org.flowable.job.service.impl.HistoryJobProcessorContextImpl;
-import org.flowable.job.service.impl.JobProcessorContextImpl;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.TriggerAsyncHistoryExecutorTransactionListener;
 import org.flowable.job.service.impl.persistence.entity.AbstractJobEntity;
@@ -57,8 +53,8 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.util.JobProcessorUtil;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
@@ -113,24 +109,7 @@ public class DefaultJobManager implements JobManager {
 
     @Override
     public void scheduleTimerJob(TimerJobEntity timerJob) {
-        scheduleTimer(timerJob);
-        sendTimerScheduledEvent(timerJob);
-    }
-
-    private void scheduleTimer(TimerJobEntity timerJob) {
-        if (timerJob == null) {
-            throw new FlowableException("Empty timer job can not be scheduled");
-        }
-        callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, timerJob);
-        jobServiceConfiguration.getTimerJobEntityManager().insert(timerJob);
-    }
-
-    protected void sendTimerScheduledEvent(TimerJobEntity timerJob) {
-        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
-                    FlowableEngineEventType.TIMER_SCHEDULED, timerJob), jobServiceConfiguration.getEngineName());
-        }
+        jobServiceConfiguration.getTimerJobScheduler().scheduleTimerJob(timerJob);
     }
 
     @Override
@@ -509,8 +488,6 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void executeTimerJob(JobEntity timerEntity) {
-        TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
-
         VariableScope variableScope = null;
         if (jobServiceConfiguration.getInternalJobManager() != null) {
             variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
@@ -539,16 +516,7 @@ public class DefaultJobManager implements JobManager {
             LOGGER.debug("Timer {} fired. Deleting timer.", timerEntity.getId());
         }
 
-        if (timerEntity.getRepeat() != null) {
-            TimerJobEntity newTimerJobEntity = timerJobEntityManager.createAndCalculateNextTimer(timerEntity, variableScope);
-            if (newTimerJobEntity != null) {
-                if (jobServiceConfiguration.getInternalJobManager() != null) {
-                    jobServiceConfiguration.getInternalJobManager().preRepeatedTimerSchedule(newTimerJobEntity, variableScope);
-                }
-                
-                scheduleTimerJob(newTimerJobEntity);
-            }
-        }
+        jobServiceConfiguration.getTimerJobScheduler().rescheduleTimerJobAfterExecution(timerEntity, variableScope);
     }
     
     protected void executeJobHandler(JobEntity jobEntity) {
@@ -902,21 +870,11 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity) {
-        if (jobServiceConfiguration.getJobProcessors() != null) {
-            JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
-            for (JobProcessor jobProcessor : jobServiceConfiguration.getJobProcessors()) {
-                jobProcessor.process(jobProcessorContext);
-            }
-        }
+        JobProcessorUtil.callJobProcessors(jobServiceConfiguration, processorType, abstractJobEntity);
     }
 
     protected void callHistoryJobProcessors(HistoryJobProcessorContext.Phase processorType, HistoryJobEntity historyJobEntity) {
-        if (jobServiceConfiguration.getHistoryJobProcessors() != null) {
-            HistoryJobProcessorContextImpl historyJobProcessorContext = new HistoryJobProcessorContextImpl(processorType, historyJobEntity);
-            for (HistoryJobProcessor historyJobProcessor : jobServiceConfiguration.getHistoryJobProcessors()) {
-                historyJobProcessor.process(historyJobProcessorContext);
-            }
-        }
+        JobProcessorUtil.callHistoryJobProcessors(jobServiceConfiguration, processorType, historyJobEntity);
     }
 
 }

@@ -10,19 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.delete;
+package org.flowable.engine.impl.repository;
+
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Filip Hrisafov
  */
-public interface DeleteCaseInstanceBatchConstants {
+public interface DeploymentProcessDefinitionDeletionManager {
 
-    String STATUS_IN_PROGRESS = "inProgress";
-    String STATUS_WAITING = "waiting";
-    String STATUS_COMPLETED = "completed";
-    String STATUS_FAILED = "failed";
-    String STATUS_STOPPED = "stopped";
-
-    String BATCH_PART_COMPUTE_IDS_TYPE = "computeDeleteCaseInstanceIds";
-    String BATCH_PART_DELETE_CASE_INSTANCES_TYPE = "deleteCase";
+    void deleteDefinitionForDeployment(ProcessDefinition processDefinition, String deploymentId);
 }

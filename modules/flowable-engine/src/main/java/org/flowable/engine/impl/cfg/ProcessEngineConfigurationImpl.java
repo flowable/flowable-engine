@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
+import org.flowable.common.engine.impl.ServiceConfigurator;
 import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
@@ -362,6 +364,8 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefin
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
+import org.flowable.engine.impl.repository.DeploymentProcessDefinitionDeletionManager;
+import org.flowable.engine.impl.repository.DeploymentProcessDefinitionDeletionManagerImpl;
 import org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -523,6 +527,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
     protected ResourceEntityManager resourceEntityManager;
 
+    protected DeploymentProcessDefinitionDeletionManager processDefinitionDeploymentDeletionManager;
+
     // Candidate Manager
 
     protected CandidateManager candidateManager;
@@ -563,6 +569,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
+    protected Collection<ServiceConfigurator<JobServiceConfiguration>> jobServiceConfigurators;
     protected BatchServiceConfiguration batchServiceConfiguration;
 
     protected boolean enableEntityLinks;
@@ -570,6 +577,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Variable Aggregation
 
     protected VariableAggregator variableAggregator;
+
+    protected Collection<String> dependentScopeTypes = new HashSet<>();
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -991,8 +1000,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initSessionFactories();
         initDataManagers();
         initEntityManagers();
+        initProcessDefinitionDeploymentDeletionManager();
         initCandidateManager();
         initVariableAggregator();
+        initDependentScopeTypes();
         initHistoryConfigurationSettings();
         initHistoryManager();
         initChangeTenantIdManager();
@@ -1282,6 +1293,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    public void initProcessDefinitionDeploymentDeletionManager() {
+        if (processDefinitionDeploymentDeletionManager == null) {
+            processDefinitionDeploymentDeletionManager = new DeploymentProcessDefinitionDeletionManagerImpl(this);
+        }
+    }
+
     // CandidateManager //////////////////////////////
 
     public void initCandidateManager() {
@@ -1296,6 +1313,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (variableAggregator == null) {
             variableAggregator = new JsonVariableAggregator(this);
         }
+    }
+
+    public void initDependentScopeTypes() {
+        this.dependentScopeTypes.add(ScopeTypes.BPMN_VARIABLE_AGGREGATION);
+        this.dependentScopeTypes.add(ScopeTypes.BPMN_EXTERNAL_WORKER);
     }
 
     // History manager ///////////////////////////////////////////////////////////
@@ -1650,6 +1672,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (enabledJobCategories != null) {
                 this.jobServiceConfiguration.setEnabledJobCategories(enabledJobCategories);
             }
+
+            this.jobServiceConfiguration.setConfigurators(jobServiceConfigurators);
         }
     }
 
@@ -4345,6 +4369,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public DeploymentProcessDefinitionDeletionManager getProcessDefinitionDeploymentDeletionManager() {
+        return processDefinitionDeploymentDeletionManager;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessDefinitionDeploymentDeletionManager(
+            DeploymentProcessDefinitionDeletionManager processDefinitionDeploymentDeletionManager) {
+        this.processDefinitionDeploymentDeletionManager = processDefinitionDeploymentDeletionManager;
+        return this;
+    }
+
     @Override
     public ProcessEngineConfigurationImpl setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
@@ -4662,6 +4696,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setVariableAggregator(VariableAggregator variableAggregator) {
         this.variableAggregator = variableAggregator;
+        return this;
+    }
+
+    public Collection<String> getDependentScopeTypes() {
+        return dependentScopeTypes;
+    }
+
+    public ProcessEngineConfigurationImpl setDependentScopeTypes(Collection<String> dependentScopeTypes) {
+        this.dependentScopeTypes = dependentScopeTypes;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addDependentScopeType(String scopeType) {
+        this.dependentScopeTypes.add(scopeType);
         return this;
     }
 
@@ -5492,6 +5540,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
     
+    public Collection<ServiceConfigurator<JobServiceConfiguration>> getJobServiceConfigurators() {
+        return jobServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setJobServiceConfigurators(Collection<ServiceConfigurator<JobServiceConfiguration>> jobServiceConfigurators) {
+        this.jobServiceConfigurators = jobServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addJobServiceConfigurator(ServiceConfigurator<JobServiceConfiguration> configurator) {
+        if (this.jobServiceConfigurators == null) {
+            this.jobServiceConfigurators = new ArrayList<>();
+        }
+
+        this.jobServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public BatchServiceConfiguration getBatchServiceConfiguration() {
         return batchServiceConfiguration;
     }

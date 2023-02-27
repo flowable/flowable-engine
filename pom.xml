@@ -16,23 +16,23 @@
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.7.8</spring.boot.version>
 		<spring.framework.version>5.3.25</spring.framework.version>
-		<spring.security.version>5.8.1</spring.security.version>
 		<spring.amqp.version>2.4.9</spring.amqp.version>
+		<spring.security.version>5.8.2</spring.security.version>
 		<spring.kafka.version>2.8.11</spring.kafka.version>
-		<reactor-netty.version>1.0.25</reactor-netty.version>
-		<jackson.version>2.13.4.20221013</jackson.version>
+		<reactor-netty.version>1.0.28</reactor-netty.version>
+		<jackson.version>2.13.5</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-        <camel.version>3.14.0</camel.version>
+    <camel.version>3.14.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<groovy.version>4.0.3</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.8.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.2</junit.jupiter.version>
 		<hikari.version>4.0.3</hikari.version>
-		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
+		<maven.deploy.plugin.version>3.1.0</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
 		<mockito.version>4.0.0</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
@@ -800,7 +800,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.6.14.Final</version>
+				<version>5.6.15.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.groovy</groupId>
