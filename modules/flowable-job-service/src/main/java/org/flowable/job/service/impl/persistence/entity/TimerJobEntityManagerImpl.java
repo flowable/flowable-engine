@@ -173,7 +173,7 @@ public class TimerJobEntityManagerImpl
 
     @Override
     public void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities) {
-        List<String> byteArrayIdsToDelete = new ArrayList<>(timerJobEntities.size() * 2);
+        List<String> byteArrayIdsToDelete = new ArrayList<>();
 
         for (TimerJobEntity timerJobEntity : timerJobEntities) {
             if (serviceConfiguration.getInternalJobManager() != null) {
@@ -185,7 +185,7 @@ public class TimerJobEntityManagerImpl
                 byteArrayIdsToDelete.add(exceptionByteArrayRef.getId());
             }
 
-            ByteArrayRef customValuesByteArrayRef = timerJobEntity.getExceptionByteArrayRef();
+            ByteArrayRef customValuesByteArrayRef = timerJobEntity.getCustomValuesByteArrayRef();
             if (customValuesByteArrayRef != null && !customValuesByteArrayRef.isDeleted() && customValuesByteArrayRef.getId() != null) {
                 byteArrayIdsToDelete.add(customValuesByteArrayRef.getId());
             }
