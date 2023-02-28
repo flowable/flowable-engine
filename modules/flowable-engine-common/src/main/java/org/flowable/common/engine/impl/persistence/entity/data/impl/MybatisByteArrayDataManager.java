@@ -53,6 +53,11 @@ public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEn
     }
 
     @Override
+    public void bulkDeleteByteArraysNoRevisionCheck(List<String> byteArrayEntityIds) {
+        getDbSqlSession().delete("deleteByteArraysNoRevisionCheck", byteArrayEntityIds, ByteArrayEntityImpl.class);
+    }
+
+    @Override
     protected IdGenerator getIdGenerator() {
         return idGenerator;
     }
