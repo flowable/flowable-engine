@@ -29,6 +29,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
@@ -42,6 +43,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
@@ -51,6 +53,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -87,6 +90,63 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.executeJob("unexistingjob"))
                 .isExactlyInstanceOf(JobNotFoundException.class)
                 .hasMessageContaining("No job found with id");
+    }
+
+    @Test
+    public void testExecuteJobThrowsNonFlowableException() {
+        JobHandler jobHandler = new ExceptionThrowingJobHandler(() -> new RuntimeException("Test exception"));
+        try {
+            processEngineConfiguration.addJobHandler(jobHandler);
+            String jobId = managementService.executeCommand(commandContext -> {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity job = jobService.createJob();
+                job.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+                job.setJobHandlerType(jobHandler.getType());
+                job.setRetries(3);
+                jobService.insertJob(job);
+                return job.getId();
+            });
+            assertThatThrownBy(() -> managementService.executeJob(jobId))
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Job " + jobId + " failed")
+                    .cause()
+                    .isExactlyInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Test exception")
+                    .hasNoCause();
+        } finally {
+            Job job = managementService.createTimerJobQuery().singleResult();
+            if (job != null) {
+                managementService.deleteTimerJob(job.getId());
+            }
+            processEngineConfiguration.removeJobHandler(jobHandler.getType());
+        }
+    }
+
+    @Test
+    public void testExecuteJobThrowsFlowableException() {
+        JobHandler jobHandler = new ExceptionThrowingJobHandler(() -> new FlowableIllegalArgumentException("Test exception"));
+        try {
+            processEngineConfiguration.addJobHandler(jobHandler);
+            String jobId = managementService.executeCommand(commandContext -> {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity job = jobService.createJob();
+                job.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+                job.setJobHandlerType(jobHandler.getType());
+                job.setRetries(3);
+                jobService.insertJob(job);
+                return job.getId();
+            });
+            assertThatThrownBy(() -> managementService.executeJob(jobId))
+                    .isInstanceOf(FlowableIllegalArgumentException.class)
+                    .hasMessageContaining("Test exception")
+                    .hasNoCause();
+        } finally {
+            Job job = managementService.createTimerJobQuery().singleResult();
+            if (job != null) {
+                managementService.deleteTimerJob(job.getId());
+            }
+            processEngineConfiguration.removeJobHandler(jobHandler.getType());
+        }
     }
 
     @Test
