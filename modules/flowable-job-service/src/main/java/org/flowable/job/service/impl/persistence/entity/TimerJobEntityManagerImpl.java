@@ -13,6 +13,7 @@
 
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -171,13 +173,28 @@ public class TimerJobEntityManagerImpl
 
     @Override
     public void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities) {
+        List<String> byteArrayIdsToDelete = new ArrayList<>();
+
         for (TimerJobEntity timerJobEntity : timerJobEntities) {
             if (serviceConfiguration.getInternalJobManager() != null) {
                 serviceConfiguration.getInternalJobManager().handleJobDelete(timerJobEntity);
             }
+
+            ByteArrayRef exceptionByteArrayRef = timerJobEntity.getExceptionByteArrayRef();
+            if (exceptionByteArrayRef != null && !exceptionByteArrayRef.isDeleted() && exceptionByteArrayRef.getId() != null) {
+                byteArrayIdsToDelete.add(exceptionByteArrayRef.getId());
+            }
+
+            ByteArrayRef customValuesByteArrayRef = timerJobEntity.getCustomValuesByteArrayRef();
+            if (customValuesByteArrayRef != null && !customValuesByteArrayRef.isDeleted() && customValuesByteArrayRef.getId() != null) {
+                byteArrayIdsToDelete.add(customValuesByteArrayRef.getId());
+            }
         }
 
         dataManager.bulkDeleteWithoutRevision(timerJobEntities);
+
+        // Delete ByteArrays related with timer jobs
+        bulkDeleteByteArraysById(byteArrayIdsToDelete);
     }
 
     protected TimerJobEntity createTimer(JobEntity te) {
