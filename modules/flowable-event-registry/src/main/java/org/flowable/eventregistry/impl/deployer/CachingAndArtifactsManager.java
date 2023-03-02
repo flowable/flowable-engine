@@ -17,10 +17,12 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
 import org.flowable.eventregistry.impl.persistence.deploy.EventDefinitionCacheEntry;
+import org.flowable.eventregistry.impl.persistence.deploy.EventDeploymentManager;
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
@@ -74,7 +76,7 @@ public class CachingAndArtifactsManager {
         }
     }
     
-    protected void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
+    public void registerChannelModel(ChannelModel channelModel, ChannelDefinition channelDefinition, EventRegistryEngineConfiguration eventRegistryEngineConfiguration) {
         String channelDefinitionKey = channelModel.getKey();
         if (StringUtils.isEmpty(channelDefinitionKey)) {
             throw new FlowableIllegalArgumentException("No key set for channel model");
@@ -89,25 +91,61 @@ public class CachingAndArtifactsManager {
                 inboundEventChannelAdapter.setEventRegistry(eventRegistryEngineConfiguration.getEventRegistry());
                 inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
             }
-            
-            if (eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().isChannelModelAlreadyRegistered(inboundChannelModel, channelDefinition)) {
-                // inbound channel model is already registered, returning to prevent the same listener from getting registered again
-                return;
-                
-            } else {
-                eventRegistryEngineConfiguration.getInboundChannelModelCacheManager().registerChannelModel(inboundChannelModel, channelDefinition);
-            }
 
         } else if (!(channelModel instanceof OutboundChannelModel)) {
             throw new FlowableIllegalArgumentException("Unrecognized ChannelModel class : " + channelModel.getClass());
         }
 
+        InboundChannelModelCacheManager.ChannelRegistration channelRegistration = null;
+        if (channelModel instanceof InboundChannelModel) {
+            channelRegistration = eventRegistryEngineConfiguration.getInboundChannelModelCacheManager()
+                    .registerChannelModel((InboundChannelModel) channelModel, channelDefinition);
+        }
+
+        boolean channelRegistered = channelRegistration == null || channelRegistration.registered();
         for (ChannelModelProcessor channelDefinitionProcessor : eventRegistryEngineConfiguration.getChannelModelProcessors()) {
-            if (channelDefinitionProcessor.canProcess(channelModel)) {
-                channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRepositoryService());
-                channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(), eventRegistryEngineConfiguration.getEventRegistry(),
-                        eventRegistryEngineConfiguration.getEventRepositoryService(), eventRegistryEngineConfiguration.getEventSerializerManager(),
-                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+            boolean canProcessChannel;
+            if (channelRegistered) {
+                canProcessChannel = channelDefinitionProcessor.canProcess(channelModel);
+            } else {
+                canProcessChannel = channelDefinitionProcessor.canProcessIfChannelModelAlreadyRegistered(channelModel);
+            }
+
+            if (canProcessChannel) {
+                channelDefinitionProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(),
+                        eventRegistryEngineConfiguration.getEventRepositoryService());
+                try {
+                    channelDefinitionProcessor.registerChannelModel(channelModel, channelDefinition.getTenantId(),
+                            eventRegistryEngineConfiguration.getEventRegistry(),
+                            eventRegistryEngineConfiguration.getEventRepositoryService(),
+                            eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+                } catch (RuntimeException ex) {
+                    // Registering a channel can lead to an exception
+                    // In such a case we need to roll back the channel registration and re-register the previous channel
+                    // The reason for that is that previous channel should keep listening i.e. JMS connection should exist
+                    if (channelRegistration != null) {
+                        // If there was a channel registration then we need to rollback it
+                        channelRegistration.rollback();
+
+                        InboundChannelModelCacheManager.RegisteredChannel previousChannel = channelRegistration.previousChannel();
+                        if (previousChannel != null) {
+                            // If there was a previous channel in the registration then we actually need to re-register that one
+                            EventDeploymentManager deploymentManager = eventRegistryEngineConfiguration.getDeploymentManager();
+                            ChannelDefinitionEntity previousChannelDefinition = deploymentManager
+                                    .findDeployedChannelDefinitionById(previousChannel.getChannelDefinitionId());
+
+                            ChannelDefinitionCacheEntry cacheEntry = deploymentManager.resolveChannelDefinition(previousChannelDefinition);
+                            ChannelModel previousChannelModel = cacheEntry.getChannelModel();
+                            if (previousChannelModel instanceof InboundChannelModel) {
+                                channelDefinitionProcessor.registerChannelModel(previousChannelModel, previousChannelDefinition.getTenantId(),
+                                        eventRegistryEngineConfiguration.getEventRegistry(), eventRegistryEngineConfiguration.getEventRepositoryService(),
+                                        eventRegistryEngineConfiguration.isFallbackToDefaultTenant());
+                            }
+
+                        }
+                    }
+                    throw ex;
+                }
             }
         }
     }

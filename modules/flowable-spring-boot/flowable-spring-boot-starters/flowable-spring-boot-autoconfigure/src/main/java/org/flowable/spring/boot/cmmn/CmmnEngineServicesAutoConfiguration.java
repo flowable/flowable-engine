@@ -30,7 +30,7 @@ import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -42,13 +42,12 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Filip Hrisafov
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnCmmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableCmmnProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     CmmnEngineAutoConfiguration.class,
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class

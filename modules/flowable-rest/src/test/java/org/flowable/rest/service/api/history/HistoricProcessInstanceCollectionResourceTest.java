@@ -29,6 +29,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -66,12 +68,16 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey", processVariables);
 
+        runtimeService.setProcessInstanceName(processInstance.getId(), "myProcessInstance");
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         startTime.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey2");
+        
+        runtimeService.setProcessInstanceName(processInstance2.getId(), "otherProcessInstance");
 
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES);
 
@@ -84,6 +90,15 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId() + "&finished=true", processInstance.getId());
 
         assertResultsPresentInDataResponse(url + "?processDefinitionKey=oneTaskProcess", processInstance.getId(), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceName=myProcessInstance", processInstance.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceName=otherProcessInstance", processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("%ProcessInstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("other%Instance"), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("%proceSSinstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("OTHER%Instance"), processInstance2.getId());
         
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey", processInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey2", processInstance2.getId());
@@ -187,6 +202,82 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
                 + "}");
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
+    public void testBulkDeleteHistoricProcessInstances() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance3.getId()).count()).isEqualTo(1);
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "/delete";
+
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId());
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance3.getId()).count()).isEqualTo(1);
+
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
+    public void testInvalidBulkDeleteHistoricProcessInstances() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "/delete";
+
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(processInstance.getId()).add(processInstance2.getId()).add("notValidID");
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
+
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance2.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance3.getId()).count()).isEqualTo(1);
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+
+        body.put("action", "invalidAction");
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+    }
+    
     @Override
     protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
         int numberOfResultsExpected = expectedResourceIds.length;

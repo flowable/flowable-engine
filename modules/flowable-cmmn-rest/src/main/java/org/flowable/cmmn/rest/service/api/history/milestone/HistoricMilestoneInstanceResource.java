@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history.milestone;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;

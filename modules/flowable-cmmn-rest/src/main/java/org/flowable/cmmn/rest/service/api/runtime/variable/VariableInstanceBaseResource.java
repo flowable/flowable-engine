@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
@@ -61,10 +61,12 @@ public class VariableInstanceBaseResource {
         VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
         // Populate query based on request
-        if (queryRequest.getExcludeTaskVariables() != null) {
-            if (queryRequest.getExcludeTaskVariables()) {
-                query.excludeTaskVariables();
-            }
+        if (Boolean.TRUE.equals(queryRequest.getExcludeTaskVariables())) {
+            query.excludeTaskVariables();
+        }
+
+        if (Boolean.TRUE.equals(queryRequest.getExcludeLocalVariables())) {
+            query.excludeLocalVariables();
         }
 
         if (queryRequest.getTaskId() != null) {

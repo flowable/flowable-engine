@@ -105,7 +105,21 @@ public class EventModelBuilderImpl implements EventModelBuilder {
         eventPayloadDefinitions.put(name, new EventPayload(name, type));
         return this;
     }
-    
+
+    @Override
+    public EventModelBuilder metaParameter(String name, String type) {
+        EventPayload payload = new EventPayload(name, type);
+        payload.setMetaParameter(true);
+        eventPayloadDefinitions.put(name, payload);
+        return this;
+    }
+
+    @Override
+    public EventModelBuilder fullPayload(String name) {
+        eventPayloadDefinitions.put(name, EventPayload.fullPayload(name));
+        return this;
+    }
+
     @Override
     public EventModel createEventModel() {
         return buildEventModel();

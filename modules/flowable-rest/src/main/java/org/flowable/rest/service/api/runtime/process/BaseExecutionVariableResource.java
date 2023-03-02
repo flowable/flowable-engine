@@ -20,8 +20,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -33,6 +32,7 @@ import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,15 +41,15 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 /**
  * @author Frederik Heremans
  */
-public class BaseExecutionVariableResource extends BaseProcessInstanceResource {
+public class BaseExecutionVariableResource extends BaseProcessInstanceResource implements InitializingBean {
 
     @Autowired
     protected Environment env;
 
     protected boolean isSerializableVariableAllowed;
 
-    @PostConstruct
-    protected void postConstruct() {
+    @Override
+    public void afterPropertiesSet() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
     }
 
@@ -281,22 +281,27 @@ public class BaseExecutionVariableResource extends BaseProcessInstanceResource {
     }
 
     /**
-     * Get valid execution from request. Throws exception if execution does not exist or if execution id is not provided.
+     * Get valid execution from request without calling rest interceptor.
+     * Throws exception if execution does not exist or if execution id is not provided.
+     */
+    protected Execution getExecutionFromRequestWithoutAccessCheck(String executionId) {
+        Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
+        if (execution == null) {
+            throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
+        }
+        
+        return execution;
+    }
+
+    /**
+     * Get valid execution from request and calls rest interceptor.
+     * Throws exception if execution does not exist or if execution id is not provided.
      */
     protected Execution getExecutionFromRequestWithAccessCheck(String executionId) {
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessExecutionInfoById(execution);
-        }
-        
-        return execution;
-    }
-
-    protected Execution getExecutionFromRequestWithoutAccessCheck(String executionId) {
-        Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
-        if (execution == null) {
-            throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
         }
         
         return execution;

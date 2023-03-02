@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
-import org.flowable.eventregistry.api.ChannelProcessingPipelineManager;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
@@ -47,21 +46,29 @@ public class DelegateExpressionInboundChannelModelProcessor implements ChannelMo
     }
 
     @Override
+    public boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel) {
+        return channelModel instanceof DelegateExpressionInboundChannelModel;
+    }
+
+    @Override
     public void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant) {
         
         if (channelModel instanceof DelegateExpressionInboundChannelModel) {
-            registerChannelModel((DelegateExpressionInboundChannelModel) channelModel, eventRegistry);
+            registerChannelModel((DelegateExpressionInboundChannelModel) channelModel, tenantId, eventRegistry);
         }
     }
 
-    protected void registerChannelModel(DelegateExpressionInboundChannelModel channelModel, EventRegistry eventRegistry) {
+    protected void registerChannelModel(DelegateExpressionInboundChannelModel channelModel, String tenantId, EventRegistry eventRegistry) {
         String delegateExpression = channelModel.getAdapterDelegateExpression();
         if (StringUtils.isNotEmpty(delegateExpression)) {
+            VariableContainerWrapper variableContainer = new VariableContainerWrapper(Collections.emptyMap());
+            variableContainer.setVariable("tenantId", tenantId);
+            variableContainer.setTenantId(tenantId);
             Object channelAdapter = engineConfiguration.getExpressionManager()
                 .createExpression(delegateExpression)
-                .getValue(new VariableContainerWrapper(Collections.emptyMap()));
+                .getValue(variableContainer);
             if (!(channelAdapter instanceof InboundEventChannelAdapter)) {
                 throw new FlowableException(
                     "DelegateExpression inbound channel model with key " + channelModel.getKey() + " resolved channel adapter delegate expression to "

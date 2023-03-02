@@ -1,0 +1,14 @@
+{
+    "key": "issueEvent",
+    "name": "Issue Event",
+    "payload": [
+    	{
+            "name": "issueNo",
+            "type": "string"
+        },
+        {
+            "name": "issueType",
+            "type": "string"
+        }
+    ]
+}

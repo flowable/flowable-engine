@@ -31,7 +31,7 @@
   </process>
   
   
-  <process id="subProcess">
+  <process id="subProcess" name="Sub process">
      <startEvent id="subProcessStart" />
         <sequenceFlow sourceRef="subProcessStart" targetRef="anotherTask" />
         <userTask id="anotherTask" name="Process task" activiti:candidateUsers="kermit" activiti:candidateGroups="sales" />

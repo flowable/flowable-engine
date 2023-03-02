@@ -1888,7 +1888,7 @@ public class LongRunningJavaDelegate implements MapBasedFlowableFutureJavaDelega
 Note: the same rules and logic that applied for the `JavaDelegate` applies for the `FutureJavaDelegate` as well. 
 Keep in mind that when using field expression inject the evaluation of the expression should only be done before or after the execution is done (on the same thread as the process instance).
 
-[\[INTERNAL: non-public implementation classes\]](internal) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
+[\[INTERNAL: non-public implementation classes\]](../oss-introduction.md#internal-implementation-classes) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
 
 #### Field Injection
 
@@ -3045,74 +3045,6 @@ Below are few examples for exception handling and retry for http task.
 
 Refer [Exception mapping](bpmn/ch07b-BPMN-Constructs.md#exception-mapping)
 
-### Mule Task
-
-The mule task allows you to send messages to Mule, enhancing the integration features of Flowable. Note that the Mule task is **not** an 'official' task of the BPMN 2.0 spec (and doesn’t have a dedicated icon as a consequence). Hence, in Flowable the mule task is implemented as a dedicated service task.
-
-#### Defining an Mule Task
-
-The Mule task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'mule'* for the *type* of the service task.
-
-    <serviceTask id="sendMule" flowable:type="mule">
-
-The Mule task is configured by [field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection). All the values for these properties can contain EL expression, which are resolved at runtime during process execution. Following properties can be set:
-
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Property</th>
-<th>Required?</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><p>endpointUrl</p></td>
-<td><p>yes</p></td>
-<td><p>The Mule endpoint you want to invoke.</p></td>
-</tr>
-<tr class="even">
-<td><p>language</p></td>
-<td><p>yes</p></td>
-<td><p>The language you want to use to evaluate the payloadExpression field.</p></td>
-</tr>
-<tr class="odd">
-<td><p>payloadExpression</p></td>
-<td><p>yes</p></td>
-<td><p>An expression that will be the message’s payload.</p></td>
-</tr>
-<tr class="even">
-<td><p>resultVariable</p></td>
-<td><p>no</p></td>
-<td><p>The name of the variable which will store the result of the invocation.</p></td>
-</tr>
-</tbody>
-</table>
-
-#### Example usage
-
-The following XML snippet shows an example of using the Mule Task.
-
-    <extensionElements>
-      <flowable:field name="endpointUrl">
-        <flowable:string>vm://in</flowable:string>
-      </flowable:field>
-      <flowable:field name="language">
-        <flowable:string>juel</flowable:string>
-      </flowable:field>
-      <flowable:field name="payloadExpression">
-        <flowable:string>"hi"</flowable:string>
-      </flowable:field>
-      <flowable:field name="resultVariable">
-        <flowable:string>theVariable</flowable:string>
-      </flowable:field>
-    </extensionElements>
-
 ### Camel Task
 
 The Camel task allows you to send messages to and receive messages from Camel, and thereby enhances the integration features of Flowable. Note that the Camel task is **not** an 'official' task of the BPMN 2.0 spec (and doesn’t have a dedicated icon as a consequence). Hence, in Flowable the Camel task is implemented as a dedicated service task. Also note that you must include the Flowable Camel module in your project to use the Camel task functionality.
@@ -3713,7 +3645,6 @@ A while back, we also introduced a new type of execution listener, the org.flowa
 
     <flowable:executionListener event="start"
         class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener">
-
       <flowable:field name="script">
         <flowable:string>
           def bar = "BAR";  // local variable
@@ -3725,6 +3656,18 @@ A while back, we also introduced a new type of execution listener, the org.flowa
       <flowable:field name="language" stringValue="groovy" />
       <flowable:field name="resultVariable" stringValue="myVar" />
 
+    </flowable:executionListener>
+
+Scriptable execution listeners became a first-class citizen using a more compact syntax, avoiding
+to hard-code the class name:
+
+    <flowable:executionListener event="start" type="script">
+      <flowable:script language="groovy">
+        <![CDATA[
+          def bar = "BAR";  // local variable
+          execution.setVariable("var1", "test"); // test access to execution instance
+        ]]>
+        </flowable:script>
     </flowable:executionListener>
 
 #### Field injection on execution listeners
@@ -3786,6 +3729,23 @@ The class ExampleFieldInjectedExecutionListener concatenates the two injected fi
     }
 
 Note that the same rules with regards to thread-safety apply to service tasks. Please read the [relevant section](bpmn/ch07b-BPMN-Constructs.md#field-injection-and-thread-safety) for more information.
+
+#### Throwing BPMN Error in Execution Listeners
+It is possible to throw BPMN Errors out of execution listener code, which is caught by a matching [error boundary event](bpmn/ch07b-BPMN-Constructs.md#error-boundary-event) or [error start event](bpmn/ch07b-BPMN-Constructs.md#error-start-event) in the model. 
+This can be done using the Flowable `org.flowable.engine.delegate.BpmnError` class. See section [throwing BPMN Errors](bpmn/ch07b-BPMN-Constructs.md#throwing-bpmn-errors) for
+examples and further description.
+
+It is important to note, that BPMN Errors thrown in Execution Listeners are only caught on _parent scoped_ error boundary events, not on the boundary event of the activity.
+
+The following image illustrates that: 
+![bpmn.executionlistener.bpmnerror](assets/bpmn/bpmn.executionlistener.bpmnerror.png)
+
+Given that _A Task_ has an execution listener defined, which throws a BpmnError at some point: 
+The error is only caught if the error boundary event on the _Subprocess_ matches (the red one in the image). 
+The error boundary event on the _A Task_ is ignored in this case.
+This is a recommended practice anyway.
+
+The reason for this is: When execution listeners are called, the activity is either not yet fully initialized (for _start_ listeners) or the scope was already destroyed (for _end_ listeners).
 
 ### Task listener
 
@@ -3852,6 +3812,24 @@ It is also possible to use [field injection](bpmn/ch07b-BPMN-Constructs.md#field
       <flowable:field name="language" stringValue="groovy" />
       <flowable:field name="resultVariable" stringValue="myVar" />
     </flowable:taskListener>
+
+- Scriptable task listeners became a first-class citizen using a more compact syntax, avoiding to hard-code the class name:
+
+<!-- -->
+
+    <flowable:taskListener event="complete" type="script">
+      <flowable:script language="groovy" resultVariable="myVar">
+        <![CDATA[
+          def bar = "BAR";  // local variable
+          task.setOwner("kermit"); // test access to task instance
+          bar // implicit return value
+        ]]>
+      </flowable:script>
+    </flowable:taskListener>
+
+#### Throwing BPMN Error in Task Listeners
+
+Jump to section [Throwing BPMN Error in Execution Listeners](bpmn/ch07b-BPMN-Constructs.md#throwing-bpmn-error-in-execution-listeners) as the same rules apply for task listeners.
 
 ### Multi-instance (for each)
 

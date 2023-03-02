@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -22,12 +23,15 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.cmmn.api.reactivation.CaseReactivationBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.cmd.BulkDeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkChildrenWithSameRootAsCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetHistoricEntityLinkParentsForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
@@ -87,6 +91,11 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
+    public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new BulkDeleteHistoricCaseInstancesCmd(caseInstanceIds));
+    }
+
+    @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
         return new HistoricTaskInstanceQueryImpl(commandExecutor, configuration.getDatabaseType(),
                 configuration.getTaskServiceConfiguration(), configuration.getVariableServiceConfiguration());
@@ -130,6 +139,16 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkChildrenForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkChildrenForTaskCmd(taskId));
+    }
+
+    @Override
+    public List<HistoricEntityLink> getHistoricEntityLinkParentsForTask(String taskId) {
+        return commandExecutor.execute(new GetHistoricEntityLinkParentsForTaskCmd(taskId));
     }
 
     @Override

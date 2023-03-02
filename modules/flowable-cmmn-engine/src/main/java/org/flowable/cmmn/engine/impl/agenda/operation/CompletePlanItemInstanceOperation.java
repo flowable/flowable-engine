@@ -12,11 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -57,8 +64,15 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
         if (isStage(planItemInstanceEntity)) {
             // terminate any remaining child plan items (e.g. in enabled / available state), but don't complete them as it might lead
             // into wrong behavior resulting from it (e.g. triggering some follow-up actions on that completion event) and it will leave
-            // such implicitly completed plan items in complete state although they were never explicitly completed
+            // such implicitly completed plan items in complete state, although they were never explicitly completed
             exitChildPlanItemInstances(PlanItemTransition.COMPLETE, null, null);
+
+            // create stage ended with completion state event
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createStageEndedEvent(getCaseInstance(), planItemInstanceEntity,
+                        FlowableCaseStageEndedEvent.ENDING_STATE_COMPLETED), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
 
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
@@ -67,9 +81,15 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(OperationSerializationMetadata.FIELD_PLAN_ITEM_INSTANCE_ID, planItemInstanceEntity.getId());
+        return metadata;
+    }
+
+    @Override
     public String getOperationName() {
         return "[Complete plan item]";
     }
 
-    
 }

@@ -13,6 +13,7 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -310,7 +311,24 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         Map<String, String> params = new HashMap<>();
         params.put("oldTenantId", oldTenantId);
         params.put("newTenantId", newTenantId);
-        getDbSqlSession().update("updateTenantIdOfEventSubscriptions", params);
+        getDbSqlSession().directUpdate("updateTenantIdOfEventSubscriptions", params);
+    }
+
+    @Override
+    public boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", eventSubscriptionId);
+        params.put("lockTime", lockDate);
+        params.put("currentTime", currentTime);
+        params.put("lockOwner", lockOwner);
+
+        int result = getDbSqlSession().directUpdate("updateEventSubscriptionLockTime", params);
+        return result > 0;
+    }
+
+    @Override
+    public void clearEventSubscriptionLockTime(String eventSubscriptionId) {
+        getDbSqlSession().directUpdate("clearEventSubscriptionLockTime", eventSubscriptionId);
     }
 
     @Override

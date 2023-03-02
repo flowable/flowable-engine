@@ -15,15 +15,18 @@ package org.flowable.cmmn.test.itemcontrol;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -148,6 +151,153 @@ public class PlanItemRepetitionMaxInstanceCountWithNumberTest extends FlowableCm
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task D", ENABLED);
         assertPlanItemInstanceState(planItemInstances, "Task E", ACTIVE, ACTIVE, ACTIVE, ACTIVE, ACTIVE, WAITING_FOR_REPETITION);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionMaxInstanceCountWithNumberTest.oneInstance.cmmn")
+    public void testMaxCountOne() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(2);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(2);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(2);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        
+        assertThat(planItemInstances).hasSize(4);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE, COMPLETED);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionMaxInstanceCountWithNumberTest.oneInstanceWithSentry.cmmn")
+    public void testMaxCountOneWithSentry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(2);
+        assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(3);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(2);
+        assertPlanItemInstanceState(planItemInstances, "Task A", WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(3);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        
+        assertThat(planItemInstances).hasSize(7);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION, COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE, COMPLETED, COMPLETED, COMPLETED);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/PlanItemRepetitionMaxInstanceCountWithNumberTest.stageWithOneInstanceAndSentry.cmmn")
+    public void testMaxCountOneWithStageAndSentry() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("maxInstanceCountNumberTest").start();
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(3);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(4);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(3);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        cmmnRuntimeService.completeUserEventListenerInstance(
+                cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                    .singleResult().getId());
+        
+        planItemInstances = getPlanItemInstances(caseInstance.getId());
+        assertThat(planItemInstances).hasSize(4);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        
+        assertThat(planItemInstances).hasSize(8);
+        assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE, WAITING_FOR_REPETITION, COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "User Event Listener", AVAILABLE, COMPLETED, COMPLETED, COMPLETED);
     }
 
     protected void startAndCompleteTaskMultipleTimes(String caseInstanceId, String taskName, int count) {

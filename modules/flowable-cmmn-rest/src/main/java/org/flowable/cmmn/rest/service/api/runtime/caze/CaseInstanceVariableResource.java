@@ -15,8 +15,8 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -65,7 +65,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithAccessCheck(caseInstanceId);
-        return getVariableFromRequest(caseInstance, variableName, false);
+        return getVariableFromRequest(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, false);
     }
 
     @ApiOperation(value = "Update a single variable on a case instance", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariable",
@@ -116,7 +116,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, caseInstance, false);
+            result = setSimpleVariable(restVariable, caseInstance, false, CmmnRestResponseFactory.VARIABLE_CASE);
         }
         return result;
     }

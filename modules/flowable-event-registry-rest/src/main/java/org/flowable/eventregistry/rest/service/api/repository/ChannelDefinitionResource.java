@@ -13,7 +13,7 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventRepositoryService;

@@ -8,7 +8,7 @@
   <artifactId>flowable-dbclean</artifactId>
 
   <packaging>pom</packaging>
-  <version>6.7.3-SNAPSHOT</version>
+  <version>7.0.0-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
@@ -27,9 +27,9 @@
       <version>12.2.0.1</version>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.19</version>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.0.31</version>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.jtds</groupId>

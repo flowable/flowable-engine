@@ -33,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
@@ -68,6 +70,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         identityService.setAuthenticatedUserId("kermit");
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
+                .name("myCaseInstanceName")
                 .businessKey("myBusinessKey")
                 .businessStatus("myBusinessStatus")
                 .variables(caseVariables).start();
@@ -79,6 +82,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
+                .name("anotherCaseInstanceName")
                 .businessKey("anotherBusinessKey")
                 .businessStatus("anotherBusinessStatus")
                 .start();
@@ -98,6 +102,17 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?caseDefinitionKey=oneHumanTaskCase", caseInstance.getId(), caseInstance2.getId());
 
         assertResultsPresentInDataResponse(url + "?caseDefinitionName=" + encode("One Human Task Case"), caseInstance.getId(), caseInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?name=myCaseInstanceName", caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?name=none");
+        
+        assertResultsPresentInDataResponse(url + "?nameLike=" + encode("%CaseInstanceName"), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?nameLike=" + encode("my%InstanceName"), caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?nameLike=none");
+        
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=" + encode("%CASEInstanceName"), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=" + encode("my%INSTANCEName"), caseInstance.getId());
+        assertResultsPresentInDataResponse(url + "?nameLikeIgnoreCase=NONE");
         
         assertResultsPresentInDataResponse(url + "?businessKey=myBusinessKey", caseInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=none");
@@ -215,6 +230,83 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?activePlanItemDefinitionId=task1";
         assertResultsPresentInDataResponse(url);
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testBulkDeleteHistoricCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "/delete";
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
+
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
+
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testInvalidBulkDeleteHistoricCaseInstances() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "/delete";
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId()).add("notValidID");
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
+
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance1.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).count()).isEqualTo(0);
+        assertThat(historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance3.getId()).count()).isEqualTo(1);
+
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "delete");
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+
+        body = objectMapper.createObjectNode();
+        body.put("action", "invalidAction");
+        body.putArray("instanceIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(body.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })

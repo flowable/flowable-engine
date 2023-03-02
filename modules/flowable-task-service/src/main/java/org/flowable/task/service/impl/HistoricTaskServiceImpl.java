@@ -12,6 +12,7 @@
  */
 package org.flowable.task.service.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +57,11 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     @Override
     public List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId) {
         return getHistoricTaskInstanceEntityManager().findHistoricTasksByParentTaskId(parentTaskId);
+    }
+
+    @Override
+    public List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds) {
+        return getHistoricTaskInstanceEntityManager().findHistoricTaskIdsByParentTaskIds(parentTaskIds);
     }
 
     @Override
@@ -200,6 +206,13 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
     
     @Override
+    public void bulkDeleteHistoricTaskLogEntriesForTaskIds(Collection<String> taskIds) {
+        if (this.configuration.isEnableHistoricTaskLogging()) {
+            getHistoricTaskLogEntryEntityManager().bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
+        }
+    }
+    
+    @Override
     public void deleteHistoricTaskLogEntriesForNonExistingProcessInstances() {
         if (this.configuration.isEnableHistoricTaskLogging()) {
             getHistoricTaskLogEntryEntityManager().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
@@ -217,7 +230,12 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstances(historicTaskInstanceQuery);
     }
-    
+
+    @Override
+    public void bulkDeleteHistoricTaskInstances(Collection<String> taskIds) {
+        getHistoricTaskInstanceEntityManager().bulkDeleteHistoricTaskInstancesForIds(taskIds);
+    }
+
     @Override
     public void deleteHistoricTaskInstancesForNonExistingProcessInstances() {
         getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesForNonExistingProcessInstances();

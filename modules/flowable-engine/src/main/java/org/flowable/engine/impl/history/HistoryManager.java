@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -76,6 +77,11 @@ public interface HistoryManager {
      * Deletes historic process instances for a provided process definition id
      */
     void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId);
+    
+    /**
+     * Bulk delete historic process instances by id
+     */
+    void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds);
 
     /**
      * Record the start of an activity, if activity history is enabled.

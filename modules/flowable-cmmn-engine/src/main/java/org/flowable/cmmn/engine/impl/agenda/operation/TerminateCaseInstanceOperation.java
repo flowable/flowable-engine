@@ -22,14 +22,17 @@ import java.util.HashMap;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Joram Barrez
@@ -112,6 +115,18 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
             }
         }
     }
+
+    /**
+     * Overwritten in order to send a case end / terminate event through the case engine dispatcher.
+     */
+    @Override
+    protected void invokePostLifecycleListeners() {
+        super.invokePostLifecycleListeners();
+
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getEventDispatcher()
+            .dispatchEvent(FlowableCmmnEventBuilder.createCaseEndedEvent(caseInstanceEntity, CaseInstanceState.TERMINATED),
+                EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
     
     @Override
     public String getDeleteReason() {
@@ -128,15 +143,29 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         callbackData.getAdditionalData().put(CallbackConstants.MANUAL_TERMINATION, manualTermination);
     }
 
+    @Override
+    public CaseInstanceEntity getCaseInstanceEntity() {
+        if (caseInstanceEntity == null) {
+            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
+            if (caseInstanceEntity == null) {
+                throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceEntityId);
+            }
+        }
+        return caseInstanceEntity;
+    }
+
     public boolean isManualTermination() {
         return manualTermination;
     }
+
     public void setManualTermination(boolean manualTermination) {
         this.manualTermination = manualTermination;
     }
+
     public String getExitCriterionId() {
         return exitCriterionId;
     }
+
     public void setExitCriterionId(String exitCriterionId) {
         this.exitCriterionId = exitCriterionId;
     }

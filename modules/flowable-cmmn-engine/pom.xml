@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.7.3-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -160,8 +160,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -204,6 +204,11 @@
             <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -218,13 +223,13 @@
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
-            javax.persistence*;resolution:=optional,
+            jakarta.persistence*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
-            javax.transaction;resolution:=optional,
-            javax.enterprise.concurrent;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
+            jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 
@@ -302,19 +307,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>java-17+</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.openjdk.nashorn</groupId>
-                    <artifactId>nashorn-core</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
         <profile>
             <id>errorLogging</id>
             <build>
@@ -693,7 +685,7 @@
                                 <exclude>**/CmmnHistoryServiceTaskLogTest.java</exclude>
 
                             </excludes>
-                            <argLine>${argLine} -Xmx4g</argLine>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

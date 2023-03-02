@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
@@ -51,6 +51,7 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
     public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
         if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
         }

@@ -64,9 +64,13 @@ public interface CmmnRuntimeService {
     
     void terminateCaseInstance(String caseInstanceId);
 
+    void bulkTerminateCaseInstances(Collection<String> caseInstanceId);
+
     void terminatePlanItemInstance(String planItemInstanceId);
     
     void deleteCaseInstance(String caseInstanceId);
+
+    void bulkDeleteCaseInstances(Collection<String> caseInstanceId);
 
     void evaluateCriteria(String caseInstanceId);
     
@@ -175,6 +179,11 @@ public interface CmmnRuntimeService {
      */
     boolean hasVariable(String caseInstanceId, String variableName);
     
+    /**
+     * Check whether or not this plan item instance has local variable set with the given name.
+     */
+    boolean hasLocalVariable(String planItemInstanceId, String variableName);
+
     void setVariables(String caseInstanceId, Map<String, Object> variables);
     
     void setVariable(String caseInstanceId, String variableName, Object variableValue);
@@ -228,6 +237,36 @@ public interface CmmnRuntimeService {
      *             when the case instance doesn't exist.
      */
     List<StageResponse> getStageOverview(String caseInstanceId);
+
+    /**
+     * Set the new owner of a case instance.
+     *
+     * @param caseInstanceId the id of the case to set its new owner
+     * @param userId the id of the user to set as the new owner
+     */
+    void setOwner(String caseInstanceId, String userId);
+
+    /**
+     * Removes the owner of a case instance.
+     *
+     * @param caseInstanceId the id of the case to remove the owner from
+     */
+    void removeOwner(String caseInstanceId);
+
+    /**
+     * Set the new assignee of a case instance.
+     *
+     * @param caseInstanceId the id of the case to set its new assignee
+     * @param userId the id of the user to set as the new assignee
+     */
+    void setAssignee(String caseInstanceId, String userId);
+
+    /**
+     * Removes the assignee of a case instance.
+     *
+     * @param caseInstanceId the id of the case to remove the assignee from
+     */
+    void removeAssignee(String caseInstanceId);
     
     /**
      * Involves a user with a case instance. The type of identity link is defined by the given identityLinkType.

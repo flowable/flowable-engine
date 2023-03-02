@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -21,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
@@ -31,6 +33,8 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Joram Barrez
  */
 public class CmmnHistoryHelper {
+    
+    public static final int MAX_SUB_CASE_INSTANCES = 1000;
     
     public static void deleteHistoricCaseInstance(CmmnEngineConfiguration cmmnEngineConfiguration, String caseInstanceId) {
         HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
@@ -67,6 +71,41 @@ public class CmmnHistoryHelper {
         // Also delete any sub cases that may be active
         historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list()
                 .forEach(c -> deleteHistoricCaseInstance(cmmnEngineConfiguration, c.getId()));
+    }
+    
+    public static void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+
+        HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+        historicMilestoneInstanceEntityManager.bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(caseInstanceIds);
+
+        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+        historicPlanItemInstanceEntityManager.bulkDeleteHistoricPlanItemInstancesForCaseInstanceIds(caseInstanceIds);
+
+        HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
+        historicIdentityLinkService.bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+        historicIdentityLinkService.bulkDeleteHistoricIdentityLinksByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.PLAN_ITEM);
+        
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.CMMN, caseInstanceIds);
+        }
+
+        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
+        historicVariableInstanceEntityManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+
+        TaskHelper.bulkDeleteHistoricTaskInstancesByCaseInstanceIds(caseInstanceIds, cmmnEngineConfiguration);
+
+        historicCaseInstanceEntityManager.bulkDeleteHistoricCaseInstances(caseInstanceIds);
+
+        // Also delete any sub cases that may be active
+        List<String> subCaseInstanceIds = historicCaseInstanceEntityManager.findHistoricCaseInstanceIdsByParentIds(caseInstanceIds);
+        if (subCaseInstanceIds != null && !subCaseInstanceIds.isEmpty()) {
+            List<List<String>> partitionedSubCaseInstanceIds = CollectionUtil.partition(subCaseInstanceIds, MAX_SUB_CASE_INSTANCES);
+            for (List<String> batchSubCaseInstanceIds : partitionedSubCaseInstanceIds) {
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordBulkDeleteHistoricCaseInstances(batchSubCaseInstanceIds);
+            }
+        }
     }
 
 }

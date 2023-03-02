@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.springframework.web.bind.annotation.GetMapping;

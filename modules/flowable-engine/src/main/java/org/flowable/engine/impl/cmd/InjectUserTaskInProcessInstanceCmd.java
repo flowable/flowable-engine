@@ -101,7 +101,12 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
         SequenceFlow flowFromStart = new SequenceFlow(initialStartEvent.getId(), parallelGateway.getId());
         flowFromStart.setId(dynamicUserTaskBuilder.nextFlowId(process.getFlowElementMap()));
         process.addFlowElement(flowFromStart);
-        
+
+        if (dynamicUserTaskBuilder.getDynamicUserTaskCallback() != null) {
+            dynamicUserTaskBuilder.getDynamicUserTaskCallback().handleCreatedDynamicUserTask(userTask,
+                    userTask.getSubProcess(), userTask.getParentContainer(), process);
+        }
+
         GraphicInfo elementGraphicInfo = bpmnModel.getGraphicInfo(initialStartEvent.getId());
         if (elementGraphicInfo != null) {
             double yDiff = 0;
@@ -120,6 +125,14 @@ public class InjectUserTaskInProcessInstanceCmd extends AbstractDynamicInjection
                 GraphicInfo locationGraphicInfo = locationMap.get(locationId);
                 locationGraphicInfo.setX(locationGraphicInfo.getX() + xDiff);
                 locationGraphicInfo.setY(locationGraphicInfo.getY() + yDiff);
+            }
+            
+            Map<String, GraphicInfo> labelLocationMap = bpmnModel.getLabelLocationMap();
+            for (final String labelLocationId : labelLocationMap.keySet()) {
+                GraphicInfo labelLocationGraphicInfo = labelLocationMap.get(labelLocationId);
+                
+                labelLocationGraphicInfo.setX(labelLocationGraphicInfo.getX() + xDiff);
+                labelLocationGraphicInfo.setY(labelLocationGraphicInfo.getY() + yDiff);
             }
             
             Map<String, List<GraphicInfo>> flowLocationMap = bpmnModel.getFlowLocationMap();

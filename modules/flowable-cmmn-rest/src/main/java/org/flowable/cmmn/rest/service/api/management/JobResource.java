@@ -13,8 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.management;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -296,6 +296,9 @@ public class JobResource extends JobBaseResource {
 
         if (MOVE_ACTION.equals(actionRequest.getAction())) {
 
+            if (restApiInterceptor != null) {
+                restApiInterceptor.moveDeadLetterJob(deadLetterJob, MOVE_ACTION);
+            }
             /*
              * Note that the jobType is checked to know which kind of move that needs to be done.
              * The MOVE_TO_HISTORY_JOB_ACTION allows to specifically force the move to a history job and trigger the else part below.
@@ -318,6 +321,9 @@ public class JobResource extends JobBaseResource {
             response.setStatus(HttpStatus.NO_CONTENT.value());
 
         } else if (MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+            if (restApiInterceptor != null) {
+                restApiInterceptor.moveDeadLetterJob(deadLetterJob, MOVE_TO_HISTORY_JOB_ACTION);
+            }
             try {
                 managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), cmmnEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
             } catch (FlowableObjectNotFoundException aonfe) {

@@ -38,6 +38,14 @@ public interface CaseInstanceMigrationDocumentBuilder {
     CaseInstanceMigrationDocumentBuilder addMoveToAvailablePlanItemDefinitionMappings(List<MoveToAvailablePlanItemDefinitionMapping> planItemDefinitionMappings);
 
     CaseInstanceMigrationDocumentBuilder addMoveToAvailablePlanItemDefinitionMapping(MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping);
+    
+    CaseInstanceMigrationDocumentBuilder addWaitingForRepetitionPlanItemDefinitionMappings(List<WaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings);
+
+    CaseInstanceMigrationDocumentBuilder addWaitingForRepetitionPlanItemDefinitionMapping(WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping);
+    
+    CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMappings(List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> planItemDefinitionMappings);
+
+    CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping);
 
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariable(String variableName, Object variableValue);
 

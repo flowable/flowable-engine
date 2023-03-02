@@ -24,6 +24,7 @@ import java.util.Random;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -355,6 +356,36 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
                 );
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/EventRegistryEventSubprocessTest.EventRegistryEventSubprocessAndCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml"
+    })
+    public void testInterruptSubprocessOfCallActivity() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "gonzo");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EventRegistryEventSubprocessProcessAndCallActivity", variableMap);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNotNull();
+
+        // Trigger event subprocess
+        inboundEventChannelAdapter.triggerTestEvent("gonzo");
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult()).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
+            assertThat(parentProcess.getEndTime()).isNotNull();
+
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("startToEnd").singleResult();
+
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("eventProcessStart");
+        }
+    }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());

@@ -96,6 +96,32 @@
     delete from ${prefix}ACT_HI_COMMENT where PROC_INST_ID_ = #{processInstanceId} 
   </delete>
   
+  <delete id="bulkDeleteCommentsForTaskIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_COMMENT where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        TASK_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
+  <delete id="bulkDeleteCommentsForProcessInstanceIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_COMMENT where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PROC_INST_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
   <!-- COMMENT RESULTMAP -->
 
   <resultMap id="commentResultMap" type="org.flowable.engine.impl.persistence.entity.CommentEntityImpl">

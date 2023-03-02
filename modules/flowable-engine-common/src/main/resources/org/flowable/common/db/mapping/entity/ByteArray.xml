@@ -72,6 +72,13 @@
     delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </delete>
 
+  <delete id="deleteByteArraysNoRevisionCheck" parameterType="java.util.List">
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
+    <foreach item="byteArrayId" index="index" collection="collection" open="(" separator="," close=")">
+      #{byteArrayId}
+    </foreach>
+  </delete>
+
   <!-- BYTE ARRAY RESULTMAP -->
   
   <resultMap id="byteArrayResultMap" type="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">

@@ -15,8 +15,8 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;

@@ -108,6 +108,26 @@ public interface CmmnManagementService {
     Job moveJobToDeadLetterJob(String jobId);
 
     /**
+     * Moves a bulk of jobs that are in the dead letter job table back to the executable job table,
+     * and resets the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when there is no job with any of the given ids.
+     */
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries);
+
+    /**
+     * Moves a bulk of jobs that are in the dead letter job table back to be history jobs,
+     * and resets the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when one job with of the given ids is not found.
+     */
+    void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries);
+
+    /**
      * Moves a job that is in the dead letter job table back to be an executable job, 
      * and resetting the retries (as the retries were probably 0 when it was put into the dead letter job table).
      * 

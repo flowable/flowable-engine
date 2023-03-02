@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -74,10 +73,7 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
             .orderByEndTime().asc());
 
         // Filter out the states that shouldn't be returned in the overview
-        planItemInstances.removeIf(planItemInstance -> {
-            return Objects.equals(PlanItemInstanceState.WAITING_FOR_REPETITION, planItemInstance.getState())
-                || Objects.equals(PlanItemInstanceState.ASYNC_ACTIVE, planItemInstance.getState());
-        });
+        planItemInstances.removeIf(planItemInstance -> PlanItemInstanceState.INTERMEDIARY_STATES.contains(planItemInstance.getState()));
 
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstance.getCaseDefinitionId());

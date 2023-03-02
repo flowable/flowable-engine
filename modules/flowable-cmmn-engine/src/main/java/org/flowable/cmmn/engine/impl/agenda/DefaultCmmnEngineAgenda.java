@@ -13,9 +13,11 @@
 package org.flowable.cmmn.engine.impl.agenda;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivateAsyncPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.AsyncLeaveActivePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ChangePlanItemInstanceToAvailableOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
@@ -211,7 +213,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planActivateAsyncPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         addOperation(new ActivateAsyncPlanItemInstanceOperation(commandContext, planItemInstanceEntity, entryCriterionId));
     }
-    
+
+    @Override
+    public void planAsyncLeaveActivePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String transition, Map<String, String> transitionMetadata) {
+        addOperation(new AsyncLeaveActivePlanItemInstanceOperation(commandContext, planItemInstanceEntity, transition, transitionMetadata));
+    }
+
     @Override
     public void planDisablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new DisablePlanItemInstanceOperation(commandContext, planItemInstanceEntity));        

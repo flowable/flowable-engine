@@ -32,9 +32,9 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
-import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
@@ -45,6 +45,7 @@ import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceUpdateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.ChangePlanItemStateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.task.BulkTasksRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
@@ -76,6 +77,8 @@ public interface CmmnRestApiInterceptor {
     
     void updateTask(Task task, TaskRequest request);
 
+    void bulkUpdateTasks(Collection<Task> tasks, BulkTasksRequest request);
+
     void deleteTask(Task task);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
@@ -102,8 +105,12 @@ public interface CmmnRestApiInterceptor {
     
     void terminateCaseInstance(CaseInstance caseInstance);
     
+    void bulkTerminateCaseInstances(Collection<String> caseInstanceIdList);
+
     void deleteCaseInstance(CaseInstance caseInstance);
     
+    void bulkDeleteCaseInstances(Collection<String> caseInstanceIdsSet);
+
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
@@ -172,6 +179,10 @@ public interface CmmnRestApiInterceptor {
 
     void deleteHistoryJob(HistoryJob historyJob);
     
+    void moveDeadLetterJob(Job job, String action);
+
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, String action);
+
     void accessEventSubscriptionById(EventSubscription eventSubscription);
     
     void accessEventSubscriptionInfoWithQuery(EventSubscriptionQuery eventSubscriptionQuery);
@@ -196,6 +207,8 @@ public interface CmmnRestApiInterceptor {
 
     void accessHistoricCaseIdentityLinks(HistoricCaseInstance historicCaseInstance);
     
+    void bulkDeleteHistoricCases(Collection<String> instanceIds);
+
     void accessStageOverview(CaseInstance caseInstance);
 
     void accessHistoryMilestoneInfoById(HistoricMilestoneInstance historicMilestoneInstance);

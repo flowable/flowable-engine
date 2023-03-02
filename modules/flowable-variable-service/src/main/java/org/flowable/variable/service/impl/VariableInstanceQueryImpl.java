@@ -53,6 +53,7 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     protected String subScopeId;
     protected String scopeType;
     protected QueryVariableValue queryVariableValue;
+    protected boolean excludeLocalVariables;
 
     public VariableInstanceQueryImpl() {
     }
@@ -87,6 +88,9 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Execution id is null");
         }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use executionId together with excludeLocalVariables");
+        }
         this.executionId = executionId;
         return this;
     }
@@ -98,6 +102,9 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         }
         if (executionIds.isEmpty()) {
             throw new FlowableIllegalArgumentException("Set of executionIds is empty");
+        }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use executionIds together with excludeLocalVariables");
         }
         this.executionIds = executionIds;
         return this;
@@ -116,6 +123,9 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         if (excludeTaskRelated) {
             throw new FlowableIllegalArgumentException("Cannot use taskId together with excludeTaskVariables");
         }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeLocalVariables");
+        }
         this.taskId = taskId;
         return this;
     }
@@ -130,6 +140,9 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         }
         if (excludeTaskRelated) {
             throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeTaskVariables");
+        }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeLocalVariables");
         }
         this.taskIds = taskIds;
         return this;
@@ -231,6 +244,9 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     
     @Override
     public VariableInstanceQuery subScopeId(String subScopeId) {
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use subScopeId together with excludeLocalVariables");
+        }
         this.subScopeId = subScopeId;
         return this;
     }
@@ -238,6 +254,24 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     @Override
     public VariableInstanceQuery scopeType(String scopeType) {
         this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
+    public VariableInstanceQuery excludeLocalVariables() {
+        if (taskId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use taskId together with excludeLocalVariables");
+        }
+        if (taskIds != null) {
+            throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeLocalVariables");
+        }
+        if (executionId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use executionId together with excludeLocalVariables");
+        }
+        if (subScopeId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use subScopeId together with excludeLocalVariables");
+        }
+        excludeLocalVariables = true;
         return this;
     }
 
@@ -357,6 +391,10 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
 
     public QueryVariableValue getQueryVariableValue() {
         return queryVariableValue;
+    }
+
+    public boolean isExcludeLocalVariables() {
+        return excludeLocalVariables;
     }
 
 }

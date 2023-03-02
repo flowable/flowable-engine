@@ -36,6 +36,8 @@ public interface FlowableEngineAgenda extends Agenda {
 
     void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
 
+    void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions);
+
     void planEndExecutionOperation(ExecutionEntity execution);
     
     void planEndExecutionOperationSynchronous(ExecutionEntity execution);

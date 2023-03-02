@@ -12,6 +12,8 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,16 +53,38 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         return new HistoricTaskInstanceEntityImpl(task);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId) {
         return getDbSqlSession().selectList("selectHistoricTasksByParentTaskId", parentTaskId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds) {
+        return getDbSqlSession().selectList("selectHistoricTaskIdsByParentTaskIds", createSafeInValuesList(parentTaskIds));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId) {
         return getDbSqlSession().selectList("selectHistoricTaskInstancesByProcessInstanceId", processInstanceId);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findHistoricTaskIdsForProcessInstanceIds(Collection<String> processInstanceIds) {
+        return getDbSqlSession().selectList("selectHistoricTaskInstanceIdsForProcessInstanceIds", createSafeInValuesList(processInstanceIds));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findHistoricTaskIdsForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("scopeIds", createSafeInValuesList(scopeIds));
+        params.put("scopeType", scopeType);
+        
+        return getDbSqlSession().selectList("selectHistoricTaskInstanceIdsForScopeIdsAndScopeType", params);
     }
 
     @Override
@@ -97,6 +121,11 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     public void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         getDbSqlSession().delete("bulkDeleteHistoricTaskInstances", historicTaskInstanceQuery, HistoricTaskInstanceEntityImpl.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricTaskInstancesForIds(Collection<String> taskIds) {
+        getDbSqlSession().delete("bulkDeleteHistoricTaskInstancesForIds", createSafeInValuesList(taskIds), HistoricTaskInstanceEntityImpl.class);
     }
 
     @Override

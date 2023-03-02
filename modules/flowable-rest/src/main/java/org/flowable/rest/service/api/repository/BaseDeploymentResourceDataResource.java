@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.repository;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;

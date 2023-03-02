@@ -14,7 +14,7 @@ package org.flowable.test.spring.boot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;

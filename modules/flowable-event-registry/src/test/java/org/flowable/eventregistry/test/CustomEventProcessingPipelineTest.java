@@ -14,6 +14,7 @@ package org.flowable.eventregistry.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
-import org.flowable.eventregistry.api.FlowableEventInfo;
+import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
@@ -35,17 +36,18 @@ import org.flowable.eventregistry.api.OutboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
+import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
+ * @author Aleksandar Matic
  */
 public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest {
 
@@ -142,6 +144,59 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
     }
 
     @Test
+    public void testCustomInboundPipelineResolvedFromTenantId() {
+
+        TestInboundChannelAdapter testInboundChannelAdapterAcme = new TestInboundChannelAdapter();
+        TestInboundChannelAdapter testInboundChannelAdapterMegacorp = new TestInboundChannelAdapter();
+        TestInboundEventProcessingPipeline testInboundEventProcessingPipeline = new TestInboundEventProcessingPipeline();
+
+        Map<String, TestInboundChannelAdapter> adapters = new HashMap<>();
+        adapters.put("acme", testInboundChannelAdapterAcme);
+        adapters.put("megacorp", testInboundChannelAdapterMegacorp);
+        Map<Object, Object> beans = eventEngineConfiguration.getExpressionManager().getBeans();
+        beans.put("adapters", adapters);
+        beans.put("testInboundEventProcessingPipeline", testInboundEventProcessingPipeline);
+
+        eventRegistryEngine.getEventRepositoryService().createInboundChannelModelBuilder()
+                .key("customTestChannel")
+                .resourceName("customTest.channel")
+                .channelAdapter("${adapters.get(tenantId)}")
+                .eventProcessingPipeline("${testInboundEventProcessingPipeline}")
+                .deploymentTenantId("acme")
+                .deploy();
+
+        eventRegistryEngine.getEventRepositoryService().createInboundChannelModelBuilder()
+                .key("customTestChannel")
+                .resourceName("customTest.channel")
+                .channelAdapter("${adapters.get(variableContainer.tenantId)}")
+                .eventProcessingPipeline("${testInboundEventProcessingPipeline}")
+                .deploymentTenantId("megacorp")
+                .deploy();
+
+        eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
+                .key("testKey")
+                .resourceName("myEvent.event")
+                .deploy();
+
+        testInboundChannelAdapterAcme.trigger("testEvent");
+        assertThat(testInboundEventProcessingPipeline.counter.get()).isEqualTo(1);
+
+        testInboundChannelAdapterMegacorp.trigger("testEvent");
+        assertThat(testInboundEventProcessingPipeline.counter.get()).isEqualTo(2);
+
+        InboundChannelModel acmeChannel = (InboundChannelModel) eventRegistryEngine
+                .getEventRepositoryService()
+                .getChannelModelByKey("customTestChannel", "acme");
+
+        InboundChannelModel megacorpChannel = (InboundChannelModel) eventRegistryEngine
+                .getEventRepositoryService()
+                .getChannelModelByKey("customTestChannel", "megacorp");
+
+        assertThat(acmeChannel.getInboundEventChannelAdapter()).isEqualTo(testInboundChannelAdapterAcme);
+        assertThat(megacorpChannel.getInboundEventChannelAdapter()).isEqualTo(testInboundChannelAdapterMegacorp);
+    }
+
+    @Test
     public void testCustomOutboundPipelineComponentsInvoked() {
 
         TestOutboundChannelAdapter testOutboundChannelAdapter = new TestOutboundChannelAdapter();
@@ -207,6 +262,57 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         assertThat(testOutboundEventProcessingPipeline.counter.get()).isEqualTo(1);
     }
 
+    @Test
+    public void testCustomOutboundPipelineResolvedFromTenantId() {
+
+        TestOutboundChannelAdapter testOutboundChannelAdapterAcme = new TestOutboundChannelAdapter();
+        TestOutboundChannelAdapter testOutboundChannelAdapterMegacorp = new TestOutboundChannelAdapter();
+        TestOutboundEventProcessingPipeline testOutboundEventProcessingPipeline = new TestOutboundEventProcessingPipeline();
+
+        Map<String, TestOutboundChannelAdapter> adapters = new HashMap<>();
+        adapters.put("acme", testOutboundChannelAdapterAcme);
+        adapters.put("megacorp", testOutboundChannelAdapterMegacorp);
+        Map<Object, Object> beans = eventEngineConfiguration.getExpressionManager().getBeans();
+        beans.put("adapters", adapters);
+        beans.put("testOutboundEventProcessingPipeline", testOutboundEventProcessingPipeline);
+
+        eventRegistryEngine.getEventRepositoryService().createOutboundChannelModelBuilder()
+                .key("customTestOutboundChannel")
+                .resourceName("customOutboundTest.channel")
+                .channelAdapter("${adapters.get(tenantId)}")
+                .eventProcessingPipeline("${testOutboundEventProcessingPipeline}")
+                .deploymentTenantId("acme")
+                .deploy();
+
+        eventRegistryEngine.getEventRepositoryService().createOutboundChannelModelBuilder()
+                .key("customTestOutboundChannel")
+                .resourceName("customOutboundTest.channel")
+                .channelAdapter("${adapters.get(variableContainer.tenantId)}")
+                .eventProcessingPipeline("${testOutboundEventProcessingPipeline}")
+                .deploymentTenantId("megacorp")
+                .deploy();
+
+        eventRegistryEngine.getEventRepositoryService().createEventModelBuilder()
+                .key("testKey")
+                .resourceName("myEvent.event")
+                .deploy();
+
+        OutboundChannelModel acmeChannel = (OutboundChannelModel) eventRegistryEngine.getEventRepositoryService()
+                .getChannelModelByKey("customTestOutboundChannel", "acme");
+        OutboundChannelModel megacorpChannel = (OutboundChannelModel) eventRegistryEngine.getEventRepositoryService()
+                .getChannelModelByKey("customTestOutboundChannel", "megacorp");
+
+        EventInstanceImpl eventInstance = new EventInstanceImpl("testKey", Collections.emptyList());
+        eventRegistryEngine.getEventRegistry().sendEventOutbound(eventInstance, Arrays.asList(acmeChannel, megacorpChannel));
+
+        assertThat(testOutboundChannelAdapterAcme.counter.get()).isEqualTo(1);
+        assertThat(testOutboundChannelAdapterMegacorp.counter.get()).isEqualTo(1);
+        assertThat(testOutboundEventProcessingPipeline.counter.get()).isEqualTo(2);
+
+        assertThat(acmeChannel.getOutboundEventChannelAdapter()).isEqualTo(testOutboundChannelAdapterAcme);
+        assertThat(megacorpChannel.getOutboundEventChannelAdapter()).isEqualTo(testOutboundChannelAdapterMegacorp);
+    }
+
     private static class TestInboundChannelAdapter implements InboundEventChannelAdapter {
 
         private InboundChannelModel inboundChannelModel;
@@ -231,9 +337,9 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public FlowableEventInfo<String> deserialize(Object rawEvent) {
+        public String deserialize(Object rawEvent) {
             counter.incrementAndGet();
-            return new FlowableEventInfoImpl<>(null, rawEvent.toString());
+            return rawEvent.toString();
         }
 
     }
@@ -243,7 +349,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public String detectEventDefinitionKey(FlowableEventInfo<String> event) {
+        public String detectEventDefinitionKey(String payload) {
             counter.incrementAndGet();
             return "testKey";
         }
@@ -254,7 +360,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public String detectTenantId(FlowableEventInfo<String> event) {
+        public String detectTenantId(String payload) {
             counter.incrementAndGet();
             return "testTenantId";
         }
@@ -265,7 +371,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger payloadCounter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<String> event) {
+        public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, String payload) {
             payloadCounter.incrementAndGet();
             return Collections.emptyList();
         }
@@ -321,7 +427,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger counter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventRegistryEvent> run(String channelKey, Object rawEvent) {
+        public Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent rawEvent) {
             counter.incrementAndGet();
             return Collections.emptyList();
         }

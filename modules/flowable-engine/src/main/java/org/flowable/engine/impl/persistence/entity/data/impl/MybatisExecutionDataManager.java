@@ -295,7 +295,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateExecutionTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateExecutionTenantIdForDeployment", params);
     }
 
     @Override
@@ -306,7 +306,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         params.put("expirationTime", expirationTime);
         params.put("lockOwner", lockOwner);
 
-        int result = getDbSqlSession().update("updateProcessInstanceLockTime", params);
+        int result = getDbSqlSession().directUpdate("updateProcessInstanceLockTime", params);
         if (result == 0) {
             throw new FlowableOptimisticLockingException("Could not lock process instance");
         }
@@ -314,21 +314,21 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public void updateAllExecutionRelatedEntityCountFlags(boolean newValue) {
-        getDbSqlSession().update("updateExecutionRelatedEntityCountEnabled", newValue);
+        getDbSqlSession().directUpdate("updateExecutionRelatedEntityCountEnabled", newValue);
     }
 
     @Override
     public void clearProcessInstanceLockTime(String processInstanceId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
-        getDbSqlSession().update("clearProcessInstanceLockTime", params);
+        getDbSqlSession().directUpdate("clearProcessInstanceLockTime", params);
     }
 
     @Override
     public void clearAllProcessInstanceLockTimes(String lockOwner) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("lockOwner", lockOwner);
-        getDbSqlSession().update("clearAllProcessInstanceLockTimes", params);
+        getDbSqlSession().directUpdate("clearAllProcessInstanceLockTimes", params);
     }
 
     protected void setSafeInValueLists(ExecutionQueryImpl executionQuery) {

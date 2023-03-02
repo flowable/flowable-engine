@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -54,7 +54,6 @@ public class HistoricCaseInstanceIdentityLinkCollectionResource extends Historic
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getCaseIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-
         HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (restApiInterceptor != null) {

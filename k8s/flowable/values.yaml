@@ -26,37 +26,8 @@ ingress:
   # name here
   #clusterIssuer: "letsencrypt-prod"
 
-# Enable either Flowable UI or Flowable REST
-ui:
-  enabled: true
-  replicas: 1
-  service:
-    name: flowable-ui
-  contextPath: /flowable-ui
-  ingressPath: /
-  image:
-    repository: flowable/flowable-ui
-    tag: 6.7.2
-    pullPolicy: Always
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "1Gi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-  javaOpts: "-Xmx1g -Xms1g"
-  admin:
-    username: admin
-    password: test
-  idm:
-    admin:
-      username: admin
-      password: test
-
-# Enable either Flowable UI or Flowable REST
 rest:
-  enabled: false
+  enabled: true
   replicas: 1
   service:
     name: flowable-rest

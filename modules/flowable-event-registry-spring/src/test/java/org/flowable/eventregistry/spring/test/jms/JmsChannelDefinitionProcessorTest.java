@@ -21,9 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
@@ -491,7 +489,6 @@ class JmsChannelDefinitionProcessorTest {
             .header("testIntHeader", EventPayloadTypes.INTEGER)
             .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
             .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
-            .header("testCustomerHeader", "custom")
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
@@ -504,9 +501,6 @@ class JmsChannelDefinitionProcessorTest {
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        Map<String, String> customerObj = new HashMap<>();
-        customerObj.put("name", "John Doe");
-
         jmsTemplate.convertAndSend("test-customer", "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog\""
@@ -517,7 +511,6 @@ class JmsChannelDefinitionProcessorTest {
             messageProcessor.setIntProperty("testIntHeader", 123);
             messageProcessor.setBooleanProperty("testBooleanHeader", true);
             messageProcessor.setDoubleProperty("testDoubleHeader", 12.3);
-            messageProcessor.setObjectProperty("testCustomerHeader", customerObj);
             return messageProcessor;
         });
 
@@ -539,10 +532,54 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("testLongHeader", 123l),
                 tuple("testIntHeader", 123),
                 tuple("testBooleanHeader", true),
-                tuple("testDoubleHeader", 12.3),
-                tuple("testCustomerHeader", customerObj)
+                tuple("testDoubleHeader", 12.3)
             );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+    }
+    
+    @Test
+    void eventWithFullPayloadProperty() {
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .fullPayload("myFullPayload")
+            .deploy();
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .jmsChannelAdapter("test-customer")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"name\": \"Kermit the Frog\","
+                + "    \"age\": 45"
+                + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(kermitEvent).isNotNull();
+        assertThat(kermitEvent.getPayloadInstances()).hasSize(1);
+        assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
+        
+        assertThatJson(kermitEvent.getPayloadInstances().iterator().next().getValue())
+            .isEqualTo("{"
+                    + "    eventKey: 'test',"
+                    + "    name: 'Kermit the Frog',"
+                    + "    age: 45"
+                    + "}");
     }
 
     @Test

@@ -30,11 +30,8 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceIdsJobHandler;
-import org.flowable.cmmn.engine.impl.delete.ComputeDeleteHistoricCaseInstanceStatusJobHandler;
 import org.flowable.cmmn.engine.impl.delete.DeleteCaseInstanceBatchConstants;
-import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsJobHandler;
-import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstanceIdsStatusJobHandler;
+import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentialJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnConfigurationResource;
@@ -175,39 +172,25 @@ public class HistoricDataEngineDeleteTest {
                         .hasSize(1)
                         .allSatisfy(part -> {
                             assertThat(part.getStatus()).isEqualTo(DeleteCaseInstanceBatchConstants.STATUS_WAITING);
-                            assertThat(part.getType()).isEqualTo(DeleteCaseInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE);
+                            assertThat(part.getType()).isEqualTo(DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE);
                         });
 
                 assertThat(cmmnManagementService.createJobQuery().list())
                         .hasSize(1)
                         .allSatisfy(job -> {
-                            assertThat(job.getJobHandlerType()).isEqualTo(ComputeDeleteHistoricCaseInstanceIdsJobHandler.TYPE);
+                            assertThat(job.getJobHandlerType()).isEqualTo(DeleteHistoricCaseInstancesSequentialJobHandler.TYPE);
                         });
 
                 CmmnJobTestHelper.waitForJobExecutorToProcessAllAsyncJobs(cmmnEngineConfiguration, 10000, 200, true);
                 assertThat(cmmnManagementService.createJobQuery().list()).isEmpty();
-                Job timer = cmmnManagementService.createTimerJobQuery().handlerType(ComputeDeleteHistoricCaseInstanceStatusJobHandler.TYPE).singleResult();
-                assertThat(timer).isNotNull();
-                cmmnManagementService.moveTimerToExecutableJob(timer.getId());
-                cmmnManagementService.executeJob(timer.getId());
+                
                 assertThat(cmmnManagementService.createBatchPartQuery().batchId(batch.getId()).list())
                         .extracting(BatchPart::getStatus, BatchPart::getType)
                         .containsExactlyInAnyOrder(
-                                tuple(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, DeleteCaseInstanceBatchConstants.BATCH_PART_COMPUTE_IDS_TYPE),
-                                tuple(DeleteCaseInstanceBatchConstants.STATUS_WAITING, DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE)
+                                tuple(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE),
+                                tuple(DeleteCaseInstanceBatchConstants.STATUS_COMPLETED, DeleteCaseInstanceBatchConstants.BATCH_PART_DELETE_CASE_INSTANCES_TYPE)
                         );
-                assertThat(cmmnManagementService.createJobQuery().list())
-                        .hasSize(1)
-                        .allSatisfy(job -> {
-                            assertThat(job.getJobHandlerType()).isEqualTo(DeleteHistoricCaseInstanceIdsJobHandler.TYPE);
-                        });
-
-                CmmnJobTestHelper.waitForJobExecutorToProcessAllAsyncJobs(cmmnEngineConfiguration, 10000, 200, true);
                 assertThat(cmmnManagementService.createJobQuery().list()).isEmpty();
-                timer = cmmnManagementService.createTimerJobQuery().handlerType(DeleteHistoricCaseInstanceIdsStatusJobHandler.TYPE).singleResult();
-                assertThat(timer).isNotNull();
-                cmmnManagementService.moveTimerToExecutableJob(timer.getId());
-                cmmnManagementService.executeJob(timer.getId());
 
                 assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(10);
                 assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(20);

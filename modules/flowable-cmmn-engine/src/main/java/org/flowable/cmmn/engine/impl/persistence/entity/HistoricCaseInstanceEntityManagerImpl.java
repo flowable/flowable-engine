@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -50,6 +51,11 @@ public class HistoricCaseInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricCaseInstanceIdsByParentIds(Collection<String> caseInstanceIds) {
+        return dataManager.findHistoricCaseInstanceIdsByParentIds(caseInstanceIds);
+    }
+
+    @Override
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query) {
         return dataManager.findByCriteria((HistoricCaseInstanceQueryImpl) query);
     }
@@ -68,5 +74,10 @@ public class HistoricCaseInstanceEntityManagerImpl
     @Override
     public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
         dataManager.deleteHistoricCaseInstances(historicCaseInstanceQuery);
+    }
+
+    @Override
+    public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        dataManager.bulkDeleteHistoricCaseInstances(caseInstanceIds);
     }
 }

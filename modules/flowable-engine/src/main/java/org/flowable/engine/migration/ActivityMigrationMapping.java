@@ -68,6 +68,7 @@ public abstract class ActivityMigrationMapping {
         public String fromActivityId;
         public String toActivityId;
         protected String withNewAssignee;
+        protected String withNewOwner;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public OneToOneMapping(String fromActivityId, String toActivityId) {
@@ -130,6 +131,17 @@ public abstract class ActivityMigrationMapping {
         @Override
         public String getWithNewAssignee() {
             return withNewAssignee;
+        }
+
+        @Override
+        public OneToOneMapping withNewOwner(String newOwner) {
+            this.withNewOwner = newOwner;
+            return this;
+        }
+
+        @Override
+        public String getWithNewOwner() {
+            return this.withNewOwner;
         }
 
         @Override
@@ -254,6 +266,7 @@ public abstract class ActivityMigrationMapping {
         public List<String> fromActivityIds;
         public String toActivityId;
         protected String withNewAssignee;
+        protected String withNewOwner;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public ManyToOneMapping(List<String> fromActivityIds, String toActivityId) {
@@ -310,6 +323,17 @@ public abstract class ActivityMigrationMapping {
         @Override
         public String getWithNewAssignee() {
             return withNewAssignee;
+        }
+
+        @Override
+        public ManyToOneMapping withNewOwner(String newOwner) {
+            this.withNewOwner = newOwner;
+            return this;
+        }
+
+        @Override
+        public String getWithNewOwner() {
+            return withNewOwner;
         }
 
         @Override

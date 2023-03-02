@@ -17,10 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.engine.DecisionTableVariableManager;
@@ -36,6 +33,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -509,6 +508,67 @@ public class DmnTaskTest {
         Object result = processVariables.get("g");
 
         assertThat(result).isEqualTo("1000");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-3.dmn"
+    })
+    public void withDecisionServiceEmptyResult() {
+        Map<String, Object> processVariables = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionServiceTaskProcess")
+                .variable("a", "101")
+                .variable("b", "101")
+                .variable("c", "101")
+                .start()
+                .getProcessVariables();
+        Object result = processVariables.get("g");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-2.dmn"
+    })
+    public void withTwoOutcomeDecisionsAndOneEmptyResult() {
+        executeWithoutArrays(() -> {
+            ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneDecisionServiceTaskProcess")
+                    .variable("a", "101")
+                    .variable("b", "101")
+                    .variable("c", "101")
+                    .start();
+            Map<String, Object> processVariables = processInstance.getProcessVariables();
+            Object resultG = processVariables.get("g");
+            Object resultH = processVariables.get("h");
+
+            assertThat(resultG).isNull();
+            assertThat(resultH).isEqualTo("1");
+        });
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionServiceTaskProcess.bpmn20.xml",
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionService-2.dmn"
+    })
+    public void withTwoOutcomeDecisionsAndOneEmptyResultAsJsonNode() {
+        ProcessInstance processInstance = this.runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionServiceTaskProcess")
+                .variable("a", "101")
+                .variable("b", "101")
+                .variable("c", "101")
+                .start();
+        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Object decisionServiceResultObject = processVariables.get("decisionServiceTest");
+
+        assertThat(decisionServiceResultObject).isInstanceOf(ObjectNode.class);
+        ObjectNode decisionServiceResult = (ObjectNode) decisionServiceResultObject;
+        assertThat(decisionServiceResult.size()).isEqualTo(1);
+        assertThat(decisionServiceResult.has("decision4")).isTrue();
     }
 
     protected void executeWithoutArrays(Runnable runnable) {

@@ -57,6 +57,10 @@ public interface CmmnXmlConstants {
     String ELEMENT_DEFAULT_CONTROL = "defaultControl";
 
     String ELEMENT_TASK_LISTENER = "taskListener";
+    String ATTRIBUTE_LISTENER_TYPE = "type";
+    String ELEMENT_SCRIPT = "script";
+    String ATTRIBUTE_SCRIPT_LANGUAGE = "language";
+    String ATTRIBUTE_SCRIPT_RESULTVARIABLE = "resultVariable";
     String ELEMENT_PLAN_ITEM_LIFECYCLE_LISTENER = "planItemLifecycleListener";
     String ELEMENT_CASE_LIFECYCLE_LISTENER = "caseLifecycleListener";
     String ATTRIBUTE_LISTENER_CLASS = "class";
@@ -113,6 +117,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
+    String ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE = "asyncLeave";
     String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
@@ -124,7 +129,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
     String ATTRIBUTE_MILESTONE_VARIABLE = "milestoneVariable";
-
+    String ATTRIBUTE_BUSINESS_STATUS = "businessStatus";
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";

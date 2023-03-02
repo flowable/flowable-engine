@@ -13,8 +13,8 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestResponseFactory;

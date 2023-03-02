@@ -60,7 +60,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
-import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
@@ -253,7 +253,7 @@ public class EventRegistryAutoConfigurationTest {
     public void eventRegistryWithJms() {
         contextRunner
             .withConfiguration(AutoConfigurations.of(
-                ActiveMQAutoConfiguration.class,
+                ArtemisAutoConfiguration.class,
                 JmsAutoConfiguration.class
             ))
             .run(context -> {
@@ -375,7 +375,7 @@ public class EventRegistryAutoConfigurationTest {
     public void eventRegistryWithJmsRabbitAndKafka() {
         contextRunner
             .withConfiguration(AutoConfigurations.of(
-                ActiveMQAutoConfiguration.class,
+                ArtemisAutoConfiguration.class,
                 JmsAutoConfiguration.class,
                 RabbitAutoConfiguration.class,
                 KafkaAutoConfiguration.class
@@ -424,7 +424,7 @@ public class EventRegistryAutoConfigurationTest {
     public void eventRegistryWithCustomDefinitionProcessors() {
         contextRunner
             .withConfiguration(AutoConfigurations.of(
-                ActiveMQAutoConfiguration.class,
+                ArtemisAutoConfiguration.class,
                 JmsAutoConfiguration.class,
                 RabbitAutoConfiguration.class,
                 KafkaAutoConfiguration.class

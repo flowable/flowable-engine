@@ -303,7 +303,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
     protected Boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
         Boolean showInOverview = null;
         
-        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         String includeInStageOverviewValue = null;
         if (planItemInstanceEntity.isStage()) {
             if (planItemDefinition instanceof Stage) {

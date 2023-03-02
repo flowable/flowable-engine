@@ -65,9 +65,7 @@ You will see an output like this:
     o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 3085 ms
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet dispatcherServlet mapped to [/]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable IDM Rest API mapped to [/idm-api/*]
-    o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Form Rest API mapped to [/form-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable DMN Rest API mapped to [/dmn-api/*]
-    o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable Content Rest API mapped to [/content-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable CMMN Rest API mapped to [/cmmn-api/*]
     o.s.b.w.servlet.ServletRegistrationBean  : Servlet Flowable BPMN Rest API mapped to [/process-api/*]
     o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'characterEncodingFilter' to: [/*]
@@ -79,13 +77,9 @@ You will see an output like this:
     o.f.e.i.c.ProcessEngineConfigurationImpl : Found 5 Engine Configurators in total:
     o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
     o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
-    o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
-    o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
     o.f.e.i.c.ProcessEngineConfigurationImpl : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
     o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:100000)
     o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
-    o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
-    o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
     o.f.e.i.c.ProcessEngineConfigurationImpl : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
     com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
     com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
@@ -94,11 +88,6 @@ You will see an output like this:
     o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
     o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
     o.f.dmn.engine.impl.DmnEngineImpl        : DmnEngine default created
-    o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.form.spring.configurator.SpringFormEngineConfigurator (priority:300000)
-    o.f.form.engine.impl.FormEngineImpl      : FormEngine default created
-    o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.content.spring.configurator.SpringContentEngineConfigurator (priority:400000)
-    o.f.c.engine.ContentEngineConfiguration  : Content file system root : ...
-    o.f.c.engine.impl.ContentEngineImpl      : ContentEngine default created
     o.f.e.i.c.ProcessEngineConfigurationImpl : Executing configure() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
     o.f.cmmn.engine.CmmnEngineConfiguration  : Found 1 Engine Configurators in total:
     o.f.cmmn.engine.CmmnEngineConfiguration  : class org.flowable.idm.engine.configurator.IdmEngineConfigurator (priority:100000)
@@ -113,8 +102,8 @@ You will see an output like this:
     o.f.j.s.i.a.ResetExpiredJobsRunnable     : starting to reset expired jobs
     o.f.e.impl.cmd.ValidateV5EntitiesCmd     : Total of v5 deployments found: 0
     s.w.s.m.m.a.RequestMappingHandlerAdapter : Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4fdfa676: startup date [Wed Mar 28 12:04:00 CEST 2018]; root of context hierarchy
-    s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
-    s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse)
+    s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(jakarta.servlet.http.HttpServletRequest)
+    s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(jakarta.servlet.http.HttpServletRequest,jakarta.servlet.http.HttpServletResponse)
     o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
     o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
     o.s.w.s.handler.SimpleUrlHandlerMapping  : Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler]
@@ -131,7 +120,7 @@ So, by just adding the dependency to the classpath and using the *@SpringBootApp
 
 -   An in-memory datasource is created automatically (because the H2 driver is on the classpath) and passed to the Flowable process engine configuration
 
--   A Flowable ProcessEngine, CmmnEngine, DmnEngine, FormEngine, ContentEngine and IdmEngine beans have been created and exposed
+-   A Flowable ProcessEngine, CmmnEngine, DmnEngine and IdmEngine beans have been created and exposed
 
 -   All the Flowable services are exposed as Spring beans
 
@@ -144,8 +133,6 @@ Also:
 -   Any CMMN 1.1 case definitions in the *cases* folder will be automatically deployed.
 
 -   Any DMN 1.1 dmn definitions in the *dmn* folder will be automatically deployed.
-
--   Any Form definitions in the *forms* folder will be automatically deployed.
 
 The XML content of the process definition is shown below. Notice that, for the moment, we are hard-coding an assignee called "kermit" to the user task. We’ll come back to this later.
 
@@ -579,7 +566,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     # entirety to your own application.            ^^^
     # ===================================================================
 
-    # Core (Process) https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableProperties.java
+    # Core (Process) https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableProperties.java
     flowable.check-process-definitions=true # Whether process definitions need to be auto deployed.
     flowable.custom-mybatis-mappers= # The FQN of custom Mybatis mappers that need to be added to the engine.
     flowable.custom-mybatis-x-m-l-mappers= # The location of the custom Mybatis XML Mappers that need to be added to the engine.
@@ -591,7 +578,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.process-definition-location-prefix=classpath*:/processes/ # The folder in which processes need to be searched for auto deployment.
     flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # The suffixes (extensions) of the files that needs to be deployed from the 'processDefinitionLocationPrefix' location.
 
-    # Process https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/process/FlowableProcessProperties.java
+    # Process https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/process/FlowableProcessProperties.java
     flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is -1 (all process definitions).
     flowable.process.enable-safe-xml=true # Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
     flowable.process.servlet.load-on-startup=-1 # Load on startup of the Process dispatcher servlet.
@@ -608,7 +595,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.process.async.executor.timer-lock-time=PT5M # The amount of time a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 
 
-    # CMMN https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/FlowableCmmnProperties.java
+    # CMMN https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/FlowableCmmnProperties.java
     flowable.cmmn.deploy-resources=true # Whether to perform deployment of resources, default is 'true'.
     flowable.cmmn.deployment-name=SpringBootAutoDeployment # The name of the deployment for the CMMN resources.
     flowable.cmmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
@@ -628,15 +615,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # ???
     flowable.cmmn.async.executor.timer-lock-time=PT5M # The amount of time a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 
-    # Content https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/content/FlowableContentProperties.java
-    flowable.content.enabled=true # Whether the content engine needs to be started.
-    flowable.content.servlet.load-on-startup=-1 # Load on startup of the Content dispatcher servlet.
-    flowable.content.servlet.name=Flowable Content Rest API # The name of the Content servlet.
-    flowable.content.servlet.path=/content-api # The context path for the Content rest servlet.
-    flowable.content.storage.create-root=true # If the root folder doesn't exist, should it be created?
-    flowable.content.storage.root-folder= # Root folder location where content files will be stored, for example, task attachments or form file uploads.
-
-    # DMN https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/FlowableDmnProperties.java
+    # DMN https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/FlowableDmnProperties.java
     flowable.dmn.deploy-resources=true # Whether to perform deployment of resources, default is 'true'.
     flowable.dmn.deployment-name=SpringBootAutoDeployment # The name of the deployment for the dmn resources.
     flowable.dmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
@@ -649,24 +628,14 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.dmn.servlet.path=/dmn-api # The context path for the DMN rest servlet.
     flowable.dmn.strict-mode=true # Set this to false if you want to ignore the decision table hit policy validity checks to result in an failed decision table state. A result is that intermediate results created up to the point the validation error occurs are returned.
 
-    # Form https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/form/FlowableFormProperties.java
-    flowable.form.deploy-resources=true # Whether to perform deployment of resources, default is true.
-    flowable.form.deployment-name=SpringBootAutoDeployment # The name of the deployment for the form resources.
-    flowable.form.enabled=true # Whether the form engine needs to be started.
-    flowable.form.resource-location=classpath*:/forms/ # The location where the form resources are located.
-    flowable.form.resource-suffixes=**.form # The suffixes for the resources that need to be scanned.
-    flowable.form.servlet.load-on-startup=-1 # Load on startup of the Form dispatcher servlet.
-    flowable.form.servlet.name=Flowable Form Rest API # The name of the Form servlet.
-    flowable.form.servlet.path=/form-api # The context path for the Form rest servlet.
-
-    # IDM https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/FlowableIdmProperties.java
+    # IDM https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/FlowableIdmProperties.java
     flowable.idm.enabled=true # Whether the idm engine needs to be started.
     flowable.idm.password-encoder= # The type of the password encoder that needs to be used.
     flowable.idm.servlet.load-on-startup=-1 # Load on startup of the IDM dispatcher servlet.
     flowable.idm.servlet.name=Flowable IDM Rest API # The name of the IDM servlet.
     flowable.idm.servlet.path=/idm-api # The context path for the IDM rest servlet.
 
-    # IDM Ldap https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapProperties.java
+    # IDM Ldap https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapProperties.java
     flowable.idm.ldap.attribute.email= # Name of the attribute that matches the user email.
     flowable.idm.ldap.attribute.first-name= # Name of the attribute that matches the user first name.
     flowable.idm.ldap.attribute.group-id= # Name of the attribute that matches the group id.
@@ -694,7 +663,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.idm.ldap.user= # The user id that is used to connect to the LDAP system.
     flowable.idm.ldap.user-base-dn= # The base 'distinguished name' (DN) from which the searches for users are started.
 
-    # Flowable Mail https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableMailProperties.java
+    # Flowable Mail https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableMailProperties.java
     flowable.mail.server.default-from=flowable@localhost # The default from address that needs to be used when sending emails.
     flowable.mail.server.force-to= # The force to address(es) that would be used when sending out emails. IMPORTANT: If this is set then all emails will be send to defined address(es) instead of the address configured in the MailActivity.
     flowable.mail.server.host=localhost # The host of the mail server.
@@ -705,7 +674,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.mail.server.use-tls=false # Set or disable the STARTTLS encryption.
     flowable.mail.server.username= # The username that needs to be used for the mail server authentication. If empty no authentication would be used.
 
-    # Flowable Http https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableHttpProperties.java
+    # Flowable Http https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableHttpProperties.java
     flowable.http.user-system-properties=false # Whether to use system properties (e.g. http.proxyPort).
     flowable.http.connect-timeout=5s # Connect timeout for the http client
     flowable.http.socket-timeout=5s # Socket timeout for the http client
@@ -825,55 +794,37 @@ Remember to also look at the conditions report in your application for more deta
 </thead>
 <tbody>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/content/ContentEngineAutoConfiguration.java">ContentEngineAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/CmmnEngineAutoConfiguration.java">CmmnEngineAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/content/ContentEngineServicesAutoConfiguration.java">ContentEngineServicesAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/CmmnEngineServicesAutoConfiguration.java">CmmnEngineServicesAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/CmmnEngineAutoConfiguration.java">CmmnEngineAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/DmnEngineAutoConfiguration.java">DmnEngineAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/CmmnEngineServicesAutoConfiguration.java">CmmnEngineServicesAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/DmnEngineServicesAutoConfiguration.java">DmnEngineServicesAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/DmnEngineAutoConfiguration.java">DmnEngineAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/EndpointAutoConfiguration.java">EndpointAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/DmnEngineServicesAutoConfiguration.java">DmnEngineServicesAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/actuate/info/FlowableInfoAutoConfiguration.java">FlowableInfoAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/EndpointAutoConfiguration.java">EndpointAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapAutoConfiguration.java">FlowableLdapAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/actuate/info/FlowableInfoAutoConfiguration.java">FlowableInfoAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/IdmEngineAutoConfiguration.java">IdmEngineAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapAutoConfiguration.java">FlowableLdapAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/IdmEngineServicesAutoConfiguration.java">IdmEngineServicesAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/FlowableTransactionAutoConfiguration.java">FlowableTransactionAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ProcessEngineAutoConfiguration.java">ProcessEngineAutoConfiguration</a></p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/form/FormEngineAutoConfiguration.java">FormEngineAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/form/FormEngineServicesAutoConfiguration.java">FormEngineServicesAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/IdmEngineAutoConfiguration.java">IdmEngineAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/idm/IdmEngineServicesAutoConfiguration.java">IdmEngineServicesAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ProcessEngineAutoConfiguration.java">ProcessEngineAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/RestApiAutoConfiguration.java">RestApiAutoConfiguration</a></p></td>
-</tr>
-<tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/SecurityAutoConfiguration.java">SecurityAutoConfiguration</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/RestApiAutoConfiguration.java">RestApiAutoConfiguration</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -895,39 +846,39 @@ Here is a list of the flowable spring boot starters.
 </thead>
 <tbody>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-cmmn/pom.xml">flowable-spring-boot-starter-cmmn</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-cmmn/pom.xml">flowable-spring-boot-starter-cmmn</a></p></td>
 <td><p>Contains the dependencies for booting the CMMN Engine in Standalone mode</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-cmmn-rest/pom.xml">flowable-spring-boot-starter-cmmn-rest</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-cmmn-rest/pom.xml">flowable-spring-boot-starter-cmmn-rest</a></p></td>
 <td><p>Contains the dependencies for booting the CMMN Engine in Standalone mode and starts its REST API</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-dmn/pom.xml">flowable-spring-boot-starter-dmn</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-dmn/pom.xml">flowable-spring-boot-starter-dmn</a></p></td>
 <td><p>Contains the dependencies for booting the DMN Engine in Standalone mode</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-dmn-rest/pom.xml">flowable-spring-boot-starter-dmn-rest</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-dmn-rest/pom.xml">flowable-spring-boot-starter-dmn-rest</a></p></td>
 <td><p>Contains the dependencies for booting the DMN Engine in Standalone mode and starts its REST API</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-process/pom.xml">flowable-spring-boot-starter-process</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-process/pom.xml">flowable-spring-boot-starter-process</a></p></td>
 <td><p>Contains the dependencies for booting the Process Engine in Standalone mode</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-process-rest/pom.xml">flowable-spring-boot-starter-process-rest</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-process-rest/pom.xml">flowable-spring-boot-starter-process-rest</a></p></td>
 <td><p>Contains the dependencies for booting the Process Engine in Standalone mode and starts its REST API</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter/pom.xml">flowable-spring-boot-starter</a></p></td>
-<td><p>Contains the dependencies for booting all Flowable Engines (Process, CMMN, DMN, Form, Content and IDM)</p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter/pom.xml">flowable-spring-boot-starter</a></p></td>
+<td><p>Contains the dependencies for booting all Flowable Engines (Process, CMMN, DMN, and IDM)</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest/pom.xml">flowable-spring-boot-starter-rest</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-rest/pom.xml">flowable-spring-boot-starter-rest</a></p></td>
 <td><p>Contains the dependencies for booting all Flowable Engines and their respective REST API</p></td>
 </tr>
 <tr>
-<td><p><a href="https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/pom.xml">flowable-spring-boot-starter-actuator</a></p></td>
+<td><p><a href="https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-starter-actuator/pom.xml">flowable-spring-boot-starter-actuator</a></p></td>
 <td><p>Contains the required dependencies for Spring Boot</p></td>
 </tr>
 </tbody>
@@ -973,12 +924,12 @@ By exposing an instance of this class as an *@Bean* in the Spring Boot configura
 
 > **Tip**
 >
-> You can provide a custom implementation of a Flowable Service by using this. See https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapAutoConfiguration.java\[FlowableLdapAutoConfiguration\]
+> You can provide a custom implementation of a Flowable Service by using this. See https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/ldap/FlowableLdapAutoConfiguration.java\[FlowableLdapAutoConfiguration\]
 
 ### Combining starters
 
 In case you need only a combination of the engines then you can add only the required dependencies.
-For example to use the Process, CMMN, Form and IDM engine and use LDAP you need to add the following dependencies:
+For example to use the Process, CMMN, and IDM engine and use LDAP you need to add the following dependencies:
 
     <dependency>
         <groupId>org.flowable</groupId>
@@ -988,16 +939,6 @@ For example to use the Process, CMMN, Form and IDM engine and use LDAP you need 
     <dependency>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-starter-cmmn</artifactId>
-        <version>${flowable.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.flowable</groupId>
-        <artifactId>flowable-content-spring-configurator</artifactId>
-        <version>${flowable.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.flowable</groupId>
-        <artifactId>flowable-form-spring-configurator</artifactId>
         <version>${flowable.version}</version>
     </dependency>
     <dependency>

@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,8 @@ public class TaskBaseResource {
         properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
         properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
         properties.put("tenantId", TaskQueryProperty.TENANT_ID);
+        properties.put("assignee", TaskQueryProperty.ASSIGNEE);
+        properties.put("owner", TaskQueryProperty.OWNER);
     }
 
     @Autowired
@@ -124,6 +127,15 @@ public class TaskBaseResource {
         }
     }
 
+    /**
+     * Populate the tasks based on the values that are present in the given {@link BulkTasksRequest}.
+     */
+    protected void populateTasksFromRequest(Collection<Task> taskList, BulkTasksRequest taskRequest) {
+        for (Task task : taskList) {
+            populateTaskFromRequest(task, taskRequest);
+        }
+    }
+
     protected DataResponse<TaskResponse> getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
 
         TaskQuery taskQuery = taskService.createTaskQuery();
@@ -134,6 +146,9 @@ public class TaskBaseResource {
         }
         if (request.getNameLike() != null) {
             taskQuery.taskNameLike(request.getNameLike());
+        }
+        if (request.getNameLikeIgnoreCase() != null) {
+            taskQuery.taskNameLikeIgnoreCase(request.getNameLikeIgnoreCase());
         }
         if (request.getDescription() != null) {
             taskQuery.taskDescription(request.getDescription());
@@ -311,6 +326,17 @@ public class TaskBaseResource {
 
         if (request.getCategory() != null) {
             taskQuery.taskCategory(request.getCategory());
+        }
+        if (request.getCategoryIn() != null && !request.getCategoryIn().isEmpty()) {
+            taskQuery.taskCategoryIn(request.getCategoryIn());
+        }
+
+        if (request.getCategoryNotIn() != null && !request.getCategoryNotIn().isEmpty()) {
+            taskQuery.taskCategoryNotIn(request.getCategoryNotIn());
+        }
+
+        if (Boolean.TRUE.equals(request.getWithoutCategory())) {
+            taskQuery.taskWithoutCategory();
         }
 
         if (restApiInterceptor != null) {
@@ -493,18 +519,9 @@ public class TaskBaseResource {
     }
 
     /**
-     * Returns the {@link Task} that is requested and calls the access interceptor.
-     * Throws the right exceptions when bad request was made or instance was not found.
+     * Returns the {@link Task} that is requested without calling the access interceptor.
+     * Throws the right exceptions when bad request was made or if task doesn't exist or if task id is not provided.
      */
-    protected Task getTaskFromRequestWithAccessCheck(String taskId) {
-        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessTaskInfoById(task);
-        }
-
-        return task;
-    }
-
     protected Task getTaskFromRequestWithoutAccessCheck(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
@@ -515,23 +532,44 @@ public class TaskBaseResource {
     }
 
     /**
+     * Returns the {@link Task} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or if task doesn't exist or if task id is not provided.
+     */
+    protected Task getTaskFromRequestWithAccessCheck(String taskId) {
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskInfoById(task);
+        }
+
+        return task;
+    }
+
+    protected List<Task> getTasksFromRequest(Collection<String> taskIds) {
+        return taskService.createTaskQuery().taskIds(taskIds).list();
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor.
+     * Throws the right exceptions when bad request was made or if task doesn't exist or if task id is not provided.
+     */
+    protected HistoricTaskInstance getHistoricTaskFromRequestWithoutAccessCheck(String taskId) {
+        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
+        }
+
+        return task;
+    }
+
+    /**
      * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
-     * Throws the right exceptions when bad request was made or instance was not found.
+     * Throws the right exceptions when bad request was made or if task doesn't exist or if task id is not provided.
      */
     protected HistoricTaskInstance getHistoricTaskFromRequestWithAccessCheck(String taskId) {
         HistoricTaskInstance task = getHistoricTaskFromRequestWithoutAccessCheck(taskId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoById(task);
-        }
-
-        return task;
-    }
-
-    protected HistoricTaskInstance getHistoricTaskFromRequestWithoutAccessCheck(String taskId) {
-        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
 
         return task;

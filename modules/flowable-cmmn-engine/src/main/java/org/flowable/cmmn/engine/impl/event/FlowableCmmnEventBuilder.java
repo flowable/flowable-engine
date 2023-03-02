@@ -12,8 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.event;
 
+import org.flowable.cmmn.api.event.FlowableCaseEndedEvent;
+import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
+import org.flowable.cmmn.api.event.FlowableCaseStageStartedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
@@ -27,6 +31,29 @@ public class FlowableCmmnEventBuilder {
 
     public static FlowableCaseStartedEvent createCaseStartedEvent(CaseInstance caseInstance) {
         return new FlowableCaseStartedEventImpl(caseInstance);
+    }
+
+    public static FlowableCaseEndedEvent createCaseEndedEvent(CaseInstance caseInstance, String endingState) {
+        return new FlowableCaseEndedEventImpl(caseInstance, endingState);
+    }
+
+    public static FlowableCaseStageStartedEvent createStageStartedEvent(CaseInstance caseInstance, PlanItemInstance stageInstance) {
+        return new FlowableCaseStageStartedEventImpl(caseInstance, stageInstance);
+    }
+
+    public static FlowableCaseStageEndedEvent createStageEndedEvent(CaseInstance caseInstance, PlanItemInstance stageInstance, String endingState) {
+        return new FlowableCaseStageEndedEventImpl(caseInstance, stageInstance, endingState);
+    }
+
+    public static FlowableEntityEvent createTaskCreatedEvent(Task task) {
+        FlowableEntityEventImpl event = new FlowableEntityEventImpl(task, FlowableEngineEventType.TASK_CREATED);
+
+        event.setScopeId(task.getScopeId());
+        event.setScopeDefinitionId(task.getScopeDefinitionId());
+        event.setScopeType(task.getScopeType());
+        event.setSubScopeId(task.getId());
+
+        return event;
     }
 
     public static FlowableEntityEvent createTaskAssignedEvent(Task task) {

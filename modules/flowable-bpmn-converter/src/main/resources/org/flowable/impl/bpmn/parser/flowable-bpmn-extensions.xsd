@@ -243,7 +243,6 @@
         <enumeration value="camel"/>
         <enumeration value="http"/>
         <enumeration value="mail"/>
-        <enumeration value="mule"/>
         <enumeration value="shell"/>
         <enumeration value="dmn"/>
         <enumeration value="case"/>
@@ -320,8 +319,18 @@
     <annotation>
       <documentation>
         Can be used in combination with an async value of true. By default exclusive is set to false
-        and the job executor can run multiple async tasks of the same process instance concurrently.
+        and the async executor can run multiple async tasks of the same process instance concurrently.
         When exclusive is set to true, only one async task of the same process instance will be executed at a time.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="asyncLeave" type="boolean">
+    <annotation>
+      <documentation>
+        The asyncLeave attribute can be set on an activity, gateway, start or end event to let
+        the async executor handle the leaving of the activity asynchronously. This provides ways
+        to define transaction boundaries for your process execution.
       </documentation>
     </annotation>
   </attribute>

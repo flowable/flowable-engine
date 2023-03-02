@@ -16,7 +16,7 @@ package org.flowable.cmmn.rest.service.api.history.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -53,7 +53,6 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource extends Historic
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-
         HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
 
         if (restApiInterceptor != null) {

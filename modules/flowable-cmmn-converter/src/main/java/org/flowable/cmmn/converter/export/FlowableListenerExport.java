@@ -20,6 +20,7 @@ import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.ScriptInfo;
 
 /**
  * @author Joram Barrez
@@ -47,6 +48,9 @@ public class FlowableListenerExport {
                     CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_LISTENER_EXPRESSION, listener.getImplementation(), xtw);
                 } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(listener.getImplementationType())) {
                     CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_LISTENER_DELEGATEEXPRESSION, listener.getImplementation(), xtw);
+                } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+                    CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_LISTENER_TYPE, listener.getImplementationType(), xtw);
+                    writeListenerScriptInfo(xtw, listener.getScriptInfo());
                 }
 
                 CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_LISTENER_ON_TRANSACTION, listener.getOnTransaction(), xtw);
@@ -58,6 +62,23 @@ public class FlowableListenerExport {
             }
         }
         return didWriteExtensionStartElement;
+    }
+
+    public static void writeListenerScriptInfo(XMLStreamWriter xtw, ScriptInfo scriptInfo) throws Exception {
+        if (scriptInfo == null) {
+            return;
+        }
+        xtw.writeStartElement(CmmnXmlConstants.ELEMENT_SCRIPT);
+        if (scriptInfo.getLanguage() != null) {
+            CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_SCRIPT_LANGUAGE, scriptInfo.getLanguage(), xtw);
+        }
+        if (scriptInfo.getResultVariable() != null) {
+            CmmnXmlUtil.writeDefaultAttribute(CmmnXmlConstants.ATTRIBUTE_SCRIPT_RESULTVARIABLE, scriptInfo.getResultVariable(), xtw);
+        }
+        if (scriptInfo.getScript() != null) {
+            xtw.writeCData(scriptInfo.getScript());
+        }
+        xtw.writeEndElement();
     }
 
 }

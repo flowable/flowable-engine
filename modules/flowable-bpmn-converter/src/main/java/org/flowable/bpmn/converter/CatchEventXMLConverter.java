@@ -51,11 +51,15 @@ public class CatchEventXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
         BpmnXMLUtil.addXMLLocation(catchEvent, xtr);
         String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
         catchEvent.setId(elementId);
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, catchEvent, defaultElementAttributes, defaultActivityAttributes);
+        
         parseChildElements(getXMLElementName(), catchEvent, childParserMap, model, xtr);
         return catchEvent;
     }

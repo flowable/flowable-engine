@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <process id="errorHandlingProcess" name="errorHandlingProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startEvent" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        </startEvent>
+
+        <subProcess id="subProcess" name="SubProcess">
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${elements}" flowable:elementVariable="element" />
+            <startEvent id="subProcessStartEvent" flowable:initiator="initiator" flowable:formFieldValidation="false" />
+            <endEvent id="subProcessEndEvent" />
+        <userTask id="bpmnErrorThrowingTask" name="Error Throwing Task">
+            <extensionElements>
+                <flowable:taskListener event="create" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
+                            def e = task.getVariable('element') ;
+                            task.setVariable('taskListenerCreate_'+ e, 'executed');
+                            if (task.getVariable('throwErrorCodeTaskListenerCreate') != null && e.equals("2")){
+                                throw new org.flowable.engine.delegate.BpmnError(task.getVariable('throwErrorCodeTaskListenerCreate'));
+                            }
+                        ]]>
+                    </flowable:script>
+                </flowable:taskListener>
+                <flowable:taskListener event="assignment" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
+                            def e = task.getVariable('element') ;
+                            task.setVariable('taskListenerAssignment_'+ e, 'executed');
+                            if (task.getVariable('throwErrorCodeTaskListenerAssignment') != null && e.equals("2")){
+                                throw new org.flowable.engine.delegate.BpmnError(task.getVariable('throwErrorCodeTaskListenerAssignment'));
+                            }
+                        ]]>
+                    </flowable:script>
+                </flowable:taskListener>
+                <flowable:taskListener event="complete" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
+                            def e = task.getVariable('element') ;
+                            task.setVariable('taskListenerComplete_'+ e, 'executed');
+                            if (task.getVariable('throwErrorCodeTaskListenerComplete') != null  && e.equals("2")){
+                                throw new org.flowable.engine.delegate.BpmnError(task.getVariable('throwErrorCodeTaskListenerComplete'));
+                            }
+                        ]]>
+                    </flowable:script>
+                </flowable:taskListener>
+                <flowable:taskListener event="delete" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
+                           def e = task.getVariable('element') ;
+                            task.setVariable('taskListenerDelete_'+ e, 'executed');
+                            if (task.getVariable('throwErrorCodeTaskListenerDelete') != null && e.equals("2")){
+                                throw new org.flowable.engine.delegate.BpmnError(task.getVariable('throwErrorCodeTaskListenerDelete'));
+                            }
+                        ]]>
+                    </flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+            <sequenceFlow id="startEvent_to_task" sourceRef="subProcessStartEvent" targetRef="bpmnErrorThrowingTask" />
+            <sequenceFlow id="task_to_subprocess_End" sourceRef="bpmnErrorThrowingTask" targetRef="subProcessEndEvent" />
+        </subProcess>
+
+        <sequenceFlow id="startEvent_to_subProcess" sourceRef="startEvent" targetRef="subProcess" />
+        <sequenceFlow id="subProcess_to_end_event" sourceRef="subProcess" targetRef="endEvent1"/>
+
+        <endEvent id="endEvent1"/>
+        <endEvent id="endEventError"/>
+
+
+        <subProcess id="errorHandlingSubProcess" name="subProcess" triggeredByEvent="true">
+            <startEvent id="startErrorEvent1" isInterrupting="true">
+                <errorEventDefinition></errorEventDefinition>
+            </startEvent>
+            <scriptTask id="handleErrorSubProcessTask" name="Handle Error" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('error_handled_sub_process', 'true');]]></script>
+            </scriptTask>
+            <endEvent id="endHandleError" />
+            <sequenceFlow id="sequenceFlow7" sourceRef="startErrorEvent1" targetRef="handleErrorSubProcessTask" />
+            <sequenceFlow id="sequenceFlow8" sourceRef="handleErrorSubProcessTask" targetRef="endHandleError" />
+        </subProcess>
+
+    </process>
+
+</definitions>

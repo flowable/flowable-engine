@@ -12,9 +12,9 @@
  */
 package org.flowable.eventregistry.spring.jms;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -35,7 +35,7 @@ public class JmsChannelMessageListenerAdapter extends AbstractAdaptableMessageLi
 
     @Override
     public void onMessage(Message message, Session session) throws JMSException {
-        eventRegistry.eventReceived(inboundChannelModel, message);
+        eventRegistry.eventReceived(inboundChannelModel, new JmsMessageInboundEvent(message));
     }
 
     public EventRegistry getEventRegistry() {

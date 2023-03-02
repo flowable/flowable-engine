@@ -85,7 +85,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
             String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES);
 
-            assertResultsPresentInDataResponse(url, 3, task.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url, 3, task.getId(), task1.getId(), task2.getId());
 
             assertResultsPresentInDataResponse(url + "?taskMinPriority=" + "0", 3, task.getId());
 
@@ -119,6 +119,15 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?taskOwnerLike=" + encode("t%"), 1, task.getId());
 
             assertResultsPresentInDataResponse(url + "?taskInvolvedUser=test", 1, task.getId());
+            
+            assertResultsPresentInDataResponse(url + "?taskName=" + encode("Task One"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskName=none");
+            
+            assertResultsPresentInDataResponse(url + "?taskNameLike=" + encode("Task%"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskNameLike=none");
+            
+            assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=" + encode("TASK%"), task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=NONE");
 
             assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
 
@@ -148,10 +157,42 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             // Without process instance id
             assertResultsPresentInDataResponse(url + "?withoutProcessInstanceId=true", 3, task.getId(), task1.getId(), task2.getId());
 
+            assertResultsPresentInDataResponse(url + "?planItemInstanceId=" + task1.getSubScopeId(), 1, task1.getId());
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    public void testQueryTaskByCategory() throws Exception {
+        Task t1 = taskService.newTask();
+        t1.setName("t1");
+        t1.setCategory("Cat 1");
+        taskService.saveTask(t1);
+
+        Task t2 = taskService.newTask();
+        t2.setName("t2");
+        t2.setCategory("Cat 2");
+        taskService.saveTask(t2);
+
+        Task t3 = taskService.newTask();
+        t3.setName("t3");
+        taskService.saveTask(t3);
+
+        try {
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES);
+            assertResultsPresentInDataResponse(url + "?taskCategory=" + encode("Cat 1"), 1, t1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCategoryIn=" + encode("Cat 1"), 1, t1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCategoryNotIn=" + encode("Cat 1"), 1, t2.getId());
+            assertResultsPresentInDataResponse(url + "?taskWithoutCategory=true", 1, t3.getId());
+
+        } finally {
+            taskService.deleteTask(t1.getId(), true);
+            taskService.deleteTask(t2.getId(), true);
+            taskService.deleteTask(t3.getId(), true);
+        }
+    }
+
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstancesWithCandidateGroup() throws Exception {

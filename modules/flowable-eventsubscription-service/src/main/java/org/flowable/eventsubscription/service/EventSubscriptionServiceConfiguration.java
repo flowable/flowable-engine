@@ -12,6 +12,9 @@
  */
 package org.flowable.eventsubscription.service;
 
+import java.time.Duration;
+import java.util.UUID;
+
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionServiceImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityManager;
@@ -31,13 +34,29 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
 
     protected EventSubscriptionService eventSubscriptionService = new EventSubscriptionServiceImpl(this);
    
-    // DATA MANAGERS ///////////////////////////////////////////////////
+    // DATA MANAGERS
+    // /////////////////////////////////////////////////
 
     protected EventSubscriptionDataManager eventSubscriptionDataManager;
     
-    // ENTITY MANAGERS /////////////////////////////////////////////////
+    // ENTITY MANAGERS
+    // ///////////////////////////////////////////////
     
     protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
+
+    // LOCKING
+    // //////////////////////////////////////////////
+
+    /**
+     * The amount of time an event subscription is locked.
+     * A lock on an event subscription is used when using the 'unique process/case instance on start' feature.
+     */
+    private Duration eventSubscriptionLockTime = Duration.ofMinutes(10);
+
+    /**
+     * The value that should be used when locking eventsubscriptions.
+     */
+    private String lockOwner = UUID.randomUUID().toString();
     
     protected ObjectMapper objectMapper;
     
@@ -110,6 +129,24 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
     @Override
     public EventSubscriptionServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public Duration getEventSubscriptionLockTime() {
+        return eventSubscriptionLockTime;
+    }
+
+    public EventSubscriptionServiceConfiguration setEventSubscriptionLockTime(Duration eventSubscriptionLockTime) {
+        this.eventSubscriptionLockTime = eventSubscriptionLockTime;
+        return this;
+    }
+
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    public EventSubscriptionServiceConfiguration setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
         return this;
     }
 }

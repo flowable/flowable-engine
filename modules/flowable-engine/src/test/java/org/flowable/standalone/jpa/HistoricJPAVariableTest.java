@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;

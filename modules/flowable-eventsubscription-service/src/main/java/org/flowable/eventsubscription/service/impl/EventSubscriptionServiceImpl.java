@@ -150,6 +150,16 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public boolean lockEventSubscription(String eventSubscriptionId) {
+        return getEventSubscriptionEntityManager().lockEventSubscription(eventSubscriptionId);
+    }
+
+    @Override
+    public void unlockEventSubscription(String eventSubscriptionId) {
+        getEventSubscriptionEntityManager().unlockEventSubscription(eventSubscriptionId);
+    }
+
+    @Override
     public void deleteEventSubscription(EventSubscriptionEntity eventSubscription) {
         getEventSubscriptionEntityManager().delete(eventSubscription);
     }

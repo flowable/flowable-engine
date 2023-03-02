@@ -14,6 +14,7 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +32,7 @@ public class FlowableListener extends CmmnElement {
     protected String implementation;
     protected List<FieldExtension> fieldExtensions = new ArrayList<>();
     protected String onTransaction;
+    protected ScriptInfo scriptInfo;
 
     @JsonIgnore
     protected Object instance; // Can be used to set an instance of the listener directly. That instance will then always be reused.
@@ -96,6 +98,26 @@ public class FlowableListener extends CmmnElement {
         this.onTransaction = onTransaction;
     }
 
+    /**
+     * Return the script info, if present.
+     * <p>
+     * ScriptInfo must be populated, when {@code <executionListener type="script" ...>} e.g. when
+     * implementationType is 'script'.
+     * </p>
+     */
+    public ScriptInfo getScriptInfo() {
+        return scriptInfo;
+    }
+
+    /**
+     * Sets the script info
+     *
+     * @see #getScriptInfo()
+     */
+    public void setScriptInfo(ScriptInfo scriptInfo) {
+        this.scriptInfo = scriptInfo;
+    }
+
     public Object getInstance() {
         return instance;
     }
@@ -112,10 +134,14 @@ public class FlowableListener extends CmmnElement {
     }
 
     public void setValues(FlowableListener otherListener) {
+        super.setValues(otherListener);
         setEvent(otherListener.getEvent());
+        setSourceState(otherListener.getSourceState());
+        setTargetState(otherListener.getTargetState());
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
-
+        setOnTransaction(otherListener.getOnTransaction());
+        Optional.ofNullable(otherListener.getScriptInfo()).map(ScriptInfo::clone).ifPresent(this::setScriptInfo);
         fieldExtensions = new ArrayList<>();
         if (otherListener.getFieldExtensions() != null && !otherListener.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherListener.getFieldExtensions()) {

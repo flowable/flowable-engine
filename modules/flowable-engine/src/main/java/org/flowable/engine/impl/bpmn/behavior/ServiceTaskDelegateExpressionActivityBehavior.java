@@ -79,30 +79,34 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean loggingSessionEnabled = processEngineConfiguration.isLoggingSessionEnabled();
-        if (triggerable && delegate instanceof TriggerableActivityBehavior) {
-            if (loggingSessionEnabled) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
-                        "Triggering service task with delegate " + delegate, execution);
+        try {
+            if (triggerable && delegate instanceof TriggerableActivityBehavior) {
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                            "Triggering service task with delegate " + delegate, execution);
+                }
+
+                ((TriggerableActivityBehavior) delegate).trigger(execution, signalName, signalData);
+
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                            "Triggered service task with delegate " + delegate, execution);
+                }
+
+            } else if (loggingSessionEnabled) {
+                if (!triggerable) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
+                            "Service task with delegate expression triggered but not triggerable " + delegate, execution);
+                } else {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
+                            "Service task with delegate expression triggered but not implementing TriggerableActivityBehavior " + delegate, execution);
+                }
+
             }
-
-            ((TriggerableActivityBehavior) delegate).trigger(execution, signalName, signalData);
-
-            if (loggingSessionEnabled) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
-                        "Triggered service task with delegate " + delegate, execution);
-            }
-
-        } else if (loggingSessionEnabled) {
-            if (!triggerable) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
-                        "Service task with delegate expression triggered but not triggerable " + delegate, execution);
-            } else {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
-                        "Service task with delegate expression triggered but not implementing TriggerableActivityBehavior " + delegate, execution);
-            }
-
+            leave(execution);
+        } catch (Exception exc) {
+            handleException(exc, execution, loggingSessionEnabled);
         }
-        leave(execution);
     }
 
     @Override

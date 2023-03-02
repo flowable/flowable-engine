@@ -80,6 +80,7 @@ import org.activiti.engine.impl.bpmn.parser.handler.ErrorEventDefinitionParseHan
 import org.activiti.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandler;
 import org.activiti.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.activiti.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
+import org.activiti.engine.impl.bpmn.parser.handler.ExternalWorkerServiceTaskParseHandler;
 import org.activiti.engine.impl.bpmn.parser.handler.InclusiveGatewayParseHandler;
 import org.activiti.engine.impl.bpmn.parser.handler.IntermediateCatchEventParseHandler;
 import org.activiti.engine.impl.bpmn.parser.handler.IntermediateThrowEventParseHandler;
@@ -133,6 +134,7 @@ import org.activiti.engine.impl.interceptor.LogInterceptor;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.activiti.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
+import org.activiti.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.activiti.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti.engine.impl.jobexecutor.JobHandler;
 import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
@@ -1202,6 +1204,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new ErrorEventDefinitionParseHandler());
         bpmnParserHandlers.add(new EventBasedGatewayParseHandler());
         bpmnParserHandlers.add(new ExclusiveGatewayParseHandler());
+        bpmnParserHandlers.add(new ExternalWorkerServiceTaskParseHandler());
         bpmnParserHandlers.add(new InclusiveGatewayParseHandler());
         bpmnParserHandlers.add(new IntermediateCatchEventParseHandler());
         bpmnParserHandlers.add(new IntermediateThrowEventParseHandler());
@@ -1304,6 +1307,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         TimerActivateProcessDefinitionHandler activateProcessDefinitionHandler = new TimerActivateProcessDefinitionHandler();
         jobHandlers.put(activateProcessDefinitionHandler.getType(), activateProcessDefinitionHandler);
+        
+        ExternalWorkerTaskCompleteJobHandler externalWorkerTaskCompleteJobHandler = new ExternalWorkerTaskCompleteJobHandler();
+        jobHandlers.put(externalWorkerTaskCompleteJobHandler.getType(), externalWorkerTaskCompleteJobHandler);
 
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {

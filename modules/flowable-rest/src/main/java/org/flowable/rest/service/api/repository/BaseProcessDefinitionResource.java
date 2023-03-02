@@ -58,7 +58,7 @@ public class BaseProcessDefinitionResource {
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
-
+        
         return processDefinition;
     }
 }

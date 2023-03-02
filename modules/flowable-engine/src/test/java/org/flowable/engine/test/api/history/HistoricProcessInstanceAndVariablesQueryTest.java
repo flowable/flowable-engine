@@ -26,6 +26,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
@@ -220,6 +221,22 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             
             assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
             assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
+        }
+    }
+    
+    public void testQueryWithLocalVariables() {
+        String processInstanceId = processInstanceIds.get(processInstanceIds.size() - 1);
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().singleResult();
+        runtimeService.setVariableLocal(execution.getId(), "localVar1", "test");
+        runtimeService.setVariableLocal(execution.getId(), "localVar2", 123);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processDefinitionKey(PROCESS_DEFINITION_KEY_3)
+                    .includeProcessVariables()
+                    .singleResult();
+            Map<String, Object> variableMap = processInstance.getProcessVariables();
+            assertThat(variableMap);
         }
     }
 

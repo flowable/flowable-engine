@@ -13,14 +13,17 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -36,10 +39,13 @@ import org.flowable.task.api.Task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to the Task collection resource.
  *
  * @author Tijs Rademakers
+ * @author Christopher Welsch
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
@@ -177,6 +183,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Name like filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLike=" + encode("%one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLike=none";
+            assertResultsPresentInDataResponse(url);
+            
+            // Name like ignore case filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLikeIgnoreCase=" + encode("%ONE");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?nameLikeIgnoreCase=none";
+            assertResultsPresentInDataResponse(url);
 
             // Description filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?description=" + encode("Description one");
@@ -365,6 +381,15 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Category filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?categoryIn=" + encode("non-exisiting,some-category");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?categoryNotIn=" + encode("some-category");
+            assertResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutCategory=true";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
             
             // Without process instance id filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=true";
@@ -418,5 +443,53 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=" + stageInstanceId1.getId();
         assertEmptyResultsPresentInDataResponse(url);
+    }
+
+    public void testBulkUpdateTaskAssignee() throws IOException {
+
+        taskService.createTaskBuilder().id("taskID1").create();
+        taskService.createTaskBuilder().id("taskID2").create();
+        taskService.createTaskBuilder().id("taskID3").create();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("assignee", "admin");
+        requestNode.putArray("taskIds").add("taskID1").add("taskID3");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(taskService.createTaskQuery().taskId("taskID1").singleResult().getAssignee()).isEqualTo("admin");
+        assertThat(taskService.createTaskQuery().taskId("taskID2").singleResult().getAssignee()).isNull();
+        assertThat(taskService.createTaskQuery().taskId("taskID3").singleResult().getAssignee()).isEqualTo("admin");
+
+        taskService.deleteTask("taskID1", true);
+        taskService.deleteTask("taskID2", true);
+        taskService.deleteTask("taskID3", true);
+
+    }
+    public void testInvalidBulkUpdateTasks() throws IOException {
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(null);
+        executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+
+        httpPut = new HttpPut(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
+        requestNode.put("name", "testName");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "message:'Bad request',"
+                        + "exception:'taskIds can not be null for bulk update tasks requests'"
+                        + "}");
+
+        requestNode.putArray("taskIds").add("invalidId");
+
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
     }
 }

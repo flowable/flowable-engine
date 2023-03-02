@@ -89,6 +89,15 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
+        if (queryRequest.getCaseInstanceName() != null) {
+            query.caseInstanceName(queryRequest.getCaseInstanceName());
+        }
+        if (queryRequest.getCaseInstanceNameLike() != null) {
+            query.caseInstanceNameLike(queryRequest.getCaseInstanceNameLike());
+        }
+        if (queryRequest.getCaseInstanceNameLikeIgnoreCase() != null) {
+            query.caseInstanceNameLikeIgnoreCase(queryRequest.getCaseInstanceNameLikeIgnoreCase());
+        }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }
@@ -208,22 +217,22 @@ public class HistoricCaseInstanceBaseResource {
         return responseList;
     }
     
-    protected HistoricCaseInstance getHistoricCaseInstanceFromRequestWithAccessCheck(String caseInstanceId) {
-        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
-
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryCaseInfoById(caseInstance);
-        }
-        
-        return caseInstance;
-    }
-
     protected HistoricCaseInstance getHistoricCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
         HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.", HistoricCaseInstance.class);
         }
 
+        return caseInstance;
+    }
+
+    protected HistoricCaseInstance getHistoricCaseInstanceFromRequestWithAccessCheck(String caseInstanceId) {
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryCaseInfoById(caseInstance);
+        }
+        
         return caseInstance;
     }
 

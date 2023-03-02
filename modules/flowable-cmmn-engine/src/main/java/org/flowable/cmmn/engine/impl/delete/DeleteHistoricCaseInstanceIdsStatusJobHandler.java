@@ -58,6 +58,12 @@ public class DeleteHistoricCaseInstanceIdsStatusJobHandler implements JobHandler
             throw new FlowableIllegalArgumentException("There is no batch with the id " + configuration);
         }
 
+        if (DeleteCaseInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            // The batch has been stopped there is nothing that we need to check anymore, so we will set the repeat to null
+            job.setRepeat(null);
+            return;
+        }
+
         long totalBatchParts = createStatusQuery(batch, managementService).count();
         long totalCompleted = createStatusQuery(batch, managementService).completed().count();
 

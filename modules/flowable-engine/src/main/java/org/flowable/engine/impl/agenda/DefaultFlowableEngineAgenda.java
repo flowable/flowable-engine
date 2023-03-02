@@ -86,7 +86,12 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
 
     @Override
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
-        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
+        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions, false), execution);
+    }
+
+    @Override
+    public void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions) {
+        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions, true), execution);
     }
 
     @Override

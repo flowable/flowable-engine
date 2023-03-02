@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.management;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;

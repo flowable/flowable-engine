@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -660,6 +661,27 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
         }
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventSubprocessTest.SignalEventSubprocessAndCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/signal/SignalEventSubprocessTest.SignalThrowProcess.bpmn20.xml"
+    })
+    public void testInterruptSubprocessOfCallActivity() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SignalEventSubprocessAndCallActivityProcess");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processEngineConfiguration)) {
+            HistoricProcessInstance parentProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
+            assertThat(parentProcess.getEndTime()).isNotNull();
+
+            HistoricProcessInstance throwProcess = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("signalThrowProcess").singleResult();
+
+            assertThat(throwProcess).isNotNull();
+            assertThat(throwProcess.getEndTime()).isNotNull();
+            assertThat(throwProcess.getEndActivityId()).isEqualTo("startSignalEvent1");
+        }
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {

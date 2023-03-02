@@ -133,4 +133,35 @@
     order by TIME_ desc
   </select>
 
+  <delete id="bulkDeleteBytesForAttachmentsForTaskIds" parameterType="java.util.Collection">
+    delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+    where BYTES_.ID_ in (
+        select ATTACHMENT_.CONTENT_ID_
+        from ${prefix}ACT_HI_ATTACHMENT ATTACHMENT_
+        where 
+        <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            ATTACHMENT_.TASK_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
+    )
+  </delete>
+    
+  <delete id="bulkDeleteAttachmentsForTaskIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_ATTACHMENT where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        TASK_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+
 </mapper>

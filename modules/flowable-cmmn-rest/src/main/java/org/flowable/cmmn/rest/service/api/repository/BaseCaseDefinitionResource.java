@@ -35,20 +35,6 @@ public class BaseCaseDefinitionResource {
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link CaseDefinition} that is requested and calls the access interceptor.
-     * Throws the right exceptions when bad request was made or definition was not found.
-     */
-    protected CaseDefinition getCaseDefinitionFromRequestWithAccessCheck(String caseDefinitionId) {
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
-
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
-        }
-
-        return caseDefinition;
-    }
-
-    /**
      * Returns the {@link CaseDefinition} that is requested without calling the access interceptor
      * Throws the right exceptions when bad request was made or definition was not found.
      */
@@ -59,6 +45,20 @@ public class BaseCaseDefinitionResource {
             throw new FlowableObjectNotFoundException("Could not find a case definition with id '" + caseDefinitionId + "'.", CaseDefinition.class);
         }
 
+        return caseDefinition;
+    }
+
+    /**
+     * Returns the {@link CaseDefinition} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or definition was not found.
+     */
+    protected CaseDefinition getCaseDefinitionFromRequestWithAccessCheck(String caseDefinitionId) {
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionById(caseDefinition);
+        }
+        
         return caseDefinition;
     }
 }

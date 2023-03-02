@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.rest.service.api.engine.EventResponse;
 import org.flowable.task.api.history.HistoricTaskInstance;

@@ -26,12 +26,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SubProcess;
@@ -480,7 +482,8 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         return (isDirectCallActivityExecutionMigration(currentFlowElement, newFlowElement) ||
                 isDirectUserTaskExecutionMigration(currentFlowElement, newFlowElement) ||
-                isDirectReceiveTaskExecutionMigration(currentFlowElement, newFlowElement)) &&
+                isDirectReceiveTaskExecutionMigration(currentFlowElement, newFlowElement) ||
+                isDirectExternalWorkerServiceTaskExecutionMigration(currentFlowElement, newFlowElement)) &&
                 (!getFlowElementMultiInstanceParentId(currentFlowElement).isPresent() && !getFlowElementMultiInstanceParentId(newFlowElement).isPresent());
     }
 
@@ -503,6 +506,24 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 newFlowElement instanceof ReceiveTask &&
                 ((Task) currentFlowElement).getLoopCharacteristics() == null &&
                 ((Task) newFlowElement).getLoopCharacteristics() == null;
+    }
+
+    protected boolean isDirectExternalWorkerServiceTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        //The current and new external worker service task must be equal to support direct execution migration
+        if (currentFlowElement instanceof ExternalWorkerServiceTask && newFlowElement instanceof ExternalWorkerServiceTask) {
+            ExternalWorkerServiceTask currentExternalWorkerServiceTask = (ExternalWorkerServiceTask) currentFlowElement;
+            ExternalWorkerServiceTask newExternalWorkerServiceTask = (ExternalWorkerServiceTask) newFlowElement;
+            return currentExternalWorkerServiceTask.getLoopCharacteristics() == null &&
+                    newExternalWorkerServiceTask.getLoopCharacteristics() == null &&
+                    new EqualsBuilder()
+                            .append(currentExternalWorkerServiceTask.getId(), newExternalWorkerServiceTask.getId())
+                            .append(currentExternalWorkerServiceTask.getName(), newExternalWorkerServiceTask.getName())
+                            .append(currentExternalWorkerServiceTask.getTopic(), newExternalWorkerServiceTask.getTopic())
+                            .append(currentExternalWorkerServiceTask.isExclusive(), newExternalWorkerServiceTask.isExclusive())
+                            .append(currentExternalWorkerServiceTask.isAsynchronous(), newExternalWorkerServiceTask.isAsynchronous())
+                            .isEquals();
+        }
+        return false;
     }
 
     protected void executeScript(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, Script script, CommandContext commandContext) {
@@ -672,6 +693,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 String fromActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getFromActivityId();
                 String toActivityId = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getToActivityId();
                 String newAssignee = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewAssignee();
+                String newOwner = ((ActivityMigrationMapping.OneToOneMapping) activityMapping).getWithNewOwner();
                 String fromCallActivityId = activityMapping.getFromCallActivityId();
 
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
@@ -680,14 +702,18 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
                         ChangeActivityStateBuilderImpl subProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
                         subProcessChangeActivityStateBuilder.processInstanceId(subProcessInstanceExecution.getId());
-                        subProcessChangeActivityStateBuilder.moveActivityIdToParentActivityId(fromActivityId, toActivityId, newAssignee);
+                        subProcessChangeActivityStateBuilder.moveActivityIdToParentActivityId(fromActivityId, toActivityId, newAssignee, newOwner);
                         changeActivityStateBuilders.add(subProcessChangeActivityStateBuilder);
                     }
                 } else if (executionActivityIdsToMapExplicitly.contains(fromActivityId)) {
                     if (activityMapping.isToCallActivity()) {
-                        mainProcessChangeActivityStateBuilder.moveActivityIdToSubProcessInstanceActivityId(fromActivityId, toActivityId, activityMapping.getToCallActivityId(), activityMapping.getCallActivityProcessDefinitionVersion(), newAssignee);
+                        mainProcessChangeActivityStateBuilder.moveActivityIdToSubProcessInstanceActivityId(fromActivityId, toActivityId,
+                                activityMapping.getToCallActivityId(),
+                                activityMapping.getCallActivityProcessDefinitionVersion(),
+                                newAssignee,
+                                newOwner);
                     } else {
-                        mainProcessChangeActivityStateBuilder.moveActivityIdTo(fromActivityId, toActivityId, newAssignee);
+                        mainProcessChangeActivityStateBuilder.moveActivityIdTo(fromActivityId, toActivityId, newAssignee, newOwner);
                     }
                     executionActivityIdsToMapExplicitly.remove(fromActivityId);
                 }
@@ -717,13 +743,14 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 String toActivityId = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getToActivityId();
                 String fromCallActivityId = activityMapping.getFromCallActivityId();
                 String newAssignee = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewAssignee();
+                String newOwner = ((ActivityMigrationMapping.ManyToOneMapping) activityMapping).getWithNewOwner();
                 if (activityMapping.isToParentProcess() && !executionActivityIdsToMapExplicitly.contains(fromCallActivityId)) {
                     List<ExecutionEntity> callActivityExecutions = filteredExecutionsByActivityId.get(fromCallActivityId).stream().filter(ExecutionEntity::isActive).collect(Collectors.toList());
                     for (ExecutionEntity callActivityExecution : callActivityExecutions) {
                         ExecutionEntity subProcessInstanceExecution = executionEntityManager.findSubProcessInstanceBySuperExecutionId(callActivityExecution.getId());
                         ChangeActivityStateBuilderImpl subProcessChangeActivityStateBuilder = new ChangeActivityStateBuilderImpl();
                         subProcessChangeActivityStateBuilder.processInstanceId(subProcessInstanceExecution.getId());
-                        subProcessChangeActivityStateBuilder.moveActivityIdsToParentActivityId(fromActivityIds, toActivityId, newAssignee);
+                        subProcessChangeActivityStateBuilder.moveActivityIdsToParentActivityId(fromActivityIds, toActivityId, newAssignee, newOwner);
                         changeActivityStateBuilders.add(subProcessChangeActivityStateBuilder);
                     }
                 } else {
@@ -736,9 +763,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                         }
                     }
                     if (activityMapping.isToCallActivity()) {
-                        mainProcessChangeActivityStateBuilder.moveActivityIdsToSubProcessInstanceActivityId(fromActivityIds, toActivityId, activityMapping.getToCallActivityId(), activityMapping.getCallActivityProcessDefinitionVersion(), newAssignee);
+                        mainProcessChangeActivityStateBuilder.moveActivityIdsToSubProcessInstanceActivityId(fromActivityIds, toActivityId,
+                                activityMapping.getToCallActivityId(),
+                                activityMapping.getCallActivityProcessDefinitionVersion(),
+                                newAssignee,
+                                newOwner);
                     } else {
-                        mainProcessChangeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, newAssignee);
+                        mainProcessChangeActivityStateBuilder.moveExecutionsToSingleActivityId(executionIds, toActivityId, newAssignee, newOwner);
                     }
                 }
             } else {

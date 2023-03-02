@@ -129,12 +129,4 @@ public abstract class AbstractEngineAutoConfiguration {
         return defaultName;
     }
 
-    protected <T> T defaultIfNotNull(T value, T defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return value;
-    }
-
 }

@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -51,7 +53,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     public BpmnEventRegistryEventConsumer(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
-        
+
         this.processEngineConfiguration = processEngineConfiguration;
     }
 
@@ -59,7 +61,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     public String getConsumerKey() {
         return "bpmnEventConsumer";
     }
-    
+
     @Override
     protected EventRegistryProcessingInfo eventReceived(EventInstance eventInstance) {
 
@@ -69,17 +71,17 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         // should not influence (i.e. roll back) the handling of another.
 
         EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
-        
+
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.BPMN, eventInstance, correlationKeys);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
-            EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getExecutionId(), 
+            EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getExecutionId(),
                     eventSubscription.getProcessDefinitionId(), ScopeTypes.BPMN);
             handleEventSubscription(runtimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
             eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
         }
-        
+
         return eventRegistryProcessingInfo;
     }
 
@@ -95,14 +97,18 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             runtimeService.trigger(eventSubscription.getExecutionId(), null, transientVariableMap);
 
         } else if (eventSubscription.getProcessDefinitionId() != null
-                        && eventSubscription.getProcessInstanceId() == null && eventSubscription.getExecutionId() == null) {
+                && eventSubscription.getProcessInstanceId() == null && eventSubscription.getExecutionId() == null) {
 
             // If there is no execution/process instance set, but a definition id is set, this means that it's a start event
 
             ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionId(eventSubscription.getProcessDefinitionId())
-                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
+                    .processDefinitionId(eventSubscription.getProcessDefinitionId())
+                    .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
+            if (StringUtils.isNotEmpty(eventSubscription.getActivityId())) {
+                processInstanceBuilder.startEventId(eventSubscription.getActivityId());
+            }
+            
             if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
                 processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
             }
@@ -113,40 +119,118 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
 
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
-                    
-                    ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService().getProcessDefinition(eventSubscription.getProcessDefinitionId());
 
-                    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
-                        .processDefinitionKey(processDefinition.getKey())
-                        .processInstanceReferenceId(correlationKeyWithAllParameters.getValue())
-                        .processInstanceReferenceType(ReferenceTypes.EVENT_PROCESS);
-                    
-                    if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                        processInstanceQuery.processInstanceTenantId(eventInstance.getTenantId());
-                    }
-                    
-                    long processInstanceCount = processInstanceQuery.count();
+                    ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
+                            .getProcessDefinition(eventSubscription.getProcessDefinitionId());
 
+                    long processInstanceCount = countProcessInstances(runtimeService, eventInstance, correlationKeyWithAllParameters, processDefinition);
                     if (processInstanceCount > 0) {
                         // Returning, no new instance should be started
                         eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
                         return;
+
+                    } else if (processEngineConfiguration.isEventRegistryUniqueProcessInstanceCheckWithLock()) {
+
+                        /*
+                         * When multiple threads/transactions are querying concurrently, it could happen
+                         * that multiple times zero is returned as result of the count.
+                         *
+                         * To make sure only one unique instance is created, a lock is acquired for the reference correlation value,
+                         * which means that the current logic can now act on it when that's successful.
+                         *
+                         * Once the lock is acquired, the query is repeated (similar reasoning as when using synchronized methods).
+                         * If the result is again zero, the process instance can be started.
+                         *
+                         * Transitionally, there are 4 transactions at play here:
+                         * - tx 1 for acquiring a lock
+                         * - tx 2 for doing the process instance count
+                         * - tx 3 for starting the process instance (if tx 1 was successful and tx 2 returned 0)
+                         * - tx 4 for unlocking (if tx 1 was successful)
+                         *
+                         * The counting + process instance starting happens exclusively for a given event correlation value
+                         * and due to using separate transactions for the count and the start, it's guaranteed
+                         * other engine nodes or other threads will always see any other instance started.
+                         */
+
+                        String countLockName = "belock" + correlationKeyWithAllParameters.getValue() + processDefinition.getKey();
+                        LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager(countLockName);
+                        boolean lockAcquired = lockManager.acquireLock(
+                                processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionLockTime());
+
+                        if (lockAcquired) {
+
+                            try {
+
+                                processInstanceCount = countProcessInstances(runtimeService, eventInstance, correlationKeyWithAllParameters, processDefinition);
+                                if (processInstanceCount > 0) {
+                                    // Returning, no new instance should be started
+                                    eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
+                                    LOGGER.debug("Event received to start a new process instance, but a unique instance already exists.");
+                                    return;
+                                }
+
+                                startProcessInstance(processInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_PROCESS);
+                                return;
+
+                            } finally {
+                                lockManager.releaseLock();
+
+                            }
+
+                        } else {
+                            LOGGER.info(
+                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new process instance. Ignoring this one.",
+                                    countLockName);
+                            return;
+
+                        }
+
+
+                    } else {
+                        startProcessInstance(processInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_PROCESS);
+                        return;
                     }
 
-                    processInstanceBuilder.referenceId(correlationKeyWithAllParameters.getValue());
-                    processInstanceBuilder.referenceType(ReferenceTypes.EVENT_PROCESS);
-
                 }
+
             }
 
-            if (processEngineConfiguration.isEventRegistryStartProcessInstanceAsync()) {
-                processInstanceBuilder.startAsync();
-            } else {
-                processInstanceBuilder.start();
-            }
+            startProcessInstance(processInstanceBuilder, null, null);
+
         }
 
+    }
+
+    protected long countProcessInstances(RuntimeService runtimeService, EventInstance eventInstance,
+            CorrelationKey correlationKey, ProcessDefinition processDefinition) {
+
+        ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey(processDefinition.getKey())
+                .processInstanceReferenceId(correlationKey.getValue())
+                .processInstanceReferenceType(ReferenceTypes.EVENT_PROCESS);
+
+        if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+            processInstanceQuery.processInstanceTenantId(eventInstance.getTenantId());
+        }
+
+        return processInstanceQuery.count();
+    }
+
+    protected void startProcessInstance(ProcessInstanceBuilder processInstanceBuilder, String referenceId, String referenceType) {
+
+        if (referenceId != null) {
+            processInstanceBuilder.referenceId(referenceId);
+        }
+        if (referenceType != null) {
+            processInstanceBuilder.referenceType(referenceType);
+        }
+
+        if (processEngineConfiguration.isEventRegistryStartProcessInstanceAsync()) {
+            processInstanceBuilder.startAsync();
+        } else {
+            processInstanceBuilder.start();
+        }
     }
 
     protected String getStartCorrelationConfiguration(EventSubscription eventSubscription) {
@@ -163,7 +247,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                         && Objects.equals(eventSubscription.getEventType(), eventTypes.get(0).getElementText())) {
 
                     List<ExtensionElement> correlationCfgExtensions = startEvent.getExtensionElements()
-                        .getOrDefault(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
+                            .getOrDefault(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
                     if (!correlationCfgExtensions.isEmpty()) {
                         return correlationCfgExtensions.get(0).getElementText();
                     }

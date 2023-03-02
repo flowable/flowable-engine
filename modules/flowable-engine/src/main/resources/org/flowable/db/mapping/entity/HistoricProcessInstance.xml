@@ -235,6 +235,19 @@
     </foreach>
   </delete>
   
+  <delete id="bulkDeleteHistoricProcessInstancesByIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_PROCINST where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
   <!-- HISTORIC PROCESS INSTANCE RESULT MAP -->
   
   <resultMap id="historicProcessInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -329,6 +342,18 @@
     where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
   </select>
   
+  <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select ID_ from ${prefix}ACT_HI_PROCINST where 
+    <foreach item="listItem" index="listIndex" collection="parameter">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SUPER_PROCESS_INSTANCE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </select>
 
   <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
     <if test="needsPaging">${limitBefore}</if>
@@ -633,7 +658,7 @@
                                     <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                                 </choose>
                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                    or A_OR${index}.TEXT_ is null
+                                    or V.TEXT_ is null
                                 </if>
                                 )
                             </if>
@@ -653,7 +678,7 @@
                                 <include refid="executionVariableOperator" />
                                 #{queryVariableValue.longValue}
                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                    or A_OR${index}.LONG_ is null
+                                    or V.LONG_ is null
                                 </if>
                                 )
                             </if>
@@ -662,7 +687,7 @@
                                 <include refid="executionVariableOperator" />
                                 #{queryVariableValue.doubleValue}
                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                                    or A_OR${index}.DOUBLE_ is null
+                                    or V.DOUBLE_ is null
                                 </if>
                                 )
                             </if>
@@ -818,14 +843,14 @@
       <if test="withoutTenantId">
         and (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
       </if>
-       <if test="name != null">
+      <if test="name != null">
         and ${queryTablePrefix}NAME_ = #{name}
       </if>
       <if test="nameLike != null">
         and ${queryTablePrefix}NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
-        <if test="nameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+      <if test="nameLikeIgnoreCase != null">
+        and lower(${queryTablePrefix}NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
   </sql>
   
@@ -949,14 +974,14 @@
       <if test="orQueryObject.withoutTenantId">
         or (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
       </if>
-       <if test="orQueryObject.name != null">
+      <if test="orQueryObject.name != null">
         or ${queryTablePrefix}NAME_ = #{orQueryObject.name}
       </if>
       <if test="orQueryObject.nameLike != null">
         or ${queryTablePrefix}NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.nameLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.nameLikeIgnoreCase}${wildcardEscapeClause}
+        or lower(${queryTablePrefix}NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
       </if>
   </sql>
   

@@ -28,6 +28,54 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 7.0.0.M1</h3>
+
+<ul>
+	<li>This is the first milestone for version 7 of the Flowable Engines focusing on the Spring Boot 3, Spring 6 and Java 17 upgrade.</li>
+	<li>The plan forward is to keep maintaining the 6.x and 7.x versions for at least the next year, so we will do both 6.x and 7.x releases.</li>
+	<li>The REST application requires a servlet container / application server that supports Jakarta 9.</li>
+	<li>This release focuses on the main Flowable Engines and REST APIs for the BPMN, CMMN, DMN and event registry engines. This means that there
+	are no UI applications, no content and form engines and the modules for Mule and some others are removed.</li>
+</ul>
+
+
+<h3>Release Notes - Flowable - 6.8.0</h3>
+
+<ul>
+	<li>Added support for using scripts in task and execution listeners and HTTP request and response handlers.</li>
+	<li>Added support for new task and instance history levels to provide more options to reduce the amount of historic data stored.</li>
+	<li>Added support to throw BPMN errors in scripts.</li>
+	<li>Added support for headers in an event model that can be used with event registry events in case and process definitions.</li>
+	<li>Improved support for starting case and process instances with the unique feature enabled on event registry start events.
+	The event subscription for the event registry event is locked while starting the case and process instance to prevent any duplicate instances.</li>
+	<li>Added support for async leave in addition to the already long existing async (before) attribute for async tasks in BPMN and CMMN. 
+	An async job will be created to execute the leave of a task when the async leave attribute is set to true.</li>
+	<li>Improved support for parallel repeatable event listeners in case definitions.</li>
+	<li>Added interface to provide an implementation for non-matching events that are received in the event registry.</li>
+	<li>Added support to query directly on runtime variable instances both in the Java API and REST API.</li>
+	<li>Improved housekeeping logic to reduce the throughput time.</li>
+	<li>Added support for retries in Kafka channels in the event registry.</li>
+	<li>Expose topic, partitions and offset consumer record for inbound Kafka channel and provide custom partition support for outbound Kafka channel.</li>
+	<li>Added bulk support for deleting case and process instances, terminating case instances and moving deadletter jobs to executable.</li>
+	<li>Added activity instance REST API query support.</li>
+	<li>Fixed issue with event listeners in a repeatable stage in a case definition.</li>
+	<li>Fixed issue with having multiple event registry start events in a process definition.</li>
+	<li>Add dedicated task executor for the task invoker. This is fixing an issue with a potential deadlock when using the "true parallel" HTTP task feature.</li>
+	<li>Improved channel definition caching logic to prevent channels from getting unregistered when they should not.</li>
+	<li>Added support for providing an owner and assignee when starting a case or process instance.</li>
+	<li>Upgrade to Spring Boot 2.7.6.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.7.2</h3>
+
+<ul>
+	<li>Fixed issue with vulnerable Log4j dependency. The Flowable apps now use the default Spring Boot logging framework, which is Logback.</li>
+	<li>Added support to execute a decision service in the DMN REST API.</li>
+	<li>Added support to query tasks with case instance variables.</li>
+	<li>Fixed issue with migrating a process instance to a new process definition with a call activity and a new boundary event.</li>
+	<li>Upgraded to Spring boot 2.6.2.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.7.1</h3>
 
 <ul>

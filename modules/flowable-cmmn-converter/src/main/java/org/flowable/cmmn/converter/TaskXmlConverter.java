@@ -17,6 +17,7 @@ import java.util.Objects;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
@@ -167,18 +168,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         
         String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
         if (StringUtils.isNotEmpty(candidateUsersString)) {
-            String[] candidateUsers = candidateUsersString.split(",");
-            for (String candidateUser : candidateUsers) {
-                casePageTask.getCandidateUsers().add(candidateUser);
-            }
+            casePageTask.getCandidateUsers().addAll(CmmnXmlUtil.parseDelimitedList(candidateUsersString));
         }
         
         String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
         if (StringUtils.isNotEmpty(candidateGroupsString)) {
-            String[] candidateGroups = candidateGroupsString.split(",");
-            for (String candidateGroup : candidateGroups) {
-                casePageTask.getCandidateGroups().add(candidateGroup);
-            }
+            casePageTask.getCandidateGroups().addAll(CmmnXmlUtil.parseDelimitedList(candidateGroupsString));
         }
         
         return casePageTask;
@@ -242,6 +237,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
             CmmnXmlConstants.ATTRIBUTE_IS_EXCLUSIVE);
         if (StringUtils.isNotEmpty(isExclusiveString)) {
             task.setExclusive(Boolean.valueOf(isExclusiveString));
+        }
+
+        String isAsyncLeaveString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE);
+        if (StringUtils.isNotEmpty(isAsyncLeaveString)) {
+            task.setAsyncLeave(Boolean.valueOf(isAsyncLeaveString.toLowerCase()));
         }
     }
 }

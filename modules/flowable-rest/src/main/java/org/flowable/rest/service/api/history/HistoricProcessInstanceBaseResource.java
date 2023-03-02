@@ -234,7 +234,7 @@ public class HistoricProcessInstanceBaseResource {
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
         }
-
+        
         return processInstance;
     }
 

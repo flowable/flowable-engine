@@ -35,9 +35,23 @@ public interface LockManager {
     boolean acquireLock();
 
     /**
+     * Acquire the lock.
+     * The {@code lockForceAcquireAfter} will be used to acquire an expired lock
+     *
+     * @param lockForceAcquireAfter the amount of time after which the lock should be acquired
+     * @return {@code true} if the lock was acquired, {@code false} otherwise
+     */
+    boolean acquireLock(Duration lockForceAcquireAfter);
+
+    /**
      * Release the lock.
      */
     void releaseLock();
+
+    /**
+     * Release the lock and delete the resources for the lock if needed.
+     */
+    void releaseAndDeleteLock();
 
     /**
      * Wait to acquire a lock, once a lock is acquired execute the supplier and release finally the lock.

@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +74,9 @@ public class ChangeHistoryLevelTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void noneToFullVariableSet() {
+        assumeThat(processEngineConfiguration.isAsyncHistoryEnabled())
+                .as("async history")
+                .isFalse();
         String processInstanceId = null;
         try {
             processEngineConfiguration.setHistoryLevel(HistoryLevel.NONE);

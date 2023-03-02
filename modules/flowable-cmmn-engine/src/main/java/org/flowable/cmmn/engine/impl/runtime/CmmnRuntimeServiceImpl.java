@@ -32,6 +32,8 @@ import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.BulkDeleteCaseInstancesCmd;
+import org.flowable.cmmn.engine.impl.cmd.BulkTerminateCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.ChangePlanItemStateCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
@@ -57,14 +59,19 @@ import org.flowable.cmmn.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.HasPlanItemInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceAssigneeCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceOwnerCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceAssigneeCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessKeyCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessStatusCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceNameCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceOwnerCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
@@ -159,6 +166,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
+    public void bulkTerminateCaseInstances(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new BulkTerminateCaseInstancesCmd(caseInstanceIds));
+    }
+
+    @Override
     public void terminatePlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId));
     }
@@ -166,6 +178,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void deleteCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new DeleteCaseInstanceCmd(caseInstanceId));
+    }
+
+    @Override
+    public void bulkDeleteCaseInstances(Collection<String> caseInstanceIds) {
+        commandExecutor.execute(new BulkDeleteCaseInstancesCmd(caseInstanceIds));
     }
 
     @Override
@@ -228,6 +245,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         return commandExecutor.execute(new HasCaseInstanceVariableCmd(caseInstanceId, variableName, false));
     }
     
+    @Override
+    public boolean hasLocalVariable(String planItemInstanceId, String variableName) {
+        return commandExecutor.execute(new HasPlanItemInstanceVariableCmd(planItemInstanceId, variableName));
+    }
+
     @Override
     public void setVariable(String caseInstanceId, String variableName, Object variableValue) {
         commandExecutor.execute(new SetVariableCmd(caseInstanceId, variableName, variableValue));
@@ -316,6 +338,26 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public List<StageResponse> getStageOverview(String caseInstanceId) {
         return commandExecutor.execute(new GetStageOverviewCmd(caseInstanceId));
+    }
+
+    @Override
+    public void setOwner(String caseInstanceId, String userId) {
+        commandExecutor.execute(new SetCaseInstanceOwnerCmd(caseInstanceId, userId));
+    }
+
+    @Override
+    public void removeOwner(String caseInstanceId) {
+        commandExecutor.execute(new RemoveCaseInstanceOwnerCmd(caseInstanceId));
+    }
+
+    @Override
+    public void setAssignee(String caseInstanceId, String userId) {
+        commandExecutor.execute(new SetCaseInstanceAssigneeCmd(caseInstanceId, userId));
+    }
+
+    @Override
+    public void removeAssignee(String caseInstanceId) {
+        commandExecutor.execute(new RemoveCaseInstanceAssigneeCmd(caseInstanceId));
     }
 
     @Override

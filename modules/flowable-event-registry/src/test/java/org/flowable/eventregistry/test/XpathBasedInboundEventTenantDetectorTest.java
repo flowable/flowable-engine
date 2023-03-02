@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class XpathBasedInboundEventTenantDetectorTest {
 
     @Test
     void testDetectTenantId() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
 
         String xPath = "/data/tenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);
@@ -38,7 +37,7 @@ class XpathBasedInboundEventTenantDetectorTest {
 
     @Test
     void testDetectTenantIdWrongXpath() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name><tenantId>01</tenantId></data>");
 
         String xPath = "/data/wrongTenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);
@@ -47,7 +46,7 @@ class XpathBasedInboundEventTenantDetectorTest {
 
     @Test
     void testDetectTenantIdMissingTenantIdInXml() {
-        FlowableEventInfo<Document> eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
+        Document eventInfo = deserializer.deserialize("<data><name>Doe</name></data>");
 
         String xPath = "/data/tenantId";
         XpathBasedInboundEventTenantDetector detector = new XpathBasedInboundEventTenantDetector(xPath);

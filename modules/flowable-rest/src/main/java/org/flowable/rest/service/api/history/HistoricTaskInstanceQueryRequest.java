@@ -42,12 +42,16 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String executionId;
     protected String taskName;
     protected String taskNameLike;
+    protected String taskNameLikeIgnoreCase;
     protected String taskDescription;
     protected String taskDescriptionLike;
     protected String taskDefinitionKey;
     protected String taskDefinitionKeyLike;
     protected Collection<String> taskDefinitionKeys;
     protected String taskCategory;
+    protected List<String> taskCategoryIn;
+    protected List<String> taskCategoryNotIn;
+    protected Boolean taskWithoutCategory;
     protected String taskDeleteReason;
     protected String taskDeleteReasonLike;
     protected String taskAssignee;
@@ -199,6 +203,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
         this.taskNameLike = taskNameLike;
     }
 
+    public String getTaskNameLikeIgnoreCase() {
+        return taskNameLikeIgnoreCase;
+    }
+
+    public void setTaskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        this.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase;
+    }
+
     public String getTaskDescription() {
         return taskDescription;
     }
@@ -245,6 +257,30 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskCategory(String taskCategory) {
         this.taskCategory = taskCategory;
+    }
+
+    public List<String> getTaskCategoryIn() {
+        return taskCategoryIn;
+    }
+
+    public void setTaskCategoryIn(List<String> taskCategoryIn) {
+        this.taskCategoryIn = taskCategoryIn;
+    }
+
+    public List<String> getTaskCategoryNotIn() {
+        return taskCategoryNotIn;
+    }
+
+    public void setTaskCategoryNotIn(List<String> taskCategoryNotIn) {
+        this.taskCategoryNotIn = taskCategoryNotIn;
+    }
+
+    public Boolean getTaskWithoutCategory() {
+        return taskWithoutCategory;
+    }
+
+    public void setTaskWithoutCategory(Boolean taskWithoutCategory) {
+        this.taskWithoutCategory = taskWithoutCategory;
     }
 
     public String getTaskDeleteReason() {

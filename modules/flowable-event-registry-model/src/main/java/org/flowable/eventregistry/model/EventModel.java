@@ -98,12 +98,27 @@ public class EventModel {
         }
     }
 
+    public void addPayload(EventPayload payload) {
+        this.payload.put(payload.getName(), payload);
+    }
+
     public void addCorrelation(String name, String type) {
         EventPayload eventPayload = payload.get(name);
         if (eventPayload != null) {
             eventPayload.setCorrelationParameter(true);
         } else {
             payload.put(name, EventPayload.correlation(name, type));
+        }
+    }
+    
+    public void addFullPayload(String name) {
+        EventPayload eventPayload = payload.get(name);
+        if (eventPayload != null) {
+            eventPayload.setFullPayload(true);
+            eventPayload.setCorrelationParameter(false);
+            eventPayload.setHeader(false);
+        } else {
+            payload.put(name, EventPayload.fullPayload(name));
         }
     }
 }

@@ -31,8 +31,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.BaseJobQuery;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
@@ -71,7 +73,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private static final long ONE_HOUR = 60L * 60L * 1000L;
     private static final long ONE_SECOND = 1000L;
-    private static final String EXCEPTION_MESSAGE = "problem evaluating script: javax.script.ScriptException: java.lang.RuntimeException: This is an exception thrown from scriptTask";
+    private static final String EXCEPTION_MESSAGE = "This is an exception thrown from scriptTask";
     private String deploymentId;
     private String messageId;
     private CommandExecutor commandExecutor;
@@ -147,6 +149,37 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         TimerJobQuery timerQuery = managementService.createTimerJobQuery();
         verifyQueryResults(timerQuery, 3);
+    }
+
+    @Test
+    public void testQueryByIds() {
+        List<String> jobIds = new ArrayList<>();
+
+        managementService.createJobQuery().list().forEach(job -> jobIds.add(job.getId()));
+        JobQuery query = managementService.createJobQuery().jobIds(jobIds);
+        verifyQueryResults(query, jobIds.size());
+
+        jobIds.clear();
+        managementService.createTimerJobQuery().list().forEach(job -> jobIds.add(job.getId()));
+        TimerJobQuery timerQuery = managementService.createTimerJobQuery().jobIds(jobIds);
+        verifyQueryResults(timerQuery, jobIds.size());
+
+        query = managementService.createJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(query, 1);
+        timerQuery = managementService.createTimerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(timerQuery, 3);
+
+        query = managementService.createJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(query, (int) managementService.createJobQuery().count());
+
+        timerQuery = managementService.createTimerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(timerQuery, (int) managementService.createTimerJobQuery().count());
+
+        ExternalWorkerJobQuery externalWorkerQuery = managementService.createExternalWorkerJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(externalWorkerQuery, (int) managementService.createExternalWorkerJobQuery().count());
+
+        SuspendedJobQuery suspendedJobQuery = managementService.createSuspendedJobQuery().jobIds(new ArrayList<>());
+        verifyQueryResults(suspendedJobQuery, (int) managementService.createSuspendedJobQuery().count());
     }
 
     @Test
@@ -251,6 +284,34 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         Job handlerTypeJob = managementService.createJobQuery().handlerType("test").singleResult();
         assertThat(handlerTypeJob).isNotNull();
+    }
+
+    @Test
+    public void testDeadLetterJobQueryByType() {
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_MESSAGE);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(0);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_TIMER);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(2);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(0);
+
+        createDeadLetterJobWithType(Job.JOB_TYPE_EXTERNAL_WORKER);
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(3);
+        assertThat(managementService.createDeadLetterJobQuery().messages().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().timers().count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().externalWorkers().count()).isEqualTo(1);
+
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().messages().singleResult().getId());
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().timers().singleResult().getId());
+        managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().externalWorkers().singleResult().getId());
+        assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
     }
 
     @Test
@@ -524,12 +585,16 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
     public void testQueryByExceptionMessage() {
-        TimerJobQuery query = managementService.createTimerJobQuery().exceptionMessage(EXCEPTION_MESSAGE);
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("exceptionInJobExecution").singleResult();
+        TimerJobQuery query = managementService.createTimerJobQuery().exceptionMessage("This is an exception thrown from scriptTask");
         verifyQueryResults(query, 0);
 
+        String exceptionMessage = "groovy script evaluation failed: 'javax.script.ScriptException: java.lang.RuntimeException: "
+                + "This is an exception thrown from scriptTask' "
+                + "Trace: scopeType=bpmn, scopeDefinitionKey=exceptionInJobExecution, scopeDefinitionId="+processDefinition.getId()+","
+                + " subScopeDefinitionKey=theScriptTask, tenantId=<empty>, type=scriptTask";
         ProcessInstance processInstance = startProcessInstanceWithFailingJob();
-
-        query = managementService.createTimerJobQuery().exceptionMessage(EXCEPTION_MESSAGE);
+        query = managementService.createTimerJobQuery().exceptionMessage(exceptionMessage);
         verifyFailedJob(query, processInstance);
     }
 
@@ -853,7 +918,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
             managementService.executeJob(timerJob.getId());
         })
                 .isInstanceOf(FlowableException.class)
-                .hasMessage(EXCEPTION_MESSAGE);
+                .hasMessageContaining(EXCEPTION_MESSAGE);
 
         return processInstance;
     }
@@ -867,7 +932,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         assertThat(failedJob.getExceptionMessage()).containsSequence(EXCEPTION_MESSAGE);
     }
 
-    private void verifyQueryResults(JobQuery query, int countExpected) {
+    private void verifyQueryResults(BaseJobQuery query, int countExpected) {
         assertThat(query.list()).hasSize(countExpected);
         assertThat(query.count()).isEqualTo(countExpected);
 
@@ -880,25 +945,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         }
     }
 
-    private void verifySingleResultFails(JobQuery query) {
-        assertThatThrownBy(() -> query.singleResult())
-                .isExactlyInstanceOf(FlowableException.class);
-    }
-
-    private void verifyQueryResults(TimerJobQuery query, int countExpected) {
-        assertThat(query.list()).hasSize(countExpected);
-        assertThat(query.count()).isEqualTo(countExpected);
-
-        if (countExpected == 1) {
-            assertThat(query.singleResult()).isNotNull();
-        } else if (countExpected > 1) {
-            verifySingleResultFails(query);
-        } else if (countExpected == 0) {
-            assertThat(query.singleResult()).isNull();
-        }
-    }
-
-    private void verifySingleResultFails(TimerJobQuery query) {
+    private void verifySingleResultFails(BaseJobQuery query) {
         assertThatThrownBy(() -> query.singleResult())
                 .isExactlyInstanceOf(FlowableException.class);
     }
@@ -954,6 +1001,36 @@ public class JobQueryTest extends PluggableFlowableTestCase {
             }
         });
 
+    }
+
+    private JobEntity createJobWithType(String type) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        return commandExecutor.execute(new Command<JobEntity>() {
+
+            @Override
+            public JobEntity execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity result = jobService.createJob();
+                result.setJobType(type);
+                result.setRetries(0);
+                jobService.insertJob(result);
+                assertThat(result.getId()).isNotNull();
+                return result;
+            }
+        });
+    }
+
+    private void createDeadLetterJobWithType(String type) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                jobService.moveJobToDeadLetterJob(createJobWithType(type));
+                return null;
+            }
+        });
     }
 
     private JobEntity createJobWithHandlerType(String handlerType) {

@@ -13,7 +13,7 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.eventregistry.api.ChannelDefinition;

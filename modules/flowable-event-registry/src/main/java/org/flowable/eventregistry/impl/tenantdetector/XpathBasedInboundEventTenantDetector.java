@@ -17,7 +17,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -34,10 +33,10 @@ public class XpathBasedInboundEventTenantDetector implements InboundEventTenantD
     }
 
     @Override
-    public String detectTenantId(FlowableEventInfo<Document> eventInfo) {
+    public String detectTenantId(Document payload) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Node result = (Node) xPath.compile(xpathExpression).evaluate(eventInfo.getPayload(), XPathConstants.NODE);
+            Node result = (Node) xPath.compile(xpathExpression).evaluate(payload, XPathConstants.NODE);
             return result.getTextContent();
         } catch (Exception e) {
             throw new FlowableException("Could not evaluate xpath expression ", e);

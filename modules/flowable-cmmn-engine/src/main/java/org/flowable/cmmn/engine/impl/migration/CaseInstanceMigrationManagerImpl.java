@@ -19,17 +19,24 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchService;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.CaseInstanceBatchMigrationResult;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationJobHandler;
+import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationStatusJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -43,11 +50,14 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
-/**
- * @author Valentin Zickner
- */
 public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateManager implements CaseInstanceMigrationManager {
     
     public CaseInstanceMigrationManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -142,6 +152,13 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 validationResult.addValidationMessage("Invalid mapping for move to available plan item definition '" + planItemDefinitionId + "' cannot be found in the case definition");
             }
         }
+        
+        Map<String, PlanItemDefinitionMapping> waitingForRepetitionMappingLookupMap = groupByFromPlanItemId(document.getWaitingForRepetitionPlanItemDefinitionMappings(), validationResult);
+        for (String planItemDefinitionId : waitingForRepetitionMappingLookupMap.keySet()) {
+            if (!hasPlanItemDefinition(cmmnModel, planItemDefinitionId)) {
+                validationResult.addValidationMessage("Invalid mapping for add waiting for repetition plan item definition '" + planItemDefinitionId + "' cannot be found in the case definition");
+            }
+        }
     }
 
     @Override
@@ -196,6 +213,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
                 .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
                 .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
+                .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())
+                .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, commandContext);
@@ -247,6 +266,14 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         for (MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping : document.getMoveToAvailablePlanItemDefinitionMappings()) {
             changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
         }
+        
+        for (WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getWaitingForRepetitionPlanItemDefinitionMappings()) {
+            changePlanItemStateBuilder.addWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+        }
+        
+        for (RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getRemoveWaitingForRepetitionPlanItemDefinitionMappings()) {
+            changePlanItemStateBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+        }
 
         return changePlanItemStateBuilder;
     }
@@ -264,7 +291,52 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
     @Override
     public Batch batchMigrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument document, CommandContext commandContext) {
-        throw new UnsupportedOperationException("not implemented"); // TODO
+
+        CaseDefinition caseDefinition = resolveCaseDefinition(document, commandContext);
+
+        CmmnEngineConfiguration engineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+        List<CaseInstanceEntity> caseInstances = engineConfiguration.getCaseInstanceEntityManager()
+                .findCaseInstancesByCaseDefinitionId(caseDefinitionId);
+
+        BatchService batchService = engineConfiguration.getBatchServiceConfiguration().getBatchService();
+        Batch batch = batchService.createBatchBuilder().batchType(Batch.CASE_MIGRATION_TYPE)
+                .searchKey(caseDefinitionId)
+                .searchKey2(caseDefinition.getId())
+                .status(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
+                .batchDocumentJson(document.asJsonString())
+                .create();
+
+        JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
+        for (CaseInstance caseInstance : caseInstances) {
+            BatchPart batchPart = batchService.createBatchPart(batch, CaseInstanceBatchMigrationResult.STATUS_WAITING,
+                    caseInstance.getId(), null, ScopeTypes.CMMN);
+
+            JobEntity job = jobService.createJob();
+            job.setJobHandlerType(CaseInstanceMigrationJobHandler.TYPE);
+            job.setScopeId(caseInstance.getId());
+            job.setScopeType(ScopeTypes.CMMN);
+            job.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
+            jobService.createAsyncJob(job, false);
+            jobService.scheduleAsyncJob(job);
+        }
+
+        if (!caseInstances.isEmpty()) {
+            TimerJobService timerJobService = engineConfiguration.getJobServiceConfiguration().getTimerJobService();
+            TimerJobEntity timerJob = timerJobService.createTimerJob();
+            timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+            timerJob.setRevision(1);
+            timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
+            timerJob.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
+            timerJob.setScopeType(ScopeTypes.CMMN);
+
+            BusinessCalendar businessCalendar = engineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
+            timerJob.setDuedate(businessCalendar.resolveDuedate(engineConfiguration.getBatchStatusTimeCycleConfig()));
+            timerJob.setRepeat(engineConfiguration.getBatchStatusTimeCycleConfig());
+
+            timerJobService.scheduleTimerJob(timerJob);
+        }
+
+        return batch;
     }
 
     @Override

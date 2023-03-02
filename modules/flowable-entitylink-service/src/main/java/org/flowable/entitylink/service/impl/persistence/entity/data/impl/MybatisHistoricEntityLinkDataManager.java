@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,19 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeId", scopeId);
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
+        
         return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        parameters.put("scopeType", scopeType);
+        parameters.put("linkType", linkType);
+        
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType", parameters);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -107,6 +120,14 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         getDbSqlSession().delete("deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType", parameters, HistoricEntityLinkEntityImpl.class);
     }
     
+    @Override
+    public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeType", scopeType);
+        parameters.put("scopeIds", createSafeInValuesList(scopeIds));
+        getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
+    }
+
     @Override
     public void deleteHistoricEntityLinksForNonExistingProcessInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricProcessEntityLinks", null, HistoricEntityLinkEntityImpl.class);

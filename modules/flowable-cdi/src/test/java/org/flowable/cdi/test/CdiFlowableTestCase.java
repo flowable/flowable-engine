@@ -16,7 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;

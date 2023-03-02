@@ -180,7 +180,8 @@ If you’ve set the authenticated user before calling the submit methods with Id
 
 ## History Cleaning
 
-By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size. 
+By default history data is stored forever, this can cause the history tables to grow very large and impact the performance of the HistoryService.  History Cleaning has been introduced with 6.5.0 and allows the deletion of HistoricProcessInstances and their associated data.  Once process data no longer needs to be retained it can be deleted to reduce the history database's size.
+The deletion of the historical processes is done using the Flowable Batch mechanism, by scheduling jobs that are going to delete the processes in batches and store the information about what was done in a batch table.
 
 ### Automatic History Cleaning Configuration
 
@@ -190,13 +191,13 @@ Automatic cleanup of HistoricProcessInstances is disabled by default but can be 
         .createProcessEngineConfigurationFromResourceDefault()
         .setEnableHistoryCleaning(true)
         .setHistoryCleaningTimeCycleConfig("0 0 1 * * ?")
-        .setCleanInstancesEndedAfterNumberOfDays(365)
+        .setCleanInstancesEndedAfter(Duration.ofDays(365))
         .buildProcessEngine();
  
 Spring properties set in an application.properties or externalized configuration are also available:
  
          flowable.enable-history-cleaning=true
-         flowable.history-cleaning-after-days=365
+         flowable.history-cleaning-after=365d
          flowable.history-cleaning-cycle=0 0 1 * * ?
  
 Additionally, History Cleanup can also be configured in flowable.cfg.xml or in a spring-context:
@@ -210,32 +211,13 @@ Additionally, History Cleanup can also be configured in flowable.cfg.xml or in a
 
 ### Manually Deleting History
 
-Manually cleaning history can accomplished by executing methods on the HistoryService query builders.
+Manually cleaning history can be accomplished by executing methods on the HistoryService query builders.
 
 Delete all HistoricProcessInstances and their related data that are older than one year.
 
+     int numberOfProcessesInBatch = 10;
      Calendar cal = new GregorianCalendar();
      cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
      historyService.createHistoricProcessInstanceQuery()
        .finishedBefore(cal.getTime())
-       .deleteWithRelatedData();
-
-Delete just HistoricProcessInstances older than one year.
-
-    Calendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
-    historyService.createHistoricProcessInstanceQuery()
-      .finishedBefore(cal.getTime())
-      .delete();
-      
-Delete just HistoricActivityInstances older than one year.
-
-    Calendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
-    historyService.createHistoricActivityInstanceQuery()
-      .finishedBefore(cal.getTime())
-      .delete();
-          
-Delete the task and activity data for deleted HistoricProcessInstances.
-    
-    historyService.deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+       .deleteSequentiallyUsingBatch(numberOfProcessesInBatch, "Custom Delete Batch");

@@ -154,7 +154,7 @@ public class MybatisEventDefinitionDataManager extends AbstractEventDataManager<
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateEventDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateEventDefinitionTenantIdForDeploymentId", params);
     }
 
 }

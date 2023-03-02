@@ -144,7 +144,7 @@ The implementation consists of two classes:
 
 -   An implementation of the *org.flowable.engine.impl.asyncexecutor.JobManager* interface that puts a message on a message queue instead of passing it to the thread pool.
 
--   A *javax.jms.MessageListener* implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
+-   A *jakarta.jms.MessageListener* implementation that consumes a message from the message queue, using the job identifier in the message to fetch and execute the job.
 
 First of all, add the *flowable-jms-spring-executor* dependency to your project:
 
@@ -759,7 +759,7 @@ To solve this problem, the *secure scripting* feature can be enabled. Currently,
         <version>${flowable.version}</version>
     </dependency>
 
-Adding this dependency will transitively bring in the Rhino dependency (see [<https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino>]($https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino$$)). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine **does not** have the features that are needed to implement the secure scripting feature.
+Adding this dependency will transitively bring in the Rhino dependency (see [<https://github.com/mozilla/rhino>]($https://github.com/mozilla/rhino$$)). Rhino is a javascript engine for the JDK. It used to be included in JDK version 6 and 7 and was superseded by the Nashorn engine. However, the Rhino project continued development after it was included in the JDK. Many features (including the ones Flowable uses to implement the secure scripting) were added afterwards. At the time of writing, the Nashorn engine **does not** have the features that are needed to implement the secure scripting feature.
 
 This does mean that there could be (typically small) differences between scripts (for example, *importPackage* works on Rhino, but *load()* has to be used on Nashorn).
 
@@ -805,7 +805,7 @@ It’s used as follows:
       <flowable:field name="language" stringValue="javascript" />
     </flowable:executionListener>
 
-For examples that demonstrate unsecure scripts and how they are made secure by the *secure scripting* feature, please check the [unit tests on Github](https://github.com/Flowable/Flowable/tree/master/modules/flowable-secure-javascript/src/test/resources)
+For examples that demonstrate unsecure scripts and how they are made secure by the *secure scripting* feature, please check the [unit tests on Github](https://github.com/Flowable/Flowable/tree/main/modules/flowable-secure-javascript/src/test/resources)
 
 ## Logging Sessions \[Experimental\]
 

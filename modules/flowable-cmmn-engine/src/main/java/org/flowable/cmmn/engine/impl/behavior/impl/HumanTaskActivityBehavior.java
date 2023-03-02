@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityWithMigrationContextBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -39,6 +40,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -156,7 +158,11 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(
                     humanTask, taskEntity, TaskListener.EVENTNAME_CREATE);
-            
+
+            FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getTaskServiceConfiguration().getEventDispatcher();
+            if (eventDispatcher != null  && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createTaskCreatedEvent(taskEntity), cmmnEngineConfiguration.getEngineCfgKey());
+            }
 
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.

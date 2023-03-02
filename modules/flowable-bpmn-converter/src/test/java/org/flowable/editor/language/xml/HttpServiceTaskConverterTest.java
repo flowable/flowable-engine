@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.FlowableHttpResponseHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.bpmn.model.ScriptInfo;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 class HttpServiceTaskConverterTest {
@@ -45,6 +46,42 @@ class HttpServiceTaskConverterTest {
                     assertThat(httpServiceTask.getHttpResponseHandler())
                             .extracting(FlowableHttpResponseHandler::getImplementationType, FlowableHttpResponseHandler::getImplementation)
                             .containsExactly(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.flowable.Test");
+                });
+    }
+
+    @BpmnXmlConverterTest("httpservicetaskmodelwithscriptlistener.bpmn")
+    void validateModelWithScriptTypeListener(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
+                    assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
+                    assertThat(httpServiceTask.getName()).isEqualTo("Service task");
+                    assertThat(httpServiceTask.getFieldExtensions())
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+                            .containsExactly(
+                                    tuple("url", "test", null),
+                                    tuple("method", null, "GET")
+                            );
+                    ScriptInfo scriptInfoRequestHandler = httpServiceTask.getHttpRequestHandler().getScriptInfo();
+
+                    assertThat(scriptInfoRequestHandler).isNotNull();
+                    assertThat(scriptInfoRequestHandler.getLanguage()).isEqualTo("groovy");
+                    assertThat(scriptInfoRequestHandler.getScript()).contains("execution.setVariable('httpResponseHandler', 'scriptExecuted');");
+                    assertThat(scriptInfoRequestHandler.getResultVariable()).isEqualTo("httpRequestHandlerScriptResult");
+
+                    ScriptInfo scriptInfoResponseHandler = httpServiceTask.getHttpResponseHandler().getScriptInfo();
+
+                    assertThat(scriptInfoResponseHandler).isNotNull();
+                    assertThat(scriptInfoResponseHandler.getLanguage()).isEqualTo("groovy");
+                    assertThat(scriptInfoResponseHandler.getScript()).contains("execution.setVariable('httpResponseHandler', 'scriptExecuted');");
+                    assertThat(scriptInfoResponseHandler.getResultVariable()).isNull();
+
+                    assertThat(httpServiceTask.getHttpRequestHandler())
+                            .extracting(FlowableHttpRequestHandler::getImplementationType)
+                            .isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_SCRIPT);
+                    assertThat(httpServiceTask.getHttpResponseHandler())
+                            .extracting(FlowableHttpResponseHandler::getImplementationType)
+                            .isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_SCRIPT);
                 });
     }
 }

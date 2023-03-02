@@ -43,6 +43,7 @@ import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
@@ -134,7 +135,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -154,7 +154,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 2 * * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(90));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(500);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isTrue();
 
             deleteDeployments(engine);
         });
@@ -215,7 +214,6 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(engineConfiguration.getHistoryCleaningTimeCycleConfig()).isEqualTo("0 0 1 * * ?");
             assertThat(engineConfiguration.getCleanInstancesEndedAfter()).isEqualTo(Duration.ofDays(365));
             assertThat(engineConfiguration.getCleanInstancesBatchSize()).isEqualTo(100);
-            assertThat(engineConfiguration.isCleanInstancesSequentially()).isFalse();
 
             deleteDeployments(cmmnEngine);
         });
@@ -586,7 +584,8 @@ public class CmmnEngineAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context)
                             .hasSingleBean(CmmnEngineConfiguration.class)
-                            .hasSingleBean(TaskExecutor.class);
+                            .hasSingleBean(TaskExecutor.class)
+                            .hasBean("flowableAsyncTaskInvokerTaskExecutor");
 
                     CmmnEngineConfiguration configuration = context.getBean(CmmnEngineConfiguration.class);
 
@@ -599,6 +598,17 @@ public class CmmnEngineAutoConfigurationTest {
                     assertThat(configuration.getAsyncHistoryTaskExecutor()).isEqualTo(asyncTaskExecutor);
                     assertThat(((SpringAsyncTaskExecutor) asyncTaskExecutor).getAsyncTaskExecutor())
                             .isEqualTo(context.getBean(TaskExecutor.class));
+
+                    AsyncTaskExecutor taskInvokerTaskExecutor = context.getBean("flowableAsyncTaskInvokerTaskExecutor", AsyncTaskExecutor.class);
+                    assertThat(configuration.getAsyncTaskInvokerTaskExecutor())
+                            .isNotEqualTo(asyncTaskExecutor)
+                            .isEqualTo(taskInvokerTaskExecutor)
+                            .isInstanceOfSatisfying(DefaultAsyncTaskExecutor.class, taskExecutor -> {
+                                assertThat(taskExecutor.getCorePoolSize()).isEqualTo(8);
+                                assertThat(taskExecutor.getMaxPoolSize()).isEqualTo(8);
+                                assertThat(taskExecutor.getQueueSize()).isEqualTo(100);
+                                assertThat(taskExecutor.getThreadPoolNamingPattern()).isEqualTo("flowable-async-task-invoker-%d");
+                            });
                 });
     }
 
@@ -753,6 +763,35 @@ public class CmmnEngineAutoConfigurationTest {
                 });
     }
 
+    @Test
+    void taskInvokerWithCustomProperties() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(TaskExecutionAutoConfiguration.class))
+                .withPropertyValues(
+                        "flowable.task-invoker.core-pool-size=2",
+                        "flowable.task-invoker.max-pool-size=3",
+                        "flowable.task-invoker.queue-size=15",
+                        "flowable.task-invoker.thread-name-prefix=test-"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(CmmnEngineConfiguration.class)
+                            .hasSingleBean(TaskExecutor.class)
+                            .hasBean("flowableAsyncTaskInvokerTaskExecutor");
+
+                    CmmnEngineConfiguration configuration = context.getBean(CmmnEngineConfiguration.class);
+
+                    AsyncTaskExecutor taskInvokerTaskExecutor = context.getBean("flowableAsyncTaskInvokerTaskExecutor", AsyncTaskExecutor.class);
+                    assertThat(configuration.getAsyncTaskInvokerTaskExecutor())
+                            .isEqualTo(taskInvokerTaskExecutor)
+                            .isInstanceOfSatisfying(DefaultAsyncTaskExecutor.class, taskExecutor -> {
+                                assertThat(taskExecutor.getCorePoolSize()).isEqualTo(2);
+                                assertThat(taskExecutor.getMaxPoolSize()).isEqualTo(3);
+                                assertThat(taskExecutor.getQueueSize()).isEqualTo(15);
+                                assertThat(taskExecutor.getThreadPoolNamingPattern()).isEqualTo("test-%d");
+                            });
+                });
+    }
 
     private void assertAllServicesPresent(ApplicationContext context, CmmnEngine cmmnEngine) {
         List<Method> methods = Stream.of(CmmnEngine.class.getDeclaredMethods())

@@ -16,11 +16,11 @@ Alternatively, you can use the Flowable REST API to communicate over HTTP. There
 Common to all the ways of setting up Flowable is the core engine, which can be seen as a collection of services that expose APIs to manage and execute business processes.
 The various tutorials below start by introducing how to set up and use this core engine. The sections afterwards build upon the knowledge acquired in the previous sections.
 
--   The [first section](building-a-command-line-application) shows how to run Flowable in the simplest way possible: a regular Java main using only Java SE. Many core concepts and APIs will be explained here.
+-   The [first section](#building-a-command-line-application) shows how to run Flowable in the simplest way possible: a regular Java main using only Java SE. Many core concepts and APIs will be explained here.
 
--   The [section on the Flowable REST API](getting-started-with-the-flowable-rest-api) shows how to run and use the same API through REST.
+-   The [section on the Flowable REST API](#getting-started-with-the-flowable-rest-api) shows how to run and use the same API through REST.
 
--   The [section on the Flowable App](ch14-Applications.md#flowable-ui-applications-configurations), will guide you through the basics of using the out-of-the-box example Flowable user interfaces.
+-   The [section on the Flowable REST App](ch14-Applications.md), will guide you through the basics of using the out-of-the-box example Flowable REST application.
 
 ## Flowable and Activiti
 
@@ -442,7 +442,7 @@ Of course, this is just the start of the journey. The following sections will di
 
 ## Getting started with the Flowable REST API
 
-This section shows the same example as the [previous section](building-a-command-line-application): deploying a process definition, starting a process instance, getting a task list and completing a task. If you haven’t read that section, it might be good to skim through it to get an idea of what is done there.
+This section shows the same example as the [previous section](#building-a-command-line-application): deploying a process definition, starting a process instance, getting a task list and completing a task. If you haven’t read that section, it might be good to skim through it to get an idea of what is done there.
 
 This time, the Flowable REST API is used rather than the Java API. You’ll soon notice that the REST API closely matches the Java API, and knowing one automatically means that you can find your way around the other.
 
@@ -478,7 +478,7 @@ If you get back a proper json response, the REST API is up and running.
 
 The first step is to deploy a process definition. With the REST API, this is done by uploading a .bpmn20.xml file (or .zip file for multiple process definitions) as 'multipart/formdata':
 
-    curl --user rest-admin:test -F "file=@holiday-request.bpmn20.xml" http://localhost:8080/flowable-rest/service/repository/deployments
+    curl --user rest-admin:test  -X POST -F "file=@holiday-request.bpmn20.xml" http://localhost:8080/flowable-rest/service/repository/deployments
 
 To verify that the process definition is deployed correctly, the list of process definitions can be requested:
 

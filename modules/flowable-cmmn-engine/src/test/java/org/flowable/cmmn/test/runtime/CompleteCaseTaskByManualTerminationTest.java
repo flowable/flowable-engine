@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -24,7 +23,9 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.Test;
 
 /**
@@ -56,8 +57,11 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         // manually terminate the case through the API which must also complete the case task and hence complete the root case and end it
         cmmnRuntimeService.terminateCaseInstance(childCaseId);
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.TERMINATED);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());
@@ -85,8 +89,10 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         // manually terminate the case through the API which must also complete the case task and hence complete the root case and end it
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Case Task"));
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.TERMINATED);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());
@@ -116,8 +122,10 @@ public class CompleteCaseTaskByManualTerminationTest extends FlowableCmmnTestCas
         assertPlanItemInstanceState(planItemInstances, "The Task", ACTIVE);
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "The Task"));
 
-        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
-        assertEquals(historicCaseInstance.getState(), CaseInstanceState.COMPLETED);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.INSTANCE, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(childCaseId).singleResult();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.COMPLETED);
+        }
 
         assertCaseInstanceEnded(childCaseId);
         assertCaseInstanceEnded(caseInstance.getId());

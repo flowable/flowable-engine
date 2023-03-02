@@ -19,8 +19,8 @@ import static org.awaitility.Awaitility.await;
 import java.time.Duration;
 import java.util.List;
 
-import javax.jms.Message;
-import javax.jms.TextMessage;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @CmmnJmsEventTest
 @TestPropertySource(properties = {
-        "application.test.jms-queue=test-queue"
+        "application.test.jms-queue=test-cmmn-queue"
 })
 public class CaseWithEventRegistryTest {
     
@@ -67,7 +67,7 @@ public class CaseWithEventRegistryTest {
         try {
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(0);
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-cmmn-queue", "{"
                 + "    \"payload1\": \"kermit\","
                 + "    \"payload2\": 123"
                 + "}", messageProcessor -> {
@@ -86,7 +86,7 @@ public class CaseWithEventRegistryTest {
             assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable1")).isEqualTo("kermit");
             assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable2")).isEqualTo(123);
             
-            jmsTemplate.convertAndSend("test-queue", "{"
+            jmsTemplate.convertAndSend("test-cmmn-queue", "{"
                     + "    \"payload1\": \"fozzie\","
                     + "    \"payload2\": 456"
                     + "}");
@@ -185,7 +185,7 @@ public class CaseWithEventRegistryTest {
         try {
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(0);
             
-            jmsTemplate.convertAndSend("test-queue", "<?xml version=\"1.0\" encoding=\"utf-8\"?><root>"
+            jmsTemplate.convertAndSend("test-cmmn-queue-xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?><root>"
                 + "<payload1>kermit</payload1>"
                 + "<payload2>123</payload2>"
                 + "</root>", messageProcessor -> {
@@ -204,7 +204,7 @@ public class CaseWithEventRegistryTest {
             assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable1")).isEqualTo("kermit");
             assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "variable2")).isEqualTo(123);
             
-            jmsTemplate.convertAndSend("test-queue", "<root><payload1>fozzie</payload1>"
+            jmsTemplate.convertAndSend("test-cmmn-queue-xml", "<root><payload1>fozzie</payload1>"
                     + "<payload2>456</payload2></root>");
 
             await("receive events")

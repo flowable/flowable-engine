@@ -49,8 +49,11 @@ import org.flowable.bpmn.converter.child.FlowableHttpResponseHandlerParser;
 import org.flowable.bpmn.converter.child.FlowableMapExceptionParser;
 import org.flowable.bpmn.converter.child.FormPropertyParser;
 import org.flowable.bpmn.converter.child.IOSpecificationParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.MessageEventDefinitionParser;
 import org.flowable.bpmn.converter.child.MultiInstanceParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
+import org.flowable.bpmn.converter.child.ScriptInfoParser;
 import org.flowable.bpmn.converter.child.SignalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.TaskListenerParser;
 import org.flowable.bpmn.converter.child.TerminateEventDefinitionParser;
@@ -83,6 +86,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new EscalationEventDefinitionParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
+        addGenericParser(new ScriptInfoParser());
         addGenericParser(new FlowableEventListenerParser());
         addGenericParser(new FlowableHttpRequestHandlerParser());
         addGenericParser(new FlowableHttpResponseHandlerParser());
@@ -208,6 +212,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
         if (attributeValue == null) {
             attributeValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, attributeName);
+            if (attributeValue == null) {
+                attributeValue = xtr.getAttributeValue(CAMUNDA_EXTENSIONS_NAMESPACE, attributeName);
+            }
         }
 
         return attributeValue;
@@ -422,8 +429,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, "sourceType"))) {
-                writeDefaultAttribute("sourceType", ioParameter.getAttributeValue(null, "sourceType"), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE))) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE), xtw);
             }
             
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
@@ -433,13 +440,16 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, "targetType"))) {
-                writeDefaultAttribute("targetType", ioParameter.getAttributeValue(null, "targetType"), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE))) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE), xtw);
             }
             
             if (ioParameter.isTransient()) {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT, "true", xtw);
             }
+
+            writeCustomAttributes(ioParameter.getAttributes().values(), xtw,
+                    InParameterParser.defaultInParameterAttributes, OutParameterParser.defaultOutParameterAttributes);
 
             xtw.writeEndElement();
         }
@@ -564,7 +574,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 for (ExtensionAttribute blackAttribute : blackList) {
                     if (blackAttribute.getName().equals(attribute.getName())) {
                         if (attribute.getNamespace() != null && (FLOWABLE_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
-                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
+                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
+                                CAMUNDA_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
 
                             return true;
                         }

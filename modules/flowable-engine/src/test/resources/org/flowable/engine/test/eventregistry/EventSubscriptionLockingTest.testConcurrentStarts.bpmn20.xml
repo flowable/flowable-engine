@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="eventSubscriptionLocking">
+  
+    <startEvent id="theStart">
+        <extensionElements>
+            <flowable:eventType>myEvent</flowable:eventType>
+            <flowable:startEventCorrelationConfiguration><![CDATA[storeAsUniqueReferenceId]]></flowable:startEventCorrelationConfiguration>
+            <flowable:eventOutParameter source="customerId" target="customerId"/>
+        </extensionElements>
+    </startEvent>
+    
+    <sequenceFlow sourceRef="theStart" targetRef="scriptTask" />
+
+    <scriptTask id="scriptTask" name="Script Task " scriptFormat="groovy" >
+        <script>
+            <![CDATA[Thread.sleep(1000)]]>
+        </script>
+    </scriptTask>
+
+    <sequenceFlow sourceRef="scriptTask" targetRef="task" />
+
+    <userTask id="task" />
+  	
+  	<sequenceFlow sourceRef="task" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

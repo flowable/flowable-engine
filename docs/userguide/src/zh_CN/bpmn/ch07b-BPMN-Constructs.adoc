@@ -3780,63 +3780,6 @@ Content-Length: 777
 ====== 异常映射
 参见<<exceptionMapping, 异常映射>>
 
-[[bpmnMuleTask]]
-
-
-==== Mule任务
-
-Mule任务可以向Mule发送消息，增强Flowable的集成特性。请注意Mule任务**不是**BPMN 2.0规范的“官方”任务（所以也没有专用图标）。因此，在Flowable中，Mule任务实现为一种特殊的服务任务。
-
-[[bpmnMuleTaskUsage]]
-
-
-===== 定义Mule任务
-
-Mule任务实现为特殊的<<bpmnJavaServiceTask,服务任务>>，将服务任务的__type__定义为__'mule'__进行设置。
-
-[source,xml,linenums]
-----
-<serviceTask id="sendMule" flowable:type="mule">
-----
-
-Mule任务通过<<serviceTaskFieldInjection,字段注入>>配置。这些参数的值可以使用EL表达式，将在流程执行运行时解析。可以设置下列参数：
-
-
-[options="header"]
-|===============
-|参数|必填?|描述
-|endpointUrl|是|希望调用的Mule端点（endpoint）。
-|language|是|计算payloadExpression字段所用的语言。
-|payloadExpression|是|消息载荷的表达式。
-|resultVariable|否|存储调用结果的变量名。
-
-|===============
-
-[[bpmnMuleTaskExampleUsage]]
-
-
-===== 示例
-
-下面的XML代码片段是使用Mule任务的例子。
-
-[source,xml,linenums]
-----
-<extensionElements>
-  <flowable:field name="endpointUrl">
-    <flowable:string>vm://in</flowable:string>
-  </flowable:field>
-  <flowable:field name="language">
-    <flowable:string>juel</flowable:string>
-  </flowable:field>
-  <flowable:field name="payloadExpression">
-    <flowable:string>"hi"</flowable:string>
-  </flowable:field>
-  <flowable:field name="resultVariable">
-    <flowable:string>theVariable</flowable:string>
-  </flowable:field>
-</extensionElements>
-----
-
 [[bpmnCamelTask]]
 
 

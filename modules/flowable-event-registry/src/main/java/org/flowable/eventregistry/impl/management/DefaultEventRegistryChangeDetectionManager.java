@@ -12,22 +12,23 @@
  */
 package org.flowable.eventregistry.impl.management;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.ChannelDefinition;
+import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.persistence.deploy.ChannelDefinitionCacheEntry;
-import org.flowable.eventregistry.impl.persistence.deploy.EventDeploymentManager;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
+import org.flowable.eventregistry.model.ChannelModel;
+import org.flowable.eventregistry.model.InboundChannelModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class DefaultEventRegistryChangeDetectionManager implements EventRegistryChangeDetectionManager {
 
@@ -48,32 +49,64 @@ public class DefaultEventRegistryChangeDetectionManager implements EventRegistry
             .createChannelDefinitionQuery()
             .latestVersion()
             .list();
-        
-        Set<String> channelDefinitionCacheIds = new HashSet<>();
-        EventDeploymentManager deploymentManager = eventRegistryEngineConfiguration.getDeploymentManager();
-        List<ChannelDefinitionCacheEntry> cacheEntries = new ArrayList<>(deploymentManager.getChannelDefinitionCache().getAll());
-        for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
-            channelDefinitionCacheIds.add(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId());
-        }
+
+        InboundChannelModelCacheManager inboundChannelModelCacheManager = eventRegistryEngineConfiguration.getInboundChannelModelCacheManager();
+        Collection<String> latestChannelDefinitionIds = new HashSet<>();
 
         // Check for new deployments
         for (ChannelDefinition channelDefinition : channelDefinitions) {
+            latestChannelDefinitionIds.add(channelDefinition.getId());
+            InboundChannelModelCacheManager.RegisteredChannel registeredChannel = inboundChannelModelCacheManager.findRegisteredChannel(channelDefinition);
+            if (registeredChannel != null) {
+                if (registeredChannel.getChannelDefinitionId().equals(channelDefinition.getId())) {
+                    // The latest definition is already deployed nothing to do
+                    continue;
+                }
 
-            // When no instance is returned, the channel definition has not yet been deployed before (e.g. deployed on another node)
-            if (!channelDefinitionCacheIds.contains(channelDefinition.getId())) {
-                eventRegistryEngineConfiguration.getEventRepositoryService().getChannelModelById(channelDefinition.getId());
+                if (registeredChannel.getChannelDefinitionVersion() > channelDefinition.getVersion()) {
+                    // If the registered channel has a version higher than the latest one then we need to remove it
+                    // This can happen when a deployment was reverted (i.e. a newer deployment was deleted)
+                    ChannelDefinition unregisteredChannel = eventRegistryEngineConfiguration.getDeploymentManager().removeChannelDefinitionFromCache(registeredChannel.getChannelDefinitionId());
+                    if (unregisteredChannel != null) {
+                        LOGGER.info("Unregistered channel definition with key {} and tenant {} from cache", unregisteredChannel.getKey(), unregisteredChannel.getTenantId());
+                    }
+                }
+            }
+            // If the registered channel IDs does not contain the latest version we need to deploy it
+            // fetching the channel model by ID will trigger its deployment. If it does not we will manually do it
+            ChannelModel channelModel = eventRegistryEngineConfiguration.getEventRepositoryService().getChannelModelById(channelDefinition.getId());
+            if (channelModel instanceof InboundChannelModel) {
+                if (inboundChannelModelCacheManager.findRegisteredChannel(channelDefinition) == null) {
+                    // The model has not been registered in the inbound cache manager
+                    // This means that most likely a newer deployment was deleted
+                    // We need to manually register it.
+                    eventRegistryEngineConfiguration.getCommandExecutor()
+                            .execute(commandContext -> {
+                                EventRegistryEngineConfiguration eventRegistryConfiguration = CommandContextUtil.getEventRegistryConfiguration(commandContext);
+                                eventRegistryConfiguration
+                                        .getEventDeployer()
+                                        .getCachingAndArtifcatsManager()
+                                        .registerChannelModel(channelModel, channelDefinition, eventRegistryEngineConfiguration);
+                                return null;
+                            });
+                }
                 LOGGER.info("Deployed channel definition with key {} and tenant {}", channelDefinition.getKey(), channelDefinition.getTenantId());
             }
-
         }
 
-        // Check for removed deployments
-        Set<String> latestChannelDefinitionIds = channelDefinitions.stream().map(ChannelDefinition::getId).collect(Collectors.toSet());
-        for (ChannelDefinitionCacheEntry channelDefinitionCacheEntry : cacheEntries) {
-            if (!latestChannelDefinitionIds.contains(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId())) {
+        // Once the latest definitions are deployed we need to see if there are any lingering older channels that should be unregistered
+        Collection<InboundChannelModelCacheManager.RegisteredChannel> registeredChannels = inboundChannelModelCacheManager
+                .getRegisteredChannels();
+
+        for (InboundChannelModelCacheManager.RegisteredChannel registeredChannel : registeredChannels) {
+            if (!latestChannelDefinitionIds.contains(registeredChannel.getChannelDefinitionId())) {
+                // If a registered channel is not within the latest channel definitions then we need to unregister it
+                // This can happen when all deployments for a particular channel have been removed
                 // The cache is a synchronized map (default impl), so no need to synchronize, both adds (during deployment) and remove (here) are synchronized
-                deploymentManager.removeChannelDefinitionFromCache(channelDefinitionCacheEntry.getChannelDefinitionEntity());
-                LOGGER.info("Removed channel definition with key {} and tenant {} from cache", channelDefinitionCacheEntry.getChannelDefinitionEntity().getKey(), channelDefinitionCacheEntry.getChannelDefinitionEntity().getTenantId());
+                ChannelDefinition unregisteredChannel = eventRegistryEngineConfiguration.getDeploymentManager().removeChannelDefinitionFromCache(registeredChannel.getChannelDefinitionId());
+                if (unregisteredChannel != null) {
+                    LOGGER.info("Unregistered channel definition with key {} and tenant {} from cache", unregisteredChannel.getKey(), unregisteredChannel.getTenantId());
+                }
             }
         }
     }

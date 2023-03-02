@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.history;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -58,9 +58,13 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskDefinitionKeys", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
             @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskNameLike", dataType = "string", value = "The task name with like operator for the historic task instance.", paramType = "query"),
+            @ApiImplicitParam(name = "taskNameLikeIgnoreCase", dataType = "string", value = "The task name with like operator for the historic task instance ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "taskDescription", dataType = "string", value = "The task description of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskDescriptionLike", dataType = "string", value = "The task description with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskCategory", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+            @ApiImplicitParam(name = "taskCategoryIn", dataType = "string", value = "Select tasks with the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+            @ApiImplicitParam(name = "taskCategoryNotIn", dataType = "string", value = "Select tasks not assigned to the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+            @ApiImplicitParam(name = "taskWithoutCategory", dataType = "string", value = "Select tasks with no category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
             @ApiImplicitParam(name = "taskDeleteReason", dataType = "string", value = "The task delete reason of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskDeleteReasonLike", dataType = "string", value = "The task delete reason with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the historic task instance.", paramType = "query"),
@@ -159,6 +163,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
         if (allRequestParams.get("taskNameLike") != null) {
             queryRequest.setTaskNameLike(allRequestParams.get("taskNameLike"));
         }
+        
+        if (allRequestParams.get("taskNameLikeIgnoreCase") != null) {
+            queryRequest.setTaskNameLikeIgnoreCase(allRequestParams.get("taskNameLikeIgnoreCase"));
+        }
 
         if (allRequestParams.get("taskDescription") != null) {
             queryRequest.setTaskDescription(allRequestParams.get("taskDescription"));
@@ -178,6 +186,18 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.containsKey("taskCategory")) {
             queryRequest.setTaskCategory(allRequestParams.get("taskCategory"));
+        }
+
+        if (allRequestParams.containsKey("taskCategoryIn")) {
+            queryRequest.setTaskCategoryIn(Arrays.asList(allRequestParams.get("taskCategoryIn").split(",")));
+        }
+
+        if (allRequestParams.containsKey("taskCategoryNotIn")) {
+            queryRequest.setTaskCategoryNotIn(Arrays.asList(allRequestParams.get("taskCategoryNotIn").split(",")));
+        }
+
+        if (allRequestParams.containsKey("taskWithoutCategory") && Boolean.parseBoolean(allRequestParams.get("taskWithoutCategory"))) {
+            queryRequest.setTaskWithoutCategory(Boolean.TRUE);
         }
 
         if (allRequestParams.get("taskDeleteReason") != null) {

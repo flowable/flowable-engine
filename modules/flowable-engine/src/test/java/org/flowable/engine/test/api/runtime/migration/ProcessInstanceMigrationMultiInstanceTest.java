@@ -971,7 +971,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions)
                 .extracting(Execution::getActivityId)
-                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
         assertThat(executions)
                 .extracting("processDefinitionId")
                 .containsOnly(procParallelMultiInst.getId());
@@ -1149,7 +1149,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions)
                 .extracting(Execution::getActivityId)
-                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
         assertThat(executions)
                 .extracting("processDefinitionId")
                 .containsOnly(procParallelMultiInst.getId());

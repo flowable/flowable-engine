@@ -14,6 +14,8 @@ package org.flowable.cmmn.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -532,7 +534,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testQueryByUnavailableState() {
-        Date startTime = new Date();
+        Date startTime = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         setClockTo(startTime);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableCondition").start();

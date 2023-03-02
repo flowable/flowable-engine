@@ -16,6 +16,7 @@ import java.sql.Driver;
 
 import javax.sql.DataSource;
 
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -95,7 +96,7 @@ public class BpmnWithEventRegistryTestConfiguration {
 
         channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
 
-        engineConfiguration.setEnableEventRegistryChangeDetection(true);
+        engineConfiguration.setEnableEventRegistryChangeDetection(false);
 
         return engineConfiguration;
     }
@@ -120,5 +121,10 @@ public class BpmnWithEventRegistryTestConfiguration {
     @Bean
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
+    }
+    
+    @Bean
+    public ManagementService managementService(ProcessEngine processEngine) {
+        return processEngine.getManagementService();
     }
 }

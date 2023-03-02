@@ -33,7 +33,7 @@ import java.util.Map;
  * </ul>
  * The collection of context objects is necessary because each ELResolver may need access to a
  * different context object. For example, JSP and Faces resolvers need access to a
- * javax.servlet.jsp.JspContext and a javax.faces.context.FacesContext, respectively. Creation of
+ * jakarta.servlet.jsp.JspContext and a javax.faces.context.FacesContext, respectively. Creation of
  * ELContext objects is controlled through the underlying technology. For example, in JSP the
  * JspContext.getELContext() factory method is used. Some technologies provide the ability to add an
  * {@link ELContextListener} so that applications and frameworks can ensure their own context

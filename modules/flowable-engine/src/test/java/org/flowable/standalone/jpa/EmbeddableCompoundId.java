@@ -15,7 +15,7 @@ package org.flowable.standalone.jpa;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 /**
  * @author Frederik Heremans

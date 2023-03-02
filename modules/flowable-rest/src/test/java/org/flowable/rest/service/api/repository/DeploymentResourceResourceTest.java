@@ -53,7 +53,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
 
             // Build up the URL manually to make sure resource-id gets encoded
             // correctly as one piece
-            HttpGet httpGet = new HttpGet(buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), encode(rawResourceName)));
+            HttpGet httpGet = new HttpGet(buildUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), rawResourceName));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());

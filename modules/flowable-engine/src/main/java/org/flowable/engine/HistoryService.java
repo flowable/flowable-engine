@@ -14,6 +14,7 @@
 
 package org.flowable.engine;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -96,6 +97,11 @@ public interface HistoryService {
      */
     void deleteHistoricProcessInstance(String processInstanceId);
     
+    /**
+     * Performs a bulk delete with the provided process instance ids. All historic activities, historic tasks and historic details (variable updates, form properties) are deleted as well.
+     */
+    void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds);
+
     /**
      * Deletes historic task and activity data for removed process instances
      */

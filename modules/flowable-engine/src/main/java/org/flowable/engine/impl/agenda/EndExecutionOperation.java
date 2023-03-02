@@ -198,8 +198,8 @@ public class EndExecutionOperation extends AbstractOperation {
         LOGGER.debug("Parent execution found. Continuing process using execution {}", parentExecution.getId());
 
         // When ending an execution in a multi instance subprocess , special care is needed
-        if (isEndEventInMultiInstanceSubprocess(execution)) {
-            handleMultiInstanceSubProcess(executionEntityManager, parentExecution, execution);
+        if (isEndEventOrImpliedEndEventInMultiInstanceSubprocess(execution)) {
+            handleMultiInstanceSubProcess(processEngineConfiguration, executionEntityManager, parentExecution, execution);
             return;
         }
 
@@ -389,7 +389,7 @@ public class EndExecutionOperation extends AbstractOperation {
         return executionToContinue;
     }
 
-    protected void handleMultiInstanceSubProcess(ExecutionEntityManager executionEntityManager,
+    protected void handleMultiInstanceSubProcess(ProcessEngineConfigurationImpl processEngineConfiguration, ExecutionEntityManager executionEntityManager,
             ExecutionEntity parentExecution, ExecutionEntity currentExecution) {
 
         // Special case: will be handled by the ParallelMultiInstanceWithNoWaitStateCompletionJobHandler asynchronously
@@ -415,22 +415,39 @@ public class EndExecutionOperation extends AbstractOperation {
             // Destroy the current scope (subprocess) and leave via the subprocess
 
             ScopeUtil.createCopyOfSubProcessExecutionForCompensation(parentExecution);
-            agenda.planDestroyScopeOperation(parentExecution);
 
             SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
             MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) subProcess.getBehavior();
+            
+            // For a parallel multi instance with async leave, the scope will be destroyed during job execution.
+            // The scope shouldn't be destroyed here, or the variable resolvement (e.g. completed instances) won't be correct anymore.
+            if (!(multiInstanceBehavior instanceof ParallelMultiInstanceBehavior)
+                    || !processEngineConfiguration.isParallelMultiInstanceAsyncLeave()) {
+                agenda.planDestroyScopeOperation(parentExecution);
+            }
+            
             parentExecution.setCurrentFlowElement(subProcess);
             multiInstanceBehavior.leave(parentExecution);
         }
     }
 
-    protected boolean isEndEventInMultiInstanceSubprocess(ExecutionEntity executionEntity) {
-        if (executionEntity.getCurrentFlowElement() instanceof EndEvent) {
-            SubProcess subProcess = ((EndEvent) execution.getCurrentFlowElement()).getSubProcess();
+    protected boolean isEndEventOrImpliedEndEventInMultiInstanceSubprocess(ExecutionEntity executionEntity) {
+        FlowElement currentFlowElement = executionEntity.getCurrentFlowElement();
+        if (currentFlowElement instanceof EndEvent || isFlowNodeWithoutOutgoingSequenceFlow(currentFlowElement)) {
+            SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
             return !executionEntity.getParent().isProcessInstanceType()
                     && subProcess != null
                     && subProcess.getLoopCharacteristics() != null
                     && subProcess.getBehavior() instanceof MultiInstanceActivityBehavior;
+
+        }
+        return false;
+    }
+
+    protected boolean isFlowNodeWithoutOutgoingSequenceFlow(FlowElement flowElement) {
+        if (flowElement instanceof FlowNode) {
+            FlowNode flowNode = (FlowNode) flowElement;
+            return flowNode.getOutgoingFlows() == null || flowNode.getOutgoingFlows().isEmpty();
         }
         return false;
     }

@@ -69,4 +69,6 @@
     
     <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
     
+    <bean id="assignmentBean" class="org.flowable.cmmn.test.delegate.AssignmentBean" />
+    
 </beans>

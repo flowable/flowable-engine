@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.cfg.TransactionState;
@@ -67,6 +68,8 @@ public class ListenerNotificationHelper {
                         }
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
                         executionListener = (ExecutionListener) listener.getInstance();
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+                        executionListener = listenerFactory.createScriptTypeExecutionListener(listener);
                     }
 
                     if (executionListener != null) {
@@ -113,6 +116,10 @@ public class ListenerNotificationHelper {
     public void executeTaskListeners(UserTask userTask, TaskEntity taskEntity, String eventType) {
         for (FlowableListener listener : userTask.getTaskListeners()) {
             String event = listener.getEvent();
+            if (event == null) {
+                throw new FlowableIllegalStateException(
+                        "No event defined for taskListener in UserTask '" + userTask.getName() + "'. Line: " + listener.getXmlRowNumber());
+            }
             if (event.equals(eventType) || event.equals(TaskListener.EVENTNAME_ALL_EVENTS)) {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
@@ -150,6 +157,12 @@ public class ListenerNotificationHelper {
             }
         } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
             taskListener = (TaskListener) listener.getInstance();
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+            taskListener = listenerFactory.createScriptTypeTaskListener(listener);
+        } else {
+            throw new FlowableIllegalStateException(
+                    "No TaskListener implementation found for implementationType=" + listener.getImplementationType() + " implementation="
+                            + listener.getImplementation());
         }
         return taskListener;
     }

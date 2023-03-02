@@ -41,6 +41,8 @@ public abstract class FlowableListenerParser extends BaseChildElementParser {
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION))) {
             listener.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION));
             listener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_TYPE))) {
+            listener.setImplementationType(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_TYPE));
         }
         listener.setEvent(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_EVENT));
         listener.setOnTransaction(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_ON_TRANSACTION));
@@ -56,7 +58,11 @@ public abstract class FlowableListenerParser extends BaseChildElementParser {
             listener.setCustomPropertiesResolverImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
         }
         addListenerToParent(listener, parentElement);
-        parseChildElements(xtr, listener, model, new FieldExtensionParser());
+        if (ATTRIBUTE_LISTENER_TYPE_SCRIPT.equals(listener.getImplementationType())) {
+            parseChildElements(xtr, listener, model, new ScriptInfoParser());
+        } else {
+            parseChildElements(xtr, listener, model, new FieldExtensionParser());
+        }
     }
 
     public abstract void addListenerToParent(FlowableListener listener, BaseElement parentElement);

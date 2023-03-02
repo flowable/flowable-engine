@@ -19,18 +19,22 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.UNAVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
-public class StageReactivationTest  extends FlowableCmmnTestCase {
+public class StageReactivationTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Stage_Reactivation_Test_Case.cmmn.xml")
@@ -213,6 +217,59 @@ public class StageReactivationTest  extends FlowableCmmnTestCase {
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Stage_Reactivation_Repetition.cmmn.xml")
+    public void reactivateStageWithRepetition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("state", "new")
+                .caseDefinitionKey("stageReactivationTestCase")
+                .start();
+        
+        UserEventListenerInstance userEventListener = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListener.getId());
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        HistoricCaseInstance historicCase = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        CaseInstance reactivatedCase = cmmnHistoryService.createCaseReactivationBuilder(historicCase.getId())
+            .reactivate();
+
+        assertThat(reactivatedCase).isNotNull();
+
+        List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCase.getId());
+        assertThat(planItemInstances).isNotNull().hasSize(14);
+        assertPlanItemInstanceState(planItemInstances, "Reactivate", TERMINATED, COMPLETED, UNAVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Stage 1", TERMINATED, COMPLETED, ACTIVE, WAITING_FOR_REPETITION);
+        assertPlanItemInstanceState(planItemInstances, "Stage 2", TERMINATED, COMPLETED, AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "User", COMPLETED);
+        assertPlanItemInstanceState(planItemInstances, "Task 1", COMPLETED, ACTIVE);
+        assertPlanItemInstanceState(planItemInstances, "Task 2", COMPLETED);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 2");
+        
+        cmmnTaskService.complete(task.getId(), Collections.singletonMap("state", "back"));
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 1");
+        
+        cmmnTaskService.complete(task.getId(), Collections.singletonMap("state", "history"));
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 2");
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(reactivatedCase);
     }
 
     protected HistoricCaseInstance createAndFinishSimpleCase(boolean completeTaskC) {

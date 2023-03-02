@@ -39,6 +39,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String id;
+    protected Collection<String> jobIds;
     protected String processInstanceId;
     protected boolean withoutProcessInstanceId;
     protected String executionId;
@@ -91,6 +92,15 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided job id is null");
         }
         this.id = jobId;
+        return this;
+    }
+
+    @Override
+    public JobQuery jobIds(Collection<String> jobIds) {
+        if (jobIds == null) {
+            throw new FlowableIllegalArgumentException("Provided job id list is null");
+        }
+        this.jobIds = jobIds;
         return this;
     }
 
@@ -426,6 +436,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public String getHandlerType() {
         return this.handlerType;
+    }
+
+    public Collection<String> getHandlerTypes() {
+	return this.handlerTypes;
     }
 
     public Date getNow() {

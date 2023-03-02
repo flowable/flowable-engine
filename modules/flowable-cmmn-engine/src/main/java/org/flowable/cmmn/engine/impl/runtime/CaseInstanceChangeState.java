@@ -20,7 +20,9 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -34,8 +36,11 @@ public class CaseInstanceChangeState {
     protected Set<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitions;
     protected Set<MoveToAvailablePlanItemDefinitionMapping> changePlanItemToAvailables;
     protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions;
+    protected Set<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitions;
+    protected Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions;
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
-    protected HashMap<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
+    protected Map<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
+    protected Map<String, PlanItemInstanceEntity> terminatedPlanItemInstances = new HashMap<>();
 
     public CaseInstanceChangeState() {
     }
@@ -164,6 +169,24 @@ public class CaseInstanceChangeState {
         this.terminatePlanItemDefinitions = planItemDefinitionMappings;
         return this;
     }
+    
+    public Set<WaitingForRepetitionPlanItemDefinitionMapping> getWaitingForRepetitionPlanItemDefinitions() {
+        return waitingForRepetitionPlanItemDefinitions;
+    }
+
+    public CaseInstanceChangeState setWaitingForRepetitionPlanItemDefinitions(Set<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitions) {
+        this.waitingForRepetitionPlanItemDefinitions = waitingForRepetitionPlanItemDefinitions;
+        return this;
+    }
+    
+    public Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> getRemoveWaitingForRepetitionPlanItemDefinitions() {
+        return removeWaitingForRepetitionPlanItemDefinitions;
+    }
+
+    public CaseInstanceChangeState setRemoveWaitingForRepetitionPlanItemDefinitions(Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions) {
+        this.removeWaitingForRepetitionPlanItemDefinitions = removeWaitingForRepetitionPlanItemDefinitions;
+        return this;
+    }
 
     public Map<String, Map<String, Object>> getChildInstanceTaskVariables() {
         return childInstanceTaskVariables;
@@ -174,7 +197,7 @@ public class CaseInstanceChangeState {
         return this;
     }
 
-    public HashMap<String, PlanItemInstanceEntity> getCreatedStageInstances() {
+    public Map<String, PlanItemInstanceEntity> getCreatedStageInstances() {
         return createdStageInstances;
     }
 
@@ -185,5 +208,18 @@ public class CaseInstanceChangeState {
     
     public void addCreatedStageInstance(String key, PlanItemInstanceEntity planItemInstance) {
         this.createdStageInstances.put(key, planItemInstance);
+    }
+    
+    public Map<String, PlanItemInstanceEntity> getTerminatedPlanItemInstances() {
+        return terminatedPlanItemInstances;
+    }
+
+    public CaseInstanceChangeState setTerminatedPlanItemInstances(HashMap<String, PlanItemInstanceEntity> terminatedPlanItemInstances) {
+        this.terminatedPlanItemInstances = terminatedPlanItemInstances;
+        return this;
+    }
+    
+    public void addTerminatedPlanItemInstance(String key, PlanItemInstanceEntity planItemInstance) {
+        this.terminatedPlanItemInstances.put(key, planItemInstance);
     }
 }

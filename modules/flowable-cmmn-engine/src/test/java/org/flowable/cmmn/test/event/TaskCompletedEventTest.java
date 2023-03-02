@@ -30,11 +30,11 @@ import org.junit.Test;
  * @author Micha Kiener
  */
 public class TaskCompletedEventTest  extends FlowableCmmnTestCase {
-    protected TaskAssignedEventTest.CustomEventListener taskListener;
+    protected CustomEventListener taskListener;
 
     @Before
     public void setUp() {
-        taskListener = new TaskAssignedEventTest.CustomEventListener();
+        taskListener = new CustomEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_COMPLETED);
     }
 

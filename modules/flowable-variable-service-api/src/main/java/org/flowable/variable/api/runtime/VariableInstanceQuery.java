@@ -89,6 +89,11 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
      */
     VariableInstanceQuery scopeType(String scopeType);
 
+    /**
+     * Only select historic process variables which were not set local.
+     */
+    VariableInstanceQuery excludeLocalVariables();
+
     VariableInstanceQuery orderByProcessInstanceId();
 
     VariableInstanceQuery orderByVariableName();

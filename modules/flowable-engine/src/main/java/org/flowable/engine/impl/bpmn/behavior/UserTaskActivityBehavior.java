@@ -34,9 +34,11 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
@@ -116,7 +118,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
             activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, taskElementProperties);
-            activeTaskOwner = DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
+            activeTaskOwner = getOwnerValue(userTask, migrationContext, taskElementProperties);
             activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
             activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
             activeTaskIdVariableName = DynamicPropertyUtil.getActiveValue(userTask.getTaskIdVariableName(), DynamicBpmnConstants.USER_TASK_TASK_ID_VARIABLE_NAME, taskElementProperties);
@@ -129,7 +131,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskFormKey = userTask.getFormKey();
             activeTaskSkipExpression = userTask.getSkipExpression();
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, null);
-            activeTaskOwner = userTask.getOwner();
+            activeTaskOwner = getOwnerValue(userTask, migrationContext, null);
             activeTaskCandidateUsers = userTask.getCandidateUsers();
             activeTaskCandidateGroups = userTask.getCandidateGroups();
             activeTaskIdVariableName = userTask.getTaskIdVariableName();
@@ -170,7 +172,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 processEngineConfiguration.getCreateUserTaskInterceptor().afterCreateUserTask(afterContext);
             }
 
-            processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
+            try {
+                processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
+            } catch (BpmnError bpmnError) {
+                ErrorPropagation.propagateError(bpmnError, execution);
+                return;
+            }
 
             // All properties set, now firing 'create' events
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getTaskServiceConfiguration().getEventDispatcher();
@@ -498,6 +505,18 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         
         } else {
             return userTask.getAssignee();
+        }
+    }
+
+    protected String getOwnerValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getOwner() != null) {
+            return migrationContext.getOwner();
+
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
+
+        } else {
+            return userTask.getOwner();
         }
     }
 }

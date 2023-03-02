@@ -12,11 +12,17 @@
  */
 package org.flowable.cmmn.engine.impl.listener;
 
+import java.util.Optional;
+
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.FlowableListener;
+import org.flowable.cmmn.model.ScriptInfo;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.task.service.delegate.TaskListener;
 
 /**
@@ -44,7 +50,24 @@ public class DefaultCmmnListenerFactory implements CmmnListenerFactory {
 
     @Override
     public TaskListener createDelegateExpressionTaskListener(FlowableListener listener) {
-        return new DelegateExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()),listener.getFieldExtensions());
+        return new DelegateExpressionTaskListener(expressionManager.createExpression(listener.getImplementation()), listener.getFieldExtensions());
+    }
+
+    @Override
+    public TaskListener createScriptTypeTaskListener(FlowableListener listener) {
+        ScriptInfo scriptInfo = listener.getScriptInfo();
+        if (scriptInfo == null) {
+            throw new FlowableIllegalStateException("Cannot create 'script' task listener. Missing ScriptInfo.");
+        }
+        ScriptTypeTaskListener scriptListener = new ScriptTypeTaskListener(createExpression(listener.getScriptInfo().getLanguage()),
+                createExpression(listener.getScriptInfo().getScript()));
+        Optional.ofNullable(listener.getScriptInfo().getResultVariable())
+                .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
+        return scriptListener;
+    }
+
+    protected Expression createExpression(Object value) {
+        return value instanceof String ? expressionManager.createExpression((String) value) : new FixedValue(value);
     }
 
     @Override
@@ -54,7 +77,8 @@ public class DefaultCmmnListenerFactory implements CmmnListenerFactory {
 
     @Override
     public PlanItemInstanceLifecycleListener createExpressionLifeCycleListener(FlowableListener listener) {
-        return new ExpressionPlanItemLifecycleListener(listener.getSourceState(), listener.getTargetState(), expressionManager.createExpression(listener.getImplementation()));
+        return new ExpressionPlanItemLifecycleListener(listener.getSourceState(), listener.getTargetState(),
+                expressionManager.createExpression(listener.getImplementation()));
     }
 
     @Override

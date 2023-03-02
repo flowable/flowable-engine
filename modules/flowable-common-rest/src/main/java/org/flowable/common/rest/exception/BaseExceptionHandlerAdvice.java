@@ -12,6 +12,8 @@
  */
 package org.flowable.common.rest.exception;
 
+import java.util.UUID;
+
 import org.flowable.common.engine.api.FlowableForbiddenException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -35,6 +37,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BaseExceptionHandlerAdvice {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseExceptionHandlerAdvice.class);
+
+    /**
+     * Flag indicating whether to send the full error exception message for unknown exceptions.
+     * If set to {@code true}, then the {@link Exception#getMessage()} will be set on the {@link ErrorInfo#setException(String)},
+     * otherwise a unique error identifier will be set and a message containing that identifier will be logged.
+     */
+    protected boolean sendFullErrorException = true;
 
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE) // 415
     @ExceptionHandler(FlowableContentNotSupportedException.class)
@@ -82,7 +91,15 @@ public class BaseExceptionHandlerAdvice {
     @ExceptionHandler(HttpMessageConversionException.class)
     @ResponseBody
     public ErrorInfo handleBadMessageConversion(HttpMessageConversionException e) {
-        return new ErrorInfo("Bad request", e);
+        if (sendFullErrorException) {
+            return new ErrorInfo("Bad request", e);
+        } else {
+            String errorIdentifier = UUID.randomUUID().toString();
+            LOGGER.warn("Invalid Message conversion exception. Error ID: {}", errorIdentifier, e);
+            ErrorInfo errorInfo = new ErrorInfo("Bad request", null);
+            errorInfo.setException("Invalid HTTP message. Error ID: " + errorIdentifier);
+            return errorInfo;
+        }
     }
 
     @ResponseStatus(HttpStatus.CONFLICT) // 409
@@ -98,8 +115,24 @@ public class BaseExceptionHandlerAdvice {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ErrorInfo handleOtherException(Exception e) {
-        LOGGER.error("Unhandled exception", e);
-        return new ErrorInfo("Internal server error", e);
+        if (sendFullErrorException) {
+            LOGGER.error("Unhandled exception", e);
+            return new ErrorInfo("Internal server error", e);
+        } else {
+
+            String errorIdentifier = UUID.randomUUID().toString();
+            LOGGER.error("Unhandled exception. Error ID: {}", errorIdentifier, e);
+            ErrorInfo errorInfo = new ErrorInfo("Internal server error", e);
+            errorInfo.setException("Error with ID: " + errorIdentifier);
+            return errorInfo;
+        }
     }
 
+    public boolean isSendFullErrorException() {
+        return sendFullErrorException;
+    }
+
+    public void setSendFullErrorException(boolean sendFullErrorException) {
+        this.sendFullErrorException = sendFullErrorException;
+    }
 }

@@ -15,9 +15,10 @@ package org.flowable.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +27,25 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormService;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -47,6 +56,26 @@ import net.javacrumbs.jsonunit.core.Option;
  * Test for all REST-operations related to a single Historic task instance resource.
  */
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @Before
+    public void initializeMocks() {
+        Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @After
+    public void resetMocks() {
+        processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
 
     /**
      * Test getting a single task, spawned by a process. GET history/historic-task-instances/{taskId}
@@ -214,67 +243,33 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Deployment
     public void testCompletedTaskForm() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
-            try {
-                formRepositoryService.createDeployment().addClasspathResource("org/flowable/rest/service/api/runtime/simple.form").deploy();
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            String taskId = task.getId();
 
-                FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-                assertThat(formDefinition).isNotNull();
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
 
-                ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-                Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-                String taskId = task.getId();
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", processInstance.getDeploymentId(), taskId,
+                    Collections.emptyMap(), task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
-                String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
-                CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                        .isEqualTo("{"
-                                + "id: '" + formDefinition.getId() + "',"
-                                + "name: '" + formDefinition.getName() + "',"
-                                + "key: '" + formDefinition.getKey() + "',"
-                                + "fields: [ {  },"
-                                + "          {  }"
-                                + "        ]"
-                                + "}");
-
-                Map<String, Object> variables = new HashMap<>();
-                variables.put("user", "First value");
-                variables.put("number", 789);
-                taskService.completeTaskWithForm(taskId, formDefinition.getId(), null, variables);
-
-                assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
-
-                response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                        .isEqualTo("{"
-                                + "id: '" + formDefinition.getId() + "',"
-                                + "name: '" + formDefinition.getName() + "',"
-                                + "key: '" + formDefinition.getKey() + "',"
-                                + "fields: [ { "
-                                + "            id: 'user',"
-                                + "            value: 'First value'"
-                                + "          },"
-                                + "          { "
-                                + "            id: 'number',"
-                                + "            value: '789'"
-                                + "          }"
-                                + "        ]"
-                                + "}");
-
-            } finally {
-                formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
-
-                List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-                for (FormDeployment formDeployment : formDeployments) {
-                    formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-                }
-            }
+            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "id: 'formDefId',"
+                            + "name: 'Form Definition Name',"
+                            + "key: 'formDefKey',"
+                            + "type: 'historicTaskForm',"
+                            + "historicTaskId: '" + taskId +"'"
+                            + "}");
         }
     }
 }

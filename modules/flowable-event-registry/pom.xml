@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
-        <version>6.7.3-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -112,6 +112,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <scope>test</scope>
@@ -133,13 +138,13 @@
             com.sun*;resolution:=optional,
             liquibase*;resolution:=optional,
             javax.activation*;resolution:=optional,
-            javax.persistence*;resolution:=optional,
+            jakarta.persistence*;resolution:=optional,
             org.apache.commons.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
-            javax.transaction;resolution:=optional,
-            javax.enterprise.concurrent;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
+            jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
     
@@ -470,8 +475,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.history;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -53,7 +53,6 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource extends Histo
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-
         HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         if (restApiInterceptor != null) {

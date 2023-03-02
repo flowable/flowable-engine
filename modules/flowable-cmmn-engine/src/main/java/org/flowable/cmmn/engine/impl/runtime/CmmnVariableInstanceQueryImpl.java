@@ -88,6 +88,12 @@ public class CmmnVariableInstanceQueryImpl implements VariableInstanceQuery {
     }
 
     @Override
+    public VariableInstanceQuery excludeLocalVariables() {
+        wrappedVariableInstanceQuery.excludeLocalVariables();
+        return this;
+    }
+
+    @Override
     public VariableInstanceQuery excludeVariableInitialization() {
         wrappedVariableInstanceQuery.excludeVariableInitialization();
         return this;

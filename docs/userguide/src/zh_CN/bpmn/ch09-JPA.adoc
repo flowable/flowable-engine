@@ -85,7 +85,7 @@ ProcessEngine processEngine = ProcessEngineConfiguration
 
 * ++jpaPersistenceUnitName++：要使用的持久化单元的名字。（需要确保该持久化单元在classpath中可用。根据规范，默认位置为++/META-INF/persistence.xml++）。++jpaEntityManagerFactory++与++jpaPersistenceUnitName++二选一。
 
-* ++jpaEntityManagerFactory++：用于载入实体及刷入更新的，实现++javax.persistence.EntityManagerFactory++的bean。__jpaEntityManagerFactory__与__jpaPersistenceUnitName__二选一。
+* ++jpaEntityManagerFactory++：用于载入实体及刷入更新的，实现++jakarta.persistence.EntityManagerFactory++的bean。__jpaEntityManagerFactory__与__jpaPersistenceUnitName__二选一。
 
 * ++jpaHandleTransaction++：标示是否需要由引擎负责开启及提交/回滚__EntityManager__上的事务。当使用__Java Transaction API (JTA)__时，需设置为false。
 

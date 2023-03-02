@@ -22,6 +22,7 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Provider;
 import javax.mail.Provider.Type;
 import javax.mail.Session;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.flowable.engine.runtime.ProcessInstance;
@@ -31,7 +32,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mock.jndi.SimpleNamingContextBuilder;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:org/flowable/spring/test/email/jndiEmailConfiguaration-context.xml")
@@ -40,7 +40,7 @@ public class JndiEmailTest extends SpringFlowableTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(JndiEmailTest.class);
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws NoSuchProviderException, NamingException {
         Properties props = new Properties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.provider.class", MockEmailTransport.class.getName());
@@ -50,16 +50,11 @@ public class JndiEmailTest extends SpringFlowableTestCase {
 
         Provider provider = new Provider(Type.TRANSPORT, "smtp", MockEmailTransport.class.getName(), "test", "1.0");
         Session mailSession = Session.getDefaultInstance(props);
-        SimpleNamingContextBuilder builder = null;
-        try {
-            mailSession.setProvider(provider);
-            builder = SimpleNamingContextBuilder.emptyActivatedContextBuilder();
-            builder.bind("java:comp/env/Session", mailSession);
-        } catch (NamingException e) {
-            LOGGER.error("Naming error in email setup", e);
-        } catch (NoSuchProviderException e) {
-            LOGGER.error("provider error in email setup", e);
-        }
+        mailSession.setProvider(provider);
+        InitialContext ctx = new InitialContext();
+        ctx.createSubcontext("java:comp")
+                .createSubcontext("env")
+                .bind("Session", mailSession);
     }
 
     @Test

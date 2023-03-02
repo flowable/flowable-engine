@@ -79,7 +79,12 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         
         // Execution listener
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-            executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            try {
+                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
+            } catch (BpmnError e) {
+                ErrorPropagation.propagateError(e, execution);
+                return;
+            }
         }
         
         // Execute actual behavior

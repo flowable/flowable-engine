@@ -213,6 +213,72 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     @Test
+    public void testUserTaskFormKeyMigrationWithTaskMapping() {
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process-with-form-keys.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("myProcess");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+
+        Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertThat(beforeMigrationTask.getFormKey()).isEqualTo("taskCFormKey");
+        assertThat(beforeMigrationTask.getName()).isEqualTo("C");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process-with-form-keys.bpmn20.xml");
+
+        //Migrate process
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTaskC", "userTaskB"))
+                .migrate(processInstanceToMigrate.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getFormKey)
+                .containsExactly(version2ProcessDef.getId(), "userTaskB", "taskBFormKey");
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+
+    @Test
+    public void testUserTaskCategoryMigrationWithTaskMapping() {
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/three-tasks-simple-process-with-category.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstanceToMigrate = runtimeService.startProcessInstanceByKey("myProcess");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult().getId());
+
+        Task beforeMigrationTask = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertThat(beforeMigrationTask.getName()).isEqualTo("C");
+        assertThat(beforeMigrationTask.getCategory()).isEqualTo("taskCCategory");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process-with-category.bpmn20.xml");
+
+        //Migrate process
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTaskC", "userTaskB"))
+                .migrate(processInstanceToMigrate.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceToMigrate.getId()).singleResult();
+        assertThat(task)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getCategory)
+                .containsExactly(version2ProcessDef.getId(), "userTaskB", "taskBCategory");
+
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstanceToMigrate.getId());
+    }
+
+    @Test
     public void testSimpleMigrationWithTaskJsonMapping() {
         //Deploy first version of the process
         deployProcessDefinition("my deploy", "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
@@ -994,6 +1060,35 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         taskService.complete(tasksAfter.get(0).getId());
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testSimpleUserTaskDirectMigrationChangeOwner() {
+
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        List<Task> tasksBefore = taskService.createTaskQuery().list();
+        assertThat(tasksBefore)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getOwner)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id", null));
+
+        //Migrate process
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "userTask1Id").withNewOwner("kermit"))
+                .migrate(processInstance.getId());
+
+        List<Task> tasksAfter = taskService.createTaskQuery().list();
+        assertThat(tasksAfter)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey, Task::getOwner)
+                .containsExactly(tuple(version2ProcessDef.getId(), "userTask1Id", "kermit"));
+
     }
 
     @Test
@@ -3531,6 +3626,44 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         } finally {
             processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
         }
+    }
+
+    @Test
+    public void testTaskNameExpression() {
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename.bpmn20.xml");
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename-v2.bpmn20.xml");
+        ProcessDefinition version3ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-rename-v3.bpmn20.xml");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVar1", "foo");
+        variables.put("myVar2", "bar");
+
+        // Task name and description contains a variable (myVar1)
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(version1ProcessDef.getId(), variables);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("User Task: foo");
+        assertThat(task.getDescription()).isEqualTo("Description: foo");
+
+        // Task name and description contains a variable (myVar2)
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .migrate(processInstance.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("User Task: bar");
+        assertThat(task.getDescription()).isEqualTo("Description: bar");
+
+        // Task name and description is null
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version3ProcessDef.getId())
+                .migrate(processInstance.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getName()).isNull();
+        assertThat(task.getDescription()).isNull();
     }
 
     @Test

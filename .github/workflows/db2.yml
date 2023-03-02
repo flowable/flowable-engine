@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 10
       - uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 17
       - name: Test
         # use db2 for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
@@ -89,7 +89,7 @@ jobs:
           fetch-depth: 10
       - uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 17
       - name: Test
         # use db2 for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
@@ -105,50 +105,3 @@ jobs:
           -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
           -Dmaven.test.redirectTestOutputToFile=false
           -pl org.flowable:flowable-dmn-engine -am
-  test_db2_content:
-    name: DB2 ${{ matrix.db2 }} Content
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        db2: ["11.5.0.0a"]
-    services:
-      db2:
-        image: ibmcom/db2:${{ matrix.db2 }}
-        env:
-          DB2INST1_PASSWORD: flowable
-          DBNAME: flowable
-          LICENSE: accept
-          ARCHIVE_LOGS: false
-          AUTOCONFIG: false
-        ports:
-          - 50000:50000
-        # needed because the db2 container does not provide a health check
-        options: >-
-          --privileged=true
-          --health-cmd="su - db2inst1 -c \"~/sqllib/bin/db2 connect to flowable && ~/sqllib/bin/db2 connect reset\""
-          --health-interval 30s
-          --health-timeout 40s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Test
-        # use db2 for the host here because we have specified a container for the job.
-        # If we were running the job on the VM this would be localhost
-        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
-        # and new lines from the end would be removed
-        run: >-
-          ./mvnw clean install
-          ${MAVEN_ARGS}
-          -Pcontent,db2
-          -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
-          -Djdbc.username=db2inst1
-          -Djdbc.password=flowable
-          -Djdbc.driver=com.ibm.db2.jcc.DB2Driver
-          -Dmaven.test.redirectTestOutputToFile=false
-          -pl org.flowable:flowable-content-engine -am

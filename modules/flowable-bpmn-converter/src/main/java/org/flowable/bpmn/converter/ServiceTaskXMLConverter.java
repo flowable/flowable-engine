@@ -12,6 +12,7 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,14 @@ import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
 import org.flowable.bpmn.converter.export.MapExceptionExport;
+import org.flowable.bpmn.converter.export.ScriptInfoExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.AbstractFlowableHttpHandler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CustomProperty;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.HttpServiceTask;
@@ -48,6 +51,30 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected Map<String, BaseChildElementParser> caseServiceChildParserMap = new HashMap<>();
     protected Map<String, BaseChildElementParser> sendEventServiceChildParserMap = new HashMap<>();
+    
+    protected static final List<ExtensionAttribute> defaultServiceTaskAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_TYPE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_CLASS),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_IMPLEMENTATION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_OPERATION_REF),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_ACTIVITY_TRIGGERABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC),
+            new ExtensionAttribute(ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION),
+            new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY),
+            new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME),
+            new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_INHERIT_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT),
+            new ExtensionAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT),
+            new ExtensionAttribute(ATTRIBUTE_ID_VARIABLE_NAME));
 
     public ServiceTaskXMLConverter() {
 
@@ -75,6 +102,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         String serviceTaskType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TYPE, xtr);
         
@@ -88,8 +116,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else if (ServiceTask.SEND_EVENT_TASK.equals(serviceTaskType)) {
             serviceTask = new SendEventServiceTask();
             
-        } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType)) {
+        } else if (ServiceTask.EXTERNAL_WORKER_TASK.equals(serviceTaskType) || ServiceTask.EXTERNAL_WORKER_TASK_LEGACY.equals(serviceTaskType)) {
+            serviceTaskType = ServiceTask.EXTERNAL_WORKER_TASK;
             serviceTask = new ExternalWorkerServiceTask();
+            
         } else {
             serviceTask = new ServiceTask();
         }
@@ -112,9 +142,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask.setOperationRef(parseOperationRef(xtr.getAttributeValue(null, ATTRIBUTE_TASK_OPERATION_REF), model));
         }
 
-        serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
+        serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME, xtr));
         if (StringUtils.isEmpty(serviceTask.getResultVariableName())) {
-            serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue("resultVariable", xtr));
+            serviceTask.setResultVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE, xtr));
         }
 
         serviceTask.setUseLocalScopeForResultVariable(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, xtr)));
@@ -126,6 +156,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr))) {
             serviceTask.setSkipExpression(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, xtr));
         }
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, serviceTask, defaultElementAttributes, defaultActivityAttributes, defaultServiceTaskAttributes);
         
         if (serviceTask instanceof CaseServiceTask) {
             convertCaseServiceTaskXMLProperties((CaseServiceTask) serviceTask, model, xtr);
@@ -144,7 +176,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
-
         if (element instanceof CaseServiceTask) {
             writeCaseServiceTaskAdditionalAttributes(element, model, xtw);
 
@@ -153,11 +184,12 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else if (element instanceof ExternalWorkerServiceTask) {
             writeExternalTaskAdditionalAttributes((ExternalWorkerServiceTask) element, model, xtw);
+            
         } else if (element instanceof HttpServiceTask) {
             writeHttpServiceTaskAdditionalAttributes((HttpServiceTask) element, model, xtw);
+            
         } else {
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
-
         }
     }
 
@@ -240,7 +272,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
 
         if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
-            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, serviceTask.getResultVariableName(), xtw);
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME, serviceTask.getResultVariableName(), xtw);
         }
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
             writeQualifiedAttribute(ATTRIBUTE_TYPE, serviceTask.getType(), xtw);
@@ -274,7 +306,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else {
             return writeServiceTaskExtensionChildElements((ServiceTask) element, didWriteExtensionStartElement, xtw);
-
         }
     }
 
@@ -488,6 +519,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_CLASS, httpHandler.getImplementation());
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(httpHandler.getImplementationType())) {
             xtw.writeAttribute(ATTRIBUTE_TASK_SERVICE_DELEGATEEXPRESSION, httpHandler.getImplementation());
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(httpHandler.getImplementationType())) {
+            xtw.writeAttribute(ATTRIBUTE_TYPE, httpHandler.getImplementationType());
+        }
+        if (httpHandler.getScriptInfo() != null) {
+            ScriptInfoExport.writeScriptInfo(xtw, httpHandler.getScriptInfo());
         }
     }
 }

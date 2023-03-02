@@ -44,6 +44,7 @@ public class DataGridField extends BaseElement {
     }
 
     public void setValues(DataGridField otherField) {
+        super.setValues(otherField);
         setName(otherField.getName());
         setValue(otherField.getValue());
     }

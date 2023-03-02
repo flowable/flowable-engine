@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;

@@ -237,8 +237,6 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 ServiceTask serviceTask = (ServiceTask) flowNode;
                 if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawCamelTask(serviceTask.getName(), graphicInfo, scaleFactor);
-                } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
-                    processDiagramCanvas.drawMuleTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawHttpTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
@@ -509,22 +507,25 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 }
                 List<GraphicInfo> graphicInfoList = bpmnModel.getFlowLocationGraphicInfo(artifact.getId());
                 graphicInfoList = connectionPerfectionizer(processDiagramCanvas, bpmnModel, sourceElement, targetElement, graphicInfoList);
-                int[] xPoints = new int[graphicInfoList.size()];
-                int[] yPoints = new int[graphicInfoList.size()];
-                for (int i = 1; i < graphicInfoList.size(); i++) {
-                    GraphicInfo graphicInfo = graphicInfoList.get(i);
-                    GraphicInfo previousGraphicInfo = graphicInfoList.get(i - 1);
 
-                    if (i == 1) {
-                        xPoints[0] = (int) previousGraphicInfo.getX();
-                        yPoints[0] = (int) previousGraphicInfo.getY();
+                if (graphicInfoList != null) {
+                    int[] xPoints = new int[graphicInfoList.size()];
+                    int[] yPoints = new int[graphicInfoList.size()];
+                    for (int i = 1; i < graphicInfoList.size(); i++) {
+                        GraphicInfo graphicInfo = graphicInfoList.get(i);
+                        GraphicInfo previousGraphicInfo = graphicInfoList.get(i - 1);
+
+                        if (i == 1) {
+                            xPoints[0] = (int) previousGraphicInfo.getX();
+                            yPoints[0] = (int) previousGraphicInfo.getY();
+                        }
+                        xPoints[i] = (int) graphicInfo.getX();
+                        yPoints[i] = (int) graphicInfo.getY();
                     }
-                    xPoints[i] = (int) graphicInfo.getX();
-                    yPoints[i] = (int) graphicInfo.getY();
-                }
 
-                AssociationDirection associationDirection = association.getAssociationDirection();
-                processDiagramCanvas.drawAssociation(xPoints, yPoints, associationDirection, false, scaleFactor);
+                    AssociationDirection associationDirection = association.getAssociationDirection();
+                    processDiagramCanvas.drawAssociation(xPoints, yPoints, associationDirection, false, scaleFactor);
+                }
             }
         });
     }

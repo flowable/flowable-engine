@@ -23,7 +23,10 @@ import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@SpringJUnitConfig(classes = CmmnWithEventRegistryJmsConfiguration.class)
+@SpringJUnitConfig(classes = {
+        JmsConfiguration.class,
+        CmmnWithEventRegistryTestConfiguration.class,
+})
 @ExtendWith(FlowableCmmnSpringExtension.class)
 @Documented
 @Inherited

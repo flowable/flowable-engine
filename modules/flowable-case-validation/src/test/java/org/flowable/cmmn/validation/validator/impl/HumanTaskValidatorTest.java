@@ -42,19 +42,32 @@ public class HumanTaskValidatorTest extends AbstractValidatorTest {
         assertThat(validationEntries)
                 .extracting(ValidationEntry::getProblem, ValidationEntry::getDefaultDescription)
                 .containsExactlyInAnyOrder(
+                        tuple(Problems.HUMAN_TASK_LISTENER_MISSING_EVENT, "Element 'event' is mandatory on taskListener"),
+                        tuple(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING, "taskListener of type 'script' expects a <script> child element"),
                         tuple(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING,
-                                "Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener")
+                                "Element 'class', 'expression' or 'delegateExpression' or type=\"script\" is mandatory on taskListener")
                 );
 
-        ValidationEntry entry = validationEntries.get(0);
-        assertThat(entry.getLevel()).isEqualTo(ValidationEntry.Level.Error);
-        assertThat(entry.getValidatorSetName()).isEqualTo(ValidatorSetNames.FLOWABLE_CASE);
-        assertThat(entry.getCaseDefinitionId()).isEqualTo("humanTaskVariableNameCase");
-        assertThat(entry.getCaseDefinitionName()).isEqualTo("Human Task Variable Case");
-        assertThat(entry.getItemId()).isEqualTo("task1");
-        assertThat(entry.getItemName()).isEqualTo("Task 1");
+        ValidationEntry entry1 = validationEntries.get(0);
+        assertThat(entry1.getLevel()).isEqualTo(ValidationEntry.Level.Error);
+        assertThat(entry1.getValidatorSetName()).isEqualTo(ValidatorSetNames.FLOWABLE_CASE);
+        assertThat(entry1.getCaseDefinitionId()).isEqualTo("humanTaskVariableNameCase");
+        assertThat(entry1.getCaseDefinitionName()).isEqualTo("Human Task Variable Case");
+        assertThat(entry1.getItemId()).isEqualTo("task1");
+        assertThat(entry1.getItemName()).isEqualTo("Task 1");
 
-        assertThat(entry.getXmlLineNumber()).isEqualTo(23);
-        assertThat(entry.getXmlColumnNumber()).isEqualTo(54);
+        assertThat(entry1.getXmlLineNumber()).isEqualTo(23);
+        assertThat(entry1.getXmlColumnNumber()).isEqualTo(54);
+
+        ValidationEntry entry2 = validationEntries.get(1);
+        assertThat(entry2.getLevel()).isEqualTo(ValidationEntry.Level.Error);
+        assertThat(entry2.getValidatorSetName()).isEqualTo(ValidatorSetNames.FLOWABLE_CASE);
+        assertThat(entry2.getCaseDefinitionId()).isEqualTo("humanTaskVariableNameCase");
+        assertThat(entry2.getCaseDefinitionName()).isEqualTo("Human Task Variable Case");
+        assertThat(entry2.getItemId()).isEqualTo("task1");
+        assertThat(entry2.getItemName()).isEqualTo("Task 1");
+
+        assertThat(entry2.getXmlLineNumber()).isEqualTo(23);
+        assertThat(entry2.getXmlColumnNumber()).isEqualTo(54);
     }
 }

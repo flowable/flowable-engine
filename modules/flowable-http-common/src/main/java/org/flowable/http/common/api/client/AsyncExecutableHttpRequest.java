@@ -12,6 +12,7 @@
  */
 package org.flowable.http.common.api.client;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -34,6 +35,8 @@ public interface AsyncExecutableHttpRequest extends ExecutableHttpRequest {
             Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
+            } else if (cause instanceof IOException) {
+                throw new FlowableException("IO exception occurred", cause);
             } else {
                 throw new FlowableException("execution exception", cause);
             }

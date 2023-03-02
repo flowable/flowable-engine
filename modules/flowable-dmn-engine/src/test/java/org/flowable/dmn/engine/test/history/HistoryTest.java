@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
+import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
 import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
 import org.flowable.dmn.engine.test.DmnDeployment;
 
@@ -366,6 +367,50 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertThat(executionNode.get("decisionKey").asText()).isEqualTo("expandedDecisionService");
 
         JsonNode decisionServiceResult =  executionNode.get("decisionServiceResult");
+        assertThat(decisionServiceResult.get("decision1").isArray()).isTrue();
+        assertThat(decisionServiceResult.get("decision2").isArray()).isTrue();
+
+        assertThat(decisionServiceResult.get("decision1")).hasSize(3);
+        assertThat(decisionServiceResult.get("decision2")).hasSize(3);
+
+        JsonNode decisionResultArray = executionNode.get("decisionResult");
+        assertThat(decisionResultArray.isArray()).isTrue();
+        assertThat(decisionResultArray).isEmpty();
+
+        JsonNode ruleExecutions = executionNode.get("childDecisionExecutions");
+        assertThat(ruleExecutions.isObject()).isTrue();
+        assertThat(ruleExecutions.has("decision4")).isTrue();
+        assertThat(ruleExecutions.has("decision3")).isTrue();
+        assertThat(ruleExecutions.has("decision1")).isTrue();
+        assertThat(ruleExecutions.has("decision2")).isTrue();
+    }
+
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/history/HistoryTest.testHistoricDecisionService.dmn")
+    public void testHistoricDecisionServiceNativeQuery() throws Exception {
+        ruleService.createExecuteDecisionBuilder()
+                .decisionKey("expandedDecisionService")
+                .variable("input1", "test1")
+                .variable("input2", "test2")
+                .variable("input3", "test3")
+                .variable("input4", "test4")
+                .executeWithAuditTrail();
+
+        List<DmnHistoricDecisionExecution> decisionExecutions = historyService.createNativeHistoricDecisionExecutionQuery()
+                .sql("SELECT * FROM " + managementService.getTableName(HistoricDecisionExecutionEntity.class)).list();
+
+        assertThat(decisionExecutions.size()).isEqualTo(1);
+        DmnHistoricDecisionExecution decisionExecution = decisionExecutions.get(0);
+        assertThat(decisionExecution.getDecisionDefinitionId()).isNotNull();
+        assertThat(decisionExecution.getDeploymentId()).isNotNull();
+        assertThat(decisionExecution.isFailed()).isFalse();
+        assertThat(decisionExecution.getStartTime()).isNotNull();
+        assertThat(decisionExecution.getEndTime()).isNotNull();
+        assertThat(decisionExecution.getExecutionJson()).isNotNull();
+
+        JsonNode executionNode = dmnEngineConfiguration.getObjectMapper().readTree(decisionExecution.getExecutionJson());
+        assertThat(executionNode.get("decisionKey").asText()).isEqualTo("expandedDecisionService");
+
+        JsonNode decisionServiceResult = executionNode.get("decisionServiceResult");
         assertThat(decisionServiceResult.get("decision1").isArray()).isTrue();
         assertThat(decisionServiceResult.get("decision2").isArray()).isTrue();
 

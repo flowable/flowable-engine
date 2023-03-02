@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="Examples">
+
+  <process id="callActivity" name="callActivity">
+	<startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="mainTask" />
+    
+    <userTask id="mainTask" name="Task in main process" />
+    
+    <sequenceFlow id="flow2" sourceRef="mainTask" targetRef="callSubProcess" />
+    
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess">
+      <extensionElements>
+        <flowable:in source="testString" target="localString" />
+        <flowable:in source="testNumber" target="localNumber" />
+        <flowable:in source="testSerializable" target="localSerializable" />
+      </extensionElements>
+    </callActivity>
+      
+    <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

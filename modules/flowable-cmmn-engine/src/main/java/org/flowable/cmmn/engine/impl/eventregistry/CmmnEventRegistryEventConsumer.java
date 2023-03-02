@@ -27,6 +27,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.eventregistry.api.EventConsumerInfo;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
@@ -115,37 +116,111 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
                     CaseDefinition caseDefinition = cmmnEngineConfiguration.getCmmnRepositoryService().getCaseDefinition(eventSubscription.getScopeDefinitionId());
-                    
-                    CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
-                            .caseDefinitionKey(caseDefinition.getKey())
-                            .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
-                            .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
-                    
-                    if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                        caseInstanceQuery.caseInstanceTenantId(eventInstance.getTenantId());
-                    }
-                    
-                    long caseInstanceCount = caseInstanceQuery.count();
 
+                    long caseInstanceCount = countCaseInstances(cmmnRuntimeService, eventInstance, correlationKeyWithAllParameters, caseDefinition);
                     if (caseInstanceCount > 0) {
                         // Returning, no new instance should be started
                         eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
                         return;
-                    }
 
-                    caseInstanceBuilder.referenceId(correlationKeyWithAllParameters.getValue());
-                    caseInstanceBuilder.referenceType(ReferenceTypes.EVENT_CASE);
+                    } else if (cmmnEngineConfiguration.isEventRegistryUniqueCaseInstanceCheckWithLock()) {
+
+                        /*
+                         * When multiple threads/transactions are querying concurrently, it could happen
+                         * that multiple times zero is returned as result of the count.
+                         *
+                         * To make sure only one unique instance is created, a lock is acquired for the reference correlation value,
+                         * which means that the current logic can now act on it when that's successful.
+                         *
+                         * Once the lock is acquired, the query is repeated (similar reasoning as when using synchronized methods).
+                         * If the result is again zero, the case instance can be started.
+                         *
+                         * Transitionally, there are 4 transactions at play here:
+                         * - tx 1 for acquiring a lock
+                         * - tx 2 for doing the case instance count
+                         * - tx 3 for starting the case instance (if tx 1 was successful and tx 2 returned 0)
+                         * - tx 4 for unlocking (if tx 1 was successful)
+                         *
+                         * The counting + case instance starting happens exclusively for a given event correlation value
+                         * and due to using separate transactions for the count and the start, it's guaranteed
+                         * other engine nodes or other threads will always see any other instance started.
+                         */
+
+                        String countLockName = "celock" + correlationKeyWithAllParameters.getValue() + caseDefinition.getKey() ;
+                        LockManager lockManager = cmmnEngineConfiguration.getLockManager(countLockName);
+
+                        boolean lockAcquired = lockManager.acquireLock(cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionLockTime());
+
+                        if (lockAcquired) {
+
+                            try {
+
+                                caseInstanceCount = countCaseInstances(cmmnRuntimeService, eventInstance, correlationKeyWithAllParameters, caseDefinition);
+                                if (caseInstanceCount > 0) {
+                                    // Returning, no new instance should be started
+                                    eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
+                                    LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
+                                    return;
+                                }
+
+                                startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
+                                return;
+
+                            } finally {
+                                lockManager.releaseAndDeleteLock();
+
+                            }
+
+                        } else {
+                            LOGGER.info(
+                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.",
+                                    countLockName);
+                            return;
+
+                        }
+
+                    } else {
+                        startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
+                        return;
+                    }
 
                 }
             }
 
-            if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
-                caseInstanceBuilder.startAsync();
-            } else {
-                caseInstanceBuilder.start();
-            }
+            startCaseInstance(caseInstanceBuilder, null, null);
 
+        }
+    }
+
+    protected long countCaseInstances(CmmnRuntimeService cmmnRuntimeService, EventInstance eventInstance,
+            CorrelationKey correlationKey, CaseDefinition caseDefinition) {
+
+        CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey(caseDefinition.getKey())
+                .caseInstanceReferenceId(correlationKey.getValue())
+                .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
+
+        if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+            caseInstanceQuery.caseInstanceTenantId(eventInstance.getTenantId());
+        }
+
+        return caseInstanceQuery.count();
+    }
+
+    protected void startCaseInstance(CaseInstanceBuilder caseInstanceBuilder, String referenceId, String referenceType) {
+
+        if (referenceId != null) {
+            caseInstanceBuilder.referenceId(referenceId);
+        }
+        if (referenceType != null) {
+            caseInstanceBuilder.referenceType(referenceType);
+        }
+
+        if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
+            caseInstanceBuilder.startAsync();
+        } else {
+            caseInstanceBuilder.start();
         }
     }
 

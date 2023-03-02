@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -86,6 +87,15 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
+        }
+        if (queryRequest.getCaseInstanceName() != null) {
+            query.caseInstanceName(queryRequest.getCaseInstanceName());
+        }
+        if (queryRequest.getCaseInstanceNameLike() != null) {
+            query.caseInstanceNameLike(queryRequest.getCaseInstanceNameLike());
+        }
+        if (queryRequest.getCaseInstanceNameLikeIgnoreCase() != null) {
+            query.caseInstanceNameLikeIgnoreCase(queryRequest.getCaseInstanceNameLikeIgnoreCase());
         }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
@@ -195,6 +205,19 @@ public class BaseCaseInstanceResource {
     }
 
     /**
+     * Returns the {@link CaseInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected CaseInstance getCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
+        }
+
+        return caseInstance;
+    }
+
+    /**
      * Returns the {@link CaseInstance} that is requested and calls the access interceptor.
      * Throws the right exceptions when bad request was made or instance was not found.
      */
@@ -208,18 +231,25 @@ public class BaseCaseInstanceResource {
         return caseInstance;
     }
 
-    /**
-     * Returns the {@link CaseInstance} that is requested without calling the access interceptor
-     * Throws the right exceptions when bad request was made or instance was not found.
-     */
-    protected CaseInstance getCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
+    protected PlanItemInstance getPlanItemInstanceFromRequestWithoutAccessCheck(String planItemInstanceId) {
+        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).singleResult();
+        if (planItemInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a plan item instance with id '" + planItemInstanceId + "'.");
+        }
+        return planItemInstance;
+    }
+
+    protected PlanItemInstance getPlanItemInstanceFromRequestWithAccessCheck(String planItemInstanceId) {
+        PlanItemInstance planItemInstance = getPlanItemInstanceFromRequestWithoutAccessCheck(planItemInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessPlanItemInstanceInfoById(planItemInstance);
         }
 
-        return caseInstance;
+        return planItemInstance;
     }
+
+
 
     protected void addVariables(CaseInstanceQuery caseInstanceQuery, List<QueryVariable> variables) {
         for (QueryVariable variable : variables) {

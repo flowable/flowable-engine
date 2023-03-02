@@ -13,10 +13,9 @@
 package org.flowable.eventregistry.impl.payload;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.flowable.eventregistry.api.FlowableEventInfo;
+import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
@@ -30,29 +29,23 @@ import org.w3c.dom.NodeList;
 /**
  * @author Joram Barrez
  */
-public class XmlElementsToMapPayloadExtractor extends BaseMapPayloadExtractor<Document> {
+public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtractor<Document> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<Document> event) {
-        Map<String, Object> filteredHeaders = convertHeaderValues(event, eventModel);
-        Collection<EventPayloadInstance> headerInstances = eventModel.getHeaders().stream()
-                .filter(headerDefinition -> filteredHeaders.containsKey(headerDefinition.getName()))
-                .map(headerDefinition -> new EventPayloadInstanceImpl(headerDefinition, filteredHeaders.get(headerDefinition.getName())))
-                .collect(Collectors.toList());
-        
-        Collection<EventPayloadInstance> payloadInstances = eventModel.getPayload().stream()
-            .filter(parameterDefinition -> getChildNode(event.getPayload(), parameterDefinition.getName()) != null)
-            .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(event.getPayload(), 
-                    payloadDefinition.getName(), payloadDefinition.getType())))
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Document payload) {
+        return eventModel.getPayload().stream()
+            .filter(parameterDefinition -> parameterDefinition.isFullPayload() || getChildNode(payload, parameterDefinition.getName()) != null)
+            .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(payload,
+                    payloadDefinition.getName(), payloadDefinition.getType(), payloadDefinition.isFullPayload())))
             .collect(Collectors.toList());
-        
-        payloadInstances.addAll(headerInstances);
-        return payloadInstances;
     }
 
-    protected Object getPayloadValue(Document document, String definitionName, String definitionType) {
+    protected Object getPayloadValue(Document document, String definitionName, String definitionType, boolean isFullPayload) {
+        if (isFullPayload) {
+            return document;
+        }
 
         Node childNode = getChildNode(document, definitionName);
         if (childNode != null) {

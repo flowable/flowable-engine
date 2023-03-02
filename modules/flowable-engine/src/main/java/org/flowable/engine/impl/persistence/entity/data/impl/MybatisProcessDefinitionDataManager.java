@@ -168,7 +168,7 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateProcessDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateProcessDefinitionTenantIdForDeploymentId", params);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         HashMap<String, Object> params = new HashMap<>();
         params.put("processDefinitionId", processDefinitionId);
         params.put("version", version);
-        getDbSqlSession().update("updateProcessDefinitionVersionForProcessDefinitionId", params);
+        getDbSqlSession().directUpdate("updateProcessDefinitionVersionForProcessDefinitionId", params);
     }
 
     protected void setSafeInValueLists(ProcessDefinitionQueryImpl processDefinitionQuery) {

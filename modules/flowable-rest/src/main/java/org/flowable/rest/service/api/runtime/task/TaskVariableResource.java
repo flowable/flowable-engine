@@ -13,11 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.Collection;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;

@@ -143,6 +143,19 @@
     <delete id="deleteHistoricCaseInstanceByCaseDefinitionId" parameterType="string">
         delete from ${prefix}ACT_CMMN_HI_CASE_INST where CASE_DEF_ID_ = #{value}
     </delete>
+    
+    <delete id="bulkDeleteHistoricCaseInstancesByIds" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_CMMN_HI_CASE_INST where 
+        <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            ID_ in
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
+    </delete>
 
     <resultMap id="historicCaseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -203,6 +216,19 @@
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
         left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         where RES.ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectHistoricCaseInstanceIdsByParentIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+        select ID_ from ${prefix}ACT_CMMN_HI_CASE_INST where 
+        <foreach item="listItem" index="listIndex" collection="parameter">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            PARENT_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
     </select>
 
     <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
@@ -571,9 +597,6 @@
               #{caseInstanceId}
             </foreach>
         </if>
-        <if test="caseInstanceNameLikeIgnoreCase != null">
-            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase}${wildcardEscapeClause})
-        </if>
         <if test="caseDefinitionId != null">
             and ${queryTablePrefix}CASE_DEF_ID_ = #{caseDefinitionId}
         </if>
@@ -588,6 +611,15 @@
         </if>
         <if test="withoutCaseInstanceParentId">
             and ${queryTablePrefix}PARENT_ID_ is null
+        </if>
+        <if test="caseInstanceName != null">
+            and ${queryTablePrefix}NAME_ = #{caseInstanceName}
+        </if>
+        <if test="caseInstanceNameLike != null">
+            and ${queryTablePrefix}NAME_ like #{caseInstanceNameLike}${wildcardEscapeClause}
+        </if>
+        <if test="caseInstanceNameLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}NAME_) LIKE lower(#{caseInstanceNameLikeIgnoreCase})${wildcardEscapeClause}
         </if>
         <if test="businessKey != null">
             and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey}
@@ -715,6 +747,15 @@
         <if test="orQueryObject.withoutCaseInstanceParentId">
             or ${queryTablePrefix}PARENT_ID_ is null
         </if>
+        <if test="orQueryObject.caseInstanceName != null">
+            or ${queryTablePrefix}NAME_ = #{orQueryObject.caseInstanceName}
+        </if>
+        <if test="orQueryObject.caseInstanceNameLike != null">
+            or ${queryTablePrefix}NAME_ like #{orQueryObject.caseInstanceNameLike}${wildcardEscapeClause}
+        </if>
+        <if test="orQueryObject.caseInstanceNameLikeIgnoreCase != null">
+            or lower(${queryTablePrefix}NAME_) LIKE lower(#{orQueryObject.caseInstanceNameLikeIgnoreCase})${wildcardEscapeClause}
+        </if>
         <if test="orQueryObject.businessKey != null">
             or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey}
         </if>
@@ -746,13 +787,13 @@
             or ${queryTablePrefix}STATE_ = #{orQueryObject.state}
         </if>
         <if test="orQueryObject.lastReactivatedBefore != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}
+            or ${queryTablePrefix}LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
         </if>
         <if test="orQueryObject.lastReactivatedAfter != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_TIME_ &gt;= #{lastReactivatedAfter}
+            or ${queryTablePrefix}LAST_REACTIVATION_TIME_ &gt;= #{lastReactivatedAfter}
         </if>
         <if test="orQueryObject.lastReactivatedBy != null">
-            or ${queryTablePrefix}LAST_REACTIVATED_USER_ID_ = #{lastReactivatedBy}
+            or ${queryTablePrefix}LAST_REACTIVATION_USER_ID_ = #{lastReactivatedBy}
         </if>
         <if test="orQueryObject.callbackId != null">
             or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId}

@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -64,13 +65,23 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
                 .hasMessage("Illegal argument in listener");
     }
 
+    /**
+     * Tests error trace enhancement by {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer} and
+     * {@link org.flowable.engine.impl.bpmn.listener.ScriptTaskListener}
+     */
     @Test
     @Deployment
     public void testThrowNonFlowableException() {
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess"))
+        ProcessDefinition processDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("scriptTaskListenerProcess")
+                .singleResult();
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess").getProcessDefinitionId())
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("problem evaluating script: java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 7")
-                .getRootCause()
+                .hasMessage(
+                        "JavaScript script evaluation failed: 'java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 7' Trace:"
+                                + " scopeType=bpmn, scopeDefinitionKey=scriptTaskListenerProcess, scopeDefinitionId=" + processDef.getId() + ","
+                                + " subScopeDefinitionKey=usertask1, tenantId=<empty>, type=taskListener")
+                .rootCause()
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Illegal argument in listener");
     }

@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -60,6 +62,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultHistoryManager extends AbstractHistoryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
+    
+    public static final int MAX_SUB_PROCESS_INSTANCES = 1000;
 
     public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -155,6 +159,35 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             for (String historicProcessInstanceId : historicProcessInstanceIds) {
                 // The tenantId is not important for the DefaultHistoryManager
                 recordProcessInstanceDeleted(historicProcessInstanceId, processDefinitionId, null);
+            }
+        }
+    }
+    
+    @Override
+    public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
+        if (isHistoryEnabled() && processInstanceIds != null && !processInstanceIds.isEmpty()) {
+            getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+            getHistoricActivityInstanceEntityManager().bulkDeleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
+            TaskHelper.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
+            processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
+            
+            if (processEngineConfiguration.isEnableEntityLinks()) {
+                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.BPMN, processInstanceIds);
+            }
+            
+            getCommentEntityManager().bulkDeleteCommentsForProcessInstanceIds(processInstanceIds);
+    
+            getHistoricProcessInstanceEntityManager().bulkDeleteHistoricProcessInstances(processInstanceIds);
+    
+            // Also delete any sub-processes that may be active (ACT-821)
+    
+            List<String> subProcessInstanceIds = getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsBySuperProcessInstanceIds(processInstanceIds);
+            if (subProcessInstanceIds != null && !subProcessInstanceIds.isEmpty()) {
+                List<List<String>> partitionedSubProcessInstanceIds = CollectionUtil.partition(subProcessInstanceIds, MAX_SUB_PROCESS_INSTANCES);
+                for (List<String> batchSubProcessInstanceIds : partitionedSubProcessInstanceIds) {
+                    processEngineConfiguration.getHistoryManager().recordBulkDeleteProcessInstances(batchSubProcessInstanceIds);
+                }
             }
         }
     }

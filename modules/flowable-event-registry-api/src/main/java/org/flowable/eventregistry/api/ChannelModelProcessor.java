@@ -20,9 +20,11 @@ import org.flowable.eventregistry.model.ChannelModel;
 public interface ChannelModelProcessor {
 
     boolean canProcess(ChannelModel channelModel);
+    
+    boolean canProcessIfChannelModelAlreadyRegistered(ChannelModel channelModel);
 
     void registerChannelModel(ChannelModel channelModel, String tenantId, EventRegistry eventRegistry, 
-            EventRepositoryService eventRepositoryService, ChannelProcessingPipelineManager eventSerializerManager, 
+            EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant);
 
     void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService);

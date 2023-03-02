@@ -27,14 +27,21 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
@@ -130,6 +137,108 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertThatJson(variables.get(0).getValue())
                 .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandler() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptRequestHandlerResult");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(scriptRequestHandlerResult).isEqualTo("http://localhost:1111/bla");
+
+        String requestHeaders = (String) proc.getProcessVariables().get("requestHeaders");
+        assertThat(requestHeaders).containsIgnoringCase("Content-Type: application/json");
+
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptRequestHandlerResult", "httpGetResponseBody", "originalUrl", "requestHeaders");
+        assertThatJson(variables.stream().filter(v -> v.getVariableName().equals("httpGetResponseBody")).findFirst().map(HistoricVariableInstance::getValue)
+                .orElse(null))
+                .isNotNull()
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+
+        assertProcessEnded(proc.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerGroovy() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptRequestHandlerResult");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(scriptRequestHandlerResult).isEqualTo("http://localhost:1111/bla");
+
+        String requestHeaders = (String) proc.getProcessVariables().get("requestHeaders");
+        assertThat(requestHeaders).isEqualTo("Headers: Content-Type: application/json");
+
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptRequestHandlerResult", "httpGetResponseBody", "originalUrl", "requestHeaders");
+        assertThatJson(variables.stream().filter(v -> v.getVariableName().equals("httpGetResponseBody")).findFirst().map(HistoricVariableInstance::getValue)
+                .orElse(null))
+                .isNotNull()
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertProcessEnded(proc.getId());
+    }
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler#handleHttpRequest(VariableContainer, HttpRequest, FlowableHttpClient)}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerThrowsException() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleGetOnly").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'ReferenceError: \"syntaxErrorInScript\" is not defined in <eval> at line number 2'"
+                        + " Trace: scopeType=bpmn, scopeDefinitionKey=simpleGetOnly, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=httpGetWithScriptSyntaxErrorInHandler, tenantId=<empty>, type=httpRequestHandler");
+    }
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler#handleHttpResponse(VariableContainer, HttpResponse)}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testGetWithScriptResponseHandlerThrowsException() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleGetOnly").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'ReferenceError: \"syntaxErrorInScript\" is not defined in <eval> at line number 1'"
+                        + " Trace: scopeType=bpmn, scopeDefinitionKey=simpleGetOnly, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=httpGetWithScriptSyntaxErrorInHandler, tenantId=<empty>, type=httpResponseHandler");
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerThrowsFlowableException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Illegal Argument thrown in script");
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptResponseHandler() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptResponseHandlerResult");
+        assertThat(scriptRequestHandlerResult).contains("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}");
+
+        String responseHeaders = (String) proc.getProcessVariables().get("responseHeaders");
+        assertThat(responseHeaders).containsIgnoringCase("Content-Type: application/json");
+
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
+        assertThatJson(variables.get(1).getValue())
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertProcessEnded(proc.getId());
     }
 
     @Test

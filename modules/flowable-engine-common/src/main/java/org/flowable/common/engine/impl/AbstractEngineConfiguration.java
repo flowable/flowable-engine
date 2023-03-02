@@ -49,8 +49,8 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.ArrayTypeHandler;
 import org.apache.ibatis.type.BigDecimalTypeHandler;
-import org.apache.ibatis.type.BlobByteObjectArrayTypeHandler;
 import org.apache.ibatis.type.BlobInputStreamTypeHandler;
+import org.apache.ibatis.type.BlobTypeHandler;
 import org.apache.ibatis.type.BooleanTypeHandler;
 import org.apache.ibatis.type.ByteTypeHandler;
 import org.apache.ibatis.type.ClobTypeHandler;
@@ -867,6 +867,10 @@ public abstract class AbstractEngineConfiguration {
             } finally {
                 IoUtil.closeSilently(inputStream);
             }
+        } else {
+            // This is needed when the SQL Session Factory is created by another engine.
+            // When custom XML Mappers are registered with this engine they need to be loaded in the configuration as well
+            applyCustomMybatisCustomizations(sqlSessionFactory.getConfiguration());
         }
     }
 
@@ -884,7 +888,6 @@ public abstract class AbstractEngineConfiguration {
 
         configuration.setEnvironment(environment);
 
-        initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
         initCustomMybatisInterceptors(configuration);
         if (isEnableLogSqlExecutionTime()) {
@@ -898,7 +901,9 @@ public abstract class AbstractEngineConfiguration {
     public void initCustomMybatisMappers(Configuration configuration) {
         if (getCustomMybatisMappers() != null) {
             for (Class<?> clazz : getCustomMybatisMappers()) {
-                configuration.addMapper(clazz);
+                if (!configuration.hasMapper(clazz)) {
+                    configuration.addMapper(clazz);
+                }
             }
         }
     }
@@ -940,7 +945,7 @@ public abstract class AbstractEngineConfiguration {
         handlerRegistry.register(Object.class, JdbcType.NUMERIC, new BigDecimalTypeHandler());
 
         handlerRegistry.register(Object.class, JdbcType.BLOB, new BlobInputStreamTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new BlobByteObjectArrayTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.LONGVARBINARY, new BlobTypeHandler());
 
         handlerRegistry.register(Object.class, JdbcType.DATE, new DateOnlyTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.TIME, new TimeOnlyTypeHandler());
@@ -964,6 +969,13 @@ public abstract class AbstractEngineConfiguration {
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
         Configuration configuration = parser.parse();
 
+        applyCustomMybatisCustomizations(configuration);
+        return configuration;
+    }
+
+    protected void applyCustomMybatisCustomizations(Configuration configuration) {
+        initCustomMybatisMappers(configuration);
+
         if (dependentEngineMybatisTypeAliasConfigs != null) {
             for (MybatisTypeAliasConfigurator typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
                 typeAliasConfig.configure(configuration.getTypeAliasRegistry());
@@ -977,7 +989,6 @@ public abstract class AbstractEngineConfiguration {
 
         parseDependentEngineMybatisXMLMappers(configuration);
         parseCustomMybatisXMLMappers(configuration);
-        return configuration;
     }
 
     public void parseCustomMybatisXMLMappers(Configuration configuration) {

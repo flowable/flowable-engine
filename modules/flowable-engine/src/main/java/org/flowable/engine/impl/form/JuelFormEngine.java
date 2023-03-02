@@ -15,6 +15,7 @@ package org.flowable.engine.impl.form;
 import java.nio.charset.StandardCharsets;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.StartFormData;
@@ -41,7 +42,11 @@ public class JuelFormEngine implements FormEngine {
         }
         String formTemplateString = getFormTemplateString(startForm, startForm.getFormKey());
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, null);
+        ScriptEngineRequest scriptEngineRequest = ScriptEngineRequest.builder()
+                .language(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE)
+                .script(formTemplateString)
+                .build();
+        return scriptingEngines.evaluate(scriptEngineRequest).getResult();
     }
 
     @Override

@@ -15,8 +15,8 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -49,7 +49,6 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, HttpServletRequest request) {
-
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskIdentityLinks(task);

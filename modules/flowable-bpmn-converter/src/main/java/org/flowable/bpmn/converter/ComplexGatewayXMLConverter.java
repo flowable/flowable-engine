@@ -38,9 +38,13 @@ public class ComplexGatewayXMLConverter extends BaseBpmnXMLConverter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         ExclusiveGateway gateway = new ExclusiveGateway();
         BpmnXMLUtil.addXMLLocation(gateway, xtr);
+        
+        BpmnXMLUtil.addCustomAttributes(xtr, gateway, defaultElementAttributes, defaultActivityAttributes);
+        
         parseChildElements(getXMLElementName(), gateway, model, xtr);
         return gateway;
     }

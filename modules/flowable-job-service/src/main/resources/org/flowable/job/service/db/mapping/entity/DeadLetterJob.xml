@@ -245,6 +245,12 @@
             <if test="id != null">
                 RES.ID_ = #{id}
             </if>
+            <if test="jobIds != null and !jobIds.empty">
+                AND RES.ID_ IN
+                <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
+                    #{jobId}
+                </foreach>
+            </if>
             <if test="processInstanceId != null">
                 and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
             </if>
@@ -376,7 +382,7 @@
     </update>
     
     <update id="updateDeadLetterJob" parameterType="org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl">
-        update ${prefix}ACT_RU_JOB
+        update ${prefix}ACT_RU_DEADLETTER_JOB
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.retries != retries">

@@ -333,6 +333,15 @@ public interface RuntimeService {
     void deleteProcessInstance(String processInstanceId, String deleteReason);
 
     /**
+     * Delete a collection of existing runtime process instance.
+     *
+     * @param processInstanceIds Set of ids of process instances to delete, cannot be null.
+     * @param deleteReason reason for deleting, can be null.
+     * @throws FlowableObjectNotFoundException when no process instance is found with the given id.
+     */
+    void bulkDeleteProcessInstances(Collection<String> processInstanceIds, String deleteReason);
+
+    /**
      * Finds the activity ids for all executions that are waiting in activities. This is a list because a single activity can be active multiple times.
      *
      * @param executionId
@@ -439,6 +448,36 @@ public interface RuntimeService {
 
     // Identity Links
     // ///////////////////////////////////////////////////////////////
+
+    /**
+     * Set the new owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new owner
+     * @param userId the id of the user to set as the new owner
+     */
+    void setOwner(String processInstanceId, String userId);
+
+    /**
+     * Removes the owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the owner from
+     */
+    void removeOwner(String processInstanceId);
+
+    /**
+     * Set the new assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new assignee
+     * @param userId the id of the user to set as the new assignee
+     */
+    void setAssignee(String processInstanceId, String userId);
+
+    /**
+     * Removes the assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the assignee from
+     */
+    void removeAssignee(String processInstanceId);
 
     /**
      * Involves a user with a process instance. The type of identity link is defined by the given identityLinkType.

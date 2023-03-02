@@ -117,6 +117,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskNameLike() != null) {
             query.taskNameLike(queryRequest.getTaskNameLike());
         }
+        if (queryRequest.getTaskNameLikeIgnoreCase() != null) {
+            query.taskNameLikeIgnoreCase(queryRequest.getTaskNameLikeIgnoreCase());
+        }
         if (queryRequest.getTaskDescription() != null) {
             query.taskDescription(queryRequest.getTaskDescription());
         }
@@ -134,6 +137,15 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getTaskCategory() != null) {
             query.taskCategory(queryRequest.getTaskCategory());
+        }
+        if (queryRequest.getTaskCategoryIn() != null && !queryRequest.getTaskCategoryIn().isEmpty()) {
+            query.taskCategoryIn(queryRequest.getTaskCategoryIn());
+        }
+        if (queryRequest.getTaskCategoryNotIn() != null && !queryRequest.getTaskCategoryNotIn().isEmpty()) {
+            query.taskCategoryNotIn(queryRequest.getTaskCategoryNotIn());
+        }
+        if (Boolean.TRUE.equals(queryRequest.getTaskWithoutCategory())) {
+            query.taskWithoutCategory();
         }
         if (queryRequest.getTaskDeleteReason() != null) {
             query.taskDeleteReason(queryRequest.getTaskDeleteReason());
@@ -286,7 +298,7 @@ public class HistoricTaskInstanceBaseResource {
         return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
             restResponseFactory::createHistoricTaskInstanceResponseList);
     }
-
+    
     /**
      * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
      * Throws the right exceptions when bad request was made or instance was not found.
@@ -310,7 +322,7 @@ public class HistoricTaskInstanceBaseResource {
         if (taskInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
         }
-
+        
         return taskInstance;
     }
 
