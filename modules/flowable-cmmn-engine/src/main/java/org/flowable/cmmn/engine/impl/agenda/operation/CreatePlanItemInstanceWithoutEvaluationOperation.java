@@ -16,6 +16,7 @@ import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupAggreg
 
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -37,6 +38,9 @@ public class CreatePlanItemInstanceWithoutEvaluationOperation extends AbstractPl
 
     @Override
     public void run() {
+        planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
+                commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
         if (repetitionRule != null) {
             //Increase repetition counter, value is kept from the previous instance of the repetition
