@@ -54,14 +54,9 @@ public class UserEventListenerActivityBehaviour extends CoreCmmnTriggerableActiv
             RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
             if (repetitionRule != null && ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity())) {
                 PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-                eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
                 CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
                 agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
                 agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
-                
-                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
-                        commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
-                
                 
             } else {
                 CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);

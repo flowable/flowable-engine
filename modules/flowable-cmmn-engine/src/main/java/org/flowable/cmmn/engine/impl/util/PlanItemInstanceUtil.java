@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -148,12 +147,6 @@ public class PlanItemInstanceUtil {
     public static PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity, CommandContext commandContext) {
         PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
 
-        String oldState = childPlanItemInstanceEntity.getState();
-        String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-        childPlanItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, childPlanItemInstanceEntity, oldState, newState);
-
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
         return childPlanItemInstanceEntity;
@@ -192,12 +185,6 @@ public class PlanItemInstanceUtil {
 
         // The repetition counter is 1 based
         childPlanItemInstanceEntity.setVariableLocal(PlanItemInstanceUtil.getCounterVariable(childPlanItemInstanceEntity), index + 1);
-
-        String oldState = childPlanItemInstanceEntity.getState();
-        String newState = PlanItemInstanceState.ACTIVE;
-        childPlanItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(childPlanItemInstanceEntity, entryCriterionId);

@@ -16,6 +16,7 @@
           <flowable:planItemLifecycleListener targetState="available" expression="${planItemInstance.setVariable('available', true)}"></flowable:planItemLifecycleListener>
           <flowable:planItemLifecycleListener sourceState="available" targetState="completed" expression="${planItemInstance.setVariable('completed', true)}"></flowable:planItemLifecycleListener>
           <flowable:planItemLifecycleListener sourceState="available" targetState="terminated" expression="${planItemInstance.setVariable('terminate', true)}"></flowable:planItemLifecycleListener>
+          <flowable:planItemLifecycleListener class="org.flowable.cmmn.test.listener.PlanItemLifecycleListenerTest$StateCapturingStaticPlanItemInstanceLifecycleListener"></flowable:planItemLifecycleListener>
         </extensionElements>
       </userEventListener>
       <humanTask id="sid-71EE4774-9D41-4674-BD03-361603698EB3" name="the task"></humanTask>
