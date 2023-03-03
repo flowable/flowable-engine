@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
