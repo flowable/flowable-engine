@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;

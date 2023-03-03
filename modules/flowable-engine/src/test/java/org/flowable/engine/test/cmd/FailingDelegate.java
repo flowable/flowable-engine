@@ -14,7 +14,6 @@ package org.flowable.engine.test.cmd;
 
 import java.util.function.Supplier;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
