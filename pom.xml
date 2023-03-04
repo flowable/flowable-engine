@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.0.3</spring.boot.version>
-		<spring.framework.version>6.0.5</spring.framework.version>
+		<spring.boot.version>3.0.4</spring.boot.version>
+		<spring.framework.version>6.0.6</spring.framework.version>
 		<spring.security.version>6.0.2</spring.security.version>
 		<spring.amqp.version>3.0.2</spring.amqp.version>
-		<spring.kafka.version>3.0.3</spring.kafka.version>
+		<spring.kafka.version>3.0.4</spring.kafka.version>
 		<reactor-netty.version>1.1.1</reactor-netty.version>
 		<jackson.version>2.14.2</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
