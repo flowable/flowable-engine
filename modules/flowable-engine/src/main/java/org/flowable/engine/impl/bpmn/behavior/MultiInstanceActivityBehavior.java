@@ -168,6 +168,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
+        DelegateExecution rootExecution = null;
+        try {
+            rootExecution = getMultiInstanceRootExecution(execution);
+            CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
+                    .executeExecutionListeners(activity, rootExecution, ExecutionListener.EVENTNAME_END);
+        } catch (BpmnError error) {
+            ErrorPropagation.propagateError(error, rootExecution);
+            return;
+        }
         cleanupMiRoot(execution);
     }
 

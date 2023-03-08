@@ -162,7 +162,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         // hence the check for NOT being a process instance
         boolean continueNormally = true;
         if (!execution.isProcessInstanceType()) {
-            if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
+            if (shouldExecuteEndListeners(flowNode)) {
                 try {
                     executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
                 } catch (BpmnError bpmnError) {
@@ -435,6 +435,19 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 }
             }
         }
+        return true;
+    }
+
+    protected boolean shouldExecuteEndListeners(FlowNode flowNode) {
+        if (CollectionUtil.isEmpty(flowNode.getExecutionListeners())) {
+            return false;
+        }
+        if (flowNode instanceof Activity) {
+            // Execution end listeners should not be executed if the activity has multi instance loop characteristics
+            // That is handled in the MultiInstanceActivityBehaviour
+            return !((Activity) flowNode).hasMultiInstanceLoopCharacteristics();
+        }
+
         return true;
     }
 
