@@ -19,7 +19,9 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.delegate.InterruptibleActivityBehaviour;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -96,6 +98,9 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         // set new parent for boundary event execution
         executionEntity.setParent(parentScopeExecution);
 
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                executionEntity.getCurrentFlowElement(), executionEntity, ExecutionListener.EVENTNAME_START);
+
         // TakeOutgoingSequenceFlow will not set history correct when no outgoing sequence flow for boundary event
         // (This is a theoretical case ... shouldn't use a boundary event without outgoing sequence flow ...)
         if (executionEntity.getCurrentFlowElement() instanceof FlowNode
@@ -143,6 +148,9 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         
         // create new start activity instance for the non interrupting boundary event
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(executionEntity);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                nonInterruptingExecution.getCurrentFlowElement(), nonInterruptingExecution, ExecutionListener.EVENTNAME_START);
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
     }

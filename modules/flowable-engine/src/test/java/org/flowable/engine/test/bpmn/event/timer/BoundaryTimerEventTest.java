@@ -188,7 +188,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedStartEvent).isTrue();
         assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
@@ -222,7 +222,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedStartEvent).isTrue();
         assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
