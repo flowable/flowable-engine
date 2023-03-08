@@ -198,6 +198,10 @@ public class ContinueProcessOperation extends AbstractOperation {
 
     protected void executeMultiInstanceSynchronous(FlowNode flowNode) {
 
+        if (!hasMultiInstanceRootExecution(execution, flowNode)) {
+            execution = createMultiInstanceRootExecution(execution);
+        }
+
         // Execution listener: event 'start'
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
@@ -206,10 +210,6 @@ public class ContinueProcessOperation extends AbstractOperation {
                 ErrorPropagation.propagateError(bpmnError, execution);
                return;
             }
-        }
-        
-        if (!hasMultiInstanceRootExecution(execution, flowNode)) {
-            execution = createMultiInstanceRootExecution(execution);
         }
 
         // Execute the multi instance behavior

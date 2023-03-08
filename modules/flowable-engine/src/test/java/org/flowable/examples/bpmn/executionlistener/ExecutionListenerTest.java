@@ -113,6 +113,108 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersMultiInstanceSequentialProcess.bpmn20.xml" })
+    public void testExecutionListenersOnSequentialMultiInstance() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .transientVariable("numberOfIterations", 2)
+                .start();
+        assertProcessEnded(processInstance.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId,  RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("theTask", "Start Multi Instance Root", "start"),
+                        tuple("theTask", "Start 0", "start"),
+                        tuple("theTask", "End 0", "end"),
+                        tuple("theTask", "Start 1", "start"),
+                        tuple("theTask", "End 1", "end"),
+                        tuple("theTask", "End Multi Instance Root", "end")
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersMultiInstanceSequentialProcessAsync.bpmn20.xml" })
+    public void testExecutionListenersOnSequentialMultiInstanceAsync() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .variable("numberOfIterations", 2)
+                .start();
+        for (int i = 0; i < 2; i++) {
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            managementService.executeJob(job.getId());
+        }
+        assertProcessEnded(processInstance.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId,  RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("theTask", "Start Multi Instance Root", "start"),
+                        tuple("theTask", "Start 0", "start"),
+                        tuple("theTask", "End 0", "end"),
+                        tuple("theTask", "Start 1", "start"),
+                        tuple("theTask", "End 1", "end"),
+                        tuple("theTask", "End Multi Instance Root", "end")
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersMultiInstanceParallelProcess.bpmn20.xml" })
+    public void testExecutionListenersOnParallelMultiInstance() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .transientVariable("numberOfIterations", 2)
+                .start();
+        assertProcessEnded(processInstance.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId,  RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("theTask", "Start Multi Instance Root", "start"),
+                        tuple("theTask", "Start 0", "start"),
+                        tuple("theTask", "End 0", "end"),
+                        tuple("theTask", "Start 1", "start"),
+                        tuple("theTask", "End 1", "end"),
+                        tuple("theTask", "End Multi Instance Root", "end")
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersMultiInstanceParallelProcessAsync.bpmn20.xml" })
+    public void testExecutionListenersOnParallelMultiInstanceAsync() {
+        RecorderExecutionListener.clear();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .variable("numberOfIterations", 2)
+                .start();
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        jobs.forEach(job -> managementService.executeJob(job.getId()));
+        assertProcessEnded(processInstance.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId,  RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("theTask", "Start Multi Instance Root", "start"),
+                        tuple("theTask", "Start 0", "start"),
+                        tuple("theTask", "End 0", "end"),
+                        tuple("theTask", "Start 1", "start"),
+                        tuple("theTask", "End 1", "end"),
+                        tuple("theTask", "End Multi Instance Root", "end")
+                );
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml" })
     public void testExecutionListenerFieldInjection() {
         Map<String, Object> variables = new HashMap<>();
@@ -714,12 +816,4 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         }
     }
 
-
-
-    // TODO continue adding more test cases
-    /*
-     * Add sequenceFlow executionListener tests?
-     * Add asynchronous multi instance tests
-     * Add test scenario with nested sub-processes
-     */
 }

@@ -1855,6 +1855,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
         assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+
+        assertThat(TestStartExecutionListener.countWithMultiInstanceRoot.get()).isEqualTo(1);
+        assertThat(TestEndExecutionListener.countWithMultiInstanceRoot.get()).isEqualTo(1);
     }
     
     @Deployment(resources = {
@@ -1913,6 +1916,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
         assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+
+        assertThat(TestStartExecutionListener.countWithMultiInstanceRoot.get()).isEqualTo(1);
+        assertThat(TestEndExecutionListener.countWithMultiInstanceRoot.get()).isEqualTo(1);
     }
 
     @Test
@@ -2333,8 +2339,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     protected void resetTestCounts() {
+        TestStartExecutionListener.countWithMultiInstanceRoot.set(0);
         TestStartExecutionListener.countWithLoopCounter.set(0);
         TestStartExecutionListener.countWithoutLoopCounter.set(0);
+        TestEndExecutionListener.countWithMultiInstanceRoot.set(0);
         TestEndExecutionListener.countWithLoopCounter.set(0);
         TestEndExecutionListener.countWithoutLoopCounter.set(0);
         TestTaskCompletionListener.count.set(0);
@@ -2342,12 +2350,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
     public static class TestStartExecutionListener implements ExecutionListener {
 
+        public static AtomicInteger countWithMultiInstanceRoot = new AtomicInteger(0);
         public static AtomicInteger countWithLoopCounter = new AtomicInteger(0);
         public static AtomicInteger countWithoutLoopCounter = new AtomicInteger(0);
 
         @Override
         public void notify(DelegateExecution execution) {
             Integer loopCounter = (Integer) execution.getVariable("loopCounter");
+            if (execution.isMultiInstanceRoot()) {
+                countWithMultiInstanceRoot.incrementAndGet();
+            }
             if (loopCounter != null) {
                 countWithLoopCounter.incrementAndGet();
             } else {
@@ -2359,12 +2371,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
     public static class TestEndExecutionListener implements ExecutionListener {
 
+        public static AtomicInteger countWithMultiInstanceRoot = new AtomicInteger(0);
         public static AtomicInteger countWithLoopCounter = new AtomicInteger(0);
         public static AtomicInteger countWithoutLoopCounter = new AtomicInteger(0);
 
         @Override
         public void notify(DelegateExecution execution) {
             Integer loopCounter = (Integer) execution.getVariable("loopCounter");
+            if (execution.isMultiInstanceRoot()) {
+                countWithMultiInstanceRoot.incrementAndGet();
+            }
             if (loopCounter != null) {
                 countWithLoopCounter.incrementAndGet();
             } else {
