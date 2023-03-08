@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.el.FixedValue;
@@ -31,7 +32,7 @@ public class RecorderExecutionListener implements ExecutionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private FixedValue parameter;
+    private Expression parameter;
 
     private static List<RecorderExecutionListener.RecordedEvent> recordedEvents = new ArrayList<>();
 
