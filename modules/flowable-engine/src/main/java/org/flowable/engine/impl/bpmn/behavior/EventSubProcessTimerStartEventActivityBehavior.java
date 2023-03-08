@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -92,6 +93,9 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                startEvent, outgoingFlowExecution, ExecutionListener.EVENTNAME_START);
 
         leave(outgoingFlowExecution);
     }

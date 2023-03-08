@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
@@ -117,6 +118,9 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
         processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                startEvent, outgoingFlowExecution, ExecutionListener.EVENTNAME_START);
 
         leave(outgoingFlowExecution);
     }
