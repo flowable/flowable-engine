@@ -33,6 +33,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.flowable.job.api.Job;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
+ * @author Filip Hrisafov
  */
 public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
@@ -814,6 +816,118 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
                         .containsEntry("element_3", "executed")
                         .hasSize(12);
         }
+    }
+
+    @Test
+    @Deployment
+    public void testExecutionListenersOnTimerBoundary() {
+        RecorderExecutionListener.clear();
+
+        runtimeService.startProcessInstanceByKey("executionListenersProcess");
+
+        Job timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob).isNotNull();
+        Job job = managementService.moveTimerToExecutableJob(timerJob.getId());
+        managementService.executeJob(job.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testExecutionListenersOnTimerBoundaryNonInterrupting() {
+        RecorderExecutionListener.clear();
+
+        runtimeService.startProcessInstanceByKey("executionListenersProcess");
+
+        Job timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob).isNotNull();
+        Job job = managementService.moveTimerToExecutableJob(timerJob.getId());
+        managementService.executeJob(job.getId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
+
+        timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob).isNotNull();
+        job = managementService.moveTimerToExecutableJob(timerJob.getId());
+        managementService.executeJob(job.getId());
+
+        recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end"),
+
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testExecutionListenersOnMessageBoundary() {
+        RecorderExecutionListener.clear();
+
+        runtimeService.startProcessInstanceByKey("executionListenersProcess");
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertThat(eventSubscription).isNotNull();
+        runtimeService.messageEventReceived("testMessage", eventSubscription.getExecutionId());
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testExecutionListenersOnMessageBoundaryNonInterrupting() {
+        RecorderExecutionListener.clear();
+
+        runtimeService.startProcessInstanceByKey("executionListenersProcess");
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertThat(eventSubscription).isNotNull();
+        runtimeService.messageEventReceived("testMessage", eventSubscription.getExecutionId());
+
+        List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
+
+        eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+        assertThat(eventSubscription).isNotNull();
+        runtimeService.messageEventReceived("testMessage", eventSubscription.getExecutionId());
+
+        recordedEvents = RecorderExecutionListener.getRecordedEvents();
+        assertThat(recordedEvents)
+                .extracting(RecordedEvent::getActivityId, RecordedEvent::getParameter, RecordedEvent::getEventName)
+                .containsExactly(
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end"),
+
+                        tuple("boundary", "Start boundary", "start"),
+                        tuple("boundary", "End boundary", "end")
+                );
     }
 
 }
