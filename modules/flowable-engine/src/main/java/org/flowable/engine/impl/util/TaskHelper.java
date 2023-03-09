@@ -199,8 +199,7 @@ public class TaskHelper {
 
     protected static void storeTaskCompleter(TaskEntity taskEntity, ExecutionEntity execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (taskEntity.getProcessDefinitionId() != null) {
-            org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(taskEntity.getProcessDefinitionId());
-            FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
+            FlowElement flowElement = execution.getCurrentFlowElement();
             if (flowElement instanceof UserTask) {
                 UserTask userTask = (UserTask) flowElement;
                 String taskCompleterVariableName = userTask.getTaskCompleterVariableName();
