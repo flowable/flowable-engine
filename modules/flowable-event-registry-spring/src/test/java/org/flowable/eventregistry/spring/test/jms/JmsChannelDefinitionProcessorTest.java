@@ -827,7 +827,7 @@ class JmsChannelDefinitionProcessorTest {
 
         await("receive dead letter message")
                 .atMost(Duration.ofSeconds(10))
-                .until(() -> jmsTemplate.receiveAndConvert("ActiveMQ.DLQ"), Objects::nonNull);
+                .until(() -> jmsTemplate.receiveAndConvert("DLQ.test-customer"), Objects::nonNull);
 
         assertThat(testEventConsumer.getEvents())
                 .extracting(EventRegistryEvent::getType)

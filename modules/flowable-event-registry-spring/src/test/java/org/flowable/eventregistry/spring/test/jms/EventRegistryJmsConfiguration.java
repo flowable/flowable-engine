@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.jms.ConnectionFactory;
 
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.core.client.ServerLocator;
@@ -27,6 +28,7 @@ import org.apache.activemq.artemis.core.remoting.impl.invm.InVMAcceptorFactory;
 import org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory;
 import org.apache.activemq.artemis.core.remoting.impl.invm.TransportConstants;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.flowable.eventregistry.spring.jms.JmsChannelModelProcessor;
 import org.flowable.eventregistry.spring.test.config.EventRegistryEngineTestConfiguration;
@@ -91,6 +93,11 @@ public class EventRegistryJmsConfiguration {
         TransportConfiguration transportConfiguration = new TransportConfiguration(InVMAcceptorFactory.class.getName(), generateTransportParameter());
         configuration.getAcceptorConfigurations().add(transportConfiguration);
         configuration.setClusterPassword("flowable");
+        AddressSettings deadLetterSetting = new AddressSettings();
+        deadLetterSetting.setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ"));
+        deadLetterSetting.setAutoCreateDeadLetterResources(true);
+        deadLetterSetting.setMaxDeliveryAttempts(3);
+        configuration.addAddressSetting("#", deadLetterSetting);
         EmbeddedActiveMQ embeddedActiveMQ = new EmbeddedActiveMQ();
         embeddedActiveMQ.setConfiguration(configuration);
 
