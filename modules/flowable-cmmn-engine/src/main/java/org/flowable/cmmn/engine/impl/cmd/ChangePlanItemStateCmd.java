@@ -38,7 +38,9 @@ public class ChangePlanItemStateCmd implements Command<Void> {
     public Void execute(CommandContext commandContext) {
         if (changePlanItemStateBuilder.getActivatePlanItemDefinitions().size() == 0 &&
                 changePlanItemStateBuilder.getTerminatePlanItemDefinitions().size() == 0 &&
-                changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions().size() == 0) {
+                changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions().size() == 0 &&
+                changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions().size() == 0 &&
+                changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions().size() == 0) {
             
             throw new FlowableIllegalArgumentException("No move plan item instance or (activate) plan item definition ids provided");
 

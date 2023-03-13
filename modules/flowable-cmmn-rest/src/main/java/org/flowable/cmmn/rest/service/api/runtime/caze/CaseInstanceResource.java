@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.StageResponse;
@@ -45,6 +42,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -205,13 +204,25 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
                 .caseInstanceId(caseInstanceId)
                 .changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
                 .changeState();
+            
+        } else if (planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .addWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds())
+                .changeState();
+            
+        } else if (planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .removeWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds())
+                .changeState();
         
         } else if (planItemStateRequest.getTerminatePlanItemDefinitionIds() != null && !planItemStateRequest.getTerminatePlanItemDefinitionIds().isEmpty()) {
             runtimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstanceId)
                 .terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
                 .changeState();
-    }
+        }
         
     }
 

@@ -272,7 +272,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
         
         for (RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getRemoveWaitingForRepetitionPlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.removeWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
         }
 
         return changePlanItemStateBuilder;
