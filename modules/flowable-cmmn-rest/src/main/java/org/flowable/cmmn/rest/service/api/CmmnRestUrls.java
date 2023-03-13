@@ -85,6 +85,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_DECISIONS = "decisions";
     public static final String SEGMENT_FORM_DEFINITIONS = "form-definitions";
     public static final String SEGMENT_STAGE_OVERVIEW = "stage-overview";
+    public static final String SEGMENT_CHANGE_STATE = "change-state";
 
     /**
      * URL template for the deployment collection: <i>cmmn-repository/deployments</i>
@@ -256,6 +257,11 @@ public final class CmmnRestUrls {
      * URL template for a single case instance stage overview: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/stage-overview</i>
      */
     public static final String[] URL_CASE_INSTANCE_STAGE_OVERVIEW = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_STAGE_OVERVIEW};
+    
+    /**
+     * URL template for a single case instance change state: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/change-state</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_CHANGE_STATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_CHANGE_STATE};
 
     /**
      * URL template for a case instance's identity links: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/identitylinks</i>

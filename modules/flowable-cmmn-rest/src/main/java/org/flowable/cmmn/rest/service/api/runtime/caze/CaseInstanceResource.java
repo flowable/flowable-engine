@@ -205,13 +205,25 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
                 .caseInstanceId(caseInstanceId)
                 .changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
                 .changeState();
+            
+        } else if (planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .addWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds())
+                .changeState();
+            
+        } else if (planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .removeWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds())
+                .changeState();
         
         } else if (planItemStateRequest.getTerminatePlanItemDefinitionIds() != null && !planItemStateRequest.getTerminatePlanItemDefinitionIds().isEmpty()) {
             runtimeService.createChangePlanItemStateBuilder()
                 .caseInstanceId(caseInstanceId)
                 .terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
                 .changeState();
-    }
+        }
         
     }
 

@@ -86,12 +86,12 @@ public interface ChangePlanItemStateBuilder {
     /**
      * Remove waiting for repetition from a plan item by definition id.
      */
-    ChangePlanItemStateBuilder addRemoveWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId);
+    ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId);
 
     /**
      * Remove multiple waiting for repetitions from a plan item by definition id.
      */
-    ChangePlanItemStateBuilder addRemoveWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds);
+    ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds);
     
     /**
      * Set the case variable that should be set as part of the change plan item state action.

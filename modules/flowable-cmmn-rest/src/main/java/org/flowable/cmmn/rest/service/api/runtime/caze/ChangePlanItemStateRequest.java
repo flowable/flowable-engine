@@ -25,6 +25,8 @@ public class ChangePlanItemStateRequest {
     protected List<String> activatePlanItemDefinitionIds;
     protected List<String> moveToAvailablePlanItemDefinitionIds;
     protected List<String> terminatePlanItemDefinitionIds;
+    protected List<String> addWaitingForRepetitionPlanItemDefinitionIds;
+    protected List<String> removeWaitingForRepetitionPlanItemDefinitionIds;
 
     public List<String> getActivatePlanItemDefinitionIds() {
         return activatePlanItemDefinitionIds;
@@ -52,4 +54,22 @@ public class ChangePlanItemStateRequest {
     public void setTerminatePlanItemDefinitionIds(List<String> terminatePlanItemDefinitionIds) {
         this.terminatePlanItemDefinitionIds = terminatePlanItemDefinitionIds;
     }
+
+	public List<String> getAddWaitingForRepetitionPlanItemDefinitionIds() {
+		return addWaitingForRepetitionPlanItemDefinitionIds;
+	}
+
+	@ApiModelProperty(value = "add waiting for repetition to provided plan item definition ids")
+	public void setAddWaitingForRepetitionPlanItemDefinitionIds(List<String> addWaitingForRepetitionPlanItemDefinitionIds) {
+		this.addWaitingForRepetitionPlanItemDefinitionIds = addWaitingForRepetitionPlanItemDefinitionIds;
+	}
+
+	public List<String> getRemoveWaitingForRepetitionPlanItemDefinitionIds() {
+		return removeWaitingForRepetitionPlanItemDefinitionIds;
+	}
+
+	@ApiModelProperty(value = "remove waiting for repetition to provided plan item definition ids")
+	public void setRemoveWaitingForRepetitionPlanItemDefinitionIds(List<String> removeWaitingForRepetitionPlanItemDefinitionIds) {
+		this.removeWaitingForRepetitionPlanItemDefinitionIds = removeWaitingForRepetitionPlanItemDefinitionIds;
+	}
 }
