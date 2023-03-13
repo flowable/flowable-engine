@@ -40,6 +40,8 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
             .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
             .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
             .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
+            .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())
+            .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
             .setCaseVariables(changePlanItemStateBuilder.getCaseVariables())
             .setChildInstanceTaskVariables(changePlanItemStateBuilder.getChildInstanceTaskVariables());
         
