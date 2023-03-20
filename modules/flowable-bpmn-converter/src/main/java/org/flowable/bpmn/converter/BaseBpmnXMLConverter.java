@@ -89,6 +89,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         boolean asyncLeave = parsAsyncLeave(xtr);
         boolean triggerable = parseTriggerable(xtr);
         boolean notExclusive = parseNotExclusive(xtr);
+        boolean asyncLeaveNotExclusive = parseAsyncLeaveNotExclusive(xtr);
         String defaultFlow = xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT);
         boolean isForCompensation = parseForCompensation(xtr);
 
@@ -117,6 +118,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 flowNode.setAsynchronous(async);
                 flowNode.setAsynchronousLeave(asyncLeave);
                 flowNode.setNotExclusive(notExclusive);
+                flowNode.setAsynchronousLeaveNotExclusive(asyncLeaveNotExclusive);
                 
                 if (currentFlowElement instanceof Activity) {
 
@@ -171,18 +173,16 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         if (baseElement instanceof FlowNode) {
             final FlowNode flowNode = (FlowNode) baseElement;
 
-            boolean exclusiveAttributeWritten = false;
             if (flowNode.isAsynchronous()) {
                 writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, ATTRIBUTE_VALUE_TRUE, xtw);
                 if (flowNode.isNotExclusive()) {
                     writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw);
-                    exclusiveAttributeWritten = true;
                 }
             }
             if (flowNode.isAsynchronousLeave()) {
                 writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE, ATTRIBUTE_VALUE_TRUE, xtw);
-                if (flowNode.isNotExclusive() && !exclusiveAttributeWritten) {
-                    writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw); // shared with async
+                if (flowNode.isAsynchronousLeaveNotExclusive()) {
+                    writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE_EXCLUSIVE, ATTRIBUTE_VALUE_FALSE, xtw); // shared with async
                 }
             }
 
@@ -328,6 +328,15 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
     protected boolean parseNotExclusive(XMLStreamReader xtr) {
         boolean notExclusive = false;
         String exclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_EXCLUSIVE, xtr);
+        if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(exclusiveString)) {
+            notExclusive = true;
+        }
+        return notExclusive;
+    }
+    
+    protected boolean parseAsyncLeaveNotExclusive(XMLStreamReader xtr) {
+        boolean notExclusive = false;
+        String exclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE_EXCLUSIVE, xtr);
         if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(exclusiveString)) {
             notExclusive = true;
         }

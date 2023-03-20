@@ -6,7 +6,7 @@
 
   <process id="process">
   
-    <startEvent id="theStart" flowable:asyncLeave="true" />
+    <startEvent id="theStart" flowable:asyncLeave="true" flowable:asyncLeaveExclusive="false" />
     <sequenceFlow sourceRef="theStart" targetRef="service1" />
     
     <serviceTask id="service1" flowable:expression="${'Hello World'}" flowable:resultVariableName="myResultVar" />

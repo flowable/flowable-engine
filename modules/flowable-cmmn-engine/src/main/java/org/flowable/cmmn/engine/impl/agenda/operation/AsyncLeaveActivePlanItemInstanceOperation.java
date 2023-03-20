@@ -70,7 +70,7 @@ public class AsyncLeaveActivePlanItemInstanceOperation extends AbstractChangePla
 
         job.setJobHandlerConfiguration(createJobConfiguration());
 
-        jobService.createAsyncJob(job, task.isExclusive());
+        jobService.createAsyncJob(job, task.isAsyncLeaveExclusive());
         jobService.scheduleAsyncJob(job);
 
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
