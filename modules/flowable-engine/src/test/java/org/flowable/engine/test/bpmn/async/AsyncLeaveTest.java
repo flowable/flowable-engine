@@ -48,6 +48,8 @@ public class AsyncLeaveTest extends PluggableFlowableTestCase {
 
         Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
         assertThat(job.getJobHandlerType()).isEqualTo(AsyncLeaveJobHandler.TYPE);
+        assertThat(job.isExclusive()).isFalse();
+        
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).count()).isOne();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstanceId).count()).isZero();
         assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstanceId).count()).isOne(); // start event activity is recor
@@ -85,6 +87,7 @@ public class AsyncLeaveTest extends PluggableFlowableTestCase {
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job.getJobHandlerType()).isEqualTo(AsyncLeaveJobHandler.TYPE);
+        assertThat(job.isExclusive()).isTrue();
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "myResultVar")).isEqualTo("Hello World");
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
@@ -117,7 +120,10 @@ public class AsyncLeaveTest extends PluggableFlowableTestCase {
 
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
-        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncLeaveJobHandler.TYPE);
+        assertThat(job.isExclusive()).isTrue();
+        managementService.executeJob(job.getId());
 
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("Task B");
     }

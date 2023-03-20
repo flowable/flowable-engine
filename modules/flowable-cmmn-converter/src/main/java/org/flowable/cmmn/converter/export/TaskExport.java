@@ -43,19 +43,16 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
         }
 
         // Async
-        boolean exclusiveAttributeWritten = false;
-        boolean exclusive = task.isExclusive();
         if (task.isAsync()) {
+        	boolean exclusive = task.isExclusive();
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS, String.valueOf(task.isAsync()));
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(exclusive));
-            exclusiveAttributeWritten = true;
         }
 
         if (task.isAsyncLeave()) {
+        	boolean asyncLeaveExclusive = task.isAsyncLeaveExclusive();
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE, String.valueOf(task.isAsyncLeave()));
-            if (!exclusiveAttributeWritten) {
-                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(exclusive));
-            }
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE_EXCLUSIVE, String.valueOf(asyncLeaveExclusive));
         }
 
         if (task instanceof SendEventServiceTask) {
