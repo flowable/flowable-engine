@@ -23,6 +23,7 @@ public class Task extends PlanItemDefinition {
     protected boolean async;
     protected boolean exclusive;
     protected boolean asyncLeave;
+    protected boolean asyncLeaveExclusive;
 
     public boolean isBlocking() {
         return blocking;
@@ -64,12 +65,21 @@ public class Task extends PlanItemDefinition {
         this.asyncLeave = asyncLeave;
     }
 
-    public void setValues(Task otherElement) {
+    public boolean isAsyncLeaveExclusive() {
+		return asyncLeaveExclusive;
+	}
+
+	public void setAsyncLeaveExclusive(boolean asyncLeaveExclusive) {
+		this.asyncLeaveExclusive = asyncLeaveExclusive;
+	}
+
+	public void setValues(Task otherElement) {
         super.setValues(otherElement);
         setBlocking(otherElement.isBlocking());
         setBlockingExpression(otherElement.getBlockingExpression());
         setAsync(otherElement.isAsync());
         setAsyncLeave(otherElement.isAsync());
         setExclusive(otherElement.isExclusive());
+        setAsyncLeaveExclusive(otherElement.isAsyncLeaveExclusive());
     }
 }

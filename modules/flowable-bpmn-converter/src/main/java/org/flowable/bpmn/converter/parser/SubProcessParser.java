@@ -78,6 +78,12 @@ public class SubProcessParser implements BpmnXMLConstants {
         if (ATTRIBUTE_VALUE_TRUE.equalsIgnoreCase(asyncLeaveString)) {
             asyncLeave = true;
         }
+        
+        boolean asyncLeaveNotExclusive = false;
+        String asyncLeaveExclusiveString = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS_LEAVE_EXCLUSIVE, xtr);
+        if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(asyncLeaveExclusiveString)) {
+        	asyncLeaveNotExclusive = true;
+        }
 
         boolean forCompensation = false;
         String compensationString = xtr.getAttributeValue(null, ATTRIBUTE_ACTIVITY_ISFORCOMPENSATION);
@@ -88,6 +94,7 @@ public class SubProcessParser implements BpmnXMLConstants {
         subProcess.setAsynchronous(async);
         subProcess.setNotExclusive(notExclusive);
         subProcess.setAsynchronousLeave(asyncLeave);
+        subProcess.setAsynchronousLeaveNotExclusive(asyncLeaveNotExclusive);
         subProcess.setForCompensation(forCompensation);
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT))) {
             subProcess.setDefaultFlow(xtr.getAttributeValue(null, ATTRIBUTE_DEFAULT));

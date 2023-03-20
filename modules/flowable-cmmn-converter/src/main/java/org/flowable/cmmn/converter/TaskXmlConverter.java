@@ -244,5 +244,11 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         if (StringUtils.isNotEmpty(isAsyncLeaveString)) {
             task.setAsyncLeave(Boolean.valueOf(isAsyncLeaveString.toLowerCase()));
         }
+        
+        String isAsyncLeaveExclusiveString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE_EXCLUSIVE);
+        if (StringUtils.isNotEmpty(isAsyncLeaveExclusiveString)) {
+            task.setAsyncLeaveExclusive(Boolean.valueOf(isAsyncLeaveExclusiveString));
+        }
     }
 }

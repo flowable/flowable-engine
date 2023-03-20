@@ -141,7 +141,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         }
         job.setJobHandlerConfiguration(jobHandlerConfig);
 
-        jobService.createAsyncJob(job, sourceFlowNode.isExclusive());
+        jobService.createAsyncJob(job, sourceFlowNode.isAsynchronousLeaveExclusive());
         jobService.scheduleAsyncJob(job);
     }
 

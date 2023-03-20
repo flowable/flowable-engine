@@ -118,6 +118,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
     String ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE = "asyncLeave";
+    String ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE_EXCLUSIVE = "asyncLeaveExclusive";
     String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
