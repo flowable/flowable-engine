@@ -100,27 +100,27 @@ org.apache.httpcomponents       httpclient                  4.5.13          Apac
 org.apache.httpcomponents       httpcore                    4.4.15          Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.13          Apache License, Version 2.0
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
-org.apache.groovy               groovy                      4.0.7           The Apache Software License, Version 2.0
-org.apache.groovy               groovy-jsr223               4.0.7           The Apache Software License, Version 2.0
+org.apache.groovy               groovy                      4.0.10          The Apache Software License, Version 2.0
+org.apache.groovy               groovy-jsr223               4.0.10          The Apache Software License, Version 2.0
 org.liquibase                   liquibase-core              4.5.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.11          The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              3.0.0           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
-org.slf4j                       jcl-over-slf4j              1.7.36          MIT License
-org.slf4j                       slf4j-api                   1.7.36          MIT License
-org.slf4j                       slf4j-log4j12               1.7.36          MIT License
-org.springframework             spring-beans                6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-context              6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-context-support      6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-tx                   6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-web                  6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-aop                  6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-expression           6.0.5           The Apache Software License, Version 2.0
-org.springframework             spring-orm                  6.0.5           The Apache Software License, Version 2.0
+org.slf4j                       jcl-over-slf4j              2.0.7           MIT License
+org.slf4j                       slf4j-api                   2.0.7           MIT License
+org.slf4j                       slf4j-log4j12               2.0.7           MIT License
+org.springframework             spring-beans                6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-context              6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-context-support      6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-tx                   6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-web                  6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-aop                  6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-expression           6.0.7           The Apache Software License, Version 2.0
+org.springframework             spring-orm                  6.0.7           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-config      6.0.2           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-core        6.0.2           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-crypto      6.0.2           The Apache Software License, Version 2.0
