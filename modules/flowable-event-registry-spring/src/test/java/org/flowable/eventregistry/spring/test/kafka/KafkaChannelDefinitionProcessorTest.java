@@ -2493,6 +2493,56 @@ class KafkaChannelDefinitionProcessorTest {
         }
     }
 
+    @Test
+    void kafkaOutboundChannelShouldUseExpressionForMessageKey() {
+        createTopic("test-expression-for-message-key");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testExpressionMessageKey", "testClientExpressionMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-expression-for-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("test-expression-for-message-key")
+                    .recordKey("${customer.concat(name)}")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-expression-for-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("kermitKermit the Frog");
+                    });
+        }
+    }
+
     protected void createTopic(String topicName) {
         createTopic(topicName, 1);
     }

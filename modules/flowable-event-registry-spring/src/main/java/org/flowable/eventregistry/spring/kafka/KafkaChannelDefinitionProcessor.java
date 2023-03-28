@@ -441,9 +441,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             String resolvedTopic = resolve(topic);
 
             KafkaPartitionProvider partitionProvider = resolveKafkaPartitionProvider(channelModel);
+            KafkaMessageKeyProvider messageKeyProvider = resolveKafkaMessageKeyProvider(channelModel);
 
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
-                            kafkaOperations, partitionProvider, resolvedTopic, channelModel.getRecordKey()));
+                            kafkaOperations, partitionProvider, resolvedTopic, messageKeyProvider));
         }
     }
 
@@ -702,6 +703,16 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                     "The kafka partition value was not found for the channel model with key " + channelModel.getKey()
                             + ". One of eventField, delegateExpression should be set.");
         }
+    }
+
+    protected KafkaMessageKeyProvider resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
+        if (channelModel.getRecordKey() == null) {
+            return null;
+        }
+        if ((channelModel.getRecordKey().startsWith("${") || channelModel.getRecordKey().startsWith("#{"))) {
+            return new ExpressionKafkaMessageKeyProvider(channelModel);
+        }
+        return ignore -> channelModel.getRecordKey();
     }
 
     protected <T> T resolveExpression(String expression, Class<T> type) {
