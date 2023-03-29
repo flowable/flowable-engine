@@ -3,9 +3,9 @@
     "category": "channel",
     "channelType": "outbound",
     "type": "kafka",
-    "topic": "test-static-message-key",
+    "topic": "test-fixed-value-message-key",
     "serializerType": "json",
     "recordKey": {
-        "staticKey": "myKey"
+        "fixedValue": "myKey"
     }
 }

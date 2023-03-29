@@ -28,26 +28,12 @@ public class EventPayloadKafkaMessageKeyProvider implements KafkaMessageKeyProvi
     }
 
     @Override
-    public String determineMessageKey(OutboundEvent<?> eventInstance) {
-        for (EventPayloadInstance payloadInstance: eventInstance.getEventInstance().getPayloadInstances()) {
+    public Object determineMessageKey(OutboundEvent<?> eventInstance) {
+        for (EventPayloadInstance payloadInstance : eventInstance.getEventInstance().getPayloadInstances()) {
             if (eventField.equals(payloadInstance.getDefinitionName())) {
-                return parseValue(payloadInstance.getValue());
+                return payloadInstance.getValue();
             }
         }
-        return null;
-    }
-
-    protected String parseValue(Object value) {
-        if (value instanceof String) {
-            return (String) value;
-        } else if (value instanceof Integer) {
-            return value.toString();
-        } else if (value != null) {
-            throw new IllegalStateException(
-                    "The [" + eventField + "] must resolve to a String or an Integer. "
-                            + "Resolved to [" + value.getClass() + "] for [" + value + "]");
-        }
-
         return null;
     }
 }

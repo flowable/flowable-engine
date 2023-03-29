@@ -19,6 +19,6 @@ import org.flowable.eventregistry.api.OutboundEvent;
  */
 public interface KafkaMessageKeyProvider {
 
-    String determineMessageKey(OutboundEvent<?> eventInstance);
+    Object determineMessageKey(OutboundEvent<?> eventInstance);
 
 }

@@ -713,12 +713,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
         if (StringUtils.hasText(recordKey.getEventField())) {
             return new EventPayloadKafkaMessageKeyProvider(recordKey.getEventField());
-        } else if (StringUtils.hasText(recordKey.getStaticKey())) {
-            return ignore -> recordKey.getStaticKey();
+        } else if (StringUtils.hasText(recordKey.getFixedValue())) {
+            return ignore -> recordKey.getFixedValue();
         } else if (StringUtils.hasText(recordKey.getDelegateExpression())) {
             return resolveExpression(recordKey.getDelegateExpression(), KafkaMessageKeyProvider.class);
-        } else if (StringUtils.hasText(recordKey.getExpression())) {
-            return new ExpressionKafkaMessageKeyProvider(channelModel);
         } else {
             throw new FlowableException(
                     "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
@@ -727,7 +725,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     }
 
     protected <T> T resolveExpression(String expression, Class<T> type) {
-        Object value = resolveExpression(expression);
+        Object value = this.resolver.evaluate(expression, this.expressionContext);
         if (type.isInstance(value)) {
             return type.cast(value);
         }

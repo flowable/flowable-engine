@@ -60,6 +60,8 @@ import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventPayload;
+import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
+import org.flowable.eventregistry.spring.kafka.KafkaPartitionProvider;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -95,6 +97,12 @@ class KafkaChannelDefinitionProcessorTest {
     @Autowired
     protected ConsumerFactory<Object, Object> consumerFactory;
 
+    @Autowired
+    protected KafkaMessageKeyProvider kafkaMessageKeyProvider;
+
+    @Autowired
+    protected KafkaPartitionProvider kafkaPartitionProvider;
+
     protected TestEventConsumer testEventConsumer;
 
     protected Collection<String> topicsToDelete = new HashSet<>();
@@ -108,6 +116,8 @@ class KafkaChannelDefinitionProcessorTest {
     @AfterEach
     void tearDown() throws Exception {
         testEventConsumer.clear();
+        ((TestKafkaPartitionProvider) kafkaPartitionProvider).clear();
+        ((TestKafkaMessageKeyProvider) kafkaMessageKeyProvider).clear();
 
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
@@ -830,6 +840,7 @@ class KafkaChannelDefinitionProcessorTest {
         eventRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsKafkaPart2.channel")
                 .deploy();
+
 
         // Send to partition 5
         kafkaTemplate.send("test-customer-split-partitions", 5, null, kafkaEvent).get(2, TimeUnit.SECONDS);
@@ -2026,6 +2037,7 @@ class KafkaChannelDefinitionProcessorTest {
                 .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundChannel.channel")
                 .deploy();
 
+
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
             consumer.subscribe(Collections.singleton("outbound-customer"));
 
@@ -2310,6 +2322,107 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    void kafkaOutboundChannelShouldUseDelegateExpressionForPartition() {
+        createTopic("test-custom-partition-delegate-expression", 5);
+
+        Map<String, Integer> partitionMap = Map.of("fozzie", 2, "kermit", 3, "piggy", 4, "gonzo", 1);
+
+        ((TestKafkaPartitionProvider) kafkaPartitionProvider).setPartitionProvider(eventPayload -> {
+            String customer = (String) eventPayload.getEventInstance().getPayloadInstances().stream()
+                    .filter(instance -> instance.getDefinitionName().equals("customer")).map(
+                            EventPayloadInstance::getValue).findFirst().orElse(null);
+            return partitionMap.get(customer);
+        });
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testCustomPartitionDelegateExpression",
+                "testClientCustomPartitionDelegateExpression")) {
+            consumer.subscribe(Collections.singleton("test-custom-partition-delegate-expression"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomPartitionDelegateExpression.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("customPartitionDelegateExpression");
+            EventPayloadInstanceImpl customer = new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(customer);
+
+            EventInstance event = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(IntStream.range(0, 5)
+                    .mapToObj(partition -> new TopicPartition("test-custom-partition-delegate-expression", partition))
+                    .collect(Collectors.toList()));
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'kermit' }");
+                        assertThat(record.partition()).isEqualTo(3);
+                    });
+
+            customer.setValue("fozzie");
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'fozzie' }");
+                        assertThat(record.partition()).isEqualTo(2);
+                    });
+
+            customer.setValue("piggy");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'piggy' }");
+                        assertThat(record.partition()).isEqualTo(4);
+                    });
+
+            customer.setValue("gonzo");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'gonzo' }");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+        }
+    }
+
+    @Test
     void kafkaOutboundChannelShouldUseRoundRobinForPartition() {
         createTopic("test-custom-partition-round-robin", 5);
 
@@ -2492,11 +2605,11 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
-    void kafkaOutboundChannelShouldUseStaticValueForMessageKey() {
-        createTopic("test-static-message-key");
+    void kafkaOutboundChannelShouldUseFixedValueKeyForMessageKey() {
+        createTopic("test-fixed-value-message-key");
 
-        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testStaticMessageKey", "testClientStaticMessageKey")) {
-            consumer.subscribe(Collections.singleton("test-static-message-key"));
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testFixedValueMessageKey", "testClientFixedValueMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-fixed-value-message-key"));
 
             eventRepositoryService.createEventModelBuilder()
                     .resourceName("testEvent.event")
@@ -2506,7 +2619,7 @@ class KafkaChannelDefinitionProcessorTest {
                     .deploy();
 
             eventRepositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyStatic.channel")
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFixedValue.channel")
                     .deploy();
 
             ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKey");
@@ -2520,7 +2633,7 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
             consumer.commitSync();
-            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-static-message-key", 0)));
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-fixed-value-message-key", 0)));
 
             eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -2582,11 +2695,13 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
-    void kafkaOutboundChannelShouldUseExpressionForMessageKey() {
-        createTopic("test-expression-message-key");
+    void kafkaOutboundChannelShouldDelegateExpressionForMessageKey() {
+        createTopic("test-delegate-expression-message-key");
 
-        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testEventFieldMessageKey", "testClientEventFieldMessageKey")) {
-            consumer.subscribe(Collections.singleton("test-expression-message-key"));
+        ((TestKafkaMessageKeyProvider) kafkaMessageKeyProvider).setMessageKeyProvider(ignore -> "testKey");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testDelegateExpressionMessageKey", "testClientDelegateExpressionMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-delegate-expression-message-key"));
 
             eventRepositoryService.createEventModelBuilder()
                     .resourceName("testEvent.event")
@@ -2596,10 +2711,10 @@ class KafkaChannelDefinitionProcessorTest {
                     .deploy();
 
             eventRepositoryService.createDeployment()
-                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyExpression.channel")
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFromDelegateExpression.channel")
                     .deploy();
 
-            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyExpression");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyDelegateExpression");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
@@ -2610,7 +2725,7 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
             consumer.commitSync();
-            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-expression-message-key", 0)));
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-delegate-expression-message-key", 0)));
 
             eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 
@@ -2621,7 +2736,7 @@ class KafkaChannelDefinitionProcessorTest {
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThat(record.key()).isEqualTo("kermitKermit the Frog");
+                        assertThat(record.key()).isEqualTo("testKey");
                     });
         }
     }

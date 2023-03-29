@@ -65,7 +65,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
             }
 
             Integer partition = partitionProvider == null ? null : partitionProvider.determinePartition(event);
-            String key = messageKeyProvider == null ? null : messageKeyProvider.determineMessageKey(event);
+            Object key = messageKeyProvider == null ? null : messageKeyProvider.determineMessageKey(event);
 
             ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, partition, key, rawEvent, headers);
             kafkaOperations.send(producerRecord).get();

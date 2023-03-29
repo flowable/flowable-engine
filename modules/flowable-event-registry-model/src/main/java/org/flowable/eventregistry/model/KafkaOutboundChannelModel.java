@@ -16,8 +16,6 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -100,20 +98,18 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
     @JsonInclude(Include.NON_NULL)
     public static class RecordKey {
 
-        protected String staticKey;
+        protected String fixedValue;
 
         protected String eventField;
 
         protected String delegateExpression;
 
-        protected String expression;
-
-        public String getStaticKey() {
-            return staticKey;
+        public String getFixedValue() {
+            return fixedValue;
         }
 
-        public void setStaticKey(String staticKey) {
-            this.staticKey = staticKey;
+        public void setFixedValue(String fixedValue) {
+            this.fixedValue = fixedValue;
         }
 
         public String getEventField() {
@@ -131,28 +127,22 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
         public void setDelegateExpression(String delegateExpression) {
             this.delegateExpression = delegateExpression;
         }
-
-        public String getExpression() {
-            return expression;
-        }
-
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
     }
 
     // backward compatibility
     static class RecordKeyDeserializer extends JsonDeserializer<RecordKey> {
 
         @Override
-        public RecordKey deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+        public RecordKey deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             final JsonToken token = jsonParser.currentToken();
 
             if (JsonToken.START_OBJECT.equals(token)) {
-                return (RecordKey) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(RecordKey.class)).deserialize(jsonParser, deserializationContext);
+                return (RecordKey) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(RecordKey.class))
+                        .deserialize(jsonParser, deserializationContext);
             } else {
                 RecordKey recordKey = new RecordKey();
-                recordKey.setStaticKey((String) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(String.class)).deserialize(jsonParser, deserializationContext));
+                recordKey.setFixedValue((String) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(String.class))
+                        .deserialize(jsonParser, deserializationContext));
                 return recordKey;
             }
         }
