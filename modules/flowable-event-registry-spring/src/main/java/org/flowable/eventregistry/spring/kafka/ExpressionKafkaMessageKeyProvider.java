@@ -30,7 +30,7 @@ public class ExpressionKafkaMessageKeyProvider implements KafkaMessageKeyProvide
 
     @Override
     public String determineMessageKey(OutboundEvent<?> eventInstance) {
-        return CommandContextUtil.getEventRegistryConfiguration().getExpressionManager().createExpression(channelModel.getRecordKey())
+        return CommandContextUtil.getEventRegistryConfiguration().getExpressionManager().createExpression(channelModel.getRecordKey().getExpression())
                 .getValue(new ReadOnlyEventInstanceVariableContainer(eventInstance.getEventInstance())).toString();
     }
 }

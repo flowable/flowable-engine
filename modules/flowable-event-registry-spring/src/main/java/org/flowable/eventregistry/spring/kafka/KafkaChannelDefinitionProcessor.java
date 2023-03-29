@@ -40,6 +40,7 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.flowable.eventregistry.spring.kafka.payload.EventPayloadKafkaMessageKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -706,13 +707,23 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     }
 
     protected KafkaMessageKeyProvider resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
-        if (channelModel.getRecordKey() == null) {
+        KafkaOutboundChannelModel.RecordKey recordKey = channelModel.getRecordKey();
+        if (recordKey == null) {
             return null;
         }
-        if ((channelModel.getRecordKey().startsWith("${") || channelModel.getRecordKey().startsWith("#{"))) {
+        if (StringUtils.hasText(recordKey.getEventField())) {
+            return new EventPayloadKafkaMessageKeyProvider(recordKey.getEventField());
+        } else if (StringUtils.hasText(recordKey.getStaticKey())) {
+            return ignore -> recordKey.getStaticKey();
+        } else if (StringUtils.hasText(recordKey.getDelegateExpression())) {
+            return resolveExpression(recordKey.getDelegateExpression(), KafkaMessageKeyProvider.class);
+        } else if (StringUtils.hasText(recordKey.getExpression())) {
             return new ExpressionKafkaMessageKeyProvider(channelModel);
+        } else {
+            throw new FlowableException(
+                    "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
+                            + ". One of staticKey, delegateExpression or expression should be set.");
         }
-        return ignore -> channelModel.getRecordKey();
     }
 
     protected <T> T resolveExpression(String expression, Class<T> type) {

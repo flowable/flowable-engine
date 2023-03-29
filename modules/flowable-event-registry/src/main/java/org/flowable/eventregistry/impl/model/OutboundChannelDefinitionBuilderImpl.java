@@ -213,7 +213,9 @@ public class OutboundChannelDefinitionBuilderImpl implements OutboundChannelMode
 
         @Override
         public OutboundKafkaChannelBuilder recordKey(String key) {
-            kafkaChannel.setRecordKey(key);
+            KafkaOutboundChannelModel.RecordKey recordKey = new KafkaOutboundChannelModel.RecordKey();
+            recordKey.setStaticKey(key);
+            kafkaChannel.setRecordKey(recordKey);
             return this;
         }
 

@@ -118,8 +118,8 @@ class KafkaChannelDefinitionProcessorTest {
 
         Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
         Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
-            .all()
-            .get(10, TimeUnit.SECONDS);
+                .all()
+                .get(10, TimeUnit.SECONDS);
 
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testCleanup")) {
 
@@ -137,8 +137,8 @@ class KafkaChannelDefinitionProcessorTest {
         }
 
         adminClient.deleteRecords(recordsToDelete)
-            .all()
-            .get(10, TimeUnit.SECONDS);
+                .all()
+                .get(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -146,54 +146,54 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-new-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
-            .resourceName("customer.channel")
-            .kafkaChannelAdapter("test-new-customer")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("newCustomerChannel")
+                .resourceName("customer.channel")
+                .kafkaChannelAdapter("test-new-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
 
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
         kafkaTemplate.send("test-new-customer", "{"
-            + "    \"eventKey\": \"test\","
-            + "    \"customer\": \"kermit\","
-            + "    \"name\": \"Kermit the Frog\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test"));
 
         EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(eventInstance).isNotNull();
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit"),
-                tuple("name", "Kermit the Frog")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit"),
+                        tuple("name", "Kermit the Frog")
+                );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
     }
 
     @Test
@@ -201,54 +201,54 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-expression-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
-            .resourceName("customer.channel")
-            .kafkaChannelAdapter("${application.test.kafka-topic}")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("newCustomerChannel")
+                .resourceName("customer.channel")
+                .kafkaChannelAdapter("${application.test.kafka-topic}")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
 
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
         kafkaTemplate.send("test-expression-customer", "{"
-            + "    \"eventKey\": \"test\","
-            + "    \"customer\": \"kermit\","
-            + "    \"name\": \"Kermit the Frog\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test"));
 
         EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(eventInstance).isNotNull();
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit"),
-                tuple("name", "Kermit the Frog")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit"),
+                        tuple("name", "Kermit the Frog")
+                );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
     }
 
     @Test
@@ -256,100 +256,100 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("inbound-custom-bean-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
-            .resourceName("customer.channel")
-            .kafkaChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("newCustomerChannel")
+                .resourceName("customer.channel")
+                .kafkaChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
 
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
         kafkaTemplate.send("inbound-custom-bean-customer", "{"
-            + "    \"eventKey\": \"test\","
-            + "    \"customer\": \"kermit\","
-            + "    \"name\": \"Kermit the Frog\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test"));
 
         EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(eventInstance).isNotNull();
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit"),
-                tuple("name", "Kermit the Frog")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit"),
+                        tuple("name", "Kermit the Frog")
+                );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
     }
 
     @Test
     void eventShouldBeReceivedWhenChannelModelIsDeployed() throws Exception {
         createTopic("test-new-customer");
-        
+
         EventDeployment deployment = eventRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaEvent.event")
-            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaChannel.channel")
-            .deploy();
-    
+                .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaEvent.event")
+                .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaChannel.channel")
+                .deploy();
+
         try {
 
             // Give time for the consumers to register properly in the groups
             // This is linked to the session timeout property for the consumers
             Thread.sleep(600);
-    
+
             kafkaTemplate.send("test-new-customer", "{"
-                + "    \"eventKey\": \"test\","
-                + "    \"customer\": \"kermit\","
-                + "    \"name\": \"Kermit the Frog\""
-                + "}")
-                .get(5, TimeUnit.SECONDS);
-    
+                            + "    \"eventKey\": \"test\","
+                            + "    \"customer\": \"kermit\","
+                            + "    \"name\": \"Kermit the Frog\""
+                            + "}")
+                    .get(5, TimeUnit.SECONDS);
+
             await("receive events")
-                .atMost(Duration.ofSeconds(5))
-                .pollInterval(Duration.ofMillis(200))
-                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                    .extracting(EventRegistryEvent::getType)
-                    .containsExactlyInAnyOrder("test"));
-    
+                    .atMost(Duration.ofSeconds(5))
+                    .pollInterval(Duration.ofMillis(200))
+                    .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                            .extracting(EventRegistryEvent::getType)
+                            .containsExactlyInAnyOrder("test"));
+
             EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
-    
+
             assertThat(eventInstance).isNotNull();
             assertThat(eventInstance.getPayloadInstances())
-                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-                .containsExactlyInAnyOrder(
-                    tuple("customer", "kermit"),
-                    tuple("name", "Kermit the Frog")
-                );
+                    .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("customer", "kermit"),
+                            tuple("name", "Kermit the Frog")
+                    );
             assertThat(eventInstance.getCorrelationParameterInstances())
-                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-                .containsExactlyInAnyOrder(
-                    tuple("customer", "kermit")
-                );
-            
+                    .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("customer", "kermit")
+                    );
+
         } finally {
             eventRepositoryService.deleteDeployment(deployment.getId());
         }
@@ -360,83 +360,83 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-multi-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("customer")
-            .resourceName("customer.channel")
-            .kafkaChannelAdapter("test-multi-customer")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .fixedEventKey("customer")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("customer")
+                .resourceName("customer.channel")
+                .kafkaChannelAdapter("test-multi-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .fixedEventKey("customer")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomer")
-            .resourceName("newCustomer.channel")
-            .kafkaChannelAdapter("test-multi-customer")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .fixedEventKey("newCustomer")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("newCustomer")
+                .resourceName("newCustomer.channel")
+                .kafkaChannelAdapter("test-multi-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .fixedEventKey("newCustomer")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
 
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("customer")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("customer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("newCustomer")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("newCustomer")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .deploy();
 
         kafkaTemplate.send("test-multi-customer", "{"
-            + "    \"customer\": \"kermit\","
-            + "    \"name\": \"Kermit the Frog\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("customer", "newCustomer"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("customer", "newCustomer"));
 
         EventInstance eventInstance = (EventInstance) testEventConsumer.getEvent("customer").getEventObject();
 
         assertThat(eventInstance).isNotNull();
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit"),
-                tuple("name", "Kermit the Frog")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit"),
+                        tuple("name", "Kermit the Frog")
+                );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
 
         eventInstance = (EventInstance) testEventConsumer.getEvent("newCustomer").getEventObject();
 
         assertThat(eventInstance).isNotNull();
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
     }
 
     @Test
@@ -444,99 +444,99 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-customer");
 
         kafkaTemplate.send("test-customer", "{"
-            + "    \"eventKey\": \"test\","
-            + "    \"customer\": \"kermit\","
-            + "    \"name\": \"Kermit the Frog\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"kermit\","
+                        + "    \"name\": \"Kermit the Frog\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .correlationParameter("customer", EventPayloadTypes.STRING)
-            .payload("name", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
-            .resourceName("test.channel")
-            .kafkaChannelAdapter("test-customer")
-            .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .key("testChannel")
+                .resourceName("test.channel")
+                .kafkaChannelAdapter("test-customer")
+                .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
 
         kafkaTemplate.send("test-customer", "{"
-            + "    \"eventKey\": \"test\","
-            + "    \"customer\": \"fozzie\","
-            + "    \"name\": \"Fozzie Bear\""
-            + "}")
-            .get(5, TimeUnit.SECONDS);
+                        + "    \"eventKey\": \"test\","
+                        + "    \"customer\": \"fozzie\","
+                        + "    \"name\": \"Fozzie Bear\""
+                        + "}")
+                .get(5, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test", "test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test", "test"));
 
         EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(kermitEvent).isNotNull();
         assertThat(kermitEvent.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit"),
-                tuple("name", "Kermit the Frog")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit"),
+                        tuple("name", "Kermit the Frog")
+                );
         assertThat(kermitEvent.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "kermit")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "kermit")
+                );
 
         EventInstance fozzieEvent = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
 
         assertThat(fozzieEvent).isNotNull();
         assertThat(fozzieEvent.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "fozzie"),
-                tuple("name", "Fozzie Bear")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "fozzie"),
+                        tuple("name", "Fozzie Bear")
+                );
         assertThat(fozzieEvent.getCorrelationParameterInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("customer", "fozzie")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("customer", "fozzie")
+                );
     }
-    
+
     @Test
     void eventWithSimpleHeader() throws Exception {
         createTopic("test-customer");
-        
+
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .header("testStringHeader", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .header("testStringHeader", EventPayloadTypes.STRING)
+                .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
-            .resourceName("test.channel")
-            .kafkaChannelAdapter("test-customer")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
-        
+                .key("testChannel")
+                .resourceName("test.channel")
+                .kafkaChannelAdapter("test-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
@@ -549,51 +549,51 @@ class KafkaChannelDefinitionProcessorTest {
         kafkaTemplate.send(producerRecord);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test"));
 
         EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(kermitEvent).isNotNull();
         assertThat(kermitEvent.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog"),
-                tuple("testStringHeader", "123")
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Kermit the Frog"),
+                        tuple("testStringHeader", "123")
+                );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
     }
-    
+
     @Test
     void eventWithMultipleHeaders() throws Exception {
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .header("testStringHeader", EventPayloadTypes.STRING)
-            .header("testLongHeader", EventPayloadTypes.LONG)
-            .header("testIntHeader", EventPayloadTypes.INTEGER)
-            .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
-            .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .header("testStringHeader", EventPayloadTypes.STRING)
+                .header("testLongHeader", EventPayloadTypes.LONG)
+                .header("testIntHeader", EventPayloadTypes.INTEGER)
+                .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
+                .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
+                .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
-            .resourceName("test.channel")
-            .kafkaChannelAdapter("test-customer")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("eventKey")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
-        
+                .key("testChannel")
+                .resourceName("test.channel")
+                .kafkaChannelAdapter("test-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
         // Give time for the consumers to register properly in the groups
         // This is linked to the session timeout property for the consumers
         Thread.sleep(600);
-        
+
         Map<String, String> customerObj = new HashMap<>();
         customerObj.put("name", "John Doe");
 
@@ -604,7 +604,7 @@ class KafkaChannelDefinitionProcessorTest {
                 new RecordHeader("testBooleanHeader", "true".getBytes()),
                 new RecordHeader("testDoubleHeader", "12.3".getBytes())
         );
-        
+
         ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>("test-customer", 0, (Object) null, "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog\""
@@ -612,25 +612,25 @@ class KafkaChannelDefinitionProcessorTest {
         kafkaTemplate.send(producerRecord);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .containsExactlyInAnyOrder("test"));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .containsExactlyInAnyOrder("test"));
 
         EventInstance kermitEvent = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(kermitEvent).isNotNull();
         assertThat(kermitEvent.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog"),
-                tuple("testStringHeader", "123"),
-                tuple("testLongHeader", 123l),
-                tuple("testIntHeader", 123),
-                tuple("testBooleanHeader", true),
-                tuple("testDoubleHeader", 12.3)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Kermit the Frog"),
+                        tuple("testStringHeader", "123"),
+                        tuple("testLongHeader", 123l),
+                        tuple("testIntHeader", 123),
+                        tuple("testBooleanHeader", true),
+                        tuple("testDoubleHeader", 12.3)
+                );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
     }
 
@@ -638,13 +638,13 @@ class KafkaChannelDefinitionProcessorTest {
     void eventWithConsumerRecordInformation() throws Exception {
         createTopic("test-customer-multi-partition", 2);
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .payload("receivedTopic", EventPayloadTypes.STRING)
-            .payload("receivedOffset", EventPayloadTypes.LONG)
-            .payload("receivedPartition", EventPayloadTypes.INTEGER)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .payload("receivedTopic", EventPayloadTypes.STRING)
+                .payload("receivedOffset", EventPayloadTypes.LONG)
+                .payload("receivedPartition", EventPayloadTypes.INTEGER)
+                .deploy();
 
         eventRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/consumerRecordInformationToEventKafka.channel")
@@ -673,61 +673,61 @@ class KafkaChannelDefinitionProcessorTest {
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .hasSize(3));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .hasSize(3));
 
         EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(event).isNotNull();
         assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 1"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 0),
-                tuple("receivedOffset", 0L)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Kermit the Frog 1"),
+                        tuple("receivedTopic", "test-customer-multi-partition"),
+                        tuple("receivedPartition", 0),
+                        tuple("receivedOffset", 0L)
+                );
 
         event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
 
         assertThat(event).isNotNull();
         assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 2"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 1),
-                tuple("receivedOffset", 0L)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Kermit the Frog 2"),
+                        tuple("receivedTopic", "test-customer-multi-partition"),
+                        tuple("receivedPartition", 1),
+                        tuple("receivedOffset", 0L)
+                );
 
         event = (EventInstance) testEventConsumer.getEvents().get(2).getEventObject();
 
         assertThat(event).isNotNull();
         assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Fozzie the Bear 1"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 0),
-                tuple("receivedOffset", 1L)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Fozzie the Bear 1"),
+                        tuple("receivedTopic", "test-customer-multi-partition"),
+                        tuple("receivedPartition", 0),
+                        tuple("receivedOffset", 1L)
+                );
     }
 
     @Test
     void eventWithConsumerRecordInformationAndHeader() throws Exception {
         createTopic("test-customer-header-and-consumer");
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .payload("topic", EventPayloadTypes.STRING)
-            .payload("offset", EventPayloadTypes.LONG)
-            .payload("partition", EventPayloadTypes.INTEGER)
-            .header("testHeader", EventPayloadTypes.STRING)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .payload("topic", EventPayloadTypes.STRING)
+                .payload("offset", EventPayloadTypes.LONG)
+                .payload("partition", EventPayloadTypes.INTEGER)
+                .header("testHeader", EventPayloadTypes.STRING)
+                .deploy();
 
         eventRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/consumerRecordAndHeaderInformationToEventKafka.channel")
@@ -750,47 +750,47 @@ class KafkaChannelDefinitionProcessorTest {
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
 
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .hasSize(2));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .hasSize(2));
 
         EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
 
         assertThat(event).isNotNull();
         assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog"),
-                tuple("testHeader", "Kermit header"),
-                tuple("topic", "test-customer-header-and-consumer"),
-                tuple("offset", 0L)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Kermit the Frog"),
+                        tuple("testHeader", "Kermit header"),
+                        tuple("topic", "test-customer-header-and-consumer"),
+                        tuple("offset", 0L)
+                );
 
         event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
 
         assertThat(event).isNotNull();
         assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Fozzie the Bear"),
-                tuple("testHeader", "Fozzie header"),
-                tuple("topic", "test-customer-header-and-consumer"),
-                tuple("offset", 1L)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("name", "Fozzie the Bear"),
+                        tuple("testHeader", "Fozzie header"),
+                        tuple("topic", "test-customer-header-and-consumer"),
+                        tuple("offset", 1L)
+                );
     }
 
     @Test
     void differentConsumersListenerOnDifferentPartitions() throws Exception {
         createTopic("test-customer-split-partitions", 8);
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .payload("topic", EventPayloadTypes.STRING)
-            .payload("partition", EventPayloadTypes.INTEGER)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .payload("topic", EventPayloadTypes.STRING)
+                .payload("partition", EventPayloadTypes.INTEGER)
+                .deploy();
 
         EventDeployment deployment = eventRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsKafkaPart1.channel")
@@ -805,21 +805,21 @@ class KafkaChannelDefinitionProcessorTest {
                 + "    \"name\": \"Kermit the Frog\""
                 + "}";
         // Send to partitions 0-4, 6-7
-        kafkaTemplate.send("test-customer-split-partitions", 0,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 1,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 2,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 3,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 4,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 6,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions", 7,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 0, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 1, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 2, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 3, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 4, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 6, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 7, null, kafkaEvent).get(2, TimeUnit.SECONDS);
 
         // We should only receive the events that were send to partitions 0-3, 6-7
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .hasSize(6));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .hasSize(6));
 
         eventRepositoryService.deleteDeployment(deployment.getId());
 
@@ -831,9 +831,8 @@ class KafkaChannelDefinitionProcessorTest {
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsKafkaPart2.channel")
                 .deploy();
 
-
         // Send to partition 5
-        kafkaTemplate.send("test-customer-split-partitions", 5,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions", 5, null, kafkaEvent).get(2, TimeUnit.SECONDS);
 
         // The rest of the events should be received 3 and 5 using the second channel
         await("receive events")
@@ -851,12 +850,12 @@ class KafkaChannelDefinitionProcessorTest {
     void differentConsumersListenerOnDifferentPartitionsUsingExpression() throws Exception {
         createTopic("test-customer-split-partitions-expression", 5);
         eventRepositoryService.createEventModelBuilder()
-            .resourceName("testEvent.event")
-            .key("test")
-            .payload("name", EventPayloadTypes.STRING)
-            .payload("topic", EventPayloadTypes.STRING)
-            .payload("partition", EventPayloadTypes.INTEGER)
-            .deploy();
+                .resourceName("testEvent.event")
+                .key("test")
+                .payload("name", EventPayloadTypes.STRING)
+                .payload("topic", EventPayloadTypes.STRING)
+                .payload("partition", EventPayloadTypes.INTEGER)
+                .deploy();
 
         EventDeployment deployment = eventRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/customTopicPartitonsUsingExpression.channel")
@@ -871,19 +870,19 @@ class KafkaChannelDefinitionProcessorTest {
                 + "    \"name\": \"Kermit the Frog\""
                 + "}";
         // Send to partitions 0-4
-        kafkaTemplate.send("test-customer-split-partitions-expression", 0,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions-expression", 1,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions-expression", 2,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions-expression", 3,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
-        kafkaTemplate.send("test-customer-split-partitions-expression", 4,  null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 0, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 1, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 2, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 3, null, kafkaEvent).get(2, TimeUnit.SECONDS);
+        kafkaTemplate.send("test-customer-split-partitions-expression", 4, null, kafkaEvent).get(2, TimeUnit.SECONDS);
 
         // We should only receive the events that were send to partitions 3-4
         await("receive events")
-            .atMost(Duration.ofSeconds(5))
-            .pollInterval(Duration.ofMillis(200))
-            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
-                .extracting(EventRegistryEvent::getType)
-                .hasSize(2));
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                        .extracting(EventRegistryEvent::getType)
+                        .hasSize(2));
 
         eventRepositoryService.deleteDeployment(deployment.getId());
 
@@ -1972,19 +1971,19 @@ class KafkaChannelDefinitionProcessorTest {
 
             eventRepositoryService.createEventModelBuilder()
                     .resourceName("testEvent.event")
-                .key("customer")
-                .correlationParameter("customer", EventPayloadTypes.STRING)
-                .payload("name", EventPayloadTypes.STRING)
-                .deploy();
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
 
             eventRepositoryService.createOutboundChannelModelBuilder()
-                .key("outboundCustomer")
-                .resourceName("outboundCustomer.channel")
-                .kafkaChannelAdapter("outbound-customer")
-                .recordKey("customer")
-                .eventProcessingPipeline()
-                .jsonSerializer()
-                .deploy();
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("outbound-customer")
+                    .recordKey("customer")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
 
             ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
 
@@ -2004,17 +2003,17 @@ class KafkaChannelDefinitionProcessorTest {
             records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records)
-                .hasSize(1)
-                .first()
-                .isNotNull()
-                .satisfies(record -> {
-                    assertThat(record.key()).isEqualTo("customer");
-                    assertThatJson(record.value())
-                        .isEqualTo("{"
-                            + "  customer: 'kermit',"
-                            + "  name: 'Kermit the Frog'"
-                            + "}");
-                });
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("customer");
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
         }
     }
 
@@ -2023,10 +2022,9 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("outbound-customer");
 
         EventDeployment deployment = eventRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundEvent.event")
-            .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundChannel.channel")
-            .deploy();
-
+                .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundEvent.event")
+                .addClasspathResource("org/flowable/eventregistry/spring/test/deployment/kafkaOutboundChannel.channel")
+                .deploy();
 
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
             consumer.subscribe(Collections.singleton("outbound-customer"));
@@ -2048,17 +2046,17 @@ class KafkaChannelDefinitionProcessorTest {
             records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records)
-                .hasSize(1)
-                .first()
-                .isNotNull()
-                .satisfies(record -> {
-                    assertThat(record.key()).isEqualTo("customer");
-                    assertThatJson(record.value())
-                        .isEqualTo("{"
-                            + "  customer: 'kermit',"
-                            + "  name: 'Kermit the Frog'"
-                            + "}");
-                });
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("customer");
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
         } finally {
             eventRepositoryService.deleteDeployment(deployment.getId());
         }
@@ -2494,11 +2492,11 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
-    void kafkaOutboundChannelShouldUseExpressionForMessageKey() {
-        createTopic("test-expression-for-message-key");
+    void kafkaOutboundChannelShouldUseStaticValueForMessageKey() {
+        createTopic("test-static-message-key");
 
-        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testExpressionMessageKey", "testClientExpressionMessageKey")) {
-            consumer.subscribe(Collections.singleton("test-expression-for-message-key"));
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testStaticMessageKey", "testClientStaticMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-static-message-key"));
 
             eventRepositoryService.createEventModelBuilder()
                     .resourceName("testEvent.event")
@@ -2507,16 +2505,11 @@ class KafkaChannelDefinitionProcessorTest {
                     .payload("name", EventPayloadTypes.STRING)
                     .deploy();
 
-            eventRepositoryService.createOutboundChannelModelBuilder()
-                    .key("outboundCustomer")
-                    .resourceName("outboundCustomer.channel")
-                    .kafkaChannelAdapter("test-expression-for-message-key")
-                    .recordKey("${customer.concat(name)}")
-                    .eventProcessingPipeline()
-                    .jsonSerializer()
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyStatic.channel")
                     .deploy();
 
-            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKey");
 
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
@@ -2527,7 +2520,97 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
             assertThat(records).isEmpty();
             consumer.commitSync();
-            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-expression-for-message-key", 0)));
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-static-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("myKey");
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseEventFieldForMessageKey() {
+        createTopic("test-event-field-message-key");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testEventFieldMessageKey", "testClientEventFieldMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-event-field-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFromEvent.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyEventField");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-event-field-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("kermit");
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseExpressionForMessageKey() {
+        createTopic("test-expression-message-key");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testEventFieldMessageKey", "testClientEventFieldMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-expression-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyExpression.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyExpression");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-expression-message-key", 0)));
 
             eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
 

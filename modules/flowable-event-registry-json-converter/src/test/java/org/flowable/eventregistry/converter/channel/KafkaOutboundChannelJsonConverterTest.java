@@ -52,7 +52,7 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
                 assertThat(model.getSerializerType()).isEqualTo("json");
 
                 assertThat(model.getTopic()).isEqualTo("outbound-customer");
-                assertThat(model.getRecordKey()).isEqualTo("customer");
+                assertThat(model.getRecordKey().getStaticKey()).isEqualTo("customer");
             });
     }
 

@@ -1,0 +1,11 @@
+{
+    "key": "messageKeyExpression",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-expression-message-key",
+    "serializerType": "json",
+    "recordKey": {
+        "expression": "${customer.concat(name)}"
+    }
+}

@@ -12,8 +12,17 @@
  */
 package org.flowable.eventregistry.model;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Filip Hrisafov
@@ -22,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class KafkaOutboundChannelModel extends OutboundChannelModel {
 
     protected String topic;
-    protected String recordKey;
+    protected RecordKey recordKey;
 
     protected KafkaPartition partition;
 
@@ -39,11 +48,12 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
         this.topic = topic;
     }
 
-    public String getRecordKey() {
+    public RecordKey getRecordKey() {
         return recordKey;
     }
 
-    public void setRecordKey(String recordKey) {
+    @JsonDeserialize(using = RecordKeyDeserializer.class)
+    public void setRecordKey(RecordKey recordKey) {
         this.recordKey = recordKey;
     }
 
@@ -84,6 +94,67 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
 
         public void setDelegateExpression(String delegateExpression) {
             this.delegateExpression = delegateExpression;
+        }
+    }
+
+    @JsonInclude(Include.NON_NULL)
+    public static class RecordKey {
+
+        protected String staticKey;
+
+        protected String eventField;
+
+        protected String delegateExpression;
+
+        protected String expression;
+
+        public String getStaticKey() {
+            return staticKey;
+        }
+
+        public void setStaticKey(String staticKey) {
+            this.staticKey = staticKey;
+        }
+
+        public String getEventField() {
+            return eventField;
+        }
+
+        public void setEventField(String eventField) {
+            this.eventField = eventField;
+        }
+
+        public String getDelegateExpression() {
+            return delegateExpression;
+        }
+
+        public void setDelegateExpression(String delegateExpression) {
+            this.delegateExpression = delegateExpression;
+        }
+
+        public String getExpression() {
+            return expression;
+        }
+
+        public void setExpression(String expression) {
+            this.expression = expression;
+        }
+    }
+
+    // backward compatibility
+    static class RecordKeyDeserializer extends JsonDeserializer<RecordKey> {
+
+        @Override
+        public RecordKey deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+            final JsonToken token = jsonParser.currentToken();
+
+            if (JsonToken.START_OBJECT.equals(token)) {
+                return (RecordKey) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(RecordKey.class)).deserialize(jsonParser, deserializationContext);
+            } else {
+                RecordKey recordKey = new RecordKey();
+                recordKey.setStaticKey((String) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(String.class)).deserialize(jsonParser, deserializationContext));
+                return recordKey;
+            }
         }
     }
 }

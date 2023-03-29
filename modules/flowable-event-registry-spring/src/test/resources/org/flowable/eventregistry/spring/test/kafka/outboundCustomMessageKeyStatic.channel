@@ -1,0 +1,11 @@
+{
+    "key": "messageKey",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-static-message-key",
+    "serializerType": "json",
+    "recordKey": {
+        "staticKey": "myKey"
+    }
+}
