@@ -47,7 +47,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
             xtw.writeEndElement();
         }
 
-        writePlanItemDefinitionDefaultItemControl(planItemDefinition, xtw);
+        writePlanItemDefinitionDefaultItemControl(model, planItemDefinition, xtw);
         writePlanItemDefinitionBody(model, planItemDefinition, xtw);
         writePlanItemDefinitionEndElement(xtw);
     }
@@ -107,9 +107,9 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
             planItemDefinition.getLifecycleListeners(), didWriteExtensionElement);
     }
 
-    protected void writePlanItemDefinitionDefaultItemControl(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionDefaultItemControl(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         if (planItemDefinition.getDefaultControl() != null) {
-            PlanItemControlExport.writeDefaultControl(planItemDefinition.getDefaultControl(), xtw);
+            PlanItemControlExport.writeDefaultControl(model, planItemDefinition.getDefaultControl(), xtw);
         }
     }
 

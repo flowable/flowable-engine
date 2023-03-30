@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="repetitionRuleExtensionElements">
+        <casePlanModel id="repetitionRuleExtensionElementsTestPlanModel" name="repetitionRuleWithExtensionElements rule extension elements plan model">
+
+            <planItem id="repetitionRuleWithExtensionElements" name="Repetition Rule with Extension Elements" definitionRef="taskOne">
+                <itemControl>
+                    <repetitionRule>
+                        <extensionElements>
+                            <flowable:testEntry>Test Entry</flowable:testEntry>
+                            <flowable:nestedTest name="Test">
+                                <flowable:nestedValue>Test Value</flowable:nestedValue>
+                            </flowable:nestedTest>
+                        </extensionElements>
+                        <condition>${true}</condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <task id="taskOne"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>
