@@ -167,7 +167,18 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                 while (!readyWithChildElements && xtr.hasNext()) {
                     xtr.next();
                     if (xtr.isStartElement()) {
-                        if (CmmnXmlConstants.ELEMENT_CONDITION.equals(xtr.getLocalName())) {
+                        if (CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equals(xtr.getLocalName())) {
+                            boolean readyWithChildExtensionElements = false;
+                            while (!readyWithChildExtensionElements && xtr.hasNext()) {
+                                xtr.next();
+                                if (xtr.isStartElement()) {
+                                    ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
+                                    completionNeutralRule.addExtensionElement(extensionElement);
+                                } else if (xtr.isEndElement() && CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS.equals(xtr.getLocalName())) {
+                                    readyWithChildExtensionElements = true;
+                                }
+                            }
+                        } else if (CmmnXmlConstants.ELEMENT_CONDITION.equals(xtr.getLocalName())) {
                             completionNeutralRule.setCondition(xtr.getElementText());
                             break;
                         }

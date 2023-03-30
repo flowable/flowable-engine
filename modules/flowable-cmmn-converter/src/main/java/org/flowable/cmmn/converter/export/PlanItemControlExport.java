@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.ParentCompletionRule;
@@ -36,34 +37,38 @@ import org.flowable.cmmn.model.VariableAggregationDefinitions;
  */
 public class PlanItemControlExport implements CmmnXmlConstants {
 
-    public static void writeItemControl(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
+    public static void writeItemControl(CmmnModel model, PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_ITEM_CONTROL);
-        writeItemControlContent(planItemControl, xtw);
+        writeItemControlContent(model, planItemControl, xtw);
         xtw.writeEndElement();
     }
 
-    public static void writeDefaultControl(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
+    public static void writeDefaultControl(CmmnModel model, PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_DEFAULT_CONTROL);
-        writeItemControlContent(planItemControl, xtw);
+        writeItemControlContent(model, planItemControl, xtw);
         xtw.writeEndElement();
     }
 
-    protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
-        boolean hasWrittenExtensionElements = writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
+    protected static void writeItemControlContent(CmmnModel model, PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
+        boolean hasWrittenExtensionElements = writeCompletionNeutralRule(model, planItemControl.getCompletionNeutralRule(), xtw);
         hasWrittenExtensionElements = writeParentCompletionRule(planItemControl.getParentCompletionRule(), hasWrittenExtensionElements, xtw);
         hasWrittenExtensionElements = writeReactivationRule(planItemControl.getReactivationRule(), hasWrittenExtensionElements, xtw);
         if (hasWrittenExtensionElements) {
             xtw.writeEndElement();
         }
         
-        writeRepetitionRule(planItemControl.getRepetitionRule(), xtw);
-        writeRequiredRule(planItemControl.getRequiredRule(), xtw);
-        writeManualActivationRule(planItemControl.getManualActivationRule(), xtw);
+        writeRepetitionRule(model, planItemControl.getRepetitionRule(), xtw);
+        writeRequiredRule(model, planItemControl.getRequiredRule(), xtw);
+        writeManualActivationRule(model, planItemControl.getManualActivationRule(), xtw);
     }
 
-    public static void writeRequiredRule(RequiredRule requiredRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static void writeRequiredRule(CmmnModel model, RequiredRule requiredRule, XMLStreamWriter xtw) throws Exception {
         if (requiredRule != null) {
             xtw.writeStartElement(ELEMENT_REQUIRED_RULE);
+            boolean hasWrittenExtensionElements = CmmnXmlUtil.writeExtensionElements(requiredRule, false, model.getNamespaces(), xtw);
+            if (hasWrittenExtensionElements) {
+                xtw.writeEndElement();
+            }
             if (StringUtils.isNotEmpty(requiredRule.getCondition())) {
                 xtw.writeStartElement(ELEMENT_CONDITION);
                 xtw.writeCData(requiredRule.getCondition());
@@ -73,7 +78,7 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         }
     }
 
-    public static void writeRepetitionRule(RepetitionRule repetitionRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static void writeRepetitionRule(CmmnModel model, RepetitionRule repetitionRule, XMLStreamWriter xtw) throws Exception {
         if (repetitionRule != null) {
             xtw.writeStartElement(ELEMENT_REPETITION_RULE);
             if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
@@ -103,6 +108,8 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             }
 
             boolean hasWrittenExtensionElements = writeVariableAggregations(repetitionRule.getAggregations(), xtw);
+
+            hasWrittenExtensionElements = CmmnXmlUtil.writeExtensionElements(repetitionRule, hasWrittenExtensionElements, model.getNamespaces(), xtw);
 
             if (hasWrittenExtensionElements) {
                 xtw.writeEndElement();
@@ -161,9 +168,14 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         return hasWrittenExtensionElements;
     }
 
-    public static void writeManualActivationRule(ManualActivationRule manualActivationRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static void writeManualActivationRule(CmmnModel model, ManualActivationRule manualActivationRule, XMLStreamWriter xtw) throws Exception {
         if (manualActivationRule != null) {
             xtw.writeStartElement(ELEMENT_MANUAL_ACTIVATION_RULE);
+            boolean hasWrittenExtensionElements = CmmnXmlUtil.writeExtensionElements(manualActivationRule, false, model.getNamespaces(), xtw);
+            if (hasWrittenExtensionElements) {
+                xtw.writeEndElement();
+            }
+
             if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
                 xtw.writeStartElement(ELEMENT_CONDITION);
                 xtw.writeCData(manualActivationRule.getCondition());
@@ -173,11 +185,16 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         }
     }
 
-    public static boolean writeCompletionNeutralRule(CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws XMLStreamException {
+    public static boolean writeCompletionNeutralRule(CmmnModel model, CompletionNeutralRule completionNeutralRule, XMLStreamWriter xtw) throws Exception {
         boolean hasWrittenExtensionElements = false;
         if (completionNeutralRule != null) {
             xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_COMPLETION_NEUTRAL_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            boolean hasWrittenChildExtensionElements = CmmnXmlUtil.writeExtensionElements(completionNeutralRule, false, model.getNamespaces(), xtw);
+            if (hasWrittenChildExtensionElements) {
+                xtw.writeEndElement();
+            }
+
             if (StringUtils.isNotBlank(completionNeutralRule.getCondition())) {
 
                 xtw.writeStartElement(ELEMENT_CONDITION);
