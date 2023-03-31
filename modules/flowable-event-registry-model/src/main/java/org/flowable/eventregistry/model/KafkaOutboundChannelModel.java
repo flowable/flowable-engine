@@ -12,15 +12,9 @@
  */
 package org.flowable.eventregistry.model;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Filip Hrisafov
@@ -50,7 +44,6 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
         return recordKey;
     }
 
-    @JsonDeserialize(using = RecordKeyDeserializer.class)
     public void setRecordKey(RecordKey recordKey) {
         this.recordKey = recordKey;
     }
@@ -127,24 +120,13 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
         public void setDelegateExpression(String delegateExpression) {
             this.delegateExpression = delegateExpression;
         }
-    }
 
-    // backward compatibility
-    static class RecordKeyDeserializer extends JsonDeserializer<RecordKey> {
-
-        @Override
-        public RecordKey deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-            final JsonToken token = jsonParser.currentToken();
-
-            if (JsonToken.START_OBJECT.equals(token)) {
-                return (RecordKey) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(RecordKey.class))
-                        .deserialize(jsonParser, deserializationContext);
-            } else {
-                RecordKey recordKey = new RecordKey();
-                recordKey.setFixedValue((String) deserializationContext.findRootValueDeserializer(deserializationContext.constructType(String.class))
-                        .deserialize(jsonParser, deserializationContext));
-                return recordKey;
-            }
+        // backward compatibility
+        @JsonCreator
+        public static RecordKey fromFixedValue(String fixedValue) {
+            RecordKey recordKey = new RecordKey();
+            recordKey.setFixedValue(fixedValue);
+            return recordKey;
         }
     }
 }

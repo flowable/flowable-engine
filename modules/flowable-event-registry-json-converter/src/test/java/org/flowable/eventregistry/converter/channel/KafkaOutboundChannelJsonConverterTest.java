@@ -40,7 +40,7 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
 
     @Test
     void convertJsonToModelKeyWithFixedValue() {
-        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel2.json");
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-fixedValue.json");
         assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
             model.getRecordKey().getFixedValue().equals("customer");
         });
@@ -48,7 +48,7 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
 
     @Test
     void convertJsonToModelKeyWithDelegateExpression() {
-        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel3.json");
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-delegateExpression.json");
         assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
             model.getRecordKey().getDelegateExpression().equals("${test}");
         });
@@ -56,7 +56,7 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
 
     @Test
     void convertJsonToModelKeyWithEventField() {
-        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel4.json");
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-eventField.json");
         assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
             model.getRecordKey().getEventField().equals("customer");
         });

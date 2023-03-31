@@ -15,10 +15,20 @@ package org.flowable.eventregistry.spring.kafka;
 import org.flowable.eventregistry.api.OutboundEvent;
 
 /**
+ * This interface provides a way to determine the record key that needs to be sent for a particular message
+ *
+ * @param <K> The type of the record key
  * @author Roman Saratz
  */
-public interface KafkaMessageKeyProvider {
+public interface KafkaMessageKeyProvider<K> {
 
-    Object determineMessageKey(OutboundEvent<?> eventInstance);
+    /**
+     * Determine the record key for the outbound event.
+     * Can be {@code null} if you do not want to use a specific value.
+     *
+     * @param outboundEvent the outbound event
+     * @return the record key to use
+     */
+    K determineMessageKey(OutboundEvent<?> outboundEvent);
 
 }

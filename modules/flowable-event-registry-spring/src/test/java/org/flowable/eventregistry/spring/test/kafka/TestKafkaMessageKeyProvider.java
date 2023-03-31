@@ -5,7 +5,7 @@ import java.util.function.Function;
 import org.flowable.eventregistry.api.OutboundEvent;
 import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
 
-public class TestKafkaMessageKeyProvider implements KafkaMessageKeyProvider {
+public class TestKafkaMessageKeyProvider implements KafkaMessageKeyProvider<Object> {
 
     protected Function<OutboundEvent<?>, Object> messageKeyProvider;
 

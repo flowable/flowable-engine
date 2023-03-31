@@ -442,7 +442,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             String resolvedTopic = resolve(topic);
 
             KafkaPartitionProvider partitionProvider = resolveKafkaPartitionProvider(channelModel);
-            KafkaMessageKeyProvider messageKeyProvider = resolveKafkaMessageKeyProvider(channelModel);
+            KafkaMessageKeyProvider<?> messageKeyProvider = resolveKafkaMessageKeyProvider(channelModel);
 
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
                             kafkaOperations, partitionProvider, resolvedTopic, messageKeyProvider));
@@ -706,7 +706,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
     }
 
-    protected KafkaMessageKeyProvider resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
+    protected KafkaMessageKeyProvider<?> resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
         KafkaOutboundChannelModel.RecordKey recordKey = channelModel.getRecordKey();
         if (recordKey == null) {
             return null;
@@ -720,7 +720,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         } else {
             throw new FlowableException(
                     "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
-                            + ". One of staticKey, delegateExpression or expression should be set.");
+                            + ". One of fixedValue, delegateExpression or eventField should be set.");
         }
     }
 

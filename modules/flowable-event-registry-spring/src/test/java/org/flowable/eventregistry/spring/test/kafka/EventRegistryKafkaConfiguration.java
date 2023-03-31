@@ -144,12 +144,12 @@ public class EventRegistryKafkaConfiguration {
     }
 
     @Bean
-    public KafkaPartitionProvider kafkaPartitionProvider() {
+    public TestKafkaPartitionProvider kafkaPartitionProvider() {
         return new TestKafkaPartitionProvider();
     }
 
     @Bean
-    public KafkaMessageKeyProvider kafkaMessageKeyProvider() {
+    public TestKafkaMessageKeyProvider kafkaMessageKeyProvider() {
         return new TestKafkaMessageKeyProvider();
     }
 

@@ -19,7 +19,7 @@ import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
 /**
  * @author Roman Saratz
  */
-public class EventPayloadKafkaMessageKeyProvider implements KafkaMessageKeyProvider {
+public class EventPayloadKafkaMessageKeyProvider implements KafkaMessageKeyProvider<Object> {
 
     protected final String eventField;
 

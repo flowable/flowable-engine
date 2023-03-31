@@ -98,10 +98,10 @@ class KafkaChannelDefinitionProcessorTest {
     protected ConsumerFactory<Object, Object> consumerFactory;
 
     @Autowired
-    protected KafkaMessageKeyProvider kafkaMessageKeyProvider;
+    protected TestKafkaMessageKeyProvider kafkaMessageKeyProvider;
 
     @Autowired
-    protected KafkaPartitionProvider kafkaPartitionProvider;
+    protected TestKafkaPartitionProvider kafkaPartitionProvider;
 
     protected TestEventConsumer testEventConsumer;
 
@@ -116,8 +116,8 @@ class KafkaChannelDefinitionProcessorTest {
     @AfterEach
     void tearDown() throws Exception {
         testEventConsumer.clear();
-        ((TestKafkaPartitionProvider) kafkaPartitionProvider).clear();
-        ((TestKafkaMessageKeyProvider) kafkaMessageKeyProvider).clear();
+        kafkaPartitionProvider.clear();
+        kafkaMessageKeyProvider.clear();
 
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
@@ -2325,9 +2325,13 @@ class KafkaChannelDefinitionProcessorTest {
     void kafkaOutboundChannelShouldUseDelegateExpressionForPartition() {
         createTopic("test-custom-partition-delegate-expression", 5);
 
-        Map<String, Integer> partitionMap = Map.of("fozzie", 2, "kermit", 3, "piggy", 4, "gonzo", 1);
+        Map<String, Integer> partitionMap = new HashMap<>();
+        partitionMap.put("fozzie", 2);
+        partitionMap.put("kermit", 3);
+        partitionMap.put("piggy", 4);
+        partitionMap.put("gonzo", 1);
 
-        ((TestKafkaPartitionProvider) kafkaPartitionProvider).setPartitionProvider(eventPayload -> {
+        kafkaPartitionProvider.setPartitionProvider(eventPayload -> {
             String customer = (String) eventPayload.getEventInstance().getPayloadInstances().stream()
                     .filter(instance -> instance.getDefinitionName().equals("customer")).map(
                             EventPayloadInstance::getValue).findFirst().orElse(null);
@@ -2698,7 +2702,7 @@ class KafkaChannelDefinitionProcessorTest {
     void kafkaOutboundChannelShouldDelegateExpressionForMessageKey() {
         createTopic("test-delegate-expression-message-key");
 
-        ((TestKafkaMessageKeyProvider) kafkaMessageKeyProvider).setMessageKeyProvider(ignore -> "testKey");
+        kafkaMessageKeyProvider.setMessageKeyProvider(ignore -> "testKey");
 
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testDelegateExpressionMessageKey", "testClientDelegateExpressionMessageKey")) {
             consumer.subscribe(Collections.singleton("test-delegate-expression-message-key"));

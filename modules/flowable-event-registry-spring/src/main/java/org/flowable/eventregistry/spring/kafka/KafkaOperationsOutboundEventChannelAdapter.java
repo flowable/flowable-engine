@@ -36,18 +36,15 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
     protected KafkaMessageKeyProvider messageKeyProvider;
     protected String topic;
 
-    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, KafkaMessageKeyProvider messageKeyProvider) {
+    // backwards compatibility
+    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
+        this(kafkaOperations, partitionProvider, topic, (ignore) -> key);
+    }
+
+    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, KafkaMessageKeyProvider<?> messageKeyProvider) {
         this.kafkaOperations = kafkaOperations;
         this.partitionProvider = partitionProvider;
         this.messageKeyProvider = messageKeyProvider;
-        this.topic = topic;
-    }
-
-    // backwards compatibility
-    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
-        this.kafkaOperations = kafkaOperations;
-        this.partitionProvider = partitionProvider;
-        this.messageKeyProvider = (ignore) -> key;
         this.topic = topic;
     }
 
