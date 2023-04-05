@@ -30,7 +30,7 @@ import org.springframework.kafka.core.KafkaOperations;
 /**
  * @author Filip Hrisafov
  */
-public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
+public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<Object> {
 
     protected KafkaOperations<Object, Object> kafkaOperations;
     protected KafkaPartitionProvider partitionProvider;
@@ -50,9 +50,9 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
     }
 
     @Override
-    public void sendEvent(OutboundEvent<String> event) {
+    public void sendEvent(OutboundEvent<Object> event) {
         try {
-            String rawEvent = event.getBody();
+            Object rawEvent = event.getBody();
             Map<String, Object> headerMap = event.getHeaders();
             List<Header> headers = new ArrayList<>();
             for (String headerKey : headerMap.keySet()) {
@@ -81,7 +81,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
     }
 
     @Override
-    public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
+    public void sendEvent(Object rawEvent, Map<String, Object> headerMap) {
         throw new UnsupportedOperationException("Outbound processor should never call this");
     }
 }
