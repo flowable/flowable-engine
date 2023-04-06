@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Collections;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -85,7 +87,7 @@ public class PlanItemInstanceVariableResource extends BaseVariableResource {
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
             result = setBinaryVariable((MultipartHttpServletRequest) request, planItem.getId(), CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, false,
-                    RestVariable.RestVariableScope.LOCAL);
+                    RestVariable.RestVariableScope.LOCAL, createVariableInterceptor(planItem));
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
@@ -106,7 +108,7 @@ public class PlanItemInstanceVariableResource extends BaseVariableResource {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, planItem.getId(), false, RestVariable.RestVariableScope.LOCAL, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM);
+            result = setSimpleVariable(restVariable, planItem.getId(), false, RestVariable.RestVariableScope.LOCAL, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, createVariableInterceptor(planItem));
         }
         return result;
     }
@@ -129,6 +131,10 @@ public class PlanItemInstanceVariableResource extends BaseVariableResource {
             throw new FlowableObjectNotFoundException(
                     "Plan item instance '" + planItem.getId() + "' does not have a variable '" + variableName + "' in local scope",
                     VariableInstance.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deletePlanItemInstanceVariables(planItem, Collections.singleton(variableName));
         }
         runtimeService.removeLocalVariable(planItem.getId(), variableName);
     }

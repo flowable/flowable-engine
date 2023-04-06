@@ -53,7 +53,11 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource extends Histo
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricProcessIdentityLinks(processInstance);
+        }
         
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
 

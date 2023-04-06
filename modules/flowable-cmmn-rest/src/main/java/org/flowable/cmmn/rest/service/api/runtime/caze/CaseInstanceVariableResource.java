@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Collections;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -62,7 +64,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public RestVariable getVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         return getVariableFromRequest(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, false);
     }
 
@@ -89,11 +91,12 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public RestVariable updateVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, false);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, false,
+                    RestVariable.RestVariableScope.GLOBAL, createVariableInterceptor(caseInstance));
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
@@ -114,7 +117,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, caseInstance.getId(), false, CmmnRestResponseFactory.VARIABLE_CASE);
+            result = setSimpleVariable(restVariable, caseInstance.getId(), false, RestVariable.RestVariableScope.GLOBAL, CmmnRestResponseFactory.VARIABLE_CASE, createVariableInterceptor(caseInstance));
         }
         return result;
     }
@@ -128,13 +131,17 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     public void deleteVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         boolean hasVariable = runtimeService.hasVariable(caseInstance.getId(), variableName);
         if (!hasVariable) {
             throw new FlowableObjectNotFoundException("Could not find a variable with name '" + variableName + "'.");
         }
         
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceVariables(caseInstance, Collections.singleton(variableName));
+        }
+
         runtimeService.removeVariable(caseInstance.getId(), variableName);
         
         response.setStatus(HttpStatus.NO_CONTENT.value());

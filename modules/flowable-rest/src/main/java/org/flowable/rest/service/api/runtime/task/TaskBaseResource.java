@@ -540,14 +540,12 @@ public class TaskBaseResource {
     }
 
     /**
-     * Get valid task from request. Throws exception if task does not exist or if task id is not provided.
+     * Returns the {@link Task} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
      */
     protected Task getTaskFromRequest(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
-        }
-        
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoById(task);
         }
@@ -556,16 +554,40 @@ public class TaskBaseResource {
     }
 
     /**
-     * Get valid history task from request. Throws exception if task does not exist or if task id is not provided.
+     * Returns the {@link Task} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
      */
-    protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
-        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+    protected Task getTaskFromRequestWithoutAccessCheck(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+
+        return task;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithoutAccessCheck(taskId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoById(task);
+        }
+        
+        return task;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskFromRequestWithoutAccessCheck(String taskId) {
+        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
         
         return task;

@@ -220,15 +220,21 @@ public class HistoricProcessInstanceBaseResource {
     }
     
     protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
-        }
-        
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryProcessInfoById(processInstance);
         }
         
+        return processInstance;
+    }
+
+    protected HistoricProcessInstance getHistoricProcessInstanceFromRequestWithoutAccessCheck(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+        }
+
         return processInstance;
     }
 

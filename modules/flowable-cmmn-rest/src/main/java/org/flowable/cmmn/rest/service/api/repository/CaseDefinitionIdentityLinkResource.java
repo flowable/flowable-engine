@@ -55,12 +55,16 @@ public class CaseDefinitionIdentityLinkResource extends BaseCaseDefinitionResour
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletRequest request) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to get exists
         IdentityLink link = getIdentityLink(family, identityId, caseDefinition.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionIdentityLink(caseDefinition, link);
+        }
 
         return restResponseFactory.createRestIdentityLink(link);
     }
@@ -75,12 +79,17 @@ public class CaseDefinitionIdentityLinkResource extends BaseCaseDefinitionResour
             @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             HttpServletResponse response) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to delete exists
         IdentityLink link = getIdentityLink(family, identityId, caseDefinition.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseDefinitionIdentityLink(caseDefinition, link);
+        }
+
         if (link.getUserId() != null) {
             repositoryService.deleteCandidateStarterUser(caseDefinition.getId(), link.getUserId());
         } else {

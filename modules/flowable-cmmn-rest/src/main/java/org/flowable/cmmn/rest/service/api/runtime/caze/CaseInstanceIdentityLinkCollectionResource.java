@@ -50,7 +50,12 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceIdentityLinks(caseInstance);
+        }
+
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForCaseInstance(caseInstance.getId()));
     }
 
@@ -64,7 +69,7 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a case instance.");
@@ -76,6 +81,10 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createCaseInstanceIdentityLink(caseInstance, identityLink);
         }
 
         runtimeService.addUserIdentityLink(caseInstance.getId(), identityLink.getUser(), identityLink.getType());

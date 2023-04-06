@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +29,6 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -206,6 +206,14 @@ public class BaseExecutionVariableResource implements InitializingBean {
             throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable with name: '" + name + "'.", null);
         }
 
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createExecutionVariables(execution, Collections.singletonMap(name, value), scope);
+            } else {
+                restApiInterceptor.updateExecutionVariables(execution, Collections.singletonMap(name, value), scope);
+            }
+        }
+
         if (scope == RestVariableScope.LOCAL) {
             runtimeService.setVariableLocal(execution.getId(), name, value);
         } else {
@@ -243,6 +251,10 @@ public class BaseExecutionVariableResource implements InitializingBean {
         }
 
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessExecutionVariable(execution, variableName, scope);
+        }
+
         if (variableScope == null) {
             // First, check local variables (which have precedence when no scope
             // is supplied)
@@ -283,30 +295,10 @@ public class BaseExecutionVariableResource implements InitializingBean {
         return restResponseFactory.createRestVariable(variableName, value, variableScope, executionId, RestResponseFactory.VARIABLE_EXECUTION, includeBinary);
     }
 
-    /**
-     * Get valid execution from request. Throws exception if execution does not exist or if execution id is not provided.
-     */
-    protected Execution getExecutionFromRequest(String executionId) {
+    protected Execution getExecutionFromRequestWithoutAccessCheck(String executionId) {
         Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
         if (execution == null) {
             throw new FlowableObjectNotFoundException("Could not find an execution with id '" + executionId + "'.", Execution.class);
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessExecutionInfoById(execution);
-        }
-        
-        return execution;
-    }
-
-    protected Execution getProcessInstanceFromRequest(String processInstanceId) {
-        Execution execution = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (execution == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessInstanceInfoById((ProcessInstance) execution);
         }
         
         return execution;

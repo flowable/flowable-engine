@@ -33,7 +33,6 @@ import org.flowable.common.rest.api.DataResponse;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
-import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.TaskQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -519,14 +518,11 @@ public class TaskBaseResource {
     }
 
     /**
-     * Get valid task from request. Throws exception if task doesn't exist or if task id is not provided.
+     * Returns the {@link Task} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
      */
     protected Task getTaskFromRequest(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
-        }
-
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoById(task);
         }
@@ -534,23 +530,16 @@ public class TaskBaseResource {
         return task;
     }
 
-    protected List<Task> getTasksFromRequest(Collection<String> taskIds) {
-        return taskService.createTaskQuery().taskIds(taskIds).list();
-    }
-
-    /**
-     * Get valid history task from request. Throws exception if task doesn't exist or if task id is not provided.
-     */
-    protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
-        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+    protected Task getTaskFromRequestWithoutAccessCheck(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
 
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryTaskInfoById(task);
-        }
-
         return task;
+    }
+
+    protected List<Task> getTasksFromRequest(Collection<String> taskIds) {
+        return taskService.createTaskQuery().taskIds(taskIds).list();
     }
 }

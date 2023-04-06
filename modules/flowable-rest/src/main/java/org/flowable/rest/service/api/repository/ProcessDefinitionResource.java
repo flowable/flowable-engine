@@ -100,7 +100,11 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             throw new FlowableIllegalArgumentException("No action found in request body.");
         }
 
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeProcessDefinitionAction(processDefinition, actionRequest);
+        }
 
         if (actionRequest.getCategory() != null) {
             // Update of category required
@@ -162,7 +166,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void migrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);
@@ -181,7 +185,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     public void batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson, HttpServletRequest request) {
         
-        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateInstancesOfProcessDefinition(processDefinition, migrationDocumentJson);

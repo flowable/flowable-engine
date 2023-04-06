@@ -54,11 +54,16 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
         IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceIdentityLink(processInstance, link);
+        }
+
         return restResponseFactory.createRestIdentityLink(link);
     }
 
@@ -72,11 +77,15 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
-        getIdentityLink(identityId, type, processInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteProcessInstanceIdentityLink(processInstance, link);
+        }
 
         runtimeService.deleteUserIdentityLink(processInstance.getId(), identityId, type);
 

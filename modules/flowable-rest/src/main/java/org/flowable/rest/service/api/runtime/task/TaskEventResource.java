@@ -68,11 +68,15 @@ public class TaskEventResource extends TaskBaseResource {
     public void deleteEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletResponse response) {
 
         // Check if task exists
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         Event event = taskService.getEvent(eventId);
         if (event == null || event.getTaskId() == null || !event.getTaskId().equals(task.getId())) {
             throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an event with id '" + event + "'.", Event.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskEvent(task, event);
         }
 
         taskService.deleteComment(eventId);

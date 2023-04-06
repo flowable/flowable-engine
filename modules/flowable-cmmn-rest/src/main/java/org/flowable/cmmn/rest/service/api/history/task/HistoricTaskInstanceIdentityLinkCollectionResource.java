@@ -53,7 +53,11 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource extends Historic
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricTaskIdentityLinks(task);
+        }
         
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
 

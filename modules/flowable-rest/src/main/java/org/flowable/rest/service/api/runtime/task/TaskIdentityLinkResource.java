@@ -54,10 +54,14 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         validateIdentityLinkArguments(family, identityId, type);
 
         IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLink(task, link);
+        }
 
         return restResponseFactory.createRestIdentityLink(link);
     }
@@ -72,12 +76,16 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         validateIdentityLinkArguments(family, identityId, type);
 
         // Check if identitylink to delete exists
-        getIdentityLink(family, identityId, type, task.getId());
+        IdentityLink link = getIdentityLink(family, identityId, type, task.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskIdentityLink(task, link);
+        }
 
         if (RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family)) {
             taskService.deleteUserIdentityLink(task.getId(), identityId, type);

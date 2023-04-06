@@ -74,7 +74,7 @@ public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResour
             @ApiResponse(code = 404, message = "Indicates that the historic task instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-task-instances/{taskId}")
     public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricTask(task);

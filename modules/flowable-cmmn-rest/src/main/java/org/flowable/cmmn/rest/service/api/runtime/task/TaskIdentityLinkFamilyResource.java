@@ -50,10 +50,14 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks/{family}", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
         }
 
         boolean isUser = family.equals(CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);

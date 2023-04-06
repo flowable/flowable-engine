@@ -59,6 +59,10 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             addLocalVariables(execution, variableType, variableMap);
         }
 
+        if (restApiInterceptor != null) {
+            variableMap = restApiInterceptor.accessExecutionVariables(execution, variableMap);
+        }
+
         // Get unique variables from map
         List<RestVariable> result = new ArrayList<>(variableMap.values());
         return result;
@@ -66,6 +70,9 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
 
     public void deleteAllLocalVariables(Execution execution, HttpServletResponse response) {
         Collection<String> currentVariables = runtimeService.getVariablesLocal(execution.getId()).keySet();
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteExecutionVariables(execution, currentVariables, RestVariableScope.LOCAL);
+        }
         runtimeService.removeVariablesLocal(execution.getId(), currentVariables);
 
         response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -128,6 +135,10 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             }
 
             if (!variablesToSet.isEmpty()) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.createExecutionVariables(execution, variablesToSet, sharedScope);
+                }
+
                 if (sharedScope == RestVariableScope.LOCAL) {
                     runtimeService.setVariablesLocal(execution.getId(), variablesToSet);
                 } else {

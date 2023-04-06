@@ -95,7 +95,10 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     public AttachmentResponse createAttachment(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
         AttachmentResponse result = null;
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTaskAttachment(task);
+        }
         if (request instanceof MultipartHttpServletRequest) {
             result = createBinaryAttachment((MultipartHttpServletRequest) request, task, response);
         } else {

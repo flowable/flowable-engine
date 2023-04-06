@@ -58,7 +58,7 @@ public class ExecutionVariableDataResource extends BaseExecutionVariableResource
         try {
             byte[] result = null;
 
-            Execution execution = getExecutionFromRequest(executionId);
+            Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
             RestVariable variable = getVariableFromRequest(execution, variableName, scope, true);
             if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();

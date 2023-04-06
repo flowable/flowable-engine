@@ -35,19 +35,30 @@ public class BaseProcessDefinitionResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     /**
-     * Returns the {@link ProcessDefinition} that is requested. Throws the right exceptions when bad request was made or definition was not found.
+     * Returns the {@link ProcessDefinition} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or definition was not found.
      */
     protected ProcessDefinition getProcessDefinitionFromRequest(String processDefinitionId) {
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessDefinitionById(processDefinition);
+        }
+        
+        return processDefinition;
+    }
+
+    /**
+     * Returns the {@link ProcessDefinition} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or definition was not found.
+     */
+    protected ProcessDefinition getProcessDefinitionFromRequestWithoutAccessCheck(String processDefinitionId) {
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Could not find a process definition with id '" + processDefinitionId + "'.", ProcessDefinition.class);
         }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessProcessDefinitionById(processDefinition);
-        }
-        
+
         return processDefinition;
     }
 }
