@@ -93,7 +93,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}")
     public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteProcessInstance(processInstance);
         }
@@ -113,7 +113,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     public ProcessInstanceResponse updateProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
         @RequestBody ProcessInstanceUpdateRequest updateRequest, HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.updateProcessInstance(processInstance, updateRequest);
@@ -187,7 +187,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/evaluate-conditions", produces = "application/json")
     public void evaluateConditions(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId) {
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.evaluateProcessInstanceConditionalEvents(processInstance);
+        }
         runtimeService.evaluateConditionalEvents(processInstance.getId());
     }
     

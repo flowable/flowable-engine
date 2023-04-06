@@ -13,6 +13,7 @@
 package org.flowable.cmmn.rest.service.api;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
@@ -31,6 +32,8 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
@@ -49,6 +52,7 @@ import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.cmmn.rest.service.api.runtime.variable.VariableInstanceQueryRequest;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
@@ -79,6 +83,24 @@ public interface CmmnRestApiInterceptor {
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
     
+    void accessTaskVariable(Task task, String variableName);
+
+    Map<String, RestVariable> accessTaskVariables(Task task, Map<String, RestVariable> variables);
+
+    void createTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteTaskVariables(Task task, Collection<String> variableNames, RestVariable.RestVariableScope scope);
+
+    void accessTaskIdentityLinks(Task task);
+
+    void accessTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void deleteTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
+
     void accessCaseInstanceInfoById(CaseInstance caseInstance);
 
     void accessCaseInstanceInfoWithQuery(CaseInstanceQuery caseInstanceQuery, CaseInstanceQueryRequest request);
@@ -97,7 +119,33 @@ public interface CmmnRestApiInterceptor {
 
     void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
     
+    void accessCaseInstanceVariable(CaseInstance caseInstance, String variableName);
+
+    Map<String, Object> accessCaseInstanceVariables(CaseInstance caseInstance, Map<String, Object> variables);
+
+    void createCaseInstanceVariables(CaseInstance caseInstance, Map<String, Object> variables);
+
+    void updateCaseInstanceVariables(CaseInstance caseInstance, Map<String, Object> variables);
+
+    void deleteCaseInstanceVariables(CaseInstance caseInstance, Collection<String> variableNames);
+
+    void accessCaseInstanceIdentityLinks(CaseInstance caseInstance);
+
+    void accessCaseInstanceIdentityLink(CaseInstance caseInstance, IdentityLink identityLink);
+
+    void deleteCaseInstanceIdentityLink(CaseInstance caseInstance, IdentityLink identityLink);
+
+    void createCaseInstanceIdentityLink(CaseInstance caseInstance, RestIdentityLink identityLink);
+
     void accessPlanItemInstanceInfoById(PlanItemInstance planItemInstance);
+
+    void accessPlanItemInstanceVariable(PlanItemInstance planItemInstance, String variableName);
+
+    void createPlanItemInstanceVariables(PlanItemInstance planItemInstance, Map<String, Object> variables);
+
+    void updatePlanItemInstanceVariables(PlanItemInstance planItemInstance, Map<String, Object> variables);
+
+    void deletePlanItemInstanceVariables(PlanItemInstance planItemInstance, Collection<String> variableNames);
 
     void accessPlanItemInstanceInfoWithQuery(PlanItemInstanceQuery planItemInstanceQuery, PlanItemInstanceQueryRequest request);
     
@@ -109,6 +157,14 @@ public interface CmmnRestApiInterceptor {
     
     void accessCaseDefinitionById(CaseDefinition caseDefinition);
     
+    void accessCaseDefinitionIdentityLinks(CaseDefinition caseDefinition);
+
+    void accessCaseDefinitionIdentityLink(CaseDefinition caseDefinition, IdentityLink identityLink);
+
+    void deleteCaseDefinitionIdentityLink(CaseDefinition caseDefinition, IdentityLink identityLink);
+
+    void createCaseDefinitionIdentityLink(CaseDefinition caseDefinition, RestIdentityLink identityLink);
+
     void accessCaseDefinitionsWithQuery(CaseDefinitionQuery caseDefinitionQuery);
     
     void accessDeploymentById(CmmnDeployment deployment);
@@ -157,12 +213,16 @@ public interface CmmnRestApiInterceptor {
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
     
+    void accessHistoricTaskIdentityLinks(HistoricTaskInstance historicTaskInstance);
+
     void accessHistoryCaseInfoById(HistoricCaseInstance historicCaseInstance);
     
     void accessHistoryCaseInfoWithQuery(HistoricCaseInstanceQuery historicCaseInstanceQuery, HistoricCaseInstanceQueryRequest request);
     
     void deleteHistoricCase(HistoricCaseInstance historicCaseInstance);
     
+    void accessHistoricCaseIdentityLinks(HistoricCaseInstance historicCaseInstance);
+
     void bulkDeleteHistoricCases(Collection<String> instanceIds);
 
     void accessStageOverview(CaseInstance caseInstance);

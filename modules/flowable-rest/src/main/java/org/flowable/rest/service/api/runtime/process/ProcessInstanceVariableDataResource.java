@@ -48,7 +48,7 @@ public class ProcessInstanceVariableDataResource extends BaseExecutionVariableRe
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
         return getVariableDataByteArray(execution, variableName, scope, response);
     }
 }

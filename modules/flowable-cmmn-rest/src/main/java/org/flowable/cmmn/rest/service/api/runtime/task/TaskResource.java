@@ -85,7 +85,7 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when updating the task.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
@@ -118,7 +118,7 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.executeTaskAction(task, actionRequest);
@@ -155,7 +155,7 @@ public class TaskResource extends TaskBaseResource {
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
             @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
-        Task taskToDelete = getTaskFromRequest(taskId);
+        Task taskToDelete = getTaskFromRequestWithoutAccessCheck(taskId);
         if (taskToDelete.getScopeId() != null && ScopeTypes.CMMN.equals(taskToDelete.getScopeType())) {
             // Can't delete a task that is part of a case instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a case instance.");

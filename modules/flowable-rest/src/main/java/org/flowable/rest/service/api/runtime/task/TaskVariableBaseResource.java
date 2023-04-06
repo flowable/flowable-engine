@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -54,6 +55,11 @@ public class TaskVariableBaseResource extends TaskBaseResource {
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskVariable(task, variableName);
+        }
 
         boolean variableFound = false;
         Object value = null;
@@ -67,7 +73,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableFound = true;
             } else {
                 // Revert to execution-variable when not present local on the task
-                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                     value = runtimeService.getVariable(task.getExecutionId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
@@ -76,7 +81,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             }
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                 value = runtimeService.getVariable(task.getExecutionId(), variableName);
                 variableFound = true;
@@ -219,6 +223,14 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
         if (!isNew && !hasVariable) {
             throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a variable with name: '" + name + "'.", null);
+        }
+
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createTaskVariables(task, Collections.singletonMap(name, value), scope);
+            } else {
+                restApiInterceptor.updateTaskVariables(task, Collections.singletonMap(name, value), scope);
+            }
         }
 
         if (scope == RestVariableScope.LOCAL) {

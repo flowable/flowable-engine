@@ -49,7 +49,11 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, HttpServletRequest request) {
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
+        }
+
         return restResponseFactory.createRestIdentityLinks(taskService.getIdentityLinksForTask(task.getId()));
     }
 
@@ -62,7 +66,7 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
     @PostMapping(value = "/runtime/tasks/{taskId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
@@ -74,6 +78,10 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTaskIdentityLink(task, identityLink);
         }
 
         if (identityLink.getGroup() != null) {

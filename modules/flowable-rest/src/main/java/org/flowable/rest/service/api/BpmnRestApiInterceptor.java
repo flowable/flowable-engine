@@ -13,6 +13,7 @@
 package org.flowable.rest.service.api;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
@@ -36,8 +37,12 @@ import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.task.Attachment;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.Event;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.User;
@@ -49,6 +54,9 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.rest.service.api.engine.CommentRequest;
+import org.flowable.rest.service.api.engine.RestIdentityLink;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.form.SubmitFormRequest;
 import org.flowable.rest.service.api.history.HistoricActivityInstanceQueryRequest;
 import org.flowable.rest.service.api.history.HistoricDetailQueryRequest;
@@ -59,6 +67,7 @@ import org.flowable.rest.service.api.history.HistoricVariableInstanceQueryReques
 import org.flowable.rest.service.api.identity.GroupRequest;
 import org.flowable.rest.service.api.identity.UserRequest;
 import org.flowable.rest.service.api.repository.ModelRequest;
+import org.flowable.rest.service.api.repository.ProcessDefinitionActionRequest;
 import org.flowable.rest.service.api.runtime.VariableInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.ActivityInstanceQueryRequest;
 import org.flowable.rest.service.api.runtime.process.ExecutionActionRequest;
@@ -102,15 +111,53 @@ public interface BpmnRestApiInterceptor {
     void updateTask(Task task, TaskRequest request);
 
     void deleteTask(Task task);
+
+    void createTaskAttachment(Task task);
+
+    void deleteTaskAttachment(Task task, Attachment attachment);
+
+    void createTaskComment(Task task, CommentRequest comment);
+
+    void deleteTaskComment(Task task, Comment comment);
+
+    void deleteTaskEvent(Task task, Event event);
     
     void executeTaskAction(Task task, TaskActionRequest actionRequest);
     
+    void accessTaskVariable(Task task, String variableName);
+
+    Map<String, RestVariable> accessTaskVariables(Task task, Map<String, RestVariable> variableMap);
+
+    void createTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateTaskVariables(Task task, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteTaskVariables(Task task, Collection<String> variableNames, RestVariable.RestVariableScope scope);
+
+    void accessTaskIdentityLinks(Task task);
+
+    void accessTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void deleteTaskIdentityLink(Task task, IdentityLink identityLink);
+
+    void createTaskIdentityLink(Task task, RestIdentityLink identityLink);
+
     void accessExecutionInfoById(Execution execution);
+
+    void accessExecutionVariable(Execution execution, String variableName, String scope);
+
+    Map<String, RestVariable> accessExecutionVariables(Execution execution, Map<String, RestVariable> variables);
 
     void accessExecutionInfoWithQuery(ExecutionQuery executionQuery, ExecutionQueryRequest request);
     
     void doExecutionActionRequest(ExecutionActionRequest executionActionRequest);
     
+    void createExecutionVariables(Execution execution, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void updateExecutionVariables(Execution execution, Map<String, Object> variables, RestVariable.RestVariableScope scope);
+
+    void deleteExecutionVariables(Execution execution, Collection<String> variableNames, RestVariable.RestVariableScope scope);
+
     void accessProcessInstanceInfoById(ProcessInstance processInstance);
 
     void accessProcessInstanceInfoWithQuery(ProcessInstanceQuery processInstanceQuery, ProcessInstanceQueryRequest request);
@@ -121,6 +168,14 @@ public interface BpmnRestApiInterceptor {
 
     void deleteProcessInstance(ProcessInstance processInstance);
     
+    void accessProcessInstanceIdentityLinks(ProcessInstance processInstance);
+
+    void accessProcessInstanceIdentityLink(ProcessInstance processInstance, IdentityLink identityLink);
+
+    void deleteProcessInstanceIdentityLink(ProcessInstance processInstance, IdentityLink identityLink);
+
+    void createProcessInstanceIdentityLink(ProcessInstance processInstance, RestIdentityLink identityLink);
+
     void bulkDeleteProcessInstances(Collection<String> processInstances);
     
     void accessActivityInfoWithQuery(ActivityInstanceQuery activityInstanceQuery, ActivityInstanceQueryRequest request);
@@ -137,6 +192,8 @@ public interface BpmnRestApiInterceptor {
     
     void migrateInstancesOfProcessDefinition(ProcessDefinition processDefinition, String migrationDocument);
     
+    void evaluateProcessInstanceConditionalEvents(ProcessInstance processInstance);
+
     void injectActivity(InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);
@@ -145,6 +202,16 @@ public interface BpmnRestApiInterceptor {
     
     void accessProcessDefinitionById(ProcessDefinition processDefinition);
     
+    void executeProcessDefinitionAction(ProcessDefinition processDefinition, ProcessDefinitionActionRequest actionRequest);
+
+    void accessProcessDefinitionIdentityLinks(ProcessDefinition processDefinition);
+
+    void accessProcessDefinitionIdentityLink(ProcessDefinition processDefinition, IdentityLink identityLink);
+
+    void deleteProcessDefinitionIdentityLink(ProcessDefinition processDefinition, IdentityLink identityLink);
+
+    void createProcessDefinitionIdentityLink(ProcessDefinition processDefinition, RestIdentityLink identityLink);
+
     void accessProcessDefinitionsWithQuery(ProcessDefinitionQuery processDefinitionQuery);
     
     void accessDeploymentById(Deployment deployment);
@@ -201,12 +268,16 @@ public interface BpmnRestApiInterceptor {
     
     void deleteHistoricTask(HistoricTaskInstance historicTaskInstance);
     
+    void accessHistoricTaskIdentityLinks(HistoricTaskInstance historicTaskInstance);
+
     void accessHistoryProcessInfoById(HistoricProcessInstance historicProcessInstance);
     
     void accessHistoryProcessInfoWithQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery, HistoricProcessInstanceQueryRequest request);
     
     void deleteHistoricProcess(HistoricProcessInstance historicProcessInstance);
     
+    void accessHistoricProcessIdentityLinks(HistoricProcessInstance historicProcessInstance);
+
     void accessHistoryActivityInfoWithQuery(HistoricActivityInstanceQuery historicActivityInstanceQuery, HistoricActivityInstanceQueryRequest request);
     
     void accessHistoryDetailById(HistoricDetail historicDetail);

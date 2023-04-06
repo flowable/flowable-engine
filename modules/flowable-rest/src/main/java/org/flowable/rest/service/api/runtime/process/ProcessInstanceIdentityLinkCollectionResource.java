@@ -50,7 +50,12 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
+        }
+
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()));
     }
 
@@ -64,7 +69,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
     public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
         if (identityLink.getGroup() != null) {
             throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");
@@ -76,6 +81,10 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createProcessInstanceIdentityLink(processInstance, identityLink);
         }
 
         runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());

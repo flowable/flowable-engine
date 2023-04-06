@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -96,7 +98,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -140,7 +142,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString,
             HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         // Determine scope
         RestVariableScope scope = RestVariableScope.LOCAL;
@@ -150,6 +152,10 @@ public class TaskVariableResource extends TaskVariableBaseResource {
 
         if (!hasVariableOnScope(task, variableName, scope)) {
             throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable '" + variableName + "' in scope " + scope.name().toLowerCase(), VariableInstanceEntity.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskVariables(task, Collections.singleton(variableName), scope);
         }
 
         if (scope == RestVariableScope.LOCAL) {

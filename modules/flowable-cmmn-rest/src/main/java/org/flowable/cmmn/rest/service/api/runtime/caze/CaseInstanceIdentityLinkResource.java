@@ -54,11 +54,16 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletRequest request) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
         IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseInstanceIdentityLink(caseInstance, link);
+        }
+
         return restResponseFactory.createRestIdentityLink(link);
     }
 
@@ -72,11 +77,15 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
             @ApiParam(name = "type") @PathVariable("type") String type,
             HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         validateIdentityLinkArguments(identityId, type);
 
-        getIdentityLink(identityId, type, caseInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseInstanceIdentityLink(caseInstance, link);
+        }
 
         runtimeService.deleteUserIdentityLink(caseInstance.getId(), identityId, type);
 

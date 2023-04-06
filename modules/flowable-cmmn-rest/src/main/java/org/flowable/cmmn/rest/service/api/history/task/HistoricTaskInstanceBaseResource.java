@@ -278,14 +278,28 @@ public class HistoricTaskInstanceBaseResource {
             restResponseFactory::createHistoricTaskInstanceResponseList);
     }
     
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
     protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
+        HistoricTaskInstance taskInstance = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
+        }
+        
+        return taskInstance;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskInstanceFromRequestWithoutAccessCheck(String taskId) {
         HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
         if (taskInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
         }
         
         return taskInstance;
