@@ -68,11 +68,15 @@ public class TaskCommentResource extends TaskBaseResource {
     public void deleteComment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletResponse response) {
 
         // Check if task exists
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         Comment comment = taskService.getComment(commentId);
         if (comment == null || comment.getTaskId() == null || !comment.getTaskId().equals(task.getId())) {
             throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a comment with id '" + commentId + "'.", Comment.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskComment(task, comment);
         }
 
         taskService.deleteComment(commentId);

@@ -54,7 +54,11 @@ public class HistoricCaseInstanceIdentityLinkCollectionResource extends Historic
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
     public List<HistoricIdentityLinkResponse> getCaseIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
-        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricCaseIdentityLinks(caseInstance);
+        }
         
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
 

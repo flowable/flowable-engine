@@ -65,10 +65,14 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
     @PostMapping(value = "/runtime/tasks/{taskId}/comments", produces = "application/json")
     public CommentResponse createComment(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody CommentRequest comment, HttpServletRequest request, HttpServletResponse response) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (comment.getMessage() == null) {
             throw new FlowableIllegalArgumentException("Comment text is required.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTaskComment(task, comment);
         }
 
         String processInstanceId = null;
