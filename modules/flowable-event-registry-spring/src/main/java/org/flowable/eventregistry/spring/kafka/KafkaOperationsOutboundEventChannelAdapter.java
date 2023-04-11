@@ -33,14 +33,19 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
 
     protected KafkaOperations<Object, Object> kafkaOperations;
     protected KafkaPartitionProvider partitionProvider;
+    protected KafkaMessageKeyProvider messageKeyProvider;
     protected String topic;
-    protected String key;
 
+    // backwards compatibility
     public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
+        this(kafkaOperations, partitionProvider, topic, (ignore) -> key);
+    }
+
+    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, KafkaMessageKeyProvider<?> messageKeyProvider) {
         this.kafkaOperations = kafkaOperations;
         this.partitionProvider = partitionProvider;
+        this.messageKeyProvider = messageKeyProvider;
         this.topic = topic;
-        this.key = key;
     }
 
     @Override
@@ -57,6 +62,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
             }
 
             Integer partition = partitionProvider == null ? null : partitionProvider.determinePartition(event);
+            Object key = messageKeyProvider == null ? null : messageKeyProvider.determineMessageKey(event);
 
             ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, partition, key, rawEvent, headers);
             kafkaOperations.send(producerRecord).get();
