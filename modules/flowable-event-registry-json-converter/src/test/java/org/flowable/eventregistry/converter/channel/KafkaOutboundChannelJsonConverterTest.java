@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest {
 
     @Test
-    void convertJsonToModel() {
+    void convertJsonToModelKeyBackwardsCompatible() {
         ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel.json");
 
         validateModel(channelModel);
@@ -37,6 +37,31 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
 
         validateModel(parsedChannel);
     }
+
+    @Test
+    void convertJsonToModelKeyWithFixedValue() {
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-fixedValue.json");
+        assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
+            model.getRecordKey().getFixedValue().equals("customer");
+        });
+    }
+
+    @Test
+    void convertJsonToModelKeyWithDelegateExpression() {
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-delegateExpression.json");
+        assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
+            model.getRecordKey().getDelegateExpression().equals("${test}");
+        });
+    }
+
+    @Test
+    void convertJsonToModelKeyWithEventField() {
+        ChannelModel channelModel = readJson("org/flowable/eventregistry/converter/channel/simpleKafkaOutboundChannel-recordKey-eventField.json");
+        assertThat(channelModel).isInstanceOfSatisfying(KafkaOutboundChannelModel.class, model -> {
+            model.getRecordKey().getEventField().equals("customer");
+        });
+    }
+
 
     protected void validateModel(ChannelModel channelModel) {
         assertThat(channelModel)
@@ -52,7 +77,7 @@ class KafkaOutboundChannelJsonConverterTest extends AbstractChannelConverterTest
                 assertThat(model.getSerializerType()).isEqualTo("json");
 
                 assertThat(model.getTopic()).isEqualTo("outbound-customer");
-                assertThat(model.getRecordKey()).isEqualTo("customer");
+                assertThat(model.getRecordKey().getFixedValue()).isEqualTo("customer");
             });
     }
 

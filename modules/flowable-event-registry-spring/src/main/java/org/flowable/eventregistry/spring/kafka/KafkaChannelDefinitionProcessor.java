@@ -40,6 +40,7 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.flowable.eventregistry.spring.kafka.payload.EventPayloadKafkaMessageKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -441,9 +442,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             String resolvedTopic = resolve(topic);
 
             KafkaPartitionProvider partitionProvider = resolveKafkaPartitionProvider(channelModel);
+            KafkaMessageKeyProvider<?> messageKeyProvider = resolveKafkaMessageKeyProvider(channelModel);
 
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
-                            kafkaOperations, partitionProvider, resolvedTopic, channelModel.getRecordKey()));
+                            kafkaOperations, partitionProvider, resolvedTopic, messageKeyProvider));
         }
     }
 
@@ -704,8 +706,26 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
     }
 
+    protected KafkaMessageKeyProvider<?> resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
+        KafkaOutboundChannelModel.RecordKey recordKey = channelModel.getRecordKey();
+        if (recordKey == null) {
+            return null;
+        }
+        if (StringUtils.hasText(recordKey.getEventField())) {
+            return new EventPayloadKafkaMessageKeyProvider(recordKey.getEventField());
+        } else if (StringUtils.hasText(recordKey.getFixedValue())) {
+            return ignore -> recordKey.getFixedValue();
+        } else if (StringUtils.hasText(recordKey.getDelegateExpression())) {
+            return resolveExpression(recordKey.getDelegateExpression(), KafkaMessageKeyProvider.class);
+        } else {
+            throw new FlowableException(
+                    "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
+                            + ". One of fixedValue, delegateExpression or eventField should be set.");
+        }
+    }
+
     protected <T> T resolveExpression(String expression, Class<T> type) {
-        Object value = resolveExpression(expression);
+        Object value = this.resolver.evaluate(expression, this.expressionContext);
         if (type.isInstance(value)) {
             return type.cast(value);
         }

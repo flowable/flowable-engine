@@ -24,6 +24,8 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.kafka.KafkaChannelDefinitionProcessor;
+import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
+import org.flowable.eventregistry.spring.kafka.KafkaPartitionProvider;
 import org.flowable.eventregistry.spring.kafka.payload.KafkaConsumerRecordInformationPayloadExtractor;
 import org.flowable.eventregistry.spring.test.config.EventRegistryEngineTestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -139,6 +141,16 @@ public class EventRegistryKafkaConfiguration {
         container.withEnv("KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS ", "500");
         container.start();
         return container;
+    }
+
+    @Bean
+    public TestKafkaPartitionProvider kafkaPartitionProvider() {
+        return new TestKafkaPartitionProvider();
+    }
+
+    @Bean
+    public TestKafkaMessageKeyProvider kafkaMessageKeyProvider() {
+        return new TestKafkaMessageKeyProvider();
     }
 
 }
