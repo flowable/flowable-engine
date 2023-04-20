@@ -23,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
@@ -64,6 +67,7 @@ import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -1550,6 +1554,44 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnManagementService.createHistoryJobQuery().list().forEach(j -> cmmnManagementService.deleteHistoryJob(j.getId()));
         cmmnManagementService.createDeadLetterJobQuery().list().forEach(j -> cmmnManagementService.deleteDeadLetterJob(j.getId()));
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/history/testTwoTaskCase.cmmn")
+    public void testVariableChanges() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("var1", "test")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("var1", "updated");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        CmmnHistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(cmmnEngineConfiguration, cmmnManagementService, 10000, 200);
+
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .variableName("var1").singleResult().getValue()).isEqualTo("updated");
+
+        ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(commandContext -> {
+            List<VariableInstanceEntity> variablesInstances = CommandContextUtil.getVariableService(commandContext)
+                    .findVariableInstanceByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN);
+
+            VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
+            variableInstanceEntity.setMetaInfo("test meta info");
+            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
+
+            return null;
+        });
+
+        CmmnHistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(cmmnEngineConfiguration, cmmnManagementService, 10000, 200);
+
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .variableName("var1").singleResult().getValue()).isEqualTo("updated");
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .variableName("var1").singleResult().getMetaInfo()).isEqualTo("test meta info");
+    }
+
 
     protected void changeHistoryJsonToBeInvalid(HistoryJobEntity historyJob) {
         cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {

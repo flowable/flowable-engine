@@ -185,6 +185,8 @@ public interface HistoryJsonConstants {
     String VARIABLE_LONG_VALUE = "variableLongValue";
     
     String VARIABLE_BYTES_VALUE = "variableBytesValue";
+
+    String VARIABLE_META_INFO = "variableMetaInfo";
     
     String FORM_PROPERTY_ID = "formPropertyId";
     

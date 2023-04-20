@@ -81,6 +81,8 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         if (StringUtils.isNotEmpty(variableBytes)) {
             historicVariable.setBytes(Base64.getDecoder().decode(variableBytes));
         }
+
+        historicVariable.setMetaInfo(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_META_INFO));
         
         historicVariable.setLastUpdatedTime(time);
     }

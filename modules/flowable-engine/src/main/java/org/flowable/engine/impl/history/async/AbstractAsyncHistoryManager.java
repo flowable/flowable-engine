@@ -129,6 +129,8 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         if (variable.getByteArrayRef() != null) {
             putIfNotNull(data, HistoryJsonConstants.VARIABLE_BYTES_VALUE, convertToBase64(variable));
         }
+        putIfNotNull(data, HistoryJsonConstants.VARIABLE_META_INFO, variable.getMetaInfo());
+
 
         if (variable.getExecutionId() != null) {
             addProcessDefinitionFields(data, variable.getProcessDefinitionId());

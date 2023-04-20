@@ -79,6 +79,8 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         if (StringUtils.isNotEmpty(variableBytes)) {
             historicVariableInstanceEntity.setBytes(Base64.getDecoder().decode(variableBytes));
         }
+
+        historicVariableInstanceEntity.setMetaInfo(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_META_INFO));
         
         Date time = getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME);
         historicVariableInstanceEntity.setCreateTime(time);
