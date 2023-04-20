@@ -819,9 +819,12 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variableInstance = cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(variableInstance.getMetaInfo()).isEqualTo("test meta info");
 
-        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
-                .caseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
+        }
+
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {
