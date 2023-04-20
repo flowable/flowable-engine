@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -57,6 +58,10 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -1954,6 +1959,65 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testSequentialRepeatingProcessTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testProcessTask")
+                .variable("nrOfLoops", 3)
+                .start();
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 0");
+        processEngineTaskService.complete(task.getId(), variables);
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        processEngineTaskService.complete(task.getId(), variables);
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        processEngineTaskService.complete(task.getId(), variables);
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "approved")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "description")).isNull();
+
+        VariableInstance reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNotNull();
+        assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviews.getValue())
+                .isEqualTo("["
+                        + "{ approved: false, description: 'description task 0' },"
+                        + "{ approved: true, description: 'description task 1' },"
+                        + "{ approved: false, description: 'description task 2' }"
+                        + "]");
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ approved: false, description: 'description task 0' },"
+                            + "{ approved: true, description: 'description task 1' },"
+                            + "{ approved: false, description: 'description task 2' }"
+                            + "]");
         }
     }
 }
