@@ -22,4 +22,4 @@ create table ACT_RU_EVENT_SUBSCR (
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_EVENT_SUBSCR_SCOPEREF_ on ACT_RU_EVENT_SUBSCR(SCOPE_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.8.0.0', 1);
+insert into ACT_GE_PROPERTY values ('eventsubscription.schema.version', '6.8.1.0', 1);

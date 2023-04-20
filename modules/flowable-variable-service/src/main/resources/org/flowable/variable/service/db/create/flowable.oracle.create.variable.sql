@@ -14,6 +14,7 @@ create table ACT_RU_VARIABLE (
     LONG_ NUMBER(19,0),
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
+    META_INFO_ NVARCHAR2(4000),
     primary key (ID_)
 );
 
@@ -26,4 +27,4 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.8.0.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.8.1.0', 1);

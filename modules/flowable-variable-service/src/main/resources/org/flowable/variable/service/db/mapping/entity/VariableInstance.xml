@@ -8,7 +8,7 @@
 
     <insert id="insertVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
         insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
-            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
+            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_)
         values (
             #{id, jdbcType=VARCHAR},
             1, #{type, jdbcType=VARCHAR},
@@ -23,13 +23,14 @@
             #{doubleValue, jdbcType=DOUBLE},
             #{longValue, jdbcType=BIGINT},
             #{textValue, jdbcType=VARCHAR},
-            #{textValue2, jdbcType=VARCHAR}
+            #{textValue2, jdbcType=VARCHAR},
+            #{metaInfo, jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertVariableInstance" parameterType="java.util.List">
         INSERT INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
-            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
+            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_) VALUES
         <foreach collection="list" item="variable" index="index" separator=",">
             (
                 #{variable.id, jdbcType=VARCHAR},
@@ -45,7 +46,8 @@
                 #{variable.doubleValue, jdbcType=DOUBLE},
                 #{variable.longValue, jdbcType=BIGINT},
                 #{variable.textValue, jdbcType=VARCHAR},
-                #{variable.textValue2, jdbcType=VARCHAR}
+                #{variable.textValue2, jdbcType=VARCHAR},
+                #{variable.metaInfo, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -54,7 +56,7 @@
         INSERT ALL
         <foreach collection="list" item="variable" index="index">
             INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
-                BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
+                BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_) VALUES
             (
                 #{variable.id, jdbcType=VARCHAR},
                 1, #{variable.typeName, jdbcType=VARCHAR },
@@ -69,7 +71,8 @@
                 #{variable.doubleValue, jdbcType=DOUBLE},
                 #{variable.longValue, jdbcType=BIGINT},
                 #{variable.textValue, jdbcType=VARCHAR},
-                #{variable.textValue2, jdbcType=VARCHAR}
+                #{variable.textValue2, jdbcType=VARCHAR},
+                #{variable.metaInfo, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -113,6 +116,9 @@
             </if>
             <if test="originalPersistentState.textValue2 != textValue2">
                 TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.metaInfo != metaInfo">
+                META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
@@ -171,6 +177,7 @@
         <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
         <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
         <result property="longValue" column="LONG_" jdbcType="BIGINT" />
+        <result property="metaInfo" column="META_INFO_" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- VARIABLE INSTANCE SELECT -->

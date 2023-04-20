@@ -530,6 +530,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         variableInstance.setScopeId(caseInstanceId);
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+        variableInstance.setScopeDefinitionId(caseDefinitionId);
     }
 
     @Override
