@@ -256,6 +256,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         if (variable.getByteArrayRef() != null) {
             putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_VARIABLE_BYTES_VALUE, convertToBase64(variable));
         }
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_META_INFO, variable.getMetaInfo());
 
         if (variable.getScopeId() != null && ScopeTypes.CMMN.equals(variable.getScopeType())) {
             CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variable.getScopeId());

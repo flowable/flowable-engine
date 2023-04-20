@@ -26,8 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
@@ -639,9 +641,12 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variableInstance = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(variableInstance.getMetaInfo()).isEqualTo("test meta info");
 
-        HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstance.getId()).singleResult();
-        assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId()).singleResult();
+            assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
+        }
+
     }
 
     // Class to test variable serialization

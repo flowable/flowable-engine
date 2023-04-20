@@ -77,6 +77,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setTextValue2(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TEXT_VALUE2));
         historicVariableInstanceEntity.setDoubleValue(getDoubleFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_DOUBLE_VALUE));
         historicVariableInstanceEntity.setLongValue(getLongFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_LONG_VALUE));
+        historicVariableInstanceEntity.setMetaInfo(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_META_INFO));
         
         String variableBytes = getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_BYTES_VALUE);
         if (StringUtils.isNotEmpty(variableBytes)) {

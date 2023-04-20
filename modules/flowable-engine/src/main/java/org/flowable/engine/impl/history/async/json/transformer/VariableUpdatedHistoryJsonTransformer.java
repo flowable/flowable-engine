@@ -80,6 +80,8 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
             // We need to still set them so that the byte array ref can be deleted
             historicVariable.setBytes(null);
         }
+
+        historicVariable.setMetaInfo(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_META_INFO));
         
         historicVariable.setLastUpdatedTime(time);
     }

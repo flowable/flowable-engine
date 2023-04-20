@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -1002,6 +1005,42 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(1);
         processEngineConfiguration.getEventDispatcher().removeEventListener(testDeadletterEventListener);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml")
+    public void testVariableChanges() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("var1", "test");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables = new HashMap<>();
+        variables.put("var1", "updated");
+        taskService.complete(task.getId(), variables);
+
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 200L);
+
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("var1").singleResult().getValue()).isEqualTo("updated");
+
+        managementService.executeCommand(commandContext -> {
+            List<VariableInstanceEntity> variablesInstances = CommandContextUtil.getVariableService(commandContext)
+                    .findVariableInstancesByExecutionId(processInstance.getId());
+
+            VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
+            variableInstanceEntity.setMetaInfo("test meta info");
+            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
+
+            return null;
+        });
+
+        waitForHistoryJobExecutorToProcessAllJobs(20000L, 200L);
+
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("var1").singleResult().getValue()).isEqualTo("updated");
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("var1").singleResult().getMetaInfo()).isEqualTo("test meta info");
     }
 
     static final class TestDeadletterEventListener implements FlowableEventListener {
