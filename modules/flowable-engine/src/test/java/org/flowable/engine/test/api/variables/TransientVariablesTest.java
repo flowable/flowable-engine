@@ -32,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -304,6 +305,22 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
                 .complete();
     }
 
+    @Test
+    @Deployment
+    public void testMetaInfo() {
+        runtimeService.startProcessInstanceByKey("transientVariableTest");
+
+        assertThat(TestServiceDelegate02.executionId).isNotNull();
+        assertThat(TestServiceDelegate02.processInstanceId).isNotNull();
+        assertThat(TestServiceDelegate02.processDefinitionId).isNotNull();
+        assertThat(TestServiceDelegate02.metaInfo).isNull();
+
+        assertThat(TestServiceDelegate03.executionId).isNotNull();
+        assertThat(TestServiceDelegate03.processInstanceId).isNotNull();
+        assertThat(TestServiceDelegate03.processDefinitionId).isNotNull();
+        assertThat(TestServiceDelegate03.metaInfo).isEqualTo("Updated meta info");
+    }
+
     /* Service task class for previous tests */
 
     /**
@@ -420,6 +437,54 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
 
             execution.setVariable("result", strb.toString());
         }
+    }
+
+    public static class TestServiceDelegate01 implements JavaDelegate {
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            execution.setTransientVariable("myVar", "Hello World");
+        }
+
+    }
+
+    public static class TestServiceDelegate02 implements JavaDelegate {
+
+        public static String executionId;
+        public static String processInstanceId;
+        public static String processDefinitionId;
+        public static String metaInfo;
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            VariableInstance myVar = execution.getVariableInstance("myVar");
+            executionId = myVar.getExecutionId();
+            processInstanceId = myVar.getProcessInstanceId();
+            processDefinitionId = myVar.getProcessDefinitionId();
+            metaInfo = myVar.getMetaInfo();
+
+            myVar.setMetaInfo("Updated meta info");
+        }
+
+    }
+
+    public static class TestServiceDelegate03 implements JavaDelegate {
+
+        public static String executionId;
+        public static String processInstanceId;
+        public static String processDefinitionId;
+        public static String metaInfo;
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            VariableInstance myVar = execution.getVariableInstance("myVar");
+            executionId = myVar.getExecutionId();
+            processInstanceId = myVar.getProcessInstanceId();
+            processDefinitionId = myVar.getProcessDefinitionId();
+
+            metaInfo = myVar.getMetaInfo();
+        }
+
     }
 
 }

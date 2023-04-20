@@ -64,7 +64,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected abstract VariableScopeImpl getParentVariableScope();
 
-    protected abstract void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance);
+    protected abstract void initializeVariableInstanceBackPointer(VariableInstance variableInstance);
     
     protected abstract void addLoggingSessionInfo(ObjectNode loggingNode);
 
@@ -954,8 +954,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             transientVariables = new HashMap<>();
         }
         TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, variableValue);
+        initializeVariableInstanceBackPointer(transientVariableInstance);
         transientVariables.put(variableName, transientVariableInstance);
-
     }
 
     @Override
