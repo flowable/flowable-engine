@@ -23,14 +23,20 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +44,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Testing various constructs with variables. Created to test the changes done in https://jira.codehaus.org/browse/ACT-1900.
+ * Testing various constructs with variables.
  *
  * @author Joram Barrez
  */
@@ -606,6 +612,36 @@ public class VariablesTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("datetimeVar1", queryDate).singleResult();
         assertThat(processInstance).isNotNull();
         assertThat(processInstance.getId()).isEqualTo(processInstanceId);
+    }
+
+    @Test
+    @org.flowable.engine.test.Deployment(resources = "")
+    public void testUpdateMetaInfo() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVariable", "Hello World");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variablesTest", variables);
+
+        VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(variableInstance.getMetaInfo()).isNull();
+
+        managementService.executeCommand(commandContext -> {
+            List<VariableInstanceEntity> variablesInstances = CommandContextUtil.getVariableService(commandContext)
+                    .findVariableInstancesByExecutionId(processInstance.getId());
+            assertThat(variablesInstances).extracting(ValueFields::getName).containsExactly("myVariable");
+
+            VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
+            variableInstanceEntity.setMetaInfo("test meta info");
+            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
+
+            return null;
+        });
+
+        variableInstance = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(variableInstance.getMetaInfo()).isEqualTo("test meta info");
+
+        HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
     }
 
     // Class to test variable serialization

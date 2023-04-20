@@ -70,7 +70,7 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
         }
 
         if (historicVariable != null) {
-            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity, updateTime);
+            historicVariableInstanceEntityManager.copyVariableFields(historicVariable, variableInstanceEntity, updateTime);
         } else {
             historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity, updateTime);
         }

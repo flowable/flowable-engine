@@ -33,6 +33,8 @@ import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -48,6 +50,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -789,6 +792,36 @@ public class VariablesTest extends FlowableCmmnTestCase {
             assertThat(historyVars.size()).isEqualTo(1);
             assertThat(historyVars).extracting(HistoricVariableInstance::getValue).containsExactlyInAnyOrder("test1");
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testUpdateMetaInfo() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVariable", "Hello World");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(variables).start();
+
+        VariableInstance variableInstance = cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(variableInstance.getMetaInfo()).isNull();
+
+        ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(commandContext -> {
+            List<VariableInstanceEntity> variablesInstances = CommandContextUtil.getVariableService(commandContext)
+                    .findVariableInstanceByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN);
+            assertThat(variablesInstances).extracting(ValueFields::getName).containsExactly("myVariable");
+
+            VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
+            variableInstanceEntity.setMetaInfo("test meta info");
+            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
+
+            return null;
+        });
+
+        variableInstance = cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(variableInstance.getMetaInfo()).isEqualTo("test meta info");
+
+        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {

@@ -41,17 +41,9 @@ public class HistoricVariableInstanceEntityManagerImpl
     public HistoricVariableInstanceEntity create(VariableInstanceEntity variableInstance, Date createTime) {
         HistoricVariableInstanceEntity historicVariableInstance = dataManager.create();
         historicVariableInstance.setId(variableInstance.getId());
-        historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
-        historicVariableInstance.setExecutionId(variableInstance.getExecutionId());
-        historicVariableInstance.setTaskId(variableInstance.getTaskId());
         historicVariableInstance.setRevision(variableInstance.getRevision());
-        historicVariableInstance.setName(variableInstance.getName());
-        historicVariableInstance.setVariableType(variableInstance.getType());
-        historicVariableInstance.setScopeId(variableInstance.getScopeId());
-        historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
-        historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
-        copyVariableValue(historicVariableInstance, variableInstance, createTime);
+        copyVariableFields(historicVariableInstance, variableInstance, createTime);
 
         historicVariableInstance.setCreateTime(createTime);
         historicVariableInstance.setLastUpdatedTime(createTime);
@@ -66,6 +58,21 @@ public class HistoricVariableInstanceEntityManagerImpl
         insert(historicVariableInstance);
 
         return historicVariableInstance;
+    }
+
+    @Override
+    public void copyVariableFields(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime) {
+        historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
+        historicVariableInstance.setExecutionId(variableInstance.getExecutionId());
+        historicVariableInstance.setTaskId(variableInstance.getTaskId());
+        historicVariableInstance.setName(variableInstance.getName());
+        historicVariableInstance.setVariableType(variableInstance.getType());
+        historicVariableInstance.setScopeId(variableInstance.getScopeId());
+        historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
+        historicVariableInstance.setScopeType(variableInstance.getScopeType());
+        historicVariableInstance.setMetaInfo(variableInstance.getMetaInfo());
+
+        copyVariableValue(historicVariableInstance, variableInstance, updateTime);
     }
 
     @Override

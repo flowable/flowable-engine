@@ -30,6 +30,8 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
 
     HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime);
 
+    void copyVariableFields(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime);
+
     void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime);
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);

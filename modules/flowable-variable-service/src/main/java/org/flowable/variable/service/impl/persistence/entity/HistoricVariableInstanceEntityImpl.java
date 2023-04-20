@@ -49,6 +49,8 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     protected String textValue2;
     protected ByteArrayRef byteArrayRef;
 
+    protected String metaInfo;
+
     protected Object cachedValue;
 
     public HistoricVariableInstanceEntityImpl() {
@@ -75,6 +77,8 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
         if (byteArrayRef != null) {
             persistentState.put("byteArrayRef", byteArrayRef.getId());
         }
+
+        persistentState.put("metaInfo", metaInfo);
 
         persistentState.put("createTime", createTime);
         persistentState.put("lastUpdatedTime", lastUpdatedTime);
@@ -273,6 +277,15 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getMetaInfo() {
+        return metaInfo;
+    }
+
+    public void setMetaInfo(String metaInfo) {
+        this.metaInfo = metaInfo;
     }
 
     @Override
