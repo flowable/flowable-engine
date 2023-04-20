@@ -30,6 +30,19 @@ public class TransientVariableInstance implements VariableInstance {
     protected String variableName;
     protected Object variableValue;
 
+    protected String taskId;
+
+    protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
+
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeDefinitionId;
+    protected String scopeType;
+
+    protected String metaInfo;
+
     public TransientVariableInstance(String variableName, Object variableValue) {
         this.variableName = variableName;
         this.variableValue = variableValue;
@@ -41,13 +54,139 @@ public class TransientVariableInstance implements VariableInstance {
     }
 
     @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public void setId(String id) {
+
+    }
+
+    @Override
+    public void setName(String name) {
+
+    }
+
+    @Override
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
+    
+    @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    @Override
+    public Object getValue() {
+        return variableValue;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        variableValue = value;
+    }
+
+    @Override
+    public String getTypeName() {
+        return TYPE_TRANSIENT;
+    }
+
+    @Override
+    public void setTypeName(String typeName) {
+        // Not relevant
+    }
+
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    @Override
+    public String getTaskId() {
+        return taskId;
+    }
+
+    @Override
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    @Override
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getMetaInfo() {
+        return metaInfo;
+    }
+
+    @Override
+    public void setMetaInfo(String metaInfo) {
+        this.metaInfo = metaInfo;
+    }
+
+    // The methods below are not relevant, as getValue() is used directly to return the value set during the transaction
+
+    @Override
     public String getTextValue() {
         return null;
     }
 
     @Override
     public void setTextValue(String textValue) {
-
     }
 
     @Override
@@ -100,128 +239,4 @@ public class TransientVariableInstance implements VariableInstance {
 
     }
 
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    @Override
-    public void setId(String id) {
-
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
-    public void setProcessInstanceId(String processInstanceId) {
-
-    }
-    
-    @Override
-    public void setProcessDefinitionId(String processDefinitionId) {
-        
-    }
-
-    @Override
-    public void setExecutionId(String executionId) {
-
-    }
-
-    @Override
-    public Object getValue() {
-        return variableValue;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        variableValue = value;
-    }
-
-    @Override
-    public String getTypeName() {
-        return TYPE_TRANSIENT;
-    }
-
-    @Override
-    public void setTypeName(String typeName) {
-
-    }
-
-    @Override
-    public String getProcessInstanceId() {
-        return null;
-    }
-    
-    @Override
-    public String getProcessDefinitionId() {
-        return null;
-    }
-
-    @Override
-    public String getTaskId() {
-        return null;
-    }
-
-    @Override
-    public void setTaskId(String taskId) {
-
-    }
-
-    @Override
-    public String getExecutionId() {
-        return null;
-    }
-    
-    @Override
-    public String getScopeId() {
-        return null;
-    }
-
-    @Override
-    public String getScopeType() {
-        return null;
-    }
-
-    @Override
-    public void setScopeId(String scopeId) {
-        
-    }
-    
-    @Override
-    public String getSubScopeId() {
-        return null;
-    }
-    
-    @Override
-    public void setSubScopeId(String subScopeId) {
-        
-    }
-
-    @Override
-    public void setScopeType(String scopeType) {
-        
-    }
-
-    @Override
-    public String getScopeDefinitionId() {
-        return null;
-    }
-
-    @Override
-    public void setScopeDefinitionId(String scopeDefinitionId) {
-
-    }
-
-    @Override
-    public String getMetaInfo() {
-        return null;
-    }
-
-    @Override
-    public void setMetaInfo(String metaInfo) {
-
-    }
 }

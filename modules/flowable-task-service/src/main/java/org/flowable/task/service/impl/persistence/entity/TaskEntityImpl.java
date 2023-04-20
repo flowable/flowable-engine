@@ -41,6 +41,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
 import org.flowable.task.service.impl.util.TaskVariableUtils;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -202,7 +203,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     }
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         variableInstance.setTaskId(id);
         if (ScopeTypes.CMMN.equals(this.scopeType)) {
             variableInstance.setScopeId(this.scopeId);

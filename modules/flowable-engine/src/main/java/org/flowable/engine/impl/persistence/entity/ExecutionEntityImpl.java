@@ -47,6 +47,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -644,7 +645,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     // VariableScopeImpl methods //////////////////////////////////////////////////////////////////
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         if (processInstanceId != null) {
             variableInstance.setProcessInstanceId(processInstanceId);
         } else {
