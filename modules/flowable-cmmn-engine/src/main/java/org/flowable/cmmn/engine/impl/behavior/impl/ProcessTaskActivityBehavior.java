@@ -219,7 +219,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                 variableValue = processInstanceService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
 
             }
-            caseInstance.setVariable(variableName, variableValue);
+            planItemInstance.setVariable(variableName, variableValue);
         }
     }
 

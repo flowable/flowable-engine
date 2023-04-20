@@ -279,7 +279,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                 variableValue = cmmnRuntimeService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
 
             }
-            caseInstance.setVariable(variableName, variableValue);
+            planItemInstance.setVariable(variableName, variableValue);
         }
     }
 

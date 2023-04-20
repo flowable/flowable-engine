@@ -318,6 +318,92 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testSequentialRepeatingCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn",
+    })
+    public void testSequentialRepeatingCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .variable("nrOfLoops", 3)
+                .variable("otherVariable", "Hello World")
+                .start();
+
+        VariableInstance reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        Task task = cmmnTaskService.createTaskQuery().taskName("Sub task").singleResult();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 0");
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        cmmnTaskService.complete(task.getId(), variables);
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        assertVariablesNotVisible(caseInstance);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        task = cmmnTaskService.createTaskQuery().taskName("Sub task").singleResult();
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        task = cmmnTaskService.createTaskQuery().taskName("Sub task").singleResult();
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        assertVariablesNotVisible(caseInstance);
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNotNull();
+        assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviews.getValue())
+                .isEqualTo("["
+                        + "{ approved: false, description: 'description task 0' },"
+                        + "{ approved: true, description: 'description task 1' },"
+                        + "{ approved: false, description: 'description task 2' }"
+                        + "]");
+
+        assertNoAggregatedVariables();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ approved: false, description: 'description task 0' },"
+                            + "{ approved: true, description: 'description task 1' },"
+                            + "{ approved: false, description: 'description task 2' }"
+                            + "]");
+        }
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testStageWithSequentialRepeatingUserTask.cmmn")
     public void testTerminateStateWithSequentialRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
