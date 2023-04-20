@@ -54,4 +54,12 @@ public interface VariableInstance extends ValueFields {
     
     void setScopeType(String scopeType);
 
+    void setScopeDefinitionId(String scopeDefinitionId);
+
+    String getScopeDefinitionId();
+
+    String getMetaInfo();
+
+    void setMetaInfo(String metaInfo);
+
 }

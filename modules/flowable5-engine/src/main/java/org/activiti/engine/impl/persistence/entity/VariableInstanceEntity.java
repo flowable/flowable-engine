@@ -353,4 +353,23 @@ public class VariableInstanceEntity extends AbstractVariableServiceEntity implem
         
     }
 
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return null;
+    }
+
+    @Override
+    public void setMetaInfo(String metaInfo) {
+
+    }
+
+    @Override
+    public String getMetaInfo() {
+        return null;
+    }
 }

@@ -52,4 +52,6 @@ public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVar
 
     ByteArrayRef getByteArrayRef();
 
+    void setMetaInfo(String metaInfo);
+
 }
