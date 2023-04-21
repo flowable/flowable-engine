@@ -165,6 +165,11 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         // not used
     }
     
+    public void triggerCaseTaskAndLeave(DelegateExecution execution, Map<String, Object> variables) {
+        triggerCaseTask(execution, variables);
+        leave(execution);
+    }
+
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
         execution.setVariables(variables);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
@@ -176,7 +181,5 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         // Set the reference id and type to null since the execution could be reused
         executionEntity.setReferenceId(null);
         executionEntity.setReferenceType(null);
-
-        leave(execution);
     }
 }
