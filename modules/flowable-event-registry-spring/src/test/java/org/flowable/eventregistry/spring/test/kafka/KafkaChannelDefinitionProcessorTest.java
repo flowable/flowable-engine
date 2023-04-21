@@ -60,8 +60,6 @@ import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventPayload;
-import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
-import org.flowable.eventregistry.spring.kafka.KafkaPartitionProvider;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
