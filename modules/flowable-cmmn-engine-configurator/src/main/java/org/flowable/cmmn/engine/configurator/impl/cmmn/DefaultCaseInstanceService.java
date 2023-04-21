@@ -119,7 +119,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     public void deleteCaseInstance(String caseInstanceId) {
         cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
-            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted()) {
+            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted() || CaseInstanceState.isInTerminalState(caseInstanceEntity)) {
                 return null;
             }
 

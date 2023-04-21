@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
@@ -30,12 +31,14 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
@@ -46,7 +49,11 @@ import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.Test;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Tijs Rademakers
@@ -1114,6 +1121,144 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn" })
+    public void testSequentialMultiInstanceCaseTask() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskSequentialMultiInstanceProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .variable("nrOfLoops", 3)
+                    .start();
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", false);
+            variables.put("description", "description task 0");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            variables = new HashMap<>();
+            variables.put("approved", true);
+            variables.put("description", "description task 1");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            variables = new HashMap<>();
+            variables.put("approved", false);
+            variables.put("description", "description task 2");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            assertThat(processEngineRuntimeService.getVariable(processInstance.getId(), "approved")).isNull();
+            assertThat(processEngineRuntimeService.getVariable(processInstance.getId(), "description")).isNull();
+
+            VariableInstance reviews = processEngineRuntimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+            assertThat(reviews).isNotNull();
+            assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+            assertThatJson(reviews.getValue())
+                    .isEqualTo("["
+                            + "{ approved: false, description: 'description task 0' },"
+                            + "{ approved: true, description: 'description task 1' },"
+                            + "{ approved: false, description: 'description task 2' }"
+                            + "]");
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+                HistoricVariableInstance historicReviews = processEngineHistoryService.createHistoricVariableInstanceQuery()
+                        .variableName("reviews")
+                        .singleResult();
+                assertThat(historicReviews).isNotNull();
+                assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+                assertThatJson(historicReviews.getValue())
+                        .isEqualTo("["
+                                + "{ approved: false, description: 'description task 0' },"
+                                + "{ approved: true, description: 'description task 1' },"
+                                + "{ approved: false, description: 'description task 2' }"
+                                + "]");
+            }
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn" })
+    public void testParallelMultiInstanceCaseTask() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskParallelMultiInstanceProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("caseTask")
+                    .variable("nrOfLoops", 3)
+                    .start();
+
+            List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+            CaseInstance caseInstance = caseInstances.get(0);
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", false);
+            variables.put("description", "description task 0");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            caseInstance = caseInstances.get(1);
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            variables = new HashMap<>();
+            variables.put("approved", true);
+            variables.put("description", "description task 1");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            caseInstance = caseInstances.get(2);
+            task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            variables = new HashMap<>();
+            variables.put("approved", false);
+            variables.put("description", "description task 2");
+            cmmnTaskService.complete(task.getId(), variables);
+
+            assertThat(processEngineRuntimeService.getVariable(processInstance.getId(), "approved")).isNull();
+            assertThat(processEngineRuntimeService.getVariable(processInstance.getId(), "description")).isNull();
+
+            VariableInstance reviews = processEngineRuntimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+            assertThat(reviews).isNotNull();
+            assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+            assertThatJson(reviews.getValue())
+                    .when(Option.IGNORING_ARRAY_ORDER)
+                    .isEqualTo("["
+                            + "{ approved: false, description: 'description task 0' },"
+                            + "{ approved: true, description: 'description task 1' },"
+                            + "{ approved: false, description: 'description task 2' }"
+                            + "]");
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+                HistoricVariableInstance historicReviews = processEngineHistoryService.createHistoricVariableInstanceQuery()
+                        .variableName("reviews")
+                        .singleResult();
+                assertThat(historicReviews).isNotNull();
+                assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+                assertThatJson(historicReviews.getValue())
+                        .when(Option.IGNORING_ARRAY_ORDER)
+                        .isEqualTo("["
+                                + "{ approved: false, description: 'description task 0' },"
+                                + "{ approved: true, description: 'description task 1' },"
+                                + "{ approved: false, description: 'description task 2' }"
+                                + "]");
+            }
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
 
     static class ClearExecutionReferenceCmd implements Command<Void> {
 
