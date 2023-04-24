@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.service.impl.persistence.entity.data.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -76,12 +77,21 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        // We are using 2 queries here (first find all the root scope ids and then find all the entity links for those root scope ids)
+        // The reason for using 2 queries is due to the fact that some DBs are going to do a full table scan if we nest the queries into a single query
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("scopeIds", createSafeInValuesList(scopeIds));
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
-        
-        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType", parameters);
+        List rootScopeIds = getDbSqlSession().selectList("selectRootScopeIdsByScopeIdsAndType", parameters);
+        if (rootScopeIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        parameters.put("rootScopeIds", createSafeInValuesList(rootScopeIds));
+        parameters.remove("scopeIds");
+
+        return (List) getList("selectHistoricEntityLinksByRootScopeIdsAndType", parameters);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
