@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
@@ -38,7 +39,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
 
     // backwards compatibility
     public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
-        this(kafkaOperations, partitionProvider, topic, (ignore) -> key);
+        this(kafkaOperations, partitionProvider, topic, (ignore) -> StringUtils.defaultIfEmpty(key, null));
     }
 
     public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, KafkaMessageKeyProvider<?> messageKeyProvider) {

@@ -670,10 +670,11 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
         if (StringUtils.hasText(recordKey.getEventField())) {
             return new EventPayloadKafkaMessageKeyProvider(recordKey.getEventField());
-        } else if (StringUtils.hasText(recordKey.getFixedValue())) {
-            return ignore -> recordKey.getFixedValue();
         } else if (StringUtils.hasText(recordKey.getDelegateExpression())) {
             return resolveExpression(recordKey.getDelegateExpression(), KafkaMessageKeyProvider.class);
+        } else if (recordKey.getFixedValue() != null) {
+            String fixedValue = org.apache.commons.lang3.StringUtils.defaultIfBlank(recordKey.getFixedValue(), null);
+            return ignore -> fixedValue;
         } else {
             throw new FlowableException(
                     "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
