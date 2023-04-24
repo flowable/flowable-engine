@@ -2076,6 +2076,61 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    void eventShouldBeSendWithoutRecordKeyWhenRecordKeyIsEmptyString() {
+        createTopic("outbound-customer");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            consumer.subscribe(Collections.singleton("outbound-customer"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("outbound-customer")
+                    .recordKey("")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isNull();
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
+    }
+
+    @Test
     void kafkaOutboundChannelShouldResolveTopicFromExpression() {
         createTopic("test-expression-customer");
 
