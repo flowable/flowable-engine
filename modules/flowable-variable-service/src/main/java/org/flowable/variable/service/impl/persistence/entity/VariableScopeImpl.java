@@ -36,6 +36,7 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
+import org.flowable.variable.service.impl.VariableInstanceEnhancer;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -856,17 +857,18 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         Object oldVariableValue = variableInstance.getValue();
         String oldVariableType = variableInstance.getTypeName();
-
+        initializeVariableInstanceBackPointer(variableInstance);
+        VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
         if (newType != null && !newType.equals(variableInstance.getType())) {
             variableInstance.setValue(null);
             variableInstance.setType(newType);
             variableInstance.forceUpdate();
-            variableInstance.setValue(value);
+            variableInstance.setValue(variableValue);
         } else {
-            variableInstance.setValue(value);
+            variableInstance.setValue(variableValue);
         }
 
-        initializeVariableInstanceBackPointer(variableInstance);
 
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
@@ -878,7 +880,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         // Dispatch event, if needed
         if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance, value,
+                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance, variableValue,
                             variableInstance.getType()), variableServiceConfiguration.getEngineName());
         }
         
@@ -890,6 +892,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
+        variableInstanceEnhancer.postSetVariableValue(variableInstance, value, variableValue);
     }
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
@@ -901,9 +904,10 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableInstanceEntityManager variableInstanceEntityManager = variableServiceConfiguration.getVariableInstanceEntityManager();
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type);
         initializeVariableInstanceBackPointer(variableInstance);
-        
+        VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
         // Set the value after initializing the back pointer
-        variableInstance.setValue(value);
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
+        variableInstance.setValue(variableValue);
         variableInstanceEntityManager.insert(variableInstance);
 
         if (variableInstances != null) {
@@ -919,7 +923,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
         if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableInstance, value,
+                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableInstance, variableValue,
                             variableInstance.getType()), variableServiceConfiguration.getEngineName());
         }
         
@@ -929,7 +933,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             addLoggingSessionInfo(loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
-
+        variableInstanceEnhancer.postSetVariableValue(variableInstance, value, variableValue);
         return variableInstance;
     }
 

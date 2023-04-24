@@ -24,6 +24,7 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.VariableInstanceEnhancer;
 import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
@@ -42,8 +43,10 @@ public class VariableInstanceEntityManagerImpl
 
     @Override
     public VariableInstanceEntity create(String name, VariableType type, Object value) {
+        VariableInstanceEnhancer variableInstanceEnhancer = serviceConfiguration.getVariableInstanceEnhancer();
         VariableInstanceEntity variableInstance = create(name, type);
-        variableInstance.setValue(value);
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
+        variableInstance.setValue(variableValue);
         return variableInstance;
     }
 
@@ -86,7 +89,6 @@ public class VariableInstanceEntityManagerImpl
     public long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return dataManager.findVariableInstanceCountByNativeQuery(parameterMap);
     }
-
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, false);

@@ -16,7 +16,9 @@ import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.DefaultVariableInstanceEnhancer;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
+import org.flowable.variable.service.impl.VariableInstanceEnhancer;
 import org.flowable.variable.service.impl.VariableServiceImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
@@ -60,6 +62,8 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     protected int maxLengthString;
     
     protected boolean loggingSessionEnabled;
+
+    protected VariableInstanceEnhancer variableInstanceEnhancer;
     
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
@@ -82,6 +86,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     public void init() {
         initDataManagers();
         initEntityManagers();
+        initVariableInstanceEnhancer();
     }
 
     // Data managers
@@ -102,6 +107,12 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicVariableInstanceEntityManager == null) {
             historicVariableInstanceEntityManager = new HistoricVariableInstanceEntityManagerImpl(this, historicVariableInstanceDataManager);
+        }
+    }
+
+    public void initVariableInstanceEnhancer() {
+        if(variableInstanceEnhancer == null){
+            variableInstanceEnhancer = new DefaultVariableInstanceEnhancer();
         }
     }
 
@@ -217,5 +228,13 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public VariableInstanceEnhancer getVariableInstanceEnhancer() {
+        return variableInstanceEnhancer;
+    }
+
+    public void setVariableInstanceEnhancer(VariableInstanceEnhancer variableValueEnhancer) {
+        this.variableInstanceEnhancer = variableValueEnhancer;
     }
 }
