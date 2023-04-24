@@ -34,7 +34,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
 
     protected KafkaOperations<Object, Object> kafkaOperations;
     protected KafkaPartitionProvider partitionProvider;
-    protected KafkaMessageKeyProvider messageKeyProvider;
+    protected KafkaMessageKeyProvider<?> messageKeyProvider;
     protected String topic;
 
     // backwards compatibility
