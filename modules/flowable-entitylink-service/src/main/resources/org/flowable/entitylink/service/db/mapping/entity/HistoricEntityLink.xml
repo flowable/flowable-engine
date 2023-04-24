@@ -192,23 +192,36 @@
     where LINK_TYPE_ = #{parameter.linkType}
   </select>
   
-  <select id="selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType" resultMap="historicEntityLinkResultMap">
+  <select id="selectHistoricEntityLinksByRootScopeIdsAndType" resultMap="historicEntityLinkResultMap">
     select RES.*
-    from ${prefix}ACT_HI_ENTITYLINK RES where ROOT_SCOPE_ID_ in (
-        select ROOT_SCOPE_ID_ from ${prefix}ACT_HI_ENTITYLINK
-        where 
-        (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
-            <if test="listIndex &gt; 0">
-            or
-            </if>
-            SCOPE_ID_ in 
-            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-              #{item}
-            </foreach>
-        </foreach>)
-        and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
-    ) 
+    from ${prefix}ACT_HI_ENTITYLINK RES where (
+    <foreach item="listItem" index="listIndex" collection="parameter.rootScopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        ROOT_SCOPE_ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+    )
     and LINK_TYPE_ = #{parameter.linkType}
   </select>
   
+  <select id="selectRootScopeIdsByScopeIdsAndType" resultType="string">
+    select distinct ROOT_SCOPE_ID_
+    from ${prefix}ACT_HI_ENTITYLINK
+    where
+    (<foreach item="listItem" index="listIndex" collection="parameter.scopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
+  </select>
+
 </mapper>
