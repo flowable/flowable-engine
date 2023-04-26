@@ -60,7 +60,6 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
         params.setFirstResult(page.getFirstResult());
         params.setMaxResults(page.getMaxResults());
-        params.addOrder("CREATE_TIME_", Direction.ASCENDING.getName(), null);
         return getDbSqlSession().selectList("selectHistoryJobsToExecute", params);
     }
 
