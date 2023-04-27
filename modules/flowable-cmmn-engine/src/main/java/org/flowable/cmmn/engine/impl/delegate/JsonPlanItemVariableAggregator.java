@@ -97,7 +97,6 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                 }
 
                 if (varInstance != null) {
-
                     String varInstanceTypeName = varInstance.getTypeName();
 
                     switch (varInstanceTypeName) {

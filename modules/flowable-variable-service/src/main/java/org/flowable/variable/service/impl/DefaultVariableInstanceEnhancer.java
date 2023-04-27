@@ -22,11 +22,11 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 public class DefaultVariableInstanceEnhancer implements VariableInstanceEnhancer {
 
     @Override
-    public Object preSetVariableValue(VariableInstance variableInstance, Object originalValue) {
+    public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
         return originalValue;
     }
 
     @Override
-    public void postSetVariableValue(VariableInstance variableInstance, Object originalValue, Object variableValue) {
+    public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
     }
 }

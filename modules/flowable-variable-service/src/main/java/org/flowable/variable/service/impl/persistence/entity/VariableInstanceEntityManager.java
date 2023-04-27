@@ -28,6 +28,7 @@ import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 public interface VariableInstanceEntityManager extends EntityManager<VariableInstanceEntity> {
 
     VariableInstanceEntity create(String name, VariableType type, Object value);
+    VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value);
 
     /**
      * Create a variable instance without setting the value on it.

@@ -27,7 +27,7 @@ public interface VariableInstanceEnhancer {
      * @param originalValue the original value for the variableInstanceEntity
      * @return the value that will be set on the variable instance
      */
-    Object preSetVariableValue(VariableInstance variableInstance, Object originalValue);
+    Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue);
 
     /**
      * Called after the value is set on the variable instance.
@@ -36,7 +36,7 @@ public interface VariableInstanceEnhancer {
      * {@code variableValue} and {@code originalValue} may often be the same
      * @param variableValue the value that was set on the variable instance
      */
-    void postSetVariableValue(VariableInstance variableInstance, Object originalValue, Object variableValue);
+    void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue);
 
 
 }

@@ -93,7 +93,7 @@ public class JsonVariableAggregator implements VariableAggregator {
                             .getValue(execution);
                     VariableType variableType = variableTypes.findVariableType(sourceValue);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(targetVarName, variableType, sourceValue);
+                    varInstance = variableService.createVariableInstance(execution.getTenantId(), targetVarName, variableType, sourceValue);
                 }
 
                 if (varInstance != null) {

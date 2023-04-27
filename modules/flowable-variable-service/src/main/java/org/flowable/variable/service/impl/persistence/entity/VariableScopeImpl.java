@@ -859,7 +859,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         String oldVariableType = variableInstance.getTypeName();
         initializeVariableInstanceBackPointer(variableInstance);
         VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
-        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), variableInstance, value);
         if (newType != null && !newType.equals(variableInstance.getType())) {
             variableInstance.setValue(null);
             variableInstance.setType(newType);
@@ -892,7 +892,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
-        variableInstanceEnhancer.postSetVariableValue(variableInstance, value, variableValue);
+        variableInstanceEnhancer.postSetVariableValue(getTenantId(), variableInstance, value, variableValue);
     }
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
@@ -903,10 +903,10 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
         VariableInstanceEntityManager variableInstanceEntityManager = variableServiceConfiguration.getVariableInstanceEntityManager();
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type);
+        // Set the value after initializing the back pointer
         initializeVariableInstanceBackPointer(variableInstance);
         VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
-        // Set the value after initializing the back pointer
-        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), variableInstance, value);
         variableInstance.setValue(variableValue);
         variableInstanceEntityManager.insert(variableInstance);
 
@@ -933,7 +933,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             addLoggingSessionInfo(loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
-        variableInstanceEnhancer.postSetVariableValue(variableInstance, value, variableValue);
+        variableInstanceEnhancer.postSetVariableValue(getTenantId(), variableInstance, value, variableValue);
         return variableInstance;
     }
 

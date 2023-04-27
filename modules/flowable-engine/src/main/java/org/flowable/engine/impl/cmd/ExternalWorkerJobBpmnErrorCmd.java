@@ -65,7 +65,7 @@ public class ExternalWorkerJobBpmnErrorCmd extends AbstractExternalWorkerJobCmd 
                 Object varValue = variableEntry.getValue();
 
                 VariableType variableType = variableTypes.findVariableType(varValue);
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(externalWorkerJob.getTenantId(), varName, variableType, varValue);
                 variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
                 variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
                 variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);

@@ -111,7 +111,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     }
 
     public void initVariableInstanceEnhancer() {
-        if(variableInstanceEnhancer == null){
+        if (variableInstanceEnhancer == null) {
             variableInstanceEnhancer = new DefaultVariableInstanceEnhancer();
         }
     }

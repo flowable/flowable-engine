@@ -55,7 +55,7 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
     public void testCompleteTaskWithExceptionInPostSetVariable() {
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
             @Override
-            public void postSetVariableValue(VariableInstance variableInstance, Object originalValue, Object variableValue) {
+            public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
                 if (variableInstance.getName().equals("orderId")) {
                     if (((Number) originalValue).longValue() < 0) {
                         throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
@@ -80,11 +80,21 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
-    public void testTransientVariables() {
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" }, tenantId = "myTenant")
+    public void testCompleteTaskWithExceptionInPostSetVariableWithTenantId() {
+        List<String> preSetVariableTenantId = new LinkedList<>();
+        List<String> postSetVariableTenantId = new LinkedList<>();
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
             @Override
-            public void postSetVariableValue(VariableInstance variableInstance, Object originalValue, Object variableValue) {
+            public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
+                preSetVariableTenantId.add(tenantId);
+                return originalValue;
+            }
+
+            @Override
+            public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
+                postSetVariableTenantId.add(tenantId);
                 if (variableInstance.getName().equals("orderId")) {
                     if (((Number) originalValue).longValue() < 0) {
                         throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
@@ -96,15 +106,42 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
-        variables.put("OtherVariable", "Hello World");
-
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().transientVariables(variables).processDefinitionKey("oneTaskProcess").start();
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKeyAndTenantId("oneTaskProcess", variables, "myTenant");
 
         assertThatThrownBy(() -> {
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             variables.put("orderId", -1L);
-            variables.put("OtherVariable", "Hello World update");
             taskService.complete(task.getId(), variables);
+        }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
+
+        assertThat(preSetVariableTenantId).containsExactly("myTenant", "myTenant");
+        assertThat(postSetVariableTenantId).containsExactly("myTenant", "myTenant");
+    }
+
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testTransientVariables() {
+        DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+            @Override
+            public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
+                if (variableInstance.getName().equals("orderId")) {
+                    if (((Number) originalValue).longValue() < 0) {
+                        throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
+                    }
+                }
+            }
+        };
+        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderId", -1L);
+        variables.put("OtherVariable", "Hello World");
+
+        assertThatThrownBy(() -> {
+            // TODO discuss with Joram how to handle transient variables
+            runtimeService.createProcessInstanceBuilder().transientVariables(variables).processDefinitionKey("oneTaskProcess").start();
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
     }
 
@@ -117,8 +154,10 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
 
             @Override
-            public Object preSetVariableValue(VariableInstance variableInstance, Object originalValue) {
+            public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
                 preSetValueCalls.add(originalValue);
+                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
+                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
                 if (originalValue instanceof String) {
                     VariableMeta variableMeta = new VariableMeta();
                     variableMeta.byteLength = String.valueOf(((String) originalValue).getBytes().length);
@@ -133,8 +172,10 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
             }
 
             @Override
-            public void postSetVariableValue(VariableInstance variableInstance, Object originalValue, Object variableValue) {
+            public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
                 postSetValueCalls.add(variableValue);
+                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
+                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
                 if (originalValue instanceof String) {
                     assertThat(originalValue).isNotSameAs(variableValue);
                     assertThat(originalValue).isEqualTo("myValue1");
@@ -160,6 +201,7 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
         assertThat(processVariables.get("myIntVariable")).isInstanceOf(Integer.class);
         Object intVariableValue = runtimeService.getVariable(processInstance.getId(), "myIntVariable");
         assertThat(intVariableValue).isEqualTo(1);
+
         VariableInstance intVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "myIntVariable");
         assertThat(intVariableInstance.getMetaInfo()).isNull();
 

@@ -42,12 +42,18 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public VariableInstanceEntity create(String name, VariableType type, Object value) {
+    public VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value) {
         VariableInstanceEnhancer variableInstanceEnhancer = serviceConfiguration.getVariableInstanceEnhancer();
         VariableInstanceEntity variableInstance = create(name, type);
-        Object variableValue = variableInstanceEnhancer.preSetVariableValue(variableInstance, value);
+        Object variableValue = variableInstanceEnhancer.preSetVariableValue(tenantId, variableInstance, value);
         variableInstance.setValue(variableValue);
+        variableInstanceEnhancer.postSetVariableValue(tenantId, variableInstance, value, variableValue);
         return variableInstance;
+    }
+
+    @Override
+    public VariableInstanceEntity create(String name, VariableType type, Object value) {
+        return create(null, name, type, value);
     }
 
     @Override

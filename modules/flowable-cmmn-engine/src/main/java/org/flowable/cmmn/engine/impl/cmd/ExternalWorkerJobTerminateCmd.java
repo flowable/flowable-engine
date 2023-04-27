@@ -49,21 +49,21 @@ public class ExternalWorkerJobTerminateCmd extends AbstractExternalWorkerJobCmd 
             VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
             VariableService variableService = variableServiceConfiguration.getVariableService();
             VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
+
+            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findById(externalWorkerJob.getSubScopeId());
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
 
                 VariableType variableType = variableTypes.findVariableType(varValue);
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(planItemInstanceEntity.getTenantId(), varName, variableType, varValue);
                 variableInstance.setScopeId(externalWorkerJob.getScopeId());
                 variableInstance.setSubScopeId(externalWorkerJob.getSubScopeId());
                 variableInstance.setScopeType(ScopeTypes.CMMN_EXTERNAL_WORKER);
 
                 variableService.insertVariableInstance(variableInstance);
             }
-
-            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
-                    .findById(externalWorkerJob.getSubScopeId());
 
             if (planItemInstanceEntity instanceof CountingPlanItemInstanceEntity) {
                 ((CountingPlanItemInstanceEntity) planItemInstanceEntity)
