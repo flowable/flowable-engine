@@ -1475,6 +1475,7 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui</module>
+				<module>tooling/archetypes</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1730,6 +1731,7 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
+				<module>tooling/archetypes</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
