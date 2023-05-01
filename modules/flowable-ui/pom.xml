@@ -16,6 +16,7 @@
     <properties>
         <!-- Maven build properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <docker.base.image>flowable/flowable-jre:11.0.18</docker.base.image>
     </properties>
 
     <modules>

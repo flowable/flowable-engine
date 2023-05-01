@@ -1,7 +1,7 @@
 version: '3.6'
 services:
     flowable-ui-app:
-        image: flowable/flowable-ui
+        image: flowable/flowable-ui:6.8.1.10
         depends_on:
             - flowable-ui-db
         environment:
@@ -14,10 +14,12 @@ services:
             - FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD=test
         ports:
             - 8080:8080
-        entrypoint: ["./wait-for-something.sh", "flowable-ui-db", "5432", "PostgreSQL", "/flowable-entrypoint.sh"]
+        entrypoint: ["./wait-for-something.sh", "flowable-ui-db", "5432", "PostgreSQL", "sh", "/flowable-entrypoint.sh"]
     flowable-ui-db:
-        image: postgres:9.6-alpine
-        container_name: flowable-ui-postgres
+        image: postgres:15.2-alpine
+        container_name: flowable-ui-postgresql
+        volumes:
+           - ~/volumes/flowable/ui/postgresql/data/:/var/lib/postgresql/data/
         environment:
             - POSTGRES_PASSWORD=flowable
             - POSTGRES_USER=flowable

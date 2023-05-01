@@ -1,7 +1,8 @@
-FROM eclipse-temurin:11.0.15_10-jre-alpine@sha256:d401c4025eb1ead95cf2ca83cd5155bff8756527a4f4e9820570900e835f5ba4
+FROM eclipse-temurin:11.0.18_10-jdk-alpine@sha256:c79304fa39f7de760f9999697d0a013eca891cab7716d22b78728a179401e2ba
 
 LABEL maintainer="Flowable <info@flowable.org>"
-RUN apk add --no-cache ttf-dejavu && rm -rf /var/cache/apk/*
+RUN apk add --no-cache ttf-dejavu 'su-exec>=0.2' && rm -rf /var/cache/apk/*
+RUN chmod u+s /sbin/su-exec
 
 RUN addgroup -S flowable && adduser -S flowable -G flowable
 

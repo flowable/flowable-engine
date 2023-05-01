@@ -19,6 +19,7 @@
         <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
         <docker.publisher.user>-</docker.publisher.user>
         <docker.publisher.password>-</docker.publisher.password>
+        <docker.base.image>flowable/flowable-jre:11.0.18</docker.base.image>
     </properties>
 
     <build>
@@ -615,10 +616,10 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>docker://${docker.base.image}</image>
                             </from>
                             <to>
-                                <image>flowable-rest</image>
+                                <image>flowable/flowable-rest:${project.version}</image>
                             </to>
                         </configuration>
                         <executions>
@@ -657,7 +658,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>${docker.base.image}</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
@@ -703,7 +704,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>${docker.base.image}</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
