@@ -26,8 +26,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.DefaultVariableInstanceEnhancer;
 import org.flowable.variable.service.impl.VariableInstanceEnhancer;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.LongType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +87,186 @@ public class VariableInstanceEnhancerBpmnTest extends PluggableFlowableTestCase 
             variables.put("OtherVariable", "Hello World update");
             taskService.complete(task.getId(), variables);
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+    public void testChangeVariableType() {
+        VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
+            @Override
+            public VariableType determineVariableType(VariableInstanceEntity variableInstance, Object originalVariableValue, Object variableValue,
+                    VariableType selectedType) {
+                return variableValue instanceof Long ? variableTypes.getVariableType(LongType.TYPE_NAME) : selectedType;
+            }
+
+            @Override
+            public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
+                String typeName = variableInstance.getTypeName();
+                if ("string".equals(typeName) && originalValue instanceof Number) {
+                    return Long.valueOf(originalValue.toString());
+                }
+                return originalValue;
+            }
+        };
+        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderId", "ABC");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+        VariableInstance orderIdInstance = runtimeService.getVariableInstance(processInstance.getId(), "orderId");
+        assertThat(orderIdInstance.getTypeName()).isEqualTo("string");
+        assertThat(orderIdInstance.getValue()).isEqualTo("ABC");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("orderId", 1);
+        taskService.complete(task.getId(), variables);
+
+        VariableInstanceEntity orderIdInstanceTask = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(), "orderId");
+        assertThat(orderIdInstanceTask.getTypeName()).isEqualTo("long");
+        assertThat(orderIdInstanceTask.getValue()).isEqualTo(1L);
+
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+    public void testWrapVariableWithCustomType() {
+        VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        variableTypes.addTypeBefore(new WrappedIntegerCustomType(), "integer");
+        DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
+            @Override
+            public VariableType determineVariableType(VariableInstanceEntity variableInstance, Object originalVariableValue, Object variableValue,
+                    VariableType selectedType) {
+                return isSpecialType(originalVariableValue) ?
+                        variableTypes.getVariableType(WrappedIntegerCustomType.TYPE_NAME) :
+                        variableTypes.getVariableType(IntegerType.TYPE_NAME);
+            }
+
+            @Override
+            public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
+
+                // new variable instance
+                if (isSpecialType(originalValue)) {
+                    String meta = originalValue + "meta";
+                    variableInstance.setMetaInfo(meta);
+                    return new WrappedIntegerValue((Integer) originalValue, variableInstance.getMetaInfo());
+                }
+                return originalValue;
+            }
+
+            private boolean isSpecialType(Object originalValue) {
+                return originalValue instanceof Integer && ((Integer) originalValue) > 1000;
+            }
+        };
+
+        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("simpleInteger", 1000);
+        variables.put("wrappedInteger", 1001);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+
+        VariableInstance simpleInteger = runtimeService.getVariableInstance(processInstance.getId(), "simpleInteger");
+        assertThat(simpleInteger.getTypeName()).isEqualTo("integer");
+        assertThat(simpleInteger.getValue()).isEqualTo(Integer.parseInt("1000"));
+
+        VariableInstance wrappedInteger = runtimeService.getVariableInstance(processInstance.getId(), "wrappedInteger");
+        assertThat(wrappedInteger.getTypeName()).isEqualTo("wrappedIntegerType");
+        assertThat(wrappedInteger.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+        Object wrappedIntegerProcessVariable = processInstance.getProcessVariables().get("wrappedInteger");
+        assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("wrappedInteger", 1002);
+        //variables.put("simpleInteger", 1001);
+        taskService.complete(task.getId(), variables);
+
+        VariableInstanceEntity wrappedIntegerTaskUpdate = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(),
+                "wrappedInteger");
+        assertThat(wrappedIntegerTaskUpdate.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1002);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1002meta");
+        });
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+    public void testWrapVariableWithCustomTypeChangeToSimpleType() {
+        VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        variableTypes.addTypeBefore(new WrappedIntegerCustomType(), "integer");
+        DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
+            @Override
+            public VariableType determineVariableType(VariableInstanceEntity variableInstance, Object originalVariableValue, Object enhancedVariableValue,
+                    VariableType selectedType) {
+                return enhancedVariableValue instanceof WrappedIntegerValue ?
+                        variableTypes.getVariableType(WrappedIntegerCustomType.TYPE_NAME) :
+                        variableTypes.getVariableType(IntegerType.TYPE_NAME);
+            }
+
+            @Override
+            public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
+
+                VariableInstanceEntity instanceEntity = (VariableInstanceEntity) variableInstance;
+                // new variable instance
+                if (isSpecialType(originalValue)) {
+                    String meta = originalValue + "meta";
+                    variableInstance.setMetaInfo(meta);
+                    return new WrappedIntegerValue((Integer) originalValue, variableInstance.getMetaInfo());
+                } else {
+                    VariableType defaultIntegerType = variableTypes.getVariableType("integer");
+                    instanceEntity.setType(defaultIntegerType);
+                    instanceEntity.setTypeName(defaultIntegerType.getTypeName());
+                    return originalValue;
+                }
+            }
+
+            private boolean isSpecialType(Object originalValue) {
+                return originalValue instanceof Integer && ((Integer) originalValue) > 1000;
+            }
+        };
+
+        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("wrappedInteger", 1001);
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+
+        VariableInstanceEntity wrappedInteger = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(), "wrappedInteger");
+        assertThat(wrappedInteger.getType()).isInstanceOf(WrappedIntegerCustomType.class);
+        assertThat(wrappedInteger.getTypeName()).isEqualTo(WrappedIntegerCustomType.TYPE_NAME);
+        assertThat(wrappedInteger.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        Object wrappedIntegerProcessVariable = processInstance.getProcessVariables().get("wrappedInteger");
+        assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        // Change back to simple integer type by setting value to 1000
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("wrappedInteger", 1000);
+        taskService.complete(task.getId(), variables);
+
+        VariableInstanceEntity wrappedIntegerTaskUpdate = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(),
+                "wrappedInteger");
+        assertThat(wrappedIntegerTaskUpdate.getValue()).isInstanceOf(Integer.class).isEqualTo(1000);
+        assertThat(wrappedIntegerTaskUpdate.getType()).isInstanceOf(IntegerType.class);
+        assertThat(wrappedIntegerTaskUpdate.getTypeName()).isEqualTo(IntegerType.TYPE_NAME);
     }
 
     @Test
@@ -218,6 +404,53 @@ public class VariableInstanceEnhancerBpmnTest extends PluggableFlowableTestCase 
         @JsonProperty("byteLength")
         public String byteLength;
 
+    }
+
+    static class WrappedIntegerValue {
+
+        public String metaInfo;
+        public Integer value;
+
+        public WrappedIntegerValue(Number value, String metaInfo) {
+            this.metaInfo = metaInfo;
+            this.value = value.intValue();
+        }
+    }
+
+    public static class WrappedIntegerCustomType extends IntegerType {
+
+        public static final String TYPE_NAME = "wrappedIntegerType";
+
+        @Override
+        public String getTypeName() {
+            return TYPE_NAME;
+        }
+
+        @Override
+        public void setValue(Object value, ValueFields valueFields) {
+            if (value instanceof WrappedIntegerValue) {
+                super.setValue(((WrappedIntegerValue) value).value, valueFields);
+            } else {
+                super.setValue(value, valueFields);
+            }
+        }
+
+        public Object getValue(ValueFields valueFields) {
+            if (valueFields instanceof VariableInstance) {
+                return new WrappedIntegerValue(valueFields.getLongValue(), ((VariableInstance) valueFields).getMetaInfo());
+            }
+            return super.getValue(valueFields);
+        }
+
+        @Override
+        public boolean isAbleToStore(Object value) {
+            if (value == null) {
+                return true;
+            }
+            return value instanceof WrappedIntegerValue ||
+                    Integer.class.isAssignableFrom(value.getClass()) ||
+                    int.class.isAssignableFrom(value.getClass());
+        }
     }
 
 }

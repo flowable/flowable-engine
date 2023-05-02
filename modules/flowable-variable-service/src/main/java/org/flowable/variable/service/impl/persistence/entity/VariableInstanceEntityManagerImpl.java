@@ -46,6 +46,11 @@ public class VariableInstanceEntityManagerImpl
         VariableInstanceEnhancer variableInstanceEnhancer = serviceConfiguration.getVariableInstanceEnhancer();
         VariableInstanceEntity variableInstance = create(name, type);
         Object variableValue = variableInstanceEnhancer.preSetVariableValue(tenantId, variableInstance, value);
+        VariableType overriddenType = variableInstanceEnhancer.determineVariableType(variableInstance, value, variableValue, type);
+        if(overriddenType != null && overriddenType != type){
+            variableInstance.setType(overriddenType);
+            variableInstance.setTypeName(overriddenType.getTypeName());
+        }
         variableInstance.setValue(variableValue);
         variableInstanceEnhancer.postSetVariableValue(tenantId, variableInstance, value, variableValue);
         return variableInstance;

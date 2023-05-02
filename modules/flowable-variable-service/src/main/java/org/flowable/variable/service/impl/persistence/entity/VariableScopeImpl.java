@@ -844,7 +844,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
     }
 
-    protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value) {
+    protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object newVariableValue) {
 
         // Always check if the type should be altered. It's possible that the previous type is lower in the type
         // checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type
@@ -853,20 +853,21 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
 
-        VariableType newType = variableTypes.findVariableType(value);
-        
+        VariableType newType = variableTypes.findVariableType(newVariableValue);
+
         Object oldVariableValue = variableInstance.getValue();
         String oldVariableType = variableInstance.getTypeName();
         initializeVariableInstanceBackPointer(variableInstance);
         VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
-        Object variableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), variableInstance, value);
+        Object enhancedNewVariableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), variableInstance, newVariableValue);
+        newType = variableInstanceEnhancer.determineVariableType(variableInstance, newVariableValue, enhancedNewVariableValue, newType);
         if (newType != null && !newType.equals(variableInstance.getType())) {
             variableInstance.setValue(null);
             variableInstance.setType(newType);
             variableInstance.forceUpdate();
-            variableInstance.setValue(variableValue);
+            variableInstance.setValue(enhancedNewVariableValue);
         } else {
-            variableInstance.setValue(variableValue);
+            variableInstance.setValue(enhancedNewVariableValue);
         }
 
 
@@ -880,7 +881,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         // Dispatch event, if needed
         if (variableServiceConfiguration.isEventDispatcherEnabled()) {
             variableServiceConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance, variableValue,
+                    FlowableVariableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance, enhancedNewVariableValue,
                             variableInstance.getType()), variableServiceConfiguration.getEngineName());
         }
         
@@ -892,21 +893,27 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
-        variableInstanceEnhancer.postSetVariableValue(getTenantId(), variableInstance, value, variableValue);
+        variableInstanceEnhancer.postSetVariableValue(getTenantId(), variableInstance, newVariableValue, enhancedNewVariableValue);
     }
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
 
+        VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
         VariableType type = variableTypes.findVariableType(value);
+
 
         VariableInstanceEntityManager variableInstanceEntityManager = variableServiceConfiguration.getVariableInstanceEntityManager();
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create(variableName, type);
         // Set the value after initializing the back pointer
         initializeVariableInstanceBackPointer(variableInstance);
-        VariableInstanceEnhancer variableInstanceEnhancer = variableServiceConfiguration.getVariableInstanceEnhancer();
         Object variableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), variableInstance, value);
+        VariableType overriddenType = variableInstanceEnhancer.determineVariableType(variableInstance, value, variableValue, type);
+        if(overriddenType != null && type != overriddenType){
+            variableInstance.setTypeName(overriddenType.getTypeName());
+            variableInstance.setType(overriddenType);
+        }
         variableInstance.setValue(variableValue);
         variableInstanceEntityManager.insert(variableInstance);
 

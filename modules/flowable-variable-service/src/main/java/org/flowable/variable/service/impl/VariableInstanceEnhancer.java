@@ -13,9 +13,11 @@
 package org.flowable.variable.service.impl;
 
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
- * Interface that can be implemented to enhance variable instances during the lifecyle of a {@link org.flowable.variable.api.persistence.entity.VariableInstance}
+ * Interface that can be implemented to enhance variable instances during the lifecycle of a {@link org.flowable.variable.api.persistence.entity.VariableInstance}
  * @author Arthur Hupka-Merle
  */
 public interface VariableInstanceEnhancer {
@@ -30,13 +32,26 @@ public interface VariableInstanceEnhancer {
     Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue);
 
     /**
+     * Called prior the variable value is set for the given variable instance. The returned value will be used as the variable type.
+     * Allows to override the default variable type.
+     *
+     * @param variableInstance the variable instance entity the value will be set on
+     * @param originalVariableValue the original value for the variableInstanceEntity
+     * @param enhancedVariableValue the enhanced value for the variableInstanceEntity
+     * @param selectedType the selected type for the variableInstanceEntity
+     */
+    default VariableType determineVariableType(VariableInstanceEntity variableInstance, Object originalVariableValue, Object enhancedVariableValue,
+            VariableType selectedType) {
+        return selectedType;
+    }
+
+    /**
      * Called after the value is set on the variable instance.
+     *
      * @param variableInstance the variable instance entity the value was set on
      * @param originalValue the non-enhanced value that was used to choose the {@link org.flowable.variable.api.types.VariableType}.
      * {@code variableValue} and {@code originalValue} may often be the same
      * @param variableValue the value that was set on the variable instance
      */
     void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue);
-
-
 }
