@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.test.api.variables;
+package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,40 +20,44 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.DefaultVariableInstanceEnhancer;
 import org.flowable.variable.service.impl.VariableInstanceEnhancer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
-
-    ObjectMapper objectMapper = new ObjectMapper();
+/**
+ * @author: Arthur Hupka-Merle
+ */
+public class VariableInstanceEnhancerCmmnTest extends FlowableCmmnTestCase {
 
     VariableInstanceEnhancer originalEnhancer;
 
-    @BeforeEach
+    @Before
     public void setUp() {
-        originalEnhancer = processEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEnhancer();
+        originalEnhancer = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEnhancer();
     }
 
+    @After
     public void tearDown() {
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(originalEnhancer);
+        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(originalEnhancer);
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testCompleteTaskWithExceptionInPostSetVariable() {
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
             @Override
             public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
                 if (variableInstance.getName().equals("orderId")) {
@@ -63,24 +67,27 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
                 }
             }
         };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
         variables.put("OtherVariable", "Hello World");
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(variables)
+                .start();
 
         assertThatThrownBy(() -> {
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             variables.put("orderId", -1L);
             variables.put("OtherVariable", "Hello World update");
-            taskService.complete(task.getId(), variables);
+            cmmnTaskService.complete(task.getId(), variables);
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" }, tenantId = "myTenant")
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" }, tenantId = "myTenant")
     public void testCompleteTaskWithExceptionInPostSetVariableWithTenantId() {
         List<String> preSetVariableTenantId = new LinkedList<>();
         List<String> postSetVariableTenantId = new LinkedList<>();
@@ -102,28 +109,32 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
                 }
             }
         };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
-        ProcessInstance processInstance = runtimeService
-                .startProcessInstanceByKeyAndTenantId("oneTaskProcess", variables, "myTenant");
+        CaseInstance caseInstance = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(variables)
+                .tenantId("myTenant")
+                .start();
 
         assertThatThrownBy(() -> {
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             variables.put("orderId", -1L);
-            taskService.complete(task.getId(), variables);
+            cmmnTaskService.complete(task.getId(), variables);
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
 
         assertThat(preSetVariableTenantId).containsExactly("myTenant", "myTenant");
         assertThat(postSetVariableTenantId).containsExactly("myTenant", "myTenant");
     }
 
-
     @Test
-    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testTransientVariables() {
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
+
             @Override
             public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
                 if (variableInstance.getName().equals("orderId")) {
@@ -133,22 +144,21 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
                 }
             }
         };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", -1L);
         variables.put("OtherVariable", "Hello World");
 
         assertThatThrownBy(() -> {
-            // TODO discuss with Joram how to handle transient variables
-            runtimeService.createProcessInstanceBuilder().transientVariables(variables).processDefinitionKey("oneTaskProcess").start();
+            cmmnRuntimeService.createCaseInstanceBuilder().transientVariables(variables).caseDefinitionKey("oneTaskCase").start();
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
     }
 
     @Test
-    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-    void testEnhanceVariableWithMetaInfo() {
-
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void testEnhanceVariableWithMetaInfo() {
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         List<Object> preSetValueCalls = new LinkedList<>();
         List<Object> postSetValueCalls = new LinkedList<>();
         DefaultVariableInstanceEnhancer enhancer = new DefaultVariableInstanceEnhancer() {
@@ -156,8 +166,8 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
             @Override
             public Object preSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue) {
                 preSetValueCalls.add(originalValue);
-                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
-                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
+                assertThat(variableInstance.getScopeId()).isNotNull();
+                assertThat(variableInstance.getScopeDefinitionId()).isNotNull();
                 if (originalValue instanceof String) {
                     VariableMeta variableMeta = new VariableMeta();
                     variableMeta.byteLength = String.valueOf(((String) originalValue).getBytes().length);
@@ -174,8 +184,8 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
             @Override
             public void postSetVariableValue(String tenantId, VariableInstance variableInstance, Object originalValue, Object variableValue) {
                 postSetValueCalls.add(variableValue);
-                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
-                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
+                assertThat(variableInstance.getScopeId()).isNotNull();
+                assertThat(variableInstance.getScopeDefinitionId()).isNotNull();
                 if (originalValue instanceof String) {
                     assertThat(originalValue).isNotSameAs(variableValue);
                     assertThat(originalValue).isEqualTo("myValue1");
@@ -183,26 +193,26 @@ public class VariableInstanceEnhancerTest extends PluggableFlowableTestCase {
                 }
             }
         };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
+        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceEnhancer(enhancer);
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("oneTaskProcess")
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
                 .variable("myEnhancedStringVariable", "myValue1")
                 .variable("myIntVariable", 1)
                 .start();
 
-        Map<String, Object> processVariables = processInstance.getProcessVariables();
+        Map<String, Object> processVariables = caseInstance.getCaseVariables();
         assertThat(processVariables.get("myEnhancedStringVariable")).isInstanceOf(String.class);
-        Object stringVariableValue = runtimeService.getVariable(processInstance.getId(), "myEnhancedStringVariable");
+        Object stringVariableValue = cmmnRuntimeService.getVariable(caseInstance.getId(), "myEnhancedStringVariable");
         assertThat(stringVariableValue).isEqualTo("myValue1Enhanced");
-        VariableInstance stringVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "myEnhancedStringVariable");
+        VariableInstance stringVariableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "myEnhancedStringVariable");
         assertThat(stringVariableInstance.getMetaInfo()).isEqualTo("{\"byteLength\":\"8\"}");
 
         assertThat(processVariables.get("myIntVariable")).isInstanceOf(Integer.class);
-        Object intVariableValue = runtimeService.getVariable(processInstance.getId(), "myIntVariable");
+        Object intVariableValue = cmmnRuntimeService.getVariable(caseInstance.getId(), "myIntVariable");
         assertThat(intVariableValue).isEqualTo(1);
 
-        VariableInstance intVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "myIntVariable");
+        VariableInstance intVariableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "myIntVariable");
         assertThat(intVariableInstance.getMetaInfo()).isNull();
 
         assertThat(preSetValueCalls).containsExactlyInAnyOrder("myValue1", 1);

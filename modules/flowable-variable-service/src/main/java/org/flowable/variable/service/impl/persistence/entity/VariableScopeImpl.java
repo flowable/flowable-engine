@@ -957,9 +957,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         if (transientVariables == null) {
             transientVariables = new HashMap<>();
         }
-        TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, variableValue);
+        VariableInstanceEnhancer variableInstanceEnhancer = getVariableServiceConfiguration().getVariableInstanceEnhancer();
+        TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, null);
         initializeVariableInstanceBackPointer(transientVariableInstance);
+        Object transientVariableValue = variableInstanceEnhancer.preSetVariableValue(getTenantId(), transientVariableInstance, variableValue);
+        transientVariableInstance.setValue(transientVariableValue);
         transientVariables.put(variableName, transientVariableInstance);
+        variableInstanceEnhancer.postSetVariableValue(getTenantId(), transientVariableInstance, variableValue, transientVariableValue);
     }
 
     @Override
