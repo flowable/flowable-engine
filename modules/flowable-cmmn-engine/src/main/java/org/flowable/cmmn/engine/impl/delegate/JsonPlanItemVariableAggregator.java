@@ -93,7 +93,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                             .getValue(planItemInstance);
                     VariableType variableType = variableTypes.findVariableType(sourceValue);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(targetVarName, variableType, sourceValue);
+                    varInstance = variableService.createVariableInstance(planItemInstance.getTenantId(), targetVarName, variableType, sourceValue);
                 }
 
                 if (varInstance != null) {

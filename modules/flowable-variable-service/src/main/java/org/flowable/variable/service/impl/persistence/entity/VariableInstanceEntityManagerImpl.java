@@ -24,7 +24,6 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
-import org.flowable.variable.service.impl.VariableInstanceEnhancer;
 import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
@@ -43,16 +42,8 @@ public class VariableInstanceEntityManagerImpl
 
     @Override
     public VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value) {
-        VariableInstanceEnhancer variableInstanceEnhancer = serviceConfiguration.getVariableInstanceEnhancer();
         VariableInstanceEntity variableInstance = create(name, type);
-        Object variableValue = variableInstanceEnhancer.preSetVariableValue(tenantId, variableInstance, value);
-        VariableType overriddenType = variableInstanceEnhancer.determineVariableType(variableInstance, value, variableValue, type);
-        if(overriddenType != null && overriddenType != type){
-            variableInstance.setType(overriddenType);
-            variableInstance.setTypeName(overriddenType.getTypeName());
-        }
-        variableInstance.setValue(variableValue);
-        variableInstanceEnhancer.postSetVariableValue(tenantId, variableInstance, value, variableValue);
+        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
         return variableInstance;
     }
 
