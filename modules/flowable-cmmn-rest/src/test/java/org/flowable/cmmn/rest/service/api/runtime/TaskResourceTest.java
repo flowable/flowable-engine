@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
@@ -448,6 +449,59 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                 historyService.deleteHistoricTaskInstance(task.getId());
             }
         }
+    }
+
+    /**
+     * Test completing a single task. POST cmmn-runtime/tasks/{taskId}
+     */
+    @CmmnDeployment
+    public void testCompleteTaskWithLocalAndTransientVariables() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        String taskId = task.getId();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode variablesNode = objectMapper.createArrayNode();
+        requestNode.put("action", "complete");
+        requestNode.set("variables", variablesNode);
+
+        ObjectNode var1 = objectMapper.createObjectNode();
+        variablesNode.add(var1);
+        var1.put("name", "var1");
+        var1.put("value", "Hello");
+        ObjectNode var2 = objectMapper.createObjectNode();
+        variablesNode.add(var2);
+        var2.put("name", "var2");
+        var2.put("value", "world");
+        var2.put("scope", "local");
+
+        ArrayNode transientVariablesNode = objectMapper.createArrayNode();
+        requestNode.set("transientVariables", transientVariablesNode);
+        ObjectNode var3 = objectMapper.createObjectNode();
+        transientVariablesNode.add(var3);
+        var3.put("name", "var3");
+        var3.put("value", "this");
+        ObjectNode var4 = objectMapper.createObjectNode();
+        transientVariablesNode.add(var4);
+        var4.put("name", "var4");
+        var4.put("value", "is a test");
+        var4.put("scope", "local");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        assertThat(task).isNull();
+
+        assertThat(runtimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "Hello"),
+                        entry("copiedVar2", "world"),
+                        entry("copiedVar3", "this"),
+                        entry("copiedVar4", "is a test")
+                );
+
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn" })

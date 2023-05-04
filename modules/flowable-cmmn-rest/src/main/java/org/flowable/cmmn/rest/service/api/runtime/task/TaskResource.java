@@ -13,12 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.CmmnFormHandlerRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.FormModelResponse;
@@ -30,6 +24,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,6 +45,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -200,40 +197,44 @@ public class TaskResource extends TaskBaseResource {
     }
 
     protected void completeTask(Task task, TaskActionRequest actionRequest) {
-        Map<String, Object> variablesToSet = null;
-        Map<String, Object> transientVariablesToSet = null;
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
 
         if (actionRequest.getVariables() != null) {
-            variablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required");
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                variablesToSet.put(var.getName(), actualVariableValue);
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    taskCompletionBuilder.variableLocal(var.getName(), actualVariableValue);
+                } else {
+                    taskCompletionBuilder.variable(var.getName(), actualVariableValue);
+                }
+
             }
         }
 
         if (actionRequest.getTransientVariables() != null) {
-            transientVariablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getTransientVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                transientVariablesToSet.put(var.getName(), actualVariableValue);
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    taskCompletionBuilder.transientVariableLocal(var.getName(), actualVariableValue);
+                } else {
+                    taskCompletionBuilder.transientVariable(var.getName(), actualVariableValue);
+                }
             }
         }
 
-        if (actionRequest.getFormDefinitionId() != null) {
-            taskService.completeTaskWithForm(task.getId(), actionRequest.getFormDefinitionId(), actionRequest.getOutcome(), 
-                            variablesToSet, transientVariablesToSet);
-            
-        } else {
-            taskService.complete(task.getId(), variablesToSet, transientVariablesToSet);
-        }
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .formDefinitionId(actionRequest.getFormDefinitionId())
+                .outcome(actionRequest.getOutcome())
+                .complete();
     }
 
     protected void resolveTask(Task task, TaskActionRequest actionRequest) {

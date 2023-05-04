@@ -26,6 +26,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -62,7 +63,14 @@ public interface CmmnTaskService {
 
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope);
-    
+
+    /**
+     * Create a completion builder for the task
+     *
+     * @return task completion builder
+     */
+    TaskCompletionBuilder createTaskCompletionBuilder();
+
     /**
      * Claim responsibility for a task: the given user is made assignee for the task. The difference with {@link #setAssignee(String, String)} is that here a check is done if the task already has a
      * user assigned to it. No check is done whether the user is known by the identity component.

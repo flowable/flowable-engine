@@ -15,10 +15,13 @@ package org.flowable.cmmn.test.task;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +49,7 @@ import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Rule;
 import org.junit.Test;
@@ -319,6 +323,62 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         } finally {
             cmmnEngineConfiguration.setCreateHumanTaskInterceptor(null);
         }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testTaskCompletionBuilder() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("taskCompletionBuilderTest").start();
+        TaskQuery tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId());
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("mapInstanceLevelVariable1", "value1");
+        variables.put("mapInstanceLevelVariable2", "value2");
+
+        Map<String, Object> variablesLocal = new HashMap<>();
+        variablesLocal.put("mapInstanceLocalVariable1", "localValue1");
+        variablesLocal.put("mapInstanceLocalVariable2", "localValue2");
+
+        Map<String, Object> transientVariables = new HashMap<>();
+        transientVariables.put("mapInstanceLevelTransientVariable1", "transientValue1");
+        transientVariables.put("mapInstanceLevelTransientVariable2", "transientValue2");
+
+        Map<String, Object> transientLocalVariables = new HashMap<>();
+        transientLocalVariables.put("mapInstanceLocalTransientVariable1", "localTransientValue1");
+        transientLocalVariables.put("mapInstanceLocalTransientVariable2", "localTransientValue2");
+
+        cmmnTaskService.createTaskCompletionBuilder()
+                .variables(variables)
+                .variable("singleInstanceVariable", "singleValue1")
+                .variablesLocal(variablesLocal)
+                .variableLocal("singleLocalVariable", "singleLocalValue1")
+                .transientVariables(transientVariables)
+                .transientVariable("singleTransientVariable", "singleTransientValue1")
+                .transientVariablesLocal(transientLocalVariables)
+                .transientVariableLocal("singleLocalTransientVariable", "singleTransientLocalValue1")
+                .taskId(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult().getId())
+                .complete();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        // variables
+                        entry("mapInstanceLevelVariable1", "value1"),
+                        entry("mapInstanceLevelVariable2", "value2"),
+                        entry("singleInstanceVariable", "singleValue1"),
+                        // local variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLocalVariable1", "localValue1"),
+                        entry("copiedMapInstanceLocalVariable2", "localValue2"),
+                        entry("copiedSingleLocalVariable", "singleLocalValue1"),
+                        // transient variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLevelTransientVariable1", "transientValue1"),
+                        entry("copiedMapInstanceLevelTransientVariable2", "transientValue2"),
+                        entry("copiedSingleTransientVariable", "singleTransientValue1"),
+                        // transient local variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLocalTransientVariable1", "localTransientValue1"),
+                        entry("copiedMapInstanceLocalTransientVariable2", "localTransientValue2"),
+                        entry("copiedSingleLocalTransientVariable", "singleTransientLocalValue1")
+                );
+
     }
 
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
