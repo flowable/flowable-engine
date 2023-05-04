@@ -22,8 +22,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
-import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -49,13 +47,11 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
             VariableService variableService = variableServiceConfiguration.getVariableService();
-            VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
 
-                VariableType variableType = variableTypes.findVariableType(varValue);
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(externalWorkerJob.getTenantId(), varName, varValue);
                 variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
                 variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
                 variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);

@@ -71,7 +71,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -551,7 +550,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
      */
     protected Map<String, VariableInstanceEntity> createCaseVariablesFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance) {
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        VariableTypes variableTypes = cmmnEngineConfiguration.getVariableTypes();
         List<HistoricVariableInstance> variables = cmmnEngineConfiguration.getCmmnHistoryService()
             .createHistoricVariableInstanceQuery()
             .caseInstanceId(historicCaseInstance.getId())
@@ -563,8 +561,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 // only make a copy, if it is a case variable, we don't copy locally scoped ones (e.g. from stages), as those plan items are practically
                 // finished
                 if (variable.getSubScopeId() == null) {
-                    VariableInstanceEntity newVariable = variableService.createVariableInstance(
-                        variable.getVariableName(), variableTypes.getVariableType(variable.getVariableTypeName()), variable.getValue());
+                    VariableInstanceEntity newVariable = variableService.createVariableInstance(historicCaseInstance.getTenantId(),
+                        variable.getVariableName(), variable.getValue());
 
                     newVariable.setId(variable.getId());
                     newVariable.setScopeId(historicCaseInstance.getId());
