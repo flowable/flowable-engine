@@ -108,14 +108,21 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
     }
 
+    /**
+     * Tests changing of the variable type for a variable.
+     * First the variable is set as a string, then it is changed to an integral number, which is stored
+     * as 'long' (and not as 'integer' as the default would be).
+     */
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testChangeVariableType() {
-        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
+        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(
+                processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
-                if (isNumeric(value)) {
+                if (isIntegralNumber(value)) {
+                    // We always use 'long' as the type for integral numbers
                     return typeRegistry.getVariableType(LongType.TYPE_NAME);
                 }
                 return super.determineVariableType(typeRegistry, tenantId, variableInstance, value);
@@ -123,32 +130,36 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
-                if (isNumeric(value)) {
+                if (isIntegralNumber(value)) {
                     variableInstance.setValue(((Number) value).longValue());
                 } else {
                     super.setOrUpdateValue(tenantId, variableInstance, value);
                 }
             }
 
-            boolean isNumeric(Object value) {
+            boolean isIntegralNumber(Object value) {
                 return StringUtils.isNumeric(Objects.toString(value));
             }
         };
         processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(variableValueModifier);
 
         Map<String, Object> variables = new HashMap<>();
+        // First variable is a string
         variables.put("orderId", "ABC");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
         VariableInstance orderIdInstance = runtimeService.getVariableInstance(processInstance.getId(), "orderId");
+        // type should be string
         assertThat(orderIdInstance.getTypeName()).isEqualTo("string");
         assertThat(orderIdInstance.getValue()).isEqualTo("ABC");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        // now we change it to be an integral number
         variables.put("orderId", 1);
         taskService.complete(task.getId(), variables);
 
         VariableInstanceEntity orderIdInstanceTask = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(), "orderId");
+        // and expect it to be stored as long, because the variable value modifier forced it to be a long
         assertThat(orderIdInstanceTask.getTypeName()).isEqualTo("long");
         assertThat(orderIdInstanceTask.getValue()).isEqualTo(1L);
         assertThat(eventListener.getEventsReceived())
