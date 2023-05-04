@@ -23,7 +23,6 @@ import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.delegate.variable.VariableAggregatorContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.types.BooleanType;
@@ -91,9 +90,8 @@ public class JsonVariableAggregator implements VariableAggregator {
                     Object sourceValue = processEngineConfiguration.getExpressionManager()
                             .createExpression(definition.getSourceExpression())
                             .getValue(execution);
-                    VariableType variableType = variableTypes.findVariableType(sourceValue);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(targetVarName, variableType, sourceValue);
+                    varInstance = variableService.createVariableInstance(execution.getTenantId(), targetVarName, sourceValue);
                 }
 
                 if (varInstance != null) {

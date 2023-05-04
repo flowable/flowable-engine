@@ -16,7 +16,9 @@ import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
+import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableServiceImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
@@ -50,24 +52,18 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     
     protected VariableInstanceEntityManager variableInstanceEntityManager;
     protected HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager;
-    
     protected VariableTypes variableTypes;
-    
     protected InternalHistoryVariableManager internalHistoryVariableManager;
-    
     protected ExpressionManager expressionManager;
-    
     protected int maxLengthString;
-    
     protected boolean loggingSessionEnabled;
-    
+
+    protected VariableInstanceValueModifier variableInstanceValueModifier;
+
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
-     *
      * MySerializableVariable myVariable = (MySerializableVariable) execution.getVariable("myVariable"); myVariable.setNumber(123);
-     *
      * And the changes to the java object will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
-     *
      * By default true for backwards compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
@@ -82,6 +78,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     public void init() {
         initDataManagers();
         initEntityManagers();
+        initVariableInstanceValueModifier();
     }
 
     // Data managers
@@ -102,6 +99,12 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         }
         if (historicVariableInstanceEntityManager == null) {
             historicVariableInstanceEntityManager = new HistoricVariableInstanceEntityManagerImpl(this, historicVariableInstanceDataManager);
+        }
+    }
+
+    public void initVariableInstanceValueModifier() {
+        if (variableInstanceValueModifier == null) {
+            variableInstanceValueModifier = new DefaultVariableInstanceValueModifier(this);
         }
     }
 
@@ -217,5 +220,13 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public VariableInstanceValueModifier getVariableInstanceValueModifier() {
+        return variableInstanceValueModifier;
+    }
+
+    public void setVariableInstanceValueModifier(VariableInstanceValueModifier variableInstanceValueModifier) {
+        this.variableInstanceValueModifier = variableInstanceValueModifier;
     }
 }

@@ -22,8 +22,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
-import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -49,13 +47,11 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
             VariableService variableService = variableServiceConfiguration.getVariableService();
-            VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
 
-                VariableType variableType = variableTypes.findVariableType(varValue);
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(externalWorkerJob.getTenantId(), varName, varValue);
                 variableInstance.setScopeId(externalWorkerJob.getScopeId());
                 variableInstance.setSubScopeId(externalWorkerJob.getSubScopeId());
                 variableInstance.setScopeType(ScopeTypes.CMMN_EXTERNAL_WORKER);
