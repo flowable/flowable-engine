@@ -206,8 +206,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
                     Integer elementIndexValue = getLoopVariable(childExecution, getCollectionElementIndexVariable());
                     String counterValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + elementIndexValue;
-                    VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
-                            aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), counterValue, variableServiceConfiguration);
+                    VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(childExecution.getTenantId(),
+                            COUNTER_VAR_PREFIX + targetVarName, aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), counterValue,
+                            variableServiceConfiguration);
                     variableService.insertVariableInstance(counterVarInstance);
                 }
             }

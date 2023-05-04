@@ -56,9 +56,6 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
     protected boolean forcedUpdate;
     protected boolean deleted;
 
-    public VariableInstanceEntityImpl() {
-
-    }
 
     @Override
     public Object getPersistentState() {

@@ -41,7 +41,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -120,7 +119,7 @@ public class CmmnAggregation {
             subScopeId = caseInstanceId;
         }
 
-        return createScopedVariableAggregationVariableInstance(targetVarName, caseInstanceId, subScopeId, aggregatedValue, variableServiceConfiguration);
+        return createScopedVariableAggregationVariableInstance(planItemInstance.getTenantId(), targetVarName, caseInstanceId, subScopeId, aggregatedValue, variableServiceConfiguration);
     }
 
     /**
@@ -205,7 +204,7 @@ public class CmmnAggregation {
                     elementIndexValue = 0;
                 }
                 String counterValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + elementIndexValue;
-                VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
+                VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(repetitionPlanItem.getTenantId(),COUNTER_VAR_PREFIX + targetVarName,
                         aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), counterValue, variableServiceConfiguration);
                 instances.add(counterVarInstance);
             }
@@ -226,13 +225,12 @@ public class CmmnAggregation {
         return null;
     }
 
-    public static VariableInstanceEntity createScopedVariableAggregationVariableInstance(String varName, String scopeId, String subScopeId, Object value,
+    public static VariableInstanceEntity createScopedVariableAggregationVariableInstance(String tenantId, String varName, String scopeId, String subScopeId, Object value,
             VariableServiceConfiguration variableServiceConfiguration) {
 
         VariableService variableService = variableServiceConfiguration.getVariableService();
 
-        VariableType variableType = variableServiceConfiguration.getVariableTypes().findVariableType(value);
-        VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, value);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, value);
         variableInstance.setScopeId(scopeId);
         variableInstance.setSubScopeId(subScopeId);
         variableInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);

@@ -303,7 +303,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
                 int repetitionCounter = PlanItemInstanceUtil.getRepetitionCounter(planItemInstanceEntity);
                 String repetitionValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + repetitionCounter;
-                VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
+                VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(planItemInstanceEntity.getTenantId(), COUNTER_VAR_PREFIX + targetVarName,
                         aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), repetitionValue, variableServiceConfiguration);
                 variableService.insertVariableInstance(counterVarInstance);
             }
