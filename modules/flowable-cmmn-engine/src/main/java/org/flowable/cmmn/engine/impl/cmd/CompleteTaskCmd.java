@@ -40,12 +40,21 @@ public class CompleteTaskCmd implements Command<Void> {
     
     protected String taskId;
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
+    protected Map<String, Object> transientVariablesLocal;
     
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {  
         this.taskId = taskId;
         this.variables = variables;
         this.transientVariables = transientVariables;
+    }
+
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        this(taskId, variables, transientVariables);
+        this.variablesLocal = variablesLocal;
+        this.transientVariablesLocal = transientVariablesLocal;
     }
     
     @Override
@@ -77,8 +86,14 @@ public class CompleteTaskCmd implements Command<Void> {
         if (variables != null) {
             taskEntity.setVariables(variables);
         }
+        if (variablesLocal != null) {
+            taskEntity.setVariablesLocal(variablesLocal);
+        }
         if (transientVariables != null) {
             taskEntity.setTransientVariables(transientVariables);
+        }
+        if (transientVariablesLocal != null) {
+            taskEntity.setTransientVariablesLocal(transientVariablesLocal);
         }
 
         logUserTaskCompleted(taskEntity, cmmnEngineConfiguration);

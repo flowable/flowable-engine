@@ -35,6 +35,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
@@ -42,7 +43,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected String formDefinitionId;
     protected String outcome;
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
+    protected Map<String, Object> transientVariablesLocal;
     protected boolean localScope;
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
@@ -64,6 +67,13 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
+    }
+
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String,
+            Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        this(taskId, formDefinitionId, outcome, variables, transientVariables);
+        this.variablesLocal = variablesLocal;
+        this.transientVariablesLocal = transientVariablesLocal;
     }
 
     @Override
@@ -132,21 +142,29 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         if (planItemInstanceEntity == null) {
             throw new FlowableException("Could not find plan item instance for task " + taskId);
         }
-        
+
         if (taskVariables != null) {
-            if (localScope) {
+            if (localScope) { // backwards compatibility from before variableLocal was available in constructor
                 task.setVariablesLocal(taskVariables);
             } else {
                 task.setVariables(taskVariables);
             }
         }
-        
+
+        if (variablesLocal != null) {
+            task.setVariablesLocal(variablesLocal);
+        }
+
         if (transientVariables != null) {
-            if (localScope) {
+            if (localScope) { // backwards compatibility from before variableLocal was available in constructor
                 task.setTransientVariablesLocal(transientVariables);
             } else {
                 task.setTransientVariables(transientVariables);
             }
+        }
+
+        if (transientVariablesLocal != null) {
+            task.setTransientVariablesLocal(transientVariablesLocal);
         }
 
         logUserTaskCompleted(task, cmmnEngineConfiguration);
