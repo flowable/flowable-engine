@@ -23,7 +23,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.types.BooleanType;
@@ -91,9 +90,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                     Object sourceValue = cmmnEngineConfiguration.getExpressionManager()
                             .createExpression(definition.getSourceExpression())
                             .getValue(planItemInstance);
-                    VariableType variableType = variableTypes.findVariableType(sourceValue);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(planItemInstance.getTenantId(), targetVarName, variableType, sourceValue);
+                    varInstance = variableService.createVariableInstance(planItemInstance.getTenantId(), targetVarName, sourceValue);
                 }
 
                 if (varInstance != null) {

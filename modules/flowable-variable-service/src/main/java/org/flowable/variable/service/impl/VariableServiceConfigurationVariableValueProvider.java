@@ -16,6 +16,7 @@ package org.flowable.variable.service.impl;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * Wrapper class for {@link VariableServiceConfiguration} to enable VariableValueProvider functionality
@@ -37,6 +38,13 @@ public class VariableServiceConfigurationVariableValueProvider implements Variab
 
     @Override
     public ValueFields createValueFields(String name, VariableType type, Object value) {
-        return variableServiceConfiguration.getVariableInstanceEntityManager().create(name, type, value);
+        VariableInstanceEntity variableInstanceEntity = variableServiceConfiguration.getVariableInstanceEntityManager().create();
+        variableInstanceEntity.setName(name);
+        variableInstanceEntity.setTypeName(type.getTypeName());
+        variableInstanceEntity.setType(type);
+        // We don't have to go through VariableInstanceValueModifier here, because this is used in the sqlmap for the where clause.
+        // The 'type' has been predefined in this case.
+        variableInstanceEntity.setValue(value);
+        return variableInstanceEntity;
     }
 }

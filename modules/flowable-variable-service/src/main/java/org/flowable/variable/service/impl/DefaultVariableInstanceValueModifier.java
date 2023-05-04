@@ -25,22 +25,18 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class DefaultVariableInstanceValueModifier implements VariableInstanceValueModifier {
 
-    protected final VariableTypes typeRegistry;
     protected final VariableServiceConfiguration serviceConfiguration;
 
     public DefaultVariableInstanceValueModifier(VariableServiceConfiguration serviceConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
-        this.typeRegistry = serviceConfiguration.getVariableTypes();
     }
 
     @Override
     public void setVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
         if (variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            if (variableInstanceEntity.getType() == null) {
-                VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
-                setVariableType(variableInstanceEntity, variableType);
-            }
+            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
+            setVariableType(variableInstanceEntity, variableType);
         }
         setOrUpdateValue(tenantId, variableInstance, value);
     }
@@ -53,7 +49,7 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
          */
         if(variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
+            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
             if (!variableType.equals(variableInstanceEntity.getType())) {
                 // variable type has changed
                 variableInstance.setValue(null);
@@ -65,7 +61,7 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
     }
 
     protected VariableType determineVariableType(VariableTypes variableTypes, String tenantId, VariableInstance variableInstance, Object value) {
-        return typeRegistry.findVariableType(value);
+        return variableTypes.findVariableType(value);
     }
 
     /**

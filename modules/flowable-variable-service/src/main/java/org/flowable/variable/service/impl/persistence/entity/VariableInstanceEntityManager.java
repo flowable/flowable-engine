@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 
@@ -27,19 +26,14 @@ import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
  */
 public interface VariableInstanceEntityManager extends EntityManager<VariableInstanceEntity> {
 
-    VariableInstanceEntity create(String name, VariableType type, Object value);
-    VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value);
-
     /**
-     * Create a variable instance without setting the value on it.
-     * <b>IMPORTANT:</b> If you use this method you would have to call {@link VariableInstanceEntity#setValue(Object)}
-     * for setting the value
-     * @param name the name of the variable to create
-     * @param type the type of the created variable
-     *
+     * Creates a variable instance for the given tenant, name and value.
+     * @param tenantId the tenant id of the variable instance
+     * @param name the name of the variable instance
+     * @param value the value of the variable instance
      * @return the {@link VariableInstanceEntity} to be used
      */
-    VariableInstanceEntity create(String name, VariableType type);
+    VariableInstanceEntity create(String tenantId, String name, Object value);
 
     /**
      * The {@link HistoricVariableInstanceEntity} is the historic counterpart of the {@link VariableInstanceEntity}.

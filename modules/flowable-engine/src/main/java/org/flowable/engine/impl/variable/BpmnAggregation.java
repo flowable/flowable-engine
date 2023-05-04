@@ -42,7 +42,6 @@ import org.flowable.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -232,8 +231,7 @@ public class BpmnAggregation {
 
         VariableService variableService = variableServiceConfiguration.getVariableService();
 
-        VariableType variableType = variableServiceConfiguration.getVariableTypes().findVariableType(value);
-        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, variableType, value);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, value);
         variableInstance.setScopeId(scopeId);
         variableInstance.setSubScopeId(subScopeId);
         variableInstance.setScopeType(ScopeTypes.BPMN_VARIABLE_AGGREGATION);

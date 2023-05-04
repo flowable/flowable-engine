@@ -32,10 +32,9 @@ import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
+import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -849,7 +848,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         String oldVariableType = variableInstance.getTypeName();
         initializeVariableInstanceBackPointer(variableInstance);
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
-        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
         variableServiceConfiguration.getVariableInstanceValueModifier().updateVariableValue(getTenantId(), variableInstance, newVariableValue);
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
@@ -877,7 +875,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
-        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
 
         VariableInstanceEntityManager variableInstanceEntityManager = variableServiceConfiguration.getVariableInstanceEntityManager();
         VariableInstanceEntity variableInstance = variableInstanceEntityManager.create();
@@ -936,8 +933,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
         VariableInstanceValueModifier variableValueModifier = getVariableServiceConfiguration().getVariableInstanceValueModifier();
         TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, null);
-        variableValueModifier.setVariableValue(getTenantId(), transientVariableInstance, variableValue);
         initializeVariableInstanceBackPointer(transientVariableInstance);
+        variableValueModifier.setVariableValue(getTenantId(), transientVariableInstance, variableValue);
         transientVariables.put(variableName, transientVariableInstance);
     }
 

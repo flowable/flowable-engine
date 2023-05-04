@@ -20,7 +20,6 @@ import java.util.Map;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
@@ -41,23 +40,10 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value) {
-        VariableInstanceEntity variableInstance = create(name, type);
-        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(tenantId, variableInstance, value);
-        return variableInstance;
-    }
-
-    @Override
-    public VariableInstanceEntity create(String name, VariableType type, Object value) {
-        return create(null, name, type, value);
-    }
-
-    @Override
-    public VariableInstanceEntity create(String name, VariableType type) {
+    public VariableInstanceEntity create(String tenantId, String name, Object value) {
         VariableInstanceEntity variableInstance = create();
         variableInstance.setName(name);
-        variableInstance.setType(type);
-        variableInstance.setTypeName(type.getTypeName());
+        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(tenantId, variableInstance, value);
         return variableInstance;
     }
 

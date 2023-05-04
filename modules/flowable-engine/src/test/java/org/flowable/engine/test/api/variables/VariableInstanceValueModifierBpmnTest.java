@@ -39,6 +39,7 @@ import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.StringType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -279,6 +280,16 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
             });
 
+            // Use variable query API to check if the variable can be retrieved by value correctly
+            VariableInstanceEntity variableInstanceResult = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                    .variableValueEquals("wrappedInteger", new WrappedIntegerValue(1001, null)).singleResult();
+            assertThat(variableInstanceResult.getType()).isInstanceOf(WrappedIntegerCustomType.class);
+            assertThat(variableInstanceResult.getTypeName()).isEqualTo(WrappedIntegerCustomType.TYPE_NAME);
+            assertThat(variableInstanceResult.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+            });
+
             Object wrappedIntegerProcessVariable = processInstance.getProcessVariables().get("wrappedInteger");
             assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
                 assertThat(wrappedIntegerValue.value).isEqualTo(1001);
@@ -418,6 +429,15 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         assertThat(stringVariableValue).isEqualTo("myValue1Enhanced");
         VariableInstance stringVariableInstance = runtimeService.getVariableInstance(processInstance.getId(), "myEnhancedStringVariable");
         assertThat(stringVariableInstance.getMetaInfo()).isEqualTo("{\"byteLength\":\"8\"}");
+
+
+        // Use variable query API to check if the variable can be retrieved by value correctly
+        VariableInstanceEntity variableInstanceResult = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                .variableValueLike("myEnhancedStringVariable", "myValue1Enh%").singleResult();
+        assertThat(variableInstanceResult.getType()).isInstanceOf(StringType.class);
+        assertThat(variableInstanceResult.getTypeName()).isEqualTo("string");
+        assertThat(variableInstanceResult.getValue()).isEqualTo("myValue1Enhanced");
+
 
         assertThat(processVariables.get("myIntVariable")).isInstanceOf(Integer.class);
         Object intVariableValue = runtimeService.getVariable(processInstance.getId(), "myIntVariable");

@@ -41,7 +41,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -231,8 +230,7 @@ public class CmmnAggregation {
 
         VariableService variableService = variableServiceConfiguration.getVariableService();
 
-        VariableType variableType = variableServiceConfiguration.getVariableTypes().findVariableType(value);
-        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, variableType, value);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, value);
         variableInstance.setScopeId(scopeId);
         variableInstance.setSubScopeId(subScopeId);
         variableInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
