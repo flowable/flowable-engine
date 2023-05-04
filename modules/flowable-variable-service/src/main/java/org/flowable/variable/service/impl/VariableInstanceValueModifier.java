@@ -13,8 +13,6 @@
 package org.flowable.variable.service.impl;
 
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * This interface is the contract for modifying the values for persistent and transient variable instances.
@@ -24,32 +22,22 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface VariableInstanceValueModifier {
 
-    /**
-     * Sets the value of a transient variable instance.
-     *
-     * @param tenantId the ID of the tenant the variable instance belongs to
-     * @param variableInstance the variable instance to be modified
-     * @param value the value to be set for the variable instance
-     */
-    void setTransientVariableValue(String tenantId, VariableInstance variableInstance, Object value);
 
     /**
-     * Sets the value of a persistent variable instance.
+     * Sets the value of a persistent or transient variable instance.
      *
-     * @param typeRegistry the {@link VariableTypes} instance to be used for resolving the variable type
      * @param tenantId the ID of the tenant the variable instance belongs to
      * @param variableInstance the variable instance to be modified
      * @param value the new value to be set for the variable instance.
      */
-    void setVariableValue(VariableTypes typeRegistry, String tenantId, VariableInstanceEntity variableInstance, Object value);
+    void setVariableValue(String tenantId, VariableInstance variableInstance, Object value);
 
     /**
-     * Updates the value of a persistent variable instance.
+     * Updates the value of a variable instance.
      *
-     * @param typeRegistry the {@link VariableTypes} instance to be used for resolving the variable type
      * @param tenantId the ID of the tenant the variable instance belongs to
      * @param variableInstance the variable instance to be modified
      * @param value the value to be set for the updated variable instance.
      */
-    void updateVariableValue(VariableTypes typeRegistry, String tenantId, VariableInstanceEntity variableInstance, Object value);
+    void updateVariableValue(String tenantId, VariableInstance variableInstance, Object value);
 }

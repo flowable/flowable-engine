@@ -850,7 +850,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         initializeVariableInstanceBackPointer(variableInstance);
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
-        variableServiceConfiguration.getVariableInstanceValueModifier().updateVariableValue(variableTypes, getTenantId(), variableInstance, newVariableValue);
+        variableServiceConfiguration.getVariableInstanceValueModifier().updateVariableValue(getTenantId(), variableInstance, newVariableValue);
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager()
@@ -884,7 +884,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         variableInstance.setName(variableName);
         // Set the value after initializing the back pointer
         initializeVariableInstanceBackPointer(variableInstance);
-        variableServiceConfiguration.getVariableInstanceValueModifier().setVariableValue(variableTypes, getTenantId(), variableInstance, value);
+        variableServiceConfiguration.getVariableInstanceValueModifier().setVariableValue(getTenantId(), variableInstance, value);
 
         variableInstanceEntityManager.insert(variableInstance);
 
@@ -936,7 +936,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
         VariableInstanceValueModifier variableValueModifier = getVariableServiceConfiguration().getVariableInstanceValueModifier();
         TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, null);
-        variableValueModifier.setTransientVariableValue(getTenantId(), transientVariableInstance, variableValue);
+        variableValueModifier.setVariableValue(getTenantId(), transientVariableInstance, variableValue);
         initializeVariableInstanceBackPointer(transientVariableInstance);
         transientVariables.put(variableName, transientVariableInstance);
     }

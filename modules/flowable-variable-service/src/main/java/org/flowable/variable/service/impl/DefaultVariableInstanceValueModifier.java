@@ -15,45 +15,56 @@ package org.flowable.variable.service.impl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * The default implementation of the {@link VariableInstanceValueModifier} interface for the Flowable Variable Service.
- *
+ * <p>
  * It implements the default lookup logic for variable types, setting and updating of values for variable instances.
  */
 public class DefaultVariableInstanceValueModifier implements VariableInstanceValueModifier {
 
-    @Override
-    public void setTransientVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
-        setOrUpdateValue(tenantId, variableInstance, value);
+    protected final VariableTypes typeRegistry;
+    protected final VariableServiceConfiguration serviceConfiguration;
+
+    public DefaultVariableInstanceValueModifier(VariableServiceConfiguration serviceConfiguration) {
+        this.serviceConfiguration = serviceConfiguration;
+        this.typeRegistry = serviceConfiguration.getVariableTypes();
     }
 
     @Override
-    public void setVariableValue(VariableTypes typeRegistry, String tenantId, VariableInstanceEntity variableInstance, Object value) {
-        if (variableInstance.getType() == null) {
-            VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
-            setVariableType(variableInstance, variableType);
+    public void setVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
+        if (variableInstance instanceof VariableInstanceEntity) {
+            VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+            if (variableInstanceEntity.getType() == null) {
+                VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
+                setVariableType(variableInstanceEntity, variableType);
+            }
         }
         setOrUpdateValue(tenantId, variableInstance, value);
     }
 
+
     @Override
-    public void updateVariableValue(VariableTypes typeRegistry, String tenantId, VariableInstanceEntity variableInstance, Object value) {
+    public void updateVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
         /* Always check if the type should be altered. It's possible that the previous type is lower in the type
          * checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type higher in the chain is eligible for storage.
          */
-        VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
-        if (!variableType.equals(variableInstance.getType())) {
-            // variable type has changed
-            variableInstance.setValue(null);
-            setVariableType(variableInstance, variableType);
-            variableInstance.forceUpdate();
+        if(variableInstance instanceof VariableInstanceEntity) {
+            VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+            VariableType variableType = determineVariableType(typeRegistry, tenantId, variableInstance, value);
+            if (!variableType.equals(variableInstanceEntity.getType())) {
+                // variable type has changed
+                variableInstance.setValue(null);
+                setVariableType(variableInstanceEntity, variableType);
+                variableInstanceEntity.forceUpdate();
+            }
         }
         setOrUpdateValue(tenantId, variableInstance, value);
     }
 
-    protected VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
+    protected VariableType determineVariableType(VariableTypes variableTypes, String tenantId, VariableInstance variableInstance, Object value) {
         return typeRegistry.findVariableType(value);
     }
 
@@ -70,7 +81,6 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
     /**
      * Central hook method for all modifications of a value for the variable instance.
      * Please note, that transient variable instances are passed here as well.
-     * Persistent variable instances are passed as {@link VariableInstanceEntity} instances.
      * @param tenantId the ID of the tenant the variable instance belongs to
      * @param variableInstance the variable instance to be modified
      * @param value the value to be set for the variable instance

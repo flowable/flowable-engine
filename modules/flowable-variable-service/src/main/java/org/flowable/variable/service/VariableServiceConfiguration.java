@@ -104,7 +104,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initVariableInstanceValueModifier() {
         if (variableInstanceValueModifier == null) {
-            variableInstanceValueModifier = new DefaultVariableInstanceValueModifier();
+            variableInstanceValueModifier = new DefaultVariableInstanceValueModifier(this);
         }
     }
 

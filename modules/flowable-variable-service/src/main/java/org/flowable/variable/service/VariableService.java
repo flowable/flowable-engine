@@ -39,11 +39,7 @@ public interface VariableService {
         return createInternalVariableInstanceQuery().subScopeId(subScopeId).scopeType(scopeType).list();
     }
 
-    VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
-
-    default VariableInstanceEntity createVariableInstance(String tenantId, String name, VariableType type, Object value) {
-        return createVariableInstance(name, type, value);
-    }
+    VariableInstanceEntity createVariableInstance(String tenantId, String name, VariableType type, Object value);
 
     /**
      * Create a variable instance without setting the value on it.

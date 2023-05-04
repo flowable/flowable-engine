@@ -43,7 +43,7 @@ public class VariableInstanceEntityManagerImpl
     @Override
     public VariableInstanceEntity create(String tenantId, String name, VariableType type, Object value) {
         VariableInstanceEntity variableInstance = create(name, type);
-        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
+        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(tenantId, variableInstance, value);
         return variableInstance;
     }
 

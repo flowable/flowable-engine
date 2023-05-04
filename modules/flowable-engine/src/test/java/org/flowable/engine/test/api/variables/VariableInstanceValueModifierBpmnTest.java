@@ -80,7 +80,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testCompleteTaskWithExceptionInPostSetVariable() {
-        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             public void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
@@ -110,7 +110,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testChangeVariableType() {
-        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
@@ -165,7 +165,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         customType = new WrappedIntegerCustomType();
         variableTypes.addTypeBefore(customType, "integer");
         try {
-            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier() {
+            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
                 @Override
                 public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
@@ -245,7 +245,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         customType = new WrappedIntegerCustomType();
         try {
             variableTypes.addTypeBefore(customType, "integer");
-            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier() {
+            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
                 @Override
                 public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
@@ -317,7 +317,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" }, tenantId = "myTenant")
     public void testCompleteTaskWithExceptionInPostSetVariableWithTenantId() {
         List<String> setOrUpdateValueTenantIds = new LinkedList<>();
-        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
@@ -349,7 +349,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTransientVariables() {
         List<String> setOrUpdateValueTenantIds = new LinkedList<>();
-        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
@@ -378,7 +378,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
 
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
         List<Object> preSetValueCalls = new LinkedList<>();
-        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {

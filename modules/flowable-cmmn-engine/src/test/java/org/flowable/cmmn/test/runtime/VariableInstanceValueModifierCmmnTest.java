@@ -32,11 +32,11 @@ import org.junit.Test;
 /**
  * This test checks the basic functionality of the {@link VariableInstanceValueModifier} implementation.
  * It ensures that the modifier is called when setting a variable and that it can be replaced with a custom implementation.
- * Additional tests are available in <code>VariableInstanceEnhancerBpmnTest</code>, as BPMN shares the same implementation of the VariableService.
+ * Additional tests are available in <code>VariableInstanceValueModifierBpmnTest</code>, as BPMN shares the same implementation of the VariableService.
  *
  * @author Arthur Hupka-Merle
  */
-public class VariableInstanceEnhancerCmmnTest extends FlowableCmmnTestCase {
+public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase {
 
     VariableInstanceValueModifier originalModifier;
 
@@ -53,7 +53,7 @@ public class VariableInstanceEnhancerCmmnTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testCompleteTaskWithExceptionInPostSetVariable() {
-        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
@@ -87,7 +87,7 @@ public class VariableInstanceEnhancerCmmnTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testTransientVariables() {
-        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier() {
+        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
             protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
