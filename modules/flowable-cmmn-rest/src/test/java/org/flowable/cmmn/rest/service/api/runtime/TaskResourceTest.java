@@ -441,7 +441,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
      * Test completing a single task. POST cmmn-runtime/tasks/{taskId}
      */
     @CmmnDeployment
-    public void TatestCompleteTaskWithLocalAndTransientVariables() throws Exception {
+    public void testCompleteTaskWithLocalAndTransientVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         String taskId = task.getId();
@@ -490,7 +490,10 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn" })
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simple.form",
+    })
     public void testCompleteTaskWithForm() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
         try {
