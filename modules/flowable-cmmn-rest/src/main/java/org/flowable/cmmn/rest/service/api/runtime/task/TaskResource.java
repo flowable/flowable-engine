@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.CmmnFormHandlerRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.FormModelResponse;
@@ -45,8 +48,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
