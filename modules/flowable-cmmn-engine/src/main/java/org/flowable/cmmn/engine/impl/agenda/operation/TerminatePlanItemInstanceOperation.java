@@ -77,6 +77,11 @@ public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInst
     }
 
     @Override
+    public boolean abortOperationIfNewStateEqualsOldState() {
+        return true;
+    }
+
+    @Override
     public String getOperationName() {
         return "[Terminate plan item]";
     }

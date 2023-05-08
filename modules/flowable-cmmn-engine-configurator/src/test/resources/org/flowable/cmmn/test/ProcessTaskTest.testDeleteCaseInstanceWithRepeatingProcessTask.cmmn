@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn"
+             design:palette="flowable-core-case-palette">
+    <case id="testCaseInstanceDeletion" name="testCaseInstanceDeletion" flowable:initiatorVariableName="initiator"
+          flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <extensionElements>
+                <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+            </extensionElements>
+            <planItem id="planItemcmmnStage_1" definitionRef="cmmnStage_1">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1">
+                        <extensionElements></extensionElements>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <planItem id="planItemcmmnTask_0" name="Human task" definitionRef="cmmnTask_0"></planItem>
+            <stage id="cmmnStage_1">
+                <extensionElements>
+                    <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+                </extensionElements>
+                <planItem id="planItemcmmnTask_2" name="Process task" definitionRef="cmmnTask_2">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1">
+                            <extensionElements></extensionElements>
+                        </repetitionRule>
+                    </itemControl>
+                </planItem>
+                <processTask id="cmmnTask_2" name="Process task" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
+                    <extensionElements>
+                        <design:stencilid><![CDATA[ProcessTask]]></design:stencilid>
+                        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    </extensionElements>
+                    <processRefExpression><![CDATA[oneTask]]></processRefExpression>
+                </processTask>
+            </stage>
+            <humanTask id="cmmnTask_0" name="Human task" flowable:assignee="${initiator}">
+                <extensionElements>
+                    <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </humanTask>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_testCaseInstanceDeletion">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="709.0" width="830.0" x="270.0" y="90.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnStage_1" cmmnElementRef="planItemcmmnStage_1">
+                <dc:Bounds height="262.0" width="383.0" x="569.0" y="221.359375"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_2" cmmnElementRef="planItemcmmnTask_2">
+                <dc:Bounds height="80.0" width="100.0" x="663.0" y="318.359375"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_0" cmmnElementRef="planItemcmmnTask_0">
+                <dc:Bounds height="80.0" width="100.0" x="351.0" y="403.359375"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

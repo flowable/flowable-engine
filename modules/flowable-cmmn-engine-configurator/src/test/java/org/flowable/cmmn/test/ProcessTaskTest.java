@@ -1956,4 +1956,19 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment
+    public void testDeleteCaseInstanceWithRepeatingProcessTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCaseInstanceDeletion").start();
+
+        Task task = processEngineTaskService.createTaskQuery().taskName("my task").singleResult();
+        processEngineTaskService.complete(task.getId());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isOne();
+
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+    }
 }
