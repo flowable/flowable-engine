@@ -490,7 +490,10 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
     }
 
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn" })
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simple.form",
+    })
     public void testCompleteTaskWithForm() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
         try {
