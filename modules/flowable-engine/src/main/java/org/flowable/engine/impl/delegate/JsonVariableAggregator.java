@@ -23,8 +23,8 @@ import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.delegate.variable.VariableAggregatorContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -63,8 +63,8 @@ public class JsonVariableAggregator implements VariableAggregator {
     public Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context) {
         ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
 
-        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
 
         for (VariableAggregationDefinition.Variable definition : context.getDefinition().getDefinitions()) {
             String targetVarName = null;
@@ -91,7 +91,8 @@ public class JsonVariableAggregator implements VariableAggregator {
                             .createExpression(definition.getSourceExpression())
                             .getValue(execution);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(execution.getTenantId(), targetVarName, sourceValue);
+                    varInstance = variableService.createVariableInstance(targetVarName);
+                    variableServiceConfiguration.getVariableInstanceValueModifier().setVariableValue(varInstance, sourceValue, execution.getTenantId());
                 }
 
                 if (varInstance != null) {

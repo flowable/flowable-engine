@@ -14,6 +14,7 @@ package org.flowable.variable.service;
 
 import java.util.List;
 
+import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -40,14 +41,21 @@ public interface VariableService {
 
     /**
      * Create a variable instance with the given name and value for the given tenant.
-     * @param tenantId the id of the tenant
+     *
      * @param name the name of the variable to create
-     * @param value the value of the variable to create
      * @return the {@link VariableInstanceEntity} to be used
      */
-    VariableInstanceEntity createVariableInstance(String tenantId, String name, Object value);
+    VariableInstanceEntity createVariableInstance(String name);
 
     void insertVariableInstance(VariableInstanceEntity variable);
+
+    /**
+     * Inserts a variable instance with the given value.
+     * @param variable the variable instance to insert
+     * @param value the value to set
+     * @param tenantId the tenant id of the variable instance
+     */
+    void insertVariableInstanceWithValue(VariableInstanceEntity variable, Object value, String tenantId);
 
     /**
      * Updates variable instance with the new value
@@ -55,6 +63,15 @@ public interface VariableService {
      * @param variable to update
      */
     void updateVariableInstance(VariableInstanceEntity variable);
+
+    /**
+     * Updates variable instance with the new value. Makes sure the {@link VariableInstanceValueModifier} is called.
+     *
+     * @param variable variable to update
+     * @param newValue new value to set
+     * @param tenantId the tenant id of the variable instance
+     */
+    void updateVariableInstanceWithValue(VariableInstanceEntity variable, Object newValue, String tenantId);
 
     void deleteVariableInstance(VariableInstanceEntity variable);
 

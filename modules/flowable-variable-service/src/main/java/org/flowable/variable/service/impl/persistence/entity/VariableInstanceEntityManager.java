@@ -28,12 +28,19 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
 
     /**
      * Creates a variable instance for the given tenant, name and value.
-     * @param tenantId the tenant id of the variable instance
+     *
      * @param name the name of the variable instance
-     * @param value the value of the variable instance
      * @return the {@link VariableInstanceEntity} to be used
      */
-    VariableInstanceEntity create(String tenantId, String name, Object value);
+    VariableInstanceEntity create(String name);
+
+    /**
+     * Inserts a variable instance with the given value.
+     * @param variable the variable instance to insert
+     * @param value the value to set
+     * @param tenantId  the tenant id of the variable instance
+     */
+    void insertWithValue(VariableInstanceEntity variable, Object value, String tenantId);
 
     /**
      * The {@link HistoricVariableInstanceEntity} is the historic counterpart of the {@link VariableInstanceEntity}.
@@ -44,6 +51,8 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
      * @param variableInstanceEntity The variable instance to update.
      */
     void updateWithHistoricVariableSync(VariableInstanceEntity variableInstanceEntity);
+
+    void updateWithHistoricVariableSync(String tenantId, VariableInstanceEntity variableInstanceEntity, Object newValue);
 
     InternalVariableInstanceQuery createInternalVariableInstanceQuery();
     
