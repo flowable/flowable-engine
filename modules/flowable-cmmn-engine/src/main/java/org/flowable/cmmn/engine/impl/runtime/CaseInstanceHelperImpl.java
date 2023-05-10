@@ -561,14 +561,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 // only make a copy, if it is a case variable, we don't copy locally scoped ones (e.g. from stages), as those plan items are practically
                 // finished
                 if (variable.getSubScopeId() == null) {
-                    VariableInstanceEntity newVariable = variableService.createVariableInstance(historicCaseInstance.getTenantId(),
-                        variable.getVariableName(), variable.getValue());
+                    VariableInstanceEntity newVariable = variableService.createVariableInstance(variable.getVariableName());
 
                     newVariable.setId(variable.getId());
                     newVariable.setScopeId(historicCaseInstance.getId());
                     newVariable.setScopeType(variable.getScopeType());
 
-                    variableService.insertVariableInstance(newVariable);
+                    variableService.insertVariableInstanceWithValue(newVariable, variable.getValue(), historicCaseInstance.getTenantId());
                     newVars.put(newVariable.getName(), newVariable);
                 }
             }

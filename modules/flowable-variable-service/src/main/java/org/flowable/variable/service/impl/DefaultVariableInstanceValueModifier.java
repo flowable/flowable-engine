@@ -32,24 +32,23 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
     }
 
     @Override
-    public void setVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
+    public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
         if (variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
+            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), variableInstance, value, tenantId);
             setVariableType(variableInstanceEntity, variableType);
         }
-        setOrUpdateValue(tenantId, variableInstance, value);
+        setOrUpdateValue(variableInstance, value, tenantId);
     }
 
-
     @Override
-    public void updateVariableValue(String tenantId, VariableInstance variableInstance, Object value) {
+    public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
         /* Always check if the type should be altered. It's possible that the previous type is lower in the type
          * checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type higher in the chain is eligible for storage.
          */
-        if(variableInstance instanceof VariableInstanceEntity) {
+        if (variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), tenantId, variableInstance, value);
+            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), variableInstance, value, tenantId);
             if (!variableType.equals(variableInstanceEntity.getType())) {
                 // variable type has changed
                 variableInstance.setValue(null);
@@ -57,10 +56,10 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
                 variableInstanceEntity.forceUpdate();
             }
         }
-        setOrUpdateValue(tenantId, variableInstance, value);
+        setOrUpdateValue(variableInstance, value, tenantId);
     }
 
-    protected VariableType determineVariableType(VariableTypes variableTypes, String tenantId, VariableInstance variableInstance, Object value) {
+    protected VariableType determineVariableType(VariableTypes variableTypes, VariableInstance variableInstance, Object value, String tenantId) {
         return variableTypes.findVariableType(value);
     }
 
@@ -77,11 +76,12 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
     /**
      * Central hook method for all modifications of a value for the variable instance.
      * Please note, that transient variable instances are passed here as well.
-     * @param tenantId the ID of the tenant the variable instance belongs to
+     *
      * @param variableInstance the variable instance to be modified
      * @param value the value to be set for the variable instance
+     * @param tenantId the ID of the tenant the variable instance belongs to
      */
-    protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+    protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
         variableInstance.setValue(value);
     }
 }

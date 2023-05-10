@@ -230,11 +230,11 @@ public class CmmnAggregation {
 
         VariableService variableService = variableServiceConfiguration.getVariableService();
 
-        VariableInstanceEntity variableInstance = variableService.createVariableInstance(tenantId, varName, value);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName);
         variableInstance.setScopeId(scopeId);
         variableInstance.setSubScopeId(subScopeId);
         variableInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
-
+        variableServiceConfiguration.getVariableInstanceValueModifier().setVariableValue(variableInstance, value, tenantId);
         return variableInstance;
     }
 

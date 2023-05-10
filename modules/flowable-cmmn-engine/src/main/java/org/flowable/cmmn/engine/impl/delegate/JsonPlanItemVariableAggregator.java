@@ -23,8 +23,8 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -63,8 +63,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
     public Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
         ObjectNode objectNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
 
-        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        VariableTypes variableTypes = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
 
         for (VariableAggregationDefinition.Variable definition : context.getDefinition().getDefinitions()) {
             String targetVarName = null;
@@ -91,7 +91,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                             .createExpression(definition.getSourceExpression())
                             .getValue(planItemInstance);
                     // This is a fake variable instance so we can get the type of it
-                    varInstance = variableService.createVariableInstance(planItemInstance.getTenantId(), targetVarName, sourceValue);
+                    varInstance = variableService.createVariableInstance(targetVarName);
+                    variableServiceConfiguration.getVariableInstanceValueModifier().setVariableValue(varInstance, sourceValue, planItemInstance.getTenantId());
                 }
 
                 if (varInstance != null) {

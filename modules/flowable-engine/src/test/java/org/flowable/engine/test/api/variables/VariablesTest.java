@@ -23,9 +23,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -38,6 +40,7 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -633,8 +636,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
             VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
             variableInstanceEntity.setMetaInfo("test meta info");
-            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
-
+            processEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstanceEntity);
             return null;
         });
 
@@ -646,7 +648,58 @@ public class VariablesTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId()).singleResult();
             assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("test meta info");
         }
+    }
 
+    @Test
+    public void testCreateAndUpdateWithValue() {
+        List<Object> toDelete = new LinkedList<>();
+        try {
+            managementService.executeCommand(commandContext -> {
+
+                VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
+                        .createVariableInstance("myVariable");
+                variableInstanceEntity.setScopeId("testScopeId");
+                variableInstanceEntity.setScopeType("testScopeType");
+                CommandContextUtil.getVariableService(commandContext).insertVariableInstanceWithValue(variableInstanceEntity, "myStringValue", "myTenantId");
+                return null;
+            });
+
+            managementService.executeCommand(commandContext -> {
+                List<VariableInstanceEntity> variablesInstances = CommandContextUtil.getVariableService(commandContext)
+                        .findVariableInstanceByScopeIdAndScopeType("testScopeId", "testScopeType");
+                assertThat(variablesInstances).extracting(ValueFields::getName, ValueFields::getTextValue, VariableInstanceEntity::getTypeName)
+                        .containsExactly(Tuple.tuple("myVariable", "myStringValue", "string"));
+
+                VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
+                CommandContextUtil.getVariableService(commandContext).updateVariableInstanceWithValue(variableInstanceEntity, 42, "myTenantId");
+
+                return null;
+            });
+
+            VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().variableName("myVariable").singleResult();
+            assertThat(variableInstance.getValue()).isEqualTo(42);
+            assertThat(variableInstance.getTypeName()).isEqualTo("integer");
+            toDelete.add(variableInstance);
+            HistoricVariableInstance historicVariableInstance;
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                        .variableName("myVariable").singleResult();
+                assertThat(historicVariableInstance.getValue()).isEqualTo(42);
+                toDelete.add(historicVariableInstance);
+            }
+        } finally {
+            managementService.executeCommand(commandContext -> {
+                toDelete.forEach(var -> {
+                    if (var instanceof VariableInstanceEntity) {
+                        CommandContextUtil.getVariableService(commandContext).deleteVariableInstance((VariableInstanceEntity) var);
+                    }
+                    if (var instanceof HistoricVariableInstance) {
+                        CommandContextUtil.getHistoricVariableService(commandContext).deleteHistoricVariableInstance((HistoricVariableInstanceEntity) var);
+                    }
+                });
+                return null;
+            });
+        }
     }
 
     // Class to test variable serialization

@@ -25,19 +25,19 @@ public interface VariableInstanceValueModifier {
 
     /**
      * Sets the value of a persistent or transient variable instance.
-     *
-     * @param tenantId the ID of the tenant the variable instance belongs to
+
      * @param variableInstance the variable instance to be modified
      * @param value the new value to be set for the variable instance.
+     * @param tenantId the ID of the tenant the variable instance belongs to
      */
-    void setVariableValue(String tenantId, VariableInstance variableInstance, Object value);
+    void setVariableValue(VariableInstance variableInstance, Object value, String tenantId);
 
     /**
      * Updates the value of a variable instance.
      *
-     * @param tenantId the ID of the tenant the variable instance belongs to
      * @param variableInstance the variable instance to be modified
      * @param value the value to be set for the updated variable instance.
+     * @param tenantId the ID of the tenant the variable instance belongs to
      */
-    void updateVariableValue(String tenantId, VariableInstance variableInstance, Object value);
+    void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId);
 }
