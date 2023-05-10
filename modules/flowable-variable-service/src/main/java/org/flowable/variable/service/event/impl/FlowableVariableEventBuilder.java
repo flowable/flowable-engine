@@ -49,6 +49,7 @@ public class FlowableVariableEventBuilder {
         newEvent.setVariableValue(variableValue);
         newEvent.setVariableType(variableType);
         newEvent.setTaskId(variableInstance.getTaskId());
+        newEvent.setVariableInstanceId(variableInstance.getId());
         if (variableInstance.getScopeType() == null) {
             newEvent.setExecutionId(variableInstance.getExecutionId());
             newEvent.setProcessInstanceId(variableInstance.getProcessInstanceId());
