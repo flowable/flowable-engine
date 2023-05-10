@@ -58,13 +58,6 @@ public interface VariableService {
     void insertVariableInstanceWithValue(VariableInstanceEntity variable, Object value, String tenantId);
 
     /**
-     * Updates variable instance with the new value
-     *
-     * @param variable to update
-     */
-    void updateVariableInstance(VariableInstanceEntity variable);
-
-    /**
      * Updates variable instance with the new value. Makes sure the {@link VariableInstanceValueModifier} is called.
      *
      * @param variable variable to update

@@ -636,8 +636,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
             VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
             variableInstanceEntity.setMetaInfo("test meta info");
-            CommandContextUtil.getVariableService(commandContext).updateVariableInstance(variableInstanceEntity);
-
+            processEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstanceEntity);
             return null;
         });
 
