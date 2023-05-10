@@ -62,6 +62,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         assertThat(event.getVariableValue()).isEqualTo("The value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         listener.clearEventsReceived();
 
         // Update variable
@@ -75,6 +76,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         assertThat(event.getVariableValue()).isEqualTo("Updated value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         listener.clearEventsReceived();
 
         // Delete variable
@@ -90,6 +92,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         // deleted variable value is always null
         assertThat(event.getVariableValue()).isNull();
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         listener.clearEventsReceived();
 
         // Create, update and delete multiple variables
@@ -158,6 +161,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         assertThat(event.getVariableValue()).isEqualTo("The value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         listener.clearEventsReceived();
     }
 
@@ -267,6 +271,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("variable");
         assertThat(event.getVariableValue()).isEqualTo(123);
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         // Check update event
         event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
@@ -277,6 +282,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("variable");
         assertThat(event.getVariableValue()).isEqualTo(456);
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         // Check delete event
         event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
@@ -286,6 +292,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("variable");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         // deleted values are always null
         assertThat(event.getVariableValue()).isNull();
     }
@@ -315,6 +322,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         assertThat(event.getVariableValue()).isEqualTo("The value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_UPDATED);
@@ -323,6 +331,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("testVariable");
         assertThat(event.getVariableValue()).isEqualTo("Updated value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
@@ -331,6 +340,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("testVariable");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         // deleted values are always null
         assertThat(event.getVariableValue()).isNull();
         listener.clearEventsReceived();
@@ -358,6 +368,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("variable");
         assertThat(event.getVariableValue()).isEqualTo(123);
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         // Check update event
         event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
@@ -367,6 +378,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("variable");
         assertThat(event.getVariableValue()).isEqualTo(456);
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         // Check delete event
         event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
@@ -376,6 +388,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(event.getTaskId()).isEqualTo(task.getId());
         assertThat(event.getVariableName()).isEqualTo("variable");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
         // deleted variable value is always null
         assertThat(event.getVariableValue()).isNull();
     }
@@ -409,6 +422,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             assertThat(event.getTaskId()).isEqualTo(newTask.getId());
             assertThat(event.getVariableName()).isEqualTo("testVariable");
             assertThat(event.getVariableValue()).isEqualTo(123);
+            assertThat(event.getVariableInstanceId()).isNotEmpty();
 
             event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
             assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_UPDATED);
@@ -418,6 +432,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             assertThat(event.getTaskId()).isEqualTo(newTask.getId());
             assertThat(event.getVariableName()).isEqualTo("testVariable");
             assertThat(event.getVariableValue()).isEqualTo(456);
+            assertThat(event.getVariableInstanceId()).isNotEmpty();
 
             event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
             assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
@@ -426,6 +441,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
             assertThat(event.getProcessInstanceId()).isNull();
             assertThat(event.getTaskId()).isEqualTo(newTask.getId());
             assertThat(event.getVariableName()).isEqualTo("testVariable");
+            assertThat(event.getVariableInstanceId()).isNotEmpty();
             // deleted variable value is always null
             assertThat(event.getVariableValue()).isNull();
         } finally {
@@ -458,6 +474,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("var2");
         assertThat(event.getVariableValue()).isEqualTo("var2 value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_UPDATED);
@@ -467,6 +484,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("var2");
         assertThat(event.getVariableValue()).isEqualTo("The value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         listener.clearEventsReceived();
     }
@@ -493,6 +511,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("var1");
         assertThat(event.getVariableValue()).isEqualTo("var1 value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         ExecutionEntity subprocessInstance = (ExecutionEntity) runtimeService.createExecutionQuery()
                 .rootProcessInstanceId(processInstance.getId())
@@ -508,6 +527,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("var3");
         assertThat(event.getVariableValue()).isEqualTo("var3 value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
 
         event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_UPDATED);
@@ -517,6 +537,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertThat(event.getTaskId()).isNull();
         assertThat(event.getVariableName()).isEqualTo("var3");
         assertThat(event.getVariableValue()).isEqualTo("var1 value");
+        assertThat(event.getVariableInstanceId()).isNotEmpty();
     }
 
     @BeforeEach
