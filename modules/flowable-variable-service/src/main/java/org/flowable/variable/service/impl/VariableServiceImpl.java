@@ -35,8 +35,8 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
     }
 
     @Override
-    public VariableInstanceEntity createVariableInstance(String tenantId, String name, Object value) {
-        return getVariableInstanceEntityManager().create(tenantId, name, value);
+    public VariableInstanceEntity createVariableInstance(String name) {
+        return getVariableInstanceEntityManager().create(name);
     }
 
     @Override
@@ -45,8 +45,13 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
     }
 
     @Override
-    public void updateVariableInstance(VariableInstanceEntity variableInstance) {
-        getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstance);
+    public void insertVariableInstanceWithValue(VariableInstanceEntity variable, Object value, String tenantId) {
+        getVariableInstanceEntityManager().insertWithValue(variable, value, tenantId);
+    }
+
+    @Override
+    public void updateVariableInstanceWithValue(VariableInstanceEntity variable, Object newValue, String tenantId) {
+        getVariableInstanceEntityManager().updateWithHistoricVariableSync(tenantId, variable, newValue);
     }
 
     @Override

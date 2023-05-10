@@ -84,7 +84,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            public void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            public void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (variableInstance.getName().equals("orderId")) {
                     if (((Number) value).longValue() < 0) {
                         throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
@@ -120,20 +120,20 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
+            public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
                 if (isIntegralNumber(value)) {
                     // We always use 'long' as the type for integral numbers
                     return typeRegistry.getVariableType(LongType.TYPE_NAME);
                 }
-                return super.determineVariableType(typeRegistry, tenantId, variableInstance, value);
+                return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
             }
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (isIntegralNumber(value)) {
                     variableInstance.setValue(((Number) value).longValue());
                 } else {
-                    super.setOrUpdateValue(tenantId, variableInstance, value);
+                    super.setOrUpdateValue(variableInstance, value, tenantId);
                 }
             }
 
@@ -180,20 +180,20 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
             DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
                 @Override
-                public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
+                public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
                     if ((value instanceof Integer) && ((Integer) value) > 1000) {
                         return typeRegistry.getVariableType(WrappedIntegerCustomType.TYPE_NAME);
                     }
-                    return super.determineVariableType(typeRegistry, tenantId, variableInstance, value);
+                    return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
                 }
 
                 @Override
-                protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+                protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                     if (variableInstance.getTypeName().equals(WrappedIntegerCustomType.TYPE_NAME)) {
                         variableInstance.setMetaInfo(value + "meta");
                         variableInstance.setValue(new WrappedIntegerValue((Integer) value, variableInstance.getMetaInfo()));
                     } else {
-                        super.setOrUpdateValue(tenantId, variableInstance, value);
+                        super.setOrUpdateValue(variableInstance, value, tenantId);
                     }
                 }
             };
@@ -260,20 +260,20 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
             DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
                 @Override
-                public VariableType determineVariableType(VariableTypes typeRegistry, String tenantId, VariableInstance variableInstance, Object value) {
+                public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
                     if ((value instanceof Integer) && ((Integer) value) > 1000) {
                         return typeRegistry.getVariableType(WrappedIntegerCustomType.TYPE_NAME);
                     }
-                    return super.determineVariableType(typeRegistry, tenantId, variableInstance, value);
+                    return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
                 }
 
                 @Override
-                protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+                protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                     if (variableInstance.getTypeName().equals(WrappedIntegerCustomType.TYPE_NAME)) {
                         variableInstance.setMetaInfo(value + "meta");
                         variableInstance.setValue(new WrappedIntegerValue((Integer) value, variableInstance.getMetaInfo()));
                     } else {
-                        super.setOrUpdateValue(tenantId, variableInstance, value);
+                        super.setOrUpdateValue(variableInstance, value, tenantId);
                     }
                 }
             };
@@ -342,12 +342,12 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 setOrUpdateValueTenantIds.add(tenantId);
                 if (variableInstance.getName().equals("orderId") && ((Long) value) < 0) {
                     throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
                 }
-                super.setOrUpdateValue(tenantId, variableInstance, value);
+                super.setOrUpdateValue(variableInstance, value, tenantId);
             }
 
         };
@@ -374,12 +374,12 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 setOrUpdateValueTenantIds.add(tenantId);
                 if (variableInstance.getName().equals("orderId") && ((Long) value) < 0) {
                     throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
                 }
-                super.setOrUpdateValue(tenantId, variableInstance, value);
+                super.setOrUpdateValue(variableInstance, value, tenantId);
             }
 
         };
@@ -403,7 +403,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (variableInstance instanceof VariableInstanceEntity) {
                     preSetValueCalls.add(value);
                     assertThat(variableInstance.getProcessInstanceId()).isNotNull();
