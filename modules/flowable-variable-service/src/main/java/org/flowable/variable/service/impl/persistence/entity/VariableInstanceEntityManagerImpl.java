@@ -40,15 +40,27 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public VariableInstanceEntity create(String tenantId, String name, Object value) {
+    public VariableInstanceEntity create(String name) {
         VariableInstanceEntity variableInstance = create();
         variableInstance.setName(name);
-        serviceConfiguration.getVariableInstanceValueModifier().setVariableValue(tenantId, variableInstance, value);
         return variableInstance;
     }
 
     @Override
+    public void insertWithValue(VariableInstanceEntity variable, Object value, String tenantId) {
+        getServiceConfiguration().getVariableInstanceValueModifier().setVariableValue(variable, value, tenantId);
+        insert(variable);
+    }
+
+    @Override
     public void updateWithHistoricVariableSync(VariableInstanceEntity variableInstanceEntity) {
+        update(variableInstanceEntity, true);
+        serviceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstanceEntity, serviceConfiguration.getClock().getCurrentTime());
+    }
+
+    @Override
+    public void updateWithHistoricVariableSync(String tenantId, VariableInstanceEntity variableInstanceEntity, Object newValue) {
+        serviceConfiguration.getVariableInstanceValueModifier().updateVariableValue(variableInstanceEntity, newValue, tenantId);
         update(variableInstanceEntity, true);
         serviceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstanceEntity, serviceConfiguration.getClock().getCurrentTime());
     }

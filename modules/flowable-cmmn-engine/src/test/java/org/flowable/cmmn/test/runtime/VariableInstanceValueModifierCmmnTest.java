@@ -56,13 +56,13 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
         DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (variableInstance.getName().equals("orderId")) {
                     if (((Number) value).longValue() < 0) {
                         throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
                     }
                 }
-                super.setOrUpdateValue(tenantId, variableInstance, value);
+                super.setOrUpdateValue(variableInstance, value, tenantId);
             }
         };
         cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(modifier);
@@ -90,7 +90,7 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
         DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(String tenantId, VariableInstance variableInstance, Object value) {
+            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (variableInstance.getName().equals("orderId")) {
                     if (((Number) value).longValue() < 0) {
                         throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");

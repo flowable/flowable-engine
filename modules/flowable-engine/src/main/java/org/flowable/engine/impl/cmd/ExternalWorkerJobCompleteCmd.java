@@ -51,12 +51,12 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
 
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(externalWorkerJob.getTenantId(), varName, varValue);
+                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName);
                 variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
                 variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
                 variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);
 
-                variableService.insertVariableInstance(variableInstance);
+                variableService.insertVariableInstanceWithValue(variableInstance, varValue, externalWorkerJob.getTenantId());
 
                 CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
             }
