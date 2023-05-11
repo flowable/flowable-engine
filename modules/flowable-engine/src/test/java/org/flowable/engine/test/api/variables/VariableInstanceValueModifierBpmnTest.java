@@ -14,31 +14,38 @@ package org.flowable.engine.test.api.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.event.TestVariableEventListener;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.IntegerType;
-import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,18 +88,8 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testCompleteTaskWithExceptionInPostSetVariable() {
-        DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
-
-            @Override
-            public void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                if (variableInstance.getName().equals("orderId")) {
-                    if (((Number) value).longValue() < 0) {
-                        throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
-                    }
-                }
-            }
-        };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(variableValueModifier);
+        processEngineConfiguration.getVariableServiceConfiguration()
+                .setVariableInstanceValueModifier(new TestOrderIdValidatingValueModifier(processEngineConfiguration.getVariableServiceConfiguration()));
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
@@ -120,20 +117,20 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
+            public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (isIntegralNumber(value)) {
-                    // We always use 'long' as the type for integral numbers
-                    return typeRegistry.getVariableType(LongType.TYPE_NAME);
+                    super.setVariableValue(variableInstance, Long.parseLong(value.toString()), tenantId);
+                } else {
+                    super.setVariableValue(variableInstance, value, tenantId);
                 }
-                return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
             }
 
             @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
+            public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
                 if (isIntegralNumber(value)) {
-                    variableInstance.setValue(((Number) value).longValue());
+                    super.updateVariableValue(variableInstance, Long.parseLong(value.toString()), tenantId);
                 } else {
-                    super.setOrUpdateValue(variableInstance, value, tenantId);
+                    super.updateVariableValue(variableInstance, value, tenantId);
                 }
             }
 
@@ -153,6 +150,16 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         assertThat(orderIdInstance.getTypeName()).isEqualTo("string");
         assertThat(orderIdInstance.getValue()).isEqualTo("ABC");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .contains(entry("orderId", "ABC"));
+        }
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         // now we change it to be an integral number
         variables.put("orderId", 1);
@@ -168,6 +175,16 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 .extracting(FlowableVariableEvent::getVariableName, FlowableVariableEvent::getVariableValue)
                 .containsExactly(tuple("orderId", "ABC"), tuple("orderId", 1L));
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .contains(entry("orderId", 1L));
+        }
+
     }
 
     @Test
@@ -177,27 +194,8 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         customType = new WrappedIntegerCustomType();
         variableTypes.addTypeBefore(customType, "integer");
         try {
-            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
-
-                @Override
-                public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
-                    if ((value instanceof Integer) && ((Integer) value) > 1000) {
-                        return typeRegistry.getVariableType(WrappedIntegerCustomType.TYPE_NAME);
-                    }
-                    return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
-                }
-
-                @Override
-                protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                    if (variableInstance.getTypeName().equals(WrappedIntegerCustomType.TYPE_NAME)) {
-                        variableInstance.setMetaInfo(value + "meta");
-                        variableInstance.setValue(new WrappedIntegerValue((Integer) value, variableInstance.getMetaInfo()));
-                    } else {
-                        super.setOrUpdateValue(variableInstance, value, tenantId);
-                    }
-                }
-            };
-            processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(variableValueModifier);
+            processEngineConfiguration.getVariableServiceConfiguration()
+                    .setVariableInstanceValueModifier(new WrappedIntegerValueModifier(processEngineConfiguration.getVariableServiceConfiguration()));
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("simpleInteger", 1000);
@@ -220,6 +218,21 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 assertThat(wrappedIntegerValue.value).isEqualTo(1001);
                 assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
             });
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("wrappedInteger")
+                        .singleResult();
+                assertThat(historicVariableInstance).isNotNull();
+                assertThat(historicVariableInstance.getValue())
+                        .isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+                        });
+                assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
+                assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1001meta");
+            }
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             variables.put("wrappedInteger", 1002);
@@ -244,6 +257,21 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                             tuple("wrappedInteger", "wrappedIntegerType", wrappedInteger.getValue(), "VARIABLE_CREATED"),
                             tuple("simpleInteger", "integer", 1000, "VARIABLE_UPDATED"),  // task completion triggers 'update' of this variable
                             tuple("wrappedInteger", "wrappedIntegerType", wrappedIntegerTaskUpdate.getValue(), "VARIABLE_UPDATED"));
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("wrappedInteger")
+                        .singleResult();
+                assertThat(historicVariableInstance).isNotNull();
+                assertThat(historicVariableInstance.getValue())
+                        .isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                            assertThat(wrappedIntegerValue.value).isEqualTo(1002);
+                            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1002meta");
+                        });
+                assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
+                assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1002meta");
+            }
         } finally {
             // We have to delete here. Otherwise the annotation deployment delete operation will fail, due to the missing custom type
             deleteDeployments();
@@ -257,27 +285,8 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         customType = new WrappedIntegerCustomType();
         try {
             variableTypes.addTypeBefore(customType, "integer");
-            DefaultVariableInstanceValueModifier variableValueModifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
-
-                @Override
-                public VariableType determineVariableType(VariableTypes typeRegistry, VariableInstance variableInstance, Object value, String tenantId) {
-                    if ((value instanceof Integer) && ((Integer) value) > 1000) {
-                        return typeRegistry.getVariableType(WrappedIntegerCustomType.TYPE_NAME);
-                    }
-                    return super.determineVariableType(typeRegistry, variableInstance, value, tenantId);
-                }
-
-                @Override
-                protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                    if (variableInstance.getTypeName().equals(WrappedIntegerCustomType.TYPE_NAME)) {
-                        variableInstance.setMetaInfo(value + "meta");
-                        variableInstance.setValue(new WrappedIntegerValue((Integer) value, variableInstance.getMetaInfo()));
-                    } else {
-                        super.setOrUpdateValue(variableInstance, value, tenantId);
-                    }
-                }
-            };
-            processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(variableValueModifier);
+            processEngineConfiguration.getVariableServiceConfiguration()
+                    .setVariableInstanceValueModifier(new WrappedIntegerValueModifier(processEngineConfiguration.getVariableServiceConfiguration()));
             Map<String, Object> variables = new HashMap<>();
             variables.put("wrappedInteger", 1001);
 
@@ -307,6 +316,21 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
             });
 
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("wrappedInteger")
+                        .singleResult();
+                assertThat(historicVariableInstance).isNotNull();
+                assertThat(historicVariableInstance.getValue())
+                        .isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+                        });
+                assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
+                assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1001meta");
+            }
+
             // Change back to simple integer type by setting value to 1000
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             variables.put("wrappedInteger", 1000);
@@ -315,6 +339,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
             VariableInstanceEntity wrappedIntegerTaskUpdate = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(),
                     "wrappedInteger");
             assertThat(wrappedIntegerTaskUpdate.getValue()).isInstanceOf(Integer.class).isEqualTo(1000);
+            assertThat(wrappedIntegerTaskUpdate.getMetaInfo()).isNull();
             assertThat(wrappedIntegerTaskUpdate.getType()).isInstanceOf(IntegerType.class);
             assertThat(wrappedIntegerTaskUpdate.getTypeName()).isEqualTo(IntegerType.TYPE_NAME);
 
@@ -329,6 +354,17 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                             tuple("wrappedInteger", "wrappedIntegerType", wrappedInteger.getValue(), "VARIABLE_CREATED"),
                             tuple("wrappedInteger", "integer", 1000, "VARIABLE_UPDATED"));
 
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("wrappedInteger")
+                        .singleResult();
+                assertThat(historicVariableInstance).isNotNull();
+                assertThat(historicVariableInstance.getValue()).isEqualTo(1000);
+                assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo(IntegerType.TYPE_NAME);
+                assertThat(historicVariableInstance.getMetaInfo()).isNull();
+            }
+
         } finally {
             // We have to delete here. Otherwise the annotation deployment delete operation will fail, due to the missing custom type
             deleteDeployments();
@@ -338,25 +374,15 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" }, tenantId = "myTenant")
     public void testCompleteTaskWithExceptionInPostSetVariableWithTenantId() {
-        List<String> setOrUpdateValueTenantIds = new LinkedList<>();
-        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
-
-            @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                setOrUpdateValueTenantIds.add(tenantId);
-                if (variableInstance.getName().equals("orderId") && ((Long) value) < 0) {
-                    throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
-                }
-                super.setOrUpdateValue(variableInstance, value, tenantId);
-            }
-
-        };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(enhancer);
+        TestOrderIdValidatingValueModifier valueModifier = new TestOrderIdValidatingValueModifier(processEngineConfiguration.getVariableServiceConfiguration());
+        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(valueModifier);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKeyAndTenantId("oneTaskProcess", variables, "myTenant");
+
+        assertThat(valueModifier.setVariableTenantIds).containsExactly("myTenant");
 
         assertThatThrownBy(() -> {
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -364,26 +390,15 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
             taskService.complete(task.getId(), variables);
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
 
-        assertThat(setOrUpdateValueTenantIds).containsExactly("myTenant", "myTenant");
+        assertThat(valueModifier.setVariableTenantIds).containsExactly("myTenant");
+        assertThat(valueModifier.updateVariableTenantIds).containsExactly("myTenant");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testTransientVariables() {
-        List<String> setOrUpdateValueTenantIds = new LinkedList<>();
-        DefaultVariableInstanceValueModifier enhancer = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
-
-            @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                setOrUpdateValueTenantIds.add(tenantId);
-                if (variableInstance.getName().equals("orderId") && ((Long) value) < 0) {
-                    throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
-                }
-                super.setOrUpdateValue(variableInstance, value, tenantId);
-            }
-
-        };
-        processEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(enhancer);
+        processEngineConfiguration.getVariableServiceConfiguration()
+                .setVariableInstanceValueModifier(new TestOrderIdValidatingValueModifier(processEngineConfiguration.getVariableServiceConfiguration()));
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", -1L);
@@ -399,30 +414,43 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
     void testEnhanceVariableWithMetaInfo() {
 
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
-        List<Object> preSetValueCalls = new LinkedList<>();
+        List<Object> preSetValueCalls = new ArrayList<>();
         DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(processEngineConfiguration.getVariableServiceConfiguration()) {
 
             @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                if (variableInstance instanceof VariableInstanceEntity) {
-                    preSetValueCalls.add(value);
-                    assertThat(variableInstance.getProcessInstanceId()).isNotNull();
-                    assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
-                    if (value instanceof String) {
-                        VariableMeta variableMeta = new VariableMeta();
-                        variableMeta.byteLength = String.valueOf(((String) value).getBytes().length);
-                        try {
-                            variableInstance.setMetaInfo(objectMapper.writeValueAsString(variableMeta));
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                        variableInstance.setValue(value + "Enhanced");
-                    } else {
-                        variableInstance.setValue(value);
+            public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+                preSetValueCalls.add(value);
+                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
+                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
+                Pair<Object, String> valueAndMeta = determineValueAndMetaInfo(value);
+                super.setVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+                variableInstance.setMetaInfo(valueAndMeta.getRight());
+            }
+
+            @Override
+            public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+                preSetValueCalls.add(value);
+                assertThat(variableInstance.getProcessInstanceId()).isNotNull();
+                assertThat(variableInstance.getProcessDefinitionId()).isNotNull();
+                Pair<Object, String> valueAndMeta = determineValueAndMetaInfo(value);
+                super.updateVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+                variableInstance.setMetaInfo(valueAndMeta.getRight());
+            }
+
+            Pair<Object, String> determineValueAndMetaInfo(Object value) {
+                if (value instanceof String) {
+                    VariableMeta variableMeta = new VariableMeta();
+                    variableMeta.byteLength = String.valueOf(((String) value).getBytes().length);
+                    String metaInfo;
+                    try {
+                        metaInfo = objectMapper.writeValueAsString(variableMeta);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
                     }
-                } else {
-                    variableInstance.setValue(value);
+                    return Pair.of(value + "Enhanced", metaInfo);
                 }
+
+                return Pair.of(value, null);
             }
 
         };
@@ -458,6 +486,25 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         assertThat(intVariableInstance.getMetaInfo()).isNull();
 
         assertThat(preSetValueCalls).containsExactlyInAnyOrder("myValue1", 1);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("myEnhancedStringVariable")
+                    .singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue()).isEqualTo("myValue1Enhanced");
+            assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("string");
+            assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("{\"byteLength\":\"8\"}");
+
+            historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("myIntVariable")
+                    .singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue()).isEqualTo(1);
+            assertThat(historicVariableInstance.getMetaInfo()).isNull();
+        }
     }
 
     static class VariableMeta {
@@ -489,6 +536,8 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         public Object getValue(ValueFields valueFields) {
             if (valueFields instanceof VariableInstance) {
                 return new WrappedIntegerValue(valueFields.getLongValue(), ((VariableInstance) valueFields).getMetaInfo());
+            } else if (valueFields instanceof HistoricVariableInstance) {
+                return new WrappedIntegerValue(valueFields.getLongValue(), ((HistoricVariableInstance) valueFields).getMetaInfo());
             }
             return super.getValue(valueFields);
         }
@@ -527,6 +576,68 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
         @Override
         public int hashCode() {
             return Objects.hash(metaInfo, value);
+        }
+    }
+
+    static class TestOrderIdValidatingValueModifier extends DefaultVariableInstanceValueModifier {
+
+        final Collection<String> setVariableTenantIds = new ArrayList<>();
+        final Collection<String> updateVariableTenantIds = new ArrayList<>();
+
+        TestOrderIdValidatingValueModifier(VariableServiceConfiguration serviceConfiguration) {
+            super(serviceConfiguration);
+        }
+
+        @Override
+        public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            setVariableTenantIds.add(tenantId);
+            validateValue(variableInstance, value);
+            super.setVariableValue(variableInstance, value, tenantId);
+        }
+
+        @Override
+        public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            updateVariableTenantIds.add(tenantId);
+            validateValue(variableInstance, value);
+            super.updateVariableValue(variableInstance, value, tenantId);
+        }
+
+        protected void validateValue(VariableInstance variableInstance, Object value) {
+            if (variableInstance.getName().equals("orderId")) {
+                if (((Number) value).longValue() < 0) {
+                    throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
+                }
+            }
+        }
+    }
+
+    static class WrappedIntegerValueModifier extends DefaultVariableInstanceValueModifier {
+
+        WrappedIntegerValueModifier(VariableServiceConfiguration serviceConfiguration) {
+            super(serviceConfiguration);
+        }
+
+
+        @Override
+        public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            Pair<Object, String> valueAndMeta = determineValueAndMeta(value);
+            super.setVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+            variableInstance.setMetaInfo(valueAndMeta.getRight());
+        }
+
+        @Override
+        public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            Pair<Object, String> valueAndMeta = determineValueAndMeta(value);
+            super.updateVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+            variableInstance.setMetaInfo(valueAndMeta.getRight());
+        }
+
+        Pair<Object, String> determineValueAndMeta(Object value) {
+            if (value instanceof Integer && ((Integer) value) > 1000) {
+                String metaInfo = value + "meta";
+                return Pair.of(new WrappedIntegerValue((Number) value, metaInfo), metaInfo);
+            }
+            return Pair.of(value, null);
         }
     }
 

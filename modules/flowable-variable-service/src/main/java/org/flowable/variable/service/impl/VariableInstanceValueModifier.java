@@ -24,8 +24,9 @@ public interface VariableInstanceValueModifier {
 
 
     /**
-     * Sets the value of a persistent or transient variable instance.
-
+     * Sets the value of a new persistent or transient variable instance.
+     * This is invoked when a variable instance is created.
+     *
      * @param variableInstance the variable instance to be modified
      * @param value the new value to be set for the variable instance.
      * @param tenantId the ID of the tenant the variable instance belongs to
@@ -34,6 +35,7 @@ public interface VariableInstanceValueModifier {
 
     /**
      * Updates the value of a variable instance.
+     * This is invoked when a variable instance already exists and its value is being updated.
      *
      * @param variableInstance the variable instance to be modified
      * @param value the value to be set for the updated variable instance.

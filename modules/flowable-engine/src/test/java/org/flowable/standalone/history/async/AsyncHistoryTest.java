@@ -56,6 +56,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
@@ -1030,7 +1031,12 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
             VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
             variableInstanceEntity.setMetaInfo("test meta info");
-            processEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstanceEntity);
+            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+            variableServiceConfiguration.getVariableInstanceEntityManager().update(variableInstanceEntity);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                        .recordVariableUpdate(variableInstanceEntity, commandContext.getClock().getCurrentTime());
+            }
             return null;
         });
 

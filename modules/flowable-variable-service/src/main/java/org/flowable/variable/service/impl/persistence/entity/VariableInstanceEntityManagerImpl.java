@@ -53,19 +53,6 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public void updateWithHistoricVariableSync(VariableInstanceEntity variableInstanceEntity) {
-        update(variableInstanceEntity, true);
-        serviceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstanceEntity, serviceConfiguration.getClock().getCurrentTime());
-    }
-
-    @Override
-    public void updateWithHistoricVariableSync(String tenantId, VariableInstanceEntity variableInstanceEntity, Object newValue) {
-        serviceConfiguration.getVariableInstanceValueModifier().updateVariableValue(variableInstanceEntity, newValue, tenantId);
-        update(variableInstanceEntity, true);
-        serviceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstanceEntity, serviceConfiguration.getClock().getCurrentTime());
-    }
-
-    @Override
     public InternalVariableInstanceQuery createInternalVariableInstanceQuery() {
         return new InternalVariableInstanceQueryImpl(dataManager);
     }
