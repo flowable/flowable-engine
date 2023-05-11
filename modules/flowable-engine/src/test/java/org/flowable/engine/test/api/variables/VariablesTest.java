@@ -40,6 +40,7 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.joda.time.DateTime;
@@ -636,7 +637,12 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
             VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
             variableInstanceEntity.setMetaInfo("test meta info");
-            processEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstanceEntity);
+            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+            variableServiceConfiguration.getVariableInstanceEntityManager().update(variableInstanceEntity);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                        .recordVariableUpdate(variableInstanceEntity, commandContext.getClock().getCurrentTime());
+            }
             return null;
         });
 
@@ -671,7 +677,14 @@ public class VariablesTest extends PluggableFlowableTestCase {
                         .containsExactly(Tuple.tuple("myVariable", "myStringValue", "string"));
 
                 VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
-                CommandContextUtil.getVariableService(commandContext).updateVariableInstanceWithValue(variableInstanceEntity, 42, "myTenantId");
+                VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        .getVariableServiceConfiguration();
+                variableServiceConfiguration.getVariableInstanceValueModifier().updateVariableValue(variableInstanceEntity, 42, "myTenantId");
+                variableServiceConfiguration.getVariableInstanceEntityManager().update(variableInstanceEntity);
+                if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                    variableServiceConfiguration.getInternalHistoryVariableManager()
+                            .recordVariableUpdate(variableInstanceEntity, commandContext.getClock().getCurrentTime());
+                }
 
                 return null;
             });

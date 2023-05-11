@@ -42,18 +42,6 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
      */
     void insertWithValue(VariableInstanceEntity variable, Object value, String tenantId);
 
-    /**
-     * The {@link HistoricVariableInstanceEntity} is the historic counterpart of the {@link VariableInstanceEntity}.
-     * Changes to the variable data are normally only propagated when a value changes on the {@link VariableScopeImpl} implementation.
-     * This is normally all that is needed. There are however certain use cases where a direct synchronization
-     * is needed when the value remains the same.
-     *
-     * @param variableInstanceEntity The variable instance to update.
-     */
-    void updateWithHistoricVariableSync(VariableInstanceEntity variableInstanceEntity);
-
-    void updateWithHistoricVariableSync(String tenantId, VariableInstanceEntity variableInstanceEntity, Object newValue);
-
     InternalVariableInstanceQuery createInternalVariableInstanceQuery();
     
     List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);

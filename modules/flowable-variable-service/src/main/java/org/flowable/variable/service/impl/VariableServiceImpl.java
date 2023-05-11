@@ -50,11 +50,6 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
     }
 
     @Override
-    public void updateVariableInstanceWithValue(VariableInstanceEntity variable, Object newValue, String tenantId) {
-        getVariableInstanceEntityManager().updateWithHistoricVariableSync(tenantId, variable, newValue);
-    }
-
-    @Override
     public void deleteVariableInstance(VariableInstanceEntity variable) {
         getVariableInstanceEntityManager().delete(variable);
     }

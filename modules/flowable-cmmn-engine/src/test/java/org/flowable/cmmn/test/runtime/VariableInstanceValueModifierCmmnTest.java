@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.junit.After;
@@ -53,19 +54,8 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testCompleteTaskWithExceptionInPostSetVariable() {
-        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
-
-            @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                if (variableInstance.getName().equals("orderId")) {
-                    if (((Number) value).longValue() < 0) {
-                        throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
-                    }
-                }
-                super.setOrUpdateValue(variableInstance, value, tenantId);
-            }
-        };
-        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(modifier);
+        cmmnEngineConfiguration.getVariableServiceConfiguration()
+                .setVariableInstanceValueModifier(new TestOrderIdValidatingValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()));
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", 1L);
@@ -87,18 +77,8 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/test/one-human-task-model.cmmn" })
     public void testTransientVariables() {
-        DefaultVariableInstanceValueModifier modifier = new DefaultVariableInstanceValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()) {
-
-            @Override
-            protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-                if (variableInstance.getName().equals("orderId")) {
-                    if (((Number) value).longValue() < 0) {
-                        throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
-                    }
-                }
-            }
-        };
-        cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(modifier);
+        cmmnEngineConfiguration.getVariableServiceConfiguration()
+                .setVariableInstanceValueModifier(new TestOrderIdValidatingValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()));
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("orderId", -1L);
@@ -107,5 +87,32 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
         assertThatThrownBy(() -> {
             cmmnRuntimeService.createCaseInstanceBuilder().transientVariables(variables).caseDefinitionKey("oneTaskCase").start();
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
+    }
+
+    static class TestOrderIdValidatingValueModifier extends DefaultVariableInstanceValueModifier {
+
+        public TestOrderIdValidatingValueModifier(VariableServiceConfiguration serviceConfiguration) {
+            super(serviceConfiguration);
+        }
+
+        @Override
+        public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            validateValue(variableInstance, value);
+            super.setVariableValue(variableInstance, value, tenantId);
+        }
+
+        @Override
+        public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            validateValue(variableInstance, value);
+            super.updateVariableValue(variableInstance, value, tenantId);
+        }
+
+        protected void validateValue(VariableInstance variableInstance, Object value) {
+            if (variableInstance.getName().equals("orderId")) {
+                if (((Number) value).longValue() < 0) {
+                    throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
+                }
+            }
+        }
     }
 }
