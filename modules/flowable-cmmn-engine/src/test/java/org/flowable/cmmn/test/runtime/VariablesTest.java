@@ -50,6 +50,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Rule;
 import org.junit.Test;
@@ -811,7 +812,12 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
             VariableInstanceEntity variableInstanceEntity = variablesInstances.get(0);
             variableInstanceEntity.setMetaInfo("test meta info");
-            cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager().updateWithHistoricVariableSync(variableInstanceEntity);
+            VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+            variableServiceConfiguration.getVariableInstanceEntityManager().update(variableInstanceEntity);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager()
+                        .recordVariableUpdate(variableInstanceEntity, commandContext.getClock().getCurrentTime());
+            }
 
             return null;
         });

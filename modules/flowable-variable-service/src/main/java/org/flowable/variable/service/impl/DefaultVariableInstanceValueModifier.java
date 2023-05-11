@@ -14,7 +14,6 @@ package org.flowable.variable.service.impl;
 
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -35,10 +34,10 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
     public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
         if (variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), variableInstance, value, tenantId);
+            VariableType variableType = determineVariableType(value);
             setVariableType(variableInstanceEntity, variableType);
         }
-        setOrUpdateValue(variableInstance, value, tenantId);
+        variableInstance.setValue(value);
     }
 
     @Override
@@ -48,19 +47,23 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
          */
         if (variableInstance instanceof VariableInstanceEntity) {
             VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-            VariableType variableType = determineVariableType(serviceConfiguration.getVariableTypes(), variableInstance, value, tenantId);
+            VariableType variableType = determineVariableType(value);
             if (!variableType.equals(variableInstanceEntity.getType())) {
-                // variable type has changed
-                variableInstance.setValue(null);
-                setVariableType(variableInstanceEntity, variableType);
-                variableInstanceEntity.forceUpdate();
+                updateVariableType(variableInstanceEntity, variableType);
             }
         }
-        setOrUpdateValue(variableInstance, value, tenantId);
+        variableInstance.setValue(value);
     }
 
-    protected VariableType determineVariableType(VariableTypes variableTypes, VariableInstance variableInstance, Object value, String tenantId) {
-        return variableTypes.findVariableType(value);
+    protected void updateVariableType(VariableInstanceEntity variableInstance, VariableType variableType) {
+        // variable type has changed
+        variableInstance.setValue(null);
+        setVariableType(variableInstance, variableType);
+        variableInstance.forceUpdate();
+    }
+
+    protected VariableType determineVariableType(Object value) {
+        return serviceConfiguration.getVariableTypes().findVariableType(value);
     }
 
     /**
@@ -73,15 +76,4 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
         variableInstance.setType(type);
     }
 
-    /**
-     * Central hook method for all modifications of a value for the variable instance.
-     * Please note, that transient variable instances are passed here as well.
-     *
-     * @param variableInstance the variable instance to be modified
-     * @param value the value to be set for the variable instance
-     * @param tenantId the ID of the tenant the variable instance belongs to
-     */
-    protected void setOrUpdateValue(VariableInstance variableInstance, Object value, String tenantId) {
-        variableInstance.setValue(value);
-    }
 }
