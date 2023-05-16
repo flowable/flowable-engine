@@ -426,6 +426,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
+                .variable("dynamicVariable", "myDynamicVariable")
                 .start();
 
         // Normal string
@@ -440,8 +441,16 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
         assertThat(secondTask).isNotNull();
         cmmnTaskService.complete(secondTask.getId());
-        Object completerTask2 = cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask2");
+        String completerTask2 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask2");
         assertThat(completerTask2).isNull();
+
+        // Expression
+        Authentication.setAuthenticatedUserId("DynamicDoe");
+        Task thirdTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task3").singleResult();
+        assertThat(thirdTask).isNotNull();
+        cmmnTaskService.complete(thirdTask.getId());
+        String completerTask3 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myDynamicVariable");
+        assertThat(completerTask3).isEqualTo("DynamicDoe");
     }
 
 }

@@ -421,9 +421,13 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             }
         } else if (PlanItemTransition.COMPLETE.equals(transition)) {
             if (humanTask.getTaskCompleterVariableName() != null) {
-                String taskCompleterVariableName = humanTask.getTaskCompleterVariableName();
+
+                ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+                Expression expression = expressionManager.createExpression(humanTask.getTaskCompleterVariableName());
+                String completerVariableName = (String) expression.getValue(planItemInstance);
                 String completer = Authentication.getAuthenticatedUserId();
-                planItemInstance.setVariable(taskCompleterVariableName, completer);
+
+                planItemInstance.setVariable(completerVariableName, completer);
             }
         }
     }
