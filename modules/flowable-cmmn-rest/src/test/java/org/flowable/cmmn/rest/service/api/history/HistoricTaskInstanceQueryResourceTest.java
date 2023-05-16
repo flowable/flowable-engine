@@ -33,7 +33,6 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -282,7 +281,6 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
     }
 
-    @Test
     public void testQueryTaskByCategory() throws Exception {
         Task t1 = taskService.newTask();
         t1.setName("t1");

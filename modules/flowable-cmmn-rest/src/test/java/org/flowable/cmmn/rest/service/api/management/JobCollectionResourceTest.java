@@ -25,7 +25,6 @@ import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.job.api.Job;
-import org.junit.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -122,7 +121,6 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test moving a bulk of dead letter jobs
      */
-    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/management/timerEventListenerCase.cmmn" })
     public void testExecuteBulkDeadLetterMove() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
