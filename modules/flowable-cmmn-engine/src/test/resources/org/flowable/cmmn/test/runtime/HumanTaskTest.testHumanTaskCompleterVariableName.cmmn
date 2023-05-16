@@ -12,10 +12,13 @@
 
             <planItem id="planItem1" name="Task One" definitionRef="task1" />
             <planItem id="planItem2" name="Task Two" definitionRef="task2" />
+            <planItem id="planItem3" name="Task Three" definitionRef="task3" />
+            <planItem id="planItem4" name="Dummy Task" definitionRef="task4" />
 
             <humanTask id="task1" name="Task One" flowable:taskCompleterVariableName="completerTask1" />
             <humanTask id="task2" name="Task Two" flowable:taskCompleterVariableName="completerTask2" />
-
+            <humanTask id="task3" name="Task Three" flowable:taskCompleterVariableName="${dynamicVariable}" />
+            <humanTask id="task4" name="Dummy Task" />
         </casePlanModel>
     </case>
 
