@@ -15,11 +15,11 @@
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>3.0.5</spring.boot.version>
-		<spring.framework.version>6.0.7</spring.framework.version>
-		<spring.security.version>6.0.2</spring.security.version>
+		<spring.framework.version>6.0.8</spring.framework.version>
+		<spring.security.version>6.0.3</spring.security.version>
 		<spring.amqp.version>3.0.3</spring.amqp.version>
 		<spring.kafka.version>3.0.5</spring.kafka.version>
-		<reactor-netty.version>1.1.1</reactor-netty.version>
+		<reactor-netty.version>1.1.6</reactor-netty.version>
 		<jackson.version>2.14.2</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>3.19.0</camel.version>
@@ -467,7 +467,7 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.23.1</version>
+				<version>3.24.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
