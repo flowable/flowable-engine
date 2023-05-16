@@ -109,21 +109,44 @@ public abstract class AbstractDynamicStateManager {
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     //-- Move container preparation section start
-    public List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, Optional<String> migrateToProcessDefinitionId, Map<String, Object> variables, CommandContext commandContext) {
+    public List<MoveExecutionEntityContainer> resolveMoveExecutionEntityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, 
+    		Map<String, Object> variables, CommandContext commandContext) {
+    	
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
             for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
-                //Executions belonging to the same parent should move together - i.e multipleExecution to single activity
+                // Executions belonging to the same parent should move together - i.e multipleExecution to single activity
                 Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<>();
+                Map<String, List<ExecutionEntity>> miExecutionsByParent = new HashMap<>();
                 for (String executionId : executionContainer.getExecutionIds()) {
                     ExecutionEntity execution = resolveActiveExecution(executionId, commandContext);
-                    List<ExecutionEntity> executionEntities = executionsByParent.computeIfAbsent(execution.getParentId(), k -> new ArrayList<>());
+                    List<ExecutionEntity> executionEntities;
+                    if (!execution.isMultiInstanceRoot()) {
+                    	executionEntities = executionsByParent.computeIfAbsent(execution.getParentId(), k -> new ArrayList<>());
+                    } else {
+                    	executionEntities = miExecutionsByParent.computeIfAbsent(execution.getParentId(), k -> new ArrayList<>());
+                    }
                     executionEntities.add(execution);
                 }
                 executionsByParent.values().forEach(executions -> {
                     MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
-                    executionContainer.getNewAssigneeId().ifPresent(moveExecutionEntityContainer::setNewAssigneeId);
-                    executionContainer.getNewOwnerId().ifPresent(moveExecutionEntityContainer::setNewOwnerId);
+                    if (executionContainer.getNewAssigneeId() != null) {
+                    	moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                    }
+                    if (executionContainer.getNewOwnerId() != null) {
+                    	moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
+                    }
+                    moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
+                });
+                
+                miExecutionsByParent.values().forEach(executions -> {
+                    MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
+                    if (executionContainer.getNewAssigneeId() != null) {
+                    	moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                    }
+                    if (executionContainer.getNewOwnerId() != null) {
+                    	moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
+                    }
                     moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                 });
             }
@@ -254,10 +277,13 @@ public abstract class AbstractDynamicStateManager {
         return moveExecutionEntityContainer;
     }
 
-    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, Optional<String> migrateToProcessDefinitionId, CommandContext commandContext) {
+    protected void prepareMoveExecutionEntityContainer(MoveExecutionEntityContainer moveExecutionContainer, ProcessDefinition migrateToProcessDefinition, CommandContext commandContext) {
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
 
-        Optional<BpmnModel> bpmnModelToMigrateTo = migrateToProcessDefinitionId.map(ProcessDefinitionUtil::getBpmnModel);
+        BpmnModel bpmnModelToMigrateTo = null;
+        if (migrateToProcessDefinition != null) {
+        	bpmnModelToMigrateTo = ProcessDefinitionUtil.getBpmnModel(migrateToProcessDefinition.getId());
+        }
         boolean canContainerDirectMigrate = (moveExecutionContainer.getMoveToActivityIds().size() == 1) && (moveExecutionContainer.getExecutions().size() == 1);
         for (String activityId : moveExecutionContainer.getMoveToActivityIds()) {
             FlowElement currentFlowElement;
@@ -265,11 +291,15 @@ public abstract class AbstractDynamicStateManager {
             String currentActivityId;
             if (moveExecutionContainer.isMoveToParentProcess()) {
                 String parentProcessDefinitionId = moveExecutionContainer.getSuperExecution().getProcessDefinitionId();
-                BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
                 BpmnModel modelOfCallActivity = ProcessDefinitionUtil.getBpmnModel(moveExecutionContainer.getExecutions().get(0).getProcessDefinitionId());
                 currentActivityId = moveExecutionContainer.getExecutions().get(0).getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(modelOfCallActivity, currentActivityId);
-                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), activityId);
+                if (bpmnModelToMigrateTo != null) {
+                	newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo, activityId);
+                } else {
+                	BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentProcessDefinitionId);
+                	newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+                }
                 canContainerDirectMigrate = false;
                 
             } else if (moveExecutionContainer.isMoveToSubProcessInstance()) {
@@ -279,8 +309,19 @@ public abstract class AbstractDynamicStateManager {
                 currentActivityId = firstExecution.getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
 
-                String processDefinitionIdOfCallActivity = migrateToProcessDefinitionId.orElse(firstExecution.getProcessDefinitionId());
-                CallActivity callActivity = (CallActivity) resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), moveExecutionContainer.getCallActivityId());
+                String processDefinitionIdOfCallActivity = null;
+                if (migrateToProcessDefinition != null) {
+                	processDefinitionIdOfCallActivity = migrateToProcessDefinition.getId();
+                } else {
+                	processDefinitionIdOfCallActivity = firstExecution.getProcessDefinitionId();
+                }
+                
+                CallActivity callActivity = null;
+                if (bpmnModelToMigrateTo != null) {
+                	callActivity = (CallActivity) resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo, moveExecutionContainer.getCallActivityId());
+                } else {
+                	callActivity = (CallActivity) resolveFlowElementFromBpmnModel(bpmnModel, moveExecutionContainer.getCallActivityId());
+                }
 
                 moveExecutionContainer.setCallActivity(callActivity);
                 ProcessDefinition callActivityProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionIdOfCallActivity);
@@ -309,14 +350,18 @@ public abstract class AbstractDynamicStateManager {
                 BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(firstExecution.getProcessDefinitionId());
                 currentActivityId = firstExecution.getCurrentActivityId();
                 currentFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, currentActivityId);
-                newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo.orElse(bpmnModel), activityId);
+                if (bpmnModelToMigrateTo != null) {
+                	newFlowElement = resolveFlowElementFromBpmnModel(bpmnModelToMigrateTo, activityId);
+                } else {
+                	newFlowElement = resolveFlowElementFromBpmnModel(bpmnModel, activityId);
+                }
             }
 
             moveExecutionContainer.addMoveToFlowElement(activityId, currentFlowElement, newFlowElement);
             canContainerDirectMigrate = canContainerDirectMigrate && isDirectFlowElementExecutionMigration(currentFlowElement, newFlowElement);
         }
 
-        moveExecutionContainer.setDirectExecutionMigration(canContainerDirectMigrate && migrateToProcessDefinitionId.isPresent());
+        moveExecutionContainer.setDirectExecutionMigration(canContainerDirectMigrate && migrateToProcessDefinition != null);
     }
 
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
@@ -334,12 +379,12 @@ public abstract class AbstractDynamicStateManager {
         Map<String, List<ExecutionEntity>> activeEmbeddedSubProcesses = resolveActiveEmbeddedSubProcesses(processInstanceChangeState.getProcessInstanceId(), commandContext);
         processInstanceChangeState.setProcessInstanceActiveEmbeddedExecutions(activeEmbeddedSubProcesses);
 
-        //Set the processInstance variables first so they are available during te change state
+        //Set the processInstance variables first so they are available during the change state
         ExecutionEntity processInstanceExecution = executionEntityManager.findById(processInstanceChangeState.getProcessInstanceId());
         processInstanceExecution.setVariables(processInstanceChangeState.getProcessInstanceVariables());
 
         for (MoveExecutionEntityContainer moveExecutionContainer : processInstanceChangeState.getMoveExecutionEntityContainers()) {
-            prepareMoveExecutionEntityContainer(moveExecutionContainer, processInstanceChangeState.getProcessDefinitionToMigrateTo().map(ProcessDefinition::getId), commandContext);
+            prepareMoveExecutionEntityContainer(moveExecutionContainer, processInstanceChangeState.getProcessDefinitionToMigrateTo(), commandContext);
             // Action the moves (changeState)
             if (moveExecutionContainer.isMoveToParentProcess()) {
                 String callActivityInstanceId = moveExecutionContainer.getExecutions().get(0).getProcessInstanceId();
@@ -387,8 +432,9 @@ public abstract class AbstractDynamicStateManager {
 
                 // Delete the parent executions for each current execution when the move to activity id has the same subProcess scope
                 ExecutionEntity continueParentExecution;
-                if (processInstanceChangeState.getProcessDefinitionToMigrateTo().isPresent()) {
-                    continueParentExecution = deleteDirectParentExecutions(execution.getParentId(), moveToFlowElements, executionIdsNotToDelete, commandContext);
+                if (processInstanceChangeState.getProcessDefinitionToMigrateTo() != null) {
+                    continueParentExecution = deleteDirectParentExecutions(execution.getParentId(), moveToFlowElements, 
+                    		executionIdsNotToDelete, processInstanceChangeState.getProcessDefinitionToMigrateTo(), moveExecutionContainer, commandContext);
                 } else {
                     continueParentExecution = deleteParentExecutions(execution.getParentId(), moveToFlowElements, executionIdsNotToDelete, commandContext);
                 }
@@ -521,26 +567,37 @@ public abstract class AbstractDynamicStateManager {
         return parentExecution;
     }
 
-    protected ExecutionEntity deleteDirectParentExecutions(String parentExecutionId, Collection<FlowElementMoveEntry> moveToFlowElements, Collection<String> executionIdsNotToDelete, CommandContext commandContext) {
+    protected ExecutionEntity deleteDirectParentExecutions(String parentExecutionId, Collection<FlowElementMoveEntry> moveToFlowElements, 
+    		Collection<String> executionIdsNotToDelete, ProcessDefinition procDefToMigrateTo, 
+    		MoveExecutionEntityContainer moveExecutionContainer, CommandContext commandContext) {
+    	
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         ExecutionEntity parentExecution = executionEntityManager.findById(parentExecutionId);
         if (parentExecution.getCurrentFlowElement() instanceof SubProcess) {
             SubProcess parentSubProcess = (SubProcess) parentExecution.getCurrentFlowElement();
             if (!isSubProcessContainerOfAnyFlowElement(parentSubProcess.getId(), moveToFlowElements)) {
-                ExecutionEntity toDeleteParentExecution = resolveParentExecutionToDelete(parentExecution, moveToFlowElements);
-                ExecutionEntity finalDeleteExecution = null;
-                if (toDeleteParentExecution != null) {
-                    finalDeleteExecution = toDeleteParentExecution;
-                } else {
-                    finalDeleteExecution = parentExecution;
-                }
-
-                parentExecution = finalDeleteExecution.getParent();
-
-                String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
-                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, false, true, finalDeleteExecution.getCurrentFlowElement());
+            	if (parentSubProcess.getLoopCharacteristics() == null || moveExecutionContainer.getMoveToFlowElement(parentSubProcess.getId()) != null) {
+	                ExecutionEntity toDeleteParentExecution = resolveParentExecutionToDelete(parentExecution, moveToFlowElements);
+	                ExecutionEntity finalDeleteExecution = null;
+	                if (toDeleteParentExecution != null) {
+	                    finalDeleteExecution = toDeleteParentExecution;
+	                } else {
+	                    finalDeleteExecution = parentExecution;
+	                }
+	
+	                parentExecution = finalDeleteExecution.getParent();
+	
+	                String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
+	                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
+	                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, false, true, finalDeleteExecution.getCurrentFlowElement());
+            	
+            	} else {
+            		parentExecution.setProcessDefinitionId(procDefToMigrateTo.getId());
+            		if (!parentExecution.isMultiInstanceRoot()) {
+            			parentExecution.getParent().setProcessDefinitionId(procDefToMigrateTo.getId());
+            		}
+            	}
             }
         }
 
@@ -1091,18 +1148,18 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected boolean isExecutionInsideMultiInstance(ExecutionEntity execution) {
-        return getFlowElementMultiInstanceParentId(execution.getCurrentFlowElement()).isPresent();
+        return getFlowElementMultiInstanceParentId(execution.getCurrentFlowElement()) != null;
     }
 
-    protected Optional<String> getFlowElementMultiInstanceParentId(FlowElement flowElement) {
+    protected String getFlowElementMultiInstanceParentId(FlowElement flowElement) {
         FlowElementsContainer parentContainer = flowElement.getParentContainer();
         while (parentContainer instanceof Activity) {
             if (isFlowElementMultiInstance((Activity) parentContainer)) {
-                return Optional.of(((Activity) parentContainer).getId());
+                return parentContainer.getId();
             }
             parentContainer = ((Activity) parentContainer).getParentContainer();
         }
-        return Optional.empty();
+        return null;
     }
 
     protected boolean isFlowElementMultiInstance(FlowElement flowElement) {

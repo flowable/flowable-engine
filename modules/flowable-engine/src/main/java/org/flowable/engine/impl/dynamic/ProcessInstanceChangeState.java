@@ -48,8 +48,8 @@ public class ProcessInstanceChangeState {
         return this;
     }
 
-    public Optional<ProcessDefinition> getProcessDefinitionToMigrateTo() {
-        return Optional.ofNullable(processDefinitionToMigrateTo);
+    public ProcessDefinition getProcessDefinitionToMigrateTo() {
+        return processDefinitionToMigrateTo;
     }
 
     public ProcessInstanceChangeState setProcessDefinitionToMigrateTo(ProcessDefinition processDefinitionToMigrateTo) {
@@ -58,7 +58,7 @@ public class ProcessInstanceChangeState {
     }
 
     public boolean isMigrateToProcessDefinition() {
-        return getProcessDefinitionToMigrateTo().isPresent();
+        return processDefinitionToMigrateTo != null;
     }
 
     public Map<String, Object> getProcessInstanceVariables() {

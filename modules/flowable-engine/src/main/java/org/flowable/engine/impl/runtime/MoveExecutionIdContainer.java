@@ -23,8 +23,8 @@ public class MoveExecutionIdContainer {
 
     protected List<String> executionIds;
     protected List<String> moveToActivityIds;
-    protected Optional<String> newAssigneeId;
-    protected Optional<String> newOwnerId;
+    protected String newAssigneeId;
+    protected String newOwnerId;
 
     public MoveExecutionIdContainer(String singleExecutionId, String moveToActivityId) {
         this(singleExecutionId, moveToActivityId, null, null);
@@ -33,8 +33,8 @@ public class MoveExecutionIdContainer {
     public MoveExecutionIdContainer(String singleExecutionId, String moveToActivityId, String newAssigneeId, String newOwnerId) {
         this.executionIds = Collections.singletonList(singleExecutionId);
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        this.newAssigneeId = Optional.ofNullable(newAssigneeId);
-        this.newOwnerId = Optional.ofNullable(newOwnerId);
+        this.newAssigneeId = newAssigneeId;
+        this.newOwnerId = newOwnerId;
     }
 
     public MoveExecutionIdContainer(List<String> executionIds, String moveToActivityId) {
@@ -45,8 +45,8 @@ public class MoveExecutionIdContainer {
     public MoveExecutionIdContainer(List<String> executionIds, String moveToActivityId, String newAssigneeId, String newOwnerId) {
         this.executionIds = executionIds;
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        this.newAssigneeId = Optional.ofNullable(newAssigneeId);
-        this.newOwnerId = Optional.ofNullable(newOwnerId);
+        this.newAssigneeId = newAssigneeId;
+        this.newOwnerId = newOwnerId;
     }
 
     public MoveExecutionIdContainer(String singleExecutionId, List<String> moveToActivityIds) {
@@ -56,10 +56,10 @@ public class MoveExecutionIdContainer {
     public MoveExecutionIdContainer(String singleExecutionId, List<String> moveToActivityIds, String newAssigneeId, String newOwnerId) {
         this.executionIds = Collections.singletonList(singleExecutionId);
         this.moveToActivityIds = moveToActivityIds;
-        this.newAssigneeId = Optional.ofNullable(newAssigneeId);
-        this.newOwnerId = Optional.ofNullable(newOwnerId);
+        this.newAssigneeId = newAssigneeId;
+        this.newOwnerId = newOwnerId;
     }
-
+    
     public List<String> getExecutionIds() {
         return Optional.ofNullable(executionIds).orElse(Collections.emptyList());
     }
@@ -68,11 +68,11 @@ public class MoveExecutionIdContainer {
         return Optional.ofNullable(moveToActivityIds).orElse(Collections.emptyList());
     }
 
-    public Optional<String> getNewAssigneeId() {
+    public String getNewAssigneeId() {
         return newAssigneeId;
     }
 
-    public Optional<String> getNewOwnerId() {
+    public String getNewOwnerId() {
         return newOwnerId;
     }
 }
