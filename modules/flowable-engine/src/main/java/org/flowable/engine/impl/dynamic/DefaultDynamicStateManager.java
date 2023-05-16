@@ -15,7 +15,6 @@ package org.flowable.engine.impl.dynamic;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -34,7 +33,8 @@ public class DefaultDynamicStateManager extends AbstractDynamicStateManager impl
 
     @Override
     public void moveExecutionState(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), changeActivityStateBuilder.getProcessInstanceVariables(), commandContext);
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, 
+        		changeActivityStateBuilder.getProcessInstanceVariables(), commandContext);
         List<ExecutionEntity> executions = moveExecutionEntityContainerList.iterator().next().getExecutions();
         String processInstanceId = executions.iterator().next().getProcessInstanceId();
         

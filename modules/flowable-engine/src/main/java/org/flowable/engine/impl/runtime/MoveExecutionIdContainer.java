@@ -59,7 +59,7 @@ public class MoveExecutionIdContainer {
         this.newAssigneeId = newAssigneeId;
         this.newOwnerId = newOwnerId;
     }
-
+    
     public List<String> getExecutionIds() {
         return Optional.ofNullable(executionIds).orElse(Collections.emptyList());
     }
