@@ -520,8 +520,7 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
                 .containsExactly("seqTasks", procSequentialMultiInst.getId());
         Map<String, Object> miTaskVars = taskService.getVariables(task.getId());
-        assertThat(miTaskVars)
-                .contains(entry("loopCounter", 0));
+        assertThat(miTaskVars).contains(entry("loopCounter", 0));
 
         //Complete one...
         completeTask(task);

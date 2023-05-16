@@ -855,7 +855,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     public String toString() {
-        return "Task[id=" + id + ", name=" + name + "]";
+        return "Task[id=" + id + ", key=" + taskDefinitionKey + ", name=" + name + "]";
     }
 
     @Override
