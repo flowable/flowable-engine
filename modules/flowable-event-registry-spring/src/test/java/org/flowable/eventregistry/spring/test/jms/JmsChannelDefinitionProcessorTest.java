@@ -803,4 +803,44 @@ class JmsChannelDefinitionProcessorTest {
                         + "}");
     }
 
+    @Test
+    void eventShouldBeSendToDeadLetterAfterAnExceptionIsThrown() {
+        eventRepositoryService.createInboundChannelModelBuilder()
+                .key("testChannel")
+                .resourceName("test.channel")
+                .jmsChannelAdapter("test-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        testEventConsumer.setEventConsumer(event -> {
+            throw new RuntimeException("Failed to receive event " + event.getType());
+        });
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"customer\": \"kermit\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}");
+
+
+        await("receive dead letter message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("ActiveMQ.DLQ"), Objects::nonNull);
+
+        assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSizeGreaterThan(1)
+                .containsOnly("test");
+    }
+
 }
