@@ -14,7 +14,7 @@ create table ACT_RU_VARIABLE (
     LONG_ NUMBER(19,0),
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
-    META_INFO_ NVARCHAR2(4000),
+    META_INFO_ NVARCHAR2(2000),
     primary key (ID_)
 );
 
