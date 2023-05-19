@@ -422,6 +422,7 @@
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
+      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="VARCHAR" />
       <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
@@ -521,6 +522,7 @@
     <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
       VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.VAR_TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
       VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
+      VAR.META_INFO_ as VAR_META_INFO_,
       VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
       VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, VAR.LONG_ as VAR_LONG_,
       VAR.SCOPE_ID_ AS VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ AS VAR_SUB_SCOPE_ID_,VAR.SCOPE_TYPE_ AS VAR_SCOPE_TYPE_
