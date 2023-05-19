@@ -12,20 +12,36 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableInstanceValueModifier;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.IntegerType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +56,7 @@ import org.junit.Test;
 public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase {
 
     VariableInstanceValueModifier originalModifier;
+    VariableType customType;
 
     @Before
     public void setUp() {
@@ -49,6 +66,9 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
     @After
     public void tearDown() {
         cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(originalModifier);
+        if (customType != null) {
+            cmmnEngineConfiguration.getVariableTypes().removeType(customType);
+        }
     }
 
     @Test
@@ -89,6 +109,171 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
         }).isInstanceOf(FlowableIllegalArgumentException.class).hasMessage("Invalid type: value should be larger than zero");
     }
 
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/history/testTwoTaskCase.cmmn" })
+    public void testWrapVariableWithCustomType() {
+        VariableTypes variableTypes = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
+        customType = new WrappedIntegerCustomType();
+        variableTypes.addTypeBefore(customType, "integer");
+
+        cmmnEngineConfiguration.getVariableServiceConfiguration()
+                .setVariableInstanceValueModifier(new WrappedIntegerValueModifier(cmmnEngineConfiguration.getVariableServiceConfiguration()));
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("simpleInteger", 1000)
+                .variable("wrappedInteger", 1001)
+                .caseDefinitionKey("myCase")
+                .start();
+
+        VariableInstance simpleInteger = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "simpleInteger");
+        assertThat(simpleInteger.getTypeName()).isEqualTo("integer");
+        assertThat(simpleInteger.getValue()).isEqualTo(1000);
+
+        VariableInstance wrappedInteger = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "wrappedInteger");
+        assertThat(wrappedInteger.getTypeName()).isEqualTo("wrappedIntegerType");
+        assertThat(wrappedInteger.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+        Object wrappedIntegerCaseVariable = caseInstance.getCaseVariables().get("wrappedInteger");
+        assertThat(wrappedIntegerCaseVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+
+        wrappedIntegerCaseVariable = caseInstance.getCaseVariables().get("wrappedInteger");
+        assertThat(wrappedIntegerCaseVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("wrappedInteger")
+                    .singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue())
+                    .isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                        assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                        assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+                    });
+            assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
+            assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1001meta");
+
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .includeCaseVariables()
+                    .singleResult();
+
+            wrappedIntegerCaseVariable = historicCaseInstance.getCaseVariables().get("wrappedInteger");
+            assertThat(wrappedIntegerCaseVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+            });
+
+            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .includeCaseVariables()
+                    .singleResult();
+
+            wrappedIntegerCaseVariable = historicTask.getCaseVariables().get("wrappedInteger");
+            assertThat(wrappedIntegerCaseVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+            });
+        }
+
+        Task task = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+
+        wrappedIntegerCaseVariable = task.getCaseVariables().get("wrappedInteger");
+        assertThat(wrappedIntegerCaseVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+        });
+
+        cmmnTaskService.complete(task.getId(), Collections.singletonMap("wrappedInteger", 1002));
+
+        VariableInstance wrappedIntegerTaskUpdate = cmmnRuntimeService.getVariableInstance(caseInstance.getId(),
+                "wrappedInteger");
+        assertThat(wrappedIntegerTaskUpdate.getValue()).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+            assertThat(wrappedIntegerValue.value).isEqualTo(1002);
+            assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1002meta");
+        });
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("wrappedInteger")
+                    .singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue())
+                    .isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                        assertThat(wrappedIntegerValue.value).isEqualTo(1002);
+                        assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1002meta");
+                    });
+            assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
+            assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1002meta");
+        }
+    }
+
+
+    public static class WrappedIntegerCustomType extends IntegerType {
+
+        public static final String TYPE_NAME = "wrappedIntegerType";
+
+        @Override
+        public String getTypeName() {
+            return TYPE_NAME;
+        }
+
+        @Override
+        public void setValue(Object value, ValueFields valueFields) {
+            if (value instanceof WrappedIntegerValue) {
+                super.setValue(((WrappedIntegerValue) value).value, valueFields);
+            } else {
+                super.setValue(value, valueFields);
+            }
+        }
+
+        @Override
+        public Object getValue(ValueFields valueFields) {
+            if (valueFields instanceof VariableInstance) {
+                return new WrappedIntegerValue(valueFields.getLongValue(), ((VariableInstance) valueFields).getMetaInfo());
+            } else if (valueFields instanceof HistoricVariableInstance) {
+                return new WrappedIntegerValue(valueFields.getLongValue(), ((HistoricVariableInstance) valueFields).getMetaInfo());
+            }
+            return super.getValue(valueFields);
+        }
+
+        @Override
+        public boolean isAbleToStore(Object value) {
+            if (value == null) {
+                return true;
+            }
+            return value instanceof WrappedIntegerValue;
+        }
+    }
+
+    static class WrappedIntegerValue {
+
+        public String metaInfo;
+        public Integer value;
+
+        public WrappedIntegerValue(Number value, String metaInfo) {
+            this.metaInfo = metaInfo;
+            this.value = value.intValue();
+        }
+    }
+
     static class TestOrderIdValidatingValueModifier extends DefaultVariableInstanceValueModifier {
 
         public TestOrderIdValidatingValueModifier(VariableServiceConfiguration serviceConfiguration) {
@@ -113,6 +298,36 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
                     throw new FlowableIllegalArgumentException("Invalid type: value should be larger than zero");
                 }
             }
+        }
+    }
+
+    static class WrappedIntegerValueModifier extends DefaultVariableInstanceValueModifier {
+
+        WrappedIntegerValueModifier(VariableServiceConfiguration serviceConfiguration) {
+            super(serviceConfiguration);
+        }
+
+
+        @Override
+        public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            Pair<Object, String> valueAndMeta = determineValueAndMeta(value);
+            super.setVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+            variableInstance.setMetaInfo(valueAndMeta.getRight());
+        }
+
+        @Override
+        public void updateVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
+            Pair<Object, String> valueAndMeta = determineValueAndMeta(value);
+            super.updateVariableValue(variableInstance, valueAndMeta.getLeft(), tenantId);
+            variableInstance.setMetaInfo(valueAndMeta.getRight());
+        }
+
+        Pair<Object, String> determineValueAndMeta(Object value) {
+            if (value instanceof Integer && ((Integer) value) > 1000) {
+                String metaInfo = value + "meta";
+                return Pair.of(new WrappedIntegerValue((Number) value, metaInfo), metaInfo);
+            }
+            return Pair.of(value, null);
         }
     }
 }
