@@ -35,6 +35,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.event.TestVariableEventListener;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -219,6 +220,17 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
             });
 
+            processInstance = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+
+            wrappedIntegerProcessVariable = processInstance.getProcessVariables().get("wrappedInteger");
+            assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+            });
+
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                         .processInstanceId(processInstance.getId())
@@ -232,9 +244,41 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                         });
                 assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("wrappedIntegerType");
                 assertThat(historicVariableInstance.getMetaInfo()).isEqualTo("1001meta");
+
+                HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .includeProcessVariables()
+                        .singleResult();
+
+                wrappedIntegerProcessVariable = historicProcessInstance.getProcessVariables().get("wrappedInteger");
+                assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                    assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                    assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+                });
+
+                HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .includeProcessVariables()
+                        .singleResult();
+
+                wrappedIntegerProcessVariable = historicTask.getProcessVariables().get("wrappedInteger");
+                assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                    assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                    assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+                });
             }
 
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+
+            wrappedIntegerProcessVariable = task.getProcessVariables().get("wrappedInteger");
+            assertThat(wrappedIntegerProcessVariable).isInstanceOfSatisfying(WrappedIntegerValue.class, wrappedIntegerValue -> {
+                assertThat(wrappedIntegerValue.value).isEqualTo(1001);
+                assertThat(wrappedIntegerValue.metaInfo).isEqualTo("1001meta");
+            });
+
             variables.put("wrappedInteger", 1002);
             taskService.complete(task.getId(), variables);
 
