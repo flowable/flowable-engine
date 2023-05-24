@@ -198,7 +198,8 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
                 if (startEvent.isSameDeployment()) {
                     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
                     formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                                    deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+                    		deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+                    
                 } else {
                     formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), processDefinition.getTenantId(),
                             processEngineConfiguration.isFallbackToDefaultTenant());
@@ -215,7 +216,6 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     }
 
     protected ProcessDefinitionResponse activateProcessDefinition(ProcessDefinition processDefinition, boolean suspendInstances, Date date) {
-
         if (!repositoryService.isProcessDefinitionSuspended(processDefinition.getId())) {
             throw new FlowableConflictException("Process definition with id '" + processDefinition.getId() + " ' is already active");
         }
@@ -230,7 +230,6 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     }
 
     protected ProcessDefinitionResponse suspendProcessDefinition(ProcessDefinition processDefinition, boolean suspendInstances, Date date) {
-
         if (repositoryService.isProcessDefinitionSuspended(processDefinition.getId())) {
             throw new FlowableConflictException("Process definition with id '" + processDefinition.getId() + " ' is already suspended");
         }

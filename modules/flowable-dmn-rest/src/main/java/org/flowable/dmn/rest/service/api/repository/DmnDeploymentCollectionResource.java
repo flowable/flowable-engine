@@ -14,6 +14,7 @@ package org.flowable.dmn.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,10 +174,14 @@ public class DmnDeploymentCollectionResource {
             }
 
             if (DmnResourceUtil.isDmnResource(fileName)) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+                try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+                
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .dmn");
             }
+            
             deploymentBuilder.name(fileName);
 
             if (tenantId != null) {

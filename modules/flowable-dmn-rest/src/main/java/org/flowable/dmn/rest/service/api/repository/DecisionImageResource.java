@@ -13,6 +13,7 @@
 
 package org.flowable.dmn.rest.service.api.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -49,18 +50,22 @@ public class DecisionImageResource extends BaseDecisionResource {
     @GetMapping(value = "/dmn-repository/decisions/{decisionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getImageResource(@ApiParam(name = "decisionId") @PathVariable String decisionId) {
         DmnDecision decision = getDecisionFromRequest(decisionId);
-        InputStream imageStream = dmnRepositoryService.getDecisionRequirementsDiagram(decision.getId());
-
-        if (imageStream != null) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
-            try {
-                return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
-            } catch (Exception e) {
-                throw new FlowableException("Error reading image stream", e);
+        
+        try (final InputStream imageStream = dmnRepositoryService.getDecisionRequirementsDiagram(decision.getId())) {
+            if (imageStream != null) {
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
+                try {
+                    return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
+                } catch (Exception e) {
+                    throw new FlowableException("Error reading image stream", e);
+                }
+            } else {
+                throw new FlowableObjectNotFoundException("Decision with id '" + decision.getId() + "' has no image.");
             }
-        } else {
-            throw new FlowableObjectNotFoundException("Decision with id '" + decision.getId() + "' has no image.");
+            
+        } catch (IOException e) {
+            throw new FlowableException("Error reading image stream", e);
         }
     }
 }

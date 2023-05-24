@@ -41,7 +41,7 @@ public class DeploymentResourceDataResource extends BaseDeploymentResourceDataRe
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.") })
     @ResponseBody
     @GetMapping("/cmmn-repository/deployments/{deploymentId}/resourcedata/{resourceName}")
-     public byte[] getDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
+    public byte[] getDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId,
             @ApiParam(name = "resourceName", value = "The name of the resource to get. Make sure you URL-encode the resourceName in case it contains forward slashes. Eg: use diagrams%2Fmy-process.bpmn20.xml instead of diagrams/my-process.bpmn20.xml.") @PathVariable("resourceName") String resourceName,
             HttpServletResponse response) {
 
