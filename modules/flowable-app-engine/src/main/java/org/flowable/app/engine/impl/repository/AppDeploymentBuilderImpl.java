@@ -12,6 +12,7 @@
  */
 package org.flowable.app.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.zip.ZipEntry;
@@ -72,11 +73,16 @@ public class AppDeploymentBuilderImpl implements AppDeploymentBuilder {
 
     @Override
     public AppDeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (inputStream == null) {
+                throw new FlowableException("resource '" + resource + "' not found");
+            }
+            
+            return addInputStream(resource, inputStream);
+            
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
     }
 
     @Override

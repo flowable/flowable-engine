@@ -16,8 +16,6 @@ package org.flowable.cmmn.rest.service.api.repository;
 import java.io.InputStream;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -28,6 +26,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -65,8 +65,6 @@ public class BaseDeploymentResourceDataResource {
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceName)) {
-            final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName);
-
             String contentType = null;
             if (resourceName.toLowerCase().endsWith(".cmmn")) {
                 contentType = ContentType.TEXT_XML.getMimeType();
@@ -75,11 +73,13 @@ public class BaseDeploymentResourceDataResource {
             }
             response.setContentType(contentType);
             
-            try {
+            try (final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName)) {
                 return IOUtils.toByteArray(resourceStream);
+                
             } catch (Exception e) {
                 throw new FlowableException("Error converting resource stream", e);
             }
+            
         } else {
             // Resource not found in deployment
             throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId + "'.", String.class);

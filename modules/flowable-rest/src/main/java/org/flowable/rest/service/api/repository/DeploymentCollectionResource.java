@@ -15,15 +15,13 @@ package org.flowable.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -54,6 +52,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -188,9 +188,17 @@ public class DeploymentCollectionResource {
             }
 
             if (fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".bpmn")) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+            	try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+            	
             } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
-                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
+            	try (InputStream fileInputStream = file.getInputStream();
+                        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+            		
+            		deploymentBuilder.addZipInputStream(zipInputStream);
+            	}
+
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
             }
@@ -203,6 +211,7 @@ public class DeploymentCollectionResource {
                 }
 
                 deploymentBuilder.name(fileName);
+                
             } else {
                 deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }
