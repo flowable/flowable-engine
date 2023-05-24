@@ -65,8 +65,6 @@ public class BaseDeploymentResourceDataResource {
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceName)) {
-            final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName);
-
             String contentType = null;
             if (resourceName.toLowerCase().endsWith(".event") || resourceName.toLowerCase().endsWith(".channel")) {
                 contentType = ContentType.APPLICATION_JSON.getMimeType();
@@ -75,8 +73,9 @@ public class BaseDeploymentResourceDataResource {
             }
             response.setContentType(contentType);
             
-            try {
+            try (final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName)) {
                 return IOUtils.toByteArray(resourceStream);
+                
             } catch (Exception e) {
                 throw new FlowableException("Error converting resource stream", e);
             }

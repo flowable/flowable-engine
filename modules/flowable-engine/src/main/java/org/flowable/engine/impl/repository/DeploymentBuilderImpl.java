@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -76,11 +77,16 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     @Override
     public DeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = ReflectUtil.getResourceAsStream(resource)) {
+	        if (inputStream == null) {
+	            throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
+	        }
+	        return addInputStream(resource, inputStream);
+	        
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
+
     }
 
     @Override
