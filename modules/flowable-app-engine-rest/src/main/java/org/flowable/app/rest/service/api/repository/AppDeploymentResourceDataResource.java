@@ -81,14 +81,14 @@ public class AppDeploymentResourceDataResource {
         List<String> resourceList = appRepositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceName)) {
-            final InputStream resourceStream = appRepositoryService.getResourceAsStream(deploymentId, resourceName);
-
             response.setContentType("application/json");
-            try {
+            try (final InputStream resourceStream = appRepositoryService.getResourceAsStream(deploymentId, resourceName)) {
                 return IOUtils.toByteArray(resourceStream);
+                
             } catch (Exception e) {
                 throw new FlowableException("Error converting resource stream", e);
             }
+            
         } else {
             // Resource not found in deployment
             throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId);

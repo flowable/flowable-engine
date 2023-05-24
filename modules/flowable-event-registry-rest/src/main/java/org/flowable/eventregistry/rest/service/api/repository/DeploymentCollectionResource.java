@@ -15,6 +15,7 @@ package org.flowable.eventregistry.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -181,12 +182,14 @@ public class DeploymentCollectionResource {
             EventDeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
             if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".event") || fileName.endsWith(".channel"))) {
-
                 fileName = file.getName();
             }
 
             if (fileName.endsWith(".event") || fileName.endsWith(".channel")) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+                try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+                
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .event, .channel");
             }
@@ -199,6 +202,7 @@ public class DeploymentCollectionResource {
                 }
 
                 deploymentBuilder.name(fileName);
+                
             } else {
                 deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }

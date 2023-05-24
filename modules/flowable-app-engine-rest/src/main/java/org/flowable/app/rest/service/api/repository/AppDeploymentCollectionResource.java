@@ -14,6 +14,7 @@ package org.flowable.app.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -169,9 +170,17 @@ public class AppDeploymentCollectionResource {
             }
 
             if (fileName.endsWith(".app")) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+                try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+
             } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
-                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
+                try (InputStream fileInputStream = file.getInputStream();
+                        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+                    
+                    deploymentBuilder.addZipInputStream(zipInputStream);
+                }
+
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .app");
             }

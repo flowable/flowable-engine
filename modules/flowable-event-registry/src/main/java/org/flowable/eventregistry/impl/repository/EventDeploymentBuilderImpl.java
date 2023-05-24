@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -74,11 +75,15 @@ public class EventDeploymentBuilderImpl implements EventDeploymentBuilder, Seria
 
     @Override
     public EventDeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (inputStream == null) {
+                throw new FlowableException("resource '" + resource + "' not found");
+            }
+            return addInputStream(resource, inputStream);
+            
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
     }
 
     @Override
