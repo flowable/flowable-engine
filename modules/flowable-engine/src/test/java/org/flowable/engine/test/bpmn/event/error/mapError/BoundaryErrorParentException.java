@@ -23,8 +23,16 @@ public class BoundaryErrorParentException extends RuntimeException {
     public BoundaryErrorParentException() {
     }
 
+    public BoundaryErrorParentException(String message) {
+        super(message);
+    }
+
     public BoundaryErrorParentException(Throwable cause) {
         super(cause);
+    }
+
+    public BoundaryErrorParentException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 }

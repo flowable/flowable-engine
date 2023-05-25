@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.event.error.mapError;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,6 +120,26 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
         assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
+    @Test
+    @Deployment
+    public void testRootCauseSingleDirectMapInputErrorMessage() {
+        FlagDelegate.reset();
+
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processWithSingleExceptionMap")
+                .transientVariable("exceptionClass", BoundaryErrorParentException.class.getName())
+                .transientVariable("exceptionMessage", "Message from main")
+                .transientVariable("nestedExceptionClass", IllegalArgumentException.class.getName())
+                .transientVariable("nestedExceptionMessage", "Message from cause")
+                .start();
+        assertThat(FlagDelegate.isVisited()).isTrue();
+        assertThat(FlagDelegate.getVariables())
+                .contains(
+                        entry("errorMessageVar", "Message from main"),
+                        entry("errorCauseMessageVar", "Message from cause")
+                );
     }
 
     // exception does not match the single mapping
@@ -329,6 +350,26 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
         assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testCallProcessSingleDirectMapInputErrorMessage.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testCallProcessCalee.bpmn20.xml" })
+    public void testCallProcessSingleDirectMapInputErrorMessage() {
+        FlagDelegate.reset();
+
+         runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("callProcessWithSingleExceptionMap")
+                .variable("exceptionClass", BoundaryErrorParentException.class.getName())
+                .variable("exceptionMessage", "Message from main")
+                .start();
+        assertThat(FlagDelegate.isVisited()).isTrue();
+        assertThat(FlagDelegate.getVariables())
+                .contains(
+                        entry("errorMessageVar", "Message from main")
+                );
     }
 
     @Test

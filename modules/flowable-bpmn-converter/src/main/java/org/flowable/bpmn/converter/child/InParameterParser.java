@@ -22,9 +22,8 @@ import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
-import org.flowable.bpmn.model.CaseServiceTask;
-import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.ExtensionAttribute;
+import org.flowable.bpmn.model.HasInParameters;
 import org.flowable.bpmn.model.IOParameter;
 
 public class InParameterParser extends BaseChildElementParser {
@@ -67,14 +66,8 @@ public class InParameterParser extends BaseChildElementParser {
                 parameter.setTransient(true);
             }
 
-            if (parentElement instanceof CallActivity) {
-                ((CallActivity) parentElement).getInParameters().add(parameter);
-
-            } else if (parentElement instanceof CaseServiceTask) {
-                ((CaseServiceTask) parentElement).getInParameters().add(parameter);
-
-            } else if (parentElement instanceof Event) {
-                ((Event) parentElement).getInParameters().add(parameter);
+            if (parentElement instanceof HasInParameters) {
+                ((HasInParameters) parentElement).addInParameter(parameter);
             }
 
             BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultInParameterAttributes);
