@@ -80,6 +80,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
@@ -920,17 +921,7 @@ public abstract class AbstractDynamicStateManager {
         }
 
         // copy process variables
-        for (IOParameter ioParameter : callActivity.getInParameters()) {
-            Object value;
-            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(ioParameter.getSourceExpression().trim());
-                value = expression.getValue(parentExecution);
-
-            } else {
-                value = parentExecution.getVariable(ioParameter.getSource());
-            }
-            variables.put(ioParameter.getTarget(), value);
-        }
+        IOParameterUtil.processInParameters(callActivity.getInParameters(), parentExecution, variables::put, variables::put, expressionManager);
 
         if (!variables.isEmpty()) {
             subProcessInstance.setVariables(variables);

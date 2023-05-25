@@ -57,36 +57,8 @@ public class EventSubscriptionUtil {
                     
                     VariableContainerWrapper variableWrapper = new VariableContainerWrapper(payloadMap);
                     ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
-                    for (IOParameter inParameter : event.getInParameters()) {
+                    IOParameterUtil.processInParameters(event.getInParameters(), variableWrapper, execution, expressionManager);
 
-                        Object value = null;
-                        if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                            Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
-                            value = expression.getValue(variableWrapper);
-
-                        } else {
-                            value = variableWrapper.getVariable(inParameter.getSource());
-                        }
-
-                        String variableName = null;
-                        if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                            Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
-                            Object variableNameValue = expression.getValue(variableWrapper);
-                            if (variableNameValue != null) {
-                                variableName = variableNameValue.toString();
-                            } else {
-                                LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                                    inParameter.getTargetExpression());
-                            }
-
-                        } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                            variableName = inParameter.getTarget();
-
-                        }
-                        
-                        execution.setVariable(variableName, value);
-                    }
-                    
                 } else {
                     execution.setVariables(payloadMap);
                 }
