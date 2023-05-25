@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -123,6 +124,7 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
     @Override
     protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         BoundaryEvent boundaryEvent = (BoundaryEvent) element;
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS, boundaryEvent.getInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeVariableListenerDefinition(boundaryEvent, didWriteExtensionStartElement, xtw);        
         return didWriteExtensionStartElement;
     }

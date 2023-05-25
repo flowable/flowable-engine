@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -46,6 +47,8 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT));
     
     public StartEventXMLConverter() {
+        InParameterParser inParameterParser = new InParameterParser();
+        childParserMap.put(inParameterParser.getElementName(), inParameterParser);
         VariableListenerEventDefinitionParser variableListenerEventDefinitionParser = new VariableListenerEventDefinitionParser();
         childParserMap.put(variableListenerEventDefinitionParser.getElementName(), variableListenerEventDefinitionParser);
     }
@@ -123,6 +126,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     @Override
     protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         StartEvent startEvent = (StartEvent) element;
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS, startEvent.getInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeVariableListenerDefinition(startEvent, didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeFormProperties(startEvent, didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;

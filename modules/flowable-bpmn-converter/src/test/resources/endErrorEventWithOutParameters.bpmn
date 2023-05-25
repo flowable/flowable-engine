@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             exporter="Yaoqiang BPMN Editor" exporterVersion="2.2.12 (GPLv3, Non-Commercial)" expressionLanguage="http://www.w3.org/1999/XPath"
+             id="_1384552647085" name="" targetNamespace="http://sourceforge.net/bpmn/definitions/_1384552647085"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
+    <error id="errorOne" name="Error One" errorCode="errorOne"/>
+    <process id="testProcess" isExecutable="true" name="Test Process">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theSubProcess"/>
+        <subProcess id="theSubProcess">
+            <startEvent id="theSubProcessStart"/>
+            <sequenceFlow id="subFlow1" sourceRef="theStart" targetRef="theTask"/>
+            <serviceTask id="theTask" flowable:expression="${true}"/>
+            <sequenceFlow id="subFlow2" sourceRef="theTask" targetRef="theSubProcessEnd"/>
+            <endEvent id="theSubProcessEnd">
+                <extensionElements>
+                    <flowable:out target="targetErrorVar" source="sourceVar"/>
+                    <flowable:out target="targetErrorVarFromExpression" sourceExpression="${'test'}"/>
+                </extensionElements>
+                <errorEventDefinition errorRef="testError" />
+            </endEvent>
+        </subProcess>
+        <boundaryEvent id="theErrorBoundary" attachedToRef="theSubProcess">
+            <errorEventDefinition id="one" errorRef="errorOne"/>
+        </boundaryEvent>
+        <sequenceFlow id="flow2" sourceRef="theErrorBoundary" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+</definitions>

@@ -12,9 +12,14 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -24,6 +29,13 @@ import org.flowable.bpmn.model.EndEvent;
  * @author Tijs Rademakers
  */
 public class EndEventXMLConverter extends BaseBpmnXMLConverter {
+
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+
+    public EndEventXMLConverter() {
+        OutParameterParser outParameterParser = new OutParameterParser();
+        childParserMap.put(outParameterParser.getElementName(), outParameterParser);
+    }
 
     @Override
     public Class<? extends BaseElement> getBpmnElementType() {
@@ -42,13 +54,20 @@ public class EndEventXMLConverter extends BaseBpmnXMLConverter {
         BpmnXMLUtil.addXMLLocation(endEvent, xtr);
         
         BpmnXMLUtil.addCustomAttributes(xtr, endEvent, defaultElementAttributes, defaultActivityAttributes);
-        
-        parseChildElements(getXMLElementName(), endEvent, model, xtr);
+
+        parseChildElements(getXMLElementName(), endEvent, childParserMap, model, xtr);
         return endEvent;
     }
 
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+    }
+
+    @Override
+    protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        EndEvent endEvent = (EndEvent) element;
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_OUT_PARAMETERS, endEvent.getOutParameters(), didWriteExtensionStartElement, xtw);
+        return didWriteExtensionStartElement;
     }
 
     @Override
