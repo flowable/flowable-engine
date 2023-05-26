@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
-import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -34,6 +33,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,36 +86,8 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         Map<String, Object> inParameters = new HashMap<>();
 
         // copy process variables
-        for (IOParameter inParameter : caseServiceTask.getInParameters()) {
+        IOParameterUtil.processInParameters(caseServiceTask.getInParameters(), execution, inParameters::put, inParameters::put, expressionManager);
 
-            Object value = null;
-            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
-                value = expression.getValue(execution);
-
-            } else {
-                value = execution.getVariable(inParameter.getSource());
-            }
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
-                Object variableNameValue = expression.getValue(execution);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        inParameter.getTargetExpression());
-                }
-
-            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                variableName = inParameter.getTarget();
-
-            }
-
-            inParameters.put(variableName, value);
-        }
-        
         String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
 
         if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {

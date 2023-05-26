@@ -13,8 +13,12 @@
 
 package org.flowable.engine.delegate;
 
+import java.util.HashMap;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.engine.impl.bpmn.parser.Error;
 
 /**
@@ -32,6 +36,7 @@ public class BpmnError extends FlowableException {
     private static final long serialVersionUID = 1L;
 
     private String errorCode;
+    private VariableContainer additionalDataContainer;
 
     public BpmnError(String errorCode) {
         super("");
@@ -55,5 +60,20 @@ public class BpmnError extends FlowableException {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public VariableContainer getAdditionalDataContainer() {
+        return additionalDataContainer;
+    }
+
+    public void setAdditionalDataContainer(VariableContainer additionalDataContainer) {
+        this.additionalDataContainer = additionalDataContainer;
+    }
+
+    public void addAdditionalData(String name, Object value) {
+        if (this.additionalDataContainer == null) {
+            this.additionalDataContainer = new VariableContainerWrapper(new HashMap<>());
+        }
+        this.additionalDataContainer.setVariable(name, value);
     }
 }

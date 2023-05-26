@@ -630,7 +630,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
     @Override
     public ErrorEndEventActivityBehavior createErrorEndEventActivityBehavior(EndEvent endEvent, ErrorEventDefinition errorEventDefinition) {
-        return new ErrorEndEventActivityBehavior(errorEventDefinition.getErrorCode());
+        return new ErrorEndEventActivityBehavior(errorEventDefinition.getErrorCode(), endEvent.getOutParameters());
     }
     
     @Override

@@ -13,20 +13,15 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.ThrowEvent;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -37,6 +32,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
@@ -105,39 +101,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             subscriptionEntities = eventSubscriptionService
                     .findSignalEventSubscriptionsByEventName(eventSubscriptionName, execution.getTenantId());
         }
-        
-        Map<String, Object> payload = new HashMap<>();
-        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-        for (IOParameter outParameter : throwEvent.getOutParameters()) {
 
-            Object value = null;
-            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(outParameter.getSourceExpression().trim());
-                value = expression.getValue(execution);
-
-            } else {
-                value = execution.getVariable(outParameter.getSource());
-            }
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
-                variableName = outParameter.getTarget();
-
-            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Expression expression = expressionManager.createExpression(outParameter.getTargetExpression());
-
-                Object variableNameValue = expression.getValue(execution);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        outParameter.getTargetExpression());
-                }
-
-            }
-            
-            payload.put(variableName, value);
-        }
+        Map<String, Object> payload = IOParameterUtil.extractOutVariables(throwEvent.getOutParameters(), execution,
+                processEngineConfiguration.getExpressionManager());;
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,

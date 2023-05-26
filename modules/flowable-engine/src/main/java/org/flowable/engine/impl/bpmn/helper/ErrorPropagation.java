@@ -37,6 +37,8 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
@@ -46,6 +48,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,12 +66,21 @@ public class ErrorPropagation {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPropagation.class);
 
     public static void propagateError(BpmnError error, DelegateExecution execution) {
-        propagateError(error.getErrorCode(), execution);
+        propagateError(new BpmnErrorVariableContainer(error, execution.getTenantId()), execution);
     }
 
     public static void propagateError(String errorCode, DelegateExecution execution) {
+        propagateError(new BpmnErrorVariableContainer(errorCode, execution.getTenantId()), execution);
+    }
+
+    protected static void propagateError(String errorCode, Throwable exception, DelegateExecution execution) {
+        propagateError(new BpmnErrorVariableContainer(errorCode, exception, execution.getTenantId()), execution);
+    }
+
+    protected static void propagateError(BpmnErrorVariableContainer errorVariableContainer, DelegateExecution execution) {
         Map<String, List<Event>> eventMap = new HashMap<>();
         Set<String> rootProcessDefinitionIds = new HashSet<>();
+        String errorCode = errorVariableContainer.getErrorCode();
         if (!execution.getProcessInstanceId().equals(execution.getRootProcessInstanceId())) {
             ExecutionEntity parentExecution = (ExecutionEntity) execution;
             while (parentExecution.getParentId() != null || parentExecution.getSuperExecutionId() != null) {
@@ -89,16 +101,21 @@ public class ErrorPropagation {
 
         eventMap.putAll(findCatchingEventsForProcess(execution.getProcessDefinitionId(), errorCode));
         if (eventMap.size() > 0) {
-            executeCatch(eventMap, execution, errorCode);
+            executeCatch(eventMap, execution, errorVariableContainer);
         }
 
         if (eventMap.size() == 0) {
-            throw new BpmnError(errorCode, "No catching boundary event found for error with errorCode '" + errorCode + "', neither in same process nor in parent process");
+            BpmnError bpmnError = new BpmnError(errorCode,
+                    "No catching boundary event found for error with errorCode '" + errorCode + "', neither in same process nor in parent process");
+            bpmnError.setAdditionalDataContainer(errorVariableContainer);
+            throw bpmnError;
         }
     }
 
-    protected static void executeCatch(Map<String, List<Event>> eventMap, DelegateExecution delegateExecution, String errorId) {
+    protected static void executeCatch(Map<String, List<Event>> eventMap, DelegateExecution delegateExecution,
+            BpmnErrorVariableContainer errorVariableContainer) {
         Set<String> toDeleteProcessInstanceIds = new HashSet<>();
+        String errorId = errorVariableContainer.getErrorCode();
         LOGGER.debug("Executing error catch for error={}, execution={}, eventMap={}", errorId, delegateExecution, eventMap);
         Event matchingEvent = null;
         ExecutionEntity currentExecution = (ExecutionEntity) delegateExecution;
@@ -204,23 +221,26 @@ public class ErrorPropagation {
                 }
             }
 
-            executeEventHandler(matchingEvent, parentExecution, currentExecution, errorId);
+            executeEventHandler(matchingEvent, parentExecution, currentExecution, errorVariableContainer);
 
         } else {
             throw new FlowableException("No matching parent execution for error code " + errorId + " found");
         }
     }
 
-    protected static void executeEventHandler(Event event, ExecutionEntity parentExecution, ExecutionEntity currentExecution, String errorId) {
+    protected static void executeEventHandler(Event event, ExecutionEntity parentExecution, ExecutionEntity currentExecution,
+            BpmnErrorVariableContainer errorVariableContainer) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         FlowableEventDispatcher eventDispatcher = null;
 
+        String errorId = errorVariableContainer.getErrorCode();
         String errorCode = errorId;
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
         if (bpmnModel != null) {
             String modelError = bpmnModel.getErrors().get(errorId);
             if (modelError != null) {
                 errorCode = modelError;
+                errorVariableContainer.setErrorCode(errorCode);
             }
         }
 
@@ -253,7 +273,7 @@ public class ErrorPropagation {
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
-            injectErrorContext(event, eventSubProcessExecution, errorCode);
+            injectErrorContext(event, eventSubProcessExecution, errorVariableContainer, processEngineConfiguration.getExpressionManager());
             if (event.getSubProcess() != null) {
                 eventSubProcessExecution.setCurrentFlowElement(event.getSubProcess());
                 CommandContextUtil.getActivityInstanceEntityManager().recordActivityStart(eventSubProcessExecution);
@@ -282,7 +302,7 @@ public class ErrorPropagation {
                     boundaryExecution = childExecution;
                 }
             }
-            injectErrorContext(event, boundaryExecution, errorCode);
+            injectErrorContext(event, boundaryExecution, errorVariableContainer, processEngineConfiguration.getExpressionManager());
             CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
         }
     }
@@ -339,7 +359,7 @@ public class ErrorPropagation {
     public static boolean mapException(Exception e, ExecutionEntity execution, List<MapExceptionEntry> exceptionMap) {
         String errorCode = findMatchingExceptionMapping(e, exceptionMap);
         if (errorCode != null) {
-            propagateError(errorCode, execution);
+            propagateError(errorCode, e, execution);
             return true;
         } else {
             ExecutionEntity callActivityExecution = null;
@@ -361,7 +381,7 @@ public class ErrorPropagation {
                 if (CollectionUtil.isNotEmpty(callActivity.getMapExceptions())) {
                     errorCode = findMatchingExceptionMapping(e, callActivity.getMapExceptions());
                     if (errorCode != null) {
-                        propagateError(errorCode, callActivityExecution);
+                        propagateError(errorCode, e, callActivityExecution);
                         return true;
                     }
                 }
@@ -487,7 +507,8 @@ public class ErrorPropagation {
         }
     }
 
-    protected static void injectErrorContext(Event event, ExecutionEntity execution, String errorCode) {
+    protected static void injectErrorContext(Event event, ExecutionEntity execution, BpmnErrorVariableContainer errorSourceContainer,
+            ExpressionManager expressionManager) {
 
         for (EventDefinition eventDefinition : event.getEventDefinitions()) {
             if (!(eventDefinition instanceof ErrorEventDefinition)) {
@@ -495,11 +516,15 @@ public class ErrorPropagation {
             }
 
             ErrorEventDefinition definition = (ErrorEventDefinition) eventDefinition;
+            IOParameterUtil.processInParameters(event.getInParameters(), errorSourceContainer, execution, expressionManager);
+
             String variableName = definition.getErrorVariableName();
 
             if (variableName == null || variableName.isEmpty()) {
                 continue;
             }
+
+            String errorCode = errorSourceContainer.getErrorCode();
 
             if (definition.getErrorVariableTransient() != null && definition.getErrorVariableTransient()) {
                 if (definition.getErrorVariableLocalScope() != null && definition.getErrorVariableLocalScope()) {
@@ -514,6 +539,87 @@ public class ErrorPropagation {
                     execution.setVariable(variableName, errorCode);
                 }
             }
+        }
+    }
+
+    protected static class BpmnErrorVariableContainer implements VariableContainer {
+
+        private static final String ERROR_CODE_VARIABLE_NAME = "errorCode";
+        private static final String ERROR_VARIABLE_NAME = "error";
+        private static final String ERROR_MESSAGE_VARIABLE_NAME = "errorMessage";
+
+        protected String errorCode;
+        protected Throwable error;
+        protected VariableContainer additionalDataContainer;
+        protected String tenantId;
+
+        protected BpmnErrorVariableContainer(String errorCode, String tenantId) {
+            this.errorCode = errorCode;
+            this.tenantId = tenantId;
+        }
+
+        protected BpmnErrorVariableContainer(BpmnError error, String tenantId) {
+            this.error = error;
+            this.additionalDataContainer = error.getAdditionalDataContainer();
+            this.errorCode = error.getErrorCode();
+            this.tenantId = tenantId;
+        }
+
+        protected BpmnErrorVariableContainer(String errorCode, Throwable error, String tenantId) {
+            this.error = error;
+            if (error instanceof BpmnError) {
+                this.additionalDataContainer = ((BpmnError) error).getAdditionalDataContainer();
+            }
+            this.errorCode = errorCode;
+            this.tenantId = tenantId;
+        }
+
+        protected String getErrorCode() {
+            return errorCode;
+        }
+
+        protected void setErrorCode(String errorCode) {
+            this.errorCode = errorCode;
+        }
+
+        @Override
+        public boolean hasVariable(String variableName) {
+            if (ERROR_CODE_VARIABLE_NAME.equals(variableName) || ERROR_VARIABLE_NAME.equals(variableName) || ERROR_MESSAGE_VARIABLE_NAME.equals(variableName)) {
+                return true;
+            } else if (additionalDataContainer != null) {
+                return additionalDataContainer.hasVariable(variableName);
+            }
+            return false;
+        }
+
+        @Override
+        public Object getVariable(String variableName) {
+            if (ERROR_CODE_VARIABLE_NAME.equals(variableName)) {
+                return errorCode;
+            } else if (ERROR_VARIABLE_NAME.equals(variableName)) {
+                return error;
+            } else if (ERROR_MESSAGE_VARIABLE_NAME.equals(variableName)) {
+                return error != null ? error.getMessage() : null;
+            } else if (additionalDataContainer != null) {
+                return additionalDataContainer.getVariable(variableName);
+            }
+
+            return null;
+        }
+
+        @Override
+        public void setVariable(String variableName, Object variableValue) {
+            throw new UnsupportedOperationException("Not allowed to set variables in a bpmn error variable container");
+        }
+
+        @Override
+        public void setTransientVariable(String variableName, Object variableValue) {
+            throw new UnsupportedOperationException("Not allowed to set variables in a bpmn error variable container");
+        }
+
+        @Override
+        public String getTenantId() {
+            return tenantId;
         }
     }
 
