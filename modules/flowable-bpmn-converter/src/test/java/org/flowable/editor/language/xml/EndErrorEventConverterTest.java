@@ -19,7 +19,6 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
-import org.flowable.bpmn.model.StartEvent;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**

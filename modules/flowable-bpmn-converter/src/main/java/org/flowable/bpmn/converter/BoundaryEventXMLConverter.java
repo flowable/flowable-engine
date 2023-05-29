@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
-import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
