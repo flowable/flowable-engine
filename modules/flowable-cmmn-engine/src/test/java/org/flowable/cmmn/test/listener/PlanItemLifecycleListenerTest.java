@@ -134,7 +134,8 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
         assertThat(StateCapturingStaticPlanItemInstanceLifecycleListener.planItemsInstanceStates.get(userEventListenerInstance.getId()))
                 .extracting(Pair::getLeft, Pair::getRight)
                 .containsExactly(
-                        tuple(null, "available")
+                        tuple(null, "available"),
+                        tuple("active", "available")
                 );
 
         PlanItemInstance completedEventListenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery()

@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.model.EventListener;
 
 /**
  * @author Joram Barrez
@@ -27,6 +29,14 @@ public abstract class AbstractTestLifecycleListener implements PlanItemInstanceL
 
     @Override
     public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+        if (planItemInstance.getPlanItemDefinition() instanceof EventListener && 
+                planItemInstance.getPlanItem().getItemControl() != null && 
+                planItemInstance.getPlanItem().getItemControl().getRepetitionRule() != null &&
+                PlanItemInstanceState.ACTIVE.equals(oldState) && PlanItemInstanceState.AVAILABLE.equals(newState)) {
+            
+            return;
+        }
+        
         events.add(new TestLifeCycleEvent(planItemInstance, oldState, newState));
     }
 
