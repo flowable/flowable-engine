@@ -788,6 +788,7 @@
       <attribute name="source" type="string" use="optional"/>
       <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
       <attribute name="target" type="string" use="required" />
+      <attribute name="transient" type="boolean" default="false" use="optional" />
     </complexType>
   </element>
   <element name="out">
@@ -801,6 +802,7 @@
       <attribute name="source" type="string" use="optional"/>
       <attribute name="sourceExpression" type="tns:tExpression" use="optional"/>
       <attribute name="target" type="string" use="required" />
+      <attribute name="transient" type="boolean" default="false" use="optional"/>
     </complexType>
   </element>
 

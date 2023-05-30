@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CallActivity;
@@ -49,6 +50,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.interceptor.StartSubProcessInstanceAfterContext;
 import org.flowable.engine.interceptor.StartSubProcessInstanceBeforeContext;
@@ -168,36 +170,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             }
 
         }
-        
-        // copy process variables
-        for (IOParameter inParameter : instanceBeforeContext.getInParameters()) {
 
-            Object value = null;
-            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
-                value = expression.getValue(execution);
-
-            } else {
-                value = execution.getVariable(inParameter.getSource());
-            }
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
-                Object variableNameValue = expression.getValue(execution);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        inParameter.getTargetExpression());
-                }
-
-            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                variableName = inParameter.getTarget();
-
-            }
-
-            instanceBeforeContext.getVariables().put(variableName, value);
+        List<IOParameter> inParameters = instanceBeforeContext.getInParameters();
+        if (!inParameters.isEmpty()) {
+            Map<String, Object> variables = instanceBeforeContext.getVariables();
+            // copy process variables
+            IOParameterUtil.processInParameters(inParameters, execution, variables::put, variables::put, expressionManager);
         }
 
         if (!instanceBeforeContext.getVariables().isEmpty()) {
@@ -286,39 +264,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
 
-        for (IOParameter outParameter : callActivity.getOutParameters()) {
-
-            Object value = null;
-            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(outParameter.getSourceExpression().trim());
-                value = expression.getValue(subProcessInstance);
-
-            } else {
-                value = subProcessInstance.getVariable(outParameter.getSource());
-            }
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
-                variableName = outParameter.getTarget();
-
-            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Expression expression = expressionManager.createExpression(outParameter.getTargetExpression());
-
-                Object variableNameValue = expression.getValue(subProcessInstance);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
+        List<IOParameter> outParameters = callActivity.getOutParameters();
+        if (!outParameters.isEmpty()) {
+            BiConsumer<String, Object> variableConsumer = (variableName, value) -> {
+                if (callActivity.isUseLocalScopeForOutParameters()) {
+                    executionEntity.setVariableLocal(variableName, value);
                 } else {
-                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        outParameter.getTargetExpression());
+                    executionEntity.setVariable(variableName, value);
                 }
+            };
 
-            }
-
-            if (callActivity.isUseLocalScopeForOutParameters()) {
-                executionEntity.setVariableLocal(variableName, value);
-            } else {
-                executionEntity.setVariable(variableName, value);
-            }
+            IOParameterUtil.processOutParameters(outParameters, subProcessInstance, variableConsumer, variableConsumer, expressionManager);
         }
     }
 

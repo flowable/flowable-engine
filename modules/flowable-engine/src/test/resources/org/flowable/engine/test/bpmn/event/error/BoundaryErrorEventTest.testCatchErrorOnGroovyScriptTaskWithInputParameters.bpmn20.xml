@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             targetNamespace="Examples">
+
+    <error id="errorOne" name="Error One" errorCode="errorOne"/>
+
+    <process id="catchErrorOnScriptTask">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScript"/>
+
+        <scriptTask id="theScript" scriptFormat="groovy">
+            <script><![CDATA[
+			import org.flowable.engine.delegate.BpmnError;
+
+            BpmnError error = new BpmnError("errorOne", "Error One");
+            error.addAdditionalData("customErrorProperty", "Custom value");
+
+            throw error;
+			]]></script>
+        </scriptTask>
+
+        <sequenceFlow id="flow4" sourceRef="theScript" targetRef="theEnd"/>
+
+        <boundaryEvent id="catchError" attachedToRef="theScript" cancelActivity="true">
+            <extensionElements>
+                <flowable:in target="handledErrorCodeVar" source="errorCode"/>
+                <flowable:in target="handledErrorCodeVarWithExpression" sourceExpression="${errorCode.concat('-testing')}"/>
+                <flowable:in target="handledErrorMessage" source="errorMessage"/>
+                <flowable:in target="handledCustomParameter" source="customErrorProperty"/>
+            </extensionElements>
+            <errorEventDefinition id="one" errorRef="errorOne"/>
+        </boundaryEvent>
+
+        <sequenceFlow id="errorFlow" sourceRef="catchError" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

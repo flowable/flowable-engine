@@ -39,6 +39,18 @@ public class BpmnErrorBean implements Serializable {
                 });
     }
 
+    public void throwComplexBpmnError(String errorCode, String errorMessage, String... additionalData) {
+        BpmnError error = new BpmnError(errorCode, errorMessage);
+        if (additionalData.length > 1) {
+            for (int i = 1; i < additionalData.length; i+=2) {
+                String key = additionalData[i - 1];
+                String value = additionalData[i];
+                error.addAdditionalData(key, value);
+            }
+        }
+        throw error;
+    }
+
     public JavaDelegate getDelegate() {
         return new ThrowBpmnErrorDelegate();
     }

@@ -14,20 +14,24 @@ package org.flowable.engine.test.bpmn.event.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
@@ -259,6 +263,40 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatchWithParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrowWithOutputParameters.bpmn20.xml" })
+    public void testCatchErrorEndEventWithOutputParametersOnCallActivity() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("catchError")
+                .transientVariable("testVar", "For test")
+                .transientVariable("errorMessageToUseVar", "Test error message")
+                .start();
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .contains(
+                        entry("outVar", "For test"),
+                        entry("outExpressionVar", "For test-testing"),
+                        entry("errorMessageVar", "Test error message")
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventCatchWithParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.callActivityWithErrorEndEventThrowWithOutputParametersAndErrorMessageFromExpression.bpmn20.xml" })
+    public void testCatchErrorEndEventWithOutputParametersAndErrorMessageFromExpressionOnCallActivity() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("catchError")
+                .start();
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .contains(
+                        entry("outVar", null),
+                        entry("outExpressionVar", null),
+                        entry("errorMessageVar", "Custom error message")
+                );
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml" })
     public void testUncaughtError() {
         runtimeService.startProcessInstanceByKey("simpleSubProcess");
@@ -431,6 +469,22 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment
+    public void testCatchErrorOnGroovyScriptTaskWithInputParameters() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("catchErrorOnScriptTask")
+                .start();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(
+                        entry("handledErrorCodeVar", "errorOne"),
+                        entry("handledErrorCodeVarWithExpression", "errorOne-testing"),
+                        entry("handledErrorMessage", "Error One"),
+                        entry("handledCustomParameter", "Custom value")
+                );
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnJavaScriptScriptTask.bpmn20.xml" })
     public void testCatchErrorOnJavaScriptScriptTask() {
         String procId = runtimeService.startProcessInstanceByKey("catchErrorOnScriptTask").getId();
@@ -589,6 +643,58 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getName()).isEqualTo("Triggered Escalated Task");
+    }
+
+    @Test
+    @Deployment
+    public void testCatchErrorWithInputParametersThrownByExpressionOnServiceTask() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorProcess")
+                .transientVariable("errorCodeVar", "test123")
+                .transientVariable("errorMessageVar", "Test message")
+                .transientVariable("customErrorValueVar", "Custom property value")
+                .transientVariable("bpmnErrorBean", new BpmnErrorBean())
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Escalated Task");
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("handledErrorCodeVar", "test123"),
+                        entry("handledErrorCodeVarWithExpression", "test123-testing"),
+                        entry("handledErrorMessage", "Test message"),
+                        entry("handledCustomParameter", "Custom property value"),
+                        entry("fromTransientHandledVar", "Custom property value")
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testCatchErrorWithInputParametersThrownByExpressionOnServiceTaskWithCustomVariableContainer() {
+        Supplier<Object> errorBean = () -> {
+            BpmnError error = new BpmnError("test123", "Test message");
+            error.setAdditionalDataContainer(new VariableContainerWrapper(Collections.singletonMap("customErrorProperty", "Custom property value")));
+            throw error;
+        };
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("errorProcess")
+                .transientVariable("bpmnErrorBean", errorBean)
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Escalated Task");
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("handledErrorCodeVar", "test123"),
+                        entry("handledErrorCodeVarWithExpression", "test123-testing"),
+                        entry("handledErrorMessage", "Test message"),
+                        entry("handledCustomParameter", "Custom property value"),
+                        entry("fromTransientHandledVar", "Custom property value")
+                );
     }
 
     protected String getWaitingExecutionId(String processInstanceId) {

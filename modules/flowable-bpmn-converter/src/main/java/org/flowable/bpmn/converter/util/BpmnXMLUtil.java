@@ -411,7 +411,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     
     public static boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
 
-        if (parameterList.isEmpty()) {
+        if (parameterList == null || parameterList.isEmpty()) {
             return didWriteExtensionStartElement;
         }
 
