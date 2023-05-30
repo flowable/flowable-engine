@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
@@ -44,6 +45,9 @@ public class GenericEventListenerActivityBehaviour extends CoreCmmnTriggerableAc
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
             agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
             agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+            
+            CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
+                    commandContext, planItemInstanceEntity, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.AVAILABLE);
             
         } else {
             CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
