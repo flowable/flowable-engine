@@ -76,7 +76,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/cmmn-management/timer-jobs/{jobId}", produces = "application/json")
     public JobResponse getTimerJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getTimerJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createTimerJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single suspended job", tags = { "Jobs" })
@@ -87,7 +87,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/cmmn-management/suspended-jobs/{jobId}", produces = "application/json")
     public JobResponse getSuspendedJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getSuspendedJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createSuspendedJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single deadletter job", tags = { "Jobs" })
@@ -98,7 +98,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/cmmn-management/deadletter-jobs/{jobId}", produces = "application/json")
     public JobResponse getDeadletterJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getDeadLetterJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createDeadLetterJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single history job job", tags = { "Jobs" })
@@ -129,7 +129,7 @@ public class JobResource extends JobBaseResource {
         Job job = getJobById(jobId);
         try {
             managementService.deleteJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -146,7 +146,7 @@ public class JobResource extends JobBaseResource {
         Job job = getTimerJobById(jobId);
         try {
             managementService.deleteTimerJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -167,7 +167,7 @@ public class JobResource extends JobBaseResource {
 
         try {
             managementService.deleteHistoryJob(jobId);
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -184,7 +184,7 @@ public class JobResource extends JobBaseResource {
         Job job = getSuspendedJobById(jobId);
         try {
             managementService.deleteSuspendedJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -201,7 +201,7 @@ public class JobResource extends JobBaseResource {
         Job job = getDeadLetterJobById(jobId);
         try {
             managementService.deleteDeadLetterJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -224,7 +224,7 @@ public class JobResource extends JobBaseResource {
 
         try {
             managementService.executeJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -248,7 +248,7 @@ public class JobResource extends JobBaseResource {
 
         try {
             managementService.moveTimerToExecutableJob(job.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a timer job with id '" + jobId + "'.", Job.class);
         }
@@ -272,7 +272,7 @@ public class JobResource extends JobBaseResource {
 
         try {
             managementService.executeHistoryJob(historyJob.getId());
-        } catch (FlowableObjectNotFoundException aonfe) {
+        } catch (FlowableObjectNotFoundException e) {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
@@ -313,7 +313,7 @@ public class JobResource extends JobBaseResource {
 
                 }
 
-            } catch (FlowableObjectNotFoundException aonfe) {
+            } catch (FlowableObjectNotFoundException e) {
                 // Re-throw to have consistent error-messaging across REST-API
                 throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
             }
@@ -326,7 +326,7 @@ public class JobResource extends JobBaseResource {
             }
             try {
                 managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), cmmnEngineConfiguration.getAsyncHistoryExecutorNumberOfRetries());
-            } catch (FlowableObjectNotFoundException aonfe) {
+            } catch (FlowableObjectNotFoundException e) {
                 // Re-throw to have consistent error-messaging across REST-api
                 throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
             }

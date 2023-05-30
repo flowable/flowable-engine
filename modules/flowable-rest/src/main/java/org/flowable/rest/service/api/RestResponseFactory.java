@@ -66,6 +66,8 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
 import org.flowable.rest.service.api.engine.EventResponse;
@@ -1158,6 +1160,11 @@ public class RestResponseFactory {
         response.setElementName(job.getElementName());
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
+        if (job instanceof JobInfoEntity) {
+            JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
+            response.setLockOwner(jobInfoEntity.getLockOwner());
+            response.setLockExpirationTime(jobInfoEntity.getLockExpirationTime());
+        }
         response.setTenantId(job.getTenantId());
 
         response.setUrl(urlBuilder.buildUrl(urlJobSegments, job.getId()));
@@ -1200,6 +1207,11 @@ public class RestResponseFactory {
         response.setJobHandlerType(job.getJobHandlerType());
         response.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
         response.setCustomValues(job.getCustomValues());
+        if (job instanceof HistoryJobEntity) {
+            HistoryJobEntity historyJobEntity = (HistoryJobEntity) job;
+            response.setLockOwner(historyJobEntity.getLockOwner());
+            response.setLockExpirationTime(historyJobEntity.getLockExpirationTime());
+        }
         response.setTenantId(job.getTenantId());
 
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORY_JOB, job.getId()));
