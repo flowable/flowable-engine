@@ -41,7 +41,11 @@ public class JobResponse {
     protected String exceptionMessage;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date dueDate;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date createTime;
+    protected String lockOwner;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date lockExpirationTime;
     protected String tenantId;
 
     @ApiModelProperty(example = "8")
@@ -161,7 +165,7 @@ public class JobResponse {
         this.exceptionMessage = exceptionMessage;
     }
 
-    @ApiModelProperty(example = "2013-06-04T22:05:05.474+0000")
+    @ApiModelProperty(example = "2023-06-04T22:05:05.474+0000")
     public Date getDueDate() {
         return dueDate;
     }
@@ -170,13 +174,31 @@ public class JobResponse {
         this.dueDate = dueDate;
     }
 
-    @ApiModelProperty(example = "2013-06-03T22:05:05.474+0000")
+    @ApiModelProperty(example = "2023-06-03T22:05:05.474+0000")
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @ApiModelProperty(example = "node1")
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
+    @ApiModelProperty(example = "2023-06-03T22:05:05.474+0000")
+    public Date getLockExpirationTime() {
+        return lockExpirationTime;
+    }
+
+    public void setLockExpirationTime(Date lockExpirationTime) {
+        this.lockExpirationTime = lockExpirationTime;
     }
 
     public void setTenantId(String tenantId) {

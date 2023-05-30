@@ -38,6 +38,9 @@ public class HistoryJobResponse {
     protected String customValues;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date createTime;
+    protected String lockOwner;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date lockExpirationTime;
 
     @ApiModelProperty(example = "8")
     public String getId() {
@@ -75,7 +78,7 @@ public class HistoryJobResponse {
         this.exceptionMessage = exceptionMessage;
     }
 
-    @ApiModelProperty(example = "2013-06-03T22:05:05.474+0000")
+    @ApiModelProperty(example = "2023-06-03T22:05:05.474+0000")
     public Date getCreateTime() {
         return createTime;
     }
@@ -136,5 +139,23 @@ public class HistoryJobResponse {
 
     public void setCustomValues(String customValues) {
         this.customValues = customValues;
+    }
+    
+    @ApiModelProperty(example = "node1")
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
+    }
+
+    @ApiModelProperty(example = "2023-06-03T22:05:05.474+0000")
+    public Date getLockExpirationTime() {
+        return lockExpirationTime;
+    }
+
+    public void setLockExpirationTime(Date lockExpirationTime) {
+        this.lockExpirationTime = lockExpirationTime;
     }
 }

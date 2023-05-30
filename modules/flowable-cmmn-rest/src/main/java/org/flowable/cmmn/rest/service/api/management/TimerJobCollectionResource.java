@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -40,6 +38,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Joram Barrez
@@ -164,6 +163,6 @@ public class TimerJobCollectionResource {
             restApiInterceptor.accessTimerJobInfoWithQuery(query);
         }
 
-        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
+        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createTimerJobResponseList);
     }
 }
