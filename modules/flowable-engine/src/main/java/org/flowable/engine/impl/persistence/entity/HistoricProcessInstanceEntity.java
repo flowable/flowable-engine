@@ -53,6 +53,8 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
 
     void setProcessDefinitionVersion(Integer processDefinitionVersion);
 
+    void setProcessDefinitionCategory(String processDefinitionCategory);
+
     void setDeploymentId(String deploymentId);
     
     void setCallbackId(String callbackId);
