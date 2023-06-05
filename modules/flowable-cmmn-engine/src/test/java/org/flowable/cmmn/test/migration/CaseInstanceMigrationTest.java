@@ -2019,6 +2019,137 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(task.getName()).isEqualTo("Human Task: bar");
         assertThat(task.getDescription()).isEqualTo("Description: bar");
     }
+    
+    @Test
+    void migrateCaseInstancesWithSimpleOneTaskCaseWithMappingToSecondNewTask() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addMoveToAvailablePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("humanTask2"))
+                .migrateCaseInstances("testCase", 1, "");
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeEnded()
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2");
+        assertThat(planItemInstances)
+                .filteredOn("name", "Task 2")
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        assertThat(planItemInstances)
+                .filteredOn("name", "Task 1")
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+    
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(2);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(2);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void migrateCaseInstancesWithSimpleOneTaskMultipleCaseWithMappingsToSecondNewTask() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addTerminatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("humanTask1"))
+                .addMoveToAvailablePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("humanTask2"))
+                .migrateCaseInstances("testCase", 1, "");
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeEnded()
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2");
+        assertThat(planItemInstances)
+                .filteredOn("name", "Task 2")
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        assertThat(planItemInstances)
+                .filteredOn("name", "Task 1")
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.TERMINATED);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+    
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(2);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(2);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
 
     // with sentries
     // with stages
