@@ -152,6 +152,9 @@ public class PlanItemInstanceEntityManagerImpl
             stagePlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
         } else {
             CaseInstanceEntity caseInstanceEntity = engineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceEntity.getCaseInstanceId());
+            if (caseInstanceEntity.getChildPlanItemInstances() == null) {
+                caseInstanceEntity.setChildPlanItemInstances(new ArrayList<>());
+            }
             caseInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
         }
     }
