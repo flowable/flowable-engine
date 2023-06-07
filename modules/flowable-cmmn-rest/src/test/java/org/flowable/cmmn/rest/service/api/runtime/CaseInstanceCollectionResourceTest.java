@@ -40,6 +40,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
@@ -614,7 +615,8 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
             when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                     .thenReturn(formInfo);
             when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "simple string value", "number", 1234), null))
+            when(formEngineFormService.getVariablesFromFormSubmission(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, formInfo, 
+                    Map.of("user", "simple string value", "number", 1234), null))
                     .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));

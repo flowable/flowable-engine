@@ -33,6 +33,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -618,7 +619,8 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", processDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
         when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-        when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "simple string value", "number", 1234), null))
+        when(formEngineFormService.getVariablesFromFormSubmission("theStart", "startEvent", null,
+                processDefinition.getId(), ScopeTypes.BPMN, formInfo, Map.of("user", "simple string value", "number", 1234), null))
                 .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));

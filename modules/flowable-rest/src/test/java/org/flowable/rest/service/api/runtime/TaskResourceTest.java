@@ -30,6 +30,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -615,7 +616,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
         when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "First value", "number", 789), null))
+        when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(),
+                processInstance.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, Map.of("user", "First value", "number", 789), null))
                 .thenReturn(Map.of("user", "First value return", "number", 789L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));

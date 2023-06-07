@@ -98,10 +98,12 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
         when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(formInfo, null, "__COMPLETE"))
+        when(formService.getVariablesFromFormSubmission(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
+                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null, "__COMPLETE"))
                 .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
         doNothing().when(formService)
-                .validateFormFields(formInfo, null);
+                .validateFormFields(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
+                        caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
 
         cmmnTaskService
                 .completeTaskWithForm(caseTask.getId(), "formDefId",
@@ -137,10 +139,12 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
         when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(formInfo, null, "__COMPLETE"))
+        when(formService.getVariablesFromFormSubmission(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
+                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null, "__COMPLETE"))
                 .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
         doNothing().when(formService)
-                .validateFormFields(formInfo, null);
+                .validateFormFields(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
+                        caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
 
         cmmnTaskService.completeTaskWithForm(caseTask.getId(), "formDefId", "__COMPLETE", null);
 

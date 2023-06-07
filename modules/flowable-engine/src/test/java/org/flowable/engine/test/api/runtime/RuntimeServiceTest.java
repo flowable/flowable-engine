@@ -34,6 +34,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -1437,10 +1438,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
             engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(
+                    "oneTaskProcess").latestVersion().singleResult();
+            
             FormInfo formInfo = new FormInfo();
             when(formEngineConfiguration.getFormService()).thenReturn(formService);
             Map<String, Object> formVariables = Collections.singletonMap("intVar", 42);
-            when(formService.getVariablesFromFormSubmission(formInfo, formVariables, "simple"))
+            when(formService.getVariablesFromFormSubmission("theStart", "startEvent", null, processDefinition.getId(), ScopeTypes.BPMN, 
+                    formInfo, formVariables, "simple"))
                     .thenReturn(Collections.singletonMap("otherIntVar", 150));
 
             String procId = runtimeService.createProcessInstanceBuilder()

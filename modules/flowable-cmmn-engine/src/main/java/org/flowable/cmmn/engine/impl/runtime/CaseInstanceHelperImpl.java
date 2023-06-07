@@ -391,11 +391,12 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
                         // validate input before anything else
                         if (isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel)) {
-                            formService.validateFormFields(formInfo, startFormVariables);
+                            formService.validateFormFields(null, "planModel", null, caseDefinition.getId(), 
+                                    ScopeTypes.CMMN, formInfo, startFormVariables);
                         }
                         // Extract the caseVariables from the form submission variables and pass them to the case
-                        Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(formInfo,
-                            startFormVariables, caseInstanceBuilder.getOutcome());
+                        Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(null, "planModel", null, 
+                                caseDefinition.getId(), ScopeTypes.CMMN, formInfo, startFormVariables, caseInstanceBuilder.getOutcome());
 
                         if (caseVariables != null) {
 	                        for (String variableName : caseVariables.keySet()) {

@@ -35,6 +35,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormEngineConfigurationApi;
@@ -556,7 +557,9 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
             when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, Map.of("user", "First value", "number", 789), null))
+            when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", 
+                    caseInstance.getId(), caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, 
+                    formInfo, Map.of("user", "First value", "number", 789), null))
                     .thenReturn(Map.of("user", "First value return", "number", 789L));
 
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));

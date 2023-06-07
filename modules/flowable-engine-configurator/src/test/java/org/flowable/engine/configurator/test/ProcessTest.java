@@ -32,6 +32,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.HistoryService;
@@ -156,7 +157,8 @@ public class ProcessTest extends FlowableAppTestCase {
             when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
             FormInfo formInfo = new FormInfo();
             when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, variables, null))
+            when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(),
+                    processInstance.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, variables, null))
                     .thenReturn(Collections.emptyMap());
 
             taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
@@ -207,7 +209,8 @@ public class ProcessTest extends FlowableAppTestCase {
             when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
             FormInfo formInfo = new FormInfo();
             when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-            when(formEngineFormService.getVariablesFromFormSubmission(formInfo, variables, null))
+            when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(),
+                    processInstance.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, variables, null))
                     .thenReturn(Collections.emptyMap());
 
             taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);

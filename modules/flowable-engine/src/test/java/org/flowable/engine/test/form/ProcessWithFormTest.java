@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -84,10 +85,12 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void startProcessInstanceWithFormVariables() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").latestVersion().singleResult();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         FormInfo formInfo = new FormInfo();
         Map<String, Object> formVariables = Collections.singletonMap("intVar", 42);
-        when(formService.getVariablesFromFormSubmission(formInfo, formVariables, "simple"))
+        when(formService.getVariablesFromFormSubmission("theStart", "startEvent", null, processDefinition.getId(), 
+                ScopeTypes.BPMN, formInfo, formVariables, "simple"))
                 .thenReturn(Collections.singletonMap("otherIntVar", 150));
 
         String procId = runtimeService.createProcessInstanceBuilder()
@@ -159,7 +162,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
         doThrow(new RuntimeException("validation failed"))
                 .when(formService)
-                .validateFormFields(formInfo, startFormVariables);
+                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
+                        ScopeTypes.BPMN, formInfo, startFormVariables);
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test"))
                 .isExactlyInstanceOf(RuntimeException.class)
@@ -182,7 +186,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         doThrow(new RuntimeException("validation failed"))
                 .when(formService)
-                .validateFormFields(formInfo, Collections.emptyMap());
+                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
+                        ScopeTypes.BPMN, formInfo, Collections.emptyMap());
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.emptyMap(), "test"))
                 .isExactlyInstanceOf(RuntimeException.class)
@@ -205,9 +210,11 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
         doNothing().when(formService)
-                .validateFormFields(formInfo, startFormVariables);
+                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
+                        ScopeTypes.BPMN, formInfo, startFormVariables);
 
-        when(formService.getVariablesFromFormSubmission(formInfo, startFormVariables, "COMPLETE"))
+        when(formService.getVariablesFromFormSubmission("start", "startEvent", null, processDefinition.getId(), 
+                ScopeTypes.BPMN, formInfo, startFormVariables, "COMPLETE"))
                 .thenReturn(Collections.singletonMap("nameVar", "Test name"));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test");
@@ -230,7 +237,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("test", processDefinition.getDeploymentId())).thenReturn(formInfo);
 
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
-        when(formService.getVariablesFromFormSubmission(formInfo, startFormVariables, "COMPLETE"))
+        when(formService.getVariablesFromFormSubmission("start", "startEvent", null, processDefinition.getId(), 
+                ScopeTypes.BPMN, formInfo, startFormVariables, "COMPLETE"))
                 .thenReturn(Collections.singletonMap("nameVar", "Test name"));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test");
@@ -255,7 +263,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
         doThrow(new RuntimeException("validation failed"))
                 .when(formService)
-                .validateFormFields(formInfo, Collections.emptyMap());
+                .validateFormFields(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
+                        ScopeTypes.BPMN, formInfo, Collections.emptyMap());
 
         assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", Collections.emptyMap()))
                 .isExactlyInstanceOf(RuntimeException.class)
@@ -283,7 +292,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
+                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
                 .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
@@ -321,7 +331,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
+                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
                 .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
@@ -359,10 +370,12 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(formInfo, completeVariables, "__COMPLETE"))
+        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
+                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
                 .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
         doNothing().when(formService)
-                .validateFormFields(formInfo, completeVariables);
+                .validateFormFields(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
+                        ScopeTypes.BPMN, formInfo, completeVariables);
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
