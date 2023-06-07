@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -95,10 +96,12 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             // validate input at first
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(task)) {
-                formService.validateFormFields(formInfo, variables);
+                formService.validateFormFields(task.getTaskDefinitionKey(), "humanTask", task.getScopeId(), 
+                        task.getScopeDefinitionId(), ScopeTypes.CMMN, formInfo, variables);
             }
             // Extract raw variables and complete the task
-            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", task.getScopeId(), 
+                    task.getScopeDefinitionId(), ScopeTypes.CMMN, formInfo, variables, outcome);
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances

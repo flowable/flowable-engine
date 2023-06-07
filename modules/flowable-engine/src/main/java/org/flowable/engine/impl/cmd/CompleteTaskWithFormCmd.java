@@ -102,11 +102,13 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formService.validateFormFields(formInfo, formVariables);
+                formService.validateFormFields(task.getTaskDefinitionKey(), "userTask", task.getProcessInstanceId(), 
+                        task.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, formVariables);
             }
 
             // Extract raw variables and complete the task
-            taskVariables = formService.getVariablesFromFormSubmission(formInfo, formVariables, outcome);
+            taskVariables = formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", task.getProcessInstanceId(), 
+                    task.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, formVariables, outcome);
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances

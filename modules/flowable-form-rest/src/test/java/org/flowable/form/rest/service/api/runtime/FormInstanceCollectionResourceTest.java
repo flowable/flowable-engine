@@ -42,7 +42,8 @@ public class FormInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         valuesMap.put("user", "test");
         valuesMap.put("number", "1234");
 
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "default");
         assertThat(formValues)
                 .contains(
                         entry("user", "test"),

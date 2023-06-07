@@ -531,7 +531,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             variablesNode.add(var2);
             var2.put("name", "number");
             var2.put("value", 789);
-
+            
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK, taskId));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));

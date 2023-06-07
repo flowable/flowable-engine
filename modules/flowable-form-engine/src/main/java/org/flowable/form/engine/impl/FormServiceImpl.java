@@ -43,7 +43,8 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public void validateFormFields(FormInfo formInfo, Map<String, Object> values) {
+    public void validateFormFields(String elementId, String elementType, String scopeId, String scopeDefinitionId, 
+            String scopeType, FormInfo formInfo, Map<String, Object> values) {
         // empty validate form fields implementation
     }
 
@@ -52,7 +53,9 @@ public class FormServiceImpl extends CommonEngineServiceImpl<FormEngineConfigura
     }
 
     @Override
-    public Map<String, Object> getVariablesFromFormSubmission(FormInfo formInfo, Map<String, Object> values, String outcome) {
+    public Map<String, Object> getVariablesFromFormSubmission(String elementId, String elementType, String scopeId, 
+            String scopeDefinitionId, String scopeType, FormInfo formInfo, Map<String, Object> values, String outcome) {
+        
         return commandExecutor.execute(new GetVariablesFromFormSubmissionCmd(formInfo, values, outcome));
     }
 

@@ -139,16 +139,19 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     protected ProcessInstance handleProcessInstanceWithForm(CommandContext commandContext, ProcessDefinition processDefinition, 
                     ProcessEngineConfigurationImpl processEngineConfiguration) {
-        FormInfo formInfo = null;
-        Map<String, Object> processVariables = null;
-
-        if (hasStartFormData()) {
-
-            FormService formService = CommandContextUtil.getFormService(commandContext);
+        
+        FormService formService = CommandContextUtil.getFormService(commandContext);
+        
+        FlowElement startElement = null;
+        if (hasStartFormData() || extraFormInfo != null) {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
             Process process = bpmnModel.getProcessById(processDefinition.getKey());
-            FlowElement startElement = process.getInitialFlowElement();
+            startElement = process.getInitialFlowElement();
+        }
 
+        FormInfo formInfo = null;
+        Map<String, Object> processVariables = null;
+        if (hasStartFormData()) {
             if (startElement instanceof StartEvent) {
                 StartEvent startEvent = (StartEvent) startElement;
                 String startFormKey = startEvent.getFormKey();
@@ -159,11 +162,13 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
                     if (formInfo != null) {
                         if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
-                            formService.validateFormFields(formInfo, startFormVariables);
+                            formService.validateFormFields(startEvent.getId(), "startEvent", null, processDefinition.getId(), 
+                                    ScopeTypes.BPMN, formInfo, startFormVariables);
                         }
                         // The processVariables are the variables that should be used when starting the process
                         // the actual variables should instead be used when saving the form instances
-                        processVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
+                        processVariables = formService.getVariablesFromFormSubmission(startElement.getId(), "startEvent", 
+                                null, processDefinition.getId(), ScopeTypes.BPMN, formInfo, startFormVariables, outcome);
                         if (processVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();
@@ -178,8 +183,13 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         Map<String, Object> extraFormVariables = null;
         if (extraFormInfo != null) {
-            FormService formService = CommandContextUtil.getFormService(commandContext);
-            extraFormVariables = formService.getVariablesFromFormSubmission(this.extraFormInfo, this.extraFormVariables, this.extraFormOutcome);
+            String startEventId = null;
+            if (startElement instanceof StartEvent) {
+                startEventId = startElement.getId();
+            }
+            
+            extraFormVariables = formService.getVariablesFromFormSubmission(startEventId, "startEvent", null, processDefinition.getId(), 
+                    ScopeTypes.BPMN, this.extraFormInfo, this.extraFormVariables, this.extraFormOutcome);
 
             if (extraFormVariables != null) {
                 if (variables == null) {
@@ -194,7 +204,6 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         if (processVariables != null) {
             // processVariables can be non null only if the formInfo was not null
-            FormService formService = CommandContextUtil.getFormService(commandContext);
             formService.createFormInstance(startFormVariables, formInfo, null, processInstance.getId(),
                             processInstance.getProcessDefinitionId(), processInstance.getTenantId(), outcome);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();

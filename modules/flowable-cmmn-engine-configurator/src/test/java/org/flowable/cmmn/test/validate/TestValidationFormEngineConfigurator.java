@@ -41,7 +41,9 @@ public class TestValidationFormEngineConfigurator extends FormEngineConfigurator
         }
 
         @Override
-        public void validateFormFields(FormInfo formInfo, Map<String, Object> values) {
+        public void validateFormFields(String elementId, String elementType, String scopeId, String scopeDefinitionId, 
+                String scopeType, FormInfo formInfo, Map<String, Object> values) {
+            
             if (activate.get() && (values == null || !values.containsKey("doNotThrowException"))) {
                 throw new FlowableFormValidationException("Validation failed by default");
             }
