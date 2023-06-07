@@ -44,7 +44,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "default");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -83,7 +84,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "default");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -124,7 +126,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "default");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -169,7 +172,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
     
             Map<String, Object> valuesMap = new HashMap<>();
             valuesMap.put("input1", "test");
-            Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+            Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                    formInfo, valuesMap, "default");
             assertThat(formValues)
                 .containsOnly(
                     entry("input1", "test"),
@@ -219,7 +223,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap.put("date1", "2016-01-01");
         valuesMap.put("date2", "2017-01-01");
         valuesMap.put("date3", format.parse("2018-01-01"));
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "date");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "date");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -258,7 +263,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         Map<String, Object> valuesMap = new HashMap<>();
         valuesMap.put("input1", "test");
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "default");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "test"),
@@ -285,7 +291,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
 
         valuesMap = new HashMap<>();
         valuesMap.put("input1", "updatedValue");
-        formValues = formService.getVariablesFromFormSubmission(formInfo, valuesMap, "updatedOutcome");
+        formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, valuesMap, "updatedOutcome");
         assertThat(formValues)
             .containsOnly(
                 entry("input1", "updatedValue"),
@@ -327,7 +334,8 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> variables = new HashMap<>();
         variables.put("plainLink", "http://notmylink.com");
         variables.put("page", "downloads.html");
-        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formInfo, variables, "default");
+        Map<String, Object> formValues = formService.getVariablesFromFormSubmission(null, null, null, null, null,
+                formInfo, variables, "default");
         // Should be not contain expressionLink as this is not an input element
         assertThat(formValues)
             .containsOnly(

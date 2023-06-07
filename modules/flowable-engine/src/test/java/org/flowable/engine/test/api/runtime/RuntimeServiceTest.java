@@ -1415,5 +1415,4 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
                 .hasMessage("No process definition found for key 'oneTaskProcess'. Fallback to default tenant was also applied.");
     }
-
 }

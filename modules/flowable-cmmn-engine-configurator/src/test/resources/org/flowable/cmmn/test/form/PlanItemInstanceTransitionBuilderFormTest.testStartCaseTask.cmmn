@@ -2,12 +2,12 @@
 <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
   <case id="testStartChildCase" name="testStartChildCase">
     <casePlanModel id="casePlanModel" flowable:formFieldValidation="true" flowable:includeInStageOverview="false">
-      <planItem id="planItem1" name="Case" definitionRef="sid-3C388C24-7B19-4E2A-BFCA-A9A33F062DAA">
+      <planItem id="planItem1" name="Case" definitionRef="caseTask1">
         <itemControl>
           <manualActivationRule></manualActivationRule>
         </itemControl>
       </planItem>
-      <caseTask id="sid-3C388C24-7B19-4E2A-BFCA-A9A33F062DAA" name="Case" caseRef="childCase"></caseTask>
+      <caseTask id="caseTask1" name="Case" caseRef="childCase"></caseTask>
     </casePlanModel>
   </case>
   <cmmndi:CMMNDI>

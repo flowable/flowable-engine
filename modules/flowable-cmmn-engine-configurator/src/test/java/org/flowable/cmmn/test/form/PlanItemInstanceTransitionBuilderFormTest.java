@@ -27,6 +27,7 @@ import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngines;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,8 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
     @CmmnDeployment
     public void testTriggerWithFormVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
-        assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNotNull();
+        Task task = cmmnTaskService.createTaskQuery().taskName("A").singleResult();
+        assertThat(task).isNotNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
         formDeploymentId = formRepositoryService.createDeployment()
@@ -92,6 +94,8 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
     @CmmnDeployment
     public void testEnableWithFormVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        Task task = cmmnTaskService.createTaskQuery().taskName("A").singleResult();
+        assertThat(task).isNotNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
         formDeploymentId = formRepositoryService.createDeployment()
@@ -124,6 +128,8 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
     @CmmnDeployment
     public void testDisableWithFormVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+        Task task = cmmnTaskService.createTaskQuery().taskName("A").singleResult();
+        assertThat(task).isNotNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
         formDeploymentId = formRepositoryService.createDeployment()
@@ -159,7 +165,8 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
     @CmmnDeployment
     public void testTerminateWithFormVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
-
+        Task task = cmmnTaskService.createTaskQuery().taskName("A").singleResult();
+        assertThat(task).isNotNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
         formDeploymentId = formRepositoryService.createDeployment()
@@ -196,7 +203,8 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
     })
     public void testStartCaseTaskWithFormVariables() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult()).isNull();
+        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
+        assertThat(childCaseInstance).isNull();
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).isEmpty();
 
         formDeploymentId = formRepositoryService.createDeployment()
@@ -215,7 +223,7 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                 .formVariables(Collections.singletonMap("intVar", "135"), formInfo, "child")
                 .start();
 
-        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
+        childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
         assertThat(childCaseInstance).isNotNull();
 
         assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId()))
