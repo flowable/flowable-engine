@@ -84,6 +84,10 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         if (StringUtils.isNotEmpty(humanTask.getTaskIdVariableName())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_ID_VARIABLE_NAME, humanTask.getTaskIdVariableName());
         }
+
+        if (StringUtils.isNotEmpty(humanTask.getTaskCompleterVariableName())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME, humanTask.getTaskCompleterVariableName());
+        }
     }
 
     @Override

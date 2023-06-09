@@ -132,7 +132,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                     .caseInstanceId(caseInstance.getId())
                     .variableName("var1")
                     .singleResult().getValue()).isEqualTo("JohnDoe");
-            
+
             List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
             for (HistoricEntityLink historicEntityLink : historicEntityLinks) {
                 assertThat(historicEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
@@ -417,6 +417,40 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         actualTaskId = secondTask.getId();
         String myExpressionTaskId = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myExpressionTaskId");
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskCompleterVariableName.cmmn")
+    public void testHumanTaskCompleterVariableName() {
+        Authentication.setAuthenticatedUserId("JohnDoe");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("dynamicVariable", "myDynamicVariable")
+                .start();
+
+        // Normal string
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+        cmmnTaskService.complete(firstTask.getId());
+        String completerTask1 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask1");
+        assertThat(completerTask1).isEqualTo("JohnDoe");
+
+        // No authenticated user
+        Authentication.setAuthenticatedUserId(null);
+        Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+        cmmnTaskService.complete(secondTask.getId());
+        String completerTask2 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask2");
+        assertThat(completerTask2).isNull();
+
+        // Expression
+        Authentication.setAuthenticatedUserId("DynamicDoe");
+        Task thirdTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task3").singleResult();
+        assertThat(thirdTask).isNotNull();
+        cmmnTaskService.complete(thirdTask.getId());
+        String completerTask3 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myDynamicVariable");
+        assertThat(completerTask3).isEqualTo("DynamicDoe");
     }
 
 }

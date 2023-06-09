@@ -44,6 +44,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
@@ -261,7 +262,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     protected void handleFormKey(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
             TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
-        
+
         if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
             Object formKey = expressionManager.createExpression(beforeContext.getFormKey()).getValue(planItemInstanceEntity);
             if (formKey != null) {
@@ -417,6 +418,16 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
             for (TaskEntity taskEntity : taskEntities) {
                 TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true, cmmnEngineConfiguration);
+            }
+        } else if (PlanItemTransition.COMPLETE.equals(transition)) {
+            if (humanTask.getTaskCompleterVariableName() != null) {
+
+                ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+                Expression expression = expressionManager.createExpression(humanTask.getTaskCompleterVariableName());
+                String completerVariableName = (String) expression.getValue(planItemInstance);
+                String completer = Authentication.getAuthenticatedUserId();
+
+                planItemInstance.setVariable(completerVariableName, completer);
             }
         }
     }

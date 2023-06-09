@@ -18,7 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -124,6 +127,13 @@ public class TaskHelper {
 
         logUserTaskCompleted(taskEntity);
 
+        if (taskEntity.getExecutionId() != null) {
+            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+            if (execution != null) {
+                storeTaskCompleter(taskEntity, execution, processEngineConfiguration);
+            }
+        }
+
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             if (variables != null) {
@@ -184,6 +194,25 @@ public class TaskHelper {
             taskLogEntryBuilder.data(data.toString());
             taskLogEntryBuilder.type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name());
             taskServiceConfiguration.getInternalHistoryTaskManager().recordHistoryUserTaskLog(taskLogEntryBuilder);
+        }
+    }
+
+    protected static void storeTaskCompleter(TaskEntity taskEntity, ExecutionEntity execution, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        if (taskEntity.getProcessDefinitionId() != null) {
+            FlowElement flowElement = execution.getCurrentFlowElement();
+            if (flowElement instanceof UserTask) {
+                UserTask userTask = (UserTask) flowElement;
+                String taskCompleterVariableName = userTask.getTaskCompleterVariableName();
+                if (StringUtils.isNotEmpty(taskCompleterVariableName)) {
+                    ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+                    Expression expression = expressionManager.createExpression(userTask.getTaskCompleterVariableName());
+                    String completerVariableName = (String) expression.getValue(execution);
+                    String completer = Authentication.getAuthenticatedUserId();
+                    if (StringUtils.isNotEmpty(completerVariableName)) {
+                        execution.setVariable(completerVariableName, completer);
+                    }
+                }
+            }
         }
     }
 

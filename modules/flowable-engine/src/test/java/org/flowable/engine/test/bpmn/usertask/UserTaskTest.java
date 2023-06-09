@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -301,6 +302,35 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         actualTaskId = secondTask.getId();
         String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskCompleterVariableName.bpmn20.xml")
+    public void testUserTaskCompleterVariableName() throws Exception {
+        Authentication.setAuthenticatedUserId("JohnDoe");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskCompleterVariableName");
+
+        // Normal string
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+        taskService.complete(firstTask.getId());
+        String completerTask1 = runtimeService.getVariable(processInstance.getProcessInstanceId(), "completerTask1", String.class);
+        assertThat(completerTask1).isEqualTo("JohnDoe");
+
+        // Expression
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+        taskService.complete(secondTask.getId());
+        String completerTask2 = runtimeService.getVariable(processInstance.getProcessInstanceId(), "completerTask2", String.class);
+        assertThat(completerTask2).isEqualTo("JohnDoe");
+
+        // No user
+        Authentication.setAuthenticatedUserId(null);
+        Task thirdTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task3").singleResult();
+        assertThat(thirdTask).isNotNull();
+        taskService.complete(thirdTask.getId());
+        String completerTask3 = runtimeService.getVariable(processInstance.getProcessInstanceId(), "completerTask3", String.class);
+        assertThat(completerTask3).isEqualTo(null);
     }
 
     /**
