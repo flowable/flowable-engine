@@ -50,6 +50,10 @@ public class VariableContainerELResolver extends ELResolver {
                             // reviews[0].score, reviews is an aggregated variable which is read only
                             value = variableInstance.getValue();
                         }
+                    } else {
+                        // simple variable container can be written to by default.
+                        // No further checks required.
+                        value = variableContainer.getVariable(variable);
                     }
                 } else {
                     value = variableContainer.getVariable(variable);
