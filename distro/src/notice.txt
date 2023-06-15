@@ -109,18 +109,18 @@ org.mvel                        mvel2                       2.2.6.Final     The 
 org.slf4j                       jcl-over-slf4j              2.0.7           MIT License
 org.slf4j                       slf4j-api                   2.0.7           MIT License
 org.slf4j                       slf4j-log4j12               2.0.7           MIT License
-org.springframework             spring-beans                6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-context              6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-context-support      6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-tx                   6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-web                  6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-aop                  6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-expression           6.0.9           The Apache Software License, Version 2.0
-org.springframework             spring-orm                  6.0.9           The Apache Software License, Version 2.0
+org.springframework             spring-beans                6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-context              6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-context-support      6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-tx                   6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-web                  6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-aop                  6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-core                 6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-expression           6.0.10          The Apache Software License, Version 2.0
+org.springframework             spring-orm                  6.0.10          The Apache Software License, Version 2.0
 org.springframework.security    spring-security-config      6.0.3           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-core        6.0.3           The Apache Software License, Version 2.0
 org.springframework.security    spring-security-crypto      6.0.3           The Apache Software License, Version 2.0
