@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="minimalCase" name="Minimal case" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItem1" name="Human task 1" definitionRef="onehumantask1" />
+      <planItem id="planItem2" name="Human task 2" definitionRef="onehumantask2" />
+      <humanTask id="onehumantask1" name="Human task 1" flowable:assignee="${initiator}" />
+      <humanTask id="onehumantask2" name="Human task 2" flowable:assignee="${initiator}" />
+      <exitCriterion id="oneexitcriterion2" sentryRef="sentry1">
+        <planItemOnPart id="sentryOnPartcmmnExitSentry_1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+        <planItemOnPart id="sentryOnPartcmmnExitSentry_2" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </exitCriterion>
+    </casePlanModel>
+  </case>
+</definitions>

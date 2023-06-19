@@ -28,10 +28,13 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -2145,6 +2148,1172 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
 
             List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
             assertThat(historicTasks).hasSize(2);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesOnPartEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(firstTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnEntrySentry_2");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask4"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnEntrySentry_2");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2", "Task 3", "Task 4");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(4);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(4);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesOnPartChangeIdEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-id-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(firstTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPart1cmmnEntrySentry_2");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask4"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnEntrySentry_2");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2", "Task 3", "Task 4");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(4);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(4);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesOnPartChangePlanItemEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-planitem-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task zeroTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask0").singleResult();
+        cmmnTaskService.complete(zeroTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPart1cmmnEntrySentry_2");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask1"))
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask4"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(0);
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(4);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2", "Task 3", "Task 4");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+        
+        Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").singleResult();
+        assertThat(secondTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+        cmmnTaskService.complete(secondTask.getId());
+        
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        assertThat(firstTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+        cmmnTaskService.complete(firstTask.getId());
+        
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(0);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(5);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(5);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesOnPartEventDeferredToOnEvent() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("var1", "test2")
+                .start();
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 1");
+        
+        cmmnTaskService.complete(task.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnEntrySentry_2");
+        
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-onevent.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry If Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(0);
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE);
+        
+        cmmnRuntimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("humanTask1")
+                .changeState();
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 1");
+        
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+            .extracting(PlanItemInstance::getName)
+            .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE);
+        
+        cmmnRuntimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstance.getId())
+            .activatePlanItemDefinitionId("humanTask1")
+            .changeState();
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+            .extracting(PlanItemInstance::getName)
+            .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(4);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(4);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesIfPartEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("var1", "test")
+                .start();
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test2");
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getIfPartId()).isEqualTo("ifpart1");
+        
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-eventdeferred-extratask.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry If Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getIfPartId()).isEqualTo("ifpart2");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesIfPartChangedConditionEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-condition-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("var1", "test2")
+                .start();
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test3");
+        
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-eventdeferred-extratask.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry If Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE);
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances)
+            .extracting(PlanItemInstance::getState)
+            .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withTwoSentriesIfPartEventDeferredToOnEvent() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("var1", "test")
+                .start();
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test2");
+        
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/twosentry-ifpart-onevent.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry If Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+        cmmnTaskService.complete(tasks.get(0).getId());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        cmmnRuntimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("humanTask1")
+                .changeState();
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task 1");
+        
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+            .extracting(PlanItemInstance::getName)
+            .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withExitSentryOnPartEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-onpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(firstTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnExitSentry_1");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnExitSentry_1");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withExitSentryOnPartChangedIdEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-onpart-id-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(firstTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPart1cmmnExitSentry_1");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnExitSentry_1");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withExitSentryOnPartEventDeferredOnStage() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-stage-onpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/exitsentry-stage-onpart-eventdeferred-extratask.cmmn.xml");
+
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("stageHumanTask1").singleResult();
+        cmmnTaskService.complete(firstTask.getId());
+        
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnExitSentry_1");
+        
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("stageHumanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry On Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+
+            @Override
+            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+            }
+            
+        });
+        
+        assertThat(sentryPartInstances).hasSize(1);
+        assertThat(sentryPartInstances.get(0).getOnPartId()).isEqualTo("sentryOnPartcmmnExitSentry_1");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(4);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Stage", "Stage task 2", "Stage task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("stageHumanTask2").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(5);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(4);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+        }
+    }
+    
+    @Test
+    void withSentryIfPartEventDeferred() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/sentry-ifpart-eventdeferred.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("var1", "test2")
+                .start();
+        
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/sentry-ifpart-eventdeferred-extratask.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask3"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Sentry If Part Test Case");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.AVAILABLE);
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 2");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(3);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(3);
             for (HistoricTaskInstance historicTask : historicTasks) {
                 assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
             }
