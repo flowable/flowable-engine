@@ -14,6 +14,9 @@
 package org.flowable.cmmn.engine.impl.runtime;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -35,6 +38,11 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
             throw new FlowableException("Could not resolve case instance id");
         }
         
+        CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
+        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(caseInstanceId);
+        
+        String originalCaseDefinitionId = caseInstance.getCaseDefinitionId();
+        
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
             .setCaseInstanceId(caseInstanceId)
             .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
@@ -43,7 +51,7 @@ public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateMana
             .setCaseVariables(changePlanItemStateBuilder.getCaseVariables())
             .setChildInstanceTaskVariables(changePlanItemStateBuilder.getChildInstanceTaskVariables());
         
-        doMovePlanItemState(caseInstanceChangeState, commandContext);
+        doMovePlanItemState(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
     }
 
     @Override
