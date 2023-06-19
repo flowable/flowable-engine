@@ -200,6 +200,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = prepareChangeStateBuilder(caseInstance, caseDefinitionToMigrateTo, document, commandContext);
 
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        String originalCaseDefinitionId = caseInstance.getCaseDefinitionId();
         caseInstance.setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
         caseInstance.setCaseDefinitionKey(caseDefinitionToMigrateTo.getKey());
         caseInstance.setCaseDefinitionName(caseDefinitionToMigrateTo.getName());
@@ -217,7 +218,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
-        doMovePlanItemState(caseInstanceChangeState, commandContext);
+        doMovePlanItemState(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
 
         LOGGER.debug("Updating case definition reference in plan item instances");
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).updatePlanItemInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
