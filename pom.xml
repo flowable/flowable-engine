@@ -15,11 +15,11 @@
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>3.0.7</spring.boot.version>
-		<spring.framework.version>6.0.9</spring.framework.version>
-		<spring.security.version>6.0.3</spring.security.version>
+		<spring.framework.version>6.0.10</spring.framework.version>
+		<spring.security.version>6.0.4</spring.security.version>
 		<spring.amqp.version>3.0.3</spring.amqp.version>
 		<spring.kafka.version>3.0.5</spring.kafka.version>
-		<reactor-netty.version>1.1.6</reactor-netty.version>
+		<reactor-netty.version>1.1.8</reactor-netty.version>
 		<jackson.version>2.14.3</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>3.19.0</camel.version>
@@ -389,7 +389,7 @@
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
-				<version>2.7.1</version>
+				<version>2.7.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
