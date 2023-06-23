@@ -19,6 +19,7 @@ import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Sentry;
+import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
 
 public class SentryExport implements CmmnXmlConstants {
@@ -65,10 +66,14 @@ public class SentryExport implements CmmnXmlConstants {
         }
         
         // If part
-        if (sentry.getSentryIfPart() != null) {
+        SentryIfPart sentryIfPart = sentry.getSentryIfPart();
+        if (sentryIfPart != null) {
             xtw.writeStartElement(ELEMENT_IF_PART);
+            if (StringUtils.isNotEmpty(sentryIfPart.getId())) {
+                xtw.writeAttribute(ATTRIBUTE_ID, sentryIfPart.getId());
+            }
             xtw.writeStartElement(ELEMENT_CONDITION);
-            xtw.writeCData(sentry.getSentryIfPart().getCondition());
+            xtw.writeCData(sentryIfPart.getCondition());
             xtw.writeEndElement();
             xtw.writeEndElement();
         }

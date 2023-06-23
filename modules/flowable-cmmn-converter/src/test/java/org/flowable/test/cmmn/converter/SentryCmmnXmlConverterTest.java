@@ -50,10 +50,10 @@ public class SentryCmmnXmlConverterTest {
                         tuple("sentry1", "sentry name", "sentry doc")
                 );
 
-        assertThat(planModel.getSentries().get(0).getSentryIfPart())
-                .isNotNull()
-                .extracting(SentryIfPart::getCondition)
-                .isEqualTo("${true}");
+        SentryIfPart sentryIfPart = planModel.getSentries().get(0).getSentryIfPart();
+        assertThat(sentryIfPart).isNotNull();
+        assertThat(sentryIfPart.getId()).isEqualTo("sentryIfPart_sentry1");
+        assertThat(sentryIfPart.getCondition()).isEqualTo("${true}");
 
         PlanItem planItemTask1 = cmmnModel.findPlanItem("planItem1");
         assertThat(planItemTask1).isNotNull();
