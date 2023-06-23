@@ -9,7 +9,7 @@
             </planItem>
             <sentry id="sentry1" name="sentry name">
                 <documentation><![CDATA[sentry doc]]></documentation>
-                <ifPart>
+                <ifPart id="sentryIfPart_sentry1">
                     <condition><![CDATA[${true}]]></condition>
                 </ifPart>
             </sentry>
