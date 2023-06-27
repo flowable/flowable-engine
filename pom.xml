@@ -35,7 +35,7 @@
 		<maven.deploy.plugin.version>3.1.0</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
 		<mockito.version>4.0.0</mockito.version>
-		<testcontainers.version>1.12.4</testcontainers.version>
+		<testcontainers.version>1.18.3</testcontainers.version>
 
 		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
