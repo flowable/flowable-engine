@@ -56,6 +56,8 @@ import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProcessor;
@@ -116,7 +118,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Filip Hrisafov
  */
-public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, DisposableBean, ChannelModelProcessor {
+public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, ChannelModelProcessor {
 
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 
@@ -132,8 +134,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     protected String containerFactoryBeanName = KafkaListenerAnnotationBeanPostProcessor.DEFAULT_KAFKA_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
 
     protected KafkaListenerContainerFactory<?> containerFactory;
-    protected TaskScheduler retryTopicTaskScheduler;
-    protected ThreadPoolTaskScheduler retryTopicThreadPoolTaskScheduler;
+    protected KafkaConsumerBackoffManager kafkaConsumerBackoffManager;
 
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
@@ -366,10 +367,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             DefaultDestinationTopicResolver topicResolver) {
         DeadLetterPublishingRecovererFactory recovererFactory = new DeadLetterPublishingRecovererFactory(topicResolver);
 
-        ContainerPartitionPausingBackOffManagerFactory managerFactory = new ContainerPartitionPausingBackOffManagerFactory(endpointRegistry, applicationContext);
-        configurePartitionPausingFactory(managerFactory);
-
-        KafkaConsumerBackoffManager manager = managerFactory.create();
+        KafkaConsumerBackoffManager manager = getOrCreateKafkaConsumerBackoffManager();
         ListenerContainerFactoryConfigurer factoryConfigurer = new ListenerContainerFactoryConfigurer(manager, recovererFactory, Clock.systemUTC());
         if (retryConfiguration.hasNoRetryTopic()) {
             // If we do not have a retry topic, then the retries have to be blocking
@@ -398,19 +396,24 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return factoryConfigurer;
     }
 
-    protected void configurePartitionPausingFactory(ContainerPartitionPausingBackOffManagerFactory factory) {
-        TaskScheduler scheduler = getOrCreateRetryTopicTaskScheduler();
-        Assert.notNull(scheduler, "Either a RetryTopicSchedulerWrapper or TaskScheduler bean is required");
-        factory.setBackOffHandler(new ContainerPausingBackOffHandler(
+    protected KafkaConsumerBackoffManager getOrCreateKafkaConsumerBackoffManager() {
+        if (this.kafkaConsumerBackoffManager != null) {
+            return this.kafkaConsumerBackoffManager;
+        }
+
+        ContainerPartitionPausingBackOffManagerFactory containerBackOffManagerFactory =
+                new ContainerPartitionPausingBackOffManagerFactory(endpointRegistry, applicationContext);
+        containerBackOffManagerFactory.setBackOffHandler(new ContainerPausingBackOffHandler(
                 new ListenerContainerPauseService(endpointRegistry, getOrCreateRetryTopicTaskScheduler())));
+        this.kafkaConsumerBackoffManager = containerBackOffManagerFactory.create();
+        return this.kafkaConsumerBackoffManager;
+
     }
 
     protected TaskScheduler getOrCreateRetryTopicTaskScheduler() {
-        if (retryTopicTaskScheduler != null) {
-            return retryTopicTaskScheduler;
-        }
         ObjectProvider<RetryTopicSchedulerWrapper> retryTopicSchedulerWrapperProvider = applicationContext.getBeanProvider(RetryTopicSchedulerWrapper.class);
         RetryTopicSchedulerWrapper schedulerWrapper = retryTopicSchedulerWrapperProvider.getIfAvailable();
+        TaskScheduler retryTopicTaskScheduler;
         if (schedulerWrapper != null) {
             retryTopicTaskScheduler = schedulerWrapper.getScheduler();
         } else {
@@ -418,9 +421,12 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
 
         if (retryTopicTaskScheduler == null) {
-            retryTopicThreadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-            retryTopicThreadPoolTaskScheduler.afterPropertiesSet();
-            retryTopicTaskScheduler = retryTopicThreadPoolTaskScheduler;
+            ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+            threadPoolTaskScheduler.setThreadNamePrefix("flowable-kafka-retry-scheduling-");
+            threadPoolTaskScheduler.afterPropertiesSet();
+            ((ConfigurableApplicationContext) applicationContext).addApplicationListener(
+                    (ApplicationListener<ContextClosedEvent>) event -> threadPoolTaskScheduler.destroy());
+            retryTopicTaskScheduler = threadPoolTaskScheduler;
         }
 
         return retryTopicTaskScheduler;
@@ -894,13 +900,6 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
     }
 
-    @Override
-    public void destroy() throws Exception {
-        if (retryTopicThreadPoolTaskScheduler != null) {
-            retryTopicThreadPoolTaskScheduler.destroy();
-        }
-    }
-
     public KafkaOperations<Object, Object> getKafkaOperations() {
         return kafkaOperations;
     }
@@ -941,12 +940,12 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         this.containerFactory = containerFactory;
     }
 
-    public TaskScheduler getRetryTopicTaskScheduler() {
-        return retryTopicTaskScheduler;
+    public KafkaConsumerBackoffManager getKafkaConsumerBackoffManager() {
+        return kafkaConsumerBackoffManager;
     }
 
-    public void setRetryTopicTaskScheduler(TaskScheduler retryTopicTaskScheduler) {
-        this.retryTopicTaskScheduler = retryTopicTaskScheduler;
+    public void setKafkaConsumerBackoffManager(KafkaConsumerBackoffManager kafkaConsumerBackoffManager) {
+        this.kafkaConsumerBackoffManager = kafkaConsumerBackoffManager;
     }
 
     protected static class RetryTopicContainerFactoryDecorator implements KafkaListenerContainerFactory<MessageListenerContainer> {
