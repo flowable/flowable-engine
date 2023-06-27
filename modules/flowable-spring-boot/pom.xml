@@ -46,6 +46,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--
+                The kafka clients are managed by the spring-boot-dependencies.
+                However, we want 3.2.3 since we are using spring-kafka 2.9
+             -->
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>3.2.3</version>
+            </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-spring-boot-autoconfigure</artifactId>

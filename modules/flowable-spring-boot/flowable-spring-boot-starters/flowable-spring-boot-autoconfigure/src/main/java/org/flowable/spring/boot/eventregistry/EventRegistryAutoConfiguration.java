@@ -67,6 +67,7 @@ import org.springframework.jms.core.JmsOperations;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaAdminOperations;
 import org.springframework.kafka.core.KafkaOperations;
+import org.springframework.kafka.listener.KafkaConsumerBackoffManager;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -272,11 +273,13 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         @ConditionalOnMissingBean(name = "kafkaChannelDefinitionProcessor")
         public KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor(KafkaListenerEndpointRegistry endpointRegistry,
                 KafkaOperations<Object, Object> kafkaOperations, ObjectMapper objectMapper,
+                ObjectProvider<KafkaConsumerBackoffManager> kafkaConsumerBackoffManager,
                 ObjectProvider<KafkaAdminOperations> kafkaAdminOperations) {
             
             KafkaChannelDefinitionProcessor kafkaChannelDefinitionProcessor = new KafkaChannelDefinitionProcessor(objectMapper);
             kafkaChannelDefinitionProcessor.setEndpointRegistry(endpointRegistry);
             kafkaChannelDefinitionProcessor.setKafkaOperations(kafkaOperations);
+            kafkaChannelDefinitionProcessor.setKafkaConsumerBackoffManager(kafkaConsumerBackoffManager.getIfAvailable());
             kafkaChannelDefinitionProcessor.setKafkaAdminOperations(kafkaAdminOperations.getIfAvailable());
 
             return kafkaChannelDefinitionProcessor;

@@ -1,0 +1,11 @@
+{
+    "key": "messageKey",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-fixed-value-message-key",
+    "serializerType": "json",
+    "recordKey": {
+        "fixedValue": "myKey"
+    }
+}
