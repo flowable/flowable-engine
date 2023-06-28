@@ -18,11 +18,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.activation.DataSource;
 import javax.naming.NamingException;
@@ -47,6 +50,9 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -88,17 +94,17 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             skipExpressionText = serviceTask.getSkipExpression();
             isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, flowElement.getId(), execution, commandContext);
         }
-        
+
         if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, flowElement.getId(), execution, commandContext)) {
             boolean doIgnoreException = Boolean.parseBoolean(getStringFromField(ignoreException, execution));
             String exceptionVariable = getStringFromField(exceptionVariableName, execution);
             Email email = null;
             try {
                 String headersStr = getStringFromField(headers, execution);
-                String toStr = getStringFromField(to, execution);
+                Collection<String> toList = parseRecipients(to, execution);
                 String fromStr = getStringFromField(from, execution);
-                String ccStr = getStringFromField(cc, execution);
-                String bccStr = getStringFromField(bcc, execution);
+                Collection<String> ccList = parseRecipients(cc, execution);
+                Collection<String> bccList = parseRecipients(bcc, execution);
                 String subjectStr = getStringFromField(subject, execution);
                 String textStr = textVar == null ? getStringFromField(text, execution) : getStringFromField(getExpression(execution, textVar), execution);
                 String htmlStr = htmlVar == null ? getStringFromField(html, execution) : getStringFromField(getExpression(execution, htmlVar), execution);
@@ -107,23 +113,23 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 List<DataSource> dataSources = new LinkedList<>();
                 getFilesFromFields(attachments, execution, files, dataSources);
 
-                if (StringUtils.isAllEmpty(toStr, ccStr, bccStr)) {
+                if (toList.isEmpty() && ccList.isEmpty() && bccList.isEmpty()) {
                     throw new FlowableException("No recipient could be found for sending email");
                 }
 
                 email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
                 addHeader(email, headersStr);
-                addTo(email, toStr, execution.getTenantId());
+                addTo(email, toList, execution.getTenantId());
                 setFrom(email, fromStr, execution.getTenantId());
-                addCc(email, ccStr, execution.getTenantId());
-                addBcc(email, bccStr, execution.getTenantId());
+                addCc(email, ccList, execution.getTenantId());
+                addBcc(email, bccList, execution.getTenantId());
                 setSubject(email, subjectStr);
                 setMailServerProperties(email, execution.getTenantId());
                 setCharset(email, charSetStr, execution.getTenantId());
                 attach(email, files, dataSources);
-    
+
                 email.send();
-    
+
             } catch (FlowableException e) {
                 handleException(execution, e.getMessage(), e, doIgnoreException, exceptionVariable);
             } catch (EmailException e) {
@@ -200,17 +206,17 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addTo(Email email, String to, String tenantId) {
-        if (to == null) {
+    protected void addTo(Email email, Collection<String> to, String tenantId) {
+        if (to == null || to.isEmpty()) {
             return;
         }
-        String newTo = getForceTo(tenantId);
-        if (newTo == null) {
-            newTo = to;
+        Collection<String> newTo = to;
+        String forceTo = getForceTo(tenantId);
+        if (forceTo != null) {
+            newTo = splitAndTrim(forceTo);
         }
-        String[] tos = splitAndTrim(newTo);
-        if (tos != null) {
-            for (String t : tos) {
+        if (newTo != null) {
+            for (String t : newTo) {
                 try {
                     email.addTo(t);
                 } catch (EmailException e) {
@@ -248,18 +254,18 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addCc(Email email, String cc, String tenantId) {
-        if (cc == null) {
+    protected void addCc(Email email, Collection<String> cc, String tenantId) {
+        if (cc == null || cc.isEmpty()) {
             return;
         }
+        Collection<String> newCc = cc;
 
-        String newCc = getForceTo(tenantId);
-        if (newCc == null) {
-            newCc = cc;
+        String forceTo = getForceTo(tenantId);
+        if (forceTo != null) {
+            newCc = splitAndTrim(forceTo);
         }
-        String[] ccs = splitAndTrim(newCc);
-        if (ccs != null) {
-            for (String c : ccs) {
+        if (newCc != null) {
+            for (String c : newCc) {
                 try {
                     email.addCc(c);
                 } catch (EmailException e) {
@@ -269,17 +275,17 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void addBcc(Email email, String bcc, String tenantId) {
-        if (bcc == null) {
+    protected void addBcc(Email email, Collection<String> bcc, String tenantId) {
+        if (bcc == null || bcc.isEmpty()) {
             return;
         }
-        String newBcc = getForceTo(tenantId);
-        if (newBcc == null) {
-            newBcc = bcc;
+        Collection<String> newBcc = bcc;
+        String forceTo = getForceTo(tenantId);
+        if (forceTo != null) {
+            newBcc = splitAndTrim(forceTo);
         }
-        String[] bccs = splitAndTrim(newBcc);
-        if (bccs != null) {
-            for (String b : bccs) {
+        if (newBcc != null) {
+            for (String b : newBcc) {
                 try {
                     email.addBcc(b);
                 } catch (EmailException e) {
@@ -388,13 +394,9 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected String[] splitAndTrim(String str) {
+    protected Collection<String> splitAndTrim(String str) {
         if (str != null) {
-            String[] splittedStrings = str.split(",");
-            for (int i = 0; i < splittedStrings.length; i++) {
-                splittedStrings[i] = splittedStrings[i].trim();
-            }
-            return splittedStrings;
+            return Arrays.stream(str.split(",")).map(String::trim).collect(Collectors.toList());
         }
         return null;
     }
@@ -407,6 +409,32 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             }
         }
         return null;
+    }
+
+    protected Collection<String> parseRecipients(Expression expression, DelegateExecution execution) {
+        if (expression == null) {
+            return Collections.emptyList();
+        }
+        Object value = expression.getValue(execution);
+        if (value == null) {
+            return Collections.emptyList();
+        }
+        if (value instanceof Collection) {
+            return (Collection<String>) value;
+        } else if (value instanceof ArrayNode) {
+            ArrayNode arrayNode = (ArrayNode) value;
+            Collection<String> recipients = new ArrayList<>(arrayNode.size());
+            for (JsonNode node : arrayNode) {
+                recipients.add(node.asText());
+            }
+            return recipients;
+        } else {
+            String str = value.toString();
+            if (StringUtils.isNotEmpty(str)) {
+                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
+            }
+        }
+        return Collections.emptyList();
     }
 
     protected void getFilesFromFields(Expression expression, DelegateExecution execution, List<File> files, List<DataSource> dataSources) {
