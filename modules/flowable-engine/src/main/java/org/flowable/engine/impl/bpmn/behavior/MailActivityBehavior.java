@@ -50,6 +50,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -211,11 +212,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             return;
         }
         Collection<String> newTo = to;
-        String forceTo = getForceTo(tenantId);
-        if (forceTo != null) {
-            newTo = splitAndTrim(forceTo);
+        Collection<String> forceTo = getForceTo(tenantId);
+        if (!CollectionUtils.isEmpty(forceTo)) {
+            newTo = forceTo;
         }
-        if (newTo != null) {
+        if (!newTo.isEmpty()) {
             for (String t : newTo) {
                 try {
                     email.addTo(t);
@@ -260,11 +261,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         Collection<String> newCc = cc;
 
-        String forceTo = getForceTo(tenantId);
-        if (forceTo != null) {
-            newCc = splitAndTrim(forceTo);
+        Collection<String> forceTo = getForceTo(tenantId);
+        if (!CollectionUtils.isEmpty(forceTo)) {
+            newCc = forceTo;
         }
-        if (newCc != null) {
+        if (!newCc.isEmpty()) {
             for (String c : newCc) {
                 try {
                     email.addCc(c);
@@ -280,11 +281,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             return;
         }
         Collection<String> newBcc = bcc;
-        String forceTo = getForceTo(tenantId);
-        if (forceTo != null) {
-            newBcc = splitAndTrim(forceTo);
+        Collection<String> forceTo = getForceTo(tenantId);
+        if (!CollectionUtils.isEmpty(forceTo)) {
+            newBcc = forceTo;
         }
-        if (newBcc != null) {
+        if (!newBcc.isEmpty()) {
             for (String b : newBcc) {
                 try {
                     email.addBcc(b);
@@ -527,7 +528,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected String getForceTo(String tenantId) {
+    protected Collection<String> getForceTo(String tenantId) {
         String forceTo = null;
         if (tenantId != null && tenantId.length() > 0) {
             Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
@@ -541,7 +542,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             forceTo = CommandContextUtil.getProcessEngineConfiguration().getMailServerForceTo();
         }
 
-        return forceTo;
+        return splitAndTrim(forceTo);
     }
 
     protected Charset getDefaultCharSet(String tenantId) {
