@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class GetLocalVariablesCmd implements Command<Map<String, Object>> {
     
     protected String planItemInstanceId;
-    
-    public GetLocalVariablesCmd(String planItemInstanceId) {
+    protected Collection<String> variableNames;
+
+    public GetLocalVariablesCmd(String planItemInstanceId, Collection<String> variableNames) {
         this.planItemInstanceId = planItemInstanceId;
+        this.variableNames = variableNames;
     }
     
     @Override
@@ -42,8 +45,18 @@ public class GetLocalVariablesCmd implements Command<Map<String, Object>> {
         }
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        List<VariableInstanceEntity> variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
-                .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceId, ScopeTypes.CMMN);
+        List<VariableInstanceEntity> variableInstanceEntities;
+        if (variableNames == null || variableNames.isEmpty()) {
+            variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceId, ScopeTypes.CMMN);
+        } else {
+            variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(planItemInstanceId)
+                    .scopeType(ScopeTypes.CMMN)
+                    .names(variableNames)
+                    .list();
+        }
         Map<String, Object> variables = new HashMap<>(variableInstanceEntities.size());
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
             variables.put(variableInstanceEntity.getName(), variableInstanceEntity.getValue());

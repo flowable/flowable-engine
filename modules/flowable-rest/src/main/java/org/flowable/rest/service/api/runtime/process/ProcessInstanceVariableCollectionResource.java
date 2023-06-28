@@ -47,6 +47,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
+    public ProcessInstanceVariableCollectionResource() {
+        super(RestResponseFactory.VARIABLE_PROCESS);
+    }
+
     @ApiOperation(value = "List variables for a process instance", nickname="listProcessInstanceVariables", tags = {"Process Instance Variables" },
             notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
     @ApiResponses(value = {
@@ -57,7 +61,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     public List<RestVariable> getVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        return processVariables(execution, scope, RestResponseFactory.VARIABLE_PROCESS);
+        return processVariables(execution, scope);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
@@ -88,7 +92,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        return createExecutionVariable(execution, true, RestResponseFactory.VARIABLE_PROCESS, request, response);
+        return createExecutionVariable(execution, true, request, response);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
@@ -119,7 +123,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     public Object createExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        return createExecutionVariable(execution, false, RestResponseFactory.VARIABLE_PROCESS, request, response);
+        return createExecutionVariable(execution, false, request, response);
     }
 
     // FIXME Documentation
@@ -135,14 +139,14 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     }
 
     @Override
-    protected void addGlobalVariables(Execution execution, int variableType, Map<String, RestVariable> variableMap) {
+    protected void addGlobalVariables(Execution execution, Map<String, RestVariable> variableMap) {
         // no global variables
     }
 
     // For process instance there's only one scope. Using the local variables
     // method for that
     @Override
-    protected void addLocalVariables(Execution execution, int variableType, Map<String, RestVariable> variableMap) {
+    protected void addLocalVariables(Execution execution, Map<String, RestVariable> variableMap) {
         Map<String, Object> rawVariables = runtimeService.getVariables(execution.getId());
         List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, execution.getId(), variableType, RestVariableScope.LOCAL);
 

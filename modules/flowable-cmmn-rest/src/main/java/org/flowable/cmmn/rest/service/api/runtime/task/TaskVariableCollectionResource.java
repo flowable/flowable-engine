@@ -175,24 +175,33 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, varScope, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, false));
             }
 
             if (!variablesToSet.isEmpty()) {
                 if (restApiInterceptor != null) {
                     restApiInterceptor.createTaskVariables(task, variablesToSet, sharedScope);
                 }
+
+                Map<String, Object> setVariables;
                 if (sharedScope == RestVariableScope.LOCAL) {
                     taskService.setVariablesLocal(task.getId(), variablesToSet);
+                    setVariables = taskService.getVariablesLocal(task.getId(), variablesToSet.keySet());
                 } else {
                     if (task.getScopeId() != null) {
                         // Explicitly set on case, setting non-local
                         // variables on task will override local-variables if exists
                         runtimeService.setVariables(task.getScopeId(), variablesToSet);
+                        setVariables = runtimeService.getVariables(task.getScopeId(), variablesToSet.keySet());
                     } else {
                         // Standalone task, no global variables possible
                         throw new FlowableIllegalArgumentException("Cannot set global variables on task '" + task.getId() + "', task is not part of process.");
                     }
+                }
+
+                for (RestVariable inputVariable : inputVariables) {
+                    String variableName = inputVariable.getName();
+                    Object variableValue = setVariables.get(variableName);
+                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, varScope, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, false));
                 }
             }
         }

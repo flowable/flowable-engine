@@ -1,0 +1,10 @@
+{
+  "key": "outboundCustomer",
+  "category": "channel",
+  "name": "Test channel",
+  "channelType": "outbound",
+  "type": "kafka",
+  "topic": "outbound-customer",
+  "recordKey": "customer",
+  "serializerType": "json"
+}

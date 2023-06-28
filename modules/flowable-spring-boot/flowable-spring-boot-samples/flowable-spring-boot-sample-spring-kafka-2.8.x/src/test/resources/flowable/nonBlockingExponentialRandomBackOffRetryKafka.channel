@@ -1,0 +1,31 @@
+{
+    "key": "randomExponentialBackOff",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "random-exponential-backoff"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "customProperties": [
+        {
+            "name": "auto.offset.reset",
+            "value": "earliest"
+        }
+    ],
+    "retry": {
+        "attempts": "4",
+        "retryTopicSuffix": "-retry",
+        "dltTopicSuffix": "-dlt",
+        "nonBlockingBackOff": {
+            "delay": "100",
+            "maxDelay": "1000",
+            "multiplier": "2",
+            "random": "true"
+        }
+
+    }
+}

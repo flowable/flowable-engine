@@ -60,7 +60,12 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskVariable(task, variableName);
         }
+        return getVariableFromRequestWithoutAccessCheck(task, variableName, scope, includeBinary);
+    }
 
+    public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, String scope, boolean includeBinary) {
+
+        String taskId = task.getId();
         boolean variableFound = false;
         Object value = null;
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -186,7 +191,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), null, null);
+            return getVariableFromRequestWithoutAccessCheck(task, variableName, scope.name(), false);
 
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
@@ -210,7 +215,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(task, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return restResponseFactory.createRestVariable(restVariable.getName(), actualVariableValue, scope, task.getId(), RestResponseFactory.VARIABLE_TASK, false);
+        return getVariableFromRequestWithoutAccessCheck(task, restVariable.getName(), scope.name(), false);
     }
 
     protected void setVariable(Task task, String name, Object value, RestVariableScope scope, boolean isNew) {

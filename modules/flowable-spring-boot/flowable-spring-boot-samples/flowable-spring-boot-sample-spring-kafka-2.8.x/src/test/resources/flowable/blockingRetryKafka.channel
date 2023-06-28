@@ -1,0 +1,16 @@
+{
+    "key": "blockingChannel",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "blocking-retry-test"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "retry": {
+        "attempts": "3"
+    }
+}

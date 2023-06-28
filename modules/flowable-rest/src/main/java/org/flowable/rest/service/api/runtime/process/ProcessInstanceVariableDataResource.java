@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +37,10 @@ import io.swagger.annotations.Authorization;
 @RestController
 @Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableDataResource extends BaseExecutionVariableResource {
+
+    public ProcessInstanceVariableDataResource() {
+        super(RestResponseFactory.VARIABLE_PROCESS);
+    }
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariableData")
     @ApiResponses(value = {

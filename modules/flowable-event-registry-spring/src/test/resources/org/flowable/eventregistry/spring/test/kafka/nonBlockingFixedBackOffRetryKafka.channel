@@ -21,7 +21,7 @@
         "retryTopicSuffix": "-retry-topic",
         "dltTopicSuffix": "-dlt-topic",
         "nonBlockingBackOff": {
-            "delay": "100"
+            "delay": "1000"
         }
 
     }

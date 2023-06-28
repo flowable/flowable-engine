@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +50,6 @@ public class PlanItemInstanceVariableDataResource extends BaseVariableResource {
             HttpServletRequest request, HttpServletResponse response) {
 
         PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(planItemInstanceId);
-        return getVariableDataByteArray(planItemInstance, variableName, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, response);
+        return getVariableDataByteArray(planItemInstance, variableName, response);
     }
 }
