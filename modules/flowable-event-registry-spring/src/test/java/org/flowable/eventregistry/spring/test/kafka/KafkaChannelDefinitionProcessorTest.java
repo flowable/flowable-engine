@@ -42,6 +42,7 @@ import org.apache.kafka.clients.admin.RecordsToDelete;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -60,8 +61,6 @@ import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventPayload;
-import org.flowable.eventregistry.spring.kafka.KafkaMessageKeyProvider;
-import org.flowable.eventregistry.spring.kafka.KafkaPartitionProvider;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -1259,9 +1258,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("exponential-backoff-retry-topic-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1269,7 +1269,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1279,11 +1279,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("exponential-backoff-retry-topic-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1292,11 +1293,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("exponential-backoff-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1386,9 +1388,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("exponential-backoff-delay-retry-topic-100"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1396,7 +1399,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1406,11 +1409,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("exponential-backoff-delay-retry-topic-200"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1419,11 +1423,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("exponential-backoff-delay-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1512,9 +1517,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("random-exponential-backoff-retry-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1522,7 +1528,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1532,11 +1538,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("random-exponential-backoff-retry-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1545,11 +1552,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("random-exponential-backoff-retry-2"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1651,9 +1659,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("uniform-random-backoff-retry-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1661,7 +1670,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1671,11 +1680,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("uniform-random-backoff-retry-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1684,11 +1694,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("uniform-random-backoff-retry-2"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1697,11 +1708,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("uniform-random-backoff-dlt"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1789,9 +1801,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("fixed-backoff-multi-retry-topic-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1799,7 +1812,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1809,11 +1822,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("fixed-backoff-multi-retry-topic-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1822,11 +1836,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("fixed-backoff-multi-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1931,9 +1946,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("fixed-backoff-retry-topic"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1941,7 +1957,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1949,7 +1965,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1959,11 +1975,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("fixed-backoff-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
