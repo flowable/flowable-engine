@@ -316,7 +316,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
-                        + "  value: '2019-12-13T12:32:45.583345Z'"
+                        + "  value: '2019-12-13T12:32:45.583Z'"
                         + "}");
     }
 

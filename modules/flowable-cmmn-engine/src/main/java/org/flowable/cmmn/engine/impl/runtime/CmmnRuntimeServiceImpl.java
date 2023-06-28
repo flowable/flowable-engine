@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.runtime;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -202,9 +203,14 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public Map<String, Object> getVariables(String caseInstanceId) {
-        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
+        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId, Collections.emptyList()));
     }
     
+    @Override
+    public Map<String, Object> getVariables(String caseInstanceId, Collection<String> variableNames) {
+        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId, variableNames));
+    }
+
     @Override
     public Map<String, VariableInstance> getVariableInstances(String caseInstanceId) {
         return commandExecutor.execute(new GetCaseVariableInstancesCmd(caseInstanceId));
@@ -212,7 +218,12 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public Map<String, Object> getLocalVariables(String planItemInstanceId) {
-        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId));
+        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId, Collections.emptyList()));
+    }
+
+    @Override
+    public Map<String, Object> getLocalVariables(String planItemInstanceId, Collection<String> variableNames) {
+        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId, variableNames));
     }
     
     @Override

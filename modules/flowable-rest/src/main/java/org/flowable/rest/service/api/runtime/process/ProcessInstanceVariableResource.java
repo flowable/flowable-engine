@@ -57,6 +57,10 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
     @Autowired
     protected ObjectMapper objectMapper;
 
+    public ProcessInstanceVariableResource() {
+        super(RestResponseFactory.VARIABLE_PROCESS);
+    }
+
     @ApiOperation(value = "Get a variable for a process instance", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariable")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is returned."),
@@ -98,7 +102,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, RestResponseFactory.VARIABLE_PROCESS, false);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, false);
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
