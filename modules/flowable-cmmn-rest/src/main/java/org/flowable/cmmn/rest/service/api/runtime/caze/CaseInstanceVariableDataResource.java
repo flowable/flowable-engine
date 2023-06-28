@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,6 +49,6 @@ public class CaseInstanceVariableDataResource extends BaseVariableResource {
             HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
-        return getVariableDataByteArray(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, response);
+        return getVariableDataByteArray(caseInstance, variableName, response);
     }
 }

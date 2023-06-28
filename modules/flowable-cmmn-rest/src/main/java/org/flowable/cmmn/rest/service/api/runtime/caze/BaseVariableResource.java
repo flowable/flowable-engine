@@ -80,8 +80,7 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         return planItemInstance;
     }
 
-    public RestVariable getVariableFromRequest(CaseInstance caseInstance, String variableName, int variableType, boolean includeBinary) {
-        Object value = null;
+    public RestVariable getVariableFromRequest(CaseInstance caseInstance, String variableName, boolean includeBinary) {
 
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a case instance", CaseInstance.class);
@@ -91,19 +90,10 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
             restApiInterceptor.accessCaseInstanceVariable(caseInstance, variableName);
         }
 
-        value = runtimeService.getVariable(caseInstance.getId(), variableName);
-
-        if (value == null) {
-            throw new FlowableObjectNotFoundException("Case instance '" + caseInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstance.class);
-        } else {
-            //we use null for the scope, because the extraction from request does not require the scope
-            return constructRestVariable(variableName, value, caseInstance.getId(), variableType, includeBinary, null);
-        }
+        return getVariableFromRequestWithoutAccessCheck(caseInstance.getId(), variableName, CmmnRestResponseFactory.VARIABLE_CASE, includeBinary);
     }
 
-    public RestVariable getVariableFromRequest(PlanItemInstance planItemInstance, String variableName, int variableType, boolean includeBinary) {
-        Object value = null;
-
+    public RestVariable getVariableFromRequest(PlanItemInstance planItemInstance, String variableName, boolean includeBinary) {
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a plan item instance", CaseInstance.class);
         }
@@ -111,26 +101,43 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         if (restApiInterceptor != null) {
             restApiInterceptor.accessPlanItemInstanceVariable(planItemInstance, variableName);
         }
-
-        value = runtimeService.getLocalVariable(planItemInstance.getId(), variableName);
-
-        if (value == null) {
-            throw new FlowableObjectNotFoundException(
-                    "Plan item instance '" + planItemInstance.getId() + "' doesn't have a variable with name: '" + variableName + "'.",
-                    VariableInstance.class);
-        } else {
-            //we use null for the scope, because the extraction from request does not require the scope
-            return constructRestVariable(variableName, value, planItemInstance.getId(), variableType, includeBinary, null);
-        }
+        return getVariableFromRequestWithoutAccessCheck(planItemInstance.getId(), variableName, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, includeBinary);
     }
 
-    protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, int variableType, HttpServletResponse response) {
-        RestVariable variable = getVariableFromRequest(caseInstance, variableName, variableType, true);
+    protected RestVariable getVariableFromRequestWithoutAccessCheck(String instanceId, String variableName, int variableType, boolean includeBinary) {
+        Object value = null;
+
+        if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM) {
+            value = runtimeService.getLocalVariable(instanceId, variableName);
+        } else if (variableType == CmmnRestResponseFactory.VARIABLE_CASE) {
+            value = runtimeService.getVariable(instanceId, variableName);
+        } else {
+            throw new FlowableIllegalArgumentException("Unknown variable type " + variableType);
+        }
+
+        if (value == null) {
+            if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM) {
+                throw new FlowableObjectNotFoundException(
+                        "Plan item instance '" + instanceId + "' doesn't have a variable with name: '" + variableName + "'.",
+                        VariableInstance.class);
+            } else {
+                throw new FlowableObjectNotFoundException(
+                        "Case instance '" + instanceId + "' doesn't have a variable with name: '" + variableName + "'.",
+                        VariableInstance.class);
+            }
+        }
+
+        //we use null for the scope, because the extraction from request does not require the scope
+        return constructRestVariable(variableName, value, instanceId, variableType, includeBinary, null);
+    }
+
+    protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, HttpServletResponse response) {
+        RestVariable variable = getVariableFromRequest(caseInstance, variableName, true);
         return restVariableDataToRestResponse(variable, response);
     }
 
-    protected byte[] getVariableDataByteArray(PlanItemInstance planItemInstance, String variableName, int variableType, HttpServletResponse response) {
-        RestVariable variable = getVariableFromRequest(planItemInstance, variableName, variableType, true);
+    protected byte[] getVariableDataByteArray(PlanItemInstance planItemInstance, String variableName, HttpServletResponse response) {
+        RestVariable variable = getVariableFromRequest(planItemInstance, variableName, true);
         return restVariableDataToRestResponse(variable, response);
     }
 
@@ -163,22 +170,24 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         return restResponseFactory.createRestVariable(variableName, value, scope, caseInstanceId, variableType, includeBinary);
     }
 
-    protected List<RestVariable> processCaseVariables(CaseInstance caseInstance, int variableType) {
+    protected List<RestVariable> processCaseVariables(CaseInstance caseInstance) {
 
         // Check if it's a valid execution to get the variables for
-        List<RestVariable> variables = addVariables(caseInstance, variableType);
+        List<RestVariable> variables = addVariables(caseInstance);
 
         // Get unique variables from map
         List<RestVariable> result = new ArrayList<>(variables);
         return result;
     }
 
-    protected Object createVariable(CaseInstance caseInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(caseInstance.getId(), variableType, request, response, RestVariableScope.GLOBAL, createVariableInterceptor(caseInstance));
+    protected Object createVariable(CaseInstance caseInstance, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, request, response, RestVariableScope.GLOBAL,
+                createVariableInterceptor(caseInstance));
     }
 
-    protected Object createVariable(PlanItemInstance planItemInstance, int variableType, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(planItemInstance.getId(), variableType, request, response, RestVariableScope.LOCAL, createVariableInterceptor(planItemInstance));
+    protected Object createVariable(PlanItemInstance planItemInstance, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(planItemInstance.getId(), CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, request, response, RestVariableScope.LOCAL,
+                createVariableInterceptor(planItemInstance));
     }
 
     protected Object createVariable(String instanceId, int variableType, HttpServletRequest request, HttpServletResponse response, RestVariableScope scope,
@@ -216,15 +225,23 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, scope, instanceId, variableType, false));
             }
 
             if (!variablesToSet.isEmpty()) {
                 variableInterceptor.createVariables(variablesToSet);
+                Map<String, Object> setVariables;
                 if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM || scope == RestVariableScope.LOCAL) {
                     runtimeService.setLocalVariables(instanceId, variablesToSet);
+                    setVariables = runtimeService.getLocalVariables(instanceId, variablesToSet.keySet());
                 } else {
                     runtimeService.setVariables(instanceId, variablesToSet);
+                    setVariables = runtimeService.getVariables(instanceId, variablesToSet.keySet());
+                }
+
+                for (RestVariable inputVariable : inputVariables) {
+                    String variableName = inputVariable.getName();
+                    Object variableValue = setVariables.get(variableName);
+                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, scope, instanceId, variableType, false));
                 }
             }
         }
@@ -232,12 +249,12 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         return result;
     }
     
-    protected List<RestVariable> addVariables(CaseInstance caseInstance, int variableType) {
+    protected List<RestVariable> addVariables(CaseInstance caseInstance) {
         Map<String, Object> rawVariables = runtimeService.getVariables(caseInstance.getId());
         if (restApiInterceptor != null) {
             rawVariables = restApiInterceptor.accessCaseInstanceVariables(caseInstance, rawVariables);
         }
-        return restResponseFactory.createRestVariables(rawVariables, caseInstance.getId(), variableType);
+        return restResponseFactory.createRestVariables(rawVariables, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE);
     }
     
     public void deleteAllVariables(CaseInstance caseInstance, HttpServletResponse response) {
@@ -259,7 +276,10 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
 
         setVariable(instanceId, restVariable.getName(), actualVariableValue, scope, isNew, variableInterceptor);
 
-        return constructRestVariable(restVariable.getName(), actualVariableValue, instanceId, variableType, false, scope);
+        RestVariable variable = getVariableFromRequestWithoutAccessCheck(instanceId, restVariable.getName(), variableType, false);
+        // We are setting the scope because the fetched variable does not have it
+        variable.setVariableScope(scope);
+        return variable;
     }
 
     protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, String instanceId, int responseVariableType, boolean isNew,
@@ -332,8 +352,10 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-
-            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, instanceId, responseVariableType);
+            RestVariable restVariable = getVariableFromRequestWithoutAccessCheck(instanceId, variableName, responseVariableType, false);
+            // We are setting the scope because the fetched variable does not have it
+            restVariable.setVariableScope(scope);
+            return restVariable;
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Could not process multipart content", ioe);
         } catch (ClassNotFoundException ioe) {

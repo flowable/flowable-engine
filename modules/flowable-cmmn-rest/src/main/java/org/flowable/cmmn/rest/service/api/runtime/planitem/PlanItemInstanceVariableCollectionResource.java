@@ -18,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.runtime.caze.BaseVariableResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,7 +73,7 @@ public class PlanItemInstanceVariableCollectionResource extends BaseVariableReso
             HttpServletRequest request, HttpServletResponse response) {
 
         PlanItemInstance planItem = getPlanItemInstanceFromRequest(planItemInstanceId);
-        return createVariable(planItem, CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, request, response);
+        return createVariable(planItem, request, response);
 
     }
 }

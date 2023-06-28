@@ -56,13 +56,19 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
-        
-        boolean variableFound = false;
-        Object value = null;
+
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskVariable(task, variableName);
         }
+        return getVariableFromRequestWithoutAccessCheck(task, variableName, variableScope, includeBinary);
+    }
+
+    public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, RestVariableScope variableScope, boolean includeBinary) {
+
+        String taskId = task.getId();
+        boolean variableFound = false;
+        Object value = null;
 
         if (variableScope == null) {
             // First, check local variables (which have precedence when no scope is supplied)
@@ -185,7 +191,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK);
+            return getVariableFromRequestWithoutAccessCheck(task, variableName, scope, false);
 
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
@@ -209,7 +215,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(task, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return restResponseFactory.createRestVariable(restVariable.getName(), actualVariableValue, scope, task.getId(), CmmnRestResponseFactory.VARIABLE_TASK, false);
+        return getVariableFromRequestWithoutAccessCheck(task, restVariable.getName(), scope, false);
     }
 
     protected void setVariable(Task task, String name, Object value, RestVariableScope scope, boolean isNew) {

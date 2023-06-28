@@ -65,7 +65,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
-        return getVariableFromRequest(caseInstance, variableName, CmmnRestResponseFactory.VARIABLE_CASE, false);
+        return getVariableFromRequest(caseInstance, variableName, false);
     }
 
     @ApiOperation(value = "Update a single variable on a case instance", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariable",

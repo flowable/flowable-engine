@@ -14,9 +14,11 @@ package org.flowable.cmmn.test.runtime;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,6 +105,30 @@ public class VariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testGetSpecificVariablesOnly() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("stringVar", "Hello World")
+                .variable("intVar", 42)
+                .variable("doubleVar", 10.5)
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("stringVar", "Hello World"),
+                        entry("intVar", 42),
+                        entry("doubleVar", 10.5)
+                );
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId(), Arrays.asList("stringVar", "doubleVar", "dummyVar")))
+                .containsOnly(
+                        entry("stringVar", "Hello World"),
+                        entry("doubleVar", 10.5)
+                );
+    }
+
+    @Test
     @CmmnDeployment
     public void testGetLocalVariables() {
         Map<String, Object> variables = new HashMap<>();
@@ -146,6 +172,35 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variableInstance = localVariableInstancesFromGet.get("intVar");
         assertThat(((Integer) variableInstance.getValue()).intValue()).isEqualTo(21);
         assertThat(variableInstance.getTypeName()).isEqualTo("integer");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testGetSpecificLocalVariables() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("stringVar", "Hello World")
+                .variable("intVar", 42)
+                .variable("doubleVar", 10.5)
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().singleResult();
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "stringVar", "Changed value");
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "intVar", 21);
+        cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "doubleVar", 12.6);
+
+        assertThat(cmmnRuntimeService.getLocalVariables(planItemInstance.getId()))
+                .containsOnly(
+                        entry("stringVar", "Changed value"),
+                        entry("intVar", 21),
+                        entry("doubleVar", 12.6)
+                );
+
+        assertThat(cmmnRuntimeService.getLocalVariables(planItemInstance.getId(), Arrays.asList("stringVar", "doubleVar", "dummyVar")))
+                .containsOnly(
+                        entry("stringVar", "Changed value"),
+                        entry("doubleVar", 12.6)
+                );
     }
 
     @Test

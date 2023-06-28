@@ -45,6 +45,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableDataResource extends BaseExecutionVariableResource {
 
+    public ExecutionVariableDataResource() {
+        super(RestResponseFactory.VARIABLE_EXECUTION);
+    }
+
     @ApiOperation(value = "Get the binary data for an execution", tags = { "Executions" }, nickname = "getExecutionVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the requested variables are returned."),

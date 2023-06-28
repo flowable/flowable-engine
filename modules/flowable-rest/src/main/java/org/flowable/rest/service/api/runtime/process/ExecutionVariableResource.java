@@ -57,6 +57,10 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    public ExecutionVariableResource() {
+        super(RestResponseFactory.VARIABLE_EXECUTION);
+    }
+
     @ApiOperation(value = "Get a variable for an execution", tags = { "Executions" }, nickname = "getExecutionVariable")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both the execution and variable were found and variable is returned."),
@@ -100,7 +104,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, RestResponseFactory.VARIABLE_EXECUTION, false);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, false);
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");

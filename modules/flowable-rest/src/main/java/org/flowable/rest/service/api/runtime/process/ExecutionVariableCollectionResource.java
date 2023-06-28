@@ -45,6 +45,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableCollectionResource extends BaseVariableCollectionResource {
 
+    public ExecutionVariableCollectionResource() {
+        super(RestResponseFactory.VARIABLE_EXECUTION);
+    }
+
     @ApiOperation(value = "List variables for an execution", tags = { "Executions" }, nickname = "listExecutionVariables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and variables are returned."),
@@ -54,7 +58,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     public List<RestVariable> getVariables(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
-        return processVariables(execution, scope, RestResponseFactory.VARIABLE_EXECUTION);
+        return processVariables(execution, scope);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
@@ -81,7 +85,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
-        return createExecutionVariable(execution, true, RestResponseFactory.VARIABLE_EXECUTION, request, response);
+        return createExecutionVariable(execution, true, request, response);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
@@ -110,7 +114,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     public Object createExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
-        return createExecutionVariable(execution, false, RestResponseFactory.VARIABLE_EXECUTION, request, response);
+        return createExecutionVariable(execution, false, request, response);
     }
 
     @ApiOperation(value = "Delete all variables for an execution", tags = { "Executions" })

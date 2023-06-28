@@ -59,6 +59,12 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     protected boolean isSerializableVariableAllowed;
 
+    protected final int variableType;
+
+    public BaseExecutionVariableResource(int variableType) {
+        this.variableType = variableType;
+    }
+
     @Override
     public void afterPropertiesSet() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
@@ -93,7 +99,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
         }
     }
 
-    protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, Execution execution, int responseVariableType, boolean isNew) {
+    protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, Execution execution, boolean isNew) {
 
         // Validate input and set defaults
         if (request.getFileMap().size() == 0) {
@@ -163,11 +169,10 @@ public class BaseExecutionVariableResource implements InitializingBean {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            if (responseVariableType == RestResponseFactory.VARIABLE_PROCESS) {
-                return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, null, null, execution.getId());
-            } else {
-                return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, null, execution.getId(), null);
-            }
+            RestVariable variable = getVariableFromRequestWithoutAccessCheck(execution, variableName, scope, false);
+            // We are setting the scope because the fetched variable does not have it
+            variable.setVariableScope(scope);
+            return variable;
 
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Could not process multipart content", ioe);
@@ -191,7 +196,10 @@ public class BaseExecutionVariableResource implements InitializingBean {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(execution, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return constructRestVariable(restVariable.getName(), actualVariableValue, scope, execution.getId(), false);
+        RestVariable variable = getVariableFromRequestWithoutAccessCheck(execution, restVariable.getName(), scope, false);
+        // We are setting the scope because the fetched variable does not always have it
+        variable.setVariableScope(scope);
+        return variable;
     }
 
     protected void setVariable(Execution execution, String name, Object value, RestVariableScope scope, boolean isNew) {
@@ -243,9 +251,6 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     public RestVariable getVariableFromRequest(Execution execution, String variableName, String scope, boolean includeBinary) {
 
-        boolean variableFound = false;
-        Object value = null;
-
         if (execution == null) {
             throw new FlowableObjectNotFoundException("Could not find an execution", Execution.class);
         }
@@ -254,6 +259,14 @@ public class BaseExecutionVariableResource implements InitializingBean {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessExecutionVariable(execution, variableName, scope);
         }
+
+        return getVariableFromRequestWithoutAccessCheck(execution, variableName, variableScope, includeBinary);
+    }
+
+    public RestVariable getVariableFromRequestWithoutAccessCheck(Execution execution, String variableName, RestVariableScope variableScope, boolean includeBinary) {
+
+        boolean variableFound = false;
+        Object value = null;
 
         if (variableScope == null) {
             // First, check local variables (which have precedence when no scope
@@ -292,7 +305,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     protected RestVariable constructRestVariable(String variableName, Object value, RestVariableScope variableScope, String executionId, boolean includeBinary) {
 
-        return restResponseFactory.createRestVariable(variableName, value, variableScope, executionId, RestResponseFactory.VARIABLE_EXECUTION, includeBinary);
+        return restResponseFactory.createRestVariable(variableName, value, variableScope, executionId, variableType, includeBinary);
     }
 
     protected Execution getExecutionFromRequestWithoutAccessCheck(String executionId) {

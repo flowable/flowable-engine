@@ -88,6 +88,16 @@ public interface CmmnRuntimeService {
      *     when no case instance is found for the given caseInstanceId.
      */
     Map<String, Object> getVariables(String caseInstanceId);
+
+    /**
+     * The variable values for all given variableNames.
+     *
+     * @param caseInstanceId id of execution, cannot be null.
+     * @param variableNames the collection of variable names that should be retrieved.
+     * @return the variables or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException when no case instance is found for the given caseInstanceId.
+     */
+    Map<String, Object> getVariables(String caseInstanceId, Collection<String> variableNames);
     
     /**
      * All variables visible from the given case instance scope.
@@ -111,6 +121,17 @@ public interface CmmnRuntimeService {
      */
     Map<String, Object> getLocalVariables(String planItemInstanceId);
     
+    /**
+     * All variable values for all given variableNames that are defined in the plan item instance scope,
+     * without taking outer scopes into account.
+     *
+     * @param planItemInstanceId id of plan item instance, cannot be null.
+     * @param variableNames the collection of variable names that should be retrieved.
+     * @return the variables or an empty map if no such variables are found.
+     * @throws FlowableObjectNotFoundException when no plan item instance is found for the given planItemInstanceId.
+     */
+    Map<String, Object> getLocalVariables(String planItemInstanceId, Collection<String> variableNames);
+
     /**
      * All variable values that are defined in the plan item instance scope, without taking outer scopes into account.
      *
