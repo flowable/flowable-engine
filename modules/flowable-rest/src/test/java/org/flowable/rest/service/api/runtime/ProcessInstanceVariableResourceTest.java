@@ -297,6 +297,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
+                        + "scope: null,"
                         + "value: 'updatedValue'"
                         + "}");
 
@@ -342,6 +343,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
+                        + "  scope: null,"
                         + "  value: '2019-12-13T12:32:45.583Z'"
                         + "}");
     }
@@ -374,6 +376,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
+                        + "  scope: null,"
                         + "  value: '2020-01-28'"
                         + "}");
     }
@@ -407,6 +410,7 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
+                        + "  scope: null,"
                         + "  value: '2020-01-28T12:32:45'"
                         + "}");
     }
