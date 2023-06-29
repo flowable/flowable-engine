@@ -12,11 +12,11 @@
  */
 package org.flowable.http.common.impl;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Mykhailo Marchenko
