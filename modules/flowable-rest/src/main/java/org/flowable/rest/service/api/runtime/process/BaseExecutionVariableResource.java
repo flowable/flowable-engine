@@ -196,10 +196,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(execution, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        RestVariable variable = getVariableFromRequestWithoutAccessCheck(execution, restVariable.getName(), scope, false);
-        // We are setting the scope because the fetched variable does not always have it
-        variable.setVariableScope(scope);
-        return variable;
+        return getVariableFromRequestWithoutAccessCheck(execution, restVariable.getName(), scope, false);
     }
 
     protected void setVariable(Execution execution, String name, Object value, RestVariableScope scope, boolean isNew) {
