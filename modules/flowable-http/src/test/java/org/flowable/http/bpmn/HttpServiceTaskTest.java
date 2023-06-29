@@ -31,6 +31,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -417,24 +418,10 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
     @Test
     @Deployment
-    public void testHttpGet5XX() {
-        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGet5XX");
-        assertThat(process.isEnded()).isFalse();
-        // Request assertions
-        Map<String, Object> request = new HashMap<>();
-        request.put("get500RequestMethod", "GET");
-        request.put("get500RequestUrl", "https://localhost:9799/api?code=500");
-        request.put("get500RequestHeaders", "Accept: application/json");
-        request.put("get500RequestTimeout", 5000);
-        request.put("get500HandleStatusCodes", "4XX, 5XX");
-        request.put("get500SaveRequestVariables", true);
-        assertKeysEquals(process.getId(), request);
-        // Response assertions
-        Map<String, Object> response = new HashMap<>();
-        response.put("get500ResponseStatusCode", 500);
-        response.put("get500ResponseReason", get500ResponseReason());
-        assertKeysEquals(process.getId(), response);
-        continueProcess(process);
+    void testHttpGet5XX() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testHttpGet5XX"))
+                .isExactlyInstanceOf(BpmnError.class)
+                .hasMessage("No catching boundary event found for error with errorCode 'HTTP500', neither in same process nor in parent process");
     }
 
     protected String get500ResponseReason() {
