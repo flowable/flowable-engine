@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -75,7 +76,7 @@ public abstract class ExpressionUtils {
     }
 
     public static Set<String> getStringSetFromField(final String field) {
-        String[] codes = field.split(",");
+        String[] codes = StringUtils.deleteWhitespace(field).split(",");
         Set<String> codeSet = new HashSet<>(Arrays.asList(codes));
         Collections.addAll(codeSet, codes);
         return codeSet;
