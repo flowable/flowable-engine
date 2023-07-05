@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +41,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Tag;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -162,6 +166,44 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsStringList() throws MessagingException {
+        String recipients = "flowable@localhost, misspiggy@flowable.org";
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsArrayList() throws MessagingException {
+        List<String> recipients = Arrays.asList("flowable@localhost", "misspiggy@flowable.org");
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsArrayNode() throws MessagingException {
+        ArrayNode recipients = new ObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    private void testDynamicRecipientsInternal(Object recipients) throws MessagingException {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testMail")
+                .variable("toVar", recipients)
+                .variable("fromVar", "from@flowable.org")
+                .variable("ccVar", recipients)
+                .variable("bccVar", recipients)
+                .variable("subjectVar", "Testing")
+                .variable("bodyVar", "The test body")
+                .start();
+        List<WiserMessage> messages = wiser.getMessages();
+        MimeMessage mimeMessage = messages.get(0).getMimeMessage();
+        assertThat(mimeMessage.getHeader("To", null)).isEqualTo("flowable@localhost, misspiggy@flowable.org");
+        assertThat(mimeMessage.getHeader("Cc", null)).isEqualTo("flowable@localhost, misspiggy@flowable.org");
+
+    }
+
     @Test
     @CmmnDeployment
     public void testCcBccWithoutTo() {

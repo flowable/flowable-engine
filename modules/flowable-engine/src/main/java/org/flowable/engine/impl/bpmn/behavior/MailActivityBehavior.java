@@ -50,7 +50,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -213,7 +212,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         Collection<String> newTo = to;
         Collection<String> forceTo = getForceTo(tenantId);
-        if (!CollectionUtils.isEmpty(forceTo)) {
+        if (forceTo != null && !forceTo.isEmpty()) {
             newTo = forceTo;
         }
         if (!newTo.isEmpty()) {
@@ -262,7 +261,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         Collection<String> newCc = cc;
 
         Collection<String> forceTo = getForceTo(tenantId);
-        if (!CollectionUtils.isEmpty(forceTo)) {
+        if (forceTo != null && !forceTo.isEmpty()) {
             newCc = forceTo;
         }
         if (!newCc.isEmpty()) {
@@ -282,7 +281,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         Collection<String> newBcc = bcc;
         Collection<String> forceTo = getForceTo(tenantId);
-        if (!CollectionUtils.isEmpty(forceTo)) {
+        if (forceTo != null && !forceTo.isEmpty()) {
             newBcc = forceTo;
         }
         if (!newBcc.isEmpty()) {
