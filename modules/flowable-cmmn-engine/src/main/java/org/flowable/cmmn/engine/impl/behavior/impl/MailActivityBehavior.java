@@ -18,11 +18,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.activation.DataSource;
 import javax.naming.NamingException;
@@ -45,6 +48,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Based on the MailActivityBehavior found in the bpmn engine, adapted for use in cmmn.
@@ -83,10 +89,10 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         Email email = null;
         try {
             String headersStr = getStringFromField(headers, planItemInstanceEntity);
-            String toStr = getStringFromField(to, planItemInstanceEntity);
+            Collection<String> toList = parseRecipients(to, planItemInstanceEntity);
             String fromStr = getStringFromField(from, planItemInstanceEntity);
-            String ccStr = getStringFromField(cc, planItemInstanceEntity);
-            String bccStr = getStringFromField(bcc, planItemInstanceEntity);
+            Collection<String> ccList = parseRecipients(cc, planItemInstanceEntity);
+            Collection<String> bccList = parseRecipients(bcc, planItemInstanceEntity);
             String subjectStr = getStringFromField(subject, planItemInstanceEntity);
             String textStr = textVar == null ? getStringFromField(text, planItemInstanceEntity)
                 : getStringFromField(getExpression(commandContext, planItemInstanceEntity, textVar), planItemInstanceEntity);
@@ -97,16 +103,16 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             List<DataSource> dataSources = new LinkedList<>();
             getFilesFromFields(attachments, planItemInstanceEntity, files, dataSources);
 
-            if (StringUtils.isAllEmpty(toStr, ccStr, bccStr)) {
+            if (toList.isEmpty() && ccList.isEmpty() && bccList.isEmpty()) {
                 throw new FlowableException("No recipient could be found for sending email");
             }
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
             addHeader(email, headersStr);
-            addTo(commandContext, email, toStr, planItemInstanceEntity.getTenantId());
+            addTo(email, toList, planItemInstanceEntity.getTenantId(), commandContext);
             setFrom(commandContext, email, fromStr, planItemInstanceEntity.getTenantId());
-            addCc(commandContext, email, ccStr, planItemInstanceEntity.getTenantId());
-            addBcc(commandContext, email, bccStr, planItemInstanceEntity.getTenantId());
+            addCc(email, ccList, planItemInstanceEntity.getTenantId(), commandContext);
+            addBcc(email, bccList, planItemInstanceEntity.getTenantId(), commandContext);
             setSubject(email, subjectStr);
             setMailServerProperties(commandContext, email, planItemInstanceEntity.getTenantId());
             setCharset(email, charSetStr, planItemInstanceEntity.getTenantId());
@@ -190,17 +196,17 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected void addTo(CommandContext commandContext, Email email, String to, String tenantId) {
-        if (to == null) {
+    protected void addTo(Email email, Collection<String> to, String tenantId, CommandContext commandContext) {
+        if (to == null || to.isEmpty()) {
             return;
         }
-        String newTo = getForceTo(commandContext, tenantId);
-        if (newTo == null) {
-            newTo = to;
+        Collection<String> newTo = to;
+        Collection<String> forceTo = getForceTo(commandContext, tenantId);
+        if (forceTo != null && !forceTo.isEmpty()) {
+            newTo = forceTo;
         }
-        String[] tos = splitAndTrim(newTo);
-        if (tos != null) {
-            for (String t : tos) {
+        if (!newTo.isEmpty()) {
+            for (String t : newTo) {
                 try {
                     email.addTo(t);
                 } catch (EmailException e) {
@@ -238,18 +244,18 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected void addCc(CommandContext commandContext, Email email, String cc, String tenantId) {
-        if (cc == null) {
+    protected void addCc(Email email, Collection<String> cc, String tenantId, CommandContext commandContext) {
+        if (cc == null || cc.isEmpty()) {
             return;
         }
+        Collection<String> newCc = cc;
 
-        String newCc = getForceTo(commandContext, tenantId);
-        if (newCc == null) {
-            newCc = cc;
+        Collection<String> forceTo = getForceTo(commandContext, tenantId);
+        if (forceTo != null && !forceTo.isEmpty()) {
+            newCc = forceTo;
         }
-        String[] ccs = splitAndTrim(newCc);
-        if (ccs != null) {
-            for (String c : ccs) {
+        if (!newCc.isEmpty()) {
+            for (String c : newCc) {
                 try {
                     email.addCc(c);
                 } catch (EmailException e) {
@@ -259,17 +265,17 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected void addBcc(CommandContext commandContext, Email email, String bcc, String tenantId) {
-        if (bcc == null) {
+    protected void addBcc(Email email, Collection<String> bcc, String tenantId, CommandContext commandContext) {
+        if (bcc == null || bcc.isEmpty()) {
             return;
         }
-        String newBcc = getForceTo(commandContext, tenantId);
-        if (newBcc == null) {
-            newBcc = bcc;
+        Collection<String> newBcc = bcc;
+        Collection<String> forceTo = getForceTo(commandContext, tenantId);
+        if (forceTo != null && !forceTo.isEmpty()) {
+            newBcc = forceTo;
         }
-        String[] bccs = splitAndTrim(newBcc);
-        if (bccs != null) {
-            for (String b : bccs) {
+        if (!newBcc.isEmpty()) {
+            for (String b : newBcc) {
                 try {
                     email.addBcc(b);
                 } catch (EmailException e) {
@@ -378,13 +384,9 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected String[] splitAndTrim(String str) {
+    protected Collection<String> splitAndTrim(String str) {
         if (str != null) {
-            String[] splittedStrings = str.split(",");
-            for (int i = 0; i < splittedStrings.length; i++) {
-                splittedStrings[i] = splittedStrings[i].trim();
-            }
-            return splittedStrings;
+            return Arrays.stream(str.split(",")).map(String::trim).collect(Collectors.toList());
         }
         return null;
     }
@@ -397,6 +399,32 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             }
         }
         return null;
+    }
+
+    protected Collection<String> parseRecipients(Expression expression, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (expression == null) {
+            return Collections.emptyList();
+        }
+        Object value = expression.getValue(planItemInstanceEntity);
+        if (value == null) {
+            return Collections.emptyList();
+        }
+        if (value instanceof Collection) {
+            return (Collection<String>) value;
+        } else if (value instanceof ArrayNode) {
+            ArrayNode arrayNode = (ArrayNode) value;
+            Collection<String> recipients = new ArrayList<>(arrayNode.size());
+            for (JsonNode node : arrayNode) {
+                recipients.add(node.asText());
+            }
+            return recipients;
+        } else {
+            String str = value.toString();
+            if (StringUtils.isNotEmpty(str)) {
+                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
+            }
+        }
+        return Collections.emptyList();
     }
 
     protected void getFilesFromFields(Expression expression, PlanItemInstanceEntity planItemInstanceEntity, List<File> files, List<DataSource> dataSources) {
@@ -489,7 +517,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected String getForceTo(CommandContext commandContext, String tenantId) {
+    protected Collection<String> getForceTo(CommandContext commandContext, String tenantId) {
         String forceTo = null;
         if (tenantId != null && tenantId.length() > 0) {
             Map<String, MailServerInfo> mailServers = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServers();
@@ -503,7 +531,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             forceTo = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getMailServerForceTo();
         }
 
-        return forceTo;
+        return splitAndTrim(forceTo);
     }
 
     protected Charset getDefaultCharset(String tenantId) {
