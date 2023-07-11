@@ -108,7 +108,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
     /**
      * Only select the forms which are the latest deployed (ie. which have the highest version number for the given key).
      * 
-     * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed decision tables.
+     * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed form definitions.
      * 
      * @throws FlowableIllegalArgumentException
      *             if used in combination with {@link #formVersion(Integer)} or {@link #deploymentId(String)}
