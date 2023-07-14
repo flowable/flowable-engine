@@ -49,6 +49,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -90,6 +91,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             }
         }
         autoCleanupDeploymentIds = new HashSet<>();
+        Authentication.setAuthenticatedUserId(null);
     }
 
     protected void deployOneHumanTaskCaseModel() {
