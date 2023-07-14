@@ -17,6 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Joram Barrez
  */
@@ -31,10 +33,18 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected String validateFormFields;
     protected Integer displayOrder;
     protected String includeInStageOverview;
+    protected List<PlanItemDefinition> planItemDefinitionList = new ArrayList<>();
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
-        planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
+        planItemDefinitionList.add(planItemDefinition);
+        addPlanItemDefinitionToMap(planItemDefinition);
+    }
+
+    protected void addPlanItemDefinitionToMap(PlanItemDefinition planItemDefinition) {
+        if (planItemDefinition != null && StringUtils.isNotEmpty(planItemDefinition.getId())) {
+            planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
+        }
     }
 
     public PlanItemDefinition findPlanItemDefinitionInStageOrUpwards(String planItemDefinitionId) {
@@ -95,7 +105,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     }
 
     public List<PlanItemDefinition> getPlanItemDefinitions() {
-        return new ArrayList<>(planItemDefinitionMap.values());
+        return planItemDefinitionList;
     }
 
     public Map<String, PlanItemDefinition> getPlanItemDefinitionMap() {
