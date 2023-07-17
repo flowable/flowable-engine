@@ -56,11 +56,6 @@
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
-      <!--
-        Camel still uses javax jakarta.
-        Therefore, we need to downgrade the version to test properly
-        -->
-      <version>2.3.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
