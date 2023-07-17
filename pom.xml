@@ -23,7 +23,7 @@
 		<jackson.version>2.14.3</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>4.0.0-RC1</camel.version>
-		<cxf.version>3.5.4</cxf.version>
+		<cxf.version>4.0.2</cxf.version>
 		<slf4j.version>2.0.7</slf4j.version>
 		<groovy.version>4.0.12</groovy.version>
 		<jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>

@@ -167,21 +167,14 @@
     <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-runtime</artifactId>
-        <version>2.3.5</version>
     </dependency>
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
-      <!--
-        CXF still uses javax jakarta.
-        Therefore, we need to downgrade the version for CXF
-        -->
-      <version>2.3.3</version>
     </dependency>
     <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-xjc</artifactId>
-        <version>2.3.5</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

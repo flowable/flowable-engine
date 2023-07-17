@@ -7,7 +7,7 @@
    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd" version="2.1">
    <jaxb:globalBindings>
       <!-- 
-           Use java.util.Date instead of javax.xml.datatype.XMLGregorianCalendar for xsd:date, xsd:dateTime, 
+           Use java.util.Date instead of jakarta.xml.datatype.XMLGregorianCalendar for xsd:date, xsd:dateTime,
            because Flowable engine uses java.util.Date to store dates/times and JAXB generated XMLGregorianCalendar by default.
       -->
       <jaxb:javaType name="java.util.Date" xmlType="xsd:time"

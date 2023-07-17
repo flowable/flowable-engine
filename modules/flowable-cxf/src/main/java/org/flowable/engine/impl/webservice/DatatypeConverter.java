@@ -34,7 +34,7 @@ public class DatatypeConverter {
      *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:date.
      */
     public static java.util.Date parseDate(final String lexicalXSDDate) {
-        final Calendar calendar = javax.xml.bind.DatatypeConverter.parseDate(lexicalXSDDate);
+        final Calendar calendar = jakarta.xml.bind.DatatypeConverter.parseDate(lexicalXSDDate);
         return calendar.getTime();
     }
 
@@ -51,7 +51,7 @@ public class DatatypeConverter {
     public static String printDate(final java.util.Date val) {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(val);
-        return javax.xml.bind.DatatypeConverter.printDate(calendar);
+        return jakarta.xml.bind.DatatypeConverter.printDate(calendar);
     }
 
     /**
@@ -65,7 +65,7 @@ public class DatatypeConverter {
      *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:time.
      */
     public static java.util.Date parseTime(final String lexicalXSDTime) {
-        final Calendar calendar = javax.xml.bind.DatatypeConverter.parseTime(lexicalXSDTime);
+        final Calendar calendar = jakarta.xml.bind.DatatypeConverter.parseTime(lexicalXSDTime);
         return calendar.getTime();
     }
 
@@ -82,7 +82,7 @@ public class DatatypeConverter {
     public static String printTime(final java.util.Date val) {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(val);
-        return javax.xml.bind.DatatypeConverter.printTime(calendar);
+        return jakarta.xml.bind.DatatypeConverter.printTime(calendar);
     }
 
     /**
@@ -96,7 +96,7 @@ public class DatatypeConverter {
      *             if string parameter does not conform to lexical value space defined in XML Schema Part 2: Datatypes for xsd:date/Time.
      */
     public static java.util.Date parseDateTime(final String lexicalXSDDateTime) {
-        final Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(lexicalXSDDateTime);
+        final Calendar calendar = jakarta.xml.bind.DatatypeConverter.parseDateTime(lexicalXSDDateTime);
         return calendar.getTime();
     }
 
@@ -113,7 +113,7 @@ public class DatatypeConverter {
     public static String printDateTime(final java.util.Date val) {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(val);
-        return javax.xml.bind.DatatypeConverter.printDateTime(calendar);
+        return jakarta.xml.bind.DatatypeConverter.printDateTime(calendar);
     }
 
 }

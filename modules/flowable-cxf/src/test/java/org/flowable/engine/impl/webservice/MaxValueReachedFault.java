@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.webservice;
 
-import javax.xml.ws.WebFault;
+import jakarta.xml.ws.WebFault;
 
 /**
  * An implementation of a fault returned by the counter WS
