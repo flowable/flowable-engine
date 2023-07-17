@@ -14,13 +14,13 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.0.7</spring.boot.version>
-		<spring.framework.version>6.0.9</spring.framework.version>
-		<spring.security.version>6.0.3</spring.security.version>
-		<spring.amqp.version>3.0.3</spring.amqp.version>
-		<spring.kafka.version>3.0.5</spring.kafka.version>
-		<reactor-netty.version>1.1.6</reactor-netty.version>
-		<jackson.version>2.14.3</jackson.version>
+		<spring.boot.version>3.1.1</spring.boot.version>
+		<spring.framework.version>6.0.10</spring.framework.version>
+		<spring.security.version>6.1.1</spring.security.version>
+		<spring.amqp.version>3.0.5</spring.amqp.version>
+		<spring.kafka.version>3.0.8</spring.kafka.version>
+		<reactor-netty.version>1.1.8</reactor-netty.version>
+		<jackson.version>2.15.2</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>4.0.0-RC1</camel.version>
 		<cxf.version>4.0.2</cxf.version>
@@ -30,14 +30,14 @@
 
 		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
-		<hikari.version>4.0.3</hikari.version>
+		<hikari.version>5.0.1</hikari.version>
 		<maven.deploy.plugin.version>3.0.0</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
-		<mockito.version>4.9.0</mockito.version>
+		<mockito.version>5.3.1</mockito.version>
 		<testcontainers.version>1.18.3</testcontainers.version>
-		<artemis.version>2.27.0</artemis.version>
+		<artemis.version>2.28.0</artemis.version>
 
-		<oracle.jdbc.version>21.6.0.0.1</oracle.jdbc.version>
+		<oracle.jdbc.version>21.9.0.0</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
         <!-- JVM params for test execution -->
