@@ -24,8 +24,10 @@ import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -49,10 +51,8 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain restApiSecurity(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         HttpSecurity httpSecurity = http.authenticationProvider(authenticationProvider)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf().disable();
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(CsrfConfigurer::disable);
 
         if (restAppProperties.getCors().isEnabled()) {
             httpSecurity.apply(new PropertyBasedCorsFilter(restAppProperties));
@@ -61,34 +61,33 @@ public class SecurityConfiguration {
         // Swagger docs
         if (isSwaggerDocsEnabled()) {
             httpSecurity
-                .authorizeHttpRequests()
-                .requestMatchers(antMatcher("/docs/**")).permitAll();
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(antMatcher("/docs/**")).permitAll());
 
         } else {
             httpSecurity
-                .authorizeHttpRequests()
-                .requestMatchers(antMatcher("/docs/**")).denyAll();
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(antMatcher("/docs/**")).denyAll());
             
         }
 
         httpSecurity
-            .authorizeHttpRequests()
-            .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
-            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(SecurityConstants.ACCESS_ADMIN);
+            .authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                        .requestMatchers(EndpointRequest.to(InfoEndpoint.class, HealthEndpoint.class)).authenticated()
+                        .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyAuthority(SecurityConstants.ACCESS_ADMIN)
+            );
+
 
         // Rest API access
         if (isVerifyRestApiPrivilege()) {
             httpSecurity
-                .authorizeHttpRequests()
-                .anyRequest()
-                .hasAuthority(SecurityConstants.PRIVILEGE_ACCESS_REST_API).and ().httpBasic();
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().hasAuthority(SecurityConstants.PRIVILEGE_ACCESS_REST_API));
             
         } else {
             httpSecurity
-            .authorizeHttpRequests()
-            .anyRequest()
-            .authenticated().and().httpBasic();
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated());
         }
+
+        httpSecurity.httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

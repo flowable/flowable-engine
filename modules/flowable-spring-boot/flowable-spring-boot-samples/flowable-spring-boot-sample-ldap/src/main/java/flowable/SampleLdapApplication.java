@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -46,12 +47,12 @@ public class SampleLdapApplication {
         public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
                 .securityMatcher(antMatcher("/process-api/**"))
-                .authorizeHttpRequests()
-                .requestMatchers(antMatcher("/process-api/repository/**")).hasAnyAuthority("repository-privilege")
-                .requestMatchers(antMatcher("/process-api/management/**")).hasAnyAuthority("management-privilege")
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(antMatcher("/process-api/repository/**")).hasAnyAuthority("repository-privilege")
+                        .requestMatchers(antMatcher("/process-api/management/**")).hasAnyAuthority("management-privilege")
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults());
 
             return http.build();
         }

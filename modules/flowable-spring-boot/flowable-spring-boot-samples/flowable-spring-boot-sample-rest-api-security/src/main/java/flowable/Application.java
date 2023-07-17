@@ -27,8 +27,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration(proxyBeanMethods = false)
@@ -43,10 +45,8 @@ public class Application {
         public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
                     .securityMatcher(antMatcher("/api/**"))
-                    .authorizeHttpRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                    .httpBasic();
+                    .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                    .httpBasic(Customizer.withDefaults());
 
             return http.build();
         }
@@ -118,11 +118,9 @@ public class Application {
         public SecurityFilterChain defaultSecurity(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
             http
                 .authenticationProvider(authenticationProvider)
-                .csrf().disable()
-                .authorizeHttpRequests()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                .csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
 
             return http.build();
         }
