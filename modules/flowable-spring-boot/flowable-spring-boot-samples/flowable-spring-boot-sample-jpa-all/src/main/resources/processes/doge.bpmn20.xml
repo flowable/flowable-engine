@@ -3,7 +3,7 @@
     <process id="dogeProcess" name="DogeProcess" isExecutable="true">
         <startEvent id="startEvent1"></startEvent>
         <subProcess id="sid-1AA38D08-310B-4BFE-A6AD-F32488643000" name="subProcess">
-            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="photos" flowable:elementVariable="photo"></multiInstanceLoopCharacteristics>
+            <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="photos" flowable:elementVariable="photo"></multiInstanceLoopCharacteristics>
             <serviceTask id="sid-FCFA0F9D-8796-43E2-ACFD-13AF3465F929" name="Send to photo processing service" flowable:expression="${photoService.processPhoto(photo.id)}"></serviceTask>
             <startEvent id="sid-821438D0-CD00-43F1-A847-42112E44BA12"></startEvent>
             <receiveTask id="wait" name="Wait for completion"></receiveTask>

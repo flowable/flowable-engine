@@ -93,10 +93,6 @@ public class JpaApplicationTest {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dogeProcess", variables);
 
-        List<Execution> waitingExecutions = runtimeService.createExecutionQuery().activityId("wait").list();
-        assertThat(waitingExecutions)
-            .hasSize(2);
-
         Map<String, Object> processInstanceVariables = runtimeService.getVariables(processInstance.getId());
         assertThat(processInstanceVariables).containsOnlyKeys("photos");
         List<Photo> processPhotos = (List<Photo>) processInstanceVariables.get("photos");
@@ -107,11 +103,13 @@ public class JpaApplicationTest {
                 "two"
             );
 
-        for (Execution waitingExecution : waitingExecutions) {
+        Execution waitingExecution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
+        while (waitingExecution != null) {
             Photo executionPhoto = runtimeService.getVariable(waitingExecution.getId(), "photo", Photo.class);
             assertThat(executionPhoto).isNotNull();
             assertThat(executionPhoto.getLabel()).isIn("one", "two");
             runtimeService.trigger(waitingExecution.getId());
+            waitingExecution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
         }
 
         Task reviewTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
