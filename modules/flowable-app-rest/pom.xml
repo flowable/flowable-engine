@@ -151,9 +151,8 @@
                     <plugin>
                         <groupId>com.github.kongchen</groupId>
                         <artifactId>swagger-maven-plugin</artifactId>
-                        <version>3.1.6</version>
+                        <version>3.1.8</version>
                         <configuration>
-                            <skipSwaggerGeneration>true</skipSwaggerGeneration>
                             <apiSources>
                                 <apiSource>
                                     <springmvc>true</springmvc>
@@ -420,6 +419,25 @@
                                 </apiSource>
                             </apiSources>
                         </configuration>
+                        <dependencies>
+                            <!-- Swagger uses javax XML Bind, so add that in order for everything to work properly -->
+                            <dependency>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>jaxb-api</artifactId>
+                                <version>2.3.1</version>
+                            </dependency>
+                            <!-- The swagger Maven plugin uses older Spring version. Use the same version in order to avoid problems -->
+                            <dependency>
+                                <groupId>org.springframework</groupId>
+                                <artifactId>spring-web</artifactId>
+                                <version>${spring.framework.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.springframework</groupId>
+                                <artifactId>spring-context</artifactId>
+                                <version>${spring.framework.version}</version>
+                            </dependency>
+                        </dependencies>
                         <executions>
                             <execution>
                                 <phase>generate-resources</phase>
