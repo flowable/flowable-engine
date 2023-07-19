@@ -1259,6 +1259,80 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
         }
     }
 
+    @Test
+    public void testProcessDeploymentDeleteDeletesRelatedCaseInstances() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+                .deploy();
+
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
+                .deploy();
+
+        // Start process instance, complete a user task to arrive at the case task
+        ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+        processEngineTaskService.complete(processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isOne();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isOne();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+        assertThat(caseInstance).isNotNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isOne();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isOne();
+        }
+
+        // Deleting the process deployment also should delete the case instance
+        processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isZero();
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
+        }
+    }
+
+    // TODO: this needs a DB schema change (adding process instance id to historic case instance)
+//    @Test
+//    public void testCompletedProcessDeploymentDeleteDeletesRelatedCaseInstances() {
+//        // Same test as testProcessDeploymentDeleteDeletesRelatedCaseInstances, but now the process instance and case instance are completed
+//
+//        Deployment deployment = processEngineRepositoryService.createDeployment()
+//                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+//                .deploy();
+//
+//        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+//                .addClasspathResource("org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
+//                .deploy();
+//
+//        ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+//        processEngineTaskService.complete(processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+//        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
+//        processEngineTaskService.complete(processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+//
+//        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+//            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isOne();
+//            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isOne();
+//        }
+//
+//        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+//
+//        // Deleting the process deployment also should delete the case instance
+//        processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+//
+//        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+//        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+//
+//        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, (ProcessEngineConfigurationImpl) processEngineConfiguration)) {
+//            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isZero();
+//            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
+//        }
+//    }
+
 
     static class ClearExecutionReferenceCmd implements Command<Void> {
 

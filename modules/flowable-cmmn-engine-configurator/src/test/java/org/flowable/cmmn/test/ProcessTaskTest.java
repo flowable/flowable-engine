@@ -2036,4 +2036,33 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
     }
 
+    @Test
+    public void testCaseDeploymentDeleteDeletesRelatedProcessInstances() {
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+                .deploy();
+
+        // Start case instance, complete a user task to arrive at the case task
+        startCaseInstanceWithOneTaskProcess();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isOne();
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isOne();
+        }
+
+        // Deleting the case deployment also should delete the process instance
+        cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true);
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().count()).isZero();
+        }
+    }
+
 }
