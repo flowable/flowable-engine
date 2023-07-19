@@ -47,7 +47,7 @@ public interface ProcessInstanceService {
     /**
      * Deletes the given process instance. Typically used to propagate termination.
      */
-    void deleteProcessInstance(String processInstanceId, boolean cascade);
+    void deleteProcessInstance(String processInstanceId);
 
     /**
      * Returns the variable value for a given variable.

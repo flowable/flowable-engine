@@ -148,7 +148,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public void deleteProcessInstance(String processInstanceId, boolean cascade) {
+    public void deleteProcessInstance(String processInstanceId) {
         processEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             
             ExecutionEntity processInstanceEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
@@ -156,7 +156,7 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
                 return null;
             }
 
-            CommandContextUtil.getExecutionEntityManager(commandContext).deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), DELETE_REASON, cascade);
+            CommandContextUtil.getExecutionEntityManager(commandContext).deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), DELETE_REASON, false);
             
             return null;
         });
