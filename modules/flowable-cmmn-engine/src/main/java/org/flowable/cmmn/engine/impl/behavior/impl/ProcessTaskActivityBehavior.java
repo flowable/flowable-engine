@@ -157,7 +157,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
-        deleteProcessInstance(commandContext, planItemInstance, false);
+        deleteProcessInstance(commandContext, planItemInstance);
     }
 
     @Override
@@ -165,22 +165,22 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             // The process task plan item will be deleted by the regular TerminatePlanItemOperation
             if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
-                deleteProcessInstance(commandContext, planItemInstance, false);
+                deleteProcessInstance(commandContext, planItemInstance);
 
             }
         }
     }
 
-    protected void deleteProcessInstance(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, boolean cascade) {
+    protected void deleteProcessInstance(CommandContext commandContext, DelegatePlanItemInstance planItemInstance) {
         ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getProcessInstanceService();
-        processInstanceService.deleteProcessInstance(planItemInstance.getReferenceId(), cascade);
+        processInstanceService.deleteProcessInstance(planItemInstance.getReferenceId());
     }
 
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
         if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
             delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
-            deleteProcessInstance(commandContext, delegatePlanItemInstance, cascade);
+            deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
             throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         }

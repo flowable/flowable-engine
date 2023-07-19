@@ -113,7 +113,7 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     
     void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory);
     
-    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean directDeleteInDatabase);
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase);
 
     void updateProcessInstanceLockTime(String processInstanceId, String lockOwner, Date lockTime);
 

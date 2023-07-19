@@ -142,19 +142,15 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public void deleteCaseInstanceWithoutAgenda(String caseInstanceId, boolean deleteInHistory) {
+    public void deleteCaseInstanceWithoutAgenda(String caseInstanceId) {
         cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
             if (caseInstanceEntity == null || caseInstanceEntity.isDeleted()) {
                 return null;
             }
 
-            if (deleteInHistory) {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceDeleted(caseInstanceId, caseInstanceEntity.getTenantId());
-            } else {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
-                        caseInstanceEntity, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
-            }
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
+                    caseInstanceEntity, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
             
             cmmnEngineConfiguration.getCaseInstanceEntityManager().delete(caseInstanceEntity.getId(), false, "cmmn-state-transition-delete-case");
             
