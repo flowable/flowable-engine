@@ -951,7 +951,7 @@ public abstract class AbstractCmmnDynamicStateManager {
             
             } else if (planItemDefinition instanceof ProcessTask) {
                 if (planItemInstance.getReferenceId() != null) {
-                    cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId(), false);
+                    cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
                 }
             
             } else if (planItemDefinition instanceof EventListener) {
