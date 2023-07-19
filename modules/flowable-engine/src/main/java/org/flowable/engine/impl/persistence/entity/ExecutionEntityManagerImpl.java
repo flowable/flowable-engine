@@ -561,7 +561,7 @@ public class ExecutionEntityManagerImpl
             CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd(executionEntity, deleteReason);
         }
         
-        deleteRelatedDataForExecution(executionEntity, deleteReason, directDeleteInDatabase);
+        deleteRelatedDataForExecution(executionEntity, deleteReason, deleteHistory, directDeleteInDatabase);
         delete(executionEntity);
 
         if (cancel && !executionEntity.isProcessInstanceType()) {
@@ -817,10 +817,8 @@ public class ExecutionEntityManagerImpl
         return null;
     }
     
-    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
-    
     @Override
-    public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase) {
+    public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean directDeleteInDatabase) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Ending and deleting execution {} Reason: {}", executionEntity, deleteReason);
         }
@@ -843,16 +841,16 @@ public class ExecutionEntityManagerImpl
         deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
         deleteActivityInstances(executionEntity, commandContext);
-        deleteSubCases(executionEntity, directDeleteInDatabase, commandContext);
+        deleteSubCases(executionEntity, deleteHistory, directDeleteInDatabase, commandContext);
     }
 
-    protected void deleteSubCases(ExecutionEntity executionEntity, boolean directDeleteInDatabase, CommandContext commandContext) {
+    protected void deleteSubCases(ExecutionEntity executionEntity, boolean deleteHistory, boolean directDeleteInDatabase, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
         if (caseInstanceService != null) {
             if (executionEntity.getReferenceId() != null && ReferenceTypes.EXECUTION_CHILD_CASE.equals(executionEntity.getReferenceType())) {
                 if (directDeleteInDatabase) {
-                    caseInstanceService.deleteCaseInstanceWithoutAgenda(executionEntity.getReferenceId());
+                    caseInstanceService.deleteCaseInstanceWithoutAgenda(executionEntity.getReferenceId(), deleteHistory);
                 } else {
                     caseInstanceService.deleteCaseInstance(executionEntity.getReferenceId());
                 }
