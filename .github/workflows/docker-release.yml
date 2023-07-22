@@ -2,6 +2,9 @@ name: Release Docker Images
 
 on: workflow_dispatch
 
+permissions:
+  contents: read
+
 jobs:
   release_docker_images:
     runs-on: ubuntu-latest

@@ -11,6 +11,9 @@ env:
     -B -V --no-transfer-progress
     -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
+permissions:
+  contents: read
+
 jobs:
   test_jdkea:
     name: Linux (OpenJDK EA)

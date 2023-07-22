@@ -13,6 +13,9 @@ env:
     -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
 # We explicitly don't use a container for running the job since there is some connectivity issues to MariaDB if that is done
+permissions:
+  contents: read
+
 jobs:
   test_mariadb:
     name: MariaDB ${{ matrix.mariadb }}
