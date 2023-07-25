@@ -15,19 +15,13 @@ package org.flowable.spring.boot;
 import java.util.List;
 
 import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
-import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,17 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @Bean
-    public MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
-        PutAwareStandardServletMultiPartResolver multipartResolver = new PutAwareStandardServletMultiPartResolver();
-        multipartResolver.setResolveLazily(multipartProperties.isResolveLazily());
-        return multipartResolver;
-    }
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

@@ -14,9 +14,6 @@ package org.flowable.eventregistry.rest;
 
 import java.util.List;
 
-import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,14 +30,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ComponentScan({ "org.flowable.eventregistry.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Bean
     public MultipartResolver multipartResolver() {
-        return new PutAwareStandardServletMultiPartResolver();
+        return new StandardServletMultipartResolver();
     }
 
     @Override
