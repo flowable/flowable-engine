@@ -17,7 +17,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.ContentType;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.eventregistry.api.ChannelDefinition;
@@ -64,12 +63,7 @@ public class EventRegistryRestResponseFactory {
         // Add additional metadata to the artifact-strings before returning
         List<DeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
-            String contentType = null;
-            if (resourceId.toLowerCase().endsWith(".cmmn")) {
-                contentType = ContentType.TEXT_XML.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceId);
-            }
+            String contentType = contentTypeResolver.resolveContentType(resourceId);
             responseList.add(createDeploymentResourceResponse(deploymentId, resourceId, contentType, urlBuilder));
         }
         return responseList;

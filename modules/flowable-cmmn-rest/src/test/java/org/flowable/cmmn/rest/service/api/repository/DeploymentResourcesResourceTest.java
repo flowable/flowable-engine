@@ -57,12 +57,18 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             // Check URL's for the resource
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                    .isEqualTo("[ {"
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: 'org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn',"
+                            + "    mediaType: 'text/xml',"
+                            + "    type: 'caseDefinition'"
+                            + "  },"
+                            + "  {"
                             + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
                             + " contentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
-                            + " mediaType: null,"
+                            + " mediaType: 'text/plain',"
                             + " type: 'resource'"
                             + "} ]");
 

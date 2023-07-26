@@ -13,6 +13,12 @@
 
 package org.flowable.common.rest.resolver;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
+
 /**
  * Default implementation of a {@link ContentTypeResolver}, resolving a limited set of well-known content types used in the engine.
  * 
@@ -22,25 +28,41 @@ package org.flowable.common.rest.resolver;
  */
 public class DefaultContentTypeResolver implements ContentTypeResolver {
 
+    protected final Map<String, String> fileExtensionToContentType;
+    protected String unknownFileContentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
+    public DefaultContentTypeResolver() {
+        this.fileExtensionToContentType = new HashMap<>();
+        this.fileExtensionToContentType.put("png", MediaType.IMAGE_PNG_VALUE);
+
+        this.fileExtensionToContentType.put("txt", MediaType.TEXT_PLAIN_VALUE);
+
+        this.fileExtensionToContentType.put("xml", MediaType.TEXT_XML_VALUE);
+        this.fileExtensionToContentType.put("bpmn", MediaType.TEXT_XML_VALUE);
+        this.fileExtensionToContentType.put("cmmn", MediaType.TEXT_XML_VALUE);
+        this.fileExtensionToContentType.put("dmn", MediaType.TEXT_XML_VALUE);
+
+        this.fileExtensionToContentType.put("app", MediaType.APPLICATION_JSON_VALUE);
+        this.fileExtensionToContentType.put("event", MediaType.APPLICATION_JSON_VALUE);
+        this.fileExtensionToContentType.put("form", MediaType.APPLICATION_JSON_VALUE);
+        this.fileExtensionToContentType.put("channel", MediaType.APPLICATION_JSON_VALUE);
+    }
+
     @Override
     public String resolveContentType(String resourceName) {
-        String contentType = null;
         if (resourceName != null && !resourceName.isEmpty()) {
             String lowerResourceName = resourceName.toLowerCase();
-
-            if (lowerResourceName.endsWith("png")) {
-                contentType = "image/png";
-            } else if (lowerResourceName.endsWith("xml")
-                    || lowerResourceName.endsWith("bpmn")
-                    || lowerResourceName.endsWith("dmn")) {
-                contentType = "text/xml";
-            } else if (lowerResourceName.endsWith(".app")
-                    || lowerResourceName.endsWith(".event")
-                    || lowerResourceName.endsWith(".form")
-                    || lowerResourceName.endsWith(".channel")) {
-                contentType = "application/json";
-            }
+            String fileExtension = StringUtils.substringAfterLast(lowerResourceName, '.');
+            return fileExtensionToContentType.getOrDefault(fileExtension, unknownFileContentType);
         }
-        return contentType;
+        return null;
+    }
+
+    public void addFileExtensionMapping(String fileExtension, String contentType) {
+        this.fileExtensionToContentType.put(fileExtension, contentType);
+    }
+
+    public void setUnknownFileContentType(String unknownFileContentType) {
+        this.unknownFileContentType = unknownFileContentType;
     }
 }

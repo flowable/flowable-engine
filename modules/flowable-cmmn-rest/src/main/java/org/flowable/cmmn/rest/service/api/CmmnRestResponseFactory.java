@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
@@ -183,12 +182,7 @@ public class CmmnRestResponseFactory {
         // Add additional metadata to the artifact-strings before returning
         List<DeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
-            String contentType = null;
-            if (resourceId.toLowerCase().endsWith(".cmmn")) {
-                contentType = ContentType.TEXT_XML.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceId);
-            }
+            String contentType = contentTypeResolver.resolveContentType(resourceId);
             responseList.add(createDeploymentResourceResponse(deploymentId, resourceId, contentType, urlBuilder));
         }
         return responseList;
