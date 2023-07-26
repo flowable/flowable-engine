@@ -17,7 +17,6 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.http.entity.ContentType;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -80,13 +79,8 @@ public class DeploymentResourceResource extends BaseDeploymentResource {
 
         if (resourceList.contains(resourceName)) {
             // Build resource representation
-            String contentType = null;
-            if (resourceName.toLowerCase().endsWith(".cmmn")) {
-                contentType = ContentType.TEXT_XML.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceName);
-            }
-            
+            String contentType = contentTypeResolver.resolveContentType(resourceName);
+
             DeploymentResourceResponse response = restResponseFactory.createDeploymentResourceResponse(deploymentId, resourceName, contentType);
             return response;
 

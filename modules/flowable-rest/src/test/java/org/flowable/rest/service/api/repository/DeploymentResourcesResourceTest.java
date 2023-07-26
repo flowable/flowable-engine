@@ -58,13 +58,19 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
 
             // Since resources can be returned in any arbitrary order, find the right one to check
             assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER)
-                    .isEqualTo("[{"
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: 'org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml',"
+                            + "    mediaType: 'text/xml',"
+                            + "    type: 'processDefinition'"
+                            + "  },"
+                            + "  {"
                             + "    url: '" + SERVER_URL_PREFIX + RestUrls
                             .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
                             + "    contentUrl: '" + SERVER_URL_PREFIX + RestUrls
                             .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
-                            + "    mediaType: null,"
+                            + "    mediaType: 'text/plain',"
                             + "    type: 'resource'"
                             + "}]");
 

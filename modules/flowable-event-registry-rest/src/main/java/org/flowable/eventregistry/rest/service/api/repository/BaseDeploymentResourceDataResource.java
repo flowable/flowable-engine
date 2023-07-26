@@ -16,8 +16,9 @@ package org.flowable.eventregistry.rest.service.api.repository;
 import java.io.InputStream;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.http.entity.ContentType;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -26,8 +27,6 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.rest.service.api.EventRegistryRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -65,12 +64,7 @@ public class BaseDeploymentResourceDataResource {
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceName)) {
-            String contentType = null;
-            if (resourceName.toLowerCase().endsWith(".event") || resourceName.toLowerCase().endsWith(".channel")) {
-                contentType = ContentType.APPLICATION_JSON.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceName);
-            }
+            String contentType = contentTypeResolver.resolveContentType(resourceName);
             response.setContentType(contentType);
             
             try (final InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, resourceName)) {

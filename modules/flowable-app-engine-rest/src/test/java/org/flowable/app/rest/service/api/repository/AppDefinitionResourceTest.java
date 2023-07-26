@@ -69,7 +69,7 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting app definition. GET app-repository/app-definitions/{appeDefinitionId}
      */
-    public void testGetUnexistingCaseDefinition() throws Exception {
+    public void testGetUnexistingAppDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_APP_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
@@ -89,6 +89,7 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThat(content)
                 .isNotNull()
                 .contains("oneApp");
+        assertThat(response.getFirstHeader("Content-Type").getValue()).isEqualTo("application/json");
     }
 
     /**
