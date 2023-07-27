@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +44,7 @@ public class CaseInstanceQueryResource extends BaseCaseInstanceResource {
     })
     @PostMapping(value = "/cmmn-query/case-instances", produces = "application/json")
     public DataResponse<CaseInstanceResponse> queryCaseInstances(@RequestBody CaseInstanceQueryRequest queryRequest, @ApiParam(hidden = true) 
-            @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+            @RequestParam Map<String, String> allRequestParams) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }

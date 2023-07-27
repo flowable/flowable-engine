@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -62,10 +61,10 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/variables/{variableName}/data")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, 
-                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
+                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, caseInstanceId, variableName, request);
+            RestVariable variable = getVariableFromRequest(true, caseInstanceId, variableName);
             if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -89,7 +88,7 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName) {
         HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequest(caseInstanceId);
 
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()

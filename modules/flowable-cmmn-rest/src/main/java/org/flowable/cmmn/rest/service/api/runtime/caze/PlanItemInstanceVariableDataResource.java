@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -47,7 +46,7 @@ public class PlanItemInstanceVariableDataResource extends BaseVariableResource {
     public byte[] getVariableData(@ApiParam(name = "planItemInstanceId") @PathVariable("planItemInstanceId") String planItemInstanceId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            HttpServletResponse response) {
 
         PlanItemInstance planItemInstance = getPlanItemInstanceFromRequest(planItemInstanceId);
         return getVariableDataByteArray(planItemInstance, variableName, response);

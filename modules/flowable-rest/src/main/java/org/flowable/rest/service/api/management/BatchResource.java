@@ -13,7 +13,6 @@
 
 package org.flowable.rest.service.api.management;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.batch.api.Batch;
@@ -25,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -50,7 +50,7 @@ public class BatchResource extends BatchBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested batch does not exist.")
     })
     @GetMapping(value = "/management/batches/{batchId}", produces = "application/json")
-    public BatchResponse getBatch(@ApiParam(name = "batchId") @PathVariable String batchId, HttpServletRequest request) {
+    public BatchResponse getBatch(@ApiParam(name = "batchId") @PathVariable String batchId) {
         Batch batch = getBatchById(batchId);
         return restResponseFactory.createBatchResponse(batch);
     }
@@ -74,13 +74,14 @@ public class BatchResource extends BatchBaseResource {
         return batchDocument;
     }
 
-    @ApiOperation(value = "Delete a batch", tags = { "Batches" }, nickname = "deleteBatch")
+    @ApiOperation(value = "Delete a batch", tags = { "Batches" }, nickname = "deleteBatch", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the batch was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested batch was not found.")
     })
     @DeleteMapping("/management/batches/{batchId}")
-    public void deleteJob(@ApiParam(name = "batchId") @PathVariable String batchId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteJob(@ApiParam(name = "batchId") @PathVariable String batchId) {
         Batch batch = getBatchById(batchId);
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteBatch(batch);
@@ -92,6 +93,5 @@ public class BatchResource extends BatchBaseResource {
             // Re-throw to have consistent error-messaging across REST-api
             throw new FlowableObjectNotFoundException("Could not find a batch with id '" + batchId + "'.", Batch.class);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

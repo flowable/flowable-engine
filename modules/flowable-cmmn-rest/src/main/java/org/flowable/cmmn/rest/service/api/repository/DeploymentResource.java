@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -49,19 +49,19 @@ public class DeploymentResource extends BaseDeploymentResource {
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @GetMapping(value = "/cmmn-repository/deployments/{deploymentId}", produces = "application/json")
-    public CmmnDeploymentResponse getDeployment(@ApiParam(name = "deploymentId", value ="The id of the deployment to get.") @PathVariable String deploymentId, HttpServletRequest request) {
+    public CmmnDeploymentResponse getDeployment(@ApiParam(name = "deploymentId", value ="The id of the deployment to get.") @PathVariable String deploymentId) {
         CmmnDeployment deployment = getCmmnDeployment(deploymentId);
         return restResponseFactory.createDeploymentResponse(deployment);
     }
 
-    @ApiOperation(value = "Delete a deployment", tags = { "Deployment" })
+    @ApiOperation(value = "Delete a deployment", tags = { "Deployment" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @DeleteMapping(value = "/cmmn-repository/deployments/{deploymentId}", produces = "application/json")
-    public void deleteDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, @RequestParam(value = "cascade", required = false, defaultValue = "false") Boolean cascade,
-            HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, @RequestParam(value = "cascade", required = false, defaultValue = "false") Boolean cascade) {
         
         CmmnDeployment deployment = getCmmnDeployment(deploymentId);
         if (restApiInterceptor != null) {
@@ -73,6 +73,5 @@ public class DeploymentResource extends BaseDeploymentResource {
         } else {
             repositoryService.deleteDeployment(deploymentId, false);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,8 +44,8 @@ public class ExecutionQueryResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @PostMapping(value = "/query/executions", produces = "application/json")
-    public DataResponse<ExecutionResponse> queryProcessInstances(@RequestBody ExecutionQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ExecutionResponse> queryProcessInstances(@RequestBody ExecutionQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/query/executions", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

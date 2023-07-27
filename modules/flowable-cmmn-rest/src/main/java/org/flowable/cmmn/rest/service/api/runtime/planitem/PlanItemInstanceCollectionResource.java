@@ -16,8 +16,6 @@ package org.flowable.cmmn.rest.service.api.runtime.planitem;
 import java.util.Arrays;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,7 +66,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @GetMapping(value = "/cmmn-runtime/plan-item-instances", produces = "application/json")
-    public DataResponse<PlanItemInstanceResponse> getPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<PlanItemInstanceResponse> getPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         PlanItemInstanceQueryRequest queryRequest = new PlanItemInstanceQueryRequest();
 
@@ -147,6 +145,6 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             }
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/cmmn-runtime/plan-item-instances", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

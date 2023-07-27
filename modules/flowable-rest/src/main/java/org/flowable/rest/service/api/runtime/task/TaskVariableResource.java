@@ -16,7 +16,6 @@ package org.flowable.rest.service.api.runtime.task;
 import java.util.Collections;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -32,6 +31,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -64,8 +64,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope) {
 
         return getVariableFromRequest(taskId, variableName, scope, false);
     }
@@ -130,17 +129,17 @@ public class TaskVariableResource extends TaskVariableBaseResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete a variable on a task", tags = { "Task Variables" }, nickname = "deleteTaskInstanceVariable")
+    @ApiOperation(value = "Delete a variable on a task", tags = { "Task Variables" }, nickname = "deleteTaskInstanceVariable", code = 204)
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task variable was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name. Status message contains additional information about the error.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString,
-            HttpServletResponse response) {
+            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
@@ -165,6 +164,5 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             // stopped a global-var update on standalone task
             runtimeService.removeVariable(task.getExecutionId(), variableName);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

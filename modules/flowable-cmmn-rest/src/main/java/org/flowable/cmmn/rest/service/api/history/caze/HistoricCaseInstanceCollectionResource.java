@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
@@ -83,7 +81,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiResponse(code = 200, message = "Indicates that historic case instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/cmmn-history/historic-case-instances", produces = "application/json")
-    public DataResponse<HistoricCaseInstanceResponse> getHistoricCasenstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricCaseInstanceResponse> getHistoricCasenstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricCaseInstanceQueryRequest queryRequest = new HistoricCaseInstanceQueryRequest();
 
@@ -212,7 +210,8 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     }
 
     @ApiOperation(value = "Post action request to delete a bulk of historic case instances", tags = {
-            "Manage History Case Instances" }, nickname = "bulkDeleteHistoricCaseInstances")
+            "Manage History Case Instances" }, nickname = "bulkDeleteHistoricCaseInstances",
+            code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the bulk of historic case instances was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates at least one requested case instance was not found.")

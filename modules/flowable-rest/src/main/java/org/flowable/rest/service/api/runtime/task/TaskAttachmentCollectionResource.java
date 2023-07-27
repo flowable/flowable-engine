@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -32,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -63,7 +63,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments", produces = "application/json")
-    public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId) {
         List<AttachmentResponse> result = new ArrayList<>();
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
@@ -77,7 +77,8 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create a new attachment on a task, containing a link to an external resource or an attached file", tags = { "Task Attachments" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (AttachmentRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\n"
-                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.",
+            code = 201)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.AttachmentRequest", value = "create an attachment containing a link to an external resource", paramType = "body", example = "{\n" + "  \"name\":\"Simple attachment\",\n" + "  \"description\":\"Simple attachment description\",\n"
                     + "  \"type\":\"simpleType\",\n" + "  \"externalUrl\":\"http://flowable.org\"\n" + "}"),
@@ -92,7 +93,8 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @PostMapping(value = "/runtime/tasks/{taskId}/attachments", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
-    public AttachmentResponse createAttachment(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public AttachmentResponse createAttachment(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
 
         AttachmentResponse result = null;
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
@@ -100,7 +102,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             restApiInterceptor.createTaskAttachment(task);
         }
         if (request instanceof MultipartHttpServletRequest) {
-            result = createBinaryAttachment((MultipartHttpServletRequest) request, task, response);
+            result = createBinaryAttachment((MultipartHttpServletRequest) request, task);
         } else {
 
             AttachmentRequest attachmentRequest = null;
@@ -118,7 +120,6 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             result = createSimpleAttachment(attachmentRequest, task);
         }
 
-        response.setStatus(HttpStatus.CREATED.value());
         return result;
     }
 
@@ -134,7 +135,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
         return restResponseFactory.createAttachmentResponse(createdAttachment);
     }
 
-    protected AttachmentResponse createBinaryAttachment(MultipartHttpServletRequest request, Task task, HttpServletResponse response) {
+    protected AttachmentResponse createBinaryAttachment(MultipartHttpServletRequest request, Task task) {
 
         String name = null;
         String description = null;
@@ -173,7 +174,6 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
         try {
             Attachment createdAttachment = taskService.createAttachment(type, task.getId(), task.getProcessInstanceId(), name, description, file.getInputStream());
 
-            response.setStatus(HttpStatus.CREATED.value());
             return restResponseFactory.createAttachmentResponse(createdAttachment);
 
         } catch (Exception e) {

@@ -13,8 +13,6 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -49,7 +47,7 @@ public class EventDefinitionResource extends BaseEventDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
     })
     @GetMapping(value = "/event-registry-repository/event-definitions/{eventDefinitionId}", produces = "application/json")
-    public EventDefinitionResponse getEventDefinition(@ApiParam(name = "eventDefinitionId") @PathVariable String eventDefinitionId, HttpServletRequest request) {
+    public EventDefinitionResponse getEventDefinition(@ApiParam(name = "eventDefinitionId") @PathVariable String eventDefinitionId) {
         EventDefinition eventDefinition = getEventDefinitionFromRequest(eventDefinitionId);
 
         return restResponseFactory.createEventDefinitionResponse(eventDefinition);

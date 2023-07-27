@@ -72,14 +72,12 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         return result;
     }
 
-    public void deleteAllLocalVariables(Execution execution, HttpServletResponse response) {
+    public void deleteAllLocalVariables(Execution execution) {
         Collection<String> currentVariables = runtimeService.getVariablesLocal(execution.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteExecutionVariables(execution, currentVariables, RestVariableScope.LOCAL);
         }
         runtimeService.removeVariablesLocal(execution.getId(), currentVariables);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected Object createExecutionVariable(Execution execution, boolean override, HttpServletRequest request, HttpServletResponse response) {

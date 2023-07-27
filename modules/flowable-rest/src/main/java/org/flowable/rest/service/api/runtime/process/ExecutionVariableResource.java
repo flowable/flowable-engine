@@ -16,7 +16,6 @@ package org.flowable.rest.service.api.runtime.process;
 import java.util.Collections;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -69,8 +69,7 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
     })
     @GetMapping(value = "/runtime/executions/{executionId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request) {
+            @RequestParam(value = "scope", required = false) String scope) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         return getVariableFromRequest(execution, variableName, scope, false);
@@ -132,15 +131,15 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete a variable for an execution", tags = { "Executions" }, nickname = "deletedExecutionVariable")
+    @ApiOperation(value = "Delete a variable for an execution", tags = { "Executions" }, nickname = "deletedExecutionVariable", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates both the execution and variable were found and variable has been deleted."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found or the execution does not have a variable with the given name in the requested scope. Status description contains additional information about the error.")
     })
     @DeleteMapping(value = "/runtime/executions/{executionId}/variables/{variableName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteVariable(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @RequestParam(value = "scope", required = false) String scope,
-            HttpServletResponse response) {
+            @RequestParam(value = "scope", required = false) String scope) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
         // Determine scope
@@ -165,6 +164,5 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
             // stopped a global-var update on a root-execution
             runtimeService.removeVariable(execution.getParentId(), variableName);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

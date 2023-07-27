@@ -18,9 +18,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
@@ -37,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -95,7 +93,7 @@ public class UserCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
     })
     @GetMapping(value = "/identity/users", produces = "application/json")
-    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         UserQuery query = identityService.createUserQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -139,14 +137,15 @@ public class UserCollectionResource {
         return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createUserResponseList);
     }
 
-    @ApiOperation(value = "Create a user", tags = { "Users" })
+    @ApiOperation(value = "Create a user", tags = { "Users" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the user was created."),
             @ApiResponse(code = 400, message = "Indicates the id of the user was missing.")
 
     })
     @PostMapping(value = "/identity/users", produces = "application/json")
-    public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse createUser(@RequestBody UserRequest userRequest) {
         if (userRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");
         }
@@ -168,8 +167,6 @@ public class UserCollectionResource {
         created.setPassword(userRequest.getPassword());
         created.setTenantId(userRequest.getTenantId());
         identityService.saveUser(created);
-
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createUserResponse(created, true);
     }

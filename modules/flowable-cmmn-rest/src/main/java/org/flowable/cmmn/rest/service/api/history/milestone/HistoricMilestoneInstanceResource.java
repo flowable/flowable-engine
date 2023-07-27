@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.history.milestone;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +39,7 @@ public class HistoricMilestoneInstanceResource extends HistoricMilestoneInstance
             @ApiResponse(code = 200, message = "Indicates that the historic milestone instances could be found."),
             @ApiResponse(code = 404, message = "Indicates that the historic milestone instances could not be found.")})
     @GetMapping(value = "/cmmn-history/historic-milestone-instances/{milestoneInstanceId}", produces = "application/json")
-    public HistoricMilestoneInstanceResponse getMilestoneInstance(@ApiParam(name = "milestoneInstanceId") @PathVariable String milestoneInstanceId, HttpServletRequest request) {
+    public HistoricMilestoneInstanceResponse getMilestoneInstance(@ApiParam(name = "milestoneInstanceId") @PathVariable String milestoneInstanceId) {
         HistoricMilestoneInstance milestoneInstance = historyService.createHistoricMilestoneInstanceQuery().milestoneInstanceId(milestoneInstanceId).singleResult();
         if (milestoneInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a milestone instance with id '" + milestoneInstanceId + "'.", HistoricMilestoneInstance.class);

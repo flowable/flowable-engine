@@ -23,12 +23,14 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -58,7 +60,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 400, message = "Indicates the requested process instance was not found.")
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
-    public List<RestVariable> getVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
+    public List<RestVariable> getVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "scope", required = false) String scope) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
         return processVariables(execution, scope);
@@ -127,15 +129,16 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     }
 
     // FIXME Documentation
-    @ApiOperation(value = "Delete all variables", tags = { "Process Instance Variables" }, nickname = "deleteLocalProcessVariable")
+    @ApiOperation(value = "Delete all variables", tags = { "Process Instance Variables" }, nickname = "deleteLocalProcessVariable", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates variables were found and have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
     @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/variables")
-    public void deleteLocalVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLocalVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId) {
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        deleteAllLocalVariables(execution, response);
+        deleteAllLocalVariables(execution);
     }
 
     @Override

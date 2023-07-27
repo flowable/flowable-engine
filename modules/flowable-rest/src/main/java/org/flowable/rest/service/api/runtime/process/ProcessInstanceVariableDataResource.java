@@ -13,7 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.runtime.Execution;
@@ -51,7 +50,7 @@ public class ProcessInstanceVariableDataResource extends BaseExecutionVariableRe
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}/data")
     public byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
         return getVariableDataByteArray(execution, variableName, scope, response);

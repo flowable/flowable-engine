@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.management;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -70,13 +69,14 @@ public class EnginePropertiesResource {
         return managementService.getProperties();
     }
 
-    @ApiOperation(value = "Delete an engine property", tags = { "EngineProperties" })
+    @ApiOperation(value = "Delete an engine property", tags = { "EngineProperties" }, code = 204)
     @ApiResponses(value = {
         @ApiResponse(code = 204, message = "Indicates the property was found and has been deleted. Response-body is intentionally empty."),
         @ApiResponse(code = 404, message = "Indicates the requested property was not found.")
     })
     @DeleteMapping(value = "/management/engine-properties/{engineProperty}", produces = "application/json")
-    public void deleteEngineProperty(@ApiParam(name = "engineProperty") @PathVariable String engineProperty, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEngineProperty(@ApiParam(name = "engineProperty") @PathVariable String engineProperty) {
         validateAccessToProperties();
 
         validatePropertyExists(engineProperty);
@@ -85,8 +85,6 @@ public class EnginePropertiesResource {
             CommandContextUtil.getPropertyEntityManager(commandContext).delete(engineProperty);
             return null;
         });
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected void validatePropertyExists(String engineProperty) {
@@ -96,13 +94,14 @@ public class EnginePropertiesResource {
         }
     }
 
-    @ApiOperation(value = "Create a new engine property", tags = { "EngineProperties" })
+    @ApiOperation(value = "Create a new engine property", tags = { "EngineProperties" }, code = 201)
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Indicates the property is created"),
         @ApiResponse(code = 409, message = "Indicates the property already exists")
     })
     @PostMapping(value = "/management/engine-properties", produces = "application/json")
-    public void createEngineProperty(@RequestBody PropertyRequestBody propertyRequestBody, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createEngineProperty(@RequestBody PropertyRequestBody propertyRequestBody) {
         validateAccessToProperties();
 
         Map<String, String> properties = managementService.getProperties();
@@ -119,8 +118,6 @@ public class EnginePropertiesResource {
             propertyEntityManager.insert(propertyEntity);
             return null;
         });
-
-        response.setStatus(HttpStatus.CREATED.value());
     }
 
     @ApiOperation(value = "Update an engine property", tags = { "EngineProperties" })

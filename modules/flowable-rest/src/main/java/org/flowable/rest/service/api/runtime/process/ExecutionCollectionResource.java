@@ -15,9 +15,6 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
@@ -25,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -64,7 +62,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @GetMapping(value = "/runtime/executions", produces = "application/json")
-    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         ExecutionQueryRequest queryRequest = new ExecutionQueryRequest();
 
@@ -118,17 +116,18 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
             }
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/runtime/executions", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 
     //FIXME Documentation ?
-    @ApiOperation(value = "Signal event received", tags = { "Executions" })
+    @ApiOperation(value = "Signal event received", tags = { "Executions" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates request was successful and the executions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @PutMapping(value = "/runtime/executions")
-    public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest) {
         if (restApiInterceptor != null) {
             restApiInterceptor.doExecutionActionRequest(actionRequest);
         }
@@ -146,6 +145,5 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         } else {
             runtimeService.signalEventReceived(actionRequest.getSignalName());
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

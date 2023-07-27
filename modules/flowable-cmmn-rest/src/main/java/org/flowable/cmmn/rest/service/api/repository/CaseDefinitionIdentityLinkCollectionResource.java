@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -27,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -49,7 +47,7 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
+    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
         CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         if (restApiInterceptor != null) {
@@ -60,14 +58,15 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
     }
 
     @ApiOperation(value = "Add a candidate starter to a case definition", tags = { "Case Definitions" },
-            notes = "It is possible to add either a user or a group.")
+            notes = "It is possible to add either a user or a group.", code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the case definition was found and the identity link was created."),
             @ApiResponse(code = 400, message = "Indicates the body does not contain the correct information."),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks", produces = "application/json")
-    public RestIdentityLink createIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public RestIdentityLink createIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, @RequestBody RestIdentityLink identityLink) {
 
         CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
@@ -91,8 +90,6 @@ public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefini
 
         // Always candidate for case definition. User-provided value is ignored
         identityLink.setType(IdentityLinkType.CANDIDATE);
-
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), null, caseDefinition.getId(), null);
     }

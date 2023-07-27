@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.history;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +51,7 @@ public class HistoricDetailCollectionResource extends HistoricDetailBaseResource
             @ApiResponse(code = 200, message = "Indicates that historic detail could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/history/historic-detail", produces = "application/json")
-    public DataResponse<HistoricDetailResponse> getHistoricDetailInfo(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricDetailResponse> getHistoricDetailInfo(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricDetailQueryRequest queryRequest = new HistoricDetailQueryRequest();
 

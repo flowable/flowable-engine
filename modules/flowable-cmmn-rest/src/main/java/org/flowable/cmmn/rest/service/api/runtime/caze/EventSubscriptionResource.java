@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -54,7 +52,7 @@ public class EventSubscriptionResource {
             @ApiResponse(code = 404, message = "Indicates the requested event subscription does not exist.")
     })
     @GetMapping(value = "/cmmn-runtime/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
-    public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId, HttpServletRequest request) {
+    public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId) {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().id(eventSubscriptionId).singleResult();
 
         if (eventSubscription == null) {

@@ -12,8 +12,6 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +37,7 @@ public class HistoricDecisionExecutionResource extends BaseHistoricDecisionExecu
             @ApiResponse(code = 404, message = "Indicates the requested historic decision execution was not found.")
     })
     @GetMapping(value = "/dmn-history/historic-decision-executions/{historicDecisionExecutionId}", produces = "application/json")
-    public HistoricDecisionExecutionResponse getHistoricDecisionExecution(@ApiParam(name = "historicDecisionExecutionId") @PathVariable String historicDecisionExecutionId, HttpServletRequest request) {
+    public HistoricDecisionExecutionResponse getHistoricDecisionExecution(@ApiParam(name = "historicDecisionExecutionId") @PathVariable String historicDecisionExecutionId) {
         DmnHistoricDecisionExecution decisionExecution = getHistoricDecisionExecutionFromRequest(historicDecisionExecutionId);
 
         return dmnRestResponseFactory.createHistoryDecisionExecutionResponse(decisionExecution);

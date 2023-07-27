@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -64,7 +62,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}", produces = "application/json")
-    public CaseDefinitionResponse getCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
+    public CaseDefinitionResponse getCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
 
         return restResponseFactory.createCaseDefinitionResponse(caseDefinition);
@@ -80,8 +78,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
     @PutMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}", produces = "application/json")
     public CaseDefinitionResponse executeCaseDefinitionAction(
             @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
-            @ApiParam(required = true) @RequestBody CaseDefinitionActionRequest actionRequest,
-            HttpServletRequest request) {
+            @ApiParam(required = true) @RequestBody CaseDefinitionActionRequest actionRequest) {
 
         if (actionRequest == null) {
             throw new FlowableIllegalArgumentException("No action found in request body.");
@@ -108,7 +105,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/start-form", produces = "application/json")
-    public String getProcessDefinitionStartForm(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId, HttpServletRequest request) {
+    public String getProcessDefinitionStartForm(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
         FormEngineConfigurationApi formEngineConfiguration = (FormEngineConfigurationApi) cmmnEngineConfiguration.getEngineConfigurations().get(
                 EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         if (formEngineConfiguration == null) {

@@ -14,8 +14,6 @@ package org.flowable.rest.service.api.repository;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +41,7 @@ public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefi
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decisions", produces = "application/json")
     public List<DecisionResponse> getDecisionsForProcessDefinition(
-        @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-        HttpServletRequest request) {
+        @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
 
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
@@ -64,9 +61,8 @@ public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefi
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", produces = "application/json")
     public List<DecisionResponse> getDecisionTablesForProcessDefinition(
-            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-            HttpServletRequest request) {
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
 
-        return getDecisionsForProcessDefinition(processDefinitionId, request);
+        return getDecisionsForProcessDefinition(processDefinitionId);
     }
 }

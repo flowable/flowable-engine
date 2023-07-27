@@ -13,8 +13,6 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -49,7 +47,7 @@ public class ChannelDefinitionResource extends BaseEventDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
     })
     @GetMapping(value = "/event-registry-repository/channel-definitions/{channelDefinitionId}", produces = "application/json")
-    public ChannelDefinitionResponse getChannelDefinition(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId, HttpServletRequest request) {
+    public ChannelDefinitionResponse getChannelDefinition(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId) {
         ChannelDefinition channelDefinition = getChannelDefinitionFromRequest(channelDefinitionId);
 
         return restResponseFactory.createChannelDefinitionResponse(channelDefinition);

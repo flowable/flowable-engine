@@ -16,7 +16,6 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import java.util.Collections;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -113,7 +112,7 @@ public class PlanItemInstanceVariableResource extends BaseVariableResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete a variable for a plan item instance", tags = { "Plan Item Instances" }, nickname = "deletePlanItemVariable")
+    @ApiOperation(value = "Delete a variable for a plan item instance", tags = { "Plan Item Instances" }, nickname = "deletePlanItemVariable", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates both the plan item and variable were found and variable has been deleted."),
             @ApiResponse(code = 404, message = "Indicates the requested plan item was not found or the plan item does not have a variable with the given name in the requested scope. Status description contains additional information about the error.")
@@ -122,8 +121,7 @@ public class PlanItemInstanceVariableResource extends BaseVariableResource {
     @DeleteMapping(value = "/cmmn-runtime/plan-item-instances/{planItemInstanceId}/variables/{variableName}")
     public void deleteVariable(@ApiParam(name = "planItemInstanceId") @PathVariable("planItemInstanceId") String planItemInstanceId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @RequestParam(value = "scope", required = false) String scope,
-            HttpServletResponse response) {
+            @RequestParam(value = "scope", required = false) String scope) {
 
         PlanItemInstance planItem = getPlanItemInstanceFromRequest(planItemInstanceId);
 

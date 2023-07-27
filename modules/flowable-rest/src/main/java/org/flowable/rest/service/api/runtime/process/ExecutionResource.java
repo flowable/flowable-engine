@@ -13,7 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -46,7 +45,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @GetMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
-    public ExecutionResponse getExecution(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request) {
+    public ExecutionResponse getExecution(@ApiParam(name = "executionId") @PathVariable String executionId) {
         return restResponseFactory.createExecutionResponse(getExecutionFromRequest(executionId));
     }
 
@@ -58,7 +57,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @PutMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
-    public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
         
@@ -116,7 +115,7 @@ public class ExecutionResource extends ExecutionBaseResource {
     })
     @PostMapping(value = "/runtime/executions/{executionId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "executionId") @PathVariable String executionId,
-            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest) {
         
         if (restApiInterceptor != null) {
             restApiInterceptor.changeActivityState(activityStateRequest);

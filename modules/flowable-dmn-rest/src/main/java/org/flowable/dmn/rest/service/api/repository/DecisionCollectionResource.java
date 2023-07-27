@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.dmn.api.DmnDecisionQuery;
@@ -94,7 +92,7 @@ public class DecisionCollectionResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that latest is used with other parameters other than key and keyLike. The status-message contains additional information.")
     })
     @GetMapping(value = "/dmn-repository/decisions", produces = "application/json")
-    public DataResponse<DecisionResponse> getDecisions(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<DecisionResponse> getDecisions(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery();
 
         // Populate filter-parameters

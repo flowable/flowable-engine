@@ -16,7 +16,6 @@ package org.flowable.rest.service.api.identity;
 import java.io.ByteArrayOutputStream;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -30,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -58,7 +58,7 @@ public class UserPictureResource extends BaseUserResource {
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have a profile picture. Status-description contains additional information about the error.")
     })
     @GetMapping(value = "/identity/users/{userId}/picture")
-    public ResponseEntity<byte[]> getUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<byte[]> getUserPicture(@ApiParam(name = "userId") @PathVariable String userId) {
         User user = getUserFromRequest(userId);
         Picture userPicture = identityService.getUserPicture(user.getId());
 
@@ -83,7 +83,8 @@ public class UserPictureResource extends BaseUserResource {
     @ApiOperation(consumes = "multipart/form-data", value = "Updating a user’s picture", tags = {
             "Users" },  notes = "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the picture. On top of that, the following additional form-fields can be present:\n"
                     + "\n"
-                    + "mimeType: Optional mime-type for the uploaded picture. If omitted, the default of image/jpeg is used as a mime-type for the picture.")
+                    + "mimeType: Optional mime-type for the uploaded picture. If omitted, the default of image/jpeg is used as a mime-type for the picture.",
+            code = 204)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", dataType = "file", value = "Picture to update", paramType = "form", required = true)
     })
@@ -92,7 +93,8 @@ public class UserPictureResource extends BaseUserResource {
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")
     })
     @PutMapping(value = "/identity/users/{userId}/picture", consumes = "multipart/form-data")
-    public void updateUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request) {
         User user = getUserFromRequest(userId);
 
         if (!(request instanceof MultipartHttpServletRequest)) {
@@ -117,8 +119,6 @@ public class UserPictureResource extends BaseUserResource {
 
             Picture newPicture = new Picture(bytesOutput.toByteArray(), mimeType);
             identityService.setUserPicture(user.getId(), newPicture);
-
-            response.setStatus(HttpStatus.NO_CONTENT.value());
 
         } catch (Exception e) {
             throw new FlowableException("Error while reading uploaded file: " + e.getMessage(), e);

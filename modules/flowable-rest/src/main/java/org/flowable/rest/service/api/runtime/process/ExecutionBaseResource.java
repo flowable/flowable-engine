@@ -57,7 +57,7 @@ public class ExecutionBaseResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    protected DataResponse<ExecutionResponse> getQueryResponse(ExecutionQueryRequest queryRequest, Map<String, String> requestParams, String serverRootUrl) {
+    protected DataResponse<ExecutionResponse> getQueryResponse(ExecutionQueryRequest queryRequest, Map<String, String> requestParams) {
 
         ExecutionQuery query = runtimeService.createExecutionQuery();
 

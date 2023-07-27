@@ -257,14 +257,12 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         return restResponseFactory.createRestVariables(rawVariables, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE);
     }
     
-    public void deleteAllVariables(CaseInstance caseInstance, HttpServletResponse response) {
+    public void deleteAllVariables(CaseInstance caseInstance) {
         Collection<String> currentVariables = runtimeService.getVariables(caseInstance.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstanceVariables(caseInstance, currentVariables);
         }
         runtimeService.removeVariables(caseInstance.getId(), currentVariables);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
     protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, RestVariableScope scope, int variableType, VariableInterceptor variableInterceptor) {

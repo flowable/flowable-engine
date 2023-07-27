@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -106,7 +105,7 @@ public class JobCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/cmmn-management/jobs", produces = "application/json")
-    public DataResponse<JobResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<JobResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         JobQuery query = managementService.createJobQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -188,15 +187,14 @@ public class JobCollectionResource {
         return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
     }
 
-    @ApiOperation(value = "Move a bulk of deadletter jobs. Accepts 'move' and 'moveToHistoryJob' as action.", tags = { "Jobs" })
+    @ApiOperation(value = "Move a bulk of deadletter jobs. Accepts 'move' and 'moveToHistoryJob' as action.", tags = { "Jobs" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the dead letter jobs where moved. Response-body is intentionally empty."),
             @ApiResponse(code = 500, message = "Indicates the an exception occurred while executing the job. The status-description contains additional detail about the error. The full error-stacktrace can be fetched later on if needed.")
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @PostMapping("/cmmn-management/deadletter-jobs")
-    public void executeDeadLetterJobAction(@RequestBody BulkMoveDeadLetterActionRequest actionRequest,
-            HttpServletResponse response) {
+    public void executeDeadLetterJobAction(@RequestBody BulkMoveDeadLetterActionRequest actionRequest) {
         if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'move' or 'moveToHistoryJob' is supported.");
         }

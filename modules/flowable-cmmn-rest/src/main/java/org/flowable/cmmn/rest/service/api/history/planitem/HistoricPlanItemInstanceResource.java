@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +39,7 @@ public class HistoricPlanItemInstanceResource extends HistoricPlanItemInstanceBa
             @ApiResponse(code = 200, message = "Indicates that the historic plan item instances could be found."),
             @ApiResponse(code = 404, message = "Indicates that the historic plan item instances could not be found.")})
     @GetMapping(value = "/cmmn-history/historic-planitem-instances/{planItemInstanceId}", produces = "application/json")
-    public HistoricPlanItemInstanceResponse getPlanItemInstance(@ApiParam(name = "planItemInstanceId") @PathVariable String planItemInstanceId, HttpServletRequest request) {
+    public HistoricPlanItemInstanceResponse getPlanItemInstance(@ApiParam(name = "planItemInstanceId") @PathVariable String planItemInstanceId) {
         HistoricPlanItemInstance planItemInstance = historyService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).singleResult();
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a plan item instance with id '" + planItemInstanceId + "'.", HistoricPlanItemInstance.class);

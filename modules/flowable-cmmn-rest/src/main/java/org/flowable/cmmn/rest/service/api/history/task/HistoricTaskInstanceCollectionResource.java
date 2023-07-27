@@ -16,8 +16,6 @@ package org.flowable.cmmn.rest.service.api.history.task;
 import java.util.Arrays;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,7 +91,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances", produces = "application/json")
-    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricTaskInstanceQueryRequest queryRequest = new HistoricTaskInstanceQueryRequest();
 
@@ -285,6 +283,6 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setPlanItemInstanceId(allRequestParams.get("planItemInstanceId"));
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/cmmn-history/historic-task-instances", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

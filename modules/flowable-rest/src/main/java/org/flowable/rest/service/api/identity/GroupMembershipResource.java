@@ -13,14 +13,12 @@
 
 package org.flowable.rest.service.api.identity;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -37,13 +35,14 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipResource extends BaseGroupResource {
 
-    @ApiOperation(value = "Delete a member from a group", tags = { "Groups" })
+    @ApiOperation(value = "Delete a member from a group", tags = { "Groups" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the group was found and the member has been deleted. The response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested group was not found or that the user is not a member of the group. The status description contains additional information about the error.")
     })
     @DeleteMapping("/identity/groups/{groupId}/members/{userId}")
-    public void deleteMembership(@ApiParam(name = "groupId") @PathVariable("groupId") String groupId, @ApiParam(name = "userId") @PathVariable("userId") String userId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMembership(@ApiParam(name = "groupId") @PathVariable("groupId") String groupId, @ApiParam(name = "userId") @PathVariable("userId") String userId) {
 
         Group group = getGroupFromRequest(groupId);
 
@@ -53,6 +52,5 @@ public class GroupMembershipResource extends BaseGroupResource {
         }
 
         identityService.deleteMembership(userId, group.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

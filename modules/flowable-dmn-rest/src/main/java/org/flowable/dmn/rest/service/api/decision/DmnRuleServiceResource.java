@@ -16,9 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -33,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -58,13 +56,13 @@ public class DmnRuleServiceResource {
     @Autowired(required = false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Execute a Decision", tags = { "DMN Rule Service" })
+    @ApiOperation(value = "Execute a Decision", tags = { "DMN Rule Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
     })
     @PostMapping(value = "/dmn-rule/execute", produces = "application/json")
-    public DmnRuleServiceResponse execute(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest,
-            HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceResponse execute(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -89,8 +87,6 @@ public class DmnRuleServiceResource {
 
             DecisionExecutionAuditContainer executionResult = decisionBuilder.executeWithAuditTrail();
 
-            response.setStatus(HttpStatus.CREATED.value());
-
             if (executionResult instanceof DecisionServiceExecutionAuditContainer) {
                 return dmnRestResponseFactory.createDmnRuleServiceResponse((DecisionServiceExecutionAuditContainer) executionResult);
             } else {
@@ -101,14 +97,14 @@ public class DmnRuleServiceResource {
         }
     }
 
-    @ApiOperation(value = "Execute a decision or a decision service expecting a single result", tags = { "DMN Rule Service" })
+    @ApiOperation(value = "Execute a decision or a decision service expecting a single result", tags = { "DMN Rule Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the decision or decision service has been executed"),
             @ApiResponse(code = 500, message = "Indicates the decision or decision service returned multiple results")
     })
     @PostMapping(value = "/dmn-rule/execute/single-result", produces = "application/json")
-    public DmnRuleServiceSingleResponse executeWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest,
-            HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceSingleResponse executeWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -129,21 +125,19 @@ public class DmnRuleServiceResource {
 
             Map<String, Object> executionResult = decisionBuilder.executeWithSingleResult();
 
-            response.setStatus(HttpStatus.CREATED.value());
-
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
         } catch (FlowableObjectNotFoundException fonfe) {
             throw new FlowableIllegalArgumentException(fonfe.getMessage(), fonfe);
         }
     }
 
-    @ApiOperation(value = "Execute a decision", tags = { "DMN Decision Service" })
+    @ApiOperation(value = "Execute a decision", tags = { "DMN Decision Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the decision has been executed")
     })
     @PostMapping(value = "/dmn-rule/execute-decision", produces = "application/json")
-    public DmnRuleServiceResponse executeDecision(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest,
-            HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceResponse executeDecision(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -168,8 +162,6 @@ public class DmnRuleServiceResource {
 
             DecisionExecutionAuditContainer executionResult = decisionBuilder.executeDecisionWithAuditTrail();
 
-            response.setStatus(HttpStatus.CREATED.value());
-
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
 
         } catch (FlowableObjectNotFoundException fonfe) {
@@ -177,13 +169,13 @@ public class DmnRuleServiceResource {
         }
     }
 
-    @ApiOperation(value = "Execute a decision service", tags = { "DMN Decision Service" })
+    @ApiOperation(value = "Execute a decision service", tags = { "DMN Decision Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the decision service has been executed")
     })
     @PostMapping(value = "/dmn-rule/execute-decision-service", produces = "application/json")
-    public DmnRuleServiceResponse executeDecisionService(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest,
-            HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceResponse executeDecisionService(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -208,8 +200,6 @@ public class DmnRuleServiceResource {
 
             DecisionServiceExecutionAuditContainer executionResult = decisionBuilder.executeDecisionServiceWithAuditTrail();
 
-            response.setStatus(HttpStatus.CREATED.value());
-
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
 
         } catch (FlowableObjectNotFoundException fonfe) {
@@ -217,14 +207,14 @@ public class DmnRuleServiceResource {
         }
     }
 
-    @ApiOperation(value = "Execute a decision expecting a single result", tags = { "DMN Decision Service" })
+    @ApiOperation(value = "Execute a decision expecting a single result", tags = { "DMN Decision Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the decision or decision service has been executed"),
             @ApiResponse(code = 500, message = "Indicates the decision returned multiple results")
     })
     @PostMapping(value = "/dmn-rule/execute-decision/single-result", produces = "application/json")
-    public DmnRuleServiceSingleResponse executeDecisionWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request,
-            HttpServletRequest httpRequest, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceSingleResponse executeDecisionWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -249,8 +239,6 @@ public class DmnRuleServiceResource {
 
             Map<String, Object> executionResult = decisionBuilder.executeDecisionWithSingleResult();
 
-            response.setStatus(HttpStatus.CREATED.value());
-
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
 
         } catch (FlowableObjectNotFoundException fonfe) {
@@ -258,14 +246,14 @@ public class DmnRuleServiceResource {
         }
     }
 
-    @ApiOperation(value = "Execute a decision service expecting a single result", tags = { "DMN Decision Service" })
+    @ApiOperation(value = "Execute a decision service expecting a single result", tags = { "DMN Decision Service" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the decision service has been executed"),
             @ApiResponse(code = 500, message = "Indicates the decision service returned multiple results")
     })
     @PostMapping(value = "/dmn-rule/execute-decision-service/single-result", produces = "application/json")
-    public DmnRuleServiceSingleResponse executeDecisionServiceWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request,
-            HttpServletRequest httpRequest, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DmnRuleServiceSingleResponse executeDecisionServiceWithSingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
         }
@@ -289,8 +277,6 @@ public class DmnRuleServiceResource {
             }
 
             Map<String, Object> executionResult = decisionBuilder.executeDecisionServiceWithSingleResult();
-
-            response.setStatus(HttpStatus.CREATED.value());
 
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
 

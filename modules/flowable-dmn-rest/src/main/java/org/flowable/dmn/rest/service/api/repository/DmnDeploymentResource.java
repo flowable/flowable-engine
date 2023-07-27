@@ -12,8 +12,6 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -24,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -69,13 +68,14 @@ public class DmnDeploymentResource {
         return dmnRestResponseFactory.createDmnDeploymentResponse(deployment);
     }
 
-    @ApiOperation(value = "Delete a decision deployment", tags = { "Deployment" }, nickname = "deleteDecisionDeployment")
+    @ApiOperation(value = "Delete a decision deployment", tags = { "Deployment" }, nickname = "deleteDecisionDeployment", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the deployment was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @DeleteMapping(value = "/dmn-repository/deployments/{deploymentId}", produces = "application/json")
-    public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteDmnDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
         
         DmnDeployment deployment = dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
@@ -88,7 +88,5 @@ public class DmnDeploymentResource {
         }
 
         dmnRepositoryService.deleteDeployment(deploymentId);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

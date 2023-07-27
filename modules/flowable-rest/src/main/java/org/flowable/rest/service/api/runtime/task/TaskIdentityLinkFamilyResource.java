@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.runtime.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.rest.service.api.RestUrls;
@@ -48,7 +46,7 @@ public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
+    public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 

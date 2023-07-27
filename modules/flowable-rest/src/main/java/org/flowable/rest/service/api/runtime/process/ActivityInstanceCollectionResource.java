@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +55,7 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query")
     })
     @GetMapping(value = "/runtime/activity-instances", produces = "application/json")
-    public DataResponse<ActivityInstanceResponse> getActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ActivityInstanceResponse> getActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         ActivityInstanceQueryRequest query = new ActivityInstanceQueryRequest();
 
         // Populate query based on request

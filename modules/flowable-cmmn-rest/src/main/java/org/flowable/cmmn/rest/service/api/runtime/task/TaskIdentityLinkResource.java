@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -28,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -50,9 +48,9 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}", produces = "application/json")
-    public RestIdentityLink getIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family,
+    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family,
             @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-            @ApiParam(name = "type") @PathVariable("type") String type, HttpServletRequest request) {
+            @ApiParam(name = "type") @PathVariable("type") String type) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         validateIdentityLinkArguments(family, identityId, type);
@@ -66,15 +64,15 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         return restResponseFactory.createRestIdentityLink(link);
     }
 
-    @ApiOperation(value = "Delete an identity link on a task", tags = { "Task Identity Links" }, nickname = "deleteTaskInstanceIdentityLinks")
+    @ApiOperation(value = "Delete an identity link on a task", tags = { "Task Identity Links" }, nickname = "deleteTaskInstanceIdentityLinks", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and identity link were found and the link has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @DeleteMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-            @ApiParam(name = "type") @PathVariable("type") String type,
-            HttpServletResponse response) {
+            @ApiParam(name = "type") @PathVariable("type") String type) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
@@ -92,8 +90,6 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         } else {
             taskService.deleteGroupIdentityLink(task.getId(), identityId, type);
         }
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected void validateIdentityLinkArguments(String family, String identityId, String type) {

@@ -13,9 +13,6 @@
 
 package org.flowable.rest.service.api.identity;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.IdentityService;
@@ -28,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -56,7 +54,7 @@ public class UserInfoResource extends BaseUserResource {
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does ot have info for the given key. Status description contains additional information about the error.")
     })
     @GetMapping(value = "/identity/users/{userId}/info/{key}", produces = "application/json")
-    public UserInfoResponse getUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, HttpServletRequest request) {
+    public UserInfoResponse getUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key) {
         User user = getUserFromRequest(userId);
 
         String existingValue = identityService.getUserInfo(user.getId(), key);
@@ -74,7 +72,7 @@ public class UserInfoResource extends BaseUserResource {
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have info for the given key. Status description contains additional information about the error.")
     })
     @PutMapping(value = "/identity/users/{userId}/info/{key}", produces = "application/json")
-    public UserInfoResponse setUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, @RequestBody UserInfoRequest userRequest, HttpServletRequest request) {
+    public UserInfoResponse setUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, @RequestBody UserInfoRequest userRequest) {
 
         User user = getUserFromRequest(userId);
         String validKey = getValidKeyFromRequest(user, key);
@@ -92,13 +90,14 @@ public class UserInfoResource extends BaseUserResource {
         return restResponseFactory.createUserInfoResponse(key, userRequest.getValue(), user.getId());
     }
 
-    @ApiOperation(value = "Delete a user’s info", tags = { "Users" })
+    @ApiOperation(value = "Delete a user’s info", tags = { "Users" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the user was found and the info for the given key has been deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have info for the given key. Status description contains additional information about the error.")
     })
     @DeleteMapping("/identity/users/{userId}/info/{key}")
-    public void deleteUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserInfo(@ApiParam(name = "userId") @PathVariable("userId") String userId, @ApiParam(name = "key") @PathVariable("key") String key) {
         User user = getUserFromRequest(userId);
         
         if (restApiInterceptor != null) {
@@ -108,8 +107,6 @@ public class UserInfoResource extends BaseUserResource {
         String validKey = getValidKeyFromRequest(user, key);
 
         identityService.setUserInfo(user.getId(), validKey, null);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected String getValidKeyFromRequest(User user, String key) {

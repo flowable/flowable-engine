@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.task.api.Task;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +40,7 @@ public class TaskSubTaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/subtasks", produces = "application/json")
-    public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId) {
         Task task = getTaskFromRequest(taskId);
         return restResponseFactory.createTaskResponseList(taskService.getSubTasks(task.getId()));
     }

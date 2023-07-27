@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +42,7 @@ public class TaskQueryResource extends TaskBaseResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @PostMapping(value = "/query/tasks", produces = "application/json")
-    public DataResponse<TaskResponse> getQueryResult(@RequestBody TaskQueryRequest request, @ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<TaskResponse> getQueryResult(@RequestBody TaskQueryRequest request, @ApiParam(hidden = true) @RequestParam Map<String, String> requestParams) {
 
         return getTasksFromQueryRequest(request, requestParams);
     }

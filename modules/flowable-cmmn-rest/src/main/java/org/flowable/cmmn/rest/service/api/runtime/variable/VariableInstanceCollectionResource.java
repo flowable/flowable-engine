@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.variable;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,7 +49,7 @@ public class VariableInstanceCollectionResource extends VariableInstanceBaseReso
             @ApiResponse(code = 200, message = "Indicates that variable instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/cmmn-runtime/variable-instances", produces = "application/json")
-    public DataResponse<VariableInstanceResponse> getVariableInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<VariableInstanceResponse> getVariableInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         VariableInstanceQueryRequest query = new VariableInstanceQueryRequest();
 
         // Populate query based on request

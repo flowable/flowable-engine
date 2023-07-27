@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.history;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -81,7 +79,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             @ApiResponse(code = 200, message = "Indicates that historic process instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/history/historic-process-instances", produces = "application/json")
-    public DataResponse<HistoricProcessInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricProcessInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricProcessInstanceQueryRequest queryRequest = new HistoricProcessInstanceQueryRequest();
 
@@ -204,7 +202,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
     }
 
     @ApiOperation(value = "Post action request to delete a bulk of historic process instances", tags = {
-            "Manage History Process Instances" }, nickname = "bulkDeleteHistoricProcessInstances")
+            "Manage History Process Instances" }, nickname = "bulkDeleteHistoricProcessInstances", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the bulk of historic process instances was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates at least one requested process instance was not found.")

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -49,7 +50,7 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
+    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (restApiInterceptor != null) {
@@ -60,14 +61,16 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
     }
 
     @ApiOperation(value = "Add an involved user to a case instance", tags = {"Case Instance Identity Links" }, nickname = "createCaseInstanceIdentityLinks",
-            notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a case instance.")
+            notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a case instance.",
+        code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the case instance was found and the link is created."),
             @ApiResponse(code = 400, message = "Indicates the requested body did not contain a userId or a type."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks", produces = "application/json")
-    public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public RestIdentityLink createIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestBody RestIdentityLink identityLink) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
@@ -88,8 +91,6 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
         }
 
         runtimeService.addUserIdentityLink(caseInstance.getId(), identityLink.getUser(), identityLink.getType());
-
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), null, null, caseInstance.getId());
     }

@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
@@ -101,7 +99,7 @@ public class VariableInstanceBaseResource {
         return paginateList(allRequestParams, query, "variableName", allowedSortProperties, restResponseFactory::createVariableInstanceResponseList);
     }
     
-    public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {
         VariableInstance varObject = runtimeService.createVariableInstanceQuery().id(varInstanceId).singleResult();
 
         if (varObject == null) {

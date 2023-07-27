@@ -17,8 +17,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -33,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -79,19 +78,19 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
         return caseInstanceResponse;
     }
 
-    @ApiOperation(value = " Delete a historic case instance", tags = { "History Case" }, nickname = "deleteHistoricCaseInstance")
+    @ApiOperation(value = " Delete a historic case instance", tags = { "History Case" }, nickname = "deleteHistoricCaseInstance", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates that the historic process instance was deleted."),
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })
     @DeleteMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}")
-    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteHistoricCase(caseInstance);
         }
         
         cmmnhistoryService.deleteHistoricCaseInstance(caseInstance.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")

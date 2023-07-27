@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -66,7 +67,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     })
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @GetMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json")
-    public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
+    public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope) {
 
         Map<String, RestVariable> variableMap = new HashMap<>();
 
@@ -100,7 +101,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "It is possible to create simple (non-binary) variable or list of variables or new binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.",
+            code = 201)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a task", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -119,7 +121,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
     })
     @PostMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
-    public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
 
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
@@ -206,25 +209,23 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             }
         }
 
-        response.setStatus(HttpStatus.CREATED.value());
         return result;
     }
 
-    @ApiOperation(value = "Delete all local variables on a task", tags = { "Tasks" })
+    @ApiOperation(value = "Delete all local variables on a task", tags = { "Tasks" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates all local task variables have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/variables")
-    public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId) {
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         Collection<String> currentVariables = taskService.getVariablesLocal(task.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteTaskVariables(task, currentVariables, RestVariableScope.LOCAL);
         }
         taskService.removeVariablesLocal(task.getId(), currentVariables);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected void addGlobalVariables(Task task, Map<String, RestVariable> variableMap) {

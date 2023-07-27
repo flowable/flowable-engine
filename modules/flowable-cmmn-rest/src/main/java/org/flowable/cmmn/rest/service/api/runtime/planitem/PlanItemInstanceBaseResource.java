@@ -56,7 +56,7 @@ public class PlanItemInstanceBaseResource {
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
-    protected DataResponse<PlanItemInstanceResponse> getQueryResponse(PlanItemInstanceQueryRequest queryRequest, Map<String, String> requestParams, String serverRootUrl) {
+    protected DataResponse<PlanItemInstanceResponse> getQueryResponse(PlanItemInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
         PlanItemInstanceQuery query = runtimeService.createPlanItemInstanceQuery();
 

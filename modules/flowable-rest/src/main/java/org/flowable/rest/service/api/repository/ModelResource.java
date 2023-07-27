@@ -13,9 +13,6 @@
 
 package org.flowable.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -45,7 +43,7 @@ public class ModelResource extends BaseModelResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @GetMapping(value = "/repository/models/{modelId}", produces = "application/json")
-    public ModelResponse getModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request) {
+    public ModelResponse getModel(@ApiParam(name = "modelId") @PathVariable String modelId) {
         Model model = getModelFromRequest(modelId);
 
         return restResponseFactory.createModelResponse(model);
@@ -59,7 +57,7 @@ public class ModelResource extends BaseModelResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @PutMapping(value = "/repository/models/{modelId}", produces = "application/json")
-    public ModelResponse updateModel(@ApiParam(name = "modelId") @PathVariable String modelId, @RequestBody ModelRequest modelRequest, HttpServletRequest request) {
+    public ModelResponse updateModel(@ApiParam(name = "modelId") @PathVariable String modelId, @RequestBody ModelRequest modelRequest) {
         Model model = getModelFromRequest(modelId);
 
         if (modelRequest.isCategoryChanged()) {
@@ -88,15 +86,15 @@ public class ModelResource extends BaseModelResource {
         return restResponseFactory.createModelResponse(model);
     }
 
-    @ApiOperation(value = "Delete a model", tags = { "Models" })
+    @ApiOperation(value = "Delete a model", tags = { "Models" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the model was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @DeleteMapping("/repository/models/{modelId}")
-    public void deleteModel(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteModel(@ApiParam(name = "modelId") @PathVariable String modelId) {
         Model model = getModelFromRequest(modelId);
         repositoryService.deleteModel(model.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

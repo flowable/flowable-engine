@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -129,7 +127,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiResponse(code = 200, message = "Indicates that historic planItem instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})
     @GetMapping(value = "/cmmn-history/historic-planitem-instances", produces = "application/json")
-    public DataResponse<HistoricPlanItemInstanceResponse> getHistoricPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricPlanItemInstanceResponse> getHistoricPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricPlanItemInstanceQueryRequest queryRequest = new HistoricPlanItemInstanceQueryRequest();
         allRequestParams.forEach((key, value) -> Optional.ofNullable(value).ifPresent(v -> mapping.getOrDefault(key, voidConsumer).accept(queryRequest, v)));

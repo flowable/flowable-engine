@@ -13,9 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.task.Event;
 import org.flowable.rest.service.api.engine.EventResponse;
@@ -25,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -47,7 +45,7 @@ public class TaskEventResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks does not have an event with the given ID.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/events/{eventId}", produces = "application/json")
-    public EventResponse getEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletRequest request) {
+    public EventResponse getEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId) {
 
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
@@ -59,13 +57,14 @@ public class TaskEventResource extends TaskBaseResource {
         return restResponseFactory.createEventResponse(event);
     }
 
-    @ApiOperation(value = "Delete an event on a task", tags = { "Tasks" })
+    @ApiOperation(value = "Delete an event on a task", tags = { "Tasks" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task was found and the events are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested event.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/events/{eventId}")
-    public void deleteEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEvent(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "eventId") @PathVariable("eventId") String eventId) {
 
         // Check if task exists
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
@@ -80,6 +79,5 @@ public class TaskEventResource extends TaskBaseResource {
         }
 
         taskService.deleteComment(eventId);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

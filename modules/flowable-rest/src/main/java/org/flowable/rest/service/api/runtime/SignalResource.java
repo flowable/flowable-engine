@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -54,7 +55,7 @@ public class SignalResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Signal event received", tags = { "Runtime" })
+    @ApiOperation(value = "Signal event received", tags = { "Runtime" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicated signal has been processed and no errors occurred."),
             @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),

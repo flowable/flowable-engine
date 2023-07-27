@@ -15,6 +15,8 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.StageResponse;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -41,8 +44,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -64,7 +65,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
-    public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
+    public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
         
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
@@ -85,7 +86,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceResponse updateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-                    @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletRequest request, HttpServletResponse response) {
+                    @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
@@ -129,13 +130,14 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
     }
 
-    @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance")
+    @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and terminate. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
-    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
@@ -143,16 +145,16 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         }
 
         runtimeService.terminateCaseInstance(caseInstance.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
-    @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance")
+    @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/delete")
-    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
@@ -160,7 +162,6 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         }
 
         runtimeService.deleteCaseInstance(caseInstance.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
@@ -182,7 +183,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/change-state", produces = "application/json")
     public void changePlanItemState(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-            @RequestBody ChangePlanItemStateRequest planItemStateRequest, HttpServletRequest request) {
+            @RequestBody ChangePlanItemStateRequest planItemStateRequest) {
         
         if (restApiInterceptor != null) {
             restApiInterceptor.changePlanItemState(caseInstanceId, planItemStateRequest);
@@ -229,7 +230,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/migrate", produces = "application/json")
     public void migrateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-                                       @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+                                       @RequestBody String migrationDocumentJson) {
 
         if (restApiInterceptor != null) {
             restApiInterceptor.migrateCaseInstance(caseInstanceId, migrationDocumentJson);

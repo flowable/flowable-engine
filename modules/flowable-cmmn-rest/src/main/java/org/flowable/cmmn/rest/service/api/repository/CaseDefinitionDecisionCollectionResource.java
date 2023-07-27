@@ -14,8 +14,6 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.dmn.api.DmnDecision;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,8 +41,7 @@ public class CaseDefinitionDecisionCollectionResource extends BaseCaseDefinition
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/decisions", produces = "application/json")
     public List<DecisionResponse> getDecisionsForCaseDefinition(
-        @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
-        HttpServletRequest request) {
+        @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
 
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
         List<DmnDecision> decisions = repositoryService.getDecisionsForCaseDefinition(caseDefinition.getId());
@@ -63,9 +60,8 @@ public class CaseDefinitionDecisionCollectionResource extends BaseCaseDefinition
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/decision-tables", produces = "application/json")
     public List<DecisionResponse> getDecisionTablesForCaseDefinition(
-            @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
-            HttpServletRequest request) {
+            @ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
 
-        return getDecisionsForCaseDefinition(caseDefinitionId, request);
+        return getDecisionsForCaseDefinition(caseDefinitionId);
     }
 }

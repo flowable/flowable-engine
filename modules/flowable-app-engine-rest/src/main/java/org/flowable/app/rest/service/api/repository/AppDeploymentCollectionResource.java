@@ -39,6 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -131,7 +132,8 @@ public class AppDeploymentCollectionResource {
     }
 
     @ApiOperation(value = "Create a new app deployment", tags = {
-            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .app, .zip or .bar.")
+            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .app, .zip or .bar.",
+            code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the app deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for app deployment. The status-description contains additional information.")
@@ -140,7 +142,8 @@ public class AppDeploymentCollectionResource {
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
     @PostMapping(value = "/app-repository/deployments", produces = "application/json", consumes = "multipart/form-data")
-    public AppDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public AppDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request) {
 
         if (restApiInterceptor != null) {
             restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
@@ -215,7 +218,6 @@ public class AppDeploymentCollectionResource {
             }
 
             AppDeployment deployment = deploymentBuilder.deploy();
-            response.setStatus(HttpStatus.CREATED.value());
 
             return appRestResponseFactory.createAppDeploymentResponse(deployment);
 

@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.management;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
@@ -56,7 +54,7 @@ public class TableResource {
             @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
     })
     @GetMapping(value = "/management/tables/{tableName}", produces = "application/json")
-    public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName, HttpServletRequest request) {
+    public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName) {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTableInfo();
         }

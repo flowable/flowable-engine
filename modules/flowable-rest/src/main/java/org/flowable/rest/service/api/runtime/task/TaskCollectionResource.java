@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -37,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -120,7 +118,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @GetMapping(value = "/runtime/tasks", produces = "application/json")
-    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams) {
         // Create a Task query request
         TaskQueryRequest request = new TaskQueryRequest();
 
@@ -353,13 +351,14 @@ public class TaskCollectionResource extends TaskBaseResource {
         return getTasksFromQueryRequest(request, requestParams);
     }
 
-    @ApiOperation(value = "Create Task", tags = { "Tasks" })
+    @ApiOperation(value = "Create Task", tags = { "Tasks" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @PostMapping(value = "/runtime/tasks", produces = "application/json")
-    public TaskResponse createTask(@RequestBody TaskRequest taskRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskResponse createTask(@RequestBody TaskRequest taskRequest) {
 
         Task task = taskService.newTask();
 
@@ -375,7 +374,6 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         taskService.saveTask(task);
 
-        response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createTaskResponse(task);
     }
 

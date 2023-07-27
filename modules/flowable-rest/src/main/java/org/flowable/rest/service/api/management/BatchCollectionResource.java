@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -73,7 +71,7 @@ public class BatchCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/management/batches", produces = "application/json")
-    public DataResponse<BatchResponse> getBatches(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<BatchResponse> getBatches(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         BatchQuery query = managementService.createBatchQuery();
 
         if (allRequestParams.containsKey("id")) {

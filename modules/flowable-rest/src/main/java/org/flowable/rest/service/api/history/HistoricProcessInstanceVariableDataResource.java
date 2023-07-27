@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -62,10 +61,10 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/variables/{variableName}/data")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, 
-                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
+                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, processInstanceId, variableName, request);
+            RestVariable variable = getVariableFromRequest(true, processInstanceId, variableName);
             if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -89,7 +88,7 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String processInstanceId, String variableName, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String processInstanceId, String variableName) {
 
         HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
 

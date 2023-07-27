@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -58,10 +57,10 @@ public class HistoricVariableInstanceDataResource extends HistoricVariableInstan
     @ApiOperation(value = "Get the binary data for a historic task instance variable", tags = {
             "History" }, nickname = "getHistoricInstanceVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ResponseBody
-    public byte[] getVariableData(@ApiParam(name = "varInstanceId") @PathVariable("varInstanceId") String varInstanceId, HttpServletRequest request, HttpServletResponse response) {
+    public byte[] getVariableData(@ApiParam(name = "varInstanceId") @PathVariable("varInstanceId") String varInstanceId, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, varInstanceId, request);
+            RestVariable variable = getVariableFromRequest(true, varInstanceId);
             if (CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");

@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.variable;
 
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +43,7 @@ public class VariableInstanceQueryResource extends VariableInstanceBaseResource 
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @PostMapping(value = "/cmmn-query/variable-instances", produces = "application/json")
     public DataResponse<VariableInstanceResponse> queryVariableInstances(@RequestBody VariableInstanceQueryRequest queryRequest, @ApiParam(hidden = true) 
-            @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+            @RequestParam Map<String, String> allRequestParams) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }
