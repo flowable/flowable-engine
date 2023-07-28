@@ -104,7 +104,6 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEvent
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.flowable.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
@@ -128,6 +127,7 @@ import org.flowable.engine.impl.bpmn.helper.ClassDelegate;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DefaultClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate;
+import org.flowable.engine.impl.bpmn.mail.BpmnMailActivityDelegate;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -231,19 +231,16 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
-        return createMailActivityBehavior(serviceTask.getId(), serviceTask.getFieldExtensions());
+    public ActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
+        return classDelegateFactory.create(serviceTask.getId(), BpmnMailActivityDelegate.class.getName(),
+                createFieldDeclarations(serviceTask.getFieldExtensions()),
+                false, // Mail activity is never triggerable
+                getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(SendTask sendTask) {
-        return createMailActivityBehavior(sendTask.getId(), sendTask.getFieldExtensions());
-    }
-
-    protected MailActivityBehavior createMailActivityBehavior(String taskId, List<FieldExtension> fields) {
-        List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(fields);
-        return (MailActivityBehavior) ClassDelegate.defaultInstantiateDelegate(
-                MailActivityBehavior.class, fieldDeclarations);
+    public ActivityBehavior createMailActivityBehavior(SendTask sendTask) {
+        return classDelegateFactory.create(BpmnMailActivityDelegate.class.getName(), createFieldDeclarations(sendTask.getFieldExtensions()));
     }
 
     @Override

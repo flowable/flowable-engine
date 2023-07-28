@@ -83,6 +83,7 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common-api").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-http-common").versionAsInProject(),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-mail").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-converter").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-process-validation").versionAsInProject(),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-image-generator").versionAsInProject(),

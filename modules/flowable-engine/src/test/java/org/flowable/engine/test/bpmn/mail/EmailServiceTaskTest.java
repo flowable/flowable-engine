@@ -36,10 +36,13 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
+import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -98,6 +101,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
         try {
             processEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.UTF_8);
+            reinitilizeMailClients();
             String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly").getId();
 
             List<WiserMessage> messages = wiser.getMessages();
@@ -181,6 +185,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testSimpleTextMailWhenMultiTenantWithForceTo() throws Exception {
         String tenantId = "forceToEmailTenant";
         addMailServer(tenantId, "flowable@myTenant.com", "no-reply@myTenant.com");
+        reinitilizeMailClients();
 
         String procId = runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId).getId();
 
@@ -223,6 +228,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     @Test
     public void testSimpleTextMailForNonExistentTenantWithForceTo() throws Exception {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
+        reinitilizeMailClients();
         String tenantId = "nonExistentTenant";
 
         repositoryService.createDeployment()
@@ -257,6 +263,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSimpleTextMailMultipleRecipients.bpmn20.xml")
     public void testSimpleTextMailMultipleRecipientsAndForceTo() {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org, no-reply2@flowable.org");
+        reinitilizeMailClients();
         runtimeService.startProcessInstanceByKey("simpleTextOnlyMultipleRecipients");
 
         List<WiserMessage> messages = wiser.getMessages();
@@ -363,6 +370,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testCcAndBcc.bpmn20.xml")
     public void testCcAndBccWithForceTo() throws Exception {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable");
+        reinitilizeMailClients();
         runtimeService.startProcessInstanceByKey("ccAndBcc");
 
         List<WiserMessage> messages = wiser.getMessages();

@@ -34,6 +34,9 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
+import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -106,6 +109,8 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
         try {
             cmmnEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.UTF_8);
+            MailServerInfo defaultMailServer = cmmnEngineConfiguration.getDefaultMailServer();
+            cmmnEngineConfiguration.setDefaultMailClient(FlowableMailClientCreator.createHostClient(defaultMailServer.getMailServerHost(), defaultMailServer));
             cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("testSimpleTextMail")
                     .start();
@@ -116,7 +121,9 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             WiserMessage message = messages.get(0);
             assertThat(message.getMimeMessage().getContentType()).isEqualTo("text/plain; charset=UTF-8");
         } finally {
+            cmmnEngineConfiguration.setDefaultMailClient(null);
             cmmnEngineConfiguration.setMailServerDefaultCharset(originalCharset);
+            cmmnEngineConfiguration.initMailClients();
         }
     }
 
