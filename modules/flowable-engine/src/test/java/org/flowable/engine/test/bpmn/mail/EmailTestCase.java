@@ -64,6 +64,13 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
         processEngineConfiguration.setMailServers(initialMailServers);
+        reinitilizeMailClients();
+    }
+
+    protected void reinitilizeMailClients() {
+        processEngineConfiguration.setDefaultMailClient(null);
+        processEngineConfiguration.getMailClients().clear();
+        processEngineConfiguration.initMailClients();
     }
 
     protected void addMailServer(String tenantId, String defaultFrom, String forceTo) {

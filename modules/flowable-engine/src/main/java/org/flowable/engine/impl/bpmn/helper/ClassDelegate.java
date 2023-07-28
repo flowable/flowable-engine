@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.helper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
     protected ActivityBehavior activityBehaviorInstance;
     protected Expression skipExpression;
-    protected List<MapExceptionEntry> mapExceptions;
+    protected List<MapExceptionEntry> mapExceptions = Collections.emptyList();
     protected CustomPropertiesResolver customPropertiesResolverInstance;
     protected boolean triggerable;
 

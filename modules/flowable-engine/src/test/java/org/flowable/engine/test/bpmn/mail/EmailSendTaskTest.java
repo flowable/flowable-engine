@@ -73,6 +73,7 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMailMultipleRecipients.bpmn20.xml")
     public void testSimpleTextMailMultipleRecipientsAndForceTo() {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org, no-reply2@flowable.org");
+        reinitilizeMailClients();
         runtimeService.startProcessInstanceByKey("simpleTextOnlyMultipleRecipients");
 
         List<WiserMessage> messages = wiser.getMessages();
@@ -131,6 +132,7 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testCcAndBcc.bpmn20.xml")
     public void testCcAndBccWithForceTo() throws Exception {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable");
+        reinitilizeMailClients();
         runtimeService.startProcessInstanceByKey("ccAndBcc");
 
         List<WiserMessage> messages = wiser.getMessages();

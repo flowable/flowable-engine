@@ -537,6 +537,7 @@
 		<module>modules/flowable-app-engine</module>
 		<module>modules/flowable-spring-security</module>
         <module>modules/flowable-http-common</module>
+        <module>modules/flowable-mail</module>
     </modules>
 
 	<build>
@@ -798,6 +799,7 @@
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
+				<module>modules/flowable-mail</module>
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
@@ -893,6 +895,7 @@
 				<module>modules/flowable-external-job-rest</module>
                 <module>modules/flowable-http</module>
                 <module>modules/flowable-http-common</module>
+                <module>modules/flowable-mail</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
 			</modules>
@@ -1013,6 +1016,7 @@
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
+				<module>modules/flowable-mail</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-cmmn-cdi</module>
 				<module>modules/flowable-ldap</module>
