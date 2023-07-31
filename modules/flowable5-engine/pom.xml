@@ -31,8 +31,8 @@
 			<artifactId>flowable-image-generator</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
