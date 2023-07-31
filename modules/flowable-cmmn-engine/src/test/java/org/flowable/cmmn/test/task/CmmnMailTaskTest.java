@@ -26,17 +26,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
-import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -58,15 +57,13 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
     @BeforeClass
     public static void setupWiser() throws Exception {
-        wiser = new Wiser();
-        wiser.setPort(5025);
+        wiser = Wiser.port(5025);
 
         int counter = 0;
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning && counter++ < 11) {
 
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();
