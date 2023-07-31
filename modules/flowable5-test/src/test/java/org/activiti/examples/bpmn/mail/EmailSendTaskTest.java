@@ -40,8 +40,7 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
 
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();

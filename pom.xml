@@ -183,9 +183,9 @@
 				<version>2.0.1</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sun.mail</groupId>
-				<artifactId>javax.mail</artifactId>
-				<version>1.6.2</version>
+				<groupId>org.eclipse.angus</groupId>
+				<artifactId>angus-mail</artifactId>
+				<version>2.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>jakarta.persistence</groupId>
@@ -252,12 +252,6 @@
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
 				<version>11.5.8.0</version>
-			</dependency>
-			<!-- EMAIL -->
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-email</artifactId>
-				<version>1.5</version>
 			</dependency>
 			<!-- Web service -->
 			<dependency>
@@ -364,16 +358,9 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.subethamail</groupId>
-				<artifactId>subethasmtp-wiser</artifactId>
-				<version>1.2</version>
-				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-				</exclusions>
+				<groupId>com.github.davidmoten</groupId>
+				<artifactId>subethasmtp</artifactId>
+				<version>6.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.liquibase</groupId>

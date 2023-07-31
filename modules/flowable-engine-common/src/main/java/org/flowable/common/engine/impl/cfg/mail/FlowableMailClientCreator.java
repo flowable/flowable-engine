@@ -25,7 +25,7 @@ import org.flowable.mail.common.impl.MailDefaultsConfigurationImpl;
 import org.flowable.mail.common.impl.MailHostServerConfiguration;
 import org.flowable.mail.common.impl.MailJndiServerConfiguration;
 import org.flowable.mail.common.impl.MailServerConfiguration;
-import org.flowable.mail.common.impl.apache.commons.ApacheCommonsEmailFlowableMailClient;
+import org.flowable.mail.common.impl.jakarta.mail.JakartaMailFlowableMailClient;
 
 /**
  * @author Filip Hrisafov
@@ -53,7 +53,7 @@ public class FlowableMailClientCreator {
     protected static FlowableMailClient createMailClient(MailServerConfiguration serverConfiguration, MailServerInfo serverInfo,
             MailServerInfo fallbackServerInfo) {
         MailDefaultsConfiguration defaultsConfiguration = createMailDefaultsConfiguration(serverInfo, fallbackServerInfo);
-        return new ApacheCommonsEmailFlowableMailClient(serverConfiguration, defaultsConfiguration);
+        return new JakartaMailFlowableMailClient(serverConfiguration, defaultsConfiguration);
     }
 
     protected static MailHostServerConfiguration createMailHostServerConfiguration(String host, MailServerInfo mailServer) {

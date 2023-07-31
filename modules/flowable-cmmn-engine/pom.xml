@@ -190,8 +190,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.subethamail</groupId>
-            <artifactId>subethasmtp-wiser</artifactId>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>subethasmtp</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -222,9 +222,9 @@
             junit*;resolution:=optional,
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
-            javax.activation*;resolution:=optional,
+            jakarta.activation*;resolution:=optional,
             jakarta.persistence*;resolution:=optional,
-            org.apache.commons.mail*;resolution:=optional,
+            jakarta.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,

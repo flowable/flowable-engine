@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.NoSuchProviderException;
-import javax.mail.Provider;
-import javax.mail.Provider.Type;
-import javax.mail.Session;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Provider;
+import jakarta.mail.Provider.Type;
+import jakarta.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 

@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 /**
  * @author Filip Hrisafov

@@ -77,7 +77,6 @@ com.fasterxml.jackson.datatype  jackson-datatype-joda       2.15.2          The 
 com.google.guava                guava                       31.0.1-jre      The Apache Software License, Version 2.0
 com.h2database                  h2                          2.1.214         The H2 License, Version 1.0
 com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
-com.sun.mail                    javax.mail                  1.6.2           CDDL/GPLv2+CE
 commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
 commons-codec                   commons-codec               1.15            Apache License, Version 2.0
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
@@ -91,10 +90,10 @@ de.odysseus.juel                juel-impl                   2.2.7           The 
 de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
 io.swagger                      swagger-annotations         1.6.2           Apache License 2.0
 io.swagger                      swagger-models              1.6.2           Apache License 2.0
-javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+jakarta.activation              jakarta.activation-api      2.1.2           EDL 1.0
+jakarta.mail                    jakarta.mail.api            2.1.2           EDL 1.0
 joda-time                       joda-time                   2.10.13         Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
-org.apache.commons              commons-email               1.5             Apache License, Version 2.0
 org.apache.commons              commons-lang3               3.12.0          The Apache Software License, Version 2.0
 org.apache.httpcomponents       httpclient                  4.5.13          Apache License, Version 2.0
 org.apache.httpcomponents       httpcore                    4.4.15          Apache License, Version 2.0
@@ -102,6 +101,7 @@ org.apache.httpcomponents       httpmime                    4.5.13          Apac
 org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
 org.apache.groovy               groovy                      4.0.13          The Apache Software License, Version 2.0
 org.apache.groovy               groovy-jsr223               4.0.13          The Apache Software License, Version 2.0
+org.eclipse.angus               angus-mail                  2.0.2           EDL 1.0 / EPL 2.0
 org.liquibase                   liquibase-core              4.5.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.11          The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              3.0.0           The Apache Software License, Version 2.0

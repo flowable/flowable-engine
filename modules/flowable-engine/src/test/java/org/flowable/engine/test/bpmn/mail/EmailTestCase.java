@@ -41,8 +41,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();
