@@ -95,6 +95,8 @@ public class HttpServiceTaskTestServer {
             httpServiceTaskServletHolder.getRegistration().setMultipartConfig(multipartConfig);
             contextHandler.addServlet(httpServiceTaskServletHolder, "/api/*");
             contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
+            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskBinaryContentTestServlet()), "/binary/pdf");
+            contextHandler.addServlet(new ServletHolder(new OctetStreamStringTestServlet()), "/binary/octet-stream-string");
             contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
@@ -284,6 +286,31 @@ public class HttpServiceTaskTestServer {
             nameNode.put("lastName", "Doe");
 
             resp.getWriter().println(responseNode);
+        }
+    }
+
+    private static class OctetStreamStringTestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            resp.setStatus(200);
+            resp.setContentType("application/octet-stream");
+            resp.getWriter().write("Content-Type is octet-stream, but still a string");
+        }
+    }
+
+    private static class SimpleHttpServiceTaskBinaryContentTestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            resp.setStatus(200);
+            resp.setContentType("application/pdf");
+            InputStream byteArrayInputStream = getClass().getClassLoader().getResourceAsStream("org/flowable/http/content/sample.pdf");
+            IOUtils.copy(byteArrayInputStream, resp.getOutputStream());
         }
     }
     

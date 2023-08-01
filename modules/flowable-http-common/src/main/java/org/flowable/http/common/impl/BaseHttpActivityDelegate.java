@@ -13,6 +13,11 @@
 package org.flowable.http.common.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,12 +30,15 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.HttpResponseVariableType;
 import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
 import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 /**
  * @author Filip Hrisafov
@@ -43,6 +51,29 @@ public abstract class BaseHttpActivityDelegate {
     public static final String HTTP_TASK_REQUEST_URL_REQUIRED = "requestUrl is required";
     public static final String HTTP_TASK_REQUEST_HEADERS_INVALID = "requestHeaders are invalid";
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
+
+    /* These are interpreted as binary types and base64 encoded by default. */
+    protected static final Set<String> DEFAULT_BINARY_CONTENT_TYPES = new HashSet<>(
+            Arrays.asList("application/octet-stream",
+                    "application/pdf",
+                    "image/gif",
+                    "image/jpeg",
+                    "image/png",
+                    "image/svg+xml",
+                    "image/tiff",
+                    "audio/mpeg",
+                    "audio/wav",
+                    "video/mpeg",
+                    "video/mp4",
+                    "application/zip",
+                    "application/rtf",
+                    "application/msword",
+                    "application/vnd.ms-excel",
+                    "application/vnd.ms-powerpoint",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    "application/vnd.visio"));
 
     // HttpRequest method (GET,POST,PUT etc)
     protected Expression requestMethod;
@@ -74,6 +105,8 @@ public abstract class BaseHttpActivityDelegate {
     protected Expression saveResponseParametersTransient;
     // Flag to save the response variable as an ObjectNode instead of a String
     protected Expression saveResponseVariableAsJson;
+
+    protected Expression responseVariableType;
     // Prefix for the execution variable names (Optional)
     protected Expression resultVariablePrefix;
 
@@ -103,7 +136,19 @@ public abstract class BaseHttpActivityDelegate {
         request.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, variableContainer));
         request.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, variableContainer));
         request.setSaveResponseTransient(ExpressionUtils.getBooleanFromField(saveResponseParametersTransient, variableContainer));
-        request.setSaveResponseAsJson(ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer));
+        boolean saveResponseAsJson = ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer);
+        request.setSaveResponseAsJson(saveResponseAsJson);
+
+        if (responseVariableType != null) {
+            String responseVariableTypeString = ExpressionUtils.getStringFromField(responseVariableType, variableContainer).toUpperCase(Locale.ROOT);
+            HttpResponseVariableType responseVariableType = HttpResponseVariableType.valueOf(responseVariableTypeString);
+            if (responseVariableType != null && saveResponseAsJson) {
+                throw new FlowableIllegalArgumentException(
+                        "Cannot set both fields 'saveResponseVariableAsJson' and 'responseVariableType'. Please set either of these.");
+            }
+            request.setResponseVariableType(responseVariableType);
+        }
+
         request.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, variableContainer));
 
         String failCodes = ExpressionUtils.getStringFromField(failStatusCodes, variableContainer);
@@ -160,9 +205,22 @@ public abstract class BaseHttpActivityDelegate {
             if (!response.isBodyResponseHandled()) {
                 String responseVariableName = ExpressionUtils.getStringFromField(this.responseVariableName, variableContainer);
                 String varName = StringUtils.isNotEmpty(responseVariableName) ? responseVariableName : request.getPrefix() + "ResponseBody";
-                Object varValue = request.isSaveResponseAsJson() && response.getBody() != null ? objectMapper.readTree(response.getBody()) : response.getBody();
-                if (varValue instanceof MissingNode) {
-                    varValue = null;
+
+                HttpResponseVariableType responseVariableType = request.getResponseVariableType();
+                Object varValue;
+                if (responseVariableType != null) {
+                    // explicit response variable type
+                    varValue = determineResponseVariableValue(request, response, objectMapper);
+                } else {
+                    // without explicit response variable type
+                    if (request.isSaveResponseAsJson() && response.getBody() != null) {
+                        varValue = objectMapper.readTree(response.getBody());
+                    } else {
+                        varValue = response.getBody();
+                    }
+                    if (varValue instanceof MissingNode) {
+                        varValue = null;
+                    }
                 }
                 if (request.isSaveResponseTransient()) {
                     variableContainer.setTransientVariable(varName, varValue);
@@ -200,6 +258,71 @@ public abstract class BaseHttpActivityDelegate {
                 }
             }
         }
+    }
+
+    protected Object determineResponseVariableValue(HttpRequest request, HttpResponse response, ObjectMapper objectMapper) throws IOException {
+        HttpResponseVariableType responseVariableType = request.getResponseVariableType();
+        switch (responseVariableType) {
+            case AUTO:
+                // default is best guess based on content type
+                if (isKnownBinaryContentType(response)) {
+                    return response.getBodyBytes();
+                } else if (isJsonContentType(response)) {
+                    return readJsonTree(response, objectMapper);
+                } else {
+                    return response.getBody();
+                }
+            case STRING: {
+                return response.getBody();
+            }
+            case BYTES: {
+                return response.getBodyBytes();
+            }
+            case BASE64: {
+                byte[] bodyBytes = response.getBodyBytes();
+                return Base64.getEncoder().encodeToString(bodyBytes);
+            }
+            default: {
+                throw new FlowableException("Unsupported response variable type: " + responseVariableType);
+            }
+        }
+    }
+
+    protected Object readJsonTree(HttpResponse response, ObjectMapper objectMapper) throws JsonProcessingException {
+        Object varValue;
+        if (response.getBody() != null) {
+            varValue = objectMapper.readTree(response.getBody());
+        } else {
+            varValue = response.getBody();
+        }
+        if (varValue instanceof MissingNode || varValue instanceof NullNode) {
+            varValue = null;
+        }
+        return varValue;
+    }
+
+    protected boolean isKnownBinaryContentType(HttpResponse response) {
+        List<String> contentTypeHeader = response.getHttpHeaders().get("Content-Type");
+        if (contentTypeHeader != null && !contentTypeHeader.isEmpty()) {
+            String contentType = contentTypeHeader.get(0);
+            if (contentType.indexOf(';') >= 0) {
+                contentType = contentType.split(";")[0]; // remove charset if present
+            }
+            return DEFAULT_BINARY_CONTENT_TYPES.contains(contentType);
+        }
+        return false;
+    }
+
+    protected boolean isJsonContentType(HttpResponse response) {
+        List<String> contentTypeHeader = response.getHttpHeaders().get("Content-Type");
+        if (contentTypeHeader != null && !contentTypeHeader.isEmpty()) {
+            String contentType = contentTypeHeader.get(0);
+            if (contentType.indexOf(';') >= 0) {
+                contentType = contentType.split(";")[0]; // remove charset if present
+            }
+            return contentType != null && contentType.endsWith("/json") || contentType.endsWith("+json");
+        }
+        return false;
     }
 
     protected CompletableFuture<ExecutionData> prepareAndExecuteRequest(HttpRequest request, boolean parallelInSameTransaction, AsyncTaskInvoker taskInvoker) {

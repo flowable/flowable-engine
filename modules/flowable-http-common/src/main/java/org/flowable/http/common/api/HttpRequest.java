@@ -37,7 +37,11 @@ public class HttpRequest {
     protected boolean saveRequest;
     protected boolean saveResponse;
     protected boolean saveResponseTransient;
+
     protected boolean saveResponseAsJson;
+
+    protected HttpResponseVariableType responseVariableType;
+
     protected String prefix;
 
     public String getMethod() {
@@ -165,7 +169,7 @@ public class HttpRequest {
     public void setSaveResponseTransient(boolean saveResponseTransient) {
         this.saveResponseTransient = saveResponseTransient;
     }
-    
+
     public boolean isSaveResponseAsJson() {
         return saveResponseAsJson;
     }
@@ -180,5 +184,13 @@ public class HttpRequest {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    public HttpResponseVariableType getResponseVariableType() {
+        return responseVariableType;
+    }
+
+    public void setResponseVariableType(HttpResponseVariableType responseVariableType) {
+        this.responseVariableType = responseVariableType;
     }
 }

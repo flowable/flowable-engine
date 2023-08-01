@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.MultiValuePart;
+import org.flowable.http.common.api.HttpResponseVariableType;
 
 /**
  * @author Harsha Teja Kanna.
@@ -269,6 +270,20 @@ public class HttpRequest extends org.flowable.http.common.api.HttpRequest {
             delegate.setSaveResponseAsJson(saveResponseAsJson);
         } else {
             super.setSaveResponseAsJson(saveResponseAsJson);
+        }
+    }
+
+    @Override
+    public HttpResponseVariableType getResponseVariableType() {
+        return delegate != null ? delegate.getResponseVariableType() : super.getResponseVariableType();
+    }
+
+    @Override
+    public void setResponseVariableType(HttpResponseVariableType responseVariableType) {
+        if (delegate != null) {
+            delegate.setResponseVariableType(responseVariableType);
+        } else {
+            super.setResponseVariableType(responseVariableType);
         }
     }
 
