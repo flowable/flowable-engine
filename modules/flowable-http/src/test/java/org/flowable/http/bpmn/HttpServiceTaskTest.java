@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -674,6 +676,136 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
                         + "}");
         assertProcessEnded(procId);
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testGetWithSaveResponseVariableAndVariableType.bpmn20.xml")
+    public void testGetWithSaveResponseVariablePdfIsPutAsByteArrayForAutoType() {
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/binary/pdf")
+                .transientVariable("responseVariableType","auto")
+                .start()
+                .getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(byte[].class, value -> assertThat(value).isNotEmpty());
+        assertProcessEnded(procId);
+
+
+        // request byte array
+        procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/binary/pdf")
+                .transientVariable("responseVariableType","bytes")
+                .start()
+                .getId();
+        variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(byte[].class, value -> assertThat(value).isNotEmpty());
+        assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testGetWithSaveResponseVariableAndVariableType.bpmn20.xml")
+    public void testGetWithSaveResponseVariableAndVariableTypeStringOctetStream() {
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/binary/octet-stream-string")
+                .transientVariable("responseVariableType","string")
+                .start()
+                .getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(String.class,
+                value -> assertThat(value).isEqualTo("Content-Type is octet-stream, but still a string"));
+        assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testGetWithSaveResponseVariableAndVariableType.bpmn20.xml")
+    public void testGetWithSaveResponseVariableAndVariableTypeJsonContent() {
+        // AUTO
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/test")
+                .transientVariable("responseVariableType","auto")
+                .start()
+                .getId();
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(ObjectNode.class,
+                value -> assertThatJson(value).isEqualTo("{name:{firstName:'John', lastName:'Doe'}}"));
+        assertProcessEnded(procId);
+
+        // BASE64
+        procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/test")
+                .transientVariable("responseVariableType","base64")
+                .start()
+                .getId();
+         variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(String.class,
+                value -> assertThat(value).isEqualTo("eyJuYW1lIjp7ImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRvZSJ9fQo="));
+        assertProcessEnded(procId);
+
+        // BYTES
+        procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/test")
+                .transientVariable("responseVariableType","bytes")
+                .start()
+                .getId();
+        variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(byte[].class,
+                value -> assertThat(value).asString(StandardCharsets.UTF_8).isEqualToIgnoringWhitespace("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}"));
+        assertProcessEnded(procId);
+
+        // STRING
+        procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/test")
+                .transientVariable("responseVariableType","string")
+                .start()
+                .getId();
+        variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(String.class,
+                value -> assertThat(value).isEqualToIgnoringWhitespace("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}"));
+        assertProcessEnded(procId);
+
+        // JSON
+        procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleGetOnly")
+                .transientVariable("requestUrl","http://localhost:9798/test")
+                .transientVariable("responseVariableType","json")
+                .start()
+                .getId();
+        variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(procId).list();
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactly("responseVariable");
+        assertThat(variables.get(0).getValue()).isInstanceOfSatisfying(ObjectNode.class,
+                value -> assertThatJson(value).isEqualTo("{name:{firstName:'John',lastName:'Doe'}}"));
+        assertProcessEnded(procId);
+    }
+
 
     static Stream<Arguments> parametersForGetWithVariableParameters() {
         return Stream.of(

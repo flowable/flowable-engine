@@ -12,11 +12,13 @@
  */
 package org.flowable.http.cmmn;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +30,8 @@ import org.flowable.http.bpmn.HttpServiceTaskTestServer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author martin.grofcik
@@ -317,6 +321,104 @@ public class CmmnHttpTaskTest {
                         entry("Host", "localhost:7000"),
                         entry("Test", "test")
                 );
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithResponseVariableAndVariableType.cmmn")
+    public void testGetWithSaveResponseVariablePdfIsPutAsByteArrayByDefault() {
+        // default
+        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType","auto")
+                .transientVariable("requestUrl","http://localhost:9798/binary/pdf")
+                .start();
+
+        Map<String, Object> variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(byte[].class, value -> assertThat(value).isNotEmpty());
+
+        // request byte array
+        caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType","bytes")
+                .transientVariable("requestUrl","http://localhost:9798/binary/pdf")
+                .start();
+
+        variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(byte[].class, value -> assertThat(value).isNotEmpty());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithResponseVariableAndVariableType.cmmn")
+    public void testGetWithSaveResponseVariableAndVariableTypeStringOctetStream() {
+        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType","string")
+                .transientVariable("requestUrl","http://localhost:9798/binary/octet-stream-string")
+                .start();
+
+        Map<String, Object> variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(String.class,
+                value -> assertThat(value).isEqualTo("Content-Type is octet-stream, but still a string"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithResponseVariableAndVariableType.cmmn")
+    public void testGetWithSaveResponseVariableAndVariableTypeJsonContent() {
+        // DEFAULT
+        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType", "auto")
+                .transientVariable("requestUrl", "http://localhost:9798/test")
+                .start();
+
+        Map<String, Object> variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(ObjectNode.class,
+                value -> assertThatJson(value).isEqualTo("{name:{firstName:'John', lastName:'Doe'}}"));
+
+        // BASE64
+       caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType", "base64")
+                .transientVariable("requestUrl", "http://localhost:9798/test")
+                .start();
+
+        variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(String.class,
+                value -> assertThat(value).isEqualTo("eyJuYW1lIjp7ImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRvZSJ9fQo="));
+
+        // BYTES
+        caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType", "bytes")
+                .transientVariable("requestUrl", "http://localhost:9798/test")
+                .start();
+
+        variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(byte[].class,
+                value -> assertThat(value).asString(StandardCharsets.UTF_8)
+                        .isEqualToIgnoringWhitespace("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}"));
+
+        // STRING
+        caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("responseVariableType", "string")
+                .transientVariable("requestUrl", "http://localhost:9798/test")
+                .start();
+
+        variables = caseInstance.getCaseVariables();
+        assertThat(variables.get("responseVariable")).isInstanceOfSatisfying(String.class,
+                value -> assertThatJson(value).isEqualTo("{\"name\":{\"firstName\":\"John\",\"lastName\":\"Doe\"}}"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithSaveResponseVariableAndVariableType.cmmn")
+    public void testGetWithInvalidConfigJsonAndVariableResponseType() {
+        assertThatThrownBy(() -> cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("requestUrl", "http://localhost:9798/binary/pdf")
+                .start()).isInstanceOf(FlowableException.class)
+                .hasMessage("Only one of responseVariableType or saveResponseVariableAsJson can be set, not both. "
+                        + "saveResponseVariableAsJson is deprecated, please use responseVariableType instead.");
     }
 
     protected CaseInstance createCaseInstance() {

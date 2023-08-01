@@ -13,6 +13,9 @@
 package org.flowable.http.common.impl;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,12 +28,15 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.HttpResponseVariableType;
 import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
 import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 /**
  * @author Filip Hrisafov
@@ -72,8 +78,14 @@ public abstract class BaseHttpActivityDelegate {
     protected Expression responseVariableName;
     // Flag to save the response variables as a transient variable. Default is false (Optional).
     protected Expression saveResponseParametersTransient;
+    /**
+     * @deprecated use {@link #responseVariableType} instead
+     */
     // Flag to save the response variable as an ObjectNode instead of a String
+    @Deprecated
     protected Expression saveResponseVariableAsJson;
+
+    protected Expression responseVariableType;
     // Prefix for the execution variable names (Optional)
     protected Expression resultVariablePrefix;
 
@@ -105,7 +117,7 @@ public abstract class BaseHttpActivityDelegate {
         requestData.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, variableContainer));
         requestData.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, variableContainer));
         requestData.setSaveResponseTransient(ExpressionUtils.getBooleanFromField(saveResponseParametersTransient, variableContainer));
-        requestData.setSaveResponseAsJson(ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer));
+        requestData.setResponseVariableType(determineResponseVariableType(variableContainer));
         requestData.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, variableContainer));
 
         String failCodes = ExpressionUtils.getStringFromField(failStatusCodes, variableContainer);
@@ -163,10 +175,8 @@ public abstract class BaseHttpActivityDelegate {
             if (!response.isBodyResponseHandled()) {
                 String responseVariableName = ExpressionUtils.getStringFromField(this.responseVariableName, variableContainer);
                 String varName = StringUtils.isNotEmpty(responseVariableName) ? responseVariableName : request.getPrefix() + "ResponseBody";
-                Object varValue = request.isSaveResponseAsJson() && response.getBody() != null ? objectMapper.readTree(response.getBody()) : response.getBody();
-                if (varValue instanceof MissingNode) {
-                    varValue = null;
-                }
+                Object varValue = determineResponseVariableValue(request, response, objectMapper);
+
                 if (request.isSaveResponseTransient()) {
                     variableContainer.setTransientVariable(varName, varValue);
                 } else {
@@ -203,6 +213,101 @@ public abstract class BaseHttpActivityDelegate {
                 }
             }
         }
+    }
+
+    protected Object determineResponseVariableValue(RequestData request, HttpResponse response, ObjectMapper objectMapper) throws IOException {
+        HttpResponseVariableType responseVariableType = request.getResponseVariableType();
+        String contentType = getContentTypeWithoutCharset(response);
+        switch (responseVariableType) {
+            case AUTO:
+                if (isTextContentType(contentType)) {
+                    return response.getBody();
+                } else if (isJsonContentType(contentType)) {
+                    return readJsonTree(response, objectMapper);
+                } else {
+                    return response.getBodyBytes();
+                }
+            case STRING: {
+                return response.getBody();
+            }
+            case JSON: {
+                return readJsonTree(response, objectMapper);
+            }
+            case BYTES: {
+                return response.getBodyBytes();
+            }
+            case BASE64: {
+                byte[] bodyBytes = response.getBodyBytes();
+                return Base64.getEncoder().encodeToString(bodyBytes);
+            }
+            default: {
+                throw new FlowableException("Unsupported response variable type: " + responseVariableType);
+            }
+        }
+    }
+
+    protected Object readJsonTree(HttpResponse response, ObjectMapper objectMapper) throws JsonProcessingException {
+        Object varValue;
+        if (response.getBody() != null) {
+            varValue = objectMapper.readTree(response.getBody());
+        } else {
+            varValue = response.getBody();
+        }
+        if (varValue instanceof MissingNode || varValue instanceof NullNode) {
+            varValue = null;
+        }
+        return varValue;
+    }
+
+    protected boolean isJsonContentType(String contentType) {
+        if (contentType != null) {
+            return contentType != null && contentType.endsWith("/json") || contentType.endsWith("+json");
+        }
+        return false;
+    }
+
+    protected boolean isTextContentType(String contentType) {
+        if (contentType != null) {
+            return contentType.startsWith("text/") || contentType.endsWith("/xml") || contentType.endsWith("+xml");
+        }
+        return false;
+    }
+
+    protected String getContentTypeWithoutCharset(HttpResponse response) {
+        List<String> contentTypeHeader = response.getHttpHeaders().get("Content-Type");
+        if (contentTypeHeader != null && !contentTypeHeader.isEmpty()) {
+            String contentType = contentTypeHeader.get(0);
+            if (contentType.indexOf(';') >= 0) {
+                contentType = contentType.split(";")[0]; // remove charset if present
+            }
+            return contentType;
+        }
+        return null;
+    }
+
+    protected HttpResponseVariableType determineResponseVariableType(VariableContainer variableContainer) {
+        // We use string as default, when neither is set, for backwards compatibility reasons.
+        HttpResponseVariableType effectiveResponseVariableType = HttpResponseVariableType.STRING;
+        if (responseVariableType != null && saveResponseVariableAsJson != null) {
+            throw new FlowableException(
+                    "Only one of responseVariableType or saveResponseVariableAsJson can be set, not both. saveResponseVariableAsJson is deprecated, please use responseVariableType instead.");
+        }
+        if (responseVariableType != null) {
+            String responseVariableTypeString = ExpressionUtils.getStringFromField(responseVariableType, variableContainer).toUpperCase(Locale.ROOT);
+            if (responseVariableTypeString == null) {
+                effectiveResponseVariableType = HttpResponseVariableType.AUTO;
+            } else if (responseVariableTypeString.equalsIgnoreCase("true")) {
+                // Backwards compatibility - if the responseVariableType is set to true, then we assume it's JSON
+                effectiveResponseVariableType = HttpResponseVariableType.JSON;
+            } else {
+                effectiveResponseVariableType = HttpResponseVariableType.valueOf(responseVariableTypeString.toUpperCase(Locale.ROOT));
+            }
+        } else if (saveResponseVariableAsJson != null) {
+            // Backwards compatibility - if the saveResponseVariableAsJson is set, then we assume it's JSON otherwise it's a string (old default).
+            boolean saveResponseAsJson = ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer);
+            effectiveResponseVariableType = saveResponseAsJson ? HttpResponseVariableType.JSON : HttpResponseVariableType.STRING;
+        }
+        return effectiveResponseVariableType;
     }
 
     protected CompletableFuture<ExecutionData> prepareAndExecuteRequest(RequestData request, boolean parallelInSameTransaction, AsyncTaskInvoker taskInvoker) {
@@ -303,7 +408,8 @@ public abstract class BaseHttpActivityDelegate {
         protected boolean saveRequest;
         protected boolean saveResponse;
         protected boolean saveResponseTransient;
-        protected boolean saveResponseAsJson;
+
+        protected HttpResponseVariableType responseVariableType;
         protected String prefix;
 
         public HttpRequest getHttpRequest() {
@@ -362,12 +468,12 @@ public abstract class BaseHttpActivityDelegate {
             this.saveResponseTransient = saveResponseTransient;
         }
 
-        public boolean isSaveResponseAsJson() {
-            return saveResponseAsJson;
+        public HttpResponseVariableType getResponseVariableType() {
+            return responseVariableType;
         }
 
-        public void setSaveResponseAsJson(boolean saveResponseAsJson) {
-            this.saveResponseAsJson = saveResponseAsJson;
+        public void setResponseVariableType(HttpResponseVariableType responseVariableType) {
+            this.responseVariableType = responseVariableType;
         }
 
         public String getPrefix() {
