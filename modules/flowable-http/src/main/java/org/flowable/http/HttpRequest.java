@@ -13,7 +13,6 @@
 package org.flowable.http;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.MultiValuePart;
@@ -171,118 +170,6 @@ public class HttpRequest extends org.flowable.http.common.api.HttpRequest {
             delegate.setNoRedirects(noRedirects);
         } else {
             super.setNoRedirects(noRedirects);
-        }
-    }
-
-    @Override
-    public Set<String> getFailCodes() {
-        return delegate != null ? delegate.getFailCodes() : super.getFailCodes();
-    }
-
-    @Override
-    public void setFailCodes(Set<String> failCodes) {
-        if (delegate != null) {
-            delegate.setFailCodes(failCodes);
-        } else {
-            super.setFailCodes(failCodes);
-        }
-    }
-
-    @Override
-    public Set<String> getHandleCodes() {
-        return delegate != null ? delegate.getHandleCodes() : super.getHandleCodes();
-    }
-
-    @Override
-    public void setHandleCodes(Set<String> handleCodes) {
-        if (delegate != null) {
-            delegate.setHandleCodes(handleCodes);
-        } else {
-            super.setHandleCodes(handleCodes);
-        }
-    }
-
-    @Override
-    public boolean isIgnoreErrors() {
-        return delegate != null ? delegate.isIgnoreErrors() : super.isIgnoreErrors();
-    }
-
-    @Override
-    public void setIgnoreErrors(boolean ignoreErrors) {
-        if (delegate != null) {
-            delegate.setIgnoreErrors(ignoreErrors);
-        } else {
-            super.setIgnoreErrors(ignoreErrors);
-        }
-    }
-
-    @Override
-    public boolean isSaveRequest() {
-        return delegate != null ? delegate.isSaveRequest() : super.isSaveRequest();
-    }
-
-    @Override
-    public void setSaveRequest(boolean saveRequest) {
-        if (delegate != null) {
-            delegate.setSaveRequest(saveRequest);
-        } else {
-            super.setSaveRequest(saveRequest);
-        }
-    }
-
-    @Override
-    public boolean isSaveResponse() {
-        return delegate != null ? delegate.isSaveResponse() : super.isSaveResponse();
-    }
-
-    @Override
-    public void setSaveResponse(boolean saveResponse) {
-        if (delegate != null) {
-            delegate.setSaveResponse(saveResponse);
-        } else {
-            super.setSaveResponse(saveResponse);
-        }
-    }
-
-    @Override
-    public boolean isSaveResponseTransient() {
-        return delegate != null ? delegate.isSaveResponseTransient() : super.isSaveResponseTransient();
-    }
-
-    @Override
-    public void setSaveResponseTransient(boolean saveResponseTransient) {
-        if (delegate != null) {
-            delegate.setSaveResponseTransient(saveResponseTransient);
-        } else {
-            super.setSaveResponseTransient(saveResponseTransient);
-        }
-    }
-
-    @Override
-    public boolean isSaveResponseAsJson() {
-        return delegate != null ? delegate.isSaveResponseAsJson() : super.isSaveResponseAsJson();
-    }
-
-    @Override
-    public void setSaveResponseAsJson(boolean saveResponseAsJson) {
-        if (delegate != null) {
-            delegate.setSaveResponseAsJson(saveResponseAsJson);
-        } else {
-            super.setSaveResponseAsJson(saveResponseAsJson);
-        }
-    }
-
-    @Override
-    public String getPrefix() {
-        return delegate != null ? delegate.getPrefix() : super.getPrefix();
-    }
-
-    @Override
-    public void setPrefix(String prefix) {
-        if (delegate != null) {
-            delegate.setPrefix(prefix);
-        } else {
-            super.setPrefix(prefix);
         }
     }
 

@@ -77,7 +77,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
     @Override
     public CompletableFuture<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
-        HttpRequest request;
+        RequestData request;
 
         HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
         try {
@@ -95,11 +95,11 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         HttpRequestHandler httpRequestHandler = createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), processEngineConfiguration);
 
         if (httpRequestHandler != null) {
-            httpRequestHandler.handleHttpRequest(execution, request, null);
+            httpRequestHandler.handleHttpRequest(execution, request.getHttpRequest(), null);
         }
 
         // Validate request
-        validateRequest(request);
+        validateRequest(request.getHttpRequest());
 
         boolean parallelInSameTransaction;
         if (httpServiceTask.getParallelInSameTransaction() != null) {
@@ -114,7 +114,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     @Override
     public void afterExecution(DelegateExecution execution, ExecutionData result) {
 
-        HttpRequest request = result.getRequest();
+        RequestData request = result.getRequest();
         HttpResponse response = result.getResponse();
 
         Throwable resultException = result.getException();
