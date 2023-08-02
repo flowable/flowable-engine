@@ -21,8 +21,15 @@
             org.flowable.mail.common.api,
             org.flowable.mail.common.api.client,
             org.flowable.mail.common.impl,
-            org.flowable.mail.common.impl.apache.commons
+            org.flowable.mail.common.impl.jakarta.mail
         </flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            jakarta.mail*;resolution:=optional,
+            jakarta.activation*;resolution:=optional,
+            com.fasterxml.jackson*;resolution:=optional,
+            org.slf4j*;resolution:=optional,
+            org.apache.commons.lang3*;resolution:=optional,
+        </flowable.osgi.import.additional>
     </properties>
 
     <build>
