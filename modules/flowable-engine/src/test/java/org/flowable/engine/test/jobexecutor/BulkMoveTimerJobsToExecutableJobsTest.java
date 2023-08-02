@@ -67,7 +67,6 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
 
     @Test
     public void testBulkUpdateAndDelete() {
-
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(commandContext -> {
 
@@ -120,7 +119,6 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
 
     @Test
     public void testBulkDeleteWithByteArrays() {
-
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(commandContext -> {
 

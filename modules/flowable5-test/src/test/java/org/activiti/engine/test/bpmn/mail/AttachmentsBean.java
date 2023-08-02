@@ -20,9 +20,9 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
-import javax.activation.DataSource;
-
 import org.apache.commons.lang3.Validate;
+
+import jakarta.activation.DataSource;
 
 public class AttachmentsBean implements Serializable {
     private static final long serialVersionUID = 1L;
