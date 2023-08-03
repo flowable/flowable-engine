@@ -33,6 +33,7 @@ import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -63,7 +64,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     // Instance members
     protected ActivityImpl activity;
-    protected AbstractBpmnActivityBehavior innerActivityBehavior;
+    protected ActivityBehavior innerActivityBehavior;
     protected Expression loopCardinalityExpression;
     protected Expression completionConditionExpression;
     protected Expression collectionExpression;
@@ -76,7 +77,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
      * @param activity
      * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
      */
-    public MultiInstanceActivityBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public MultiInstanceActivityBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         this.activity = activity;
         setInnerActivityBehavior(innerActivityBehavior);
     }
@@ -104,7 +105,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     // Intercepts signals, and delegates it to the wrapped {@link ActivityBehavior}.
     @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-        innerActivityBehavior.signal(execution, signalName, signalData);
+        if (innerActivityBehavior instanceof org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior) {
+            throw new FlowableException("Not supported to signal this execution");
+        } else {
+            ((AbstractBpmnActivityBehavior) this.innerActivityBehavior).signal(execution, signalName, signalData);
+        }
     }
 
     // required for supporting embedded subprocesses
@@ -330,12 +335,16 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionElementIndexVariable = collectionElementIndexVariable;
     }
 
-    public void setInnerActivityBehavior(AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public void setInnerActivityBehavior(ActivityBehavior innerActivityBehavior) {
         this.innerActivityBehavior = innerActivityBehavior;
-        this.innerActivityBehavior.setMultiInstanceActivityBehavior(this);
+        if (innerActivityBehavior instanceof org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior) {
+            ((org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior) innerActivityBehavior).setV5MultiInstanceActivityBehavior(this);
+        } else {
+            ((AbstractBpmnActivityBehavior) this.innerActivityBehavior).setMultiInstanceActivityBehavior(this);
+        }
     }
 
-    public AbstractBpmnActivityBehavior getInnerActivityBehavior() {
+    public ActivityBehavior getInnerActivityBehavior() {
         return innerActivityBehavior;
     }
 

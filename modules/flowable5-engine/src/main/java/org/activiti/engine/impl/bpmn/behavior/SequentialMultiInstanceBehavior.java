@@ -26,7 +26,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavior {
 
-    public SequentialMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public SequentialMultiInstanceBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         super(activity, innerActivityBehavior);
     }
 

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
@@ -260,13 +259,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     @Override
     public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(
-            ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+            ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return wrappedActivityBehaviorFactory.createSequentialMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 
     @Override
     public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(
-            ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+            ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return wrappedActivityBehaviorFactory.createParallelMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 

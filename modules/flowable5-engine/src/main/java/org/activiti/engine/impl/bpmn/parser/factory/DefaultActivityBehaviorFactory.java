@@ -15,7 +15,6 @@ package org.activiti.engine.impl.bpmn.parser.factory;
 import java.util.List;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.BusinessRuleTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CallActivityBehavior;
@@ -336,12 +335,12 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     // Multi Instance
 
     @Override
-    public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return new SequentialMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 
     @Override
-    public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+    public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return new ParallelMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 
