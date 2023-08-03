@@ -382,64 +382,77 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     
     @Test
     public void multipleDeploymentsInTenant() throws Exception {
-        repositoryService.createDeployment()
-                .name("deploymentA")
-                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
-                .tenantId("myTenant")
-                .enableDuplicateFiltering()
-                .deploy();
-
-        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
-                .deploymentName("deploymentA")
-                .deploymentTenantId("myTenant")
-                .singleResult();
-        assertThat(deployment).isNotNull();
-        
-        List<DmnDecision> decisions = repositoryService.createDecisionQuery()
-                .decisionKey("decision")
-                .decisionTenantId("myTenant")
-                .list();
-        assertThat(decisions).hasSize(1);
-
-        repositoryService.createDeployment()
-                .name("deploymentA")
-                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
-                .tenantId("myTenant")
-                .enableDuplicateFiltering()
-                .deploy();
-        
-        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
-                .deploymentName("deploymentA")
-                .deploymentTenantId("myTenant")
-                .list();
-        assertThat(deployments).hasSize(2);
-        
-        decisions = repositoryService.createDecisionQuery()
-                .decisionKey("anotherDecision")
-                .decisionTenantId("myTenant")
-                .list();
-        assertThat(decisions).hasSize(1);
-        
-        repositoryService.createDeployment()
-                .name("deploymentA")
-                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
-                .tenantId("myTenant")
-                .enableDuplicateFiltering()
-                .deploy();
-        
-        deployments = repositoryService.createDeploymentQuery()
-                .deploymentName("deploymentA")
-                .deploymentTenantId("myTenant")
-                .list();
-        assertThat(deployments).hasSize(2);
-        
-        decisions = repositoryService.createDecisionQuery()
-                .decisionKey("anotherDecision")
-                .decisionTenantId("myTenant")
-                .list();
-        assertThat(decisions).hasSize(1);
-
-        deleteDeployments();
+        try {
+            repositoryService.createDeployment()
+                    .name("deploymentA")
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                    .tenantId("myTenant")
+                    .enableDuplicateFiltering()
+                    .deploy();
+    
+            org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
+                    .deploymentName("deploymentA")
+                    .deploymentTenantId("myTenant")
+                    .singleResult();
+            assertThat(deployment).isNotNull();
+            
+            List<DmnDecision> decisions = repositoryService.createDecisionQuery()
+                    .decisionKey("decision")
+                    .decisionTenantId("myTenant")
+                    .list();
+            assertThat(decisions).hasSize(1);
+            
+            Calendar deployCal = new GregorianCalendar();
+            deployCal.add(Calendar.DATE, 2);
+            dmnEngineConfiguration.getClock().setCurrentTime(deployCal.getTime());
+    
+            repositoryService.createDeployment()
+                    .name("deploymentA")
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                    .tenantId("myTenant")
+                    .enableDuplicateFiltering()
+                    .deploy();
+            
+            List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
+                    .deploymentName("deploymentA")
+                    .deploymentTenantId("myTenant")
+                    .list();
+            assertThat(deployments).hasSize(2);
+            
+            decisions = repositoryService.createDecisionQuery()
+                    .decisionKey("anotherDecision")
+                    .decisionTenantId("myTenant")
+                    .list();
+            assertThat(decisions).hasSize(1);
+            
+            deployCal = new GregorianCalendar();
+            deployCal.add(Calendar.DATE, 4);
+            dmnEngineConfiguration.getClock().setCurrentTime(deployCal.getTime());
+            
+            repositoryService.createDeployment()
+                    .name("deploymentA")
+                    .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                    .tenantId("myTenant")
+                    .enableDuplicateFiltering()
+                    .deploy();
+            
+            deployments = repositoryService.createDeploymentQuery()
+                    .deploymentName("deploymentA")
+                    .deploymentTenantId("myTenant")
+                    .list();
+            assertThat(deployments).hasSize(2);
+            
+            decisions = repositoryService.createDecisionQuery()
+                    .decisionKey("anotherDecision")
+                    .decisionTenantId("myTenant")
+                    .list();
+            assertThat(decisions).hasSize(1);
+    
+            deleteDeployments();
+            
+        } finally {
+            dmnEngineConfiguration.getClock().reset();
+        }
     }
     
     @Test

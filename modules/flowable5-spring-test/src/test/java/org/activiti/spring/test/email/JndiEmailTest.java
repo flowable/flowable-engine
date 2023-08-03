@@ -23,6 +23,7 @@ import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,9 +56,10 @@ public class JndiEmailTest extends SpringFlowableTestCase {
                 .bind("Session", mailSession);
     }
 
+    @Test
     @Deployment(resources = { "org/activiti/spring/test/email/EmailTaskUsingJndi.bpmn20.xml" })
     public void testEmailUsingJndi() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("EmailJndiProcess", variables);
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
