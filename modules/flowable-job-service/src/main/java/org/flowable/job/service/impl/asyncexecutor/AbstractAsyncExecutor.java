@@ -15,9 +15,11 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.time.Duration;
 import java.util.LinkedList;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.UnacquireOwnedJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
@@ -152,7 +154,18 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected void executeTemporaryJobs() {
         while (!temporaryJobQueue.isEmpty()) {
             JobInfo job = temporaryJobQueue.pop();
-            executeAsyncJob(job);
+            JobEntityImpl jobEntity = (JobEntityImpl) job;
+            if(jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
+                if(StringUtils.isEmpty(jobEntity.getCategory())) {
+                    temporaryJobQueue.remove(job);
+                    continue;
+                }
+                if(!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                    temporaryJobQueue.remove(job);
+                    continue;
+                }
+            }
+            executeAsyncJob(jobEntity);
         }
     }
 
