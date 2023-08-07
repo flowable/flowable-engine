@@ -31,7 +31,7 @@
 		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<hikari.version>5.0.1</hikari.version>
-		<maven.deploy.plugin.version>3.0.0</maven.deploy.plugin.version>
+		<maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
 		<mockito.version>5.3.1</mockito.version>
 		<testcontainers.version>1.18.3</testcontainers.version>
