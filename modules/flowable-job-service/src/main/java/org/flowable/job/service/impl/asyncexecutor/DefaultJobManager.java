@@ -95,11 +95,11 @@ public class DefaultJobManager implements JobManager {
     protected void triggerExecutorIfNeeded(JobEntity jobEntity) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
         if (isAsyncExecutorActive()) {
-            if(jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
-                if(StringUtils.isEmpty(jobEntity.getCategory())) {
+            if (jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
+                if (StringUtils.isEmpty(jobEntity.getCategory())) {
                     return;
                 }
-                if(!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                if (!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
                     return;
                 }
             }

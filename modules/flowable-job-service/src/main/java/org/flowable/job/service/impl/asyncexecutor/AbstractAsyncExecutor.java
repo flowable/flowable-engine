@@ -155,12 +155,12 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         while (!temporaryJobQueue.isEmpty()) {
             JobInfo job = temporaryJobQueue.pop();
             JobEntityImpl jobEntity = (JobEntityImpl) job;
-            if(jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
-                if(StringUtils.isEmpty(jobEntity.getCategory())) {
+            if (jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
+                if (StringUtils.isEmpty(jobEntity.getCategory())) {
                     temporaryJobQueue.remove(job);
                     continue;
                 }
-                if(!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
+                if (!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
                     temporaryJobQueue.remove(job);
                     continue;
                 }
