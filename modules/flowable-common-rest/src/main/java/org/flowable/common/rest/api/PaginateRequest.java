@@ -15,7 +15,7 @@ package org.flowable.common.rest.api;
 /**
  * Interface representing a paginated request object, use when paging is needed without using URL-parameters.
  * 
- * @see AbstractPaginateList
+ * @see PaginateListUtil
  * 
  * @author Frederik Heremans
  */
