@@ -101,7 +101,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
@@ -201,7 +201,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isNull();
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isNull();
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isNull();
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
                 .containsAnyOf(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
@@ -362,7 +362,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
     }
 
     @Test
@@ -406,7 +406,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
         assertThat(migrationDocument.getActivitiesLocalVariables())
                 .containsKeys("newActivity1", "newActivity2")
                 .containsEntry("newActivity1", (Collections.singletonMap("variableString", "variableValue")))
@@ -491,7 +491,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);

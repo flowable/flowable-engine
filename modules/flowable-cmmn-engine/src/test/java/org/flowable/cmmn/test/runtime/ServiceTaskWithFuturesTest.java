@@ -223,9 +223,9 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
                     .start();
         })
                 .isExactlyInstanceOf(FlowableException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("Countdown latch did not reach 0");
     }

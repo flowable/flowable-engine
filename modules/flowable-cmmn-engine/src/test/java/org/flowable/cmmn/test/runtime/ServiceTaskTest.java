@@ -485,9 +485,9 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
-                .getCause()
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasNoCause()
                 .hasMessage("test exception");
@@ -507,9 +507,9 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
-                .getCause()
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasNoCause()
                 .hasMessage("test exception");

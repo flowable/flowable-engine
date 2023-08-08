@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.test.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -181,7 +182,7 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             assertThat(taskLogEntries).hasSize(2);
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
+                .isEqualTo("{\"newAssigneeId\":\"newAssignee\",\"previousAssigneeId\":\"initialAssignee\"}");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -216,9 +217,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
             assertThat(taskLogEntries).hasSize(2);
-            assertThat(taskLogEntries.get(1))
-                .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"previousOwnerId\":null\", \"newOwnerId\":\"newOwner\"}");
+            assertThatJson(taskLogEntries.get(1).getData())
+                .isEqualTo("{ previousOwnerId: null, newOwnerId: 'newOwner' }");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -250,9 +250,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(taskLogEntries).hasSize(2);
-            assertThat(taskLogEntries.get(1))
-                .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"newAssigneeId\":\"testUser\", \"previousAssigneeId\":null\"}");
+            assertThatJson(taskLogEntries.get(1).getData())
+                .isEqualTo("{ newAssigneeId: 'testUser', previousAssigneeId: null }");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -279,9 +278,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(taskLogEntries).hasSize(2);
-            assertThat(taskLogEntries.get(1))
-                .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"newAssigneeId\":null\", \"previousAssigneeId\":\"initialAssignee\"}");
+            assertThatJson(taskLogEntries.get(1).getData())
+                .isEqualTo("{ newAssigneeId: null, previousAssigneeId: 'initialAssignee' }");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -307,9 +305,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
             List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
             assertThat(taskLogEntries).hasSize(2);
-            assertThat(taskLogEntries.get(1))
-                .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"newPriority\":2147483647, \"previousPriority\":50}");
+            assertThatJson(taskLogEntries.get(1).getData())
+                .isEqualTo("{ newPriority: 2147483647, previousPriority: 50 }");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -357,15 +354,15 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     public void changeDueDate() {
         task = cmmnTaskService.createTaskBuilder().create();
 
-        cmmnTaskService.setDueDate(task.getId(), new Date());
+        Date dueDate = new Date();
+        cmmnTaskService.setDueDate(task.getId(), dueDate);
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricTaskLogEntry> taskLogEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
 
             assertThat(taskLogEntries).hasSize(2);
-            assertThat(taskLogEntries.get(1))
-                .extracting(HistoricTaskLogEntry::getData)
-                .isEqualToComparingOnlyGivenFields("{\"newDueDate\":null, \"previousDueDate\":null}");
+            assertThatJson(taskLogEntries.get(1).getData())
+                .isEqualTo("{ newDueDate: " + dueDate.getTime() + ", previousDueDate: null }");
             assertThat(taskLogEntries.get(1))
                 .extracting(HistoricTaskLogEntry::getTimeStamp)
                 .isNotNull();
@@ -594,9 +591,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                 assertThat(logEntries.get(1))
                     .extracting(HistoricTaskLogEntry::getType)
                     .isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-                assertThat(logEntries.get(1))
-                    .extracting(HistoricTaskLogEntry::getData)
-                    .isEqualToComparingOnlyGivenFields("{\"type\":\"candidate\", \"userId\":\"newCandidateUser\"}");
+                assertThatJson(logEntries.get(1).getData())
+                    .isEqualTo("{ type: 'candidate', userId: 'newCandidateUser' }");
             }
         } finally {
             cmmnTaskService.complete(task.getId());
@@ -620,9 +616,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                 assertThat(logEntries.get(1))
                     .extracting(HistoricTaskLogEntry::getType)
                     .isEqualTo("USER_TASK_IDENTITY_LINK_ADDED");
-                assertThat(logEntries.get(1))
-                    .extracting(HistoricTaskLogEntry::getData)
-                    .isEqualToComparingOnlyGivenFields("{\"type\":\"candidate\", \"userId\":\"newCandidateGroup\"}");
+                assertThatJson(logEntries.get(1).getData())
+                    .isEqualTo("{ type: 'candidate', groupId: 'newCandidateGroup' }");
             }
         } finally {
             cmmnTaskService.complete(task.getId());
@@ -648,9 +643,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                 assertThat(logEntries.get(2))
                     .extracting(HistoricTaskLogEntry::getType)
                     .isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-                assertThat(logEntries.get(2))
-                    .extracting(HistoricTaskLogEntry::getData)
-                    .isEqualToComparingOnlyGivenFields("{\"type\":\"candidate\", \"userId\":\"newCandidateGroup\"}");
+                assertThatJson(logEntries.get(2).getData())
+                    .isEqualTo("{ type: 'candidate', groupId: 'newCandidateGroup' }");
             }
         } finally {
             cmmnTaskService.complete(task.getId());
@@ -676,9 +670,8 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
                 assertThat(logEntries.get(2))
                     .extracting(HistoricTaskLogEntry::getType)
                     .isEqualTo("USER_TASK_IDENTITY_LINK_REMOVED");
-                assertThat(logEntries.get(2))
-                    .extracting(HistoricTaskLogEntry::getData)
-                    .isEqualToComparingOnlyGivenFields("{\"type\":\"candidate\", \"userId\":\"newCandidateUser\"}");
+                assertThatJson(logEntries.get(2).getData())
+                    .isEqualTo("{ type: 'candidate', userId: 'newCandidateUser' }");
             }
         } finally {
             cmmnTaskService.complete(task.getId());

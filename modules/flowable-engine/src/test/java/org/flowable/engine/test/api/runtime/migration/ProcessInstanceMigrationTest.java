@@ -941,7 +941,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                     .list();
             assertThat(historicActivityInstancesAfter).hasSameSizeAs(historicActivityInstancesBefore);
             assertThat(historicActivityInstancesBefore)
-                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId")
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("revision", "processDefinitionId")
                     .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -949,7 +949,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
                 assertThat(historicTaskInstancesAfter).hasSameSizeAs(historicTaskInstancesBefore);
                 assertThat(historicTaskInstancesBefore)
-                        .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "originalPersistentState", "lastUpdateTime")
+                        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("revision", "processDefinitionId", "originalPersistentState", "lastUpdateTime")
                         .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
             }
         }
@@ -1038,7 +1038,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                     .list();
             assertThat(historicActivityInstancesAfter).hasSameSizeAs(historicActivityInstancesBefore);
             assertThat(historicActivityInstancesBefore)
-                    .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState")
+                    .usingRecursiveFieldByFieldElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState")
                     .containsExactlyInAnyOrderElementsOf(historicActivityInstancesAfter);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -1046,7 +1046,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
                 assertThat(historicTaskInstancesAfter).hasSameSizeAs(historicTaskInstancesBefore);
                 assertThat(historicTaskInstancesBefore)
-                        .usingElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState", "lastUpdateTime")
+                        .usingRecursiveFieldByFieldElementComparatorIgnoringFields("revision", "processDefinitionId", "assignee", "originalPersistentState", "lastUpdateTime")
                         .containsExactlyInAnyOrderElementsOf(historicTaskInstancesAfter);
             }
         }

@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -84,7 +85,7 @@ public class EventRegistryRabbitConfiguration {
 
     @Bean(destroyMethod = "stop")
     public RabbitMQContainer rabbitMQContainer() {
-        RabbitMQContainer container = new RabbitMQContainer();
+        RabbitMQContainer container = new RabbitMQContainer("rabbitmq");
         container.start();
         return container;
     }
