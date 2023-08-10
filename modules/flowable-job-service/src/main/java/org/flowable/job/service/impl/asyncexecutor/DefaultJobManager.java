@@ -77,7 +77,7 @@ public class DefaultJobManager implements JobManager {
     @Override
     public void createAsyncJob(JobEntity jobEntity, boolean exclusive) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
-        if (isAsyncExecutorActive()) {
+        if (isJobApplicableForExecutorExecution(jobEntity)) {
             internalCreateLockedAsyncJob(jobEntity, exclusive);
 
         } else {
@@ -93,18 +93,30 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void triggerExecutorIfNeeded(JobEntity jobEntity) {
-        // When the async executor is activated, the job is directly passed on to the async executor thread
-        if (isAsyncExecutorActive()) {
-            if (jobServiceConfiguration.getEnabledJobCategories() != null && !jobServiceConfiguration.getEnabledJobCategories().isEmpty()) {
-                if (StringUtils.isEmpty(jobEntity.getCategory())) {
-                    return;
-                }
-                if (!jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
-                    return;
-                }
-            }
+        if (isJobApplicableForExecutorExecution(jobEntity)) {
             hintAsyncExecutor(jobEntity);
         }
+    }
+
+    protected boolean isJobApplicableForExecutorExecution(JobEntity jobEntity) {
+        if (!isAsyncExecutorActive()) {
+            // If the async executor is not active then it should not be hinted
+            return false;
+        }
+        List<String> enabledJobCategories = jobServiceConfiguration.getEnabledJobCategories();
+        if (enabledJobCategories == null || enabledJobCategories.isEmpty()) {
+            // If there are no job categories then we need to hint it
+            return true;
+        }
+
+        String category = jobEntity.getCategory();
+        if (StringUtils.isEmpty(category)) {
+            // If the job has no category then we should not hint it, another node needs to run it
+            return false;
+        }
+
+        // Finally, the job should be hinted if the enabled job categories contain the job category
+        return enabledJobCategories.contains(category);
     }
 
     @Override
@@ -668,14 +680,6 @@ public class DefaultJobManager implements JobManager {
 
     protected void internalCreateLockedAsyncJob(JobEntity jobEntity, boolean exclusive) {
         fillDefaultAsyncJobInfo(jobEntity, exclusive);
-        
-        if (StringUtils.isNotEmpty(jobEntity.getCategory())) {
-            if (jobServiceConfiguration.getEnabledJobCategories() != null && 
-                    !jobServiceConfiguration.getEnabledJobCategories().contains(jobEntity.getCategory())) {
-                
-                return;
-            }
-        }
         
         setLockTimeAndOwner(getAsyncExecutor(), jobEntity);
     }
