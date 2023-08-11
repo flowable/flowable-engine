@@ -112,7 +112,7 @@ List<Task> tasks = taskService.createTaskQuery()
 [source,java,linenums]
 ----
 List<Task> tasks = taskService.createNativeTaskQuery()
-  .sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) +
+  .sql("SELECT * FROM " + managementService.getTableName(Task.class) +
       " T WHERE T.NAME_ = #{taskName}")
   .parameter("taskName", "gonzoTask")
   .list();
