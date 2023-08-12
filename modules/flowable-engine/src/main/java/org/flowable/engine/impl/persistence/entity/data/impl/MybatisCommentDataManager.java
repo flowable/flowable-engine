@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.CommentQueryImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
@@ -122,4 +123,14 @@ public class MybatisCommentDataManager extends AbstractProcessDataManager<Commen
         return findById(commentId);
     }
 
+    @Override
+    public List<Comment> findCommentsByQueryCriteria(CommentQueryImpl commentQuery) {
+        final String query = "selectCommentByQueryCriteria";
+        return getDbSqlSession().selectList(query, commentQuery);
+    }
+
+    @Override
+    public long findCommentCountByQueryCriteria(CommentQueryImpl commentQuery) {
+        return (Long) getDbSqlSession().selectOne("selectCommentCountByQueryCriteria", commentQuery);
+    }
 }

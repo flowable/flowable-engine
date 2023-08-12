@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.engine.impl.CommentQueryImpl;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 
@@ -49,5 +50,9 @@ public interface CommentEntityManager extends EntityManager<CommentEntity> {
     Comment findComment(String commentId);
 
     Event findEvent(String commentId);
+
+    List<Comment> findCommentsByQueryCriteria(CommentQueryImpl query);
+
+    long findCommentCountByQueryCriteria(CommentQueryImpl query);
 
 }
