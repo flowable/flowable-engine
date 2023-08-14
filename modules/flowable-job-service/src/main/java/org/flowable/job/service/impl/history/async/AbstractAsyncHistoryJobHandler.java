@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -86,7 +87,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
 
                 if (failedNodes != null && !failedNodes.isEmpty()) {
                     List<HistoryJobEntity> newHistoryJobs = getAsyncHistoryListener(commandContext)
-                            .historyDataGenerated(jobServiceConfiguration, failedNodes);
+                            .historyDataGenerated(jobServiceConfiguration, failedNodes, Context.getTransactionContext());
 
                     StringWriter stringWriter = new StringWriter();
                     exception.printStackTrace(new PrintWriter(stringWriter));

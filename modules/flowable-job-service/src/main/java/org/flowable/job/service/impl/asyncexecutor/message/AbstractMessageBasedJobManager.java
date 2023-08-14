@@ -22,7 +22,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.DefaultJobManager;
-import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
@@ -49,12 +48,12 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
 
     @Override
     protected void triggerExecutorIfNeeded(final JobEntity jobEntity) {
-        prepareAndSendMessage(jobEntity);
+        prepareAndSendMessage(jobEntity, null);
     }
     
     @Override
-    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity jobEntity) {
-        prepareAndSendMessage(jobEntity);
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity jobEntity, TransactionContext transactionContext) {
+        prepareAndSendMessage(jobEntity, transactionContext);
     }
 
     @Override
@@ -67,7 +66,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
                     + jobServiceConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
         }
 
-        prepareAndSendMessage(job);
+        prepareAndSendMessage(job, null);
     }
     
     @Override
@@ -79,19 +78,10 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
         }
     }
 
-    protected void prepareAndSendMessage(final JobInfo job) {
+    protected void prepareAndSendMessage(final JobInfo job, TransactionContext transactionContext) {
         
-        // If it's an async job, the transaction context is still active
-        // If it's an async history job, the transaction context might be gone (due to the command context
-        // already being closing), but the asyncHistorySession still has it stored.
-        
-        TransactionContext transactionContext = Context.getTransactionContext();
         if (transactionContext == null) {
-            if (job instanceof HistoryJobEntity) {
-                CommandContext commandContext = Context.getCommandContext();
-                AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
-                transactionContext = asyncHistorySession.getTransactionContext();
-            }
+            transactionContext = Context.getTransactionContext();
         }
         
         if (transactionContext != null) {

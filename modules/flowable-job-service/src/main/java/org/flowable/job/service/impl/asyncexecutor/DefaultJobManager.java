@@ -41,7 +41,6 @@ import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessorContext;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
-import org.flowable.job.service.impl.history.async.AsyncHistorySession;
 import org.flowable.job.service.impl.history.async.TriggerAsyncHistoryExecutorTransactionListener;
 import org.flowable.job.service.impl.persistence.entity.AbstractJobEntity;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -642,35 +641,30 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity) {
+    public HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity, TransactionContext transactionContext) {
         callHistoryJobProcessors(HistoryJobProcessorContext.Phase.BEFORE_CREATE, historyJobEntity);
         jobServiceConfiguration.getHistoryJobEntityManager().insert(historyJobEntity);
-        triggerAsyncHistoryExecutorIfNeeded(historyJobEntity);
+        triggerAsyncHistoryExecutorIfNeeded(historyJobEntity, transactionContext);
         return historyJobEntity;
     }
     
-    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity) {
+    protected void triggerAsyncHistoryExecutorIfNeeded(HistoryJobEntity historyJobEntity, TransactionContext transactionContext) {
         if (isAsyncHistoryExecutorActive()) {
-            hintAsyncHistoryExecutor(historyJobEntity);
+            hintAsyncHistoryExecutor(historyJobEntity, transactionContext);
         }
     }
 
-    protected void hintAsyncHistoryExecutor(HistoryJobEntity historyJobEntity) {
+    protected void hintAsyncHistoryExecutor(HistoryJobEntity historyJobEntity, TransactionContext transactionContext) {
         if (historyJobEntity.getLockOwner() == null || historyJobEntity.getLockExpirationTime() == null) {
             setLockTimeAndOwner(getAsyncHistoryExecutor(), historyJobEntity);
         }
-        createAsyncHistoryHintListeners(historyJobEntity);
+        createAsyncHistoryHintListeners(historyJobEntity, transactionContext);
     }
 
-    protected void createAsyncHistoryHintListeners(HistoryJobEntity historyJobEntity) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
-        if (asyncHistorySession != null) {
-            TransactionContext transactionContext = asyncHistorySession.getTransactionContext();
-            if (transactionContext != null) {
-                transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(
-                        jobServiceConfiguration, historyJobEntity)); 
-            }
+    protected void createAsyncHistoryHintListeners(HistoryJobEntity historyJobEntity, TransactionContext transactionContext) {
+        if (transactionContext != null) {
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, new TriggerAsyncHistoryExecutorTransactionListener(
+                    jobServiceConfiguration, historyJobEntity));
         }
     }
     

@@ -87,7 +87,7 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
                 }
                 
                 // History job needs to be created in the context of which it originated
-                asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes);
+                asyncHistoryListener.historyDataGenerated(jobServiceConfiguration, objectNodes, asyncHistorySession.getTransactionContext());
                 
             }
         }

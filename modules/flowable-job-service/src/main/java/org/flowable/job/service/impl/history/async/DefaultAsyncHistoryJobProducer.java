@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -33,11 +34,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     @Override
-    public List<HistoryJobEntity> historyDataGenerated(JobServiceConfiguration jobServiceConfiguration, List<ObjectNode> historyObjectNodes) {
+    public List<HistoryJobEntity> historyDataGenerated(JobServiceConfiguration jobServiceConfiguration, List<ObjectNode> historyObjectNodes, TransactionContext transactionContext) {
         CommandContext commandContext = Context.getCommandContext();
         List<HistoryJobEntity> historyJobEntities = createJobsWithHistoricalData(commandContext, jobServiceConfiguration, historyObjectNodes);
         processHistoryJobEntities(commandContext, jobServiceConfiguration, historyObjectNodes, historyJobEntities);
-        scheduleJobs(commandContext, jobServiceConfiguration, historyJobEntities);
+        scheduleJobs(transactionContext, jobServiceConfiguration, historyJobEntities);
         return historyJobEntities;
     }
 
@@ -79,9 +80,9 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
         return currentJobEntity;
     }
 
-    protected void scheduleJobs(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration, List<HistoryJobEntity> historyJobEntities) {
+    protected void scheduleJobs(TransactionContext transactionContext, JobServiceConfiguration jobServiceConfiguration, List<HistoryJobEntity> historyJobEntities) {
         for (HistoryJobEntity historyJobEntity : historyJobEntities) {
-            jobServiceConfiguration.getJobManager().scheduleHistoryJob(historyJobEntity);
+            jobServiceConfiguration.getJobManager().scheduleHistoryJob(historyJobEntity, transactionContext);
         }
     }
 
