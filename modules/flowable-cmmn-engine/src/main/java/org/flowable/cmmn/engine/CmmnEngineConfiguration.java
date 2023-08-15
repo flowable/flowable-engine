@@ -94,41 +94,6 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.async.AsyncCmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceReactivateHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateBusinessKeyHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateBusinessStatusHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateNameHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogDeleteJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogRecordJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceAvailableHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCompletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceDisabledHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceEnabledHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceExitHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceFullHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceOccurredHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceStartedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceTerminatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.idm.DefaultCandidateManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkInterceptor;
@@ -321,13 +286,6 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
-import org.flowable.job.service.impl.history.async.AsyncHistoryListener;
-import org.flowable.job.service.impl.history.async.AsyncHistorySession;
-import org.flowable.job.service.impl.history.async.AsyncHistorySessionFactory;
-import org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobProducer;
-import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
@@ -652,10 +610,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean shutdownAsyncHistoryTaskExecutor;
     protected boolean isAsyncHistoryEnabled;
     protected boolean asyncHistoryExecutorActivate;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
-    protected boolean isAsyncHistoryJsonGroupingEnabled;
-    protected int asyncHistoryJsonGroupingThreshold = 10;
-    protected AsyncHistoryListener asyncHistoryListener;
 
     // More info: see similar async executor properties.
     protected int asyncHistoryExecutorNumberOfRetries = 10;
@@ -672,7 +626,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobHandler> customHistoryJobHandlers;
-    protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     protected FormFieldHandler formFieldHandler;
     protected boolean isFormFieldValidationEnabled;
@@ -1058,33 +1011,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initSessionFactories() {
         super.initSessionFactories();
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-        
-        if (isAsyncHistoryEnabled) {
-            initAsyncHistorySessionFactory();
-        }
 
         if (!sessionFactories.containsKey(VariableListenerSession.class)) {
             VariableListenerSessionFactory variableListenerSessionFactory = new VariableListenerSessionFactory();
             sessionFactories.put(VariableListenerSession.class, variableListenerSessionFactory);
         }
-    }
-    
-    public void initAsyncHistorySessionFactory() {
-        // If another engine has set the asyncHistorySessionFactory already, there's no need to do it again.
-        if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
-            AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
-            if (asyncHistoryListener == null) {
-                initDefaultAsyncHistoryListener();
-            }
-            asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
-            sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
-        }
-        
-        ((AsyncHistorySessionFactory) sessionFactories.get(AsyncHistorySession.class)).registerJobDataTypes(CmmnAsyncHistoryConstants.ORDERED_TYPES);
-    }
-
-    protected void initDefaultAsyncHistoryListener() {
-        asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
 
     protected void initServices() {
@@ -1365,11 +1296,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
-            if (isAsyncHistoryEnabled) {
-                cmmnHistoryManager = new AsyncCmmnHistoryManager(this);
-            } else {
-                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
-            }
+            cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
         }
     }
 
@@ -1735,21 +1662,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
-            
-            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultHistoryJsonTransformers());
-            if (customHistoryJsonTransformers != null) {
-                allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
-            }
-
-            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
-            allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
-            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-
-            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
-            allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
-            asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
 
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
@@ -1757,54 +1669,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 }
             }
         }
-    }
-    
-    protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
-        List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
-        
-        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceReactivateHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessStatusHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer(this));
-
-        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer(this));
-        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer(this));
-
-        return historyJsonTransformers;
     }
 
     public void initFailedJobCommandFactory() {
@@ -1856,14 +1720,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
             }
-            
-            // Async history job config
-            jobServiceConfiguration.setJobTypeAsyncHistory(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
-            jobServiceConfiguration.setJobTypeAsyncHistoryZipped(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
-            jobServiceConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-            jobServiceConfiguration.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            jobServiceConfiguration.setAsyncHistoryJsonGroupingThreshold(asyncHistoryJsonGroupingThreshold);
-            
+
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
             
@@ -1993,7 +1850,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor(getOrCreateAsyncHistoryExecutorConfiguration());
-    
+
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
                 
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
@@ -2007,7 +1864,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                     if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
                         asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
                     }
-                    historyJobHandlers.forEach((type, handler) -> { asyncHistoryExecutor.getJobServiceConfiguration().mergeHistoryJobHandler(handler); });
+                    historyJobHandlers.forEach((type, handler) -> asyncHistoryExecutor.getJobServiceConfiguration().addHistoryJobHandler(type, handler));
                 }
                 
             }
@@ -3769,45 +3626,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
-        return isAsyncHistoryJsonGzipCompressionEnabled;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGzipCompressionEnabled(boolean isAsyncHistoryJsonGzipCompressionEnabled) {
-        this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
-        return this;
-    }
-
-    public boolean isAsyncHistoryJsonGroupingEnabled() {
-        return isAsyncHistoryJsonGroupingEnabled;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
-        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
-        return this;
-    }
-
-    public int getAsyncHistoryJsonGroupingThreshold() {
-        return asyncHistoryJsonGroupingThreshold;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
-        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
-        return this;
-    }
-    
-    public AsyncHistoryListener getAsyncHistoryListener() {
-        if (asyncHistoryListener == null) {
-            asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
-        }
-        return asyncHistoryListener;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
-        this.asyncHistoryListener = asyncHistoryListener;
-        return this;
-    }
-
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -4128,15 +3946,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<HistoryJsonTransformer> getCustomHistoryJsonTransformers() {
-        return customHistoryJsonTransformers;
-    }
-
-    public CmmnEngineConfiguration setCustomHistoryJsonTransformers(List<HistoryJsonTransformer> customHistoryJsonTransformers) {
-        this.customHistoryJsonTransformers = customHistoryJsonTransformers;
-        return this;
-    }
-    
     public List<String> getEnabledJobCategories() {
         return enabledJobCategories;
     }
