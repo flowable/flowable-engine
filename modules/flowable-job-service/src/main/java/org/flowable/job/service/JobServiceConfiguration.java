@@ -139,7 +139,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     protected boolean asyncHistoryJsonGzipCompressionEnabled;
     protected boolean asyncHistoryJsonGroupingEnabled;
-    protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryJsonGroupingThreshold = 10;
     
     public JobServiceConfiguration(String engineName) {
@@ -696,14 +695,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setAsyncHistoryJsonGroupingEnabled(boolean asyncHistoryJsonGroupingEnabled) {
         this.asyncHistoryJsonGroupingEnabled = asyncHistoryJsonGroupingEnabled;
-    }
-
-    public boolean isAsyncHistoryExecutorMessageQueueMode() {
-        return asyncHistoryExecutorMessageQueueMode;
-    }
-
-    public void setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
-        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
     }
 
     public int getAsyncHistoryJsonGroupingThreshold() {

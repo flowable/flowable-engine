@@ -344,11 +344,6 @@
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-jms-spring-executor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.flowable</groupId>
                 <artifactId>flowable-jmx</artifactId>
                 <version>${project.version}</version>
             </dependency>

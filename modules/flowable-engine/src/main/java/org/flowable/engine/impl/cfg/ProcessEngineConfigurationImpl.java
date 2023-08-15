@@ -659,18 +659,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
      * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
-     * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
      * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
     protected int asyncExecutorResetExpiredJobsMaxTimeout = 24 * 60 * 60 * 1000;
-
-    /**
-     * Experimental!
-     * <p>
-     * Set this to true when using the message queue based job executor.
-     */
-    protected boolean asyncExecutorMessageQueueMode;
 
     protected AsyncTaskExecutorConfiguration asyncTaskInvokerTaskExecutorConfiguration;
 
@@ -678,7 +670,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected AsyncJobExecutorConfiguration asyncHistoryExecutorConfiguration;
 
     // More info: see similar async executor properties.
-    protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryExecutorNumberOfRetries = 10;
     protected AsyncTaskExecutorConfiguration asyncHistoryExecutorTaskExecutorConfiguration;
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
@@ -2235,9 +2226,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 defaultAsyncExecutor.setExecuteAsyncRunnableFactory(asyncExecutorExecuteAsyncRunnableFactory);
             }
 
-            // Message queue mode
-            defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
-
             asyncExecutor = defaultAsyncExecutor;
         }
 
@@ -2273,9 +2261,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor(getOrCreateAsyncHistoryExecutorConfiguration());
-
-                // Message queue mode
-                defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
 
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
 
@@ -5218,15 +5203,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isAsyncExecutorIsMessageQueueMode() {
-        return asyncExecutorMessageQueueMode;
-    }
-
-    public ProcessEngineConfigurationImpl setAsyncExecutorMessageQueueMode(boolean asyncExecutorMessageQueueMode) {
-        this.asyncExecutorMessageQueueMode = asyncExecutorMessageQueueMode;
-        return this;
-    }
-
     public AsyncJobExecutorConfiguration getAsyncExecutorConfiguration() {
         return asyncExecutorConfiguration;
     }
@@ -5245,15 +5221,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isAsyncHistoryExecutorIsMessageQueueMode() {
-        return asyncHistoryExecutorMessageQueueMode;
-    }
-
-    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
-        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
-        return this;
-    }
-    
     public List<String> getEnabledJobCategories() {
         return enabledJobCategories;
     }
@@ -5478,14 +5445,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setAsyncHistoryExecutorResetExpiredJobsPageSize(int asyncHistoryExecutorResetExpiredJobsPageSize) {
         getOrCreateAsyncHistoryExecutorConfiguration().setResetExpiredJobsPageSize(asyncHistoryExecutorResetExpiredJobsPageSize);
         return this;
-    }
-
-    public boolean isAsyncExecutorMessageQueueMode() {
-        return asyncExecutorMessageQueueMode;
-    }
-
-    public boolean isAsyncHistoryExecutorMessageQueueMode() {
-        return asyncHistoryExecutorMessageQueueMode;
     }
 
     /**

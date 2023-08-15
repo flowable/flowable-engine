@@ -587,13 +587,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean asyncExecutorActivate;
 
     /**
-     * Experimental!
-     * <p>
-     * Set this to true when using the message queue based job executor.
-     */
-    protected boolean asyncExecutorMessageQueueMode;
-
-    /**
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
@@ -641,7 +634,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
      * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
-     * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
      * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
@@ -662,7 +654,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean asyncHistoryExecutorActivate;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
-    protected boolean asyncHistoryExecutorMessageQueueMode;
     protected int asyncHistoryJsonGroupingThreshold = 10;
     protected AsyncHistoryListener asyncHistoryListener;
 
@@ -1967,9 +1958,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 defaultAsyncExecutor.setExecuteAsyncRunnableFactory(asyncExecutorExecuteAsyncRunnableFactory);
             }
 
-            // Message queue mode
-            defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
-
             asyncExecutor = defaultAsyncExecutor;
         }
 
@@ -2005,9 +1993,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor(getOrCreateAsyncHistoryExecutorConfiguration());
-    
-                // Message queue mode
-                defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
     
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
                 
@@ -3387,15 +3372,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public boolean isAsyncExecutorMessageQueueMode() {
-        return asyncExecutorMessageQueueMode;
-    }
-
-    public CmmnEngineConfiguration setAsyncExecutorMessageQueueMode(boolean asyncExecutorMessageQueueMode) {
-        this.asyncExecutorMessageQueueMode = asyncExecutorMessageQueueMode;
-        return this;
-    }
-
     public int getAsyncExecutorNumberOfRetries() {
         return asyncExecutorNumberOfRetries;
     }
@@ -3852,15 +3828,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
     
-    public boolean isAsyncHistoryExecutorMessageQueueMode() {
-        return asyncHistoryExecutorMessageQueueMode;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
-        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
-        return this;
-    }
-
     public AsyncHistoryListener getAsyncHistoryListener() {
         if (asyncHistoryListener == null) {
             asyncHistoryListener = new DefaultAsyncHistoryJobProducer();

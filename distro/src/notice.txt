@@ -42,7 +42,6 @@ flowable-form-api<version><.jar | -source.jar | -javadoc.jar>
 flowable-form-model<version><.jar | -source.jar | -javadoc.jar>
 flowable-http<version><.jar | -source.jar | -javadoc.jar>
 flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
-flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
 flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
 flowable-ldap<version><.jar | -source.jar | -javadoc.jar>
 flowable-osgi<version><.jar | -source.jar | -javadoc.jar>
