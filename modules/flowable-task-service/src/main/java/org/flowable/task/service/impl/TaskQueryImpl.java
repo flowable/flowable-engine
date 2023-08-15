@@ -1756,11 +1756,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
-        return this;
-    }
-
-    @Override
     public TaskQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;

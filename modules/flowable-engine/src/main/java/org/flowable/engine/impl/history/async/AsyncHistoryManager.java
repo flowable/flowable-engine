@@ -151,41 +151,6 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
-        if (getHistoryConfigurationSettings().isHistoryEnabledForActivity(executionEntity.getProcessDefinitionId(), executionEntity.getActivityId())) {
-            String activityId = getActivityIdForExecution(executionEntity);
-            if (StringUtils.isNotEmpty(activityId)) {
-                ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
-
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_DEFINITION_ID, executionEntity.getProcessDefinitionId());
-                putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, executionEntity.getProcessInstanceId());
-                putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, executionEntity.getId());
-                putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityId);
-
-                if (executionEntity.getCurrentFlowElement() != null) {
-                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, executionEntity.getCurrentFlowElement().getName());
-                    putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, parseActivityType(executionEntity.getCurrentFlowElement()));
-                }
-
-                if (executionEntity.getTenantId() != null) {
-                    putIfNotNull(data, HistoryJsonConstants.TENANT_ID, executionEntity.getTenantId());
-                }
-
-                putIfNotNull(data, HistoryJsonConstants.DELETE_REASON, deleteReason);
-                putIfNotNull(data, HistoryJsonConstants.END_TIME, endTime);
-
-                ObjectNode correspondingActivityStartData = getActivityStart(executionEntity.getId(), activityId, true);
-                if (correspondingActivityStartData == null) {
-                    getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_END, data);
-                } else {
-                    data.put(HistoryJsonConstants.START_TIME, getStringFromJson(correspondingActivityStartData, HistoryJsonConstants.START_TIME));
-                    getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_ACTIVITY_FULL, data);
-                }
-            }
-        }
-    }
-
-    @Override
     public void recordActivityEnd(ActivityInstance activityInstance) {
         if (getHistoryConfigurationSettings().isHistoryEnabledForActivity(activityInstance)) {
             if (StringUtils.isNotEmpty(activityInstance.getActivityId())) {

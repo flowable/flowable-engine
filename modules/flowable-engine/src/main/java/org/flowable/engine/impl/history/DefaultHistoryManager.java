@@ -233,23 +233,6 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
-        if (getHistoryConfigurationSettings().isHistoryEnabledForActivity(executionEntity.getProcessDefinitionId(), executionEntity.getActivityId())) {
-            HistoricActivityInstanceEntity historicActivityInstance = findHistoricActivityInstance(executionEntity, true);
-            if (historicActivityInstance != null) {
-                historicActivityInstance.markEnded(deleteReason, endTime);
-
-                // Fire event
-                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance),
-                            processEngineConfiguration.getEngineCfgKey());
-                }
-            }
-        }
-    }
-
-    @Override
     public void recordProcessDefinitionChange(String processInstanceId, String processDefinitionId) {
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId)) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);

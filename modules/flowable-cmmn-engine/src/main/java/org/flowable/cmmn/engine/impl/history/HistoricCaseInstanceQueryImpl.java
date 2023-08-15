@@ -723,11 +723,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
-    public HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit) {
-        return this;
-    }
-    
-    @Override
     public HistoricCaseInstanceQuery activePlanItemDefinitionId(String planItemDefinitionId) {
         if (planItemDefinitionId == null) {
             throw new FlowableIllegalArgumentException("planItemDefinitionId is null");

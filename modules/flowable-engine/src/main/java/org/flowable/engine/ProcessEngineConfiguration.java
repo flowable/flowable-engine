@@ -643,51 +643,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
-    /**
-     * @deprecated Use {@link #setEngineLifecycleListeners(List)}.
-     */
-    @Deprecated
-    public ProcessEngineConfiguration setProcessEngineLifecycleListener(ProcessEngineLifecycleListener processEngineLifecycleListener) {
-        // Backwards compatibility (when there was only one typed engine listener)
-        if (engineLifecycleListeners == null || engineLifecycleListeners.isEmpty()) {
-            List<EngineLifecycleListener> engineLifecycleListeners = new ArrayList<>(1);
-            engineLifecycleListeners.add(processEngineLifecycleListener);
-            super.setEngineLifecycleListeners(engineLifecycleListeners);
-
-        } else {
-            ProcessEngineLifecycleListener originalEngineLifecycleListener = (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
-
-            ProcessEngineLifecycleListener wrappingEngineLifecycleListener = new ProcessEngineLifecycleListener() {
-
-                @Override
-                public void onProcessEngineBuilt(ProcessEngine processEngine) {
-                    originalEngineLifecycleListener.onProcessEngineBuilt(processEngine);
-                }
-                @Override
-                public void onProcessEngineClosed(ProcessEngine processEngine) {
-                    originalEngineLifecycleListener.onProcessEngineClosed(processEngine);
-                }
-            };
-
-            engineLifecycleListeners.set(0, wrappingEngineLifecycleListener);
-
-        }
-
-        return this;
-    }
-
-    /**
-     * @deprecated Use {@link #getEngineLifecycleListeners()}.
-     */
-    @Deprecated
-    public ProcessEngineLifecycleListener getProcessEngineLifecycleListener() {
-        // Backwards compatibility (when there was only one typed engine listener)
-        if (engineLifecycleListeners != null && !engineLifecycleListeners.isEmpty()) {
-            return (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
-        }
-        return null;
-    }
-
     public String getLabelFontName() {
         return labelFontName;
     }

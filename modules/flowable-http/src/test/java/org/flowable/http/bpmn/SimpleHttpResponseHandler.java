@@ -13,15 +13,14 @@
 package org.flowable.http.bpmn;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.http.HttpResponse;
-import org.flowable.http.delegate.HttpResponseHandler;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SimpleHttpResponseHandler implements HttpResponseHandler {
 
-    private static final long serialVersionUID = 1L;
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Override

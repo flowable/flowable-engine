@@ -117,13 +117,6 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery includeCaseVariables();
 
     /**
-     * Limit historic case instance variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit);
-
-    /**
      * Only select historic case instances that are defined by a case definition with the given deployment identifier.
      */
     HistoricCaseInstanceQuery deploymentId(String deploymentId);

@@ -1721,15 +1721,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    /**
-     * @return name of the default tenant
-     * @deprecated use {@link AbstractEngineConfiguration#getDefaultTenantProvider()} instead
-     */
-    @Deprecated
-    public String getDefaultTenantValue() {
-        return getDefaultTenantProvider().getDefaultTenant(null, null, null);
-    }
-
     public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
         this.defaultTenantProvider = (tenantId, scope, scopeKey) -> defaultTenantValue;
         return this;

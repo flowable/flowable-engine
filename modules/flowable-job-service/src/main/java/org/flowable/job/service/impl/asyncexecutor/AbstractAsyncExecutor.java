@@ -392,19 +392,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     @Override
-    @Deprecated
-    public int getRetryWaitTimeInMillis() {
-        // No longer used
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    @Deprecated
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        // No longer used
-    }
-
-    @Override
     public int getResetExpiredJobsInterval() {
         return (int) configuration.getResetExpiredJobsInterval().toMillis();
     }

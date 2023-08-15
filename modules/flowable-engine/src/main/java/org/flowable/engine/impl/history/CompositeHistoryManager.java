@@ -142,13 +142,6 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordActivityEnd(executionEntity, deleteReason, endTime);
-        }
-    }
-
-    @Override
     public HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean validateEndTimeNull) {
         for (HistoryManager historyManager : historyManagers) {
             HistoricActivityInstanceEntity historicActivityInstance = historyManager.findHistoricActivityInstance(execution, validateEndTimeNull);

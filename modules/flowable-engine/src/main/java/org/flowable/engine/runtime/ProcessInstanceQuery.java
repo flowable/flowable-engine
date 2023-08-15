@@ -358,13 +358,6 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery includeProcessVariables();
 
     /**
-     * Limit process instance variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
-
-    /**
      * Only select process instances that failed due to an exception happening during a job execution.
      */
     ProcessInstanceQuery withJobException();

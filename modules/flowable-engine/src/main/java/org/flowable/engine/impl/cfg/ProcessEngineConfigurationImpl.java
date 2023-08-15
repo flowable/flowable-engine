@@ -3508,38 +3508,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public ProcessEngineConfigurationImpl setExecutionQueryLimit(int executionQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public ProcessEngineConfigurationImpl setTaskQueryLimit(int taskQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public ProcessEngineConfigurationImpl setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public ProcessEngineConfigurationImpl setHistoricProcessInstancesQueryLimit(int historicProcessInstancesQueryLimit) {
-        return this;
-    }
-
     public FlowableEngineAgendaFactory getAgendaFactory() {
         return agendaFactory;
     }

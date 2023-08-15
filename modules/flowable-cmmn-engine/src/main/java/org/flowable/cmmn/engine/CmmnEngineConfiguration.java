@@ -3060,22 +3060,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setTaskQueryLimit(int taskQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
-        return this;
-    }
-
     public InternalHistoryVariableManager getInternalHistoryVariableManager() {
         return internalHistoryVariableManager;
     }
@@ -3083,22 +3067,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
         this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setCaseQueryLimit(int caseQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public void setHistoricCaseQueryLimit(int historicCaseQueryLimit) {
-
     }
 
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {

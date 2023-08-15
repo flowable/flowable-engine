@@ -49,7 +49,7 @@
     <property name="mailServers">
       <map>
         <entry key="myEmailTenant">
-          <bean class="org.flowable.engine.cfg.MailServerInfo">
+          <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
             <property name="mailServerHost" value="localhost" />
             <property name="mailServerPort" value="5025" />
             <property name="mailServerUseSSL" value="false" />

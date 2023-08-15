@@ -80,18 +80,6 @@ public interface AsyncExecutor {
 
     void setMaxTimerJobsPerAcquisition(int maxJobs);
 
-    /**
-     * @deprecated no longer used
-     */
-    @Deprecated
-    int getRetryWaitTimeInMillis();
-
-    /**
-     * @deprecated no longer used
-     */
-    @Deprecated
-    void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
-
     int getResetExpiredJobsInterval();
 
     void setResetExpiredJobsInterval(int resetExpiredJobsInterval);

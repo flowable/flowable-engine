@@ -484,13 +484,6 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery includeProcessVariables();
 
     /**
-     * Limit process instance variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
-
-    /**
      * Only select process instances that failed due to an exception happening during a job execution.
      */
     HistoricProcessInstanceQuery withJobException();

@@ -50,6 +50,7 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -542,7 +543,11 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration(commandContext).getScriptingEngines();
 
         try {
-            scriptingEngines.evaluate(script.getScript(), script.getLanguage(), (ExecutionEntityImpl) processInstance);
+            ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                    .script(script.getScript())
+                    .language(script.getLanguage())
+                    .variableContainer((ExecutionEntityImpl) processInstance);
+            scriptingEngines.evaluate(builder.build());
         } catch (FlowableException e) {
             LOGGER.warn("Exception while executing upgrade of process instance {} : {}", processInstance.getId(), e.getMessage());
             throw e;

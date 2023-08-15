@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.idm.api.Group;
-import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -34,22 +33,10 @@ public class FlowableUser extends org.springframework.security.core.userdetails.
 
     protected final List<Group> groups;
 
-    protected final List<Privilege> privileges;
-
-    /**
-     * @deprecated Privileges are no longer required use {@link #FlowableUser(User, boolean, List, Collection)} instead
-     */
-    @Deprecated
-    public FlowableUser(User user, boolean active, List<? extends Group> groups, List<? extends Privilege> privileges,
-        Collection<? extends GrantedAuthority> authorities) {
+    public FlowableUser(User user, boolean active, List<? extends Group> groups, Collection<? extends GrantedAuthority> authorities) {
         super(user.getId(), user.getPassword() == null ? "" : user.getPassword(), active, active, active, active, authorities);
         this.user = user;
         this.groups = Collections.unmodifiableList(groups);
-        this.privileges = Collections.unmodifiableList(privileges);
-    }
-
-    public FlowableUser(User user, boolean active, List<? extends Group> groups, Collection<? extends GrantedAuthority> authorities) {
-        this(user, active, groups, Collections.emptyList(), authorities);
     }
 
     public FlowableUser(User user, String username, boolean enabled,
@@ -57,7 +44,6 @@ public class FlowableUser extends org.springframework.security.core.userdetails.
         super(username, user.getPassword() == null ? "" : user.getPassword(), enabled, true, true, true, authorities);
         this.user = user;
         this.groups = Collections.unmodifiableList(groups);
-        this.privileges = Collections.emptyList();
     }
 
     @Override
@@ -68,16 +54,6 @@ public class FlowableUser extends org.springframework.security.core.userdetails.
     @Override
     public List<Group> getGroups() {
         return groups;
-    }
-
-    /**
-     * The privileges are as {@link GrantedAuthority}. THey can be extracted through {@link #getAuthorities()}
-     *
-     * @deprecated use {@link #getAuthorities()} instead
-     */
-    @Deprecated
-    public List<Privilege> getPrivileges() {
-        return privileges;
     }
 
     @Override

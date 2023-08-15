@@ -266,9 +266,6 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setVariableOnPlanItemCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
-            @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-            }
 
             @Override
             public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
@@ -276,7 +273,8 @@ public class DmnTaskTest {
             }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
             }
         });
         this.runtimeService.createProcessInstanceBuilder()
@@ -295,13 +293,16 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setVariableOnPlanItemCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+
             @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution,
+                    ObjectMapper objectMapper, boolean multipleResults) {
                 setVariableOnPlanItemCalled[0] = true;
             }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
             }
         });
         this.runtimeService.createProcessInstanceBuilder()
@@ -321,12 +322,15 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
+
             @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution,
+                    ObjectMapper objectMapper, boolean multipleResults) {
             }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
                 setCalled[0] = true;
             }
         });
@@ -349,12 +353,10 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
-            @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-            }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution,
+                    ObjectMapper objectMapper, boolean multipleResults) {
             }
 
             @Override
@@ -383,12 +385,10 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
-            @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-            }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution,
+                    ObjectMapper objectMapper, boolean multipleResults) {
             }
 
             @Override
@@ -417,12 +417,10 @@ public class DmnTaskTest {
         DecisionTableVariableManager originalDecisionTableVariableManager = processEngineConfiguration.getDecisionTableVariableManager();
         final boolean[] setCalled = {false};
         processEngineConfiguration.setDecisionTableVariableManager(new DecisionTableVariableManager() {
-            @Override
-            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
-            }
 
             @Override
-            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper) {
+            public void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution,
+                    ObjectMapper objectMapper, boolean multipleResults) {
             }
 
             @Override
