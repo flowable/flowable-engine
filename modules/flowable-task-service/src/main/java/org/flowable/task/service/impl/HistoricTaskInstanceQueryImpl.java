@@ -1817,11 +1817,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
-    public HistoricTaskInstanceQuery limitTaskVariables(Integer taskVariablesLimit) {
-        return this;
-    }
-
-    @Override
     public HistoricTaskInstanceQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;

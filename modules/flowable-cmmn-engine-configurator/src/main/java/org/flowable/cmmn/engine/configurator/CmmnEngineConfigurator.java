@@ -125,9 +125,6 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             // The job handlers will be added in the CmmnEngineConfiguration itself
             cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
             cmmnEngineConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
-            cmmnEngineConfiguration.setAsyncHistoryJsonGroupingEnabled(processEngineConfiguration.isAsyncHistoryJsonGroupingEnabled());
-            cmmnEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(processEngineConfiguration.getAsyncHistoryJsonGroupingThreshold());
-            cmmnEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled());
 
             cmmnEngineConfiguration.setAsyncHistoryTaskExecutor(processEngineConfiguration.getAsyncHistoryTaskExecutor());
             

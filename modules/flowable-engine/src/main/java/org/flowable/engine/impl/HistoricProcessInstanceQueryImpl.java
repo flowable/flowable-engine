@@ -473,11 +473,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
-    public HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit) {
-        return this;
-    }
-
-    @Override
     public HistoricProcessInstanceQuery withJobException() {
         if (inOrStatement) {
             this.currentOrQueryObject.withJobException = true;

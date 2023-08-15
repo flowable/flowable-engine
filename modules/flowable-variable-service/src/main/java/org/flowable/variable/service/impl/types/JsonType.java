@@ -158,7 +158,6 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
                         new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields)
                     ));
                     
-                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
             }
         }

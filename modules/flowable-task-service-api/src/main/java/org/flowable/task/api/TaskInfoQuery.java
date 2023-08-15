@@ -824,13 +824,6 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T includeCaseVariables();
 
     /**
-     * Limit task variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    T limitTaskVariables(Integer taskVariablesLimit);
-
-    /**
      * Include identity links in the task query result
      */
     T includeIdentityLinks();

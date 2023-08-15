@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -129,7 +130,7 @@ public interface JobManager {
     /**
      * schedules a {@link HistoryJobEntity}, meaning it will be scheduled (inserted in the database/put on a queue/...) to be executed at a later point in time.
      */
-    HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity);
+    HistoryJobEntity scheduleHistoryJob(HistoryJobEntity historyJobEntity, TransactionContext transactionContext);
 
     /**
      * The ProcessEngineConfiguration instance will be passed when the ProcessEngine is built.

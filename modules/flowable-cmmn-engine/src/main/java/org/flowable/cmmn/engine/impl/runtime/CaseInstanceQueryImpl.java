@@ -773,11 +773,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
-    public CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit) {
-        return this;
-    }
-
-    @Override
     public CaseInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;

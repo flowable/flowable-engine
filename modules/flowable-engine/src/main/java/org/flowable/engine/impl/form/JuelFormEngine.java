@@ -62,8 +62,12 @@ public class JuelFormEngine implements FormEngine {
         if (task.getExecutionId() != null) {
             executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
         }
-        
-        return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, executionEntity);
+
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(formTemplateString)
+                .language(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE)
+                .variableContainer(executionEntity);
+        return scriptingEngines.evaluate(builder.build()).getResult();
     }
 
     protected String getFormTemplateString(FormData formInstance, String formKey) {

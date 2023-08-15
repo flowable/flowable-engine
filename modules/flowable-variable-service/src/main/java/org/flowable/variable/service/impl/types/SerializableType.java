@@ -99,7 +99,6 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
                     commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
                         new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields)
                     ));
-                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
             }
         }

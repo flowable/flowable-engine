@@ -199,16 +199,6 @@ class CompositeHistoryManagerTest {
     }
 
     @Test
-    void recordActivityEndWithExecutionEntity() {
-        ExecutionEntity instance = new ExecutionEntityImpl();
-        Date endTime = Date.from(Instant.now().minusSeconds(1));
-        compositeHistoryManager.recordActivityEnd(instance, "reason", endTime);
-
-        verify(historyManager1).recordActivityEnd(same(instance), eq("reason"), eq(endTime));
-        verify(historyManager2).recordActivityEnd(same(instance), eq("reason"), eq(endTime));
-    }
-
-    @Test
     void findHistoricActivityInstanceNoneReturn() {
         ExecutionEntity instance = new ExecutionEntityImpl();
         assertThat(compositeHistoryManager.findHistoricActivityInstance(instance, true)).isNull();

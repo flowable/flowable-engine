@@ -158,8 +158,6 @@ When the history data is not to be persisted in the default history tables, but 
 
 -   Or, configure the customHistoryJobHandlers list with all instances will be added to the historyJobHandlers map at boot time.
 
-Alternatively, it is also possible to use a Message Queue and configure the engine in such a way that a message will be sent when a new history job is available. This way, the historical data can be processed on different servers to where the engines are run. It’s also possible to configure the engine and Message Queue using JTA (when using JMS) and not store the historical data in a job, but send it all data to a Message Queue that participates in a global transaction.
-
 See [the Flowable Async History Examples](https://github.com/flowable/flowable-examples/tree/master/async-history) for various examples on how to configure the Async History, including the default way, using a JMS queue, using JTA or using a Message Queue and a Spring Boot application that acts as a message listener.
 
 ## History for audit purposes

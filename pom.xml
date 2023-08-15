@@ -788,7 +788,6 @@
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-mail</module>
 				<module>modules/flowable-jmx</module>
-				<module>modules/flowable-jms-spring-executor</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -884,7 +883,6 @@
                 <module>modules/flowable-http-common</module>
                 <module>modules/flowable-mail</module>
                 <module>modules/flowable-spring-boot</module>
-				<module>modules/flowable-jms-spring-executor</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1009,7 +1007,6 @@
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
-				<module>modules/flowable-jms-spring-executor</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
