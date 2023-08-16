@@ -13,7 +13,6 @@
 package org.activiti.engine.impl.bpmn.parser.handler;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.el.ExpressionManager;

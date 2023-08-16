@@ -32,7 +32,6 @@ import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.api.delegate.HttpRequestHandler;
