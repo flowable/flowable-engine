@@ -223,7 +223,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
         }
     }
-    
+
+    @Test
     public void testQueryWithLocalVariables() {
         String processInstanceId = processInstanceIds.get(processInstanceIds.size() - 1);
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().singleResult();
