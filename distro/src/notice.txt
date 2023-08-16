@@ -79,7 +79,6 @@ com.fasterxml.uuid              java-uuid-generator         3.3.0           The 
 commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
 commons-codec                   commons-codec               1.15            Apache License, Version 2.0
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
-commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
 commons-collections             commons-collections         3.2.2           The Apache Software License, Version 2.0
 commons-io                      commons-io                  2.8.0           The Apache Software License, Version 2.0
 commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
