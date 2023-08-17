@@ -36,13 +36,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
-import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
-import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
