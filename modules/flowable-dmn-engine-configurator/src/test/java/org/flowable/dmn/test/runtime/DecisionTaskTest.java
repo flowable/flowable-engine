@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -39,6 +37,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

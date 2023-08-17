@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.NativeQuery;
@@ -34,6 +33,7 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
