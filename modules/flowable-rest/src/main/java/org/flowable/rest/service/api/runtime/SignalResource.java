@@ -16,6 +16,8 @@ package org.flowable.rest.service.api.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
@@ -33,7 +35,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Resource for notifying the engine a signal event has been received, independent of an execution.
