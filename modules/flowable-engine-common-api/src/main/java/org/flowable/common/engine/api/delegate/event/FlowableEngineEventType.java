@@ -377,7 +377,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
     /**
      * @param string
      *            the string containing a comma-separated list of event-type names
-     * @return a list of FlowableEngineEventType based on the given list.
+     * @return an array of FlowableEngineEventType based on the given string.
      * @throws FlowableIllegalArgumentException
      *             when one of the given string is not a valid type name
      */
