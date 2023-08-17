@@ -81,7 +81,7 @@ public enum FlowableIdmEventType implements FlowableEventType {
     /**
      * @param string
      *            the string containing a comma-separated list of event-type names
-     * @return a list of {@link FlowableIdmEventType} based on the given list.
+     * @return an array of {@link FlowableIdmEventType} based on the given string.
      * @throws IllegalArgumentException
      *             when one of the given string is not a valid type name
      */
