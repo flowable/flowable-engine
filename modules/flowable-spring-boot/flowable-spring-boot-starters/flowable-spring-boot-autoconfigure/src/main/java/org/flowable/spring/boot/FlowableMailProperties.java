@@ -12,10 +12,10 @@
  */
 package org.flowable.spring.boot;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Flowable Mail Properties.
