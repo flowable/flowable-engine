@@ -41,7 +41,7 @@ public class EventDefinitionResource extends BaseEventDefinitionResource {
     @Autowired(required=false)
     protected EventRepositoryService eventRepositoryService;
 
-    @ApiOperation(value = "Get an event definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get an event definition", tags = { "Event Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the event definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
