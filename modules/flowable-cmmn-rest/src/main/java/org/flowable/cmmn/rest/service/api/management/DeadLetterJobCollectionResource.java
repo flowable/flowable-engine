@@ -95,7 +95,7 @@ public class DeadLetterJobCollectionResource {
             query.scopeId(allRequestParams.get("caseInstanceId"));
             query.scopeType(ScopeTypes.CMMN);
         }
-        if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
+        if (allRequestParams.containsKey("withoutScopeId") && Boolean.parseBoolean(allRequestParams.get("withoutScopeId"))) {
             query.withoutScopeId();
         }
         if (allRequestParams.containsKey("planItemInstanceId")) {
@@ -122,11 +122,11 @@ public class DeadLetterJobCollectionResource {
             if (allRequestParams.containsKey("messagesOnly")) {
                 throw new FlowableIllegalArgumentException("Only one of 'timersOnly' or 'messagesOnly' can be provided.");
             }
-            if (Boolean.valueOf(allRequestParams.get("timersOnly"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("timersOnly"))) {
                 query.timers();
             }
         }
-        if (allRequestParams.containsKey("messagesOnly") && Boolean.valueOf(allRequestParams.get("messagesOnly"))) {
+        if (allRequestParams.containsKey("messagesOnly") && Boolean.parseBoolean(allRequestParams.get("messagesOnly"))) {
             query.messages();
         }
         if (allRequestParams.containsKey("dueBefore")) {
@@ -135,7 +135,7 @@ public class DeadLetterJobCollectionResource {
         if (allRequestParams.containsKey("dueAfter")) {
             query.duedateHigherThan(RequestUtil.getDate(allRequestParams, "dueAfter"));
         }
-        if (allRequestParams.containsKey("withException") && Boolean.valueOf(allRequestParams.get("withException"))) {
+        if (allRequestParams.containsKey("withException") && Boolean.parseBoolean(allRequestParams.get("withException"))) {
             query.withException();
         }
         if (allRequestParams.containsKey("exceptionMessage")) {
@@ -147,13 +147,13 @@ public class DeadLetterJobCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             query.jobTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
-        if (allRequestParams.containsKey("withoutTenantId") && Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+        if (allRequestParams.containsKey("withoutTenantId") && Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
             query.jobWithoutTenantId();
         }
         if (allRequestParams.containsKey("scopeType")) {
             query.scopeType(allRequestParams.get("scopeType"));
         }
-        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
+        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.parseBoolean(allRequestParams.get("withoutProcessInstanceId"))) {
             query.withoutProcessInstanceId();
         }
         

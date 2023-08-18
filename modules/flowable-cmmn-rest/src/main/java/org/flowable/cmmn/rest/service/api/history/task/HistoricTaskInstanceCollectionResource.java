@@ -275,7 +275,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setTaskCandidateGroup(allRequestParams.get("taskCandidateGroup"));
         }
 
-        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.valueOf(allRequestParams.get("ignoreTaskAssignee"))) {
+        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.parseBoolean(allRequestParams.get("ignoreTaskAssignee"))) {
             queryRequest.setIgnoreTaskAssignee(true);
         }
 

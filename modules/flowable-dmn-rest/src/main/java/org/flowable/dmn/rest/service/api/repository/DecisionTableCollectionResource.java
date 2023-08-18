@@ -125,10 +125,8 @@ public class DecisionTableCollectionResource {
         if (allRequestParams.containsKey("version")) {
             definitionQuery.decisionVersion(Integer.valueOf(allRequestParams.get("version")));
         }
-
         if (allRequestParams.containsKey("latest")) {
-            Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
-            if (latest != null && latest) {
+            if (Boolean.parseBoolean(allRequestParams.get("latest"))) {
                 definitionQuery.latestVersion();
             }
         }

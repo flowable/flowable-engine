@@ -110,7 +110,7 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("processInstanceId")) {
             query.processInstanceId(allRequestParams.get("processInstanceId"));
         }
-        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
+        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.parseBoolean(allRequestParams.get("withoutProcessInstanceId"))) {
             query.withoutProcessInstanceId();
         }
         if (allRequestParams.containsKey("executionId")) {
@@ -129,11 +129,11 @@ public class JobCollectionResource {
             if (allRequestParams.containsKey("messagesOnly")) {
                 throw new FlowableIllegalArgumentException("Only one of 'timersOnly' or 'messagesOnly' can be provided.");
             }
-            if (Boolean.valueOf(allRequestParams.get("timersOnly"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("timersOnly"))) {
                 query.timers();
             }
         }
-        if (allRequestParams.containsKey("messagesOnly") && Boolean.valueOf(allRequestParams.get("messagesOnly"))) {
+        if (allRequestParams.containsKey("messagesOnly") && Boolean.parseBoolean(allRequestParams.get("messagesOnly"))) {
             query.messages();
         }
         if (allRequestParams.containsKey("dueBefore")) {
@@ -142,7 +142,7 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("dueAfter")) {
             query.duedateHigherThan(RequestUtil.getDate(allRequestParams, "dueAfter"));
         }
-        if (allRequestParams.containsKey("withException") && Boolean.valueOf(allRequestParams.get("withException"))) {
+        if (allRequestParams.containsKey("withException") && Boolean.parseBoolean(allRequestParams.get("withException"))) {
             query.withException();
         }
         if (allRequestParams.containsKey("exceptionMessage")) {
@@ -154,19 +154,19 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             query.jobTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
-        if (allRequestParams.containsKey("withoutTenantId") && Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+        if (allRequestParams.containsKey("withoutTenantId") && Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
             query.jobWithoutTenantId();
         }
-        if (allRequestParams.containsKey("locked") && Boolean.valueOf(allRequestParams.get("locked"))) {
+        if (allRequestParams.containsKey("locked") && Boolean.parseBoolean(allRequestParams.get("locked"))) {
             query.locked();
         }
-        if (allRequestParams.containsKey("unlocked") && Boolean.valueOf(allRequestParams.get("unlocked"))) {
+        if (allRequestParams.containsKey("unlocked") && Boolean.parseBoolean(allRequestParams.get("unlocked"))) {
             query.unlocked();
         }
-        if (allRequestParams.containsKey("withoutScopeType") && Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
+        if (allRequestParams.containsKey("withoutScopeType") && Boolean.parseBoolean(allRequestParams.get("withoutScopeType"))) {
             query.withoutScopeType();
         }
-        if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
+        if (allRequestParams.containsKey("withoutScopeId") && Boolean.parseBoolean(allRequestParams.get("withoutScopeId"))) {
             query.withoutScopeId();
         }
 

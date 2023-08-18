@@ -130,18 +130,14 @@ public class ProcessDefinitionCollectionResource {
             processDefinitionQuery.processDefinitionVersion(Integer.valueOf(allRequestParams.get("version")));
         }
         if (allRequestParams.containsKey("suspended")) {
-            Boolean suspended = Boolean.valueOf(allRequestParams.get("suspended"));
-            if (suspended != null) {
-                if (suspended) {
-                    processDefinitionQuery.suspended();
-                } else {
-                    processDefinitionQuery.active();
-                }
+            if (Boolean.parseBoolean(allRequestParams.get("suspended"))) {
+                processDefinitionQuery.suspended();
+            } else {
+                processDefinitionQuery.active();
             }
         }
         if (allRequestParams.containsKey("latest")) {
-            Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
-            if (latest != null && latest) {
+            if (Boolean.parseBoolean(allRequestParams.get("latest"))) {
                 processDefinitionQuery.latestVersion();
             }
         }
