@@ -4,6 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>Flowable BOM</name>
+    <description>Flowable BOM module</description>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-bom</artifactId>
     <packaging>pom</packaging>
