@@ -1299,6 +1299,11 @@
 			<url>http://www.flowable.org</url>
 		</developer>
 		<developer>
+            <name>Filip Hrisafov</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+		<developer>
 			<name>Yvo Swillens</name>
 			<organization>Flowable</organization>
 			<url>http://www.flowable.org</url>
@@ -1307,19 +1312,6 @@
 			<name>Josh Long</name>
 			<organization>Pivotal</organization>
 			<url>http://www.pivotal.com</url>
-		</developer>
-		<developer>
-			<name>Martin Grofcik</name>
-			<organization>Edorasware</organization>
-			<url>http://www.edorasware.com</url>
-		</developer>
-		<developer>
-			<name>Christian Muelder</name>
-			<organization>Next Level Integration</organization>
-			<url>http://next-level-integration.com/</url>
-		</developer>
-		<developer>
-			<name>Christian Stettler</name>
 		</developer>
 	</developers>
 	<issueManagement>
