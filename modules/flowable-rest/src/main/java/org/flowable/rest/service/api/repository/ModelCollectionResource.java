@@ -111,7 +111,7 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.modelVersion(Integer.valueOf(allRequestParams.get("version")));
         }
         if (allRequestParams.containsKey("latestVersion")) {
-            boolean isLatestVersion = Boolean.valueOf(allRequestParams.get("latestVersion"));
+            boolean isLatestVersion = Boolean.parseBoolean(allRequestParams.get("latestVersion"));
             if (isLatestVersion) {
                 modelQuery.latestVersion();
             }
@@ -120,7 +120,7 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.deploymentId(allRequestParams.get("deploymentId"));
         }
         if (allRequestParams.containsKey("deployed")) {
-            boolean isDeployed = Boolean.valueOf(allRequestParams.get("deployed"));
+            boolean isDeployed = Boolean.parseBoolean(allRequestParams.get("deployed"));
             if (isDeployed) {
                 modelQuery.deployed();
             } else {
@@ -134,7 +134,7 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.modelTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 modelQuery.modelWithoutTenantId();
             }

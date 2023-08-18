@@ -203,7 +203,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 queryRequest.setWithoutTenantId(Boolean.TRUE);
             }
         }
@@ -297,7 +297,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             if (request.isTenantSet()) {
                 caseInstanceBuilder.tenantId(request.getTenantId());
             }
-            if (request.getOverrideDefinitionTenantId() != null && request.getOverrideDefinitionTenantId().length() > 0) {
+            if (request.getOverrideDefinitionTenantId() != null && !request.getOverrideDefinitionTenantId().isEmpty()) {
                 caseInstanceBuilder.overrideCaseDefinitionTenantId(request.getOverrideDefinitionTenantId());
             }
             if (startVariables != null) {

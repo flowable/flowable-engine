@@ -81,7 +81,7 @@ public class HistoryJobCollectionResource {
             query.jobId(allRequestParams.get("scopeType"));
         }
         if (allRequestParams.containsKey("withException")) {
-            if (Boolean.valueOf(allRequestParams.get("withException"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withException"))) {
                 query.withException();
             }
         }
@@ -92,12 +92,12 @@ public class HistoryJobCollectionResource {
             query.lockOwner(allRequestParams.get("lockOwner"));
         }
         if (allRequestParams.containsKey("locked")) {
-            if (Boolean.valueOf(allRequestParams.get("locked"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("locked"))) {
                 query.locked();
             }
         }
         if (allRequestParams.containsKey("unlocked")) {
-            if (Boolean.valueOf(allRequestParams.get("unlocked"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("unlocked"))) {
                 query.unlocked();
             }
         }
@@ -108,7 +108,7 @@ public class HistoryJobCollectionResource {
             query.jobTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 query.jobWithoutTenantId();
             }
         }

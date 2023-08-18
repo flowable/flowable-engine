@@ -130,8 +130,7 @@ public class CaseDefinitionCollectionResource {
             caseDefinitionQuery.caseDefinitionVersion(Integer.valueOf(allRequestParams.get("version")));
         }
         if (allRequestParams.containsKey("latest")) {
-            Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
-            if (latest != null && latest) {
+            if (Boolean.parseBoolean(allRequestParams.get("latest"))) {
                 caseDefinitionQuery.latestVersion();
             }
         }
