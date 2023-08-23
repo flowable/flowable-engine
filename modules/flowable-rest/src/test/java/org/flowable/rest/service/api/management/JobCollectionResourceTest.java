@@ -154,6 +154,18 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutScopeId=true";
         assertResultsPresentInDataResponse(url, timerJob.getId());
 
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerType=trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerTypes=unknown-type,trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
         for (int i = 0; i < timerJob2.getRetries(); i++) {
             // Force execution of job until retries are exhausted
@@ -300,6 +312,32 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?tenantIdLike=anotherTenant";
         assertResultsPresentInDataResponse(url);
+
+        // Handler type(s)
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerType=async-continuation";
+        assertResultsPresentInDataResponse(url, asyncJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerType=trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerTypes=unknown-type,async-continuation";
+        assertResultsPresentInDataResponse(url, asyncJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerTypes=unknown-type,trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
 
     }
     @Test

@@ -1014,6 +1014,7 @@ public class CmmnRestResponseFactory {
         response.setTenantId(job.getTenantId());
         response.setElementId(job.getElementId());
         response.setElementName(job.getElementName());
+        response.setHandlerType(job.getJobHandlerType());
 
         response.setUrl(urlBuilder.buildUrl(urlJobSegments, job.getId()));
 
