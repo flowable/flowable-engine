@@ -10,16 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.flowable.cmmn.api.migration;
 
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.CaseInstance;
+public interface HistoricCaseInstanceMigrationDocumentBuilder {
 
-public interface CaseInstanceMigrationCallback {
-    
-    void caseInstanceMigrated(CaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, CaseInstanceMigrationDocument document);
-    
-    void historicCaseInstanceMigrated(HistoricCaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, HistoricCaseInstanceMigrationDocument document);
-    
+    HistoricCaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionId);
+
+    HistoricCaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionKey, Integer caseDefinitionVersion);
+
+    HistoricCaseInstanceMigrationDocumentBuilder setTenantId(String caseDefinitionTenantId);
+
+    HistoricCaseInstanceMigrationDocument build();
+
 }
