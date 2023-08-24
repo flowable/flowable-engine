@@ -18,7 +18,7 @@
 		<spring.framework.version>6.0.11</spring.framework.version>
 		<spring.security.version>6.1.2</spring.security.version>
 		<spring.amqp.version>3.0.5</spring.amqp.version>
-		<spring.kafka.version>3.0.9</spring.kafka.version>
+		<spring.kafka.version>3.0.10</spring.kafka.version>
 		<spring.ldap.version>3.1.0</spring.ldap.version>
 		<reactor-netty.version>1.1.8</reactor-netty.version>
 		<jackson.version>2.15.2</jackson.version>
