@@ -241,5 +241,11 @@ public interface CmmnRestApiInterceptor {
 
     void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
     
+    void migrateHistoricCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    
+    void migrateInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
+    
+    void migrateHistoricInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
+    
     void changePlanItemState(String caseInstanceId, ChangePlanItemStateRequest planItemStateRequest);
 }
