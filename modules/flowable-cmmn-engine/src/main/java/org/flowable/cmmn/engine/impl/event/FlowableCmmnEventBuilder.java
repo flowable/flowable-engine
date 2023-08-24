@@ -14,8 +14,8 @@ package org.flowable.cmmn.engine.impl.event;
 
 import org.flowable.cmmn.api.event.FlowableCaseEndedEvent;
 import org.flowable.cmmn.api.event.FlowableCaseStageEndedEvent;
-import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.event.FlowableCaseStageStartedEvent;
+import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;

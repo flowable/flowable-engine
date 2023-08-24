@@ -45,7 +45,6 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
     protected static ObjectMapper objectMapper = new ObjectMapper();
 
     public static JsonNode convertToJson(CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
-
         ObjectNode documentNode = objectMapper.createObjectNode();
 
         if (caseInstanceMigrationDocument.getMigrateToCaseDefinitionId() != null) {

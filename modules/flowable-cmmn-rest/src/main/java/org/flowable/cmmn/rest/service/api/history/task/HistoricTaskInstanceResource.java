@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.history.task;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnTaskService;

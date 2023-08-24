@@ -13,8 +13,6 @@
 
 package org.flowable.rest.service.api.history;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.HistoryService;

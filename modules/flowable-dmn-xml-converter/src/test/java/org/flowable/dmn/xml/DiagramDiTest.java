@@ -15,12 +15,12 @@ package org.flowable.dmn.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.nio.charset.Charset;
+
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.GraphicInfo;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.junit.jupiter.api.Test;
-
-import java.nio.charset.Charset;
 
 public class DiagramDiTest extends AbstractConverterTest {
 

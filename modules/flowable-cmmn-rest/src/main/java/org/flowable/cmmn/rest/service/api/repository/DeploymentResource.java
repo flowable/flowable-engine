@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;

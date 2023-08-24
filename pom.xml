@@ -19,10 +19,11 @@
 		<spring.security.version>6.1.2</spring.security.version>
 		<spring.amqp.version>3.0.5</spring.amqp.version>
 		<spring.kafka.version>3.0.9</spring.kafka.version>
+		<spring.ldap.version>3.1.0</spring.ldap.version>
 		<reactor-netty.version>1.1.8</reactor-netty.version>
 		<jackson.version>2.15.2</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
-        <camel.version>4.0.0-RC1</camel.version>
+        <camel.version>4.0.0</camel.version>
 		<cxf.version>4.0.2</cxf.version>
 		<slf4j.version>2.0.7</slf4j.version>
 		<groovy.version>4.0.13</groovy.version>
@@ -110,11 +111,6 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
 				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -351,6 +347,11 @@
 				<version>${spring.kafka.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.ldap</groupId>
+				<artifactId>spring-ldap-core</artifactId>
+				<version>${spring.ldap.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-bom</artifactId>
 				<version>${spring.security.version}</version>
@@ -397,7 +398,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>31.0.1-jre</version>
+				<version>32.0.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson</groupId>
@@ -1298,6 +1299,11 @@
 			<url>http://www.flowable.org</url>
 		</developer>
 		<developer>
+            <name>Filip Hrisafov</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+		<developer>
 			<name>Yvo Swillens</name>
 			<organization>Flowable</organization>
 			<url>http://www.flowable.org</url>
@@ -1306,19 +1312,6 @@
 			<name>Josh Long</name>
 			<organization>Pivotal</organization>
 			<url>http://www.pivotal.com</url>
-		</developer>
-		<developer>
-			<name>Martin Grofcik</name>
-			<organization>Edorasware</organization>
-			<url>http://www.edorasware.com</url>
-		</developer>
-		<developer>
-			<name>Christian Muelder</name>
-			<organization>Next Level Integration</organization>
-			<url>http://next-level-integration.com/</url>
-		</developer>
-		<developer>
-			<name>Christian Stettler</name>
 		</developer>
 	</developers>
 	<issueManagement>

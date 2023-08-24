@@ -156,8 +156,7 @@ public class AppDefinitionCollectionResource {
             }
         }
         if (allRequestParams.containsKey("latest")) {
-            boolean latest = Boolean.parseBoolean(allRequestParams.get("latest"));
-            if (latest) {
+            if (Boolean.parseBoolean(allRequestParams.get("latest"))) {
                 appDefinitionQuery.latestVersion();
             }
         }

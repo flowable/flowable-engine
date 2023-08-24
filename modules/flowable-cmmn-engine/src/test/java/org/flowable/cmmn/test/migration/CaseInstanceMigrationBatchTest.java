@@ -90,7 +90,7 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
                 .caseInstanceId(caseInstance1.getId())
                 .singleResult();
         CaseInstance caseInstance2AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
-                .caseInstanceId(caseInstance1.getId())
+                .caseInstanceId(caseInstance2.getId())
                 .singleResult();
 
         for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
@@ -160,7 +160,7 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
                 .caseInstanceId(caseInstance1.getId())
                 .singleResult();
         CaseInstance caseInstance2AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
-                .caseInstanceId(caseInstance1.getId())
+                .caseInstanceId(caseInstance2.getId())
                 .singleResult();
 
         executeMigrationJobStatusHandlerTimerJob();
