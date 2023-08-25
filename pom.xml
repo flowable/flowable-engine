@@ -1276,42 +1276,42 @@
 
 	<!-- Various information, not used by the build -->
 
-	<url>http://www.flowable.org</url>
+	<url>https://www.flowable.org</url>
 	<licenses>
 		<license>
 			<name>Apache v2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
 		</license>
 	</licenses>
 	<organization>
 		<name>Flowable</name>
-		<url>http://www.flowable.org</url>
+		<url>https://www.flowable.org</url>
 	</organization>
 	<developers>
 		<developer>
 			<name>Tijs Rademakers</name>
 			<organization>Flowable</organization>
-			<url>http://www.flowable.org</url>
+			<url>https://www.flowable.org</url>
 		</developer>
 		<developer>
 			<name>Joram Barrez</name>
 			<organization>Flowable</organization>
-			<url>http://www.flowable.org</url>
+			<url>https://www.flowable.org</url>
 		</developer>
 		<developer>
             <name>Filip Hrisafov</name>
             <organization>Flowable</organization>
-            <url>http://www.flowable.org</url>
+            <url>https://www.flowable.org</url>
         </developer>
 		<developer>
 			<name>Yvo Swillens</name>
 			<organization>Flowable</organization>
-			<url>http://www.flowable.org</url>
+			<url>https://www.flowable.org</url>
 		</developer>
 		<developer>
 			<name>Josh Long</name>
 			<organization>Pivotal</organization>
-			<url>http://www.pivotal.com</url>
+			<url>https://www.pivotal.com</url>
 		</developer>
 	</developers>
 	<issueManagement>
