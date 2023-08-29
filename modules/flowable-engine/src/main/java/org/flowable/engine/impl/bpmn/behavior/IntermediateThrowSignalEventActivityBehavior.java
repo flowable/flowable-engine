@@ -103,7 +103,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         Map<String, Object> payload = IOParameterUtil.extractOutVariables(throwEvent.getOutParameters(), execution,
-                processEngineConfiguration.getExpressionManager());;
+                processEngineConfiguration.getExpressionManager());
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,

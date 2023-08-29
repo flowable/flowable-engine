@@ -147,14 +147,14 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBefore=" + getISODateString(futureCal.getTime());
         assertResultsPresentInDataResponse(url, id);
 
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBefore=" + getISODateString(historicCal.getTime());;
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedBefore=" + getISODateString(historicCal.getTime());
         assertResultsPresentInDataResponse(url);
         
         // Case instance started after
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(historicCal.getTime());;
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(historicCal.getTime());
         assertResultsPresentInDataResponse(url, id);
 
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(futureCal.getTime());;
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?startedAfter=" + getISODateString(futureCal.getTime());
         assertResultsPresentInDataResponse(url);
         
         // Case instance state

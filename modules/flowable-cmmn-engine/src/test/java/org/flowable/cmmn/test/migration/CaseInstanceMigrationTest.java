@@ -1851,6 +1851,97 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
     }
     
     @Test
+    void testMultiTenantCaseInstanceMigrationWithCustomDefaultTenantProvider() {
+        DefaultTenantProvider originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantProvider();
+        cmmnEngineConfiguration.setFallbackToDefaultTenant(true);
+        CustomTenantProvider customTenantProvider = new CustomTenantProvider();
+        cmmnEngineConfiguration.setDefaultTenantProvider(customTenantProvider);
+        
+        try {
+            // Arrange
+            CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/one-task.cmmn.xml")
+                    .tenantId("tenant1-default")
+                    .deploy();
+            
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testCase")
+                    .tenantId("tenant1")
+                    .start();
+            
+            deployment = cmmnRepositoryService.createDeployment()
+                    .name("my deploy")
+                    .addClasspathResource("org/flowable/cmmn/test/migration/two-task.cmmn.xml")
+                    .tenantId("tenant1-default")
+                    .deploy();
+            
+            CaseDefinition destinationDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    
+            // Act
+            cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                    .migrateToCaseDefinition(destinationDefinition.getId())
+                    .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"))
+                    .migrate(caseInstance.getId());
+    
+            // Assert
+            CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Two Task Test Case");
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+            assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .list();
+            assertThat(planItemInstances).hasSize(2);
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getCaseDefinitionId)
+                    .containsOnly(destinationDefinition.getId());
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Task 1", "Task 2");
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getState)
+                    .containsOnly(PlanItemInstanceState.ACTIVE);
+            
+            List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(tasks).hasSize(2);
+            for (Task task : tasks) {
+                assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                cmmnTaskService.complete(task.getId());
+            }
+            
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                    .isEqualTo(destinationDefinition.getId());
+    
+                List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItemInstances).hasSize(2);
+                for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                    assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+    
+                List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+                assertThat(historicTasks).hasSize(2);
+                for (HistoricTaskInstance historicTask : historicTasks) {
+                    assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+                }
+            }
+            
+        } finally {
+            cmmnEngineConfiguration.setFallbackToDefaultTenant(false);
+            cmmnEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantValue);
+        }
+    }
+    
+    @Test
     void testMultiTenantCaseInstanceMigrationWithTargetDefaultTenantDefinition() {
         DefaultTenantProvider originalDefaultTenantValue = cmmnEngineConfiguration.getDefaultTenantProvider();
         cmmnEngineConfiguration.setDefaultTenantValue("default");
@@ -3324,4 +3415,12 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
     // with stages
     // with new expected case variables
 
+    protected class CustomTenantProvider implements DefaultTenantProvider {
+
+        @Override
+        public String getDefaultTenant(String tenantId, String scope, String scopeKey) {
+            return tenantId + "-default";
+        }
+        
+    }
 }

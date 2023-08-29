@@ -254,4 +254,58 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/ExitCriteriaTest.testStageExitCriteriaWithCondition.cmmn", "org/flowable/cmmn/test/runtime/dummyCase.cmmn"})
+    public void testStageExitCriteriaWithConditionNotTriggering() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("conditionStage").start();
+        UserEventListenerInstance userInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("triggerDummyCase").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(1);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("closeStage").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        CaseInstance dummyCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(dummyCaseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(0);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("referenceStage").singleResult();
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/ExitCriteriaTest.testStageExitCriteriaWithCondition.cmmn", "org/flowable/cmmn/test/runtime/dummyCase.cmmn"})
+    public void testStageExitCriteriaWithConditionTriggering() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("conditionStage").start();
+        UserEventListenerInstance userInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("triggerDummyCase").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userInstance.getId());
+        
+        CaseInstance dummyCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(dummyCaseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("closeStage").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(0);
+        
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("referenceStage").singleResult();
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
 }
