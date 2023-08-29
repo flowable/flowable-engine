@@ -1279,7 +1279,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
             this.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
-            ;
         }
         return this;
     }
