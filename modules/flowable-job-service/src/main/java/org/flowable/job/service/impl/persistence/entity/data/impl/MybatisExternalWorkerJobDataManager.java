@@ -163,6 +163,11 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     }
     
     @Override
+    public List<ExternalWorkerJobEntity> findJobsByWorkerId(String workerId) {
+        return getList("selectExternalWorkerJobsByWorkerId", workerId);
+    }
+    
+    @Override
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }

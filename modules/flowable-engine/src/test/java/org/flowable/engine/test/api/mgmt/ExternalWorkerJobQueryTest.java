@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -446,6 +448,94 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(jobs)
                 .extracting(ExternalWorkerJob::getId)
                 .containsExactlyInAnyOrder(userAndGroupJob.getId());
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testUnaquireWithJobId() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("orderService", Duration.ofMinutes(10))
+                .acquireAndLock(1, "testWorker1");
+
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("customerService", Duration.ofMinutes(10))
+                .acquireAndLock(1, "testWorker2");
+
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getElementId)
+                .containsExactlyInAnyOrder("externalOrder");
+
+        ExternalWorkerJob job = query.singleResult();
+        managementService.unacquireExternalWorkerJob(job.getId(), "testWorker1");
+        
+        assertThat(query.count()).isEqualTo(0);
+        
+        query = managementService.createExternalWorkerJobQuery().jobId(job.getId());
+        job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
+
+        query = managementService.createExternalWorkerJobQuery().lockOwner("testWorker2");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getElementId)
+                .containsExactlyInAnyOrder("externalCustomer1");
+
+        final Job worker2Job = query.singleResult();
+        
+        assertThatThrownBy(() -> {
+            managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker1");
+            
+        }).isInstanceOf(FlowableException.class)
+          .hasMessageContaining("Job is locked with a different worker id");
+        
+        managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker2");
+        
+        assertThat(query.count()).isEqualTo(0);
+        
+        query = managementService.createExternalWorkerJobQuery().jobId(job.getId());
+        job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testUnaquireWithWorkerId() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        ExternalWorkerJob job1 = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("orderService", Duration.ofMinutes(10))
+                .acquireAndLock(1, "testWorker1").get(0);
+
+        ExternalWorkerJob job2 = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("customerService", Duration.ofMinutes(10))
+                .acquireAndLock(1, "testWorker1").get(0);
+
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(2);
+
+        managementService.unacquireAllExternalWorkerJobsForWorker("testWorker2");
+        assertThat(query.count()).isEqualTo(2);
+        
+        managementService.unacquireAllExternalWorkerJobsForWorker("testWorker1");
+        assertThat(query.count()).isEqualTo(0);
+        
+        List<String> jobIds = new ArrayList<>();
+        jobIds.add(job1.getId());
+        jobIds.add(job2.getId());
+        query = managementService.createExternalWorkerJobQuery().jobIds(jobIds);
+        assertThat(query.count()).isEqualTo(2);
+        
+        List<ExternalWorkerJob> workerJobs = query.list();
+        for (ExternalWorkerJob externalWorkerJob : workerJobs) {
+            assertThat(externalWorkerJob.getLockOwner()).isNull();
+            assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
+        }
     }
 
     protected void addUserIdentityLinkToJob(Job job, String userId) {

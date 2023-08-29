@@ -36,6 +36,7 @@ import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeCon
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLink;
@@ -43,6 +44,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
+import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
@@ -1178,6 +1180,95 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .containsExactlyInAnyOrder(acmeJob.getId());
 
         cmmnManagementService.createExternalWorkerJobFailureBuilder(acmeJob.getId(), "testWorker").fail();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testUnaquireWithJobId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+            .topic("simple", Duration.ofMinutes(10))
+            .acquireAndLock(1, "testWorker1");
+        
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list())
+            .extracting(ExternalWorkerJob::getElementId)
+            .containsExactlyInAnyOrder("externalWorkerTask");
+
+        ExternalWorkerJob job = query.singleResult();
+
+        cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker1");
+        
+        assertThat(query.count()).isEqualTo(0);
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().jobId(job.getId());
+        job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testUnaquireWithJobIdWrongWorkerId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+            .topic("simple", Duration.ofMinutes(10))
+            .acquireAndLock(1, "testWorker1");
+        
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(1);
+        
+        final ExternalWorkerJob job = query.singleResult();
+
+        assertThatThrownBy(() -> {
+            cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker2");
+
+        }).isInstanceOf(FlowableException.class)
+            .hasMessageContaining("Job is locked with a different worker id");
+        
+        cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker1");
+        assertThat(query.count()).isEqualTo(0);
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().jobId(job.getId());
+        ExternalWorkerJob unacquiredJob = query.singleResult();
+        assertThat(unacquiredJob.getLockOwner()).isNull();
+        assertThat(unacquiredJob.getLockExpirationTime()).isNull();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testUnaquireWithWorkerId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .start();
+
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+            .topic("simple", Duration.ofMinutes(10))
+            .acquireAndLock(1, "testWorker1");
+        
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list())
+            .extracting(ExternalWorkerJob::getElementId)
+            .containsExactlyInAnyOrder("externalWorkerTask");
+
+        ExternalWorkerJob job = query.singleResult();
+
+        cmmnManagementService.unacquireAllExternalWorkerJobsForWorker("testWorker1");
+        
+        assertThat(query.count()).isEqualTo(0);
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().jobId(job.getId());
+        job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
     }
 
     protected void addUserIdentityLinkToJob(Job job, String userId) {

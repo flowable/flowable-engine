@@ -47,6 +47,12 @@
         from ${prefix}ACT_RU_EXTERNAL_JOB
         where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
     </select>
+    
+    <select id="selectExternalWorkerJobsByWorkerId" parameterType="string" resultMap="externalWorkerJobResultMap">
+        select *
+        from ${prefix}ACT_RU_EXTERNAL_JOB
+        where LOCK_OWNER_ = #{parameter, jdbcType=VARCHAR}
+    </select>
 
     <select id="selectExternalWorkerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         <if test="needsPaging">${limitBefore}</if>
