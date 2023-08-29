@@ -18,6 +18,7 @@ import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.function.Supplier;
 
 import jakarta.jms.Message;
 import jakarta.jms.TextMessage;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @CmmnJmsEventTest
@@ -58,6 +60,9 @@ public class CaseWithEventRegistryTest {
     
     @Autowired
     protected JmsTemplate jmsTemplate;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
@@ -176,7 +181,45 @@ public class CaseWithEventRegistryTest {
             }
         }
     }
-    
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/testSendEventTaskWithJson.cmmn",
+            "org/flowable/eventregistry/integrationtest/oneJson.event",
+            "org/flowable/eventregistry/integrationtest/one-outbound.channel" })
+    public void testSendEventTaskWithJsonPayload() throws Exception {
+        try {
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("firstname", "Kermit");
+            objectNode.put("lastname", "The Frog");
+
+            Supplier<ObjectNode> supplier = () -> objectMapper.createObjectNode()
+                    .put("firstname", "Annie Sue")
+                    .put("lastname", "Pig");
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSendEvent")
+                    .transientVariable("myJsonVariable", objectNode)
+                    .transientVariable("myJsonSupplierVariable", supplier)
+                    .start();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            Message message = jmsTemplate.receive("test-outbound-queue");
+            TextMessage textMessage = (TextMessage) message;
+            assertThatJson(textMessage.getText())
+                    .isEqualTo("{"
+                            + "  jsonPayload1: {firstname: 'Kermit',lastname: 'The Frog'},"
+                            + "  jsonPayload2: {firstname: 'Annie Sue',lastname: 'Pig'}"
+                            + "}");
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
     @Test
     @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
             "org/flowable/eventregistry/integrationtest/one.event",
