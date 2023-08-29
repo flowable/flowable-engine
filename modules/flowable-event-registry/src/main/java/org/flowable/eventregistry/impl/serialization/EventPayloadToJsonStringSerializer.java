@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.impl.serialization;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -96,19 +97,25 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
                     }
 
                 } else if (EventPayloadTypes.JSON.equals(definitionType)) {
-
-                    if (payloadInstanceValue instanceof JsonNode) {
-                        objectNode.set(payloadInstance.getDefinitionName(), (JsonNode) payloadInstanceValue);
-                    } else if (payloadInstanceValue instanceof String) {
-                        JsonNode jsonNode = null;
+                    Object jsonValue = payloadInstanceValue;
+                    if (payloadInstanceValue instanceof Supplier<?>) {
+                        Object suppliedValue = ((Supplier<?>) payloadInstanceValue).get();
+                        if (suppliedValue instanceof JsonNode) {
+                            jsonValue = suppliedValue;
+                        }
+                    }
+                    if (jsonValue instanceof JsonNode) {
+                        objectNode.set(payloadInstance.getDefinitionName(), (JsonNode) jsonValue);
+                    } else if (jsonValue instanceof String) {
+                        JsonNode jsonNode;
                         try {
-                            jsonNode = objectMapper.readTree((String) payloadInstanceValue);
+                            jsonNode = objectMapper.readTree((String) jsonValue);
                         } catch (JsonProcessingException e) {
                             throw new FlowableIllegalArgumentException("Could not read json event payload", e);
                         }
                         objectNode.set(payloadInstance.getDefinitionName(), jsonNode);
                     }  else {
-                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'json'");
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + jsonValue + " to type 'json'");
                     }
 
                 } else {
