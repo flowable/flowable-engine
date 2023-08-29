@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.management;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -64,6 +65,8 @@ public class SuspendedJobCollectionResource {
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return jobs with the given process definition id", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
             @ApiImplicitParam(name = "elementName", dataType = "string", value = "Only return jobs with the given element name", paramType = "query"),
+            @ApiImplicitParam(name = "handlerType", dataType = "string", value = "Only return jobs with the given handler type", paramType = "query"),
+            @ApiImplicitParam(name = "handlerTypes", dataType = "string", value = "Only return jobs which have one of the given job handler type", paramType = "query"),
             @ApiImplicitParam(name = "executable", dataType = "boolean", value = "If true, only return jobs which are executable. If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
@@ -108,6 +111,12 @@ public class SuspendedJobCollectionResource {
         }
         if (allRequestParams.containsKey("elementName")) {
             query.elementName(allRequestParams.get("elementName"));
+        }
+        if (allRequestParams.containsKey("handlerType")) {
+            query.handlerType(allRequestParams.get("handlerType"));
+        }
+        if (allRequestParams.containsKey("handlerTypes")) {
+            query.handlerTypes(Arrays.asList(allRequestParams.get("handlerTypes").split(",")));
         }
         if (allRequestParams.containsKey("executable")) {
             query.executable();

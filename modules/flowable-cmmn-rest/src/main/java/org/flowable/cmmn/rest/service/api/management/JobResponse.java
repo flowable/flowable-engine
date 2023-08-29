@@ -35,6 +35,7 @@ public class JobResponse {
     protected String planItemInstanceId;
     protected String elementId;
     protected String elementName;
+    protected String handlerType;
     protected Integer retries;
     protected String exceptionMessage;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -125,6 +126,15 @@ public class JobResponse {
 
     public void setElementName(String elementName) {
         this.elementName = elementName;
+    }
+
+    public void setHandlerType(String handlerType) {
+        this.handlerType = handlerType;
+    }
+
+    @ApiModelProperty(example = "cmmn-trigger-timer")
+    public String getHandlerType() {
+        return handlerType;
     }
 
     @ApiModelProperty(example = "3")
