@@ -1,0 +1,15 @@
+{
+    "key": "one",
+    "name": "My first Event",
+    "payload": [
+        {
+            "name": "jsonPayload1",
+            "type": "json"
+        },
+        {
+            "name": "jsonPayload2",
+            "type": "json"
+        }
+
+    ]
+}
