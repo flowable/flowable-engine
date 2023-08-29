@@ -14,23 +14,23 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.7.8</spring.boot.version>
-		<spring.framework.version>5.3.25</spring.framework.version>
-		<spring.amqp.version>2.4.9</spring.amqp.version>
+		<spring.boot.version>2.7.15</spring.boot.version>
+		<spring.framework.version>5.3.29</spring.framework.version>
+		<spring.amqp.version>2.4.15</spring.amqp.version>
 		<spring.security.version>5.8.2</spring.security.version>
 		<spring.kafka.version>2.9.9</spring.kafka.version>
 		<reactor-netty.version>1.0.28</reactor-netty.version>
 		<jackson.version>2.13.5</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-    <camel.version>3.14.0</camel.version>
+    	<camel.version>3.14.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<groovy.version>4.0.3</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.9.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<hikari.version>4.0.3</hikari.version>
 		<maven.deploy.plugin.version>3.1.0</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
@@ -86,7 +86,7 @@
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>2.1.214</version>
+				<version>2.2.220</version>
 			</dependency>
 			<!-- Logging -->
 			<dependency>
@@ -112,7 +112,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.12.0</version>
+				<version>3.13.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -232,7 +232,7 @@
 			<dependency>
 				<groupId>com.mysql</groupId>
 				<artifactId>mysql-connector-j</artifactId>
-				<version>8.0.31</version>
+				<version>8.0.33</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
@@ -242,7 +242,7 @@
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.7.0</version>
+				<version>11.5.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -1206,7 +1206,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
+				<version>3.1.2</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
