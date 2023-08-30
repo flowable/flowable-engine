@@ -371,10 +371,12 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
         }
 
         entities.stream().forEach(entity -> {
-            if (entity.getLockTime() == null || entity.getLockTime().before(expirationTime)) {
-                entity.setLockTime(expirationTime);
-                entity.setLockOwner(lockOwner);
-                update(entity);
+            synchronized (entity) {
+                if (entity.getLockTime() == null || entity.getLockTime().before(expirationTime)) {
+                    entity.setLockTime(expirationTime);
+                    entity.setLockOwner(lockOwner);
+                    update(entity);
+                }
             }
         });
     }
@@ -390,9 +392,11 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
         }
 
         entities.stream().forEach(entity -> {
-            entity.setLockTime(null);
-            entity.setLockOwner(null);
-            update(entity);
+            synchronized (entity) {
+                entity.setLockTime(null);
+                entity.setLockOwner(null);
+                update(entity);
+            }
         });
     }
 
@@ -412,9 +416,11 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
         }
 
         entities.stream().forEach(entity -> {
-            entity.setLockTime(null);
-            entity.setLockOwner(null);
-            update(entity);
+            synchronized (entity) {
+                entity.setLockTime(null);
+                entity.setLockOwner(null);
+                update(entity);
+            }
         });
     }
 
