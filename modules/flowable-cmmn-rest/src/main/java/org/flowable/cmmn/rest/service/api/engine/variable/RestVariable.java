@@ -62,6 +62,7 @@ public class RestVariable extends EngineRestVariable {
                     return s;
                 }
             }
+            System.out.println("scope: " + scope);
             throw new FlowableIllegalArgumentException("Invalid variable scope: '" + scope + "'");
         } else {
             return null;
