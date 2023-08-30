@@ -594,7 +594,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
                     execution.getCurrentFlowElement() != null ? execution.getCurrentFlowElement().getId() : "", custom, loopCounter,
-                    nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances, execution);
+                    nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
         }
     }
 

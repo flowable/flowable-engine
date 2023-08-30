@@ -206,7 +206,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 queryRequest.setWithoutTenantId(Boolean.TRUE);
             }
         }
@@ -249,7 +249,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         Map<String, Object> startVariables = null;
         Map<String, Object> transientVariables = null;
         Map<String, Object> startFormVariables = null;
-        if (request.getStartFormVariables() != null && request.getStartFormVariables().size()>0) {
+        if (request.getStartFormVariables() != null && !request.getStartFormVariables().isEmpty()) {
             startFormVariables = new HashMap<>();
             for (RestVariable variable : request.getStartFormVariables()) {
                 if (variable.getName() == null) {
@@ -260,7 +260,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             
         } else {
             
-            if (request.getVariables() != null && request.getVariables().size()>0) {
+            if (request.getVariables() != null && !request.getVariables().isEmpty()) {
                 startVariables = new HashMap<>();
                 for (RestVariable variable : request.getVariables()) {
                     if (variable.getName() == null) {
@@ -270,7 +270,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 }
             }
     
-            if (request.getTransientVariables() != null && request.getTransientVariables().size()>0) {
+            if (request.getTransientVariables() != null && !request.getTransientVariables().isEmpty()) {
                 transientVariables = new HashMap<>();
                 for (RestVariable variable : request.getTransientVariables()) {
                     if (variable.getName() == null) {
@@ -304,7 +304,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             if (request.isTenantSet()) {
                 processInstanceBuilder.tenantId(request.getTenantId());
             }
-            if (request.getOverrideDefinitionTenantId() != null && request.getOverrideDefinitionTenantId().length() > 0) {
+            if (request.getOverrideDefinitionTenantId() != null && !request.getOverrideDefinitionTenantId().isEmpty()) {
                 processInstanceBuilder.overrideProcessDefinitionTenantId(request.getOverrideDefinitionTenantId());
             }
             if (startFormVariables != null) {

@@ -1374,7 +1374,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
             this.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
-            ;
         }
         return this;
     }
@@ -1752,11 +1751,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery includeCaseVariables() {
         this.includeCaseVariables = true;
-        return this;
-    }
-
-    @Override
-    public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
         return this;
     }
 

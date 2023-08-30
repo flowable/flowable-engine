@@ -94,41 +94,6 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryConfigurationSettings;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.async.AsyncCmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceReactivateHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateBusinessKeyHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateBusinessStatusHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateNameHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.EntityLinkDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricCaseInstanceDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogDeleteJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.HistoricUserTaskLogRecordJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.IdentityLinkDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.MilestoneReachedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceAvailableHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCompletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceDisabledHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceEnabledHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceExitHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceFullHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceOccurredHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceStartedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceSuspendedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.PlanItemInstanceTerminatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskDeletedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskEndedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.TaskUpdatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.UpdateCaseDefinitionCascadeHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
-import org.flowable.cmmn.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.idm.DefaultCandidateManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.interceptor.DefaultCmmnIdentityLinkInterceptor;
@@ -139,6 +104,7 @@ import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationJobHandler;
 import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationStatusJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
+import org.flowable.cmmn.engine.impl.job.HistoricCaseInstanceMigrationJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
@@ -257,6 +223,7 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SchemaManager;
@@ -320,13 +287,7 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.db.JobDbSchemaManager;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
-import org.flowable.job.service.impl.history.async.AsyncHistoryJobZippedHandler;
-import org.flowable.job.service.impl.history.async.AsyncHistoryListener;
-import org.flowable.job.service.impl.history.async.AsyncHistorySession;
-import org.flowable.job.service.impl.history.async.AsyncHistorySessionFactory;
-import org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobProducer;
-import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
+import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskPostProcessor;
@@ -548,18 +509,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
     // Email
-    protected String mailServerHost = "localhost";
-    protected String mailServerUsername; // by default no name and password are provided, which
-    protected String mailServerPassword; // means no authentication for mail server
-    protected int mailServerPort = 25;
-    protected int mailServerSSLPort = 465;
-    protected boolean useSSL;
-    protected boolean useTLS;
-    protected String mailServerDefaultFrom = "flowable@localhost";
-    protected String mailServerForceTo;
-    protected Charset mailServerDefaultCharset;
+    protected FlowableMailClient defaultMailClient;
+    protected MailServerInfo defaultMailServer;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
+    protected Map<String, FlowableMailClient> mailClients = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     // Async executor
@@ -590,13 +544,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * Boolean flag to be set to activate the {@link AsyncExecutor} automatically after the engine has booted up.
      */
     protected boolean asyncExecutorActivate;
-
-    /**
-     * Experimental!
-     * <p>
-     * Set this to true when using the message queue based job executor.
-     */
-    protected boolean asyncExecutorMessageQueueMode;
 
     /**
      * The number of retries for a job.
@@ -646,7 +593,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
      * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
-     * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
      * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
@@ -665,11 +611,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean shutdownAsyncHistoryTaskExecutor;
     protected boolean isAsyncHistoryEnabled;
     protected boolean asyncHistoryExecutorActivate;
-    protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
-    protected boolean isAsyncHistoryJsonGroupingEnabled;
-    protected boolean asyncHistoryExecutorMessageQueueMode;
-    protected int asyncHistoryJsonGroupingThreshold = 10;
-    protected AsyncHistoryListener asyncHistoryListener;
 
     // More info: see similar async executor properties.
     protected int asyncHistoryExecutorNumberOfRetries = 10;
@@ -686,7 +627,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobHandler> customHistoryJobHandlers;
-    protected List<HistoryJsonTransformer> customHistoryJsonTransformers;
 
     protected FormFieldHandler formFieldHandler;
     protected boolean isFormFieldValidationEnabled;
@@ -784,6 +724,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initAstFunctionCreators();
         initBeans();
         initExpressionManager();
+        initMailClients();
         initCmmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
@@ -1016,6 +957,44 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         expressionManager.setAstFunctionCreators(astFunctionCreators);
     }
 
+    public void initMailClients() {
+        if (defaultMailClient == null) {
+            String sessionJndi = getMailSessionJndi();
+            if (sessionJndi != null) {
+                defaultMailClient = FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer());
+            } else {
+                MailServerInfo mailServer = getDefaultMailServer();
+                String host = mailServer.getMailServerHost();
+                if (host == null) {
+                    throw new FlowableException("no SMTP host is configured for the default mail server");
+                }
+                defaultMailClient = FlowableMailClientCreator.createHostClient(host, mailServer);
+            }
+        }
+
+        Collection<String> tenantIds = new HashSet<>(mailSessionsJndi.keySet());
+        tenantIds.addAll(mailServers.keySet());
+
+        if (!tenantIds.isEmpty()) {
+            MailServerInfo defaultMailServer = getDefaultMailServer();
+            for (String tenantId : tenantIds) {
+                if (mailClients.containsKey(tenantId)) {
+                    continue;
+                }
+                String sessionJndi = mailSessionsJndi.get(tenantId);
+                MailServerInfo tenantMailServer = mailServers.get(tenantId);
+                if (sessionJndi != null) {
+                    mailClients.put(tenantId, FlowableMailClientCreator.createSessionClient(sessionJndi, tenantMailServer, defaultMailServer));
+                } else if (tenantMailServer != null) {
+                    String host = tenantMailServer.getMailServerHost();
+                    if (host == null) {
+                        throw new FlowableException("no SMTP host is configured for the mail server for tenant " + tenantId);
+                    }
+                    mailClients.put(tenantId, FlowableMailClientCreator.createHostClient(host, tenantMailServer, defaultMailServer));
+                }
+            }
+        }
+    }
     public void initCmmnEngineAgendaFactory() {
         if (cmmnEngineAgendaFactory == null) {
             cmmnEngineAgendaFactory = new DefaultCmmnEngineAgendaFactory();
@@ -1033,33 +1012,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initSessionFactories() {
         super.initSessionFactories();
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-        
-        if (isAsyncHistoryEnabled) {
-            initAsyncHistorySessionFactory();
-        }
 
         if (!sessionFactories.containsKey(VariableListenerSession.class)) {
             VariableListenerSessionFactory variableListenerSessionFactory = new VariableListenerSessionFactory();
             sessionFactories.put(VariableListenerSession.class, variableListenerSessionFactory);
         }
-    }
-    
-    public void initAsyncHistorySessionFactory() {
-        // If another engine has set the asyncHistorySessionFactory already, there's no need to do it again.
-        if (!sessionFactories.containsKey(AsyncHistorySession.class)) {
-            AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
-            if (asyncHistoryListener == null) {
-                initDefaultAsyncHistoryListener();
-            }
-            asyncHistorySessionFactory.setAsyncHistoryListener(asyncHistoryListener);
-            sessionFactories.put(AsyncHistorySession.class, asyncHistorySessionFactory);
-        }
-        
-        ((AsyncHistorySessionFactory) sessionFactories.get(AsyncHistorySession.class)).registerJobDataTypes(CmmnAsyncHistoryConstants.ORDERED_TYPES);
-    }
-
-    protected void initDefaultAsyncHistoryListener() {
-        asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
     }
 
     protected void initServices() {
@@ -1340,11 +1297,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
-            if (isAsyncHistoryEnabled) {
-                cmmnHistoryManager = new AsyncCmmnHistoryManager(this);
-            } else {
-                cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
-            }
+            cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
         }
     }
 
@@ -1693,6 +1646,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
         addJobHandler(new CaseInstanceMigrationJobHandler());
         addJobHandler(new CaseInstanceMigrationStatusJobHandler());
+        addJobHandler(new HistoricCaseInstanceMigrationJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceIdsJobHandler());
         addJobHandler(new ComputeDeleteHistoricCaseInstanceStatusJobHandler());
         addJobHandler(new DeleteHistoricCaseInstanceIdsJobHandler());
@@ -1710,21 +1664,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
-            
-            List<HistoryJsonTransformer> allHistoryJsonTransformers = new ArrayList<>(initDefaultHistoryJsonTransformers());
-            if (customHistoryJsonTransformers != null) {
-                allHistoryJsonTransformers.addAll(customHistoryJsonTransformers);
-            }
-
-            AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
-            allHistoryJsonTransformers.forEach(asyncHistoryJobHandler::addHistoryJsonTransformer);
-            asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-
-            AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
-            allHistoryJsonTransformers.forEach(asyncHistoryJobZippedHandler::addHistoryJsonTransformer);
-            asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
 
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
@@ -1732,54 +1671,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 }
             }
         }
-    }
-    
-    protected List<HistoryJsonTransformer> initDefaultHistoryJsonTransformers() {
-        List<HistoryJsonTransformer> historyJsonTransformers = new ArrayList<>();
-        
-        historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceReactivateHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new CaseInstanceUpdateBusinessStatusHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new MilestoneReachedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new IdentityLinkCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new IdentityLinkDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new EntityLinkCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new EntityLinkDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new VariableCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new VariableUpdatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new VariableRemovedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new TaskCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskUpdatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskEndedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new TaskDeletedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new PlanItemInstanceFullHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceAvailableHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceCompletedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceCreatedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceDisabledHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceEnabledHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceExitHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceOccurredHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceStartedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceSuspendedHistoryJsonTransformer(this));
-        historyJsonTransformers.add(new PlanItemInstanceTerminatedHistoryJsonTransformer(this));
-        
-        historyJsonTransformers.add(new UpdateCaseDefinitionCascadeHistoryJsonTransformer(this));
-
-        historyJsonTransformers.add(new HistoricUserTaskLogRecordJsonTransformer(this));
-        historyJsonTransformers.add(new HistoricUserTaskLogDeleteJsonTransformer(this));
-
-        return historyJsonTransformers;
     }
 
     public void initFailedJobCommandFactory() {
@@ -1831,14 +1722,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalCmmnJobManager(this));
             }
-            
-            // Async history job config
-            jobServiceConfiguration.setJobTypeAsyncHistory(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY);
-            jobServiceConfiguration.setJobTypeAsyncHistoryZipped(CmmnAsyncHistoryConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED);
-            jobServiceConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(isAsyncHistoryJsonGzipCompressionEnabled);
-            jobServiceConfiguration.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
-            jobServiceConfiguration.setAsyncHistoryJsonGroupingThreshold(asyncHistoryJsonGroupingThreshold);
-            
+
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
             
@@ -1933,9 +1817,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 defaultAsyncExecutor.setExecuteAsyncRunnableFactory(asyncExecutorExecuteAsyncRunnableFactory);
             }
 
-            // Message queue mode
-            defaultAsyncExecutor.setMessageQueueMode(asyncExecutorMessageQueueMode);
-
             asyncExecutor = defaultAsyncExecutor;
         }
 
@@ -1971,10 +1852,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             
             if (asyncHistoryExecutor == null) {
                 DefaultAsyncHistoryJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor(getOrCreateAsyncHistoryExecutorConfiguration());
-    
-                // Message queue mode
-                defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
-    
+
                 asyncHistoryExecutor = defaultAsyncHistoryExecutor;
                 
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
@@ -1988,7 +1866,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                     if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
                         asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
                     }
-                    historyJobHandlers.forEach((type, handler) -> { asyncHistoryExecutor.getJobServiceConfiguration().mergeHistoryJobHandler(handler); });
+                    historyJobHandlers.forEach((type, handler) -> asyncHistoryExecutor.getJobServiceConfiguration().addHistoryJobHandler(type, handler));
                 }
                 
             }
@@ -3041,22 +2919,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setTaskQueryLimit(int taskQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
-        return this;
-    }
-
     public InternalHistoryVariableManager getInternalHistoryVariableManager() {
         return internalHistoryVariableManager;
     }
@@ -3064,22 +2926,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
         this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public CmmnEngineConfiguration setCaseQueryLimit(int caseQueryLimit) {
-        return this;
-    }
-
-    /**
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    public void setHistoricCaseQueryLimit(int historicCaseQueryLimit) {
-
     }
 
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {
@@ -3350,15 +3196,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
-        return this;
-    }
-
-    public boolean isAsyncExecutorMessageQueueMode() {
-        return asyncExecutorMessageQueueMode;
-    }
-
-    public CmmnEngineConfiguration setAsyncExecutorMessageQueueMode(boolean asyncExecutorMessageQueueMode) {
-        this.asyncExecutorMessageQueueMode = asyncExecutorMessageQueueMode;
         return this;
     }
 
@@ -3791,54 +3628,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public boolean isAsyncHistoryJsonGzipCompressionEnabled() {
-        return isAsyncHistoryJsonGzipCompressionEnabled;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGzipCompressionEnabled(boolean isAsyncHistoryJsonGzipCompressionEnabled) {
-        this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
-        return this;
-    }
-
-    public boolean isAsyncHistoryJsonGroupingEnabled() {
-        return isAsyncHistoryJsonGroupingEnabled;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
-        this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
-        return this;
-    }
-
-    public int getAsyncHistoryJsonGroupingThreshold() {
-        return asyncHistoryJsonGroupingThreshold;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
-        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
-        return this;
-    }
-    
-    public boolean isAsyncHistoryExecutorMessageQueueMode() {
-        return asyncHistoryExecutorMessageQueueMode;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryExecutorMessageQueueMode(boolean asyncHistoryExecutorMessageQueueMode) {
-        this.asyncHistoryExecutorMessageQueueMode = asyncHistoryExecutorMessageQueueMode;
-        return this;
-    }
-
-    public AsyncHistoryListener getAsyncHistoryListener() {
-        if (asyncHistoryListener == null) {
-            asyncHistoryListener = new DefaultAsyncHistoryJobProducer();
-        }
-        return asyncHistoryListener;
-    }
-
-    public CmmnEngineConfiguration setAsyncHistoryListener(AsyncHistoryListener asyncHistoryListener) {
-        this.asyncHistoryListener = asyncHistoryListener;
-        return this;
-    }
-
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -4159,15 +3948,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<HistoryJsonTransformer> getCustomHistoryJsonTransformers() {
-        return customHistoryJsonTransformers;
-    }
-
-    public CmmnEngineConfiguration setCustomHistoryJsonTransformers(List<HistoryJsonTransformer> customHistoryJsonTransformers) {
-        this.customHistoryJsonTransformers = customHistoryJsonTransformers;
-        return this;
-    }
-    
     public List<String> getEnabledJobCategories() {
         return enabledJobCategories;
     }
@@ -4222,93 +4002,122 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public FlowableMailClient getDefaultMailClient() {
+        return defaultMailClient;
+    }
+
+    public CmmnEngineConfiguration setDefaultMailClient(FlowableMailClient defaultMailClient) {
+        this.defaultMailClient = defaultMailClient;
+        return this;
+    }
+
+    public MailServerInfo getDefaultMailServer() {
+        return getOrCreateDefaultMaiLServer();
+    }
+
+    public CmmnEngineConfiguration setDefaultMailServer(MailServerInfo defaultMailServer) {
+        this.defaultMailServer = defaultMailServer;
+        return this;
+    }
+
+    protected MailServerInfo getOrCreateDefaultMaiLServer() {
+        if (defaultMailServer == null) {
+            defaultMailServer = new MailServerInfo();
+            defaultMailServer.setMailServerHost("localhost");
+            defaultMailServer.setMailServerPort(25);
+            defaultMailServer.setMailServerSSLPort(465);
+            defaultMailServer.setMailServerDefaultFrom("flowable@localhost");
+        }
+        return defaultMailServer;
+    }
+
     public String getMailServerHost() {
-        return mailServerHost;
+        return getOrCreateDefaultMaiLServer().getMailServerHost();
     }
 
     public CmmnEngineConfiguration setMailServerHost(String mailServerHost) {
-        this.mailServerHost = mailServerHost;
+        getOrCreateDefaultMaiLServer().setMailServerHost(mailServerHost);
         return this;
     }
 
     public String getMailServerUsername() {
-        return mailServerUsername;
+        return getOrCreateDefaultMaiLServer().getMailServerUsername();
     }
 
     public CmmnEngineConfiguration setMailServerUsername(String mailServerUsername) {
-        this.mailServerUsername = mailServerUsername;
+        getOrCreateDefaultMaiLServer().setMailServerUsername(mailServerUsername);
         return this;
     }
 
     public String getMailServerPassword() {
-        return mailServerPassword;
+        return getOrCreateDefaultMaiLServer().getMailServerPassword();
     }
 
     public CmmnEngineConfiguration setMailServerPassword(String mailServerPassword) {
-        this.mailServerPassword = mailServerPassword;
+        getOrCreateDefaultMaiLServer().setMailServerPassword(mailServerPassword);
         return this;
     }
 
     public int getMailServerPort() {
-        return mailServerPort;
+        return getOrCreateDefaultMaiLServer().getMailServerPort();
     }
 
     public CmmnEngineConfiguration setMailServerPort(int mailServerPort) {
-        this.mailServerPort = mailServerPort;
+        getOrCreateDefaultMaiLServer().setMailServerPort(mailServerPort);
         return this;
     }
 
     public int getMailServerSSLPort() {
-        return mailServerSSLPort;
+        return getOrCreateDefaultMaiLServer().getMailServerSSLPort();
     }
 
     public CmmnEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
-        this.mailServerSSLPort = mailServerSSLPort;
+        getOrCreateDefaultMaiLServer().setMailServerSSLPort(mailServerSSLPort);
         return this;
     }
 
     public boolean getMailServerUseSSL() {
-        return useSSL;
+        return getOrCreateDefaultMaiLServer().isMailServerUseSSL();
     }
 
     public CmmnEngineConfiguration setMailServerUseSSL(boolean useSSL) {
-        this.useSSL = useSSL;
+        getOrCreateDefaultMaiLServer().setMailServerUseSSL(useSSL);
         return this;
     }
 
     public boolean getMailServerUseTLS() {
-        return useTLS;
+        return getOrCreateDefaultMaiLServer().isMailServerUseTLS();
     }
 
     public CmmnEngineConfiguration setMailServerUseTLS(boolean useTLS) {
-        this.useTLS = useTLS;
+        getOrCreateDefaultMaiLServer().setMailServerUseTLS(useTLS);
         return this;
     }
 
     public String getMailServerDefaultFrom() {
-        return mailServerDefaultFrom;
+        return getOrCreateDefaultMaiLServer().getMailServerDefaultFrom();
     }
 
     public CmmnEngineConfiguration setMailServerDefaultFrom(String mailServerDefaultFrom) {
-        this.mailServerDefaultFrom = mailServerDefaultFrom;
+        getOrCreateDefaultMaiLServer().setMailServerDefaultFrom(mailServerDefaultFrom);
         return this;
     }
 
     public String getMailServerForceTo() {
-        return mailServerForceTo;
+        return getOrCreateDefaultMaiLServer().getMailServerForceTo();
     }
 
     public CmmnEngineConfiguration setMailServerForceTo(String mailServerForceTo) {
-        this.mailServerForceTo = mailServerForceTo;
+        getOrCreateDefaultMaiLServer().setMailServerForceTo(mailServerForceTo);
         return this;
     }
 
     public Charset getMailServerDefaultCharset() {
-        return mailServerDefaultCharset;
+        return getOrCreateDefaultMaiLServer().getMailServerDefaultCharset();
     }
 
     public CmmnEngineConfiguration setMailServerDefaultCharset(Charset mailServerDefaultCharset){
-        this.mailServerDefaultCharset = mailServerDefaultCharset;
+        getOrCreateDefaultMaiLServer().setMailServerDefaultCharset(mailServerDefaultCharset);
         return this;
     }
 
@@ -4332,6 +4141,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public MailServerInfo getMailServer(String tenantId) {
         return mailServers.get(tenantId);
+    }
+
+    public Map<String, FlowableMailClient> getMailClients() {
+        return mailClients;
+    }
+
+    public CmmnEngineConfiguration setMailClients(Map<String, FlowableMailClient> mailClients) {
+        this.mailClients = mailClients;
+        return this;
+    }
+
+    public FlowableMailClient getMailClient(String tenantId) {
+        return mailClients.get(tenantId);
     }
 
     public Map<String, String> getMailSessionsJndi() {

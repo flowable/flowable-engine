@@ -1279,7 +1279,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
             this.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
-            ;
         }
         return this;
     }
@@ -1813,11 +1812,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public HistoricTaskInstanceQuery includeCaseVariables() {
         this.includeCaseVariables = true;
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery limitTaskVariables(Integer taskVariablesLimit) {
         return this;
     }
 

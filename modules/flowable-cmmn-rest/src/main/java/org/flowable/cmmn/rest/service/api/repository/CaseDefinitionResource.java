@@ -14,9 +14,14 @@
 package org.flowable.cmmn.rest.service.api.repository;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnMigrationService;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
+import org.flowable.cmmn.engine.impl.migration.HistoricCaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
@@ -32,6 +37,7 @@ import org.flowable.form.model.SimpleFormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +58,9 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
     
     @Autowired
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    @Autowired
+    protected CmmnMigrationService cmmnMigrationService;
     
     @Autowired(required=false)
     protected CmmnFormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
@@ -124,6 +133,82 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
             return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
         }
+    }
+    
+    @ApiOperation(value = "Migrate all instances of case definition", tags = { "Case Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates case instances were found and migration was executed."),
+            @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
+    })
+    @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/migrate", produces = "application/json")
+    public void migrateInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateInstancesOfCaseDefinition(caseDefinition, migrationDocumentJson);
+        }
+
+        CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.migrateCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Migrate all historic case instances of case definition", tags = { "Case Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates historic case instances were found and migration was executed."),
+            @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
+    })
+    @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/migrate-historic-instances", produces = "application/json")
+    public void migrateHistoricInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateHistoricInstancesOfCaseDefinition(caseDefinition, migrationDocumentJson);
+        }
+
+        HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.migrateHistoricCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Batch migrate all instances of case definition", tags = { "Case Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates case instances were found and batch migration was started."),
+            @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
+    })
+    @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/batch-migrate", produces = "application/json")
+    public void batchMigrateInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateInstancesOfCaseDefinition(caseDefinition, migrationDocumentJson);
+        }
+
+        CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.batchMigrateCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Batch migrate all historic instances of case definition", tags = { "Case Definitions" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates historic case instances were found and batch migration was started."),
+            @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
+    })
+    @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/batch-migrate-historic-instances", produces = "application/json")
+    public void batchMigrateHistoricInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateHistoricInstancesOfCaseDefinition(caseDefinition, migrationDocumentJson);
+        }
+
+        HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.batchMigrateHistoricCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
     }
     
     protected FormInfo getStartForm(FormRepositoryService formRepositoryService, CaseDefinition caseDefinition) {

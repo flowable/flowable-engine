@@ -12,9 +12,8 @@
  */
 package org.flowable.eventregistry.spring.management;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
@@ -28,8 +27,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 public class DefaultSpringEventRegistryChangeDetectionExecutor implements EventRegistryChangeDetectionExecutor, DisposableBean {
 
-    protected long initialDelayInMs;
-    protected long delayInMs;
+    protected Duration initialDelay;
+    protected Duration delay;
     protected TaskScheduler taskScheduler;
     protected ThreadPoolTaskScheduler threadPoolTaskScheduler; // If non-null, it means the scheduler has been created in this class
 
@@ -40,8 +39,8 @@ public class DefaultSpringEventRegistryChangeDetectionExecutor implements EventR
     }
 
     public DefaultSpringEventRegistryChangeDetectionExecutor(long initialDelayInMs, long delayInMs, TaskScheduler taskScheduler) {
-        this.initialDelayInMs = initialDelayInMs;
-        this.delayInMs = delayInMs;
+        this.initialDelay = Duration.ofMillis(initialDelayInMs);
+        this.delay = Duration.ofMillis(delayInMs);
 
         if (taskScheduler != null) {
             this.taskScheduler = taskScheduler;
@@ -64,9 +63,8 @@ public class DefaultSpringEventRegistryChangeDetectionExecutor implements EventR
             threadPoolTaskScheduler.initialize();
         }
 
-        Instant initialInstant = Instant.now().plus(initialDelayInMs, ChronoUnit.MILLIS);
-        // Note we cannot use the method with the Instant since it was added in Spring 5.0, and we still want to support 4.3
-        taskScheduler.scheduleWithFixedDelay(createChangeDetectionRunnable(), Date.from(initialInstant), delayInMs);
+        Instant initialInstant = Instant.now().plus(initialDelay);
+        taskScheduler.scheduleWithFixedDelay(createChangeDetectionRunnable(), initialInstant, delay);
     }
 
     protected Runnable createChangeDetectionRunnable() {

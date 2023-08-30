@@ -44,7 +44,7 @@ public class GenericManagerFactory implements SessionFactory {
     @Override
     public Session openSession(CommandContext commandContext) {
         try {
-            return implementationClass.newInstance();
+            return implementationClass.getConstructor().newInstance();
         } catch (Exception e) {
             throw new FlowableException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
         }

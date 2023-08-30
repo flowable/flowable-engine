@@ -296,6 +296,9 @@
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-mail/target">
+				<include name="flowable-mail-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
 				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
@@ -304,9 +307,6 @@
 			</fileset>
 			<fileset dir="../modules/flowable-jmx/target">
 				<include name="flowable-jmx-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-jms-spring-executor/target">
-				<include name="flowable-jms-spring-executor-*.jar" />
 			</fileset>
 		</copy>
 

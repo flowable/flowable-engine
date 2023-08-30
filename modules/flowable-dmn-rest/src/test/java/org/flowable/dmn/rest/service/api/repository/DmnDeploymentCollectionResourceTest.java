@@ -246,6 +246,8 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
         } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
             for (DmnDeployment deployment : deployments) {
@@ -373,6 +375,8 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
         } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
             for (DmnDeployment deployment : deployments) {

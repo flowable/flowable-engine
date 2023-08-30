@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.SimpleDateFormat;
@@ -222,7 +223,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_ASSIGNEE_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).contains("\"newAssigneeId\":\"newAssignee\"", "\"previousAssigneeId\":\"initialAssignee\"");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ newAssigneeId: 'newAssignee', previousAssigneeId: 'initialAssignee' }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -249,8 +251,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_OWNER_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).
-                    contains("\"previousOwnerId\":null", "\"newOwnerId\":\"newOwner\"");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ previousOwnerId: null, newOwnerId: 'newOwner' }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -275,7 +277,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_ASSIGNEE_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).contains("\"newAssigneeId\":\"testUser\"", "\"previousAssigneeId\":null");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ newAssigneeId: 'testUser', previousAssigneeId: null }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -297,8 +300,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_ASSIGNEE_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).
-                    contains("\"newAssigneeId\":null", "\"previousAssigneeId\":\"initialAssignee\"");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ newAssigneeId: null, previousAssigneeId: 'initialAssignee' }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -317,8 +320,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_PRIORITY_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).
-                    contains("\"newPriority\":2147483647", "\"previousPriority\":50}");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ newPriority: 2147483647, previousPriority: 50 }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -359,7 +362,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
     public void changeDueDate() {
         task = taskService.createTaskBuilder().create();
 
-        taskService.setDueDate(task.getId(), new Date());
+        Date dueDate = new Date();
+        taskService.setDueDate(task.getId(), dueDate);
 
         if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
             List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
@@ -367,7 +371,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_DUEDATE_CHANGED").list();
             assertThat(taskLogEntries).hasSize(1);
-            assertThat(taskLogEntries.get(0).getData()).contains("\"newDueDate\"", "\"previousDueDate\":null}");
+            assertThatJson(taskLogEntries.get(0).getData())
+                    .isEqualTo("{ newDueDate: " + dueDate.getTime() + ", previousDueDate: null }");
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTimeStamp).isNotNull();
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
             assertThat(taskLogEntries.get(0)).extracting(HistoricTaskLogEntry::getUserId).isNull();
@@ -568,10 +573,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"candidate\"",
-                        "\"userId\":\"newCandidateUser\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'candidate', userId: 'newCandidateUser' }");
             }
 
         } finally {
@@ -600,10 +603,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"participant\"",
-                        "\"userId\":\"newCandidateUser\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'participant', userId: 'newCandidateUser' }");
             }
 
         } finally {
@@ -632,10 +633,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"candidate\"",
-                        "\"groupId\":\"newCandidateGroup\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'candidate', groupId: 'newCandidateGroup' }");
             }
 
         } finally {
@@ -664,10 +663,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_ADDED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"participant\"",
-                        "\"groupId\":\"newCandidateGroup\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'participant', groupId: 'newCandidateGroup' }");
             }
 
         } finally {
@@ -696,10 +693,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_REMOVED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"candidate\"",
-                        "\"groupId\":\"newCandidateGroup\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'candidate', groupId: 'newCandidateGroup' }");
             }
 
         } finally {
@@ -729,10 +724,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
                         .type("USER_TASK_IDENTITY_LINK_REMOVED")
                         .list();
                 assertThat(logEntries).hasSize(1);
-                assertThat(logEntries.get(0).getData()).contains(
-                        "\"type\":\"candidate\"",
-                        "\"userId\":\"newCandidateUser\""
-                );
+                assertThatJson(logEntries.get(0).getData())
+                        .isEqualTo("{ type: 'candidate', userId: 'newCandidateUser' }");
             }
 
         } finally {

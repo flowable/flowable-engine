@@ -84,7 +84,7 @@ public class EventRegistryRabbitConfiguration {
 
     @Bean(destroyMethod = "stop")
     public RabbitMQContainer rabbitMQContainer() {
-        RabbitMQContainer container = new RabbitMQContainer();
+        RabbitMQContainer container = new RabbitMQContainer("rabbitmq");
         container.start();
         return container;
     }

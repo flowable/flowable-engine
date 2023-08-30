@@ -89,8 +89,10 @@ public abstract class BaseHttpActivityDelegate {
 
     protected abstract FlowableHttpClient createHttpClient();
 
-    protected HttpRequest createRequest(VariableContainer variableContainer, String prefix) {
+    protected RequestData createRequest(VariableContainer variableContainer, String fallbackPrefix) {
         HttpRequest request = new HttpRequest();
+        RequestData requestData = new RequestData();
+        requestData.setHttpRequest(request);
 
         request.setMethod(ExpressionUtils.getStringFromField(requestMethod, variableContainer));
         request.setUrl(ExpressionUtils.getStringFromField(requestUrl, variableContainer));
@@ -99,46 +101,47 @@ public abstract class BaseHttpActivityDelegate {
         request.setBodyEncoding(ExpressionUtils.getStringFromField(requestBodyEncoding, variableContainer));
         request.setTimeout(ExpressionUtils.getIntFromField(requestTimeout, variableContainer));
         request.setNoRedirects(ExpressionUtils.getBooleanFromField(disallowRedirects, variableContainer));
-        request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(ignoreException, variableContainer));
-        request.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, variableContainer));
-        request.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, variableContainer));
-        request.setSaveResponseTransient(ExpressionUtils.getBooleanFromField(saveResponseParametersTransient, variableContainer));
-        request.setSaveResponseAsJson(ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer));
-        request.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, variableContainer));
+        requestData.setIgnoreErrors(ExpressionUtils.getBooleanFromField(ignoreException, variableContainer));
+        requestData.setSaveRequest(ExpressionUtils.getBooleanFromField(saveRequestVariables, variableContainer));
+        requestData.setSaveResponse(ExpressionUtils.getBooleanFromField(saveResponseParameters, variableContainer));
+        requestData.setSaveResponseTransient(ExpressionUtils.getBooleanFromField(saveResponseParametersTransient, variableContainer));
+        requestData.setSaveResponseAsJson(ExpressionUtils.getBooleanFromField(saveResponseVariableAsJson, variableContainer));
+        requestData.setPrefix(ExpressionUtils.getStringFromField(resultVariablePrefix, variableContainer));
 
         String failCodes = ExpressionUtils.getStringFromField(failStatusCodes, variableContainer);
         String handleCodes = ExpressionUtils.getStringFromField(handleStatusCodes, variableContainer);
 
         if (failCodes != null) {
-            request.setFailCodes(ExpressionUtils.getStringSetFromField(failCodes));
+            requestData.setFailCodes(ExpressionUtils.getStringSetFromField(failCodes));
         }
         if (handleCodes != null) {
-            request.setHandleCodes(ExpressionUtils.getStringSetFromField(handleCodes));
+            requestData.setHandleCodes(ExpressionUtils.getStringSetFromField(handleCodes));
         }
 
-        if (request.getPrefix() == null) {
-            request.setPrefix(prefix);
+        if (requestData.getPrefix() == null) {
+            requestData.setPrefix(fallbackPrefix);
         }
 
         // Save request fields
-        if (request.isSaveRequest()) {
-            variableContainer.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
-            variableContainer.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
-            variableContainer.setVariable(request.getPrefix() + "RequestHeaders", request.getHttpHeadersAsString());
-            variableContainer.setVariable(request.getPrefix() + "RequestBody", request.getBody());
-            variableContainer.setVariable(request.getPrefix() + "RequestBodyEncoding", request.getBodyEncoding());
-            variableContainer.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
-            variableContainer.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
-            variableContainer.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);
-            variableContainer.setVariable(request.getPrefix() + "HandleStatusCodes", handleCodes);
-            variableContainer.setVariable(request.getPrefix() + "IgnoreException", request.isIgnoreErrors());
-            variableContainer.setVariable(request.getPrefix() + "SaveRequestVariables", request.isSaveRequest());
-            variableContainer.setVariable(request.getPrefix() + "SaveResponseParameters", request.isSaveResponse());
+        if (requestData.isSaveRequest()) {
+            String prefix = requestData.getPrefix();
+            variableContainer.setVariable(prefix + "RequestMethod", request.getMethod());
+            variableContainer.setVariable(prefix + "RequestUrl", request.getUrl());
+            variableContainer.setVariable(prefix + "RequestHeaders", request.getHttpHeadersAsString());
+            variableContainer.setVariable(prefix + "RequestBody", request.getBody());
+            variableContainer.setVariable(prefix + "RequestBodyEncoding", request.getBodyEncoding());
+            variableContainer.setVariable(prefix + "RequestTimeout", request.getTimeout());
+            variableContainer.setVariable(prefix + "DisallowRedirects", request.isNoRedirects());
+            variableContainer.setVariable(prefix + "FailStatusCodes", failCodes);
+            variableContainer.setVariable(prefix + "HandleStatusCodes", handleCodes);
+            variableContainer.setVariable(prefix + "IgnoreException", requestData.isIgnoreErrors());
+            variableContainer.setVariable(prefix + "SaveRequestVariables", requestData.isSaveRequest());
+            variableContainer.setVariable(prefix + "SaveResponseParameters", requestData.isSaveResponse());
         }
-        return request;
+        return requestData;
     }
 
-    protected void saveResponseFields(VariableContainer variableContainer, HttpRequest request, HttpResponse response, ObjectMapper objectMapper)
+    protected void saveResponseFields(VariableContainer variableContainer, RequestData request, HttpResponse response, ObjectMapper objectMapper)
             throws IOException {
         // Save response fields
         if (response != null) {
@@ -202,8 +205,8 @@ public abstract class BaseHttpActivityDelegate {
         }
     }
 
-    protected CompletableFuture<ExecutionData> prepareAndExecuteRequest(HttpRequest request, boolean parallelInSameTransaction, AsyncTaskInvoker taskInvoker) {
-        ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request);
+    protected CompletableFuture<ExecutionData> prepareAndExecuteRequest(RequestData request, boolean parallelInSameTransaction, AsyncTaskInvoker taskInvoker) {
+        ExecutableHttpRequest httpRequest = httpClient.prepareRequest(request.getHttpRequest());
 
         if (!parallelInSameTransaction) {
             CompletableFuture<ExecutionData> future = new CompletableFuture<>();
@@ -264,21 +267,21 @@ public abstract class BaseHttpActivityDelegate {
 
     public static class ExecutionData {
 
-        protected HttpRequest request;
+        protected RequestData request;
         protected HttpResponse response;
         protected Throwable exception;
 
-        public ExecutionData(HttpRequest request, HttpResponse response) {
+        public ExecutionData(RequestData request, HttpResponse response) {
             this(request, response, null);
         }
 
-        public ExecutionData(HttpRequest request, HttpResponse response, Throwable exception) {
+        public ExecutionData(RequestData request, HttpResponse response, Throwable exception) {
             this.request = request;
             this.response = response;
             this.exception = exception;
         }
 
-        public HttpRequest getRequest() {
+        public RequestData getRequest() {
             return request;
         }
 
@@ -288,6 +291,95 @@ public abstract class BaseHttpActivityDelegate {
 
         public Throwable getException() {
             return exception;
+        }
+    }
+
+    public static class RequestData {
+
+        protected HttpRequest httpRequest;
+        protected Set<String> failCodes;
+        protected Set<String> handleCodes;
+        protected boolean ignoreErrors;
+        protected boolean saveRequest;
+        protected boolean saveResponse;
+        protected boolean saveResponseTransient;
+        protected boolean saveResponseAsJson;
+        protected String prefix;
+
+        public HttpRequest getHttpRequest() {
+            return httpRequest;
+        }
+
+        public void setHttpRequest(HttpRequest httpRequest) {
+            this.httpRequest = httpRequest;
+        }
+
+        public Set<String> getFailCodes() {
+            return failCodes;
+        }
+
+        public void setFailCodes(Set<String> failCodes) {
+            this.failCodes = failCodes;
+        }
+
+        public Set<String> getHandleCodes() {
+            return handleCodes;
+        }
+
+        public void setHandleCodes(Set<String> handleCodes) {
+            this.handleCodes = handleCodes;
+        }
+
+        public boolean isIgnoreErrors() {
+            return ignoreErrors;
+        }
+
+        public void setIgnoreErrors(boolean ignoreErrors) {
+            this.ignoreErrors = ignoreErrors;
+        }
+
+        public boolean isSaveRequest() {
+            return saveRequest;
+        }
+
+        public void setSaveRequest(boolean saveRequest) {
+            this.saveRequest = saveRequest;
+        }
+
+        public boolean isSaveResponse() {
+            return saveResponse;
+        }
+
+        public void setSaveResponse(boolean saveResponse) {
+            this.saveResponse = saveResponse;
+        }
+
+        public boolean isSaveResponseTransient() {
+            return saveResponseTransient;
+        }
+
+        public void setSaveResponseTransient(boolean saveResponseTransient) {
+            this.saveResponseTransient = saveResponseTransient;
+        }
+
+        public boolean isSaveResponseAsJson() {
+            return saveResponseAsJson;
+        }
+
+        public void setSaveResponseAsJson(boolean saveResponseAsJson) {
+            this.saveResponseAsJson = saveResponseAsJson;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public boolean isNoRedirects() {
+            return httpRequest.isNoRedirects();
         }
     }
 }

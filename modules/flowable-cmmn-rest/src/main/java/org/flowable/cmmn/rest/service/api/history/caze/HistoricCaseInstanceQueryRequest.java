@@ -32,6 +32,7 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private List<String> caseInstanceIds;
     private String caseDefinitionId;
     private String caseDefinitionKey;
+    private Set<String> caseDefinitionKeys;
     private String caseDefinitionCategory;
     private String caseDefinitionName;
     private String caseBusinessKey;
@@ -97,6 +98,14 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
         this.caseDefinitionKey = caseDefinitionKey;
     }
     
+    public Set<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public void setCaseDefinitionKeys(Set<String> caseDefinitionKeys) {
+        this.caseDefinitionKeys = caseDefinitionKeys;
+    }
+
     public String getCaseDefinitionCategory() {
         return caseDefinitionCategory;
     }

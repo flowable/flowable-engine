@@ -234,13 +234,6 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery endOr();
 
     /**
-     * Limit case instance variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);
-
-    /**
      * Localize case name to specified locale.
      */
     CaseInstanceQuery locale(String locale);

@@ -111,7 +111,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 queryRequest.setWithoutTenantId(Boolean.TRUE);
             }
         }

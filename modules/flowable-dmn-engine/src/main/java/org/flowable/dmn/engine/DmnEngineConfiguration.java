@@ -609,7 +609,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
     	if (ruleEngineExecutor == null) {
-	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
+	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper, this);
 	        
     	} else {
     	    if (ruleEngineExecutor.getExpressionManager() == null) {

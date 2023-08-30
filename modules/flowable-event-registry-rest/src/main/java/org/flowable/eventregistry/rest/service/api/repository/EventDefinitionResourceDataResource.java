@@ -35,10 +35,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Event Definitions" }, description = "Manage Event Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class EventDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
-    @ApiOperation(value = "Get an event definition resource content", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get an event definition resource content", tags = { "Event Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both event definition and resource have been found and the resource data has been returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested event definition was not found or there is no resource with the given id present in the case definition. The status-description contains additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested event definition was not found or there is no resource with the given id present in the event definition. The status-description contains additional information.")
     })
     @GetMapping(value = "/event-registry-repository/event-definitions/{eventDefinitionId}/resourcedata")
     public byte[] getEventDefinitionResource(@ApiParam(name = "eventDefinitionId") @PathVariable String eventDefinitionId, HttpServletResponse response) {

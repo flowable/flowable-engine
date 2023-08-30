@@ -101,8 +101,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.subethamail</groupId>
-			<artifactId>subethasmtp-wiser</artifactId>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>subethasmtp</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

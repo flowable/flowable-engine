@@ -26,7 +26,6 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,27 +76,6 @@ public class ScriptingEngines {
         Bindings bindings = createBindings(request);
         Object result = evaluate(request, bindings);
         return new ScriptEvaluationImpl(bindings, result);
-    }
-
-    /**
-     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
-     */
-    @Deprecated
-    public Object evaluate(String script, String language, VariableContainer variableContainer) {
-        return evaluate(script, language, variableContainer, false);
-    }
-
-    /**
-     * @deprecated since 6.8.0 use {@link #evaluate(ScriptEngineRequest)}.getResult()
-     */
-    @Deprecated
-    public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
-                .script(script)
-                .language(language)
-                .variableContainer(variableContainer);
-        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
-        return evaluate(builder.build()).getResult();
     }
 
     protected Object evaluate(ScriptEngineRequest request, Bindings bindings) {

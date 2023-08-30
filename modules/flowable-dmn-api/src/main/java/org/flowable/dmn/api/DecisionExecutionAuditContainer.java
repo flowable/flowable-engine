@@ -54,8 +54,10 @@ public class DecisionExecutionAuditContainer {
     public DecisionExecutionAuditContainer() {
     }
 
-    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, Boolean strictMode, Map<String, Object> inputVariables) {
-        this.startTime = new Date();
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, 
+            Boolean strictMode, Map<String, Object> inputVariables, Date startTime) {
+        
+        this.startTime = startTime;
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
         this.decisionVersion = decisionVersion;
@@ -66,9 +68,9 @@ public class DecisionExecutionAuditContainer {
     }
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
-                    Boolean strictMode, Map<String, Object> inputVariables) {
+            Boolean strictMode, Map<String, Object> inputVariables, Date startTime) {
         
-        this.startTime = new Date();
+        this.startTime = startTime;
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
         this.decisionVersion = decisionVersion;
@@ -109,8 +111,8 @@ public class DecisionExecutionAuditContainer {
         return variablesTypesMap;
     }
 
-    public void stopAudit() {
-        endTime = new Date();
+    public void stopAudit(Date endTime) {
+        this.endTime = endTime; 
     }
 
     public void addRuleEntry(DecisionRule rule) {

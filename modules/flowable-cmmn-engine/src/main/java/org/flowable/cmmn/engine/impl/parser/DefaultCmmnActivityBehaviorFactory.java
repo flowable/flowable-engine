@@ -22,7 +22,6 @@ import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerAct
 import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -36,6 +35,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBeh
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.VariableEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.http.DefaultCmmnHttpActivityDelegate;
+import org.flowable.cmmn.engine.impl.behavior.impl.mail.CmmnMailActivityDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CasePageTask;
@@ -197,8 +197,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
-    public MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return (MailActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(MailActivityBehavior.class, task, true); // MailActivityBehavior only has expression fields
+    public CmmnActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return classDelegateFactory.create(CmmnMailActivityDelegate.class.getName(), task.getFieldExtensions());
     }
 
     @Override

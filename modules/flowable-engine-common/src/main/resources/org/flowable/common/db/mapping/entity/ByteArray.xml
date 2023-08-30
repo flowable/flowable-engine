@@ -73,9 +73,15 @@
   </delete>
 
   <delete id="deleteByteArraysNoRevisionCheck" parameterType="java.util.List">
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in
-    <foreach item="byteArrayId" index="index" collection="collection" open="(" separator="," close=")">
-      #{byteArrayId}
+    delete from ${prefix}ACT_GE_BYTEARRAY where
+    <foreach item="byteArrayItem" index="byteIndex" collection="collection">
+        <if test="byteIndex &gt; 0">
+          or
+        </if>
+        ID_ in
+        <foreach item="byteArrayId" index="index" collection="byteArrayItem" open="(" separator="," close=")">
+          #{byteArrayId}
+        </foreach>
     </foreach>
   </delete>
 

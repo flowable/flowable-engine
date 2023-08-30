@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerAct
 import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -80,7 +79,7 @@ public interface CmmnActivityBehaviorFactory {
 
     CmmnActivityBehavior createHttpActivityBehavior(PlanItem planItem, ServiceTask task);
 
-    MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task);
+    CmmnActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task);
 
     SendEventActivityBehavior createSendEventActivityBehavior(PlanItem planItem, SendEventServiceTask sendEventServiceTask);
 

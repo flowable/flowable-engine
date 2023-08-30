@@ -90,7 +90,6 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEvent
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.flowable.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
@@ -157,9 +156,9 @@ public interface ActivityBehaviorFactory {
 
     WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
 
-    MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
+    ActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
 
-    MailActivityBehavior createMailActivityBehavior(SendTask sendTask);
+    ActivityBehavior createMailActivityBehavior(SendTask sendTask);
 
     ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask);
 

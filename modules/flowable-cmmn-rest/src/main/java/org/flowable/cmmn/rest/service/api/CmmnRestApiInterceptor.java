@@ -32,9 +32,9 @@ import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
-import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
 import org.flowable.cmmn.rest.service.api.history.caze.HistoricCaseInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.milestone.HistoricMilestoneInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInstanceQueryRequest;
@@ -240,6 +240,12 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
 
     void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    
+    void migrateHistoricCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    
+    void migrateInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
+    
+    void migrateHistoricInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
     
     void changePlanItemState(String caseInstanceId, ChangePlanItemStateRequest planItemStateRequest);
 }

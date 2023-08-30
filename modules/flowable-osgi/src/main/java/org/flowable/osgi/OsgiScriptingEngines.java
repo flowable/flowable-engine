@@ -17,7 +17,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
@@ -40,16 +39,6 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     @Override
     public ScriptEvaluation evaluate(ScriptEngineRequest request) {
         return super.evaluate(request);
-    }
-
-    @Override
-    public Object evaluate(String script, String language, VariableContainer variableContainer) {
-        return super.evaluate(script, language, variableContainer);
-    }
-
-    @Override
-    public Object evaluate(String script, String language, VariableContainer variableContainer, boolean storeScriptVariables) {
-        return super.evaluate(script, language, variableContainer, storeScriptVariables);
     }
 
     @Override

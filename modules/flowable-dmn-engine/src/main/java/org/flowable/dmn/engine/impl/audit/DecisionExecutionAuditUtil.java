@@ -12,9 +12,11 @@
  */
 package org.flowable.dmn.engine.impl.audit;
 
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.ExecuteDecisionContext;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
@@ -35,9 +37,11 @@ public class DecisionExecutionAuditUtil {
             LOGGER.error("decision service does not contain key");
             throw new IllegalArgumentException("decision does not contain decision key");
         }
+        
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
 
         return new DecisionServiceExecutionAuditContainer(decisionService.getId(), decisionService.getName(), executeDecisionInfo.getDecisionVersion(),
-           CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
+                dmnEngineConfiguration.isStrictMode(), executeDecisionInfo.getVariables(), dmnEngineConfiguration.getClock().getCurrentTime());
     }
 
     public static DecisionExecutionAuditContainer initializeDecisionExecutionAudit(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
@@ -53,8 +57,11 @@ public class DecisionExecutionAuditUtil {
             LOGGER.error("decision table does not contain a hit policy");
             throw new IllegalArgumentException("decision table does not contain a hit policy");
         }
+        
+        Clock clock = CommandContextUtil.getDmnEngineConfiguration().getClock();
 
         return new DecisionExecutionAuditContainer(decision.getId(), decision.getName(), executeDecisionInfo.getDecisionVersion(), 
-                        decisionTable.getHitPolicy(), CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), executeDecisionInfo.getVariables());
+                        decisionTable.getHitPolicy(), CommandContextUtil.getDmnEngineConfiguration().isStrictMode(), 
+                        executeDecisionInfo.getVariables(), clock.getCurrentTime());
     }
 }

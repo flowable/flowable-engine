@@ -115,18 +115,15 @@ public class AbstractFlowable6Test {
 
             // Shutdown hook
             final ProcessEngineConfiguration processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-            final ProcessEngineLifecycleListener originalLifecycleListener = processEngineConfiguration.getProcessEngineLifecycleListener();
-            processEngineConfiguration.setProcessEngineLifecycleListener(new ProcessEngineLifecycleListener() {
+            processEngineConfiguration.addEngineLifecycleListener(new ProcessEngineLifecycleListener() {
 
                 @Override
                 public void onProcessEngineClosed(ProcessEngine processEngine) {
                     server.stop();
-                    originalLifecycleListener.onProcessEngineClosed(processEngine);
                 }
 
                 @Override
                 public void onProcessEngineBuilt(ProcessEngine processEngine) {
-                    originalLifecycleListener.onProcessEngineBuilt(processEngine);
                 }
 
             });

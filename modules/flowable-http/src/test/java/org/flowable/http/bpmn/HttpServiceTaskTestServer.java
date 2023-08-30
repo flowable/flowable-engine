@@ -14,6 +14,9 @@ package org.flowable.http.bpmn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,24 +75,26 @@ public class HttpServiceTaskTestServer {
                 new HttpConnectionFactory(httpConfig));
         httpConnector.setPort(HTTP_PORT);
 
-        // https connector configuration
-        // keytool -selfcert -alias Flowable -keystore keystore -genkey -keyalg RSA -sigalg SHA256withRSA -validity 36500
-        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath(ReflectUtil.getResource("flowable.keystore").getFile());
-        sslContextFactory.setKeyStorePassword("Flowable");
-
-        HttpConfiguration httpsConfig = new HttpConfiguration();
-
-        SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
-        sslConnectionFactory.setEnsureSecureRequestCustomizer(false);
-        ServerConnector httpsConnector = new ServerConnector(server,
-                sslConnectionFactory,
-                new HttpConnectionFactory(httpsConfig));
-        httpsConnector.setPort(HTTPS_PORT);
-
-        server.setConnectors(new Connector[]{httpConnector, httpsConnector});
-
         try {
+            // https connector configuration
+            // keytool -selfcert -alias Flowable -keystore keystore -genkey -keyalg RSA -sigalg SHA256withRSA -validity 36500
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+            URL keystoreURL = ReflectUtil.getResource("flowable.keystore");
+            Path keystorePath = Paths.get(keystoreURL.toURI());
+            sslContextFactory.setKeyStorePath(keystorePath.toString());
+            sslContextFactory.setKeyStorePassword("Flowable");
+
+            HttpConfiguration httpsConfig = new HttpConfiguration();
+
+            SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
+            sslConnectionFactory.setEnsureSecureRequestCustomizer(false);
+            ServerConnector httpsConnector = new ServerConnector(server,
+                    sslConnectionFactory,
+                    new HttpConnectionFactory(httpsConfig));
+            httpsConnector.setPort(HTTPS_PORT);
+
+            server.setConnectors(new Connector[]{httpConnector, httpsConnector});
+            
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             MultipartConfigElement multipartConfig = new MultipartConfigElement((String) null);

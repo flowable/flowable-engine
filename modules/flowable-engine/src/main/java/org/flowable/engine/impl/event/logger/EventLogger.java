@@ -191,7 +191,7 @@ public class EventLogger extends AbstractFlowableEventListener {
     protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
             Class<? extends EventLoggerEventHandler> eventHandlerClass) {
         try {
-            EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
+            EventLoggerEventHandler eventHandler = eventHandlerClass.getConstructor().newInstance();
             eventHandler.setTimeStamp(clock.getCurrentTime());
             eventHandler.setEvent(event);
             eventHandler.setObjectMapper(objectMapper);

@@ -127,7 +127,7 @@ class KafkaChannelDefinitionProcessorTest {
 
         Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
         Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
-            .all()
+            .allTopicNames()
             .get(10, TimeUnit.SECONDS);
 
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testCleanup")) {

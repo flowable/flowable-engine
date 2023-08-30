@@ -239,7 +239,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
     protected DecisionExecutionAuditContainer persistDecisionAudit(ExecuteDecisionContext executeDecisionContext) {
         DecisionExecutionAuditContainer decisionExecution = executeDecisionContext.getDecisionExecution();
 
-        decisionExecution.stopAudit();
+        decisionExecution.stopAudit(configuration.getClock().getCurrentTime());
 
         commandExecutor.execute(new PersistHistoricDecisionExecutionCmd(executeDecisionContext));
 

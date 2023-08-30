@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.validation.CaseValidatorFactory;
 import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.CaseValidatorFactory;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
 import org.junit.jupiter.api.BeforeEach;
 

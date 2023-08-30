@@ -59,12 +59,7 @@
             <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
                 SCOPE_TYPE_ = #{parameter.jobExecutionScope}
             </if>
-            and (
-            (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-            <if test="parameter.maxTimeout != null">
-                or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP})
-            </if>
-            )
+            and (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
         </where>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>

@@ -94,7 +94,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             ))
                 .isExactlyInstanceOf(CmmnXMLException.class)
                 .hasRootCauseInstanceOf(FlowableIllegalArgumentException.class)
-                .getRootCause()
+                .rootCause()
                 .hasMessageContaining("There can only be one reactivation listener on a case model, not multiple ones. Use a start form on the listener, "
                     + "if there are several options on how to reactivate a case and use conditions to handle the different options on reactivation.");
     }

@@ -4,6 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <name>Flowable BOM</name>
+    <description>Flowable BOM module</description>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-bom</artifactId>
     <packaging>pom</packaging>
@@ -344,11 +345,6 @@
             </dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-jms-spring-executor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.flowable</groupId>
                 <artifactId>flowable-jmx</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -375,6 +371,11 @@
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-ldap-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-mail</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -523,5 +524,102 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
+    <!-- Various information, not used by the build -->
+
+    <url>http://www.flowable.org</url>
+    <licenses>
+        <license>
+            <name>Apache v2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+    <organization>
+        <name>Flowable</name>
+        <url>http://www.flowable.org</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Tijs Rademakers</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+        <developer>
+            <name>Joram Barrez</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+        <developer>
+            <name>Filip Hrisafov</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+        <developer>
+            <name>Yvo Swillens</name>
+            <organization>Flowable</organization>
+            <url>http://www.flowable.org</url>
+        </developer>
+        <developer>
+            <name>Josh Long</name>
+            <organization>Pivotal</organization>
+            <url>http://www.pivotal.com</url>
+        </developer>
+    </developers>
+    <issueManagement>
+        <system>Github issues</system>
+        <url>https://github.com/flowable/flowable-engine/issues</url>
+    </issueManagement>
+    <scm>
+        <url>git@github.com:flowable/flowable-engine.git</url>
+        <connection>scm:git:git@github.com:flowable/flowable-engine.git</connection>
+        <developerConnection>scm:git:git@github.com:flowable/flowable-engine.git</developerConnection>
+    </scm>
+    <distributionManagement>
+		<snapshotRepository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>${distributionManagementSnapshotsUrl}</url>
+		</snapshotRepository>
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>Nexus Release Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 </project>

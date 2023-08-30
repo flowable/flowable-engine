@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.management;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,6 +82,8 @@ public class JobCollectionResource {
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return jobs with the given process definition id", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
             @ApiImplicitParam(name = "elementName", dataType = "string", value = "Only return jobs with the given element name", paramType = "query"),
+            @ApiImplicitParam(name = "handlerType", dataType = "string", value = "Only return jobs with the given handler type", paramType = "query"),
+            @ApiImplicitParam(name = "handlerTypes", dataType = "string", value = "Only return jobs which have one of the given job handler type", paramType = "query"),
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),
@@ -110,7 +113,7 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("processInstanceId")) {
             query.processInstanceId(allRequestParams.get("processInstanceId"));
         }
-        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId"))) {
+        if (allRequestParams.containsKey("withoutProcessInstanceId") && Boolean.parseBoolean(allRequestParams.get("withoutProcessInstanceId"))) {
             query.withoutProcessInstanceId();
         }
         if (allRequestParams.containsKey("executionId")) {
@@ -125,15 +128,21 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("elementName")) {
             query.elementName(allRequestParams.get("elementName"));
         }
+        if (allRequestParams.containsKey("handlerType")) {
+            query.handlerType(allRequestParams.get("handlerType"));
+        }
+        if (allRequestParams.containsKey("handlerTypes")) {
+            query.handlerTypes(Arrays.asList(allRequestParams.get("handlerTypes").split(",")));
+        }
         if (allRequestParams.containsKey("timersOnly")) {
             if (allRequestParams.containsKey("messagesOnly")) {
                 throw new FlowableIllegalArgumentException("Only one of 'timersOnly' or 'messagesOnly' can be provided.");
             }
-            if (Boolean.valueOf(allRequestParams.get("timersOnly"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("timersOnly"))) {
                 query.timers();
             }
         }
-        if (allRequestParams.containsKey("messagesOnly") && Boolean.valueOf(allRequestParams.get("messagesOnly"))) {
+        if (allRequestParams.containsKey("messagesOnly") && Boolean.parseBoolean(allRequestParams.get("messagesOnly"))) {
             query.messages();
         }
         if (allRequestParams.containsKey("dueBefore")) {
@@ -142,7 +151,7 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("dueAfter")) {
             query.duedateHigherThan(RequestUtil.getDate(allRequestParams, "dueAfter"));
         }
-        if (allRequestParams.containsKey("withException") && Boolean.valueOf(allRequestParams.get("withException"))) {
+        if (allRequestParams.containsKey("withException") && Boolean.parseBoolean(allRequestParams.get("withException"))) {
             query.withException();
         }
         if (allRequestParams.containsKey("exceptionMessage")) {
@@ -154,19 +163,19 @@ public class JobCollectionResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             query.jobTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
-        if (allRequestParams.containsKey("withoutTenantId") && Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+        if (allRequestParams.containsKey("withoutTenantId") && Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
             query.jobWithoutTenantId();
         }
-        if (allRequestParams.containsKey("locked") && Boolean.valueOf(allRequestParams.get("locked"))) {
+        if (allRequestParams.containsKey("locked") && Boolean.parseBoolean(allRequestParams.get("locked"))) {
             query.locked();
         }
-        if (allRequestParams.containsKey("unlocked") && Boolean.valueOf(allRequestParams.get("unlocked"))) {
+        if (allRequestParams.containsKey("unlocked") && Boolean.parseBoolean(allRequestParams.get("unlocked"))) {
             query.unlocked();
         }
-        if (allRequestParams.containsKey("withoutScopeType") && Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
+        if (allRequestParams.containsKey("withoutScopeType") && Boolean.parseBoolean(allRequestParams.get("withoutScopeType"))) {
             query.withoutScopeType();
         }
-        if (allRequestParams.containsKey("withoutScopeId") && Boolean.valueOf(allRequestParams.get("withoutScopeId"))) {
+        if (allRequestParams.containsKey("withoutScopeId") && Boolean.parseBoolean(allRequestParams.get("withoutScopeId"))) {
             query.withoutScopeId();
         }
 

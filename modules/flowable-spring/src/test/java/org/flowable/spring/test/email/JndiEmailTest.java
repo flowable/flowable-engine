@@ -18,12 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.mail.NoSuchProviderException;
-import javax.mail.Provider;
-import javax.mail.Provider.Type;
-import javax.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Provider;
+import jakarta.mail.Provider.Type;
+import jakarta.mail.Session;
 
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;

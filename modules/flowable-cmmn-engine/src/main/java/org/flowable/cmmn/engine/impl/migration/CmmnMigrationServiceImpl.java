@@ -19,11 +19,15 @@ import org.flowable.cmmn.api.migration.CaseInstanceBatchMigrationResult;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationBuilder;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
+import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationBuilder;
+import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CaseInstanceMigrationBatchCmd;
 import org.flowable.cmmn.engine.impl.cmd.CaseInstanceMigrationCmd;
 import org.flowable.cmmn.engine.impl.cmd.CaseInstanceMigrationValidationCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCaseInstanceMigrationBatchResultCmd;
+import org.flowable.cmmn.engine.impl.cmd.HistoricCaseInstanceMigrationBatchCmd;
+import org.flowable.cmmn.engine.impl.cmd.HistoricCaseInstanceMigrationCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
@@ -43,6 +47,16 @@ public class CmmnMigrationServiceImpl extends CommonEngineServiceImpl<CmmnEngine
     @Override
     public CaseInstanceMigrationBuilder createCaseInstanceMigrationBuilderFromCaseInstanceMigrationDocument(CaseInstanceMigrationDocument document) {
         return createCaseInstanceMigrationBuilder().fromCaseInstanceMigrationDocument(document);
+    }
+    
+    @Override
+    public HistoricCaseInstanceMigrationBuilder createHistoricCaseInstanceMigrationBuilder() {
+        return new HistoricCaseInstanceMigrationBuilderImpl(this);
+    }
+
+    @Override
+    public HistoricCaseInstanceMigrationBuilder createHistoricCaseInstanceMigrationBuilderFromHistoricCaseInstanceMigrationDocument(HistoricCaseInstanceMigrationDocument document) {
+        return createHistoricCaseInstanceMigrationBuilder().fromHistoricCaseInstanceMigrationDocument(document);
     }
 
     @Override
@@ -65,10 +79,20 @@ public class CmmnMigrationServiceImpl extends CommonEngineServiceImpl<CmmnEngine
     public void migrateCaseInstance(String caseInstanceId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceId, caseInstanceMigrationDocument, configuration));
     }
+    
+    @Override
+    public void migrateHistoricCaseInstance(String caseInstanceId, HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
+        commandExecutor.execute(new HistoricCaseInstanceMigrationCmd(caseInstanceId, historicCaseInstanceMigrationDocument, configuration));
+    }
 
     @Override
     public void migrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         commandExecutor.execute(new CaseInstanceMigrationCmd(caseInstanceMigrationDocument, caseDefinitionId, configuration));
+    }
+    
+    @Override
+    public void migrateHistoricCaseInstancesOfCaseDefinition(String caseDefinitionId, HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
+        commandExecutor.execute(new HistoricCaseInstanceMigrationCmd(historicCaseInstanceMigrationDocument, caseDefinitionId, configuration));
     }
 
     @Override
@@ -76,16 +100,33 @@ public class CmmnMigrationServiceImpl extends CommonEngineServiceImpl<CmmnEngine
         commandExecutor.execute(new CaseInstanceMigrationCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, 
                 caseInstanceMigrationDocument, configuration));
     }
+    
+    @Override
+    public void migrateHistoricCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
+        commandExecutor.execute(new HistoricCaseInstanceMigrationCmd(caseDefinitionKey, caseDefinitionVersion, caseDefinitionTenantId, 
+                historicCaseInstanceMigrationDocument, configuration));
+    }
 
     @Override
     public Batch batchMigrateCaseInstancesOfCaseDefinition(String caseDefinitionId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseInstanceMigrationDocument, caseDefinitionId, configuration));
+    }
+    
+    @Override
+    public Batch batchMigrateHistoricCaseInstancesOfCaseDefinition(String caseDefinitionId, HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
+        return commandExecutor.execute(new HistoricCaseInstanceMigrationBatchCmd(historicCaseInstanceMigrationDocument, caseDefinitionId, configuration));
     }
 
     @Override
     public Batch batchMigrateCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         return commandExecutor.execute(new CaseInstanceMigrationBatchCmd(caseDefinitionKey, caseDefinitionVersion, 
                 caseDefinitionTenantId, caseInstanceMigrationDocument, configuration));
+    }
+    
+    @Override
+    public Batch batchMigrateHistoricCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
+        return commandExecutor.execute(new HistoricCaseInstanceMigrationBatchCmd(caseDefinitionKey, caseDefinitionVersion, 
+                caseDefinitionTenantId, historicCaseInstanceMigrationDocument, configuration));
     }
 
     @Override

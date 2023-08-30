@@ -81,11 +81,6 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
 
-        // The max timeout only is relevant for the message queue based executor, the threadpool one picks up anything without a lock owner.
-        if (jobServiceConfiguration.isAsyncHistoryExecutorMessageQueueMode()) {
-            Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
-            params.put("maxTimeout", maxTimeout);
-        }
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }
 

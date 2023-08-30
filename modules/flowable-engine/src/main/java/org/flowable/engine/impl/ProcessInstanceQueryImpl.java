@@ -501,11 +501,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
-    public ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit) {
-        return this;
-    }
-
-    @Override
     public ProcessInstanceQuery withJobException() {
         this.withJobException = true;
         return this;

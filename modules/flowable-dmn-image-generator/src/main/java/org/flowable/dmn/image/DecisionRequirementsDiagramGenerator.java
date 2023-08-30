@@ -12,10 +12,10 @@
  */
 package org.flowable.dmn.image;
 
-import org.flowable.dmn.model.DmnDefinition;
-
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+
+import org.flowable.dmn.model.DmnDefinition;
 
 /**
  * This interface declares methods to generate decision requirements diagram

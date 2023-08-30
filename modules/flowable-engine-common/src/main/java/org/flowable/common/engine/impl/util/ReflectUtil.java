@@ -134,7 +134,7 @@ public abstract class ReflectUtil {
     public static Object instantiate(String className) {
         try {
             Class<?> clazz = loadClass(className);
-            return clazz.newInstance();
+            return clazz.getConstructor().newInstance();
         } catch (Exception e) {
             throw new FlowableException("couldn't instantiate class " + className, e);
         }

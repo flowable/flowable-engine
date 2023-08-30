@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
@@ -244,7 +244,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Cmmn
         @Bean
-        public AsyncListenableTaskExecutor cmmnTaskExecutor() {
+        public AsyncTaskExecutor cmmnTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }
@@ -254,7 +254,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Process
         @Bean
-        public AsyncListenableTaskExecutor processTaskExecutor() {
+        public AsyncTaskExecutor processTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }
@@ -264,7 +264,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Primary
         @Bean
-        public AsyncListenableTaskExecutor primaryTaskExecutor() {
+        public AsyncTaskExecutor primaryTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }

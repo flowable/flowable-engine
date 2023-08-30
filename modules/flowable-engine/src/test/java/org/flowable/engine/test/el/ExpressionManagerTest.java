@@ -75,7 +75,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     public void testFloatJsonVariableSerialization() {
         Map<String, Object> vars = new HashMap<>();
-        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().put("minFloatVar", new Float(-1.5)));
+        vars.put("mapVariable", processEngineConfiguration.getObjectMapper().createObjectNode().put("minFloatVar", Float.valueOf((float)-1.5)));
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
         Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minFloatVar}");

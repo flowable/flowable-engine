@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 import org.apache.commons.lang3.Validate;
 

@@ -40,10 +40,10 @@ public class TestReturnValueFromFlowable extends SpringFlowableTestCase {
     @Autowired
     RuntimeService runtimeService;
 
-    @EndpointInject(uri = "mock:result")
+    @EndpointInject("mock:result")
     protected MockEndpoint resultEndpoint;
 
-    @Produce(uri = "direct:startReturnResultTest")
+    @Produce("direct:startReturnResultTest")
     protected ProducerTemplate template;
 
     public void setUp() throws Exception {

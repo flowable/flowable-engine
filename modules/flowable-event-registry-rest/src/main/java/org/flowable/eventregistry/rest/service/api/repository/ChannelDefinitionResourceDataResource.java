@@ -35,10 +35,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Channel Definitions" }, description = "Manage Channel Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ChannelDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
-    @ApiOperation(value = "Get a channel definition resource content", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get a channel definition resource content", tags = { "Channel Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both channel definition and resource have been found and the resource data has been returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested channel definition was not found or there is no resource with the given id present in the case definition. The status-description contains additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested channel definition was not found or there is no resource with the given id present in the channel definition. The status-description contains additional information.")
     })
     @GetMapping(value = "/event-registry-repository/channel-definitions/{channelDefinitionId}/resourcedata")
     public byte[] getChannelDefinitionResource(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId, HttpServletResponse response) {

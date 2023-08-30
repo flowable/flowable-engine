@@ -41,10 +41,10 @@ public class ChannelDefinitionResource extends BaseEventDefinitionResource {
     @Autowired(required=false)
     protected EventRepositoryService eventRepositoryService;
 
-    @ApiOperation(value = "Get a channel definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get a channel definition", tags = { "Channel Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the channel definitions are returned"),
-            @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
+            @ApiResponse(code = 404, message = "Indicates the requested channel definition was not found.")
     })
     @GetMapping(value = "/event-registry-repository/channel-definitions/{channelDefinitionId}", produces = "application/json")
     public ChannelDefinitionResponse getChannelDefinition(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId) {

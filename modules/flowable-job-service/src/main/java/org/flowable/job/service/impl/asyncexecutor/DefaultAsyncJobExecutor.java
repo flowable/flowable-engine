@@ -111,10 +111,8 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             unlockOwnedJobs();
         }
 
-        if (!isMessageQueueMode) {
-            initAsyncJobExecutionThreadPool();
-            startJobAcquisitionThread();
-        }
+        initAsyncJobExecutionThreadPool();
+        startJobAcquisitionThread();
 
         if (configuration.isTimerRunnableNeeded()) {
             startTimerAcquisitionThread();

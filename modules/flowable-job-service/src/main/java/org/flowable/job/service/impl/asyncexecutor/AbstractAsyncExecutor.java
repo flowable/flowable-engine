@@ -47,7 +47,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected boolean isAutoActivate;
     protected boolean isActive;
-    protected boolean isMessageQueueMode;
 
     // Job queue used when async executor is not yet started and jobs are already added.
     // This is mainly used for testing purpose.
@@ -65,12 +64,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     @Override
     public boolean executeAsyncJob(final JobInfo job) {
-        if (isMessageQueueMode) {
-            // When running with a message queue based job executor,
-            // the job is not executed here.
-            return true;
-        }
-
         Runnable runnable = null;
         if (isActive) {
             runnable = createRunnableForJob(job);
@@ -135,7 +128,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             resetExpiredJobsRunnable = createResetExpiredJobsRunnable(resetRunnableName);
         }
 
-        if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
+        if (asyncJobsDueRunnable == null) {
             String acquireRunnableThreadName = configuration.getAcquireRunnableThreadName();
             String acquireJobsRunnableName = acquireRunnableThreadName != null ?
                     acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
@@ -213,14 +206,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     @Override
     public boolean isActive() {
         return isActive;
-    }
-
-    public boolean isMessageQueueMode() {
-        return isMessageQueueMode;
-    }
-
-    public void setMessageQueueMode(boolean isMessageQueueMode) {
-        this.isMessageQueueMode = isMessageQueueMode;
     }
 
     @Override
@@ -404,19 +389,6 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setResetExpiredJobsRunnable(ResetExpiredJobsRunnable resetExpiredJobsRunnable) {
         this.resetExpiredJobsRunnable = resetExpiredJobsRunnable;
-    }
-
-    @Override
-    @Deprecated
-    public int getRetryWaitTimeInMillis() {
-        // No longer used
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    @Deprecated
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        // No longer used
     }
 
     @Override

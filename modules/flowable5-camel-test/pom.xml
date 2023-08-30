@@ -92,6 +92,11 @@
       <artifactId>java-uuid-generator</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.openjdk.nashorn</groupId>
+      <artifactId>nashorn-core</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 

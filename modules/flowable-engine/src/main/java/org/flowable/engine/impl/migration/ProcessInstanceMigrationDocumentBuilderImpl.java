@@ -129,7 +129,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
             if (migrateToProcessDefinitionKey == null) {
                 throw new FlowableException("Process definition key cannot be null");
             }
-            if (migrateToProcessDefinitionVersion == null || migrateToProcessDefinitionVersion < 0) {
+            if (migrateToProcessDefinitionVersion != null && migrateToProcessDefinitionVersion < 0) {
                 throw new FlowableException("Process definition version must be a positive number");
             }
         }

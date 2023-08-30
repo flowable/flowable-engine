@@ -67,7 +67,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
             assertThat(definition).isNotNull();
             assertThat(definition.getKey()).isEqualTo("decision1");
 
-            List<DmnDecision> decisionsList = repositoryService.getDecisionTablesForProcessDefinition(processDefinition.getId());
+            List<DmnDecision> decisionsList = repositoryService.getDecisionsForProcessDefinition(processDefinition.getId());
             assertThat(decisionsList)
                     .extracting(DmnDecision::getKey)
                     .containsExactly("decision1");

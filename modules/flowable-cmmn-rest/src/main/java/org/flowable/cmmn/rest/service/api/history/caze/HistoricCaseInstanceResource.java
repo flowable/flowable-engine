@@ -18,12 +18,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.impl.migration.HistoricCaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,6 +65,9 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
     
     @Autowired
     protected CmmnRuntimeService cmmnRuntimeService;
+    
+    @Autowired
+    protected CmmnMigrationService cmmnMigrationService;
 
     @ApiOperation(value = "Get a historic case instance", tags = { "History Case" }, nickname = "getHistoricCaseInstance")
     @ApiResponses(value = {
@@ -93,11 +101,32 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
         cmmnhistoryService.deleteHistoricCaseInstance(caseInstance.getId());
     }
     
+    @ApiOperation(value = "Get a stage overview of historic case instance", tags = { "History Case" }, nickname = "getHistoricStageOverview", code = 204)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates that the historic case instance was found."),
+            @ApiResponse(code = 404, message = "Indicates that the historic case instance could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
     public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequest(caseInstanceId);
 
         return cmmnhistoryService.getStageOverview(caseInstance.getId());
+    }
+    
+    @ApiOperation(value = "Migrate historic case instance", tags = { "History Case" }, nickname = "migrateHistoricCaseInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the historiccase instance was found and migration was executed."),
+            @ApiResponse(code = 404, message = "Indicates the requested historic case instance was not found.")
+    })
+    @PostMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/migrate", produces = "application/json")
+    public void migrateHistoricCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+                                       @RequestBody String migrationDocumentJson) {
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateHistoricCaseInstance(caseInstanceId, migrationDocumentJson);
+        }
+
+        HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        cmmnMigrationService.migrateHistoricCaseInstance(caseInstanceId, migrationDocument);
     }
     
     protected Date getPlanItemInstanceEndTime(List<HistoricPlanItemInstance> stagePlanItemInstances, Stage stage) {
