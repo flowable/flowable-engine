@@ -117,16 +117,9 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
     public List<TimerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         final String scope = getJobServiceConfiguration().getJobExecutionScope();
         final Date now = getJobServiceConfiguration().getClock().getCurrentTime();
-        final Date maxTimeout;
-
-        if (getJobServiceConfiguration().isAsyncHistoryExecutorMessageQueueMode()) {
-            maxTimeout = new Date(now.getTime() - getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
-        } else {
-            maxTimeout = null;
-        }
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("findExpiredJobs {} {} {} {}", enabledCategories, scope, now, maxTimeout);
+            LOGGER.trace("findExpiredJobs {} {} {}", enabledCategories, scope, now);
         }
 
         List<TimerJobEntity> r = sortAndPaginate(getData().values().stream().filter(item -> {
@@ -144,13 +137,6 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
 
             // Expired if expiration time is not null and it is before 'now
             if (item.getLockExpirationTime() != null && item.getLockExpirationTime().before(now)) {
-                return true;
-            }
-
-            // Expired if maxTimeout specified and lock time is null and create
-            // time is
-            // before maxTimeout
-            if (maxTimeout != null && item.getLockExpirationTime() == null && item.getCreateTime().before(maxTimeout)) {
                 return true;
             }
 

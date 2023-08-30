@@ -99,6 +99,15 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         return getData().values().stream().filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
                         .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<ExternalWorkerJobEntity> findJobsByWorkerId(String workerId) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("findJobsByWorkerId {}", workerId);
+        }
+        return getData().values().stream().filter(item -> item.getLockOwner() != null && item.getLockOwner().equals(workerId))
+                        .collect(Collectors.toList());
+    }
 
     @Override
     public ExternalWorkerJobEntity findJobByCorrelationId(String correlationId) {
@@ -179,16 +188,9 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
     public List<ExternalWorkerJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         final String scope = getJobServiceConfiguration().getJobExecutionScope();
         final Date now = getJobServiceConfiguration().getClock().getCurrentTime();
-        final Date maxTimeout;
-
-        if (getJobServiceConfiguration().isAsyncHistoryExecutorMessageQueueMode()) {
-            maxTimeout = new Date(now.getTime() - getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
-        } else {
-            maxTimeout = null;
-        }
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("findExpiredJobs {} {} {} {}", enabledCategories, scope, now, maxTimeout);
+            LOGGER.trace("findExpiredJobs {} {} {}", enabledCategories, scope, now);
         }
 
         List<ExternalWorkerJobEntity> r = sortAndPaginate(getData().values().stream().filter(item -> {
@@ -206,13 +208,6 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
 
             // Expired if expiration time is not null and it is before 'now
             if (item.getLockExpirationTime() != null && item.getLockExpirationTime().before(now)) {
-                return true;
-            }
-
-            // Expired if maxTimeout specified and lock time is null and create
-            // time is
-            // before maxTimeout
-            if (maxTimeout != null && item.getLockExpirationTime() == null && item.getCreateTime().before(maxTimeout)) {
                 return true;
             }
 
