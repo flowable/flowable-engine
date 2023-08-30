@@ -24,7 +24,7 @@ public interface HistoricCaseInstanceMigrationBuilder {
      * @return Returns the builder
      * @see HistoricCaseInstanceMigrationDocument
      */
-    HistoricCaseInstanceMigrationBuilder fromHistoricCaseInstanceMigrationDocument(HistoricCaseInstanceMigrationDocument caseInstanceMigrationDocument);
+    HistoricCaseInstanceMigrationBuilder fromHistoricCaseInstanceMigrationDocument(HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument);
 
     /**
      * Specifies the case definition to migrate to, using the case definition id
