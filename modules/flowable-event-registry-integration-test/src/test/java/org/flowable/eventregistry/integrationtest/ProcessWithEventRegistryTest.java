@@ -254,6 +254,7 @@ public class ProcessWithEventRegistryTest {
             assertThat(runtimeService.getVariable(anotherProcessInstance.getId(), "value2")).isEqualTo(456);
 
         } finally {
+            getEventRegistryEngineConfiguration().setNonMatchingEventConsumer(null);
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
             for (EventDeployment eventDeployment : eventDeployments) {
                 getEventRepositoryService().deleteDeployment(eventDeployment.getId());

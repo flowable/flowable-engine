@@ -21,10 +21,14 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.lock.LockManager;
@@ -76,23 +80,37 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         for (EventSubscription eventSubscription : eventSubscriptions) {
             EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getSubScopeId(), 
                     eventSubscription.getScopeDefinitionId(), ScopeTypes.CMMN);
-            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
-            eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
+            boolean eventSubscriptionHandled = handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
+            
+            if (eventSubscriptionHandled) {
+                eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
+            }
         }
 
         return eventRegistryProcessingInfo;
     }
 
-    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
+    protected boolean handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
             EventInstance eventInstance, Collection<CorrelationKey> correlationKeys, EventConsumerInfo eventConsumerInfo) {
 
         if (eventSubscription.getSubScopeId() != null) {
 
             // When a subscope id is set, this means that a plan item instance is waiting for the event
 
-            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
-                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance)
-                .trigger();
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(eventSubscription.getSubScopeId()).singleResult();
+            CmmnModel cmmnModel = cmmnEngineConfiguration.getCmmnRepositoryService().getCmmnModel(planItemInstanceEntity.getCaseDefinitionId());
+            PlanItem planItem = cmmnModel.findPlanItemByPlanItemDefinitionId(planItemInstanceEntity.getPlanItemDefinitionId());
+            if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())
+                    || (planItem != null && planItem.getPlanItemDefinition() instanceof EventListener
+                    && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))) {
+            
+                cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
+                    .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance)
+                    .trigger();
+                
+            } else {
+                return false;
+            }
 
         } else if (eventSubscription.getScopeDefinitionId() != null
                 && eventSubscription.getScopeId() == null
@@ -122,7 +140,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                         // Returning, no new instance should be started
                         eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
-                        return;
+                        return true;
 
                     } else if (cmmnEngineConfiguration.isEventRegistryUniqueCaseInstanceCheckWithLock()) {
 
@@ -161,11 +179,11 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                     // Returning, no new instance should be started
                                     eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                                     LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
-                                    return;
+                                    return true;
                                 }
 
                                 startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
-                                return;
+                                return true;
 
                             } finally {
                                 lockManager.releaseAndDeleteLock();
@@ -173,24 +191,23 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                             }
 
                         } else {
-                            LOGGER.info(
-                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.",
-                                    countLockName);
-                            return;
+                            LOGGER.info("Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.", countLockName);
+                            return true;
 
                         }
 
                     } else {
                         startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
-                        return;
+                        return true;
                     }
 
                 }
             }
 
             startCaseInstance(caseInstanceBuilder, null, null);
-
         }
+        
+        return true;
     }
 
     protected long countCaseInstances(CmmnRuntimeService cmmnRuntimeService, EventInstance eventInstance,
