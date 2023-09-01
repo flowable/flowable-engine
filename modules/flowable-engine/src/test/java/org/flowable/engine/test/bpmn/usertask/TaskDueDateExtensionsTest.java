@@ -16,6 +16,9 @@ package org.flowable.engine.test.bpmn.usertask;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -43,15 +46,26 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
     public void testDueDateExtension() throws Exception {
 
         Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("06-07-1986 12:10:00");
+        LocalDate localDate = LocalDate.of(1986, 7, 6);
+        Instant instant = date.toInstant();
+
         Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", date);
+        variables.put("instantVariable", instant);
+        variables.put("localDateVariable", localDate);
 
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task dateTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("dateTask").singleResult();
+        org.flowable.task.api.Task localDateTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("localDateTask").singleResult();
+        org.flowable.task.api.Task instantTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("instantTask").singleResult();
 
-        assertThat(task.getDueDate()).isEqualTo(date);
+        assertThat(dateTask.getDueDate()).isEqualTo(date);
+        assertThat(instantTask.getDueDate()).isEqualTo(date);
+
+        Date startOfDay = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        assertThat(localDateTask.getDueDate()).isEqualTo(startOfDay);
     }
 
     @Test
