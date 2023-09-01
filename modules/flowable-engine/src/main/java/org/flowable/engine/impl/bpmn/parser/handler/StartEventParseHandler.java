@@ -79,13 +79,11 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessVariableListenerlStartEventActivityBehavior(element, variableListenerEventDefinition));
                 }
                 
-            } else {
+            } else if (hasEventTypeElement(element)) {
                 List<ExtensionElement> eventTypeElements = element.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
-                    String eventType = eventTypeElements.get(0).getElementText();
-                    if (StringUtils.isNotEmpty(eventType)) {
-                        element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEventRegistryStartEventActivityBehavior(element, eventType));
-                    }
+                String eventType = eventTypeElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventType)) {
+                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEventRegistryStartEventActivityBehavior(element, eventType));
                 }
             }
 
@@ -99,7 +97,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
             }
         }
 
-        if (element.getSubProcess() == null && (CollectionUtil.isEmpty(element.getEventDefinitions()) ||
+        if (element.getSubProcess() == null && (hasNoEventDefinitionOrTypeElement(element) ||
                 bpmnParse.getCurrentProcess().getInitialFlowElement() == null)) {
             
             bpmnParse.getCurrentProcess().setInitialFlowElement(element);
@@ -118,5 +116,18 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
         
         return messageDefinition;
     }
+    
+    protected boolean hasNoEventDefinitionOrTypeElement(StartEvent element) {
+        return CollectionUtil.isEmpty(element.getEventDefinitions()) && !hasEventTypeElement(element);
+    }
 
+    protected boolean hasEventTypeElement(StartEvent element) {
+        boolean foundEventTypeElement = false;
+        List<ExtensionElement> eventTypeElements = element.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+        if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
+            foundEventTypeElement = true;
+        }
+        
+        return foundEventTypeElement;
+    }
 }
