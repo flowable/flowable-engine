@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -251,10 +254,16 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                     BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager()
                             .getBusinessCalendar(businessCalendarName);
                     task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
-
-                } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + activeTaskDueDate);
+                } else if (dueDate instanceof Instant) {
+                    task.setDueDate(Date.from((Instant) dueDate));
+                } else if (dueDate instanceof LocalDate) {
+                    Date localDueDate = Date.from(((LocalDate) dueDate).atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());
+                    task.setDueDate(localDueDate);
                 }
+            } else {
+                throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
             }
         }
     }

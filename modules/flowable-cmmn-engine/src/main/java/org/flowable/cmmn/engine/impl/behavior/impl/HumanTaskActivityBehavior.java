@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -293,8 +296,15 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                         taskEntity.setDueDate(DateTime.parse(dueDateString).toDate());
                     }
 
+                } else if (dueDate instanceof Instant) {
+                    taskEntity.setDueDate(Date.from((Instant) dueDate));
+                } else if (dueDate instanceof LocalDate) {
+                    Date localDueDate = Date.from(((LocalDate) dueDate).atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());
+                    taskEntity.setDueDate(localDueDate);
                 } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + beforeContext.getDueDate());
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
                 }
             }
         }
