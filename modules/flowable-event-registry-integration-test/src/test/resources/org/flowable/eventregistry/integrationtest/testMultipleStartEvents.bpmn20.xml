@@ -38,6 +38,14 @@
         <sequenceFlow sourceRef="receive1" targetRef="theEnd"/>
         
         <sequenceFlow sourceRef="receive2" targetRef="theEnd"/>
+        
+        <startEvent id="start3" flowable:formKey="testKey" />
+        
+        <sequenceFlow sourceRef="start3" targetRef="receive3"/>
+
+        <receiveTask id="receive3" />
+
+        <sequenceFlow sourceRef="receive3" targetRef="theEnd"/>
 
         <endEvent id="theEnd"/>
 
