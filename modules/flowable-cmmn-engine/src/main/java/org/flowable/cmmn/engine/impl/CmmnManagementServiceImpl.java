@@ -77,6 +77,8 @@ import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
+import org.flowable.job.service.impl.cmd.UnacquireAllExternalWorkerJobsForWorkerCmd;
+import org.flowable.job.service.impl.cmd.UnacquireExternalWorkerJobCmd;
 
 /**
  * @author Joram Barrez
@@ -292,6 +294,16 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId) {
         return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
+    }
+    
+    @Override
+    public void unacquireExternalWorkerJob(String jobId, String workerId) {
+        commandExecutor.execute(new UnacquireExternalWorkerJobCmd(jobId, workerId, configuration.getJobServiceConfiguration()));
+    }
+    
+    @Override
+    public void unacquireAllExternalWorkerJobsForWorker(String workerId) {
+        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, configuration.getJobServiceConfiguration()));
     }
     
     @Override

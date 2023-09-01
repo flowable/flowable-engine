@@ -1160,6 +1160,7 @@ public class RestResponseFactory {
         response.setElementName(job.getElementName());
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
+        response.setHandlerType(job.getJobHandlerType());
         if (job instanceof JobInfoEntity) {
             JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
             response.setLockOwner(jobInfoEntity.getLockOwner());

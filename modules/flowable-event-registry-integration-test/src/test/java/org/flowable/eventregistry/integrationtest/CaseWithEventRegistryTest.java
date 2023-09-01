@@ -18,9 +18,7 @@ import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
 import java.util.List;
-
-import jakarta.jms.Message;
-import jakarta.jms.TextMessage;
+import java.util.function.Supplier;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -30,7 +28,12 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRegistryEvent;
+import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
+import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.task.api.Task;
@@ -39,7 +42,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 @CmmnJmsEventTest
 @TestPropertySource(properties = {
@@ -58,6 +65,9 @@ public class CaseWithEventRegistryTest {
     
     @Autowired
     protected JmsTemplate jmsTemplate;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
@@ -147,6 +157,43 @@ public class CaseWithEventRegistryTest {
     }
     
     @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/caseWithEventListener.cmmn",
+            "org/flowable/eventregistry/integrationtest/one.event",
+            "org/flowable/eventregistry/integrationtest/one.channel"})
+    public void testStartCaseWithEventInUnavailableState() throws Exception {
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEvent")
+                    .start();
+            
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            
+            TestNonMatchingEventConsumer nonMatchingEventConsumer = new TestNonMatchingEventConsumer();
+            getEventRegistryEngineConfiguration().setNonMatchingEventConsumer(nonMatchingEventConsumer);
+            
+            InboundChannelModel channelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("one");
+            ObjectNode eventNode = getEventRegistryEngineConfiguration().getObjectMapper().createObjectNode();
+            eventNode.put("payload1", "fozzie");
+            eventNode.put("payload2", 456);
+            getEventRegistry().eventReceived(channelModel, eventNode.toString());
+
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+            
+            assertThat(nonMatchingEventConsumer.getNonMatchingEvent()).isNotNull();
+            EventInstance eventInstance = (EventInstance) nonMatchingEventConsumer.getNonMatchingEvent().getEventObject();
+            EventPayloadInstance payloadInstance = eventInstance.getPayloadInstances().iterator().next();
+            assertThat(payloadInstance.getDefinitionName()).isEqualTo("payload1");
+            assertThat(payloadInstance.getValue()).isEqualTo("fozzie");
+
+        } finally {
+            getEventRegistryEngineConfiguration().setNonMatchingEventConsumer(null);
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+    
+    @Test
     @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/testSendEventTask.cmmn",
             "org/flowable/eventregistry/integrationtest/one.event",
             "org/flowable/eventregistry/integrationtest/one-outbound.channel"})
@@ -176,7 +223,45 @@ public class CaseWithEventRegistryTest {
             }
         }
     }
-    
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/testSendEventTaskWithJson.cmmn",
+            "org/flowable/eventregistry/integrationtest/oneJson.event",
+            "org/flowable/eventregistry/integrationtest/one-outbound.channel" })
+    public void testSendEventTaskWithJsonPayload() throws Exception {
+        try {
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("firstname", "Kermit");
+            objectNode.put("lastname", "The Frog");
+
+            Supplier<ObjectNode> supplier = () -> objectMapper.createObjectNode()
+                    .put("firstname", "Annie Sue")
+                    .put("lastname", "Pig");
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSendEvent")
+                    .transientVariable("myJsonVariable", objectNode)
+                    .transientVariable("myJsonSupplierVariable", supplier)
+                    .start();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            Message message = jmsTemplate.receive("test-outbound-queue");
+            TextMessage textMessage = (TextMessage) message;
+            assertThatJson(textMessage.getText())
+                    .isEqualTo("{"
+                            + "  jsonPayload1: {firstname: 'Kermit',lastname: 'The Frog'},"
+                            + "  jsonPayload2: {firstname: 'Annie Sue',lastname: 'Pig'}"
+                            + "}");
+
+        } finally {
+            List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
+            for (EventDeployment eventDeployment : eventDeployments) {
+                getEventRepositoryService().deleteDeployment(eventDeployment.getId());
+            }
+        }
+    }
+
     @Test
     @CmmnDeployment(resources = { "org/flowable/eventregistry/integrationtest/startCaseWithEvent.cmmn",
             "org/flowable/eventregistry/integrationtest/one.event",
@@ -263,5 +348,23 @@ public class CaseWithEventRegistryTest {
     
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
         return (EventRegistryEngineConfiguration) cmmnEngine.getCmmnEngineConfiguration().getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+    
+    protected class TestNonMatchingEventConsumer implements EventRegistryNonMatchingEventConsumer {
+
+        protected EventRegistryEvent nonMatchingEvent;
+        
+        @Override
+        public void handleNonMatchingEvent(EventRegistryEvent event, EventRegistryProcessingInfo eventRegistryProcessingInfo) {
+            nonMatchingEvent = event;
+        }
+     
+        public EventRegistryEvent getNonMatchingEvent() {
+            return nonMatchingEvent;
+        }
+
+        public void setNonMatchingEvent(EventRegistryEvent nonMatchingEvent) {
+            this.nonMatchingEvent = nonMatchingEvent;
+        }
     }
 }

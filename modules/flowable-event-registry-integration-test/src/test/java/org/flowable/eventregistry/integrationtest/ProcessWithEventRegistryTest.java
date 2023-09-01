@@ -21,6 +21,8 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
@@ -254,6 +256,7 @@ public class ProcessWithEventRegistryTest {
             assertThat(runtimeService.getVariable(anotherProcessInstance.getId(), "value2")).isEqualTo(456);
 
         } finally {
+            getEventRegistryEngineConfiguration().setNonMatchingEventConsumer(null);
             List<EventDeployment> eventDeployments = getEventRepositoryService().createDeploymentQuery().list();
             for (EventDeployment eventDeployment : eventDeployments) {
                 getEventRepositoryService().deleteDeployment(eventDeployment.getId());
@@ -662,6 +665,15 @@ public class ProcessWithEventRegistryTest {
                 getEventRepositoryService().deleteDeployment(eventDeployment.getId());
             }
         }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/eventregistry/integrationtest/testMultipleStartEvents.bpmn20.xml")
+    public void testMultipleStartEventsForInitialStartEvent() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("multipleStartEvents").singleResult();
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+        Process process = bpmnModel.getMainProcess();
+        assertThat(process.getInitialFlowElement().getId()).isEqualTo("start3");
     }
     
     protected EventRepositoryService getEventRepositoryService() {

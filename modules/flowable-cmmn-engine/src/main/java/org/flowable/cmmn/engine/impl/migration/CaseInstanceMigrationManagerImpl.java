@@ -337,7 +337,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (cmmnEngineConfiguration.isFallbackToDefaultTenant() && cmmnEngineConfiguration.getDefaultTenantProvider() != null) {
                 
-                if (!Objects.equals(destinationTenantId, cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(caseInstance.getId(), ScopeTypes.CMMN, caseDefinitionToMigrateTo.getKey()))) {
+                if (!Objects.equals(destinationTenantId, cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(caseInstance.getTenantId(), ScopeTypes.CMMN, caseDefinitionToMigrateTo.getKey()))) {
                     throw new FlowableException("Tenant mismatch between Case Instance ('" + caseInstance.getTenantId() + "') and Case Definition ('" + destinationTenantId + "') to migrate to");
                 }
             
