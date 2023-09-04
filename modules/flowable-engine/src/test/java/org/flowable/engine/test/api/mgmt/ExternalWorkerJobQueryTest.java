@@ -42,6 +42,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -533,6 +534,104 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         
         List<ExternalWorkerJob> workerJobs = query.list();
         for (ExternalWorkerJob externalWorkerJob : workerJobs) {
+            assertThat(externalWorkerJob.getLockOwner()).isNull();
+            assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testUnaquireWithWorkerIdAndTenantId() {
+        ProcessInstance tenant1Instance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .overrideProcessDefinitionTenantId("tenant1")
+                .start();
+        
+        ProcessInstance tenant2Instance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .overrideProcessDefinitionTenantId("tenant2")
+                .start();
+        
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .jobTenantId("tenant1").count()).isEqualTo(2);
+        
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .jobTenantId("tenant2").count()).isEqualTo(2);
+        
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("orderService", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker1");
+
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("customerService", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker2");
+
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker1")
+                .jobTenantId("tenant1");
+        assertThat(query.count()).isEqualTo(1);
+        
+        query = managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker1")
+                .jobTenantId("tenant2");
+        assertThat(query.count()).isEqualTo(1);
+        
+        assertThatThrownBy(() -> {
+            managementService.unacquireAllExternalWorkerJobsForWorker("testWorker2", "tenant1");
+            
+        }).isInstanceOf(FlowableException.class)
+          .hasMessageContaining("provided worker id has external worker jobs from different tenant");
+        
+        ExternalWorkerJobEntity worker1Tenant2Job = (ExternalWorkerJobEntity) managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").jobTenantId("tenant2").singleResult();
+        ExternalWorkerJobEntity worker2Tenant1Job = (ExternalWorkerJobEntity) managementService.createExternalWorkerJobQuery().lockOwner("testWorker2").jobTenantId("tenant1").singleResult();
+
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                ExternalWorkerJobEntityManager externalWorkerJobEntityManager = processEngineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+                worker1Tenant2Job.setTenantId("tenant1");
+                externalWorkerJobEntityManager.update(worker1Tenant2Job);
+                
+                worker2Tenant1Job.setTenantId("tenant2");
+                externalWorkerJobEntityManager.update(worker2Tenant1Job);
+                
+                return null;
+            }
+        });
+        
+        query = managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker1")
+                .jobTenantId("tenant1");
+        assertThat(query.count()).isEqualTo(2);
+        
+        query = managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker2")
+                .jobTenantId("tenant2");
+        assertThat(query.count()).isEqualTo(2);
+        
+        managementService.unacquireAllExternalWorkerJobsForWorker("testWorker2", "tenant2");
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker2").count()).isEqualTo(0);
+        
+        managementService.unacquireAllExternalWorkerJobsForWorker("testWorker1", "tenant1");
+        
+        managementService.unacquireAllExternalWorkerJobsForWorker("testWorker1");
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .lockOwner("testWorker1").count()).isEqualTo(0);
+        
+        query = managementService.createExternalWorkerJobQuery().processInstanceId(tenant1Instance.getId());
+        assertThat(query.count()).isEqualTo(2);
+        
+        for (ExternalWorkerJob externalWorkerJob : query.list()) {
+            assertThat(externalWorkerJob.getLockOwner()).isNull();
+            assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
+        }
+        
+        query = managementService.createExternalWorkerJobQuery().processInstanceId(tenant2Instance.getId());
+        assertThat(query.count()).isEqualTo(2);
+        
+        for (ExternalWorkerJob externalWorkerJob : query.list()) {
             assertThat(externalWorkerJob.getLockOwner()).isNull();
             assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
         }

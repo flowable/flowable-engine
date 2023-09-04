@@ -371,6 +371,11 @@ public interface CmmnManagementService {
     void unacquireAllExternalWorkerJobsForWorker(String workerId);
     
     /**
+     * Unaquire all locked external worker jobs for worker and tenant.
+     */
+    void unacquireAllExternalWorkerJobsForWorker(String workerId, String tenantId);
+    
+    /**
      * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the case instances
      * and all the related instances. See {@link CmmnChangeTenantIdEntityTypes} for related instances.
      * <p>

@@ -18,8 +18,11 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Request that is used for unacquiring external worker jobs")
 public class UnacquireExternalWorkerJobsRequest {
 
-    @ApiModelProperty(value = "The id of the external worker", example = "orderWorker1", required = true)
+    @ApiModelProperty(value = "The worker id for the external worker jobs to unaquire", example = "orderWorker1", required = true)
     protected String workerId;
+    
+    @ApiModelProperty(value = "The tenant id for the external worker jobs to unaquire", example = "tenant1", required = false)
+    protected String tenantId;
 
     public String getWorkerId() {
         return workerId;
@@ -27,5 +30,13 @@ public class UnacquireExternalWorkerJobsRequest {
 
     public void setWorkerId(String workerId) {
         this.workerId = workerId;
+    }
+    
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 }

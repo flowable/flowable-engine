@@ -53,6 +53,12 @@
         from ${prefix}ACT_RU_EXTERNAL_JOB
         where LOCK_OWNER_ = #{parameter, jdbcType=VARCHAR}
     </select>
+    
+    <select id="selectExternalWorkerJobsByWorkerIdAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
+        select *
+        from ${prefix}ACT_RU_EXTERNAL_JOB
+        where LOCK_OWNER_ = #{parameter.workerId, jdbcType=VARCHAR} and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+    </select>
 
     <select id="selectExternalWorkerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         <if test="needsPaging">${limitBefore}</if>
@@ -554,6 +560,9 @@
             </if>
             <if test="originalPersistentState.correlationId != correlationId">
                 CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
