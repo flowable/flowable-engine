@@ -50,7 +50,7 @@ public class ExternalWorkerUnacquireJobResource extends ExternalWorkerJobBaseRes
     @PostMapping(value = "/unacquire/jobs", produces = "application/json")
     public ResponseEntity<?> unacquireJobs(@RequestBody UnacquireExternalWorkerJobsRequest request) {
         if (restApiInterceptor != null) {
-            restApiInterceptor.accessAcquireExternalWorkerJobs(request);
+            restApiInterceptor.accessUnacquireExternalWorkerJobs(request);
         }
 
         if (StringUtils.isEmpty(request.getWorkerId())) {
