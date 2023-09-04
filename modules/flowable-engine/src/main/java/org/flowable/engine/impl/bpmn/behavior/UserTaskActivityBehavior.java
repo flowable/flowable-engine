@@ -261,9 +261,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                             .atZone(ZoneId.systemDefault())
                             .toInstant());
                     task.setDueDate(localDueDate);
+                } else {
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
                 }
-            } else {
-                throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
             }
         }
     }
