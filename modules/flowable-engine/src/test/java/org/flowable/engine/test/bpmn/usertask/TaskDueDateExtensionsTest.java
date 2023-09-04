@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.usertask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -24,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
@@ -66,6 +68,19 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
         Date startOfDay = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         assertThat(localDateTask.getDueDate()).isEqualTo(startOfDay);
+    }
+
+    @Test
+    @Deployment
+    public void testDueDateExtensionWithUnparseableDate() throws Exception {
+        int notAValidDate = 0;
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("dateVariable", notAValidDate);
+
+        assertThrows(FlowableIllegalArgumentException.class, () -> {
+            runtimeService.startProcessInstanceByKey("dueDateExtensionWithUnparseableDate", variables);
+        });
     }
 
     @Test
