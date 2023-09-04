@@ -42,7 +42,7 @@ public interface ExternalWorkerJobRestApiInterceptor {
 
     void failExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobFailureRequest request);
     
-    void accessAcquireExternalWorkerJobs(UnacquireExternalWorkerJobsRequest request);
+    void accessUnacquireExternalWorkerJobs(UnacquireExternalWorkerJobsRequest request);
     
     void unacquireExternalWorkerJob(ExternalWorkerJob job, UnacquireExternalWorkerJobsRequest request);
 }
