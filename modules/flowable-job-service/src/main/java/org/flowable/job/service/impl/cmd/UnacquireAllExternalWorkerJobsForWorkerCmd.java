@@ -25,10 +25,12 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityM
 public class UnacquireAllExternalWorkerJobsForWorkerCmd implements Command<Void> {
 
     protected final String workerId;
+    protected final String tenantId;
     protected final JobServiceConfiguration jobServiceConfiguration;
 
-    public UnacquireAllExternalWorkerJobsForWorkerCmd(String workerId, JobServiceConfiguration jobServiceConfiguration) {
+    public UnacquireAllExternalWorkerJobsForWorkerCmd(String workerId, String tenantId, JobServiceConfiguration jobServiceConfiguration) {
         this.workerId = workerId;
+        this.tenantId = tenantId;
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
@@ -43,6 +45,13 @@ public class UnacquireAllExternalWorkerJobsForWorkerCmd implements Command<Void>
         List<ExternalWorkerJobEntity> jobEntities = externalWorkerJobEntityManager.findJobsByWorkerId(workerId);
         
         if (!jobEntities.isEmpty()) {
+            if (StringUtils.isNotEmpty(tenantId)) {
+                for (ExternalWorkerJobEntity externalWorkerJob : jobEntities) {
+                    if (!tenantId.equals(externalWorkerJob.getTenantId())) {
+                        throw new FlowableIllegalArgumentException("provided worker id has external worker jobs from different tenant.");
+                    }
+                }
+            }
             externalWorkerJobEntityManager.bulkUpdateJobLockWithoutRevisionCheck(jobEntities, null, null);
         }
         

@@ -474,7 +474,12 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     
     @Override
     public void unacquireAllExternalWorkerJobsForWorker(String workerId) {
-        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, configuration.getJobServiceConfiguration()));
+        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, null, configuration.getJobServiceConfiguration()));
+    }
+    
+    @Override
+    public void unacquireAllExternalWorkerJobsForWorker(String workerId, String tenantId) {
+        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, tenantId, configuration.getJobServiceConfiguration()));
     }
 
     @Override

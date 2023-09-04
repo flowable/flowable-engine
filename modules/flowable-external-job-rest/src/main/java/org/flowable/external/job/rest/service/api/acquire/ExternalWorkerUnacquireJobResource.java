@@ -57,7 +57,7 @@ public class ExternalWorkerUnacquireJobResource extends ExternalWorkerJobBaseRes
             throw new FlowableIllegalArgumentException("worker id is required");
         }
 
-        unaquireExternalWorkerJobs(request.getWorkerId());
+        unaquireExternalWorkerJobs(request.getWorkerId(), request.getTenantId());
         
         return ResponseEntity.noContent().build();
     }
@@ -113,11 +113,21 @@ public class ExternalWorkerUnacquireJobResource extends ExternalWorkerJobBaseRes
         return ResponseEntity.noContent().build();
     }
     
-    protected void unaquireExternalWorkerJobs(String workerId) {
+    protected void unaquireExternalWorkerJobs(String workerId, String tenantId) {
         if (managementService != null) {
-            managementService.unacquireAllExternalWorkerJobsForWorker(workerId);
+            if (StringUtils.isNotEmpty(tenantId)) {
+                managementService.unacquireAllExternalWorkerJobsForWorker(workerId, tenantId);
+            } else {
+                managementService.unacquireAllExternalWorkerJobsForWorker(workerId);
+            }
+            
         } else if (cmmnManagementService != null) {
-            cmmnManagementService.unacquireAllExternalWorkerJobsForWorker(workerId);
+            if (StringUtils.isNotEmpty(tenantId)) {
+                cmmnManagementService.unacquireAllExternalWorkerJobsForWorker(workerId, tenantId);
+            } else {
+                cmmnManagementService.unacquireAllExternalWorkerJobsForWorker(workerId);
+            }
+            
         } else {
             throw new FlowableException("Cannot unacquire external jobs. There is no BPMN or CMMN engine available");
         }

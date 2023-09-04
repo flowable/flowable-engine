@@ -541,6 +541,11 @@ public interface ManagementService {
     void unacquireAllExternalWorkerJobsForWorker(String workerId);
     
     /**
+     * Unaquire all locked external worker jobs for worker and tenant.
+     */
+    void unacquireAllExternalWorkerJobsForWorker(String workerId, String tenantId);
+    
+    /**
      * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the process instances
      * and all the related instances. See {@link BpmnChangeTenantIdEntityTypes} for related instances.
      * <p>
