@@ -38,6 +38,10 @@ public interface CaseInstanceMigrationDocument {
     List<WaitingForRepetitionPlanItemDefinitionMapping> getWaitingForRepetitionPlanItemDefinitionMappings();
     
     List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> getRemoveWaitingForRepetitionPlanItemDefinitionMappings();
+    
+    List<ChangePlanItemIdMapping> getChangePlanItemIdMappings();
+    
+    List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings();
 
     Map<String, Map<String, Object>> getPlanItemLocalVariables();
 
