@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
+import java.util.Map;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,6 +28,8 @@ public class ChangePlanItemStateRequest {
     protected List<String> terminatePlanItemDefinitionIds;
     protected List<String> addWaitingForRepetitionPlanItemDefinitionIds;
     protected List<String> removeWaitingForRepetitionPlanItemDefinitionIds;
+    protected Map<String, String> changePlanItemIds;
+    protected Map<String, String> changePlanItemIdsWithDefinitionId;
 
     public List<String> getActivatePlanItemDefinitionIds() {
         return activatePlanItemDefinitionIds;
@@ -72,4 +75,23 @@ public class ChangePlanItemStateRequest {
 	public void setRemoveWaitingForRepetitionPlanItemDefinitionIds(List<String> removeWaitingForRepetitionPlanItemDefinitionIds) {
 		this.removeWaitingForRepetitionPlanItemDefinitionIds = removeWaitingForRepetitionPlanItemDefinitionIds;
 	}
+
+    public Map<String, String> getChangePlanItemIds() {
+        return changePlanItemIds;
+    }
+
+    @ApiModelProperty(value = "map an existing plan item id to new plan item id, this should not be necessary in general, but could be needed when plan item ids change between case definition versions.")
+    public void setChangePlanItemIds(Map<String, String> changePlanItemIds) {
+        this.changePlanItemIds = changePlanItemIds;
+    }
+
+    public Map<String, String> getChangePlanItemIdsWithDefinitionId() {
+        return changePlanItemIdsWithDefinitionId;
+    }
+
+    @ApiModelProperty(value = "map an existing plan item id to new plan item id with the plan item definition id, this should not be necessary in general, but could be needed when plan item ids change between case definition versions.")
+    public void setChangePlanItemIdsWithDefinitionId(Map<String, String> changePlanItemIdsWithDefinitionId) {
+        this.changePlanItemIdsWithDefinitionId = changePlanItemIdsWithDefinitionId;
+    }
+	
 }
