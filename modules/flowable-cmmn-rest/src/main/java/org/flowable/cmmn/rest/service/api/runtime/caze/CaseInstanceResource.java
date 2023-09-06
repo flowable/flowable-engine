@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
@@ -194,22 +195,26 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             restApiInterceptor.changePlanItemState(caseInstanceId, planItemStateRequest);
         }
 
+        ChangePlanItemStateBuilder changePlanItemStateBuilder = runtimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstanceId);
         if (planItemStateRequest.getActivatePlanItemDefinitionIds() != null && !planItemStateRequest.getActivatePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .activatePlanItemDefinitionIds(planItemStateRequest.getActivatePlanItemDefinitionIds())
+            
+            changePlanItemStateBuilder.activatePlanItemDefinitionIds(planItemStateRequest.getActivatePlanItemDefinitionIds())
                 .changeState();
         
         } else if (planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds() != null && !planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
+            changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
                 .changeState();
         
         } else if (planItemStateRequest.getTerminatePlanItemDefinitionIds() != null && !planItemStateRequest.getTerminatePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
+            changePlanItemStateBuilder.terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
+                .changeState();
+        
+        } else if (planItemStateRequest.getChangePlanItemIds() != null && !planItemStateRequest.getChangePlanItemIds().isEmpty()) {
+            changePlanItemStateBuilder.changePlanItemIds(planItemStateRequest.getChangePlanItemIds())
+                .changeState();
+        
+        } else if (planItemStateRequest.getChangePlanItemIdsWithDefinitionId() != null && !planItemStateRequest.getChangePlanItemIdsWithDefinitionId().isEmpty()) {
+            changePlanItemStateBuilder.changePlanItemIdsWithDefinitionId(planItemStateRequest.getChangePlanItemIdsWithDefinitionId())
                 .changeState();
     }
         
