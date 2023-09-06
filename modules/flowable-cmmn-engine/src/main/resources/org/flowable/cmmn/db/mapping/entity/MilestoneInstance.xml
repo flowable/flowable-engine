@@ -54,7 +54,15 @@
     <update id="updateMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         update ${prefix}ACT_CMMN_RU_MIL_INST
         <set>
-            NAME_ = #{name, jdbcType=VARCHAR},
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.name != name">
+                NAME_ = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.elementId != elementId">
+                ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+            </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
@@ -77,7 +85,7 @@
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
-    <select id="selectMilestone" parameterType="string" resultMap="milestoneInstanceResultMap">
+    <select id="selectMilestoneInstance" parameterType="string" resultMap="milestoneInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 

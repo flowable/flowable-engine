@@ -26,6 +26,8 @@ import org.flowable.cmmn.api.migration.CaseInstanceBatchMigrationResult;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
@@ -216,6 +218,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setChangePlanItemDefinitionsToAvailable(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions())
                 .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())
                 .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
+                .setChangePlanItemIds(changePlanItemStateBuilder.getChangePlanItemIds())
+                .setChangePlanItemIdsWithDefinitionId(changePlanItemStateBuilder.getChangePlanItemIdsWithDefinitionId())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
@@ -274,6 +278,14 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         for (RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getRemoveWaitingForRepetitionPlanItemDefinitionMappings()) {
             changePlanItemStateBuilder.removeWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+        }
+        
+        for (ChangePlanItemIdMapping changePlanItemIdMapping : document.getChangePlanItemIdMappings()) {
+            changePlanItemStateBuilder.changePlanItemId(changePlanItemIdMapping.getExistingPlanItemId(), changePlanItemIdMapping.getNewPlanItemId());
+        }
+        
+        for (ChangePlanItemIdWithDefinitionIdMapping changePlanItemIdWithDefinitionMapping : document.getChangePlanItemIdWithDefinitionIdMappings()) {
+            changePlanItemStateBuilder.changePlanItemIdWithDefinitionId(changePlanItemIdWithDefinitionMapping.getExistingPlanItemDefinitionId(), changePlanItemIdWithDefinitionMapping.getNewPlanItemDefinitionId());
         }
 
         return changePlanItemStateBuilder;
