@@ -14,6 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +30,12 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -480,8 +483,20 @@ public class PlanItemInstanceEntityManagerImpl
                 .caseInstanceId(caseInstanceId)
                 .includeEnded();
         List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
-        if (planItemInstances != null) {
+        if (planItemInstances != null && !planItemInstances.isEmpty()) {
+            List<String> endStates = Arrays.asList(PlanItemInstanceState.UNAVAILABLE, PlanItemInstanceState.DISABLED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.TERMINATED, PlanItemInstanceState.FAILED);
+            CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinitionId);
             for (PlanItemInstance planItemInstance : planItemInstances) {
+                if (!endStates.contains(planItemInstance.getState())) {
+                    if (cmmnModel.findPlanItemByPlanItemDefinitionId(planItemInstance.getPlanItemDefinitionId()) == null) {
+                        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+                        planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                        planItemInstanceEntity.setEndedTime(engineConfiguration.getClock().getCurrentTime());
+                        planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+                        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+                    }
+                }
+                
                 PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
                 planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
                 update(planItemInstanceEntity);
