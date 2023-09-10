@@ -85,16 +85,19 @@ public class CaseInstanceChangeState {
     }
     
     public PlanItemInstanceEntity getRuntimePlanItemInstance(String planItemDefinitionId) {
+        PlanItemInstanceEntity foundPlanItemInstance = null;
         if (currentPlanItemInstances != null && currentPlanItemInstances.containsKey(planItemDefinitionId)) {
             List<PlanItemInstanceEntity> currentPlanItemInstanceList = currentPlanItemInstances.get(planItemDefinitionId);
             for (PlanItemInstanceEntity planItemInstance : currentPlanItemInstanceList) {
-                if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
-                    return planItemInstance;
+                if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState()) && 
+                        (foundPlanItemInstance == null || !PlanItemInstanceState.WAITING_FOR_REPETITION.equals(planItemInstance.getState()))) {
+                    
+                    foundPlanItemInstance = planItemInstance;
                 }
             }
         }
         
-        return null;
+        return foundPlanItemInstance;
     }
     
     public Map<String, List<PlanItemInstanceEntity>> getActivePlanItemInstances() {
