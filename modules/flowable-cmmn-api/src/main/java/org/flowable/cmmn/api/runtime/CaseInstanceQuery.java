@@ -27,6 +27,7 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseDefinitionKey(String caseDefinitionKey);
     CaseInstanceQuery caseDefinitionKeys(Set<String> caseDefinitionKeys);
     CaseInstanceQuery caseDefinitionId(String caseDefinitionId);
+    CaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds);
     CaseInstanceQuery caseDefinitionCategory(String caseDefinitionCategory);
     CaseInstanceQuery caseDefinitionName(String caseDefinitionName);
     CaseInstanceQuery caseDefinitionVersion(Integer caseDefinitionVersion);
