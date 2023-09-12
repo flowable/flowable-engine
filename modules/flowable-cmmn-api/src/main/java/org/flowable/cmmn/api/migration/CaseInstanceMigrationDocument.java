@@ -43,6 +43,10 @@ public interface CaseInstanceMigrationDocument {
     
     List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings();
 
+    String getPreUpgradeExpression();
+
+    String getPostUpgradeExpression();
+
     Map<String, Map<String, Object>> getPlanItemLocalVariables();
 
     Map<String, Object> getCaseInstanceVariables();

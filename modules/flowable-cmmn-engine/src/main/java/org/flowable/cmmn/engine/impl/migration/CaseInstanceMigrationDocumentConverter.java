@@ -99,6 +99,14 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         if (changePlanItemIdWithDefinitionIdMappingNodes != null && !changePlanItemIdWithDefinitionIdMappingNodes.isNull()) {
             documentNode.set(CHANGE_PLAN_ITEM_IDS_WITH_DEFINITION_ID_JSON_SECTION, changePlanItemIdWithDefinitionIdMappingNodes);
         }
+
+        if (caseInstanceMigrationDocument.getPreUpgradeExpression() != null) {
+            documentNode.put(PRE_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY, caseInstanceMigrationDocument.getPreUpgradeExpression());
+        }
+
+        if (caseInstanceMigrationDocument.getPostUpgradeExpression() != null) {
+            documentNode.put(POST_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY, caseInstanceMigrationDocument.getPostUpgradeExpression());
+        }
         
         JsonNode caseInstanceVariablesNode = convertToJsonCaseInstanceVariables(caseInstanceMigrationDocument, objectMapper);
         if (caseInstanceVariablesNode != null && !caseInstanceVariablesNode.isNull()) {
@@ -292,6 +300,13 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                 Map<String, Object> caseInstanceVariables = convertFromJsonNodeToObject(caseInstanceVariablesNode, objectMapper);
                 documentBuilder.addCaseInstanceVariables(caseInstanceVariables);
             }
+
+            String preUpgradeExpression = getJsonProperty(PRE_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY, rootNode);
+            documentBuilder.preUpgradeExpression(preUpgradeExpression);
+
+            String postUpgradeExpression = getJsonProperty(POST_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY, rootNode);
+            documentBuilder.postUpgradeExpression(postUpgradeExpression);
+
             return documentBuilder.build();
 
         } catch (IOException e) {

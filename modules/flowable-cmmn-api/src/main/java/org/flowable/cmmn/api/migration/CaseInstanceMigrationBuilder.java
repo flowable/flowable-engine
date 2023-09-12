@@ -135,6 +135,22 @@ public interface CaseInstanceMigrationBuilder {
     CaseInstanceMigrationBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
 
     /**
+     * Specifies an expression which is executed before the migration starts.
+     *
+     * @param preUpgradeExpression the expression e.g. ${mySpringBean.doSomething()}
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder withPreUpgradeExpression(String preUpgradeExpression);
+
+    /**
+     * Specifies an expression which is executed after the migration is finished.
+     *
+     * @param postUpgradeExpression the expression e.g. ${mySpringBean.doSomething()}
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder withPostUpgradeExpression(String postUpgradeExpression);
+
+    /**
      * Specifies a case instance variable that will also be available during the case migration
      *
      * @param variableName Name of the variable
