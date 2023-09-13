@@ -35,14 +35,16 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
 
     List<CaseInstance> findByCriteria(CaseInstanceQuery query);
 
+    List<String> findIdsByCriteria(CaseInstanceQuery query);
+
     List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQuery query);
 
     long countByCriteria(CaseInstanceQuery query);
 
     void delete(String caseInstanceId, boolean cascade, String deleteReason);
-    
+
     void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
-    
+
     void updateCaseInstanceBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus);
 
     void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime);

@@ -70,6 +70,13 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findIdsByCriteria(HistoricCaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectList("selectHistoricCaseInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
+    @Override
     public long countByCriteria(HistoricCaseInstanceQueryImpl query) {
         setSafeInValueLists(query);
         return (Long) getDbSqlSession().selectOne("selectHistoricCaseInstanceCountByQueryCriteria", query);

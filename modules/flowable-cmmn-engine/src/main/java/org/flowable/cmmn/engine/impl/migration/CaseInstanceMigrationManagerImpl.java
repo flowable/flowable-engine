@@ -105,11 +105,11 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 CmmnModel newModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
 
                 CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-                List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(
+                List<String> caseInstanceIds = caseInstanceEntityManager.findIdsByCriteria(
                         new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId));
 
-                for (CaseInstance caseInstance : caseInstances) {
-                    doValidateCaseInstanceMigration(caseInstance.getId(), newModel, document, validationResult, commandContext);
+                for (String caseInstanceId : caseInstanceIds) {
+                    doValidateCaseInstanceMigration(caseInstanceId, newModel, document, validationResult, commandContext);
                 }
             }
         }
@@ -497,9 +497,10 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         CaseDefinition caseDefinition = resolveCaseDefinition(document, commandContext);
 
         CmmnEngineConfiguration engineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
-        HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId).finished();
-        List<HistoricCaseInstance> historicCaseInstances = engineConfiguration.getHistoricCaseInstanceEntityManager()
-                .findByCriteria(historicCaseInstanceQuery);
+        HistoricCaseInstanceQueryImpl historicCaseInstanceQuery = new HistoricCaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(
+                caseDefinitionId).finished();
+        List<String> historicCaseInstanceIds = engineConfiguration.getHistoricCaseInstanceEntityManager()
+                .findIdsByCriteria(historicCaseInstanceQuery);
 
         BatchService batchService = engineConfiguration.getBatchServiceConfiguration().getBatchService();
         Batch batch = batchService.createBatchBuilder().batchType(Batch.CASE_MIGRATION_TYPE)
@@ -510,20 +511,20 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .create();
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
-        for (HistoricCaseInstance historicCaseInstance : historicCaseInstances) {
+        for (String historicCaseInstanceId : historicCaseInstanceIds) {
             BatchPart batchPart = batchService.createBatchPart(batch, CaseInstanceBatchMigrationResult.STATUS_WAITING,
-                    historicCaseInstance.getId(), null, ScopeTypes.CMMN);
+                    historicCaseInstanceId, null, ScopeTypes.CMMN);
 
             JobEntity job = jobService.createJob();
             job.setJobHandlerType(HistoricCaseInstanceMigrationJobHandler.TYPE);
-            job.setScopeId(historicCaseInstance.getId());
+            job.setScopeId(historicCaseInstanceId);
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(HistoricCaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
             jobService.scheduleAsyncJob(job);
         }
 
-        if (!historicCaseInstances.isEmpty()) {
+        if (!historicCaseInstanceIds.isEmpty()) {
             TimerJobService timerJobService = engineConfiguration.getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);

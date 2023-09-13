@@ -172,6 +172,15 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findIdsByCriteria(CaseInstanceQueryImpl query) {
+        // Not going through cache as the case instance should always be loaded with all related plan item instances
+        // when not doing a query call
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQueryImpl query) {

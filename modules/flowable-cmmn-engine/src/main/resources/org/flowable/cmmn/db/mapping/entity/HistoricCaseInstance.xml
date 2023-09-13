@@ -232,21 +232,33 @@
         </foreach>
     </select>
 
-    <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
+    <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+            resultMap="historicCaseInstanceResultMap">
         <if test="needsPaging">${limitBefore}</if>
         select RES.* <if test="needsPaging">${limitBetween}</if>,
-            CASE_DEF.KEY_ as CaseDefinitionKey,
-            CASE_DEF.NAME_ as CaseDefinitionName,
-            CASE_DEF.VERSION_ as CaseDefinitionVersion,
-            CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
-        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        CASE_DEF.KEY_ as CaseDefinitionKey,
+        CASE_DEF.NAME_ as CaseDefinitionName,
+        CASE_DEF.VERSION_ as CaseDefinitionVersion,
+        CASE_DEF.DEPLOYMENT_ID_ as CaseDefinitionDeploymentId
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
-    <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultType="long">
+    <select id="selectHistoricCaseInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+            resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        select RES.ID_
+        <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+            resultType="long">
         select count(distinct RES.ID_)
-        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
     </select>
 
     <select id="selectHistoricCaseInstancesWithVariablesByQueryCriteria"
