@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Filip Hrisafov
@@ -62,18 +63,22 @@ public class JobUtil {
             job.setElementName(((CaseElement) baseElement).getName());
         }
 
-        List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(variableContainer);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
+        if(CollectionUtils.isEmpty(cmmnEngineConfiguration.getEnabledJobCategories())){
+            List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                    Object categoryValue = categoryExpression.getValue(variableContainer);
+                    if (categoryValue != null) {
+                        job.setCategory(categoryValue.toString());
+                    }
                 }
             }
+        }else{
+            String category = cmmnEngineConfiguration.getEnabledJobCategories().get(0);
+            job.setCategory(category);
         }
-
 
         job.setTenantId(variableContainer.getTenantId());
 

@@ -23,6 +23,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Filip Hrisafov
@@ -45,17 +46,24 @@ public class JobUtil {
         }
         job.setJobHandlerType(jobHandlerType);
 
-        List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(execution);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
+
+        if(CollectionUtils.isEmpty(processEngineConfiguration.getEnabledJobCategories())){
+            List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                    Object categoryValue = categoryExpression.getValue(execution);
+                    if (categoryValue != null) {
+                        job.setCategory(categoryValue.toString());
+                    }
                 }
             }
+        }else{
+            String category = processEngineConfiguration.getEnabledJobCategories().get(0);
+            job.setCategory(category);
         }
+
 
         // Inherit tenant id (if applicable)
         if (execution.getTenantId() != null) {
