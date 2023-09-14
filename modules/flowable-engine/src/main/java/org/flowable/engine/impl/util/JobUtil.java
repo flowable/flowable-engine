@@ -47,7 +47,7 @@ public class JobUtil {
         job.setJobHandlerType(jobHandlerType);
 
 
-        if(CollectionUtils.isEmpty(processEngineConfiguration.getEnabledJobCategories())){
+        if (CollectionUtils.isEmpty(processEngineConfiguration.getEnabledJobCategories())) {
             List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
             if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
                 ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
@@ -59,7 +59,7 @@ public class JobUtil {
                     }
                 }
             }
-        }else{
+        } else {
             String category = processEngineConfiguration.getEnabledJobCategories().get(0);
             job.setCategory(category);
         }

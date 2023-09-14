@@ -63,7 +63,7 @@ public class JobUtil {
             job.setElementName(((CaseElement) baseElement).getName());
         }
 
-        if(CollectionUtils.isEmpty(cmmnEngineConfiguration.getEnabledJobCategories())){
+        if (CollectionUtils.isEmpty(cmmnEngineConfiguration.getEnabledJobCategories())) {
             List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
             if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
                 ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
@@ -75,7 +75,7 @@ public class JobUtil {
                     }
                 }
             }
-        }else{
+        } else {
             String category = cmmnEngineConfiguration.getEnabledJobCategories().get(0);
             job.setCategory(category);
         }
