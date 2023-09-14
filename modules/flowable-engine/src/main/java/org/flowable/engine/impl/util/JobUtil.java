@@ -23,7 +23,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Filip Hrisafov
@@ -47,7 +46,7 @@ public class JobUtil {
         job.setJobHandlerType(jobHandlerType);
 
 
-        if (CollectionUtils.isEmpty(processEngineConfiguration.getEnabledJobCategories())) {
+        if (StringUtils.isEmpty(processEngineConfiguration.getDefaultJobCategory())) {
             List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
             if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
                 ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
@@ -60,7 +59,7 @@ public class JobUtil {
                 }
             }
         } else {
-            String category = processEngineConfiguration.getEnabledJobCategories().get(0);
+            String category = processEngineConfiguration.getDefaultJobCategory();
             job.setCategory(category);
         }
 

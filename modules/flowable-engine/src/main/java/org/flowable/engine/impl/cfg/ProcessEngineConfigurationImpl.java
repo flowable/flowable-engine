@@ -34,6 +34,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -426,6 +427,7 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Tom Baeyens
@@ -1584,6 +1586,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             
             if (enabledJobCategories != null) {
                 this.jobServiceConfiguration.setEnabledJobCategories(enabledJobCategories);
+            }
+
+            if (StringUtils.isNoneBlank(defaultJobCategory)) {
+                if (!CollectionUtils.isEmpty(enabledJobCategories)) {
+                    enabledJobCategories.add(defaultJobCategory);
+                }
+                this.jobServiceConfiguration.setEnabledJobCategories(List.of(defaultJobCategory));
             }
 
             this.jobServiceConfiguration.setConfigurators(jobServiceConfigurators);

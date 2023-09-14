@@ -26,7 +26,6 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Filip Hrisafov
@@ -34,7 +33,7 @@ import org.springframework.util.CollectionUtils;
 public class JobUtil {
 
     public static JobEntity createJob(CaseInstanceEntity caseInstance, BaseElement baseElement, String jobHandlerType,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
+                                      CmmnEngineConfiguration cmmnEngineConfiguration) {
         JobEntity job = createJob((VariableContainer) caseInstance, baseElement, jobHandlerType, cmmnEngineConfiguration);
 
         job.setScopeId(caseInstance.getId());
@@ -63,7 +62,7 @@ public class JobUtil {
             job.setElementName(((CaseElement) baseElement).getName());
         }
 
-        if (CollectionUtils.isEmpty(cmmnEngineConfiguration.getEnabledJobCategories())) {
+        if (StringUtils.isEmpty(cmmnEngineConfiguration.getDefaultJobCategory())) {
             List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
             if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
                 ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
@@ -76,7 +75,7 @@ public class JobUtil {
                 }
             }
         } else {
-            String category = cmmnEngineConfiguration.getEnabledJobCategories().get(0);
+            String category = cmmnEngineConfiguration.getDefaultJobCategory();
             job.setCategory(category);
         }
 

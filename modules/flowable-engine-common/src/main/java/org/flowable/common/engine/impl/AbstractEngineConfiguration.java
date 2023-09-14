@@ -182,6 +182,10 @@ public abstract class AbstractEngineConfiguration {
     protected boolean useLockForDatabaseSchemaUpdate = false;
 
     protected String xmlEncoding = "UTF-8";
+    /**
+     *  Default jobCategory for all
+     */
+    protected String defaultJobCategory;
 
     // COMMAND EXECUTORS ///////////////////////////////////////////////
 
@@ -268,7 +272,7 @@ public abstract class AbstractEngineConfiguration {
      * correct. The {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will not be used.
      */
     protected boolean usingRelationalDatabase = true;
-    
+
     /**
      * Flag that can be set to configure whether or not a schema is used. This is useful for custom implementations that do not use relational databases at all.
      * Setting {@link #usingRelationalDatabase} to true will automatically imply using a schema.
@@ -308,12 +312,12 @@ public abstract class AbstractEngineConfiguration {
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
      */
     protected boolean tablePrefixIsSchema;
-    
+
     /**
      * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
      */
     protected boolean alwaysLookupLatestDefinitionVersion;
-    
+
     /**
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
      */
@@ -355,7 +359,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
     protected List<EngineDeployer> deployers;
-    
+
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
@@ -428,7 +432,7 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
-    
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -622,7 +626,7 @@ public abstract class AbstractEngineConfiguration {
 
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory,
                         classLoader, useClassForNameClassLoading, clock, objectMapper);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineCfgKey(engineCfgKey);
@@ -645,7 +649,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract String getEngineCfgKey();
-    
+
     public abstract String getEngineScopeType();
 
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
@@ -749,7 +753,7 @@ public abstract class AbstractEngineConfiguration {
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            
+
             if (isLoggingSessionEnabled()) {
                 if (!sessionFactories.containsKey(LoggingSession.class)) {
                     LoggingSessionFactory loggingSessionFactory = new LoggingSessionFactory();
@@ -758,9 +762,9 @@ public abstract class AbstractEngineConfiguration {
                     sessionFactories.put(LoggingSession.class, loggingSessionFactory);
                 }
             }
-            
+
             commandContextFactory.setSessionFactories(sessionFactories);
-            
+
         } else {
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactoryEntitySettings();
@@ -802,7 +806,7 @@ public abstract class AbstractEngineConfiguration {
         if (insertOrder != null) {
             for (Class<? extends Entity> clazz : insertOrder) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
-    
+
                 if (isBulkInsertEnabled) {
                     dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
                 }
@@ -1031,7 +1035,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();
-    
+
     public void initConfigurators() {
 
         allConfigurators = new ArrayList<>();
@@ -1113,7 +1117,7 @@ public abstract class AbstractEngineConfiguration {
             configurator.beforeInit(this);
         }
     }
-    
+
     public void configuratorsAfterInit() {
         for (EngineConfigurator configurator : allConfigurators) {
             logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
@@ -1199,7 +1203,7 @@ public abstract class AbstractEngineConfiguration {
         this.commonSchemaManager = commonSchemaManager;
         return this;
     }
-    
+
     public Command<Void> getSchemaManagementCmd() {
         return schemaManagementCmd;
     }
@@ -1493,7 +1497,7 @@ public abstract class AbstractEngineConfiguration {
         this.eventRegistryEventConsumers = eventRegistryEventConsumers;
         return this;
     }
-    
+
     public void addEventRegistryEventConsumer(String key, EventRegistryEventConsumer eventRegistryEventConsumer) {
         if (eventRegistryEventConsumers == null) {
             eventRegistryEventConsumers = new HashMap<>();
@@ -1648,7 +1652,7 @@ public abstract class AbstractEngineConfiguration {
         this.usingRelationalDatabase = usingRelationalDatabase;
         return this;
     }
-    
+
     public boolean isUsingSchemaMgmt() {
         return usingSchemaMgmt;
     }
@@ -1858,7 +1862,7 @@ public abstract class AbstractEngineConfiguration {
     public boolean isLoggingSessionEnabled() {
         return loggingListener != null;
     }
-    
+
     public LoggingListener getLoggingListener() {
         return loggingListener;
     }
@@ -1994,11 +1998,11 @@ public abstract class AbstractEngineConfiguration {
         this.customPostDeployers = customPostDeployers;
         return this;
     }
-    
+
     public boolean isEnableConfiguratorServiceLoader() {
         return enableConfiguratorServiceLoader;
     }
-    
+
     public AbstractEngineConfiguration setEnableConfiguratorServiceLoader(boolean enableConfiguratorServiceLoader) {
         this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
         return this;
@@ -2054,5 +2058,14 @@ public abstract class AbstractEngineConfiguration {
 
     public boolean isForceCloseMybatisConnectionPool() {
         return forceCloseMybatisConnectionPool;
+    }
+
+    protected AbstractEngineConfiguration setDefaultJobCategory(String defaultJobCategory){
+        this.defaultJobCategory = defaultJobCategory;
+        return this;
+    }
+
+    public String getDefaultJobCategory(){
+        return this.defaultJobCategory;
     }
 }
