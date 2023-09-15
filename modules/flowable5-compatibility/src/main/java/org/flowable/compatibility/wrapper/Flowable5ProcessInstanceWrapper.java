@@ -87,6 +87,11 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
     }
 
     @Override
+    public String getProcessDefinitionCategory() {
+        return null;
+    }
+
+    @Override
     public String getDeploymentId() {
         return activiti5ProcessInstance.getDeploymentId();
     }

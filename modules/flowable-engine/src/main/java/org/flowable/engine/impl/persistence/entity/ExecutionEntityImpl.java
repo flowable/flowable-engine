@@ -164,9 +164,14 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String processDefinitionName;
 
     /**
-     * persisted reference to the process definition version.
+     * Persisted reference to the process definition version.
      */
     protected Integer processDefinitionVersion;
+
+    /**
+     * Persisted reference to the process definition category.
+     */
+    protected String processDefinitionCategory;
 
     /**
      * Persisted reference to the deployment id.
@@ -175,7 +180,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     /**
      * Persisted reference to the current position in the diagram within the {@link #processDefinitionId}.
-     * 
+     *
      * @see #activityId
      * @see #setActivityId(String)
      * @see #getActivityId()
@@ -461,6 +466,19 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
         this.processDefinitionVersion = processDefinitionVersion;
+    }
+
+    @Override
+    public String getProcessDefinitionCategory() {
+        if (StringUtils.isEmpty(processDefinitionCategory) && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
+        return processDefinitionCategory;
+    }
+
+    @Override
+    public void setProcessDefinitionCategory(String processDefinitionCategory) {
+        this.processDefinitionCategory = processDefinitionCategory;
     }
 
     @Override
@@ -1472,6 +1490,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         this.processDefinitionKey = processDefinition.getKey();
         this.processDefinitionName = processDefinition.getName();
         this.processDefinitionVersion = processDefinition.getVersion();
+        this.processDefinitionCategory = processDefinition.getCategory();
         this.deploymentId = processDefinition.getDeploymentId();
     }
 

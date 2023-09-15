@@ -164,10 +164,29 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testQueryByProcessDefinitionCategory() {
-        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionCategory(PROCESS_DEFINITION_CATEGORY).count())
-                .isEqualTo(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
-        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).count())
-                .isEqualTo(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().processDefinitionCategory(PROCESS_DEFINITION_CATEGORY).list();
+        assertThat(instances).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+
+        assertThat(instances)
+                .extracting(ProcessInstance::getBusinessKey, ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionName,
+                        ProcessInstance::getProcessDefinitionVersion, ProcessInstance::getProcessDefinitionCategory, ProcessInstance::getDeploymentId)
+                .as("businessKey, processDefinitionKey, processDefinitionName, processDefinitionVersion, processDefinitionCategory, deploymentId")
+                .containsExactlyInAnyOrder(
+                        tuple("0", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, PROCESS_DEFINITION_CATEGORY, deployment.getId()),
+                        tuple("1", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, PROCESS_DEFINITION_CATEGORY, deployment.getId()),
+                        tuple("2", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, PROCESS_DEFINITION_CATEGORY, deployment.getId()),
+                        tuple("3", PROCESS_DEFINITION_KEY, "oneTaskProcessName", 1, PROCESS_DEFINITION_CATEGORY, deployment.getId()));
+
+        instances = runtimeService.createProcessInstanceQuery().processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).list();
+        assertThat(instances).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+
+        assertThat(instances)
+                .extracting(ProcessInstance::getBusinessKey, ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionName,
+                        ProcessInstance::getProcessDefinitionVersion, ProcessInstance::getProcessDefinitionCategory, ProcessInstance::getDeploymentId)
+                .as("businessKey, processDefinitionKey, processDefinitionName, processDefinitionVersion, processDefinitionCategory, deploymentId")
+                .containsExactlyInAnyOrder(
+                        tuple("1", PROCESS_DEFINITION_KEY_2, "oneTaskProcess2Name", 1, PROCESS_DEFINITION_CATEGORY_2, deployment.getId())
+                );
     }
 
     @Test
@@ -415,6 +434,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getProcessDefinitionVersion()).isEqualTo(1);
         assertThat(processInstance.getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_KEY);
         assertThat(processInstance.getProcessDefinitionName()).isEqualTo("oneTaskProcessName");
+        assertThat(processInstance.getProcessDefinitionCategory()).isEqualTo(PROCESS_DEFINITION_CATEGORY);
         assertThat(runtimeService.createProcessInstanceQuery().deploymentId(deployment.getId()).count()).isEqualTo(PROCESS_DEPLOY_COUNT);
     }
 
