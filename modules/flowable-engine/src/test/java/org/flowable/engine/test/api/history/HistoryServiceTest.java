@@ -1072,6 +1072,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).list().get(0).getProcessDefinitionCategory()).isEqualTo(processDefinitionCategory);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory(processDefinitionCategory).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").list()).isEmpty();
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategory("invalid").count()).isZero();

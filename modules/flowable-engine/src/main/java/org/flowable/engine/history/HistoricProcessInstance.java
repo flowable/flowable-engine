@@ -50,6 +50,9 @@ public interface HistoricProcessInstance {
     /** The version of the process definition of the process instance. */
     Integer getProcessDefinitionVersion();
 
+    /** The category of the process definition of the process instance. */
+    String getProcessDefinitionCategory();
+
     /**
      * The deployment id of the process definition of the process instance.
      */
