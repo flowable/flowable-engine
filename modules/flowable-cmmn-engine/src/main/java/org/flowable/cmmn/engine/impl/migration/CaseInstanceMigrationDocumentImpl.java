@@ -43,6 +43,8 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<ChangePlanItemIdMapping> changePlanItemIdMappings = new ArrayList<>();
     protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
+    protected String preUpgradeExpression;
+    protected String postUpgradeExpression;
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> planItemLocalVariables = new HashMap<>();
 
@@ -95,6 +97,14 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
 
     public void setCaseInstanceVariables(Map<String, Object> caseInstanceVariables) {
         this.caseInstanceVariables = caseInstanceVariables;
+    }
+
+    public void setPreUpgradeExpression(String preUpgradeExpression) {
+        this.preUpgradeExpression = preUpgradeExpression;
+    }
+
+    public void setPostUpgradeExpression(String postUpgradeExpression) {
+        this.postUpgradeExpression = postUpgradeExpression;
     }
 
     @Override
@@ -150,6 +160,16 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     @Override
     public List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings() {
         return changePlanItemIdWithDefinitionIdMappings;
+    }
+
+    @Override
+    public String getPreUpgradeExpression() {
+        return preUpgradeExpression;
+    }
+
+    @Override
+    public String getPostUpgradeExpression() {
+        return postUpgradeExpression;
     }
 
     @Override

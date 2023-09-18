@@ -55,6 +55,10 @@ public interface CaseInstanceMigrationDocumentBuilder {
 
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariables(Map<String, Object> caseInstanceVariables);
 
+    CaseInstanceMigrationDocumentBuilder preUpgradeExpression(String preUpgradeExpression);
+
+    CaseInstanceMigrationDocumentBuilder postUpgradeExpression(String postUpgradeExpression);
+
     CaseInstanceMigrationDocument build();
 
 }

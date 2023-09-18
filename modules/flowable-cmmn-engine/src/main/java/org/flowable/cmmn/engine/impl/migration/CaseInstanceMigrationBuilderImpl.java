@@ -123,6 +123,18 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
     }
 
     @Override
+    public CaseInstanceMigrationBuilder withPreUpgradeExpression(String preUpgradeExpression) {
+        this.caseInstanceMigrationDocumentDocumentBuilder.preUpgradeExpression(preUpgradeExpression);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationBuilder withPostUpgradeExpression(String postUpgradeExpression) {
+        this.caseInstanceMigrationDocumentDocumentBuilder.postUpgradeExpression(postUpgradeExpression);
+        return this;
+    }
+
+    @Override
     public CaseInstanceMigrationBuilder withCaseInstanceVariable(String variableName, Object variableValue) {
         this.caseInstanceMigrationDocumentDocumentBuilder.addCaseInstanceVariable(variableName, variableValue);
         return this;
@@ -138,6 +150,8 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
     public CaseInstanceMigrationDocument getCaseInstanceMigrationDocument() {
         return this.caseInstanceMigrationDocumentDocumentBuilder.build();
     }
+
+
 
     @Override
     public void migrate(String caseInstanceId) {

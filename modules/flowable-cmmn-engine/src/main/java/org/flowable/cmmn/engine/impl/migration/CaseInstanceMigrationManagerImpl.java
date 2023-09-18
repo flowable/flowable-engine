@@ -256,6 +256,10 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
     protected void doMigrateCaseInstance(CaseInstanceEntity caseInstance, CaseDefinition caseDefinitionToMigrateTo, CaseInstanceMigrationDocument document, CommandContext commandContext) {
         LOGGER.debug("Start migration of case instance with Id:'{}' to case definition identified by {}", caseInstance.getId(), printCaseDefinitionIdentifierMessage(document));
+        if (document.getPreUpgradeExpression() != null && !document.getPreUpgradeExpression().isEmpty()) {
+            cmmnEngineConfiguration.getExpressionManager().createExpression(document.getPreUpgradeExpression()).getValue(caseInstance);
+        }
+
         ChangePlanItemStateBuilderImpl changePlanItemStateBuilder = prepareChangeStateBuilder(caseInstance, caseDefinitionToMigrateTo, document, commandContext);
 
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", caseInstance.getId(), caseDefinitionToMigrateTo.getId());
@@ -292,6 +296,10 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
                 caseInstanceMigrationCallback.caseInstanceMigrated(caseInstance, caseDefinitionToMigrateTo, document);
             }
+        }
+
+        if (document.getPostUpgradeExpression() != null && !document.getPostUpgradeExpression().isEmpty()) {
+            cmmnEngineConfiguration.getExpressionManager().createExpression(document.getPostUpgradeExpression()).getValue(caseInstance);
         }
     }
     

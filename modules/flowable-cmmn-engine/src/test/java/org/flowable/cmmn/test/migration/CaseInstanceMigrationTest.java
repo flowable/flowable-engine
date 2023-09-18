@@ -4242,6 +4242,56 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         }
     }
 
+    @Test
+    void withPreUpgradeExpression() {
+        // Arrange
+        CaseDefinition definition1 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition definition2 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(definition2.getId())
+                .withPreUpgradeExpression("${variableContainer.setVariable('preUpgradeExpressionExecuted', true)}")
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(definition2.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(definition2.getDeploymentId());
+
+        assertThat((Boolean) caseInstanceAfterMigration.getCaseVariables().getOrDefault("preUpgradeExpressionExecuted", false)).isTrue();
+    }
+
+    @Test
+    void withPostUpgradeExpression() {
+        // Arrange
+        CaseDefinition definition1 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition definition2 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(definition2.getId())
+                .withPostUpgradeExpression("${variableContainer.setVariable('postUpgradeExpressionExecuted', true)}")
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(definition2.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(definition2.getDeploymentId());
+
+        assertThat((Boolean) caseInstanceAfterMigration.getCaseVariables().getOrDefault("postUpgradeExpressionExecuted", false)).isTrue();
+    }
+
     // with sentries
     // with stages
     // with new expected case variables

@@ -43,6 +43,8 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     protected List<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<ChangePlanItemIdMapping> changePlanItemIdMappings = new ArrayList<>();
+    protected String preUpgradeExpression;
+    protected String postUpgradeExpression;
     protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
 
@@ -150,6 +152,18 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     }
 
     @Override
+    public CaseInstanceMigrationDocumentBuilder preUpgradeExpression(String preUpgradeExpression) {
+        this.preUpgradeExpression = preUpgradeExpression;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder postUpgradeExpression(String postUpgradeExpression) {
+        this.postUpgradeExpression = postUpgradeExpression;
+        return this;
+    }
+
+    @Override
     public CaseInstanceMigrationDocument build() {
         CaseInstanceMigrationDocumentImpl caseInstanceMigrationDocument = new CaseInstanceMigrationDocumentImpl();
         caseInstanceMigrationDocument.setMigrateToCaseDefinitionId(this.migrateToCaseDefinitionId);
@@ -162,6 +176,8 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         caseInstanceMigrationDocument.setChangePlanItemIdMappings(this.changePlanItemIdMappings);
         caseInstanceMigrationDocument.setChangePlanItemIdWithDefinitionIdMappings(this.changePlanItemIdWithDefinitionIdMappings);
         caseInstanceMigrationDocument.setCaseInstanceVariables(this.caseInstanceVariables);
+        caseInstanceMigrationDocument.setPreUpgradeExpression(this.preUpgradeExpression);
+        caseInstanceMigrationDocument.setPostUpgradeExpression(this.postUpgradeExpression);
         return caseInstanceMigrationDocument;
     }
 }
