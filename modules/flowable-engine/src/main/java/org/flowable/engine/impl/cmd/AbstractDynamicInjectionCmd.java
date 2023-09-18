@@ -131,6 +131,7 @@ public abstract class AbstractDynamicInjectionCmd {
         String previousProcessDefinitionId = processInstance.getProcessDefinitionId();
         processInstance.setProcessDefinitionId(processDefinitionEntity.getId());
         processInstance.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
+        processInstance.setProcessDefinitionCategory(processDefinitionEntity.getCategory());
         
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         List<TaskEntity> currentTasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService()
@@ -175,6 +176,7 @@ public abstract class AbstractDynamicInjectionCmd {
         for (ExecutionEntity childExecution : childExecutions) {
             childExecution.setProcessDefinitionId(processDefinitionEntity.getId());
             childExecution.setProcessDefinitionVersion(processDefinitionEntity.getVersion());
+            childExecution.setProcessDefinitionCategory(processDefinitionEntity.getCategory());
         }
 
         updateExecutions(commandContext, processDefinitionEntity, processInstance, childExecutions);

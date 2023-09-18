@@ -28,7 +28,7 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
     void setEndActivityId(String endActivityId);
 
     void setBusinessKey(String businessKey);
-    
+
     void setBusinessStatus(String businessStatus);
 
     void setStartUserId(String startUserId);
@@ -53,10 +53,12 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
 
     void setProcessDefinitionVersion(Integer processDefinitionVersion);
 
+    void setProcessDefinitionCategory(String processDefinitionCategory);
+
     void setDeploymentId(String deploymentId);
-    
+
     void setCallbackId(String callbackId);
-    
+
     void setCallbackType(String callbackType);
 
     void setReferenceId(String referenceId);
@@ -64,7 +66,7 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
     void setReferenceType(String referenceType);
 
     void setPropagatedStageInstanceId(String propagatedStageInstanceId);
-    
+
     List<HistoricVariableInstanceEntity> getQueryVariables();
 
     void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);

@@ -256,6 +256,7 @@ public class ExecutionEntityManagerImpl
         processInstanceExecution.setProcessDefinitionKey(processDefinition.getKey());
         processInstanceExecution.setProcessDefinitionName(processDefinition.getName());
         processInstanceExecution.setProcessDefinitionVersion(processDefinition.getVersion());
+        processInstanceExecution.setProcessDefinitionCategory(processDefinition.getCategory());
         processInstanceExecution.setDeploymentId(processDefinition.getDeploymentId());
         processInstanceExecution.setBusinessKey(businessKey);
         processInstanceExecution.setBusinessStatus(businessStatus);
