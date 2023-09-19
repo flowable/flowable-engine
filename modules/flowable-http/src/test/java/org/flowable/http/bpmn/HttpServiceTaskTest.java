@@ -434,7 +434,15 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         response.put("get500ResponseStatusCode", 500);
         response.put("get500ResponseReason", get500ResponseReason());
         assertKeysEquals(process.getId(), response);
-        continueProcess(process);
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(process.getId())
+                .onlyChildExecutions()
+                .singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("waitAfterError");
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(process.getId());
     }
 
     protected String get500ResponseReason() {
