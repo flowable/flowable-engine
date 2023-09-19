@@ -119,10 +119,10 @@ org.springframework             spring-aop                  6.0.12           The
 org.springframework             spring-core                 6.0.12           The Apache Software License, Version 2.0
 org.springframework             spring-expression           6.0.12           The Apache Software License, Version 2.0
 org.springframework             spring-orm                  6.0.12           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      6.1.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        6.1.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      6.1.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         6.1.3           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      6.1.4           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        6.1.4           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      6.1.4           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         6.1.4           The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0
