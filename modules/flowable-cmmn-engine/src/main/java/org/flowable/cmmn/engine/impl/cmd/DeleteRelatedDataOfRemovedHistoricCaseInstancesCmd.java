@@ -25,6 +25,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated
 public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;

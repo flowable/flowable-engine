@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated
 public class DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;

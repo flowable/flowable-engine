@@ -695,6 +695,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         if (commandExecutor != null) {
             CommandConfig config = new CommandConfig().transactionRequiresNew();
