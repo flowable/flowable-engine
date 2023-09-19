@@ -17,7 +17,7 @@
 		<spring.boot.version>2.7.15</spring.boot.version>
 		<spring.framework.version>5.3.30</spring.framework.version>
 		<spring.amqp.version>2.4.15</spring.amqp.version>
-		<spring.security.version>5.8.2</spring.security.version>
+		<spring.security.version>5.8.7</spring.security.version>
 		<spring.kafka.version>2.9.9</spring.kafka.version>
 		<reactor-netty.version>1.0.28</reactor-netty.version>
 		<jackson.version>2.13.5</jackson.version>
