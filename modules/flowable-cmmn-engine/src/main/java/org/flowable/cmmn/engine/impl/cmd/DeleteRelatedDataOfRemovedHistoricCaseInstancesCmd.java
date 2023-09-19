@@ -36,7 +36,7 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
         IdentityLinkServiceConfiguration identityLinkServiceConfiguration = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricCaseIdentityLinksForNonExistingInstances();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        if(cmmnEngineConfiguration.isEnableEntityLinks()) {
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
             HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
             if (historicEntityLinkService != null) {
                 historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
