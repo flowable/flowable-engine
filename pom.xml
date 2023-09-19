@@ -19,7 +19,7 @@
 		<spring.amqp.version>2.4.15</spring.amqp.version>
 		<spring.security.version>5.8.7</spring.security.version>
 		<spring.kafka.version>2.9.9</spring.kafka.version>
-		<reactor-netty.version>1.0.28</reactor-netty.version>
+		<reactor-netty.version>1.0.35</reactor-netty.version>
 		<jackson.version>2.13.5</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
@@ -1011,7 +1011,7 @@
 			<dependency>
 				<groupId>org.hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
-				<version>2.7.1</version>
+				<version>2.7.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
