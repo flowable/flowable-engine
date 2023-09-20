@@ -1,11 +1,11 @@
 ---
-id: ch14-Applications
+id: ch13-Applications
 title: Flowable applications
 ---
 
-Flowable provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the [REST API](bpmn/ch15-REST.md) chapter.
+Flowable provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the [REST API](bpmn/ch14-REST.md) chapter.
 
-The application is a Spring Boot 3.0 based application, which means that the WAR file is actually executable and can be run as a normal standalone application.
+The application is a Spring Boot 3.1 based application, which means that the WAR file is actually executable and can be run as a normal standalone application.
 See [The Executable Jar Format](https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging) in the Spring Boot reference documentation.
 
 
@@ -15,7 +15,7 @@ As mentioned before, the application can be deployed on a Tomcat server, and to 
 
 1.  Download a recent stable version of [Apache Tomcat](http://tomcat.apache.org). It has to be Jakarta Servlet 6 compliant
 
-2.  Download the latest stable [Flowable 6 version](http://www.flowable.org/downloads.html).
+2.  Download the latest stable [Flowable 7 version](http://www.flowable.org/downloads.html).
 
 3.  Copy the flowable-rest.war file from the Flowable distribution *wars* folder to the Tomcat webapps folder.
 

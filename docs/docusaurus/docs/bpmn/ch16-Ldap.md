@@ -1,5 +1,5 @@
 ---
-id: ch17-Ldap
+id: ch16-Ldap
 title: LDAP integration
 ---
 

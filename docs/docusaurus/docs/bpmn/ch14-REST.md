@@ -1,5 +1,5 @@
 ---
-id: ch15-REST
+id: ch14-REST
 title: REST API
 ---
 
@@ -2899,7 +2899,7 @@ Only one of processDefinitionId, processDefinitionKey or message can be used in 
       ]
     }
 
-The request body can contain all possible filters that can be used in the [List process instances](bpmn/ch15-REST.md#list-of-process-instances) URL query. On top of these, it’s possible to provide an array of variables
+The request body can contain all possible filters that can be used in the [List process instances](bpmn/ch14-REST.md#list-of-process-instances) URL query. On top of these, it’s possible to provide an array of variables
 to include in the query, with their format [described here](#json-query-variable-format).
 
 The general [paging and sorting query-parameters](#paging-and-sorting) can be used for this URL.
@@ -4159,7 +4159,7 @@ Returns all activities which are active in the execution and in all child-execut
       ]
     }
 
-The request body can contain all possible filters that can be used in the [List executions](bpmn/ch15-REST.md#list-of-executions) URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables
+The request body can contain all possible filters that can be used in the [List executions](bpmn/ch14-REST.md#list-of-executions) URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables
 to include in the query, with their format [described here](#json-query-variable-format).
 
 The general [paging and sorting query-parameters](#paging-and-sorting) can be used for this URL.
@@ -5182,7 +5182,7 @@ The request should be of type multipart/form-data. There should be a single file
       ]
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of tasks](bpmn/ch15-REST.md#list-of-tasks) (except for candidateGroupIn which is only available in this POST task query REST service), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on task and process variables. The taskVariables and processInstanceVariables are both JSON-arrays containing objects with the format [as described here.](#json-query-variable-format)
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of tasks](bpmn/ch14-REST.md#list-of-tasks) (except for candidateGroupIn which is only available in this POST task query REST service), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on task and process variables. The taskVariables and processInstanceVariables are both JSON-arrays containing objects with the format [as described here.](#json-query-variable-format)
 
 <table>
 <caption>Query for tasks - Response codes</caption>
@@ -7605,7 +7605,7 @@ The response body contains the binary content. By default, the content-type of t
       ]
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch15-REST.md#list-of-historic-process-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format [as described here.](#json-query-variable-format)
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch14-REST.md#list-of-historic-process-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format [as described here.](#json-query-variable-format)
 
 <table>
 <caption>Query for historic process instances - Response codes</caption>
@@ -8488,7 +8488,7 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
       ]
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic task instances](bpmn/ch15-REST.md#get-historic-task-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The taskVariables and processVariables properties are JSON-arrays containing objects with the format [as described here.](#json-query-variable-format)
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic task instances](bpmn/ch14-REST.md#get-historic-task-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The taskVariables and processVariables properties are JSON-arrays containing objects with the format [as described here.](#json-query-variable-format)
 
 <table>
 <caption>Query for historic task instances - Response codes</caption>
@@ -8827,7 +8827,7 @@ The response body contains the binary value of the variable. When the variable i
       "processDefinitionId" : "oneTaskProcess%3A1%3A4"
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic task instances](bpmn/ch15-REST.md#get-historic-task-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic task instances](bpmn/ch14-REST.md#get-historic-task-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.
 
 <table>
 <caption>Query for historic activity instances - Response codes</caption>
@@ -9004,7 +9004,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
       ]
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch15-REST.md#list-of-historic-variable-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format [as described here.](#json-query-variable-format)
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch14-REST.md#list-of-historic-variable-instances), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format [as described here.](#json-query-variable-format)
 
 <table>
 <caption>Query for historic variable instances - Response codes</caption>
@@ -9216,7 +9216,7 @@ The response body contains the binary value of the variable. When the variable i
       "processInstanceId" : "5",
     }
 
-All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch15-REST.md#get-historic-detail), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.
+All supported JSON parameter fields allowed are exactly the same as the parameters found for [getting a collection of historic process instances](bpmn/ch14-REST.md#get-historic-detail), but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.
 
 <table>
 <caption>Query for historic details - Response codes</caption>

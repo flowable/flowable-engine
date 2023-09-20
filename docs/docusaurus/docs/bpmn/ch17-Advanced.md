@@ -7,10 +7,6 @@ The following sections cover advanced use cases of Flowable, that go beyond typi
 
 ## Async Executor
 
-In Flowable v5, the Async executor was added in addition to the existing job executor. The Async Executor has proved to be more performant than the old job executor by many users of Flowable and in our benchmarks.
-
-From Flowable V6, the async executor is the only one available. For V6, the async executor has been completely refactored for optimal performance and pluggability, while still being compatible with existing APIs.
-
 ### Async Executor design
 
 Two types of jobs exist: timers (such as those belonging to a boundary event on a user task) and async continuations (belonging to a service task with the *flowable:async="true"* attribute).
@@ -515,7 +511,7 @@ An advanced way of hooking into the process engine configuration is through the 
 
 There are two methods required to implement this interface. The *configure* method, which gets a *ProcessEngineConfiguration* instance as parameter. The custom configuration can be added this way, and this method will guaranteed be called **before the process engine is created, but after all default configuration has been done**. The other method is the *getPriority* method, which allows for ordering the configurators in the case where some configurators are dependent on each other.
 
-An example of such a configurator is the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration), where the configurator is used to replace the default user and group manager classes with one that is capable of handling an LDAP user store. So basically a configurator allows to change or tweak the process engine quite heavily and is meant for very advanced use cases. Another example is to swap the process definition cache with a customized version:
+An example of such a configurator is the [LDAP integration](bpmn/ch16-Ldap.md#ldap-integration), where the configurator is used to replace the default user and group manager classes with one that is capable of handling an LDAP user store. So basically a configurator allows to change or tweak the process engine quite heavily and is meant for very advanced use cases. Another example is to swap the process definition cache with a customized version:
 
     public class ProcessDefinitionCacheConfigurator extends AbstractProcessEngineConfigurator {
 
@@ -559,7 +555,7 @@ Ugh, Right. To 'solve' this, a *org.flowable.engine.task.TaskInfoQueryWrapper* c
 
 ## Custom identity management by overriding standard SessionFactory
 
-If you do not want to use a full *ProcessEngineConfigurator* implementation like in the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration), but still want to plug in your custom identity management framework, then you can also override the *IdmIdentityServiceImpl* class or implement the *IdmIdentityService* interface directly and use the implemented class for the *idmIdentityService* property in the *ProcessEngineConfiguration*. In Spring this can be easily done by adding the following to the *ProcessEngineConfiguration* bean definition:
+If you do not want to use a full *ProcessEngineConfigurator* implementation like in the [LDAP integration](bpmn/ch16-Ldap.md#ldap-integration), but still want to plug in your custom identity management framework, then you can also override the *IdmIdentityServiceImpl* class or implement the *IdmIdentityService* interface directly and use the implemented class for the *idmIdentityService* property in the *ProcessEngineConfiguration*. In Spring this can be easily done by adding the following to the *ProcessEngineConfiguration* bean definition:
 
     <bean id="processEngineConfiguration" class="...SomeProcessEngineConfigurationClass">
 
@@ -582,7 +578,7 @@ leads to a call on the following member of the *IdmIdentityService* interface:
 
     UserQuery createUserQuery();
 
-The code for the [LDAP integration](bpmn/ch17-Ldap.md#ldap-integration) contains full examples of how to implement this. Check out the code on Github: [LDAPIdentityServiceImpl](https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java).
+The code for the [LDAP integration](bpmn/ch16-Ldap.md#ldap-integration) contains full examples of how to implement this. Check out the code on Github: [LDAPIdentityServiceImpl](https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ldap/src/main/java/org/flowable/ldap/LDAPIdentityServiceImpl.java).
 
 ## Enable safe BPMN 2.0 xml
 

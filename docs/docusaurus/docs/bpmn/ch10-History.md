@@ -1,5 +1,5 @@
 ---
-id: ch11-History
+id: ch10-History
 title: History
 ---
 
@@ -136,33 +136,9 @@ Following history levels can be configured:
 
 **In older releases, the history level was stored in the database (table ACT\_GE\_PROPERTY, property with name historyLevel). Starting from 5.11, this value is not used anymore and is ignored/deleted from the database. The history can now be changed between 2 boots of the engine, without an exception being thrown in case the level changed from the previous engine-boot.**
 
-## Async History configuration
-
-Async History has been introduced with Flowable 6.1.0 and allows historic data to be persisted asynchronously using a history job executor.
-
-    <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
-      <property name="asyncHistoryEnabled" value="true" />
-      <property name="asyncHistoryExecutorNumberOfRetries" value="10" />
-      <property name="asyncHistoryExecutorActivate" value="true" />
-      ...
-    </bean>
-
-With the asyncHistoryExecutorActivate property, the history job executor can be started automatically when booting the Process Engine. This would be only set to false for test cases (or if Async History is not enabled of course).
-The asyncHistoryExecutorNumberOfRetries property configures the number of retries for an Async History job. This property is a bit different than that for a normal async job, because a history job may need more cycles before it can be handled successfully. For example, a historic task first has to be created in the ACT\_HI\_TASK\_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the Process Engine configuration. When the number of retries has been reached, the history job will be ignored (and not written to a deadletter job table).
-
-In addition to these properties, the asyncHistoryExecutor property can be used to configure an AsyncExecutor in a similar way that you can do for the normal async job executor.
-
-When the history data is not to be persisted in the default history tables, but for example, is required in a NoSQL database (such as Elasticsearch, MongoDb, Cassandra and so on), or something completely different is to be done with it, the handler that is responsible for handling the job can be overridden:
-
--   Using the historyJobHandlers property, which is a map of all the custom history job handlers
-
--   Or, configure the customHistoryJobHandlers list with all instances will be added to the historyJobHandlers map at boot time.
-
-See [the Flowable Async History Examples](https://github.com/flowable/flowable-examples/tree/master/async-history) for various examples on how to configure the Async History, including the default way, using a JMS queue, using JTA or using a Message Queue and a Spring Boot application that acts as a message listener.
-
 ## History for audit purposes
 
-When [configuring](bpmn/ch11-History.md#history-configuration) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
+When [configuring](bpmn/ch10-History.md#history-configuration) at least audit level for configuration. Then all properties submitted through methods FormService.submitStartFormData(String processDefinitionId, Map&lt;String, String&gt; properties) and FormService.submitTaskFormData(String taskId, Map&lt;String, String&gt; properties) are recorded.
 
 Form properties can be retrieved with the query API like this:
 

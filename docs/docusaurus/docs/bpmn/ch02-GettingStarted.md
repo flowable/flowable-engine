@@ -20,7 +20,7 @@ The various tutorials below start by introducing how to set up and use this core
 
 -   The [section on the Flowable REST API](#getting-started-with-the-flowable-rest-api) shows how to run and use the same API through REST.
 
--   The [section on the Flowable REST App](ch14-Applications.md), will guide you through the basics of using the out-of-the-box example Flowable REST application.
+-   The [section on the Flowable REST App](ch13-Applications.md), will guide you through the basics of using the out-of-the-box example Flowable REST application.
 
 ## Flowable and Activiti
 
@@ -66,12 +66,12 @@ Add the following to your *pom.xml* file:
       <dependency>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-engine</artifactId>
-        <version>6.6.0</version>
+        <version>7.0.0</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>1.3.176</version>
+        <version>2.1.214</version>
       </dependency>
     </dependencies>
 
@@ -137,12 +137,12 @@ Flowable uses [SLF4J](http://www.slf4j.org/) as its logging framework internally
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>2.0.7</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.30</version>
+      <version>2.0.7</version>
     </dependency>
 
 Log4j needs a properties file for configuration. Add a *log4j.properties* file to the *src/main/resources* folder with the following content:
@@ -446,7 +446,7 @@ This section shows the same example as the [previous section](#building-a-comman
 
 This time, the Flowable REST API is used rather than the Java API. You’ll soon notice that the REST API closely matches the Java API, and knowing one automatically means that you can find your way around the other.
 
-To get a full, detailed overview of the Flowable REST API, check out the [REST API chapter](bpmn/ch15-REST.md#rest-api).
+To get a full, detailed overview of the Flowable REST API, check out the [REST API chapter](bpmn/ch14-REST.md#rest-api).
 
 ### Setting up the REST application
 

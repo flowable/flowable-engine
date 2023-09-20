@@ -11,8 +11,7 @@ The Spring Boot - Flowable integration has been developed together with Spring c
 
 ## Compatibility
 
-Flowable supports both Spring Boot 2.0 and 1.5 with the same starters. The base support is for Spring Boot 2.0, which means that the actuator endpoints are only supported on 2.0.
-The Flowable starters are also puling spring boot starter transitively, which means that users will have to define the 1.5 version of the spring boot starters in their own build files.
+Flowable supports Spring Boot 3.x.
 
 ## Getting started
 

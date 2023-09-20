@@ -22,7 +22,7 @@ The flowable-cdi modules leverages both the configurability of Flowable and the 
     <dependency>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-cdi</artifactId>
-        <version>6.x</version>
+        <version>7.x</version>
     </dependency>
 
 ## Setting up flowable-cdi
