@@ -13,7 +13,7 @@ See [The Executable Jar Format](https://docs.spring.io/spring-boot/docs/current/
 
 As mentioned before, the application can be deployed on a Tomcat server, and to get started this is probably the easiest approach when additional configuration settings are used. For this installation guide we’ll describe the installation of the application in a Tomcat server.
 
-1.  Download a recent stable version of [Apache Tomcat](http://tomcat.apache.org). It has to be Jakarta Servlet 6 compliant
+1.  Download a recent stable version of [Apache Tomcat](http://tomcat.apache.org). It has to be Jakarta Servlet 6 compliant (Tomcat 10 or later)
 
 2.  Download the latest stable [Flowable 7 version](http://www.flowable.org/downloads.html).
 
