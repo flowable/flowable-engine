@@ -42,8 +42,8 @@ public class FlowableProcessProperties {
     protected int definitionCacheLimit = -1;
 
     /**
-     * Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
-     * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of
+     * Enables extra checks on the BPMN xml that is parsed.
+     * Unfortunately, this feature is not available on some platforms, hence you need to disable if your platform does not allow the use of
      * StaxSource during XML parsing.
      */
     private boolean enableSafeXml = true;

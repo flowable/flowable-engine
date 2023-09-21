@@ -540,7 +540,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
 
     # Process https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/process/FlowableProcessProperties.java
     flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is -1 (all process definitions).
-    flowable.process.enable-safe-xml=true # Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
+    flowable.process.enable-safe-xml=true # Enables extra checks on the BPMN xml that is parsed. Unfortunately, this feature is not available on some platforms, hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
     flowable.process.servlet.load-on-startup=-1 # Load on startup of the Process dispatcher servlet.
     flowable.process.servlet.name=Flowable BPMN Rest API # The name of the Process servlet.
     flowable.process.servlet.path=/process-api # The context path for the Process rest servlet.
@@ -558,7 +558,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     # CMMN https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/FlowableCmmnProperties.java
     flowable.cmmn.deploy-resources=true # Whether to perform deployment of resources, default is 'true'.
     flowable.cmmn.deployment-name=SpringBootAutoDeployment # The name of the deployment for the CMMN resources.
-    flowable.cmmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
+    flowable.cmmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. Unfortunately, this feature is not available on some platforms, hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
     flowable.cmmn.enabled=true # Whether the CMMN engine needs to be started.
     flowable.cmmn.resource-location=classpath*:/cases/ # The location where the CMMN resources are located.
     flowable.cmmn.resource-suffixes=**.cmmn,**.cmmn11,**.cmmn.xml,**.cmmn11.xml # The suffixes for the resources that need to be scanned.
@@ -578,7 +578,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     # DMN https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/dmn/FlowableDmnProperties.java
     flowable.dmn.deploy-resources=true # Whether to perform deployment of resources, default is 'true'.
     flowable.dmn.deployment-name=SpringBootAutoDeployment # The name of the deployment for the dmn resources.
-    flowable.dmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml. Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
+    flowable.dmn.enable-safe-xml=true # Enables extra checks on the DMN xml that is parsed. Unfortunately, this feature is not available on some platforms, hence you need to disable if your platform does not allow the use of StaxSource during XML parsing.
     flowable.dmn.enabled=true # Whether the dmn engine needs to be started.
     flowable.dmn.history-enabled=true # Whether the history for the DMN engine should be enabled.
     flowable.dmn.resource-location=classpath*:/dmn/ # The location where the dmn resources are located.

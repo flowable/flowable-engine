@@ -374,13 +374,6 @@ Customizing the configuration of history storage is optional. This allows you to
 
     <property name="history" value="audit" />
 
-## Async history configuration
-
-\[Experimental\] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence.
-See [async history configuration](bpmn/ch10-History.md#async-history-configuration) for more details.
-
-    <property name="asyncHistoryEnabled" value="true" />
-
 ## Exposing configuration beans in expressions and scripts
 
 By default, all beans that you specify in the flowable.cfg.xml configuration or in your own Spring configuration file are available to expressions and scripts. If you want to limit the visibility of beans in your configuration file, you can configure a property called beans in your process engine configuration. The beans property in ProcessEngineConfiguration is a map. When you specify that property, only beans specified in that map will be visible to expressions and scripts. The exposed beans will be exposed with the names as you specify in the map.

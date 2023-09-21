@@ -21,7 +21,7 @@ The distribution contains most of the sources as JAR files. The source code for 
 
 ### JDK 17+
 
-Flowable runs on a JDK higher than or equal to version 8. Go to [Oracle Java SE downloads](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and click on button "Download JDK". There are installation instructions on that page as well. To verify that your installation was successful, run java -version on the command line. That should print the installed version of your JDK.
+Flowable runs on a JDK higher than or equal to version 17. Go to [Oracle Java SE downloads](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and click on button "Download JDK". There are installation instructions on that page as well. To verify that your installation was successful, run java -version on the command line. That should print the installed version of your JDK.
 
 ### Modeling
 
