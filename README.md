@@ -39,6 +39,10 @@ Flowable V7 runs on a Java higher than or equal to version 17. Use the JDK packa
 
 [Flowable V6](https://github.com/flowable/flowable-engine/tree/flowable6.x) is still maintained and supports Java 8+.
 
+### Flowable Design
+
+Flowable offers a free to use Flowable Cloud Design application, which you can use to model CMMN, BPMN, DMN and other model types. You can register via the Flowable account registration page to get started https://www.flowable.com/account/open-source.
+
 ### Contributing
 
 Contributing to Flowable: https://github.com/flowable/flowable-engine/wiki.
