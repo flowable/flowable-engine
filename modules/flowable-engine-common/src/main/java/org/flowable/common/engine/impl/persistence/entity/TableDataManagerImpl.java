@@ -101,6 +101,12 @@ public class TableDataManagerImpl implements TableDataManager {
         List<String> tableNames = new ArrayList<>();
         try (ResultSet tables = databaseMetaData.getTables(catalog, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES)) {
             while (tables.next()) {
+                if ("cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                    String schemaName = tables.getString("TABLE_SCHEM");
+                    if ("crdb_internal".equals(schemaName)) {
+                        continue;
+                    }
+                }
                 String tableName = tables.getString("TABLE_NAME");
                 tableName = tableName.toUpperCase(Locale.ROOT);
                 tableNames.add(tableName);
