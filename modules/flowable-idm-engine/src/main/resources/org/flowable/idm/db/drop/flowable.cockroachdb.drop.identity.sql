@@ -8,4 +8,3 @@ drop table if exists act_id_token cascade;
 drop table if exists act_id_priv cascade;
 drop table if exists act_id_priv_mapping cascade;
 
--- force-commit

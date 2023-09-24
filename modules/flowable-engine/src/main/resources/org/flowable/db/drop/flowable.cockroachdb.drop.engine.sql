@@ -7,4 +7,3 @@ drop table if exists act_evt_log cascade;
 drop sequence if exists act_evt_log_nr__seq;
 drop table if exists act_procdef_info cascade;
 
--- force-commit

@@ -39,4 +39,3 @@ alter table FLW_RU_BATCH_PART
 
 insert into ACT_GE_PROPERTY values ('batch.schema.version', '7.0.0.0', 1);
 
--- force-commit

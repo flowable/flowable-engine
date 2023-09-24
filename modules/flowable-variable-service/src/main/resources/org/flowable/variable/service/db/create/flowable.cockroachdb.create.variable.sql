@@ -22,7 +22,7 @@ create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TY
 create index ACT_IDX_RU_VAR_SUB_ID_TYPE on ACT_RU_VARIABLE(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
 
--- force-commit
+
 
 alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_BYTEARRAY 
@@ -31,4 +31,4 @@ alter table ACT_RU_VARIABLE
 
 insert into ACT_GE_PROPERTY values ('variable.schema.version', '7.0.0.0', 1);
 
--- force-commit
+

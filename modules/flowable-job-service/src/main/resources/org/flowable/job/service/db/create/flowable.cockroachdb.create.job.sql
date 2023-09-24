@@ -207,7 +207,7 @@ create index ACT_IDX_EJOB_SCOPE on ACT_RU_EXTERNAL_JOB(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_EJOB_SUB_SCOPE on ACT_RU_EXTERNAL_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_EJOB_SCOPE_DEF on ACT_RU_EXTERNAL_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
--- force-commit
+
 
 alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXCEPTION
@@ -261,4 +261,3 @@ alter table ACT_RU_EXTERNAL_JOB
 
 insert into ACT_GE_PROPERTY values ('job.schema.version', '7.0.0.0', 1);
 
--- force-commit

@@ -24,4 +24,3 @@ create index ACT_IDX_ENT_LNK_SCOPE_DEF on ACT_RU_ENTITYLINK(SCOPE_DEFINITION_ID_
 
 insert into ACT_GE_PROPERTY values ('entitylink.schema.version', '7.0.0.0', 1);
 
--- force-commit

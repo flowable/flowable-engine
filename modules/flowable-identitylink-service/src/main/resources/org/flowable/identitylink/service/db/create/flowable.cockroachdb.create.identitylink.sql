@@ -22,4 +22,3 @@ create index ACT_IDX_IDENT_LNK_SCOPE_DEF on ACT_RU_IDENTITYLINK(SCOPE_DEFINITION
 
 insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '7.0.0.0', 1);
 
--- force-commit

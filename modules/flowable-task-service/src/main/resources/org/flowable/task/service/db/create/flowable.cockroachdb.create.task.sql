@@ -39,4 +39,3 @@ create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_T
 
 insert into ACT_GE_PROPERTY values ('task.schema.version', '7.0.0.0', 1);
 
--- force-commit
