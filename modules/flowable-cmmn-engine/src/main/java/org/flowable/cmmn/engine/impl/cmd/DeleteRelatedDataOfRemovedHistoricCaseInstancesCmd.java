@@ -25,6 +25,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated
 public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,9 +37,11 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
         IdentityLinkServiceConfiguration identityLinkServiceConfiguration = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricCaseIdentityLinksForNonExistingInstances();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
-        if (historicEntityLinkService != null) {
-            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+            if (historicEntityLinkService != null) {
+                historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
+            }
         }
         cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
         cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();

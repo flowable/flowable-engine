@@ -32,6 +32,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContaine
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -216,6 +217,10 @@ public class PlanItemInstanceContainerUtil {
      * @return true, if there is a parent completion mode set on the plan item equal to the given one
      */
     public static boolean isParentCompletionRuleForPlanItemEqualToType(PlanItemInstanceEntity planItemInstance, String parentCompletionRuleType) {
+        if (planItemInstance.getPlanItem() == null) {
+            throw new FlowableException("Plan item could not be found for " + planItemInstance.getElementId());
+        }
+        
         if (planItemInstance.getPlanItem().getItemControl() != null && planItemInstance.getPlanItem().getItemControl().getParentCompletionRule() != null) {
             ParentCompletionRule parentCompletionRule = planItemInstance.getPlanItem().getItemControl().getParentCompletionRule();
             if (parentCompletionRuleType.equals(parentCompletionRule.getType())) {

@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
@@ -47,6 +48,7 @@ import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
@@ -721,6 +723,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean parallelMultiInstanceAsyncLeave = true;
 
     protected ExpressionManager expressionManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
     protected Collection<ELResolver> preDefaultELResolvers;
     protected Collection<ELResolver> preBeanELResolvers;
     protected Collection<ELResolver> postDefaultELResolvers;
@@ -2367,6 +2370,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 postDefaultELResolvers.forEach(processExpressionManager::addPostDefaultResolver);
             }
 
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(processExpressionManager));
+            }
+
             expressionManager = processExpressionManager;
         }
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
@@ -3258,6 +3265,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public ProcessEngineConfigurationImpl setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
+    }
+
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
         return this;
     }
 

@@ -62,6 +62,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         this.deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
                 .deploy());
 
         cmmnRuntimeService.createCaseInstanceBuilder()
@@ -204,6 +205,39 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefinedId")
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
+    }
+
+    @Test
+    public void getCaseInstanceByCaseDefinitionIds() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .caseInstanceId(caseInstance1.getId())
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .caseInstanceId("undefinedId")
+                .endOr()
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
     }
 
     @Test

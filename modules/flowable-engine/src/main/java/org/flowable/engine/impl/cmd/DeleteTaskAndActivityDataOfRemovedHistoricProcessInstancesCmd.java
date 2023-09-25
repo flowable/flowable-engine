@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
+@Deprecated
 public class DeleteTaskAndActivityDataOfRemovedHistoricProcessInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;

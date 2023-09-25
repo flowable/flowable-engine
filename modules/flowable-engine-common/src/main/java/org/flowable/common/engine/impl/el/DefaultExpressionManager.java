@@ -57,8 +57,10 @@ public class DefaultExpressionManager implements ExpressionManager {
     protected int expressionTextLengthCacheLimit = -1;
     
     protected List<ELResolver> preDefaultResolvers;
+    protected ELResolver jsonNodeResolver;
     protected List<ELResolver> postDefaultResolvers;
     protected List<ELResolver> preBeanResolvers;
+    protected ELResolver beanResolver;
 
     protected ELResolver staticElResolver;
 
@@ -134,7 +136,10 @@ public class DefaultExpressionManager implements ExpressionManager {
         elResolvers.add(new ArrayELResolver());
         elResolvers.add(new ListELResolver());
         elResolvers.add(new MapELResolver());
-        elResolvers.add(new JsonNodeELResolver());
+        ELResolver jsonNodeElResolver = createJsonNodeElResolver();
+        if (jsonNodeElResolver != null) {
+            elResolvers.add(jsonNodeElResolver);
+        }
         if (preBeanResolvers != null) {
             elResolvers.addAll(preBeanResolvers);
         }
@@ -156,9 +161,13 @@ public class DefaultExpressionManager implements ExpressionManager {
     protected ELResolver createVariableElResolver() {
         return new VariableContainerELResolver();
     }
+
+    protected ELResolver createJsonNodeElResolver() {
+        return jsonNodeResolver == null ? new JsonNodeELResolver() : jsonNodeResolver;
+    }
     
     protected ELResolver createBeanElResolver() {
-        return new BeanELResolver();
+        return beanResolver == null ? new BeanELResolver() : beanResolver;
     }
 
     @Override
@@ -243,6 +252,16 @@ public class DefaultExpressionManager implements ExpressionManager {
         this.preDefaultResolvers.add(elResolver);
     }
 
+    public ELResolver getJsonNodeResolver() {
+        return jsonNodeResolver;
+    }
+
+    public void setJsonNodeResolver(ELResolver jsonNodeResolver) {
+        // When the bean resolver is modified we need to reset the el resolver
+        this.staticElResolver = null;
+        this.jsonNodeResolver = jsonNodeResolver;
+    }
+
     public void addPostDefaultResolver(ELResolver elResolver) {
         if (this.postDefaultResolvers == null) {
             this.postDefaultResolvers = new ArrayList<>();
@@ -258,5 +277,14 @@ public class DefaultExpressionManager implements ExpressionManager {
 
         this.preBeanResolvers.add(elResolver);
     }
-    
+
+    public ELResolver getBeanResolver() {
+        return beanResolver;
+    }
+
+    public void setBeanResolver(ELResolver beanResolver) {
+        // When the bean resolver is modified we need to reset the el resolver
+        this.staticElResolver = null;
+        this.beanResolver = beanResolver;
+    }
 }

@@ -23,6 +23,10 @@ public interface CaseInstanceMigrationDocumentConstants {
     String TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY = "toCaseDefinitionTenantId";
 
     String PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY = "planItemDefinitionId";
+    String EXISTING_PLAN_ITEM_ID_JSON_PROPERTY = "existingPlanItemId";
+    String NEW_PLAN_ITEM_ID_JSON_PROPERTY = "newPlanItemId";
+    String EXISTING_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY = "existingPlanItemDefinitionId";
+    String NEW_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY = "newPlanItemDefinitionId";
     String NEW_ASSIGNEE_JSON_PROPERTY = "newAssignee";
 
     String ACTIVATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "activatePlanItemDefinitions";
@@ -30,6 +34,10 @@ public interface CaseInstanceMigrationDocumentConstants {
     String MOVE_TO_AVAILABLE_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "moveToAvailablePlanItemDefinitions";
     String WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "waitingForRepetitionPlanItemDefinitions";
     String REMOVE_WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "removeWaitingForRepetitionPlanItemDefinitions";
+    String CHANGE_PLAN_ITEM_IDS_JSON_SECTION = "changePlanItemIds";
+    String CHANGE_PLAN_ITEM_IDS_WITH_DEFINITION_ID_JSON_SECTION = "changePlanItemIdsWithDefinitionId";
+    String PRE_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY = "preUpgradeExpression";
+    String POST_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY = "postUpgradeExpression";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";
     String CASE_INSTANCE_VARIABLES_JSON_SECTION = "caseInstanceVariables";
 

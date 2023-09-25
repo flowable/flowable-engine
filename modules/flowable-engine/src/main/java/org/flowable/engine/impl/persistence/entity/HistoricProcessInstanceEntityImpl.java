@@ -46,6 +46,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String processDefinitionKey;
     protected String processDefinitionName;
     protected Integer processDefinitionVersion;
+    protected String processDefinitionCategory;
     protected String deploymentId;
     protected String callbackId;
     protected String callbackType;
@@ -68,6 +69,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         this.processDefinitionKey = processInstance.getProcessDefinitionKey();
         this.processDefinitionName = processInstance.getProcessDefinitionName();
         this.processDefinitionVersion = processInstance.getProcessDefinitionVersion();
+        this.processDefinitionCategory = processInstance.getProcessDefinitionCategory();
         this.deploymentId = processInstance.getDeploymentId();
         this.startActivityId = processInstance.getStartActivityId();
         this.startTime = processInstance.getStartTime();
@@ -101,6 +103,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("processDefinitionKey", processDefinitionKey);
         persistentState.put("processDefinitionName", processDefinitionName);
         persistentState.put("processDefinitionVersion", processDefinitionVersion);
+        persistentState.put("processDefinitionCategory", processDefinitionCategory);
         persistentState.put("deploymentId", deploymentId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
@@ -256,6 +259,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
         this.processDefinitionVersion = processDefinitionVersion;
+    }
+
+    @Override
+    public String getProcessDefinitionCategory() {
+        return processDefinitionCategory;
+    }
+
+    @Override
+    public void setProcessDefinitionCategory(String processDefinitionCategory) {
+        this.processDefinitionCategory = processDefinitionCategory;
     }
 
     @Override

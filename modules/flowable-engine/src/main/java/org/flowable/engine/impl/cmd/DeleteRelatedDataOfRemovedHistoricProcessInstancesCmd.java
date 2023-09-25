@@ -21,6 +21,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 
+@Deprecated
 public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;

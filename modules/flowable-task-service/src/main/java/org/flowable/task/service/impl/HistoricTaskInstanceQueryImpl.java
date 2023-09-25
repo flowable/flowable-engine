@@ -2019,6 +2019,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         delete();
     }

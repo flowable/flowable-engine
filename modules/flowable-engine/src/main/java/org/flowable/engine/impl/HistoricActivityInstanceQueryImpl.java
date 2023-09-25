@@ -298,6 +298,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         delete();
     }
