@@ -114,6 +114,13 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
                 }
                 
                 throw e;
+            } catch (Throwable t) {
+                if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                    BpmnLoggingSessionUtil.addErrorLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXCEPTION,
+                            "Service task with java class " + javaDelegate.getClass().getName() + " threw throwable " + t.getMessage(), t, execution);
+                }
+
+                throw new RuntimeException(t);
             }
             
         } else {

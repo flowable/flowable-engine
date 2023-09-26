@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" targetNamespace="http://www.activiti.org/test" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="14.0.0">
+    <process id="JobErrorCheck" name="Job Error Check" isExecutable="true">
+        <startEvent id="startevent1" name="Start">
+            <outgoing>Flow_1ygz058</outgoing>
+        </startEvent>
+        <endEvent id="endevent1" name="End" />
+        <serviceTask id="servicetask1" name="Service Task"  activiti:async="true" activiti:class="org.flowable.engine.test.jobexecutor.AsyncExecutorTest$TestErrorJavaDelegate">
+            <incoming>Flow_1ygz058</incoming>
+        </serviceTask>
+        <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="endevent1" />
+        <sequenceFlow id="Flow_1ygz058" sourceRef="startevent1" targetRef="servicetask1" />
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_JobErrorCheck">
+        <bpmndi:BPMNPlane id="BPMNPlane_JobErrorCheck" bpmnElement="JobErrorCheck">
+            <bpmndi:BPMNShape id="BPMNShape_startevent1" bpmnElement="startevent1">
+                <omgdc:Bounds x="150" y="90" width="35" height="35" />
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds x="156" y="125" width="24" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_servicetask1" bpmnElement="servicetask1">
+                <omgdc:Bounds x="327" y="80" width="105" height="55" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_endevent1" bpmnElement="endevent1">
+                <omgdc:Bounds x="502" y="90" width="35" height="35" />
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds x="510" y="125" width="20" height="14" />
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+                <omgdi:waypoint x="432" y="107" />
+                <omgdi:waypoint x="502" y="107" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="Flow_1ygz058_di" bpmnElement="Flow_1ygz058">
+                <omgdi:waypoint x="185" y="108" />
+                <omgdi:waypoint x="327" y="108" />
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

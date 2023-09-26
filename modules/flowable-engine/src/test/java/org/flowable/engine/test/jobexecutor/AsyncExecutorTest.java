@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -33,6 +34,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
@@ -92,6 +94,47 @@ public class AsyncExecutorTest {
                 cleanup(processEngine);
             }
         }
+    }
+
+    @Test
+    public void testThrowingErrorInJavaDelegate() throws InterruptedException {
+
+        ProcessEngine processEngine = null;
+        try {
+            // Deploy
+            processEngine = createProcessEngine(true);
+            processEngine.getProcessEngineConfiguration().getClock().reset();
+            deploy(processEngine, "AsyncExecutorTest.JobErrorCheck.bpmn20.xml");
+
+            processEngine.getProcessEngineConfiguration().setAsyncFailedJobWaitTime(1);
+            processEngine.getProcessEngineConfiguration().setDefaultFailedJobWaitTime(1);
+            processEngine.getProcessEngineConfiguration()
+                    .getAsyncExecutor()
+                    .getJobServiceConfiguration()
+                    .setAsyncExecutorNumberOfRetries(1);
+
+            ProcessInstance processWithError = processEngine.getRuntimeService().startProcessInstanceByKey("JobErrorCheck");
+
+            assertThat(processWithError).isNotNull();
+
+            final ProcessEngine processEngineCopy = processEngine;
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return processEngineCopy.getManagementService().createDeadLetterJobQuery().count() == 1;
+                }
+            });
+
+            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery()
+                    .processInstanceId(processWithError.getId()).activityId("servicetask1").singleResult()).isNull();
+        } finally {
+
+            // Clean up
+            if (processEngine != null) {
+                cleanup(processEngine);
+            }
+        }
+
     }
 
     @Test
@@ -472,6 +515,13 @@ public class AsyncExecutorTest {
         @Override
         public String getOnTransaction() {
             return null;
+        }
+    }
+
+    public static class TestErrorJavaDelegate implements JavaDelegate {
+        @Override
+        public void execute(DelegateExecution execution) {
+            throw new Error();
         }
     }
 
