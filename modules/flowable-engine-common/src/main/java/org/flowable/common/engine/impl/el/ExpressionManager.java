@@ -71,4 +71,8 @@ public interface ExpressionManager {
      */
     void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators);
 
+    FlowableFunctionResolverFactory getFunctionResolverFactory();
+
+    void setFunctionResolverFactory(FlowableFunctionResolverFactory functionResolverFactory);
+
 }
