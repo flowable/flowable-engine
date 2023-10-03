@@ -65,8 +65,8 @@ public class CommandContext {
         try {
             try {
                 try {
-                    executeCloseListenersClosing();
                     if (exception == null) {
+                        executeCloseListenersClosing();
                         flushSessions();
                     }
                 } catch (Throwable exception) {
