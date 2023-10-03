@@ -73,6 +73,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -193,6 +194,7 @@ public abstract class AbstractEngineConfiguration {
     protected CommandInterceptor commandInvoker;
 
     protected AgendaOperationRunner agendaOperationRunner = (commandContext, runnable) -> runnable.run();
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
@@ -1422,6 +1424,23 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
         this.agendaOperationRunner = agendaOperationRunner;
+        return this;
+    }
+
+    public Collection<AgendaOperationExecutionListener> getAgendaOperationExecutionListeners() {
+        return agendaOperationExecutionListeners;
+    }
+
+    public AbstractEngineConfiguration addAgendaOperationExecutionListener(AgendaOperationExecutionListener listener) {
+        if (this.agendaOperationExecutionListeners == null) {
+            this.agendaOperationExecutionListeners = new ArrayList<>();
+        }
+        this.agendaOperationExecutionListeners.add(listener);
+        return this;
+    }
+
+    public AbstractEngineConfiguration setAgendaOperationExecutionListeners(Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
         return this;
     }
 

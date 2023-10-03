@@ -52,9 +52,15 @@ public class CommandContext {
     protected boolean useClassForNameClassLoading;
     protected Clock clock;
     protected ObjectMapper objectMapper;
+    /**
+     * The start time when the command context was created.
+     * This is the result of {@link System#currentTimeMillis()} when the command context was created.
+     */
+    protected final long startTime;
     
     public CommandContext(Command<?> command) {
         this.command = command;
+        this.startTime = System.currentTimeMillis();
     }
 
     public void close() {
@@ -409,4 +415,7 @@ public class CommandContext {
         resultStack.add(result);
     }
     
+    public long getStartTime() {
+        return startTime;
+    }
 }

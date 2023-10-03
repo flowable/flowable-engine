@@ -1010,7 +1010,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public void initCommandInvoker() {
         if (this.commandInvoker == null) {
-            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner);
+            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner, agendaOperationExecutionListeners);
         }
     }
 

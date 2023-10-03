@@ -56,6 +56,7 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.ServiceConfigurator;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
@@ -260,7 +261,7 @@ import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
-import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
+import org.flowable.engine.impl.interceptor.LoggingExecutionTreeAgendaOperationExecutionListener;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
@@ -1016,12 +1017,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
+            Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners = this.agendaOperationExecutionListeners;
             if (enableVerboseExecutionTreeLogging) {
-                this.commandInvoker = new LoggingExecutionTreeCommandInvoker(agendaOperationRunner);
-
-            } else {
-                this.commandInvoker = new CommandInvoker(agendaOperationRunner);
+                if (agendaOperationExecutionListeners == null) {
+                    agendaOperationExecutionListeners = new ArrayList<>();
+                } else {
+                    agendaOperationExecutionListeners = new ArrayList<>(agendaOperationExecutionListeners);
+                }
+                agendaOperationExecutionListeners.add(new LoggingExecutionTreeAgendaOperationExecutionListener());
             }
+            this.commandInvoker = new CommandInvoker(agendaOperationRunner, agendaOperationExecutionListeners);
         }
     }
 
