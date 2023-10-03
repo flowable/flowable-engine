@@ -34,7 +34,12 @@
 		<hikari.version>5.0.1</hikari.version>
 		<maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
-		<mockito.version>5.3.1</mockito.version>
+		<mockito.version>5.5.0</mockito.version>
+		<!--
+		 	AssertJ 3.24.2 is pulling older byte buddy not compatible with Java 21.
+			Therefore, we are fixing it like this.
+		-->
+		<byte-buddy.version>1.14.8</byte-buddy.version>
 		<testcontainers.version>1.18.3</testcontainers.version>
 		<artemis.version>2.28.0</artemis.version>
 
@@ -280,7 +285,7 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-bom</artifactId>
-				<version>7.63.0.Final</version>
+				<version>8.44.0.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -463,6 +468,11 @@
 				<artifactId>json-unit-assertj</artifactId>
 				<version>2.35.0</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy</artifactId>
+				<version>${byte-buddy.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.h-thurow</groupId>

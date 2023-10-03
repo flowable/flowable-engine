@@ -16,11 +16,9 @@ jobs:
     name: Linux (OpenJDK EA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v4
       - name: Cache Maven Repository
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}

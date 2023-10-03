@@ -137,7 +137,12 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.apache.aries.blueprint").artifactId("org.apache.aries.blueprint.core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries.proxy").artifactId("org.apache.aries.proxy").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries").artifactId("org.apache.aries.util").versionAsInProject(),
-                mavenBundle().groupId("org.apache.aries.spifly").artifactId("org.apache.aries.spifly.dynamic.framework.extension").versionAsInProject(),
+                mavenBundle().groupId("org.apache.aries.spifly").artifactId("org.apache.aries.spifly.dynamic.bundle").versionAsInProject(),
+                mavenBundle().groupId("org.ow2.asm").artifactId("asm").versionAsInProject(),
+                mavenBundle().groupId("org.ow2.asm").artifactId("asm-commons").versionAsInProject(),
+                mavenBundle().groupId("org.ow2.asm").artifactId("asm-util").versionAsInProject(),
+                mavenBundle().groupId("org.ow2.asm").artifactId("asm-tree").versionAsInProject(),
+                mavenBundle().groupId("org.ow2.asm").artifactId("asm-analysis").versionAsInProject(),
                 bundle("reference:file:target/classes"));
 
         Option[] optionArray = OptionUtils.combine(coreBundles, CoreOptions.junitBundles(),
