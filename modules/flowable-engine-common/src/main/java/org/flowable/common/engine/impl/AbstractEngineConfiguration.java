@@ -1448,6 +1448,14 @@ public abstract class AbstractEngineConfiguration {
         return customPreCommandInterceptors;
     }
 
+    public AbstractEngineConfiguration addCustomPreCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPreCommandInterceptors == null) {
+            this.customPreCommandInterceptors = new ArrayList<>();
+        }
+        this.customPreCommandInterceptors.add(commandInterceptor);
+        return this;
+    }
+
     public AbstractEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
         this.customPreCommandInterceptors = customPreCommandInterceptors;
         return this;
@@ -1455,6 +1463,14 @@ public abstract class AbstractEngineConfiguration {
 
     public List<CommandInterceptor> getCustomPostCommandInterceptors() {
         return customPostCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration addCustomPostCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPostCommandInterceptors == null) {
+            this.customPostCommandInterceptors = new ArrayList<>();
+        }
+        this.customPostCommandInterceptors.add(commandInterceptor);
+        return this;
     }
 
     public AbstractEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
