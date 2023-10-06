@@ -63,8 +63,16 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
     @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
+
+        updateStackWithDecisionResults(decisionResults, executionContext);
+
         DecisionExecutionAuditContainer auditContainer = executionContext.getAuditContainer();
         auditContainer.setDecisionResult(decisionResults);
         auditContainer.setMultipleResults(multipleResults);
+    }
+
+    @Override
+    public void updateStackWithDecisionResults(List<Map<String, Object>> decisionResults, ELExecutionContext executionContext) {
+        decisionResults.forEach(result -> result.forEach((k, v) -> executionContext.getStackVariables().put(k, v)));
     }
 }
