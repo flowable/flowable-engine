@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.tenant;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.tenant.TenantContext;
 
 /**
@@ -20,30 +19,30 @@ import org.flowable.common.engine.api.tenant.TenantContext;
  */
 public class ThreadLocalTenantContext implements TenantContext {
 
-    protected final ThreadLocal<String> tenantId = ThreadLocal.withInitial(() -> {
-        throw new FlowableException("Tenant value has not been set");
-    });
-    protected final ThreadLocal<Boolean> tenantIdSet = ThreadLocal.withInitial(() -> Boolean.FALSE);
+    protected final ThreadLocal<Tenant> tenantId = new ThreadLocal<>();
 
     @Override
     public String getTenantId() {
-        return tenantId.get();
+        Tenant tenant = tenantId.get();
+        return tenant != null ? tenant.tenantId() : null;
     }
 
     @Override
     public void setTenantId(String tenantId) {
-        this.tenantId.set(tenantId);
-        this.tenantIdSet.set(true);
+        this.tenantId.set(new Tenant(tenantId));
     }
 
     @Override
     public void clearTenantId() {
         tenantId.remove();
-        tenantIdSet.remove();
     }
 
     @Override
     public boolean isTenantIdSet() {
-        return tenantIdSet.get();
+        return tenantId.get() != null;
+    }
+
+    protected record Tenant(String tenantId) {
+
     }
 }
