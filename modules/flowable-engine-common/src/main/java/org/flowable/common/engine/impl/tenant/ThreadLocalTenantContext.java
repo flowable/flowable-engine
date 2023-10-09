@@ -23,6 +23,7 @@ public class ThreadLocalTenantContext implements TenantContext {
     protected final ThreadLocal<String> tenantId = ThreadLocal.withInitial(() -> {
         throw new FlowableException("Tenant value has not been set");
     });
+    protected final ThreadLocal<Boolean> tenantIdSet = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     @Override
     public String getTenantId() {
@@ -32,11 +33,17 @@ public class ThreadLocalTenantContext implements TenantContext {
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId.set(tenantId);
+        this.tenantIdSet.set(true);
     }
 
     @Override
     public void clearTenantId() {
         tenantId.remove();
+        tenantIdSet.remove();
     }
 
+    @Override
+    public boolean isTenantIdSet() {
+        return tenantIdSet.get();
+    }
 }

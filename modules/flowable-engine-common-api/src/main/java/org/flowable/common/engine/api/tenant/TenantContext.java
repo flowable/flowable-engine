@@ -38,4 +38,11 @@ public interface TenantContext {
      */
     void clearTenantId();
 
+    /**
+     * Flag indicating whether the tenant id is set.
+     *
+     * @return {@code true} if the tenant id can return a value for {@link #getTenantId()}, {@code false} otherwise
+     */
+    boolean isTenantIdSet();
+
 }
