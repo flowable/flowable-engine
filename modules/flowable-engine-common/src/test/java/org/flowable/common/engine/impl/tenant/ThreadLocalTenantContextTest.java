@@ -13,9 +13,7 @@
 package org.flowable.common.engine.impl.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.tenant.TenantContext;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +26,7 @@ class ThreadLocalTenantContextTest {
 
     @Test
     void getTenantId() {
-        assertThatThrownBy(() -> underTest.getTenantId())
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Tenant value has not been set");
+        assertThat(underTest.getTenantId()).isNull();
 
         underTest.setTenantId("acme");
         assertThat(underTest.getTenantId()).isEqualTo("acme");
@@ -39,9 +35,7 @@ class ThreadLocalTenantContextTest {
         assertThat(underTest.getTenantId()).isEqualTo("muppets");
 
         underTest.clearTenantId();
-        assertThatThrownBy(() -> underTest.getTenantId())
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Tenant value has not been set");
+        assertThat(underTest.getTenantId()).isNull();
     }
 
     @Test
@@ -53,5 +47,8 @@ class ThreadLocalTenantContextTest {
 
         underTest.clearTenantId();
         assertThat(underTest.isTenantIdSet()).isFalse();
+
+        underTest.setTenantId(null);
+        assertThat(underTest.isTenantIdSet()).isTrue();
     }
 }
