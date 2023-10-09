@@ -349,4 +349,22 @@ public class DecisionServiceTest {
             .isInstanceOf(FlowableException.class)
             .hasMessageContaining("more than one result in decision: decision1");
     }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceStackUpdate.dmn")
+    public void executeDecisionServiceWithCollectStackUpdate() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("expandedDecisionService")
+                .variable("inputVariable1", 5D)
+                .executeDecisionServiceWithSingleResult();
+
+        Map<String, Object> expectedResult = new HashMap<>();
+        expectedResult.put("serviceOutput1", "larger than 30");
+
+        assertThat(result)
+                .containsAllEntriesOf(expectedResult);
+    }
 }
