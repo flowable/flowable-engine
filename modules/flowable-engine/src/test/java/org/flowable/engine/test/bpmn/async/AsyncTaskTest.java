@@ -35,6 +35,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -72,6 +73,34 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         assertThat(managementService.createJobQuery().count()).isZero();
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncServiceCurrentTenant() {
+        String noTenantInstanceId = runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
+        String flowableInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("asyncService")
+                .overrideProcessDefinitionTenantId("flowable")
+                .start()
+                .getId();
+        String muppetsInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("asyncService")
+                .overrideProcessDefinitionTenantId("muppets")
+                .start()
+                .getId();
+
+        assertThat(runtimeService.hasVariable(noTenantInstanceId, "currentTenantVar")).isFalse();
+        assertThat(runtimeService.hasVariable(flowableInstanceId, "currentTenantVar")).isFalse();
+        assertThat(runtimeService.hasVariable(muppetsInstanceId, "currentTenantVar")).isFalse();
+
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(noTenantInstanceId, "currentTenantVar");
+        assertThat(variableInstance).isNotNull();
+        assertThat((String) variableInstance.getValue()).isNullOrEmpty();
+        assertThat(runtimeService.getVariable(flowableInstanceId, "currentTenantVar")).isEqualTo("flowable");
+        assertThat(runtimeService.getVariable(muppetsInstanceId, "currentTenantVar")).isEqualTo("muppets");
     }
 
     @Test

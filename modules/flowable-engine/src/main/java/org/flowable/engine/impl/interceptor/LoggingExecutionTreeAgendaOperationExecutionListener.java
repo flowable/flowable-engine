@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.interceptor;
 
-import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.debug.ExecutionTreeUtil;
 import org.flowable.engine.impl.agenda.AbstractOperation;
@@ -21,19 +21,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
+public class LoggingExecutionTreeAgendaOperationExecutionListener implements AgendaOperationExecutionListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExecutionTreeCommandInvoker.class);
-
-    public LoggingExecutionTreeCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
-        super(agendaOperationRunner);
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExecutionTreeAgendaOperationExecutionListener.class);
 
     @Override
-    public void executeOperation(CommandContext commandContext, Runnable runnable) {
-        if (runnable instanceof AbstractOperation) {
-            AbstractOperation operation = (AbstractOperation) runnable;
+    public void beforeExecute(CommandContext commandContext, Runnable runnable) {
+        if (runnable instanceof AbstractOperation operation) {
 
             if (operation.getExecution() != null) {
                 LOGGER.info("Execution tree while executing operation {}:", operation.getClass());
@@ -41,8 +37,15 @@ public class LoggingExecutionTreeCommandInvoker extends CommandInvoker {
             }
 
         }
-
-        super.executeOperation(commandContext, runnable);
     }
 
+    @Override
+    public void afterExecute(CommandContext commandContext, Runnable runnable) {
+
+    }
+
+    @Override
+    public void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error) {
+
+    }
 }

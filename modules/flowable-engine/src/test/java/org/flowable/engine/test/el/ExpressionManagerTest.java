@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.tenant.CurrentTenant;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -28,6 +29,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -270,6 +273,28 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         });
 
         assertThat(value).isNull();
+    }
+
+    @ParameterizedTest
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    @ValueSource(strings = { "", "flowable" })
+    public void testResolveCurrentTenantId(String tenantId) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${currentTenantId}");
+        Object value = managementService.executeCommand(commandContext -> {
+            ExecutionEntity executionEntity = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables().singleResult();
+            try {
+                CurrentTenant.getTenantContext().setTenantId(tenantId);
+                return expression.getValue(executionEntity);
+            } finally {
+                CurrentTenant.getTenantContext().clearTenantId();
+            }
+        });
+
+        assertThat(value).isEqualTo(tenantId);
     }
 
     static class TestAmbiguousMethodSingleNumberParameterBean {

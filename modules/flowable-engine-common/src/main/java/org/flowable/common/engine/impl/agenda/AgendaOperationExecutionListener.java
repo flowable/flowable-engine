@@ -10,18 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.hitpolicy;
+package org.flowable.common.engine.impl.agenda;
 
-import java.util.List;
-import java.util.Map;
-
-import org.flowable.dmn.engine.impl.el.ELExecutionContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
- * @author Yvo Swillens
+ * @author Filip Hrisafov
  */
-public interface ComposeDecisionResultBehavior {
+public interface AgendaOperationExecutionListener {
 
-    void composeDecisionResults(ELExecutionContext executionContext);
-    void updateStackWithDecisionResults(List<Map<String, Object>> decisionResults, ELExecutionContext executionContext);
+    void beforeExecute(CommandContext commandContext, Runnable runnable);
+
+    void afterExecute(CommandContext commandContext, Runnable runnable);
+
+    void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error);
+
 }

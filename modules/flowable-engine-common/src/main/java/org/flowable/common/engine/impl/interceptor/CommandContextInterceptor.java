@@ -104,7 +104,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
             return next.execute(config, command, commandExecutor);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
             commandContext.exception(e);
 

@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +54,8 @@ public abstract class AbstractAgenda implements Agenda {
             // If there are no more operations then we need to wait until any of the schedule future operations are done
             List<ExecuteFutureActionOperation<?>> copyOperations = new ArrayList<>(futureOperations);
             futureOperations.clear();
-            return new WaitForAnyFutureToFinishOperation(this, copyOperations);
+            Duration maxWaitTimeout = getFutureMaxWaitTimeout();
+            return new WaitForAnyFutureToFinishOperation(this, copyOperations, maxWaitTimeout);
         }
     }
 
@@ -92,6 +94,11 @@ public abstract class AbstractAgenda implements Agenda {
         }
     }
 
+    protected Duration getFutureMaxWaitTimeout() {
+        AgendaFutureMaxWaitTimeoutProvider futureOperationTimeoutProvider = getAgendaFutureMaxWaitTimeoutProvider();
+        return futureOperationTimeoutProvider != null ? futureOperationTimeoutProvider.getMaxWaitTimeout(commandContext) : null;
+    }
+
     public LinkedList<Runnable> getOperations() {
         return operations;
     }
@@ -103,6 +110,8 @@ public abstract class AbstractAgenda implements Agenda {
     public void setCommandContext(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
+
+    protected abstract AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider();
 
     @Override
     public void flush() {
