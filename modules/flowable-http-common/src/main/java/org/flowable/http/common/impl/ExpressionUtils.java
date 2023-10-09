@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
