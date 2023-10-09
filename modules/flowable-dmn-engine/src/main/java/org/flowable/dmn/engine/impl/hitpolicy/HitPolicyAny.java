@@ -73,7 +73,14 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
             if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false && validationFailed) {
                 executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; multiple valid rules with different outcomes. Setting last valid rule result as final result.", getHitPolicyName()));
             }
-            executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(ruleResults.size() - 1));
+
+            List<Map<String, Object>> decisionResults = new ArrayList<>();
+            decisionResults.add(ruleResults.get(ruleResults.size() - 1));
+
+            updateStackWithDecisionResults(decisionResults, executionContext);
+
+            // put decision results on audit container
+            executionContext.getAuditContainer().setDecisionResult(decisionResults);
         }
     }
 
