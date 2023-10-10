@@ -10,18 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.hitpolicy;
+package org.flowable.engine.test.bpmn.async;
 
-import java.util.List;
-import java.util.Map;
-
-import org.flowable.dmn.engine.impl.el.ELExecutionContext;
+import org.flowable.common.engine.impl.tenant.CurrentTenant;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 
 /**
- * @author Yvo Swillens
+ * @author Filip Hrisafov
  */
-public interface ComposeDecisionResultBehavior {
+public class AsyncServiceTenant implements JavaDelegate {
 
-    void composeDecisionResults(ELExecutionContext executionContext);
-    void updateStackWithDecisionResults(List<Map<String, Object>> decisionResults, ELExecutionContext executionContext);
+    @Override
+    public void execute(DelegateExecution execution) {
+        execution.setVariable("currentTenantVar", CurrentTenant.getTenantContext().getTenantId());
+    }
 }

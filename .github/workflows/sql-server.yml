@@ -36,9 +36,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v4
       - name: Prepare Database
         run: ./.github/actions/scripts/prepare-mssql.sh
         env:
@@ -46,8 +44,9 @@ jobs:
           # If we were running the job on a container this would be mssql
           MSSQL_HOST: localhost
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use localhost for the host here because we have specified a vm for the job.
@@ -86,9 +85,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@v4
       - name: Prepare Database
         run: ./.github/actions/scripts/prepare-mssql.sh
         env:
@@ -96,8 +93,9 @@ jobs:
           # If we were running the job on a container this would be mssql
           MSSQL_HOST: localhost
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use localhost for the host here because we have specified a vm for the job.

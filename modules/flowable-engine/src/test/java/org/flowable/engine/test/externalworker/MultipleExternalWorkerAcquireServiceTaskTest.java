@@ -157,7 +157,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
         protected CountDownLatch waitLatch;
 
         public CustomWaitCommandInvoker() {
-            super((commandContext, runnable) -> runnable.run());
+            super((commandContext, runnable) -> runnable.run(), null);
         }
 
         @Override

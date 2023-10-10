@@ -10,18 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.hitpolicy;
+package org.flowable.cmmn.test.delegate;
 
-import java.util.List;
-import java.util.Map;
-
-import org.flowable.dmn.engine.impl.el.ELExecutionContext;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.common.engine.impl.tenant.CurrentTenant;
 
 /**
- * @author Yvo Swillens
+ * @author Filip Hrisafov
  */
-public interface ComposeDecisionResultBehavior {
+public class CurrentTenantJavaDelegate implements PlanItemJavaDelegate {
 
-    void composeDecisionResults(ELExecutionContext executionContext);
-    void updateStackWithDecisionResults(List<Map<String, Object>> decisionResults, ELExecutionContext executionContext);
+    @Override
+    public void execute(DelegatePlanItemInstance planItemInstance) {
+        planItemInstance.setVariable("currentTenantVar", CurrentTenant.getTenantContext().getTenantId());
+    }
+
 }

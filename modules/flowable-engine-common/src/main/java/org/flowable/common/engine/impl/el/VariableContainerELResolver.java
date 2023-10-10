@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.tenant.CurrentTenant;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -29,6 +30,7 @@ public class VariableContainerELResolver extends ELResolver {
 
     public static final String VARIABLE_CONTAINER_KEY = "variableContainer";
     public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
+    public static final String CURRENT_TENANT_ID_KEY = "currentTenantId";
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
@@ -39,6 +41,9 @@ public class VariableContainerELResolver extends ELResolver {
                 context.setPropertyResolved(true);
                 return Authentication.getAuthenticatedUserId();
 
+            } else if (CURRENT_TENANT_ID_KEY.equals(property)) {
+                context.setPropertyResolved(true);
+                return CurrentTenant.getTenantContext().getTenantId();
             } else if (variableContainer.hasVariable(variable)) {
                 Object value = null;
                 if (context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
