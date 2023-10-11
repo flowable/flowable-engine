@@ -61,6 +61,10 @@ public class TaskHelper {
         }
 
     }
+    
+    public static void completeTask(TaskEntity task, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        internalDeleteTask(task, userId, null, false, true, cmmnEngineConfiguration);
+    }
 
     public static void deleteTask(String taskId, String deleteReason, boolean cascade, CmmnEngineConfiguration cmmnEngineConfiguration) {
         TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
@@ -76,15 +80,23 @@ public class TaskHelper {
             deleteHistoricTask(taskId, cmmnEngineConfiguration);
         }
     }
+    
+    public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, 
+            boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        internalDeleteTask(task, null, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
+    }
 
-    public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    protected static void internalDeleteTask(TaskEntity task, String userId, String deleteReason, boolean cascade, 
+            boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (!task.isDeleted()) {
             task.setDeleted(true);
 
             TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             List<Task> subTasks = taskService.findTasksByParentTaskId(task.getId());
             for (Task subTask : subTasks) {
-                deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
+                internalDeleteTask((TaskEntity) subTask, userId, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
             }
 
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
@@ -117,7 +129,7 @@ public class TaskHelper {
             if (cascade) {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
             } else {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason,
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, userId, deleteReason,
                         cmmnEngineConfiguration.getClock().getCurrentTime());
             }
 

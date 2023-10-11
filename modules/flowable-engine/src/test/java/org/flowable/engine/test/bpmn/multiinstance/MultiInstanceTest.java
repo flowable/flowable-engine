@@ -1201,11 +1201,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task3 = taskService.createTaskQuery().processDefinitionKey("midProcess").singleResult();
         assertThat(task3).isNotNull();
-        taskService.complete(task3.getId(), null);
+        taskService.complete(task3.getId());
 
         org.flowable.task.api.Task task4 = taskService.createTaskQuery().processDefinitionKey("parentProcess").singleResult();
         assertThat(task4).isNotNull();
-        taskService.complete(task4.getId(), null);
+        taskService.complete(task4.getId());
 
         assertProcessEnded(procId);
     }

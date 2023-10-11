@@ -21,6 +21,13 @@ import java.util.Date;
  * @author Tijs Rademakers
  */
 public interface Task extends TaskInfo {
+    
+    String CREATED = "created";
+    String CLAIMED = "claimed";
+    String IN_PROGRESS = "inProgress";
+    String SUSPENDED = "suspended";
+    String COMPLETED = "completed";
+    String TERMINATED = "terminated";
 
     /**
      * Default value used for priority when a new {@link Task} is created.

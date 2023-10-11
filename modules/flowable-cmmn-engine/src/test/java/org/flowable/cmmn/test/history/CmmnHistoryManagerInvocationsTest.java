@@ -49,7 +49,7 @@ public class CmmnHistoryManagerInvocationsTest extends CustomCmmnConfigurationFl
         cmmnTaskService.complete(task.getId());
 
         verify(mockHistoryManager, times(1)).recordTaskCreated(any());
-        verify(mockHistoryManager, times(1)).recordTaskEnd(any(), any(), any());
+        verify(mockHistoryManager, times(1)).recordTaskEnd(any(), any(), any(), any());
 
         verify(mockHistoryManager, times(1)).recordCaseInstanceStart(any());
         verify(mockHistoryManager, times(1)).recordCaseInstanceEnd(any(), any(), any());

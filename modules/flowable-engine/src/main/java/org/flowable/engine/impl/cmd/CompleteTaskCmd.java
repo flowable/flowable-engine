@@ -30,6 +30,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
 
+    protected String userId;
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
@@ -38,6 +39,11 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
         super(taskId);
         this.variables = variables;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables) {
+        this(taskId, variables);
+        this.userId = userId;
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
@@ -48,10 +54,20 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             this.variables = variables;
         }
     }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, boolean localScope) {
+        this(taskId, variables, localScope);
+        this.userId = userId;
+    }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         this(taskId, variables);
         this.transientVariables = transientVariables;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        this(taskId, variables, transientVariables);
+        this.userId = userId;
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
@@ -62,6 +78,13 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.variablesLocal = variablesLocal;
         this.transientVariables = transientVariables;
         this.transientVariablesLocal = transientVariablesLocal;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
     }
 
     @Override
@@ -89,7 +112,8 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        TaskHelper.completeTask(task, variables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+        TaskHelper.completeTask(task, userId, variables, variablesLocal, transientVariables, 
+                transientVariablesLocal, commandContext);
         return null;
     }
 

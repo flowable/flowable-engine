@@ -187,10 +187,10 @@ class CompositeCmmnHistoryManagerTest {
     void recordTaskEnd() {
         TaskEntity task = new TaskEntityImpl();
         Date endTime = Date.from(Instant.now().plusSeconds(3));
-        compositeHistoryManager.recordTaskEnd(task, "delete reason", endTime);
+        compositeHistoryManager.recordTaskEnd(task, "kermit", "delete reason", endTime);
 
-        verify(historyManager1).recordTaskEnd(same(task), eq("delete reason"), eq(endTime));
-        verify(historyManager2).recordTaskEnd(same(task), eq("delete reason"), eq(endTime));
+        verify(historyManager1).recordTaskEnd(same(task), eq("kermit"), eq("delete reason"), eq(endTime));
+        verify(historyManager2).recordTaskEnd(same(task), eq("kermit"), eq("delete reason"), eq(endTime));
     }
 
     @Test

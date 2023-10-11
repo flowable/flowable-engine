@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.ActivateTaskCmd;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
 import org.flowable.engine.impl.cmd.BulkSaveTasksCmd;
@@ -69,6 +70,8 @@ import org.flowable.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
+import org.flowable.engine.impl.cmd.StartProgressTaskCmd;
+import org.flowable.engine.impl.cmd.SuspendTaskCmd;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
@@ -214,28 +217,68 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     }
 
     @Override
+    public void startProgress(String taskId, String userId) {
+        commandExecutor.execute(new StartProgressTaskCmd(taskId, userId));
+    }
+
+    @Override
+    public void suspendTask(String taskId, String userId) {
+        commandExecutor.execute(new SuspendTaskCmd(taskId, userId));
+    }
+
+    @Override
+    public void activateTask(String taskId, String userId) {
+        commandExecutor.execute(new ActivateTaskCmd(taskId, userId));
+    }
+
+    @Override
     public void complete(String taskId) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, (Map<String, Object>) null));
+    }
+    
+    @Override
+    public void complete(String taskId, String userId) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, (Map<String, Object>) null));
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
     }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables));
+    }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, transientVariables));
+    }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, transientVariables));
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables, boolean localScope) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, localScope));
     }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables, boolean localScope) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, localScope));
+    }
 
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables));
     }
 
     @Override
@@ -244,11 +287,27 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, 
+                userId, variables, transientVariables));
+    }
+    
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables, localScope));
     }
 
     @Override

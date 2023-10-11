@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -40,6 +41,8 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
         if (userId != null) {
             Clock clock = cmmnEngineConfiguration.getClock();
             task.setClaimTime(clock.getCurrentTime());
+            task.setClaimedBy(userId);
+            task.setState(Task.CLAIMED);
 
             if (task.getAssignee() != null) {
                 if (!task.getAssignee().equals(userId)) {
@@ -57,6 +60,13 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             if (task.getAssignee() != null) {
                 // Task claim time should be null
                 task.setClaimTime(null);
+                task.setClaimedBy(null);
+                
+                if (task.getInProgressStartTime() != null) {
+                    task.setState(Task.IN_PROGRESS);
+                } else {
+                    task.setState(Task.CREATED);
+                }
                 
                 // Task should be assigned to no one
                 TaskHelper.changeTaskAssignee(task, null, cmmnEngineConfiguration);

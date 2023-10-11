@@ -38,6 +38,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     private static final long serialVersionUID = 1L;
     protected String formDefinitionId;
     protected String outcome;
+    protected String userId;
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
@@ -49,15 +50,28 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this.outcome = outcome;
         this.variables = variables;
     }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables) {
+        this(taskId, formDefinitionId, outcome, variables);
+        this.userId = userId;
+    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
+        
         this(taskId, formDefinitionId, outcome, variables);
         if (localScope) {
             this.variablesLocal = variables;
         } else {
             this.variables = variables;
         }
+    }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope) {
+        
+        this(taskId, formDefinitionId, outcome, variables, localScope);
+        this.userId = userId;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
@@ -66,6 +80,13 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
     }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        this(taskId, formDefinitionId, outcome, variables, transientVariables);
+        this.userId = userId;
+    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String,
             Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
@@ -73,6 +94,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this.variablesLocal = variablesLocal;
         this.transientVariables = transientVariables;
         this.transientVariablesLocal = transientVariablesLocal;
+    }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, String userId, 
+            Map<String, Object> variables, Map<String, Object> variablesLocal, 
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, formDefinitionId, outcome, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
     }
 
     @Override
@@ -127,9 +156,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         // Only one set of variables can be used as form submission.
         // When variablesLocal are present then they have precedence and those are used for the completion
         if (local) {
-            TaskHelper.completeTask(task, variables, taskVariables, transientVariables, transientVariablesLocal, commandContext);
+            TaskHelper.completeTask(task, userId, variables, taskVariables, transientVariables, transientVariablesLocal, commandContext);
         } else {
-            TaskHelper.completeTask(task, taskVariables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+            TaskHelper.completeTask(task, userId, taskVariables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
         }
 
 

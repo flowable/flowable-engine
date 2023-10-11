@@ -49,8 +49,16 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected String scopeType;
     protected String scopeDefinitionId;
     protected String propagatedStageInstanceId;
+    protected String state;
     protected Date createTime;
+    protected Date inProgressStartTime;
+    protected String inProgressStartedBy;
+    protected Date claimTime;
+    protected String claimedBy;
+    protected Date suspendedTime;
+    protected String suspendedBy;
     protected Date endTime;
+    protected String completedBy;
     protected Long durationInMillis;
     protected String deleteReason;
     protected String name;
@@ -63,8 +71,8 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected String taskDefinitionKey;
     protected String formKey;
     protected int priority;
+    protected Date inProgressStartDueDate;
     protected Date dueDate;
-    protected Date claimTime;
     protected String category;
     protected String tenantId = TaskServiceConfiguration.NO_TENANT_ID;
     protected Date lastUpdateTime;
@@ -87,18 +95,25 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         this.scopeType = task.getScopeType();
         this.scopeDefinitionId = task.getScopeDefinitionId();
         this.propagatedStageInstanceId = task.getPropagatedStageInstanceId();
+        this.state = task.getState();
         this.name = task.getName();
         this.parentTaskId = task.getParentTaskId();
         this.description = task.getDescription();
         this.owner = task.getOwner();
         this.assignee = task.getAssignee();
         this.createTime = task.getCreateTime();
+        this.inProgressStartTime = task.getInProgressStartTime();
+        this.inProgressStartedBy = task.getInProgressStartedBy();
+        this.claimTime = task.getClaimTime();
+        this.claimedBy = task.getClaimedBy();
+        this.suspendedTime = task.getSuspendedTime();
+        this.suspendedBy = task.getSuspendedBy();
         this.taskDefinitionKey = task.getTaskDefinitionKey();
         this.formKey = task.getFormKey();
-
-        this.setPriority(task.getPriority());
-        this.setDueDate(task.getDueDate());
-        this.setCategory(task.getCategory());
+        this.priority = task.getPriority();
+        this.inProgressStartDueDate = task.getInProgressStartDueDate();
+        this.dueDate = task.getDueDate();
+        this.category = task.getCategory();
 
         // Inherit tenant id (if applicable)
         if (task.getTenantId() != null) {
@@ -114,7 +129,16 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         persistentState.put("name", name);
         persistentState.put("owner", owner);
         persistentState.put("assignee", assignee);
+        persistentState.put("state", state);
+        persistentState.put("createTime", createTime);
+        persistentState.put("inProgressStartTime", inProgressStartTime);
+        persistentState.put("inProgressStartedBy", inProgressStartedBy);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
+        persistentState.put("suspendedTime", suspendedTime);
+        persistentState.put("suspendedBy", suspendedBy);
         persistentState.put("endTime", endTime);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("description", description);
         persistentState.put("deleteReason", deleteReason);
@@ -131,8 +155,8 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         persistentState.put("scopeDefinitionId", scopeDefinitionId);
         persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         persistentState.put("parentTaskId", parentTaskId);
+        persistentState.put("inProgressStartDueDate", inProgressStartDueDate);
         persistentState.put("dueDate", dueDate);
-        persistentState.put("claimTime", claimTime);
         persistentState.put("lastUpdateTime", lastUpdateTime);
         return persistentState;
     }
@@ -223,6 +247,11 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     public String getPropagatedStageInstanceId() {
         return propagatedStageInstanceId;
     }
+    
+    @Override
+    public String getState() {
+        return state;
+    }
 
     @Override
     public Date getStartTime() {
@@ -230,8 +259,43 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
 
     @Override
+    public Date getInProgressStartTime() {
+        return inProgressStartTime;
+    }
+
+    @Override
+    public String getInProgressStartedBy() {
+        return inProgressStartedBy;
+    }
+    
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public Date getSuspendedTime() {
+        return suspendedTime;
+    }
+
+    @Override
+    public String getSuspendedBy() {
+        return suspendedBy;
+    }
+
+    @Override
     public Date getEndTime() {
         return endTime;
+    }
+    
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
     }
 
     @Override
@@ -253,6 +317,11 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     public void setTaskDefinitionId(String taskDefinitionId) {
         this.taskDefinitionId = taskDefinitionId;
     }
+    
+    @Override
+    public void setState(String state) {
+        this.state = state;
+    }
 
     @Override
     public void setCreateTime(Date createTime) {
@@ -260,8 +329,43 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
 
     @Override
+    public void setInProgressStartTime(Date inProgressStartTime) {
+        this.inProgressStartTime = inProgressStartTime;
+    }
+
+    @Override
+    public void setInProgressStartedBy(String inProgressStartedBy) {
+        this.inProgressStartedBy = inProgressStartedBy;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+    
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
+    public void setSuspendedTime(Date suspendedTime) {
+        this.suspendedTime = suspendedTime;
+    }
+
+    @Override
+    public void setSuspendedBy(String suspendedBy) {
+        this.suspendedBy = suspendedBy;
+    }
+
+    @Override
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+    
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
     }
 
     @Override
@@ -361,6 +465,16 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     public void setPriority(int priority) {
         this.priority = priority;
     }
+    
+    @Override
+    public Date getInProgressStartDueDate() {
+        return inProgressStartDueDate;
+    }
+
+    @Override
+    public void setInProgressStartDueDate(Date inProgressStartDueDate) {
+        this.inProgressStartDueDate = inProgressStartDueDate;
+    }
 
     @Override
     public Date getDueDate() {
@@ -400,16 +514,6 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     @Override
     public void setParentTaskId(String parentTaskId) {
         this.parentTaskId = parentTaskId;
-    }
-
-    @Override
-    public Date getClaimTime() {
-        return claimTime;
-    }
-
-    @Override
-    public void setClaimTime(Date claimTime) {
-        this.claimTime = claimTime;
     }
 
     @Override

@@ -314,6 +314,66 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks that are created after the given date.
      */
     T taskCreatedAfter(Date after);
+    
+    /**
+     * Only select tasks that are started in progress on the given date.
+     */
+    T taskInProgressStartTimeOn(Date claimedTime);
+
+    /**
+     * Only select tasks that are started in progress before the given date.
+     */
+    T taskInProgressStartTimeBefore(Date before);
+
+    /**
+     * Only select tasks that are started in progress after the given date.
+     */
+    T taskInProgressStartTimeAfter(Date after);
+    
+    /**
+     * Select all tasks that have an in progress started user reference for the given value.
+     */
+    T taskInProgressStartedBy(String startedBy);
+    
+    /**
+     * Only select tasks that are claimed on the given date.
+     */
+    T taskClaimedOn(Date claimedTime);
+
+    /**
+     * Only select tasks that are claimed before the given date.
+     */
+    T taskClaimedBefore(Date before);
+
+    /**
+     * Only select tasks that are claimed after the given date.
+     */
+    T taskClaimedAfter(Date after);
+    
+    /**
+     * Select all tasks that have a claimed by user reference for the given value.
+     */
+    T taskClaimedBy(String claimedBy);
+    
+    /**
+     * Only select tasks that are suspended on the given date.
+     */
+    T taskSuspendedOn(Date suspendedTime);
+
+    /**
+     * Only select tasks that are suspended before the given date.
+     */
+    T taskSuspendedBefore(Date before);
+
+    /**
+     * Only select tasks that are suspended after the given date.
+     */
+    T taskSuspendedAfter(Date after);
+    
+    /**
+     * Select all tasks that have a suspended by user reference for the given value.
+     */
+    T taskSuspendedBy(String suspendedBy);
 
     /**
      * Only select tasks with the given category.
@@ -375,6 +435,31 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with the given taskDefinitionKeys. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKeys(Collection<String> keys);
+    
+    /**
+     * Only select tasks with the given state.
+     **/
+    T taskState(String state);
+    
+    /**
+     * Only select tasks with the given in progress start due date.
+     */
+    T taskInProgressStartDueDate(Date dueDate);
+
+    /**
+     * Only select tasks which have an in progress start due date before the given date.
+     */
+    T taskInProgressStartDueBefore(Date dueDate);
+
+    /**
+     * Only select tasks which have an in progress start due date after the given date.
+     */
+    T taskInProgressStartDueAfter(Date dueDate);
+
+    /**
+     * Only select tasks with no in progress start due date.
+     */
+    T withoutTaskInProgressStartDueDate();
 
     /**
      * Only select tasks with the given due date.

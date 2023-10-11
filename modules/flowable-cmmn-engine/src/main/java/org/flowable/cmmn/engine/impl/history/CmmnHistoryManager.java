@@ -65,7 +65,7 @@ public interface CmmnHistoryManager {
 
     void recordTaskCreated(TaskEntity task);
 
-    void recordTaskEnd(TaskEntity task, String deleteReason, Date endTime);
+    void recordTaskEnd(TaskEntity task, String userId, String deleteReason, Date endTime);
 
     void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
