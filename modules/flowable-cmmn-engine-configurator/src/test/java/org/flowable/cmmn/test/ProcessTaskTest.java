@@ -2034,5 +2034,25 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
         assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/caseWithVariableListener.cmmn")
+    public void testCaseVariableListener() {
+        Deployment deployment = processEngine.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processChangeVariableValue.bpmn")
+                .deploy();
+        
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithVariableListener").start();
+            List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(tasks).hasSize(2);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("After process").singleResult()).isNotNull();
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Variable change task update 1").singleResult()).isNotNull();
+            
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+        
+    }
 
 }

@@ -36,6 +36,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -76,7 +77,15 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected String description;
     protected String localizedDescription;
     protected int priority = DEFAULT_PRIORITY;
+    protected String state;
     protected Date createTime; // The time when the task has been created
+    protected Date inProgressStartTime;
+    protected String inProgressStartedBy;
+    protected Date claimTime;
+    protected String claimedBy;
+    protected Date suspendedTime;
+    protected String suspendedBy;
+    protected Date inProgressStartDueDate;
     protected Date dueDate;
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
     protected String category;
@@ -104,8 +113,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected int variableCount;
     protected int identityLinkCount;
     protected int subTaskCount;
-
-    protected Date claimTime;
 
     protected String tenantId = TaskServiceConfiguration.NO_TENANT_ID;
 
@@ -155,11 +162,35 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         if (propagatedStageInstanceId != null) {
             persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         }
+        if (state != null) {
+            persistentState.put("state", this.state);
+        }
         if (createTime != null) {
             persistentState.put("createTime", this.createTime);
         }
+        if (inProgressStartTime != null) {
+            persistentState.put("inProgressStartTime", this.inProgressStartTime);
+        }
+        if (inProgressStartedBy != null) {
+            persistentState.put("inProgressStartedBy", this.inProgressStartedBy);
+        }
+        if (claimTime != null) {
+            persistentState.put("claimTime", this.claimTime);
+        }
+        if (claimedBy != null) {
+            persistentState.put("claimedBy", this.claimedBy);
+        }
+        if (suspendedTime != null) {
+            persistentState.put("suspendedTime", this.suspendedTime);
+        }
+        if (suspendedBy != null) {
+            persistentState.put("suspendedBy", this.suspendedBy);
+        }
         if (description != null) {
             persistentState.put("description", this.description);
+        }
+        if (inProgressStartDueDate != null) {
+            persistentState.put("inProgressStartDueDate", this.inProgressStartDueDate);
         }
         if (dueDate != null) {
             persistentState.put("dueDate", this.dueDate);
@@ -176,10 +207,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
         if (forcedUpdate) {
             persistentState.put("forcedUpdate", Boolean.TRUE);
-        }
-
-        if (claimTime != null) {
-            persistentState.put("claimTime", this.claimTime);
         }
 
         persistentState.put("isCountEnabled", this.isCountEnabled);
@@ -312,6 +339,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         } else {
             this.owner = owner;
         }
+    }
+    
+    @Override
+    public void setInProgressStartDueDate(Date inProgressStartDueDate) {
+        this.inProgressStartDueDate = inProgressStartDueDate;
     }
 
     @Override
@@ -458,6 +490,11 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
     }
+    
+    @Override
+    public Date getInProgressStartDueDate() {
+        return inProgressStartDueDate;
+    }
 
     @Override
     public Date getDueDate() {
@@ -468,6 +505,16 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     public int getPriority() {
         return priority;
     }
+    
+    @Override
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public void setState(String state) {
+        this.state = state;
+    }
 
     @Override
     public Date getCreateTime() {
@@ -477,6 +524,66 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @Override
+    public Date getInProgressStartTime() {
+        return inProgressStartTime;
+    }
+
+    @Override
+    public void setInProgressStartTime(Date inProgressStartTime) {
+        this.inProgressStartTime = inProgressStartTime;
+    }
+
+    @Override
+    public String getInProgressStartedBy() {
+        return inProgressStartedBy;
+    }
+
+    @Override
+    public void setInProgressStartedBy(String inProgressStartedBy) {
+        this.inProgressStartedBy = inProgressStartedBy;
+    }
+    
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
+    public Date getSuspendedTime() {
+        return suspendedTime;
+    }
+
+    @Override
+    public void setSuspendedTime(Date suspendedTime) {
+        this.suspendedTime = suspendedTime;
+    }
+
+    @Override
+    public String getSuspendedBy() {
+        return suspendedBy;
+    }
+
+    @Override
+    public void setSuspendedBy(String suspendedBy) {
+        this.suspendedBy = suspendedBy;
     }
 
     @Override
@@ -766,7 +873,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     public boolean isSuspended() {
-        return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+        return suspensionState == SuspensionState.SUSPENDED.getStateCode() || Task.SUSPENDED.equals(state);
     }
 
     @Override
@@ -841,16 +948,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     public void setQueryIdentityLinks(List<IdentityLinkEntity> identityLinks) {
         queryIdentityLinks = identityLinks;
-    }
-
-    @Override
-    public Date getClaimTime() {
-        return claimTime;
-    }
-
-    @Override
-    public void setClaimTime(Date claimTime) {
-        this.claimTime = claimTime;
     }
 
     @Override

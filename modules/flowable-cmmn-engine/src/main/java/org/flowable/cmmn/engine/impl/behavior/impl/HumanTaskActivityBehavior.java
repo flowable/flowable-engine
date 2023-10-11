@@ -403,7 +403,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                TaskHelper.deleteTask(taskEntity, null, false, true, cmmnEngineConfiguration);
+                TaskHelper.completeTask(taskEntity, Authentication.getAuthenticatedUserId(), cmmnEngineConfiguration);
             }
         }
 

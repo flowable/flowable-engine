@@ -123,16 +123,34 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean unfinished;
     protected boolean processFinished;
     protected boolean processUnfinished;
+    protected String state;
+    protected Date createTime;
+    protected Date createTimeBefore;
+    protected Date createTimeAfter;
+    protected Date inProgressStartTime;
+    protected Date inProgressStartTimeBefore;
+    protected Date inProgressStartTimeAfter;
+    protected String inProgressStartedBy;
+    protected Date claimTime;
+    protected Date claimTimeBefore;
+    protected Date claimTimeAfter;
+    protected String claimedBy;
+    protected Date suspendedTime;
+    protected Date suspendedTimeBefore;
+    protected Date suspendedTimeAfter;
+    protected String suspendedBy;
+    protected Date completedTime;
+    protected Date completedTimeAfter;
+    protected Date completedTimeBefore;
+    protected String completedBy;
+    protected Date inProgressStartDueDate;
+    protected Date inProgressStartDueAfter;
+    protected Date inProgressStartDueBefore;
+    protected boolean withoutInProgressStartDueDate;
     protected Date dueDate;
     protected Date dueAfter;
     protected Date dueBefore;
     protected boolean withoutDueDate;
-    protected Date creationDate;
-    protected Date creationAfterDate;
-    protected Date creationBeforeDate;
-    protected Date completedDate;
-    protected Date completedAfterDate;
-    protected Date completedBeforeDate;
     protected String category;
     protected Collection<String> categoryInList;
     protected Collection<String> categoryNotInList;
@@ -1463,6 +1481,236 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             orQueryObject.ensureVariablesInitialized();
         }
     }
+    
+    @Override
+    public HistoricTaskInstanceQuery taskState(String state) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery taskCreatedOn(Date creationDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.createTime = creationDate;
+        } else {
+            this.createTime = creationDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCreatedBefore(Date creationBeforeDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.createTimeBefore = creationBeforeDate;
+        } else {
+            this.createTimeBefore = creationBeforeDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCreatedAfter(Date creationAfterDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.createTimeAfter = creationAfterDate;
+        } else {
+            this.createTimeAfter = creationAfterDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartTimeOn(Date startTime) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartTime = startTime;
+        } else {
+            this.inProgressStartTime = startTime;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartTimeBefore(Date before) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartTimeBefore = before;
+        } else {
+            this.inProgressStartTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartTimeAfter(Date after) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartTimeAfter = after;
+        } else {
+            this.inProgressStartTimeAfter = after;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartedBy(String startedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartedBy = startedBy;
+        } else {
+            this.inProgressStartedBy = startedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskClaimedOn(Date claimedTime) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.claimTime = claimedTime;
+        } else {
+            this.claimTime = claimedTime;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskClaimedBefore(Date before) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.claimTimeBefore = before;
+        } else {
+            this.claimTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskClaimedAfter(Date after) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.claimTimeAfter = after;
+        } else {
+            this.claimTimeAfter = after;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskClaimedBy(String claimedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.claimedBy = claimedBy;
+        } else {
+            this.claimedBy = claimedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskSuspendedOn(Date suspendedTime) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.suspendedTime = suspendedTime;
+        } else {
+            this.suspendedTime = suspendedTime;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskSuspendedBefore(Date before) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.suspendedTimeBefore = before;
+        } else {
+            this.suspendedTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskSuspendedAfter(Date after) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.suspendedTimeAfter = after;
+        } else {
+            this.suspendedTimeAfter = after;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskSuspendedBy(String suspendedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.suspendedBy = suspendedBy;
+        } else {
+            this.suspendedBy = suspendedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCompletedOn(Date completedDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedTime = completedDate;
+        } else {
+            this.completedTime = completedDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCompletedBefore(Date completedBeforeDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedTimeBefore = completedBeforeDate;
+        } else {
+            this.completedTimeBefore = completedBeforeDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCompletedAfter(Date completedAfterDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedTimeAfter = completedAfterDate;
+        } else {
+            this.completedTimeAfter = completedAfterDate;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartDueDate(Date dueDate) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartDueDate = dueDate;
+        } else {
+            this.inProgressStartDueDate = dueDate;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartDueBefore(Date dueBefore) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartDueBefore = dueBefore;
+        } else {
+            this.inProgressStartDueBefore = dueBefore;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskInProgressStartDueAfter(Date dueAfter) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.inProgressStartDueAfter = dueAfter;
+        } else {
+            this.inProgressStartDueAfter = dueAfter;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery withoutTaskInProgressStartDueDate() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutInProgressStartDueDate = true;
+        } else {
+            this.withoutInProgressStartDueDate = true;
+        }
+        return this;
+    }
 
     @Override
     public HistoricTaskInstanceQuery taskDueDate(Date dueDate) {
@@ -1473,17 +1721,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
-
-    @Override
-    public HistoricTaskInstanceQuery taskDueAfter(Date dueAfter) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.dueAfter = dueAfter;
-        } else {
-            this.dueAfter = dueAfter;
-        }
-        return this;
-    }
-
+    
     @Override
     public HistoricTaskInstanceQuery taskDueBefore(Date dueBefore) {
         if (inOrStatement) {
@@ -1495,61 +1733,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
-    public HistoricTaskInstanceQuery taskCreatedOn(Date creationDate) {
+    public HistoricTaskInstanceQuery taskDueAfter(Date dueAfter) {
         if (inOrStatement) {
-            this.currentOrQueryObject.creationDate = creationDate;
+            this.currentOrQueryObject.dueAfter = dueAfter;
         } else {
-            this.creationDate = creationDate;
-        }
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery taskCreatedBefore(Date creationBeforeDate) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.creationBeforeDate = creationBeforeDate;
-        } else {
-            this.creationBeforeDate = creationBeforeDate;
-        }
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery taskCreatedAfter(Date creationAfterDate) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.creationAfterDate = creationAfterDate;
-        } else {
-            this.creationAfterDate = creationAfterDate;
-        }
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery taskCompletedOn(Date completedDate) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.completedDate = completedDate;
-        } else {
-            this.completedDate = completedDate;
-        }
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery taskCompletedBefore(Date completedBeforeDate) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.completedBeforeDate = completedBeforeDate;
-        } else {
-            this.completedBeforeDate = completedBeforeDate;
-        }
-        return this;
-    }
-
-    @Override
-    public HistoricTaskInstanceQuery taskCompletedAfter(Date completedAfterDate) {
-        if (inOrStatement) {
-            this.currentOrQueryObject.completedAfterDate = completedAfterDate;
-        } else {
-            this.completedAfterDate = completedAfterDate;
+            this.dueAfter = dueAfter;
         }
         return this;
     }
@@ -2174,25 +2362,29 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public boolean isWithoutDueDate() {
         return withoutDueDate;
     }
-
-    public Date getCreationAfterDate() {
-        return creationAfterDate;
+    
+    public Date getCreateTime() {
+        return createTime;
+    }
+    
+    public Date getCreateTimeBefore() {
+        return createTimeBefore;
     }
 
-    public Date getCreationBeforeDate() {
-        return creationBeforeDate;
+    public Date getCreateTimeAfter() {
+        return createTimeAfter;
     }
 
-    public Date getCompletedDate() {
-        return completedDate;
+    public Date getCompletedTime() {
+        return completedTime;
+    }
+    
+    public Date getCompletedTimeBefore() {
+        return completedTimeBefore;
     }
 
-    public Date getCompletedAfterDate() {
-        return completedAfterDate;
-    }
-
-    public Date getCompletedBeforeDate() {
-        return completedBeforeDate;
+    public Date getCompletedTimeAfter() {
+        return completedTimeAfter;
     }
 
     public String getCategory() {
@@ -2338,10 +2530,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getTaskParentTaskId() {
         return taskParentTaskId;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
     }
 
     public String getCandidateUser() {

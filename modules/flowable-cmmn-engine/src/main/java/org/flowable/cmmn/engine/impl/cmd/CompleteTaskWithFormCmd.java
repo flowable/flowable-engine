@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -43,6 +44,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     private static final long serialVersionUID = 1L;
     protected String formDefinitionId;
     protected String outcome;
+    protected String userId;
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
@@ -55,12 +57,24 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this.outcome = outcome;
         this.variables = variables;
     }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables) {
+        this(taskId, formDefinitionId, outcome, variables);
+        this.userId = userId;
+    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.localScope = localScope;
+    }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope) {
+
+        this(taskId, formDefinitionId, outcome, variables, localScope);
+        this.userId = userId;
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
@@ -69,12 +83,27 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
     }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        this(taskId, formDefinitionId, outcome, variables, transientVariables);
+        this.userId = userId;
+    }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String,
             Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
         this(taskId, formDefinitionId, outcome, variables, transientVariables);
         this.variablesLocal = variablesLocal;
         this.transientVariablesLocal = transientVariablesLocal;
+    }
+    
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, String userId,
+            Map<String,Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, 
+            Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, formDefinitionId, outcome, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
     }
 
     @Override
@@ -178,6 +207,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         
         cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_COMPLETE);
 
+        if (StringUtils.isNotEmpty(userId)) {
+            Authentication.setAuthenticatedUserId(userId);
+        }
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
     }
 

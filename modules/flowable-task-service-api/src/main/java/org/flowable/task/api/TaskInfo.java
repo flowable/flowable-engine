@@ -99,14 +99,52 @@ public interface TaskInfo {
      * @return the stage instance id this task belongs to or null, if this task is not part of a case at all or is not a child element of a stage
      */
     String getPropagatedStageInstanceId();
+    
+    /**
+     * The state of this task
+     */
+    String getState();
 
     /** The date/time when this task was created */
     Date getCreateTime();
+    
+    /** The date/time when this task was put in progress */
+    Date getInProgressStartTime();
+    
+    /**
+     * The user reference that put this task in progress
+     */
+    String getInProgressStartedBy();
+    
+    /**
+     * The claim time of this task
+     */
+    Date getClaimTime();
+    
+    /**
+     * The user reference that claimed this task
+     */
+    String getClaimedBy();
+    
+    /**
+     * The suspended time of this task
+     */
+    Date getSuspendedTime();
+    
+    /**
+     * The user reference that suspended this task
+     */
+    String getSuspendedBy();
 
     /**
      * The id of the activity in the process defining this task or null if this is not related to a process
      */
     String getTaskDefinitionKey();
+    
+    /**
+     * In progress start due date of the task.
+     */
+    Date getInProgressStartDueDate();
 
     /**
      * Due date of the task.
@@ -152,9 +190,4 @@ public interface TaskInfo {
      * Returns the identity links.
      */
     List<? extends IdentityLinkInfo> getIdentityLinks();
-
-    /**
-     * The claim time of this task
-     */
-    Date getClaimTime();
 }

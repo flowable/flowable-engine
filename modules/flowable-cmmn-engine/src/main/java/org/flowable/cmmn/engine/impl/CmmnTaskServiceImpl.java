@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.cmd.ActivateTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkCmd;
 import org.flowable.cmmn.engine.impl.cmd.BulkSaveTasksCmd;
 import org.flowable.cmmn.engine.impl.cmd.ClaimTaskCmd;
@@ -46,6 +47,8 @@ import org.flowable.cmmn.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetTaskVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartProgressTaskCmd;
+import org.flowable.cmmn.engine.impl.cmd.SuspendTaskCmd;
 import org.flowable.cmmn.engine.impl.task.TaskCompletionBuilderImpl;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -97,15 +100,40 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     public void unclaim(String taskId) {
         commandExecutor.execute(new ClaimTaskCmd(taskId, null));
     }
+    
+    @Override
+    public void startProgress(String taskId, String userId) {
+        commandExecutor.execute(new StartProgressTaskCmd(taskId, userId));
+    }
+    
+    @Override
+    public void suspendTask(String taskId, String userId) {
+        commandExecutor.execute(new SuspendTaskCmd(taskId, userId));
+    }
+    
+    @Override
+    public void activateTask(String taskId, String userId) {
+        commandExecutor.execute(new ActivateTaskCmd(taskId, userId));
+    }
 
     @Override
     public void complete(String taskId) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, null, null));
     }
+    
+    @Override
+    public void complete(String taskId, String userId) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, null, null));
+    }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, null));        
+    }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, null));        
     }
 
     @Override
@@ -114,8 +142,18 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     }
     
     @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, transientVariables));        
+    }
+    
+    @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables));
     }
 
     @Override
@@ -124,10 +162,13 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
-
+    
     @Override
-    public TaskCompletionBuilder createTaskCompletionBuilder() {
-        return new TaskCompletionBuilderImpl(commandExecutor);
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, 
+                userId, variables, transientVariables));
     }
 
     @Override
@@ -135,6 +176,18 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
             Map<String, Object> variables, boolean localScope) {
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables, localScope));
+    }
+    
+    @Override
+    public TaskCompletionBuilder createTaskCompletionBuilder() {
+        return new TaskCompletionBuilderImpl(commandExecutor);
     }
     
     @Override

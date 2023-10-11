@@ -64,7 +64,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TaskHelper {
 
-    public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> localVariables,
+    public static void completeTask(TaskEntity taskEntity, String userId, Map<String, Object> variables, Map<String, Object> localVariables,
             Map<String, Object> transientVariables, Map<String, Object> localTransientVariables, CommandContext commandContext) {
 
         if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
@@ -174,7 +174,7 @@ public class TaskHelper {
             }
         }
 
-        deleteTask(taskEntity, null, false, true, true);
+        completeTask(taskEntity, userId);
 
         // Continue process (if not a standalone task)
         if (taskEntity.getExecutionId() != null && !bpmnErrorPropagated) {
@@ -325,12 +325,16 @@ public class TaskHelper {
 
         // Delete all entities related to the task entities
         for (TaskEntity taskEntity : taskEntities) {
-            internalDeleteTask(taskEntity, deleteReason, false, false, true, true);
+            internalDeleteTask(taskEntity, null, deleteReason, false, false, true, true);
         }
         
         // Delete the task entities itself
         processEngineConfiguration.getTaskServiceConfiguration().getTaskService().deleteTasksByExecutionId(executionEntity.getId());
         
+    }
+    
+    public static void completeTask(TaskEntity task, String userId) {
+        internalDeleteTask(task, userId, null, false, true, true, true);
     }
 
     /**
@@ -348,10 +352,10 @@ public class TaskHelper {
      *            for the deletion.
      */
     public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireTaskListener, boolean fireEvents) {
-        internalDeleteTask(task, deleteReason, cascade, true, fireTaskListener, fireEvents);
+        internalDeleteTask(task, null, deleteReason, cascade, true, fireTaskListener, fireEvents);
     }
         
-    protected static void internalDeleteTask(TaskEntity task, String deleteReason, 
+    protected static void internalDeleteTask(TaskEntity task, String userId, String deleteReason, 
             boolean cascade, boolean executeTaskDelete, boolean fireTaskListener, boolean fireEvents) {
         
         if (!task.isDeleted()) {
@@ -374,8 +378,8 @@ public class TaskHelper {
 
             task.setDeleted(true);
 
-            handleRelatedEntities(commandContext, task, deleteReason, cascade, fireTaskListener, fireEvents, eventDispatcher);
-            handleTaskHistory(commandContext, task, deleteReason, cascade);
+            handleRelatedEntities(task, deleteReason, cascade, fireTaskListener, fireEvents, eventDispatcher, commandContext);
+            handleTaskHistory(task, userId, deleteReason, cascade, commandContext);
 
             if (executeTaskDelete) {
                 executeTaskDelete(task, commandContext);
@@ -388,8 +392,8 @@ public class TaskHelper {
         }
     }
 
-    protected static void handleRelatedEntities(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade,
-            boolean fireTaskListener, boolean fireEvents, FlowableEventDispatcher eventDispatcher) {
+    protected static void handleRelatedEntities(TaskEntity task, String deleteReason, boolean cascade,
+            boolean fireTaskListener, boolean fireEvents, FlowableEventDispatcher eventDispatcher, CommandContext commandContext) {
         
         boolean isTaskRelatedEntityCountEnabled = CountingEntityUtil.isTaskRelatedEntityCountEnabled(task);
         
@@ -399,7 +403,7 @@ public class TaskHelper {
             TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             List<Task> subTasks = taskService.findTasksByParentTaskId(task.getId());
             for (Task subTask : subTasks) {
-                internalDeleteTask((TaskEntity) subTask, deleteReason, cascade, true, fireTaskListener, fireEvents); // Sub tasks are always immediately deleted
+                internalDeleteTask((TaskEntity) subTask, null, deleteReason, cascade, true, fireTaskListener, fireEvents); // Sub tasks are always immediately deleted
             }
         }
         
@@ -448,7 +452,7 @@ public class TaskHelper {
         }
     }
 
-    protected static void handleTaskHistory(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade) {
+    protected static void handleTaskHistory(TaskEntity task, String userId, String deleteReason, boolean cascade, CommandContext commandContext) {
         if (cascade) {
             deleteHistoricTask(task.getId());
         } else {
@@ -456,8 +460,8 @@ public class TaskHelper {
             if (task.getExecutionId() != null) {
                 execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(task.getExecutionId());
             }
-            CommandContextUtil.getHistoryManager(commandContext)
-                .recordTaskEnd(task, execution, deleteReason, CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
+            CommandContextUtil.getHistoryManager(commandContext).recordTaskEnd(task, execution, userId, deleteReason, 
+                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
         }
     }
 

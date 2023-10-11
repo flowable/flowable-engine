@@ -52,17 +52,31 @@ public interface CmmnTaskService {
 
     void complete(String taskId);
     
+    void complete(String taskId, String userId);
+    
     void complete(String taskId, Map<String, Object> variables);
+    
+    void complete(String taskId, String userId, Map<String, Object> variables);
     
     void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables);
     
+    void complete(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables);
+    
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
+    
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables);
 
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, Map<String, Object> transientVariables);
+    
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables);
 
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope);
+    
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope);
 
     /**
      * Create a completion builder for the task
@@ -95,6 +109,42 @@ public interface CmmnTaskService {
      *             when the task doesn't exist.
      */
     void unclaim(String taskId);
+    
+    /**
+     * Starts the progress on the task.
+     * 
+     * @param taskId
+     *            task to start progress, cannot be null.
+     * @param userId
+     *            user that starts progress for the task.
+     * @throws FlowableObjectNotFoundException
+     *             when the task doesn't exist.
+     */
+    void startProgress(String taskId, String userId);
+    
+    /**
+     * Suspends the task. No check is done whether the user is known by the identity component.
+     * 
+     * @param taskId
+     *            task to suspend, cannot be null.
+     * @param userId
+     *            user that suspends the task.
+     * @throws FlowableObjectNotFoundException
+     *             when the task doesn't exist.
+     */
+    void suspendTask(String taskId, String userId);
+    
+    /**
+     * Activates the task. No check is done whether the user is known by the identity component.
+     * 
+     * @param taskId
+     *            task to activate, cannot be null.
+     * @param userId
+     *            user that activates the task.
+     * @throws FlowableObjectNotFoundException
+     *             when the task doesn't exist.
+     */
+    void activateTask(String taskId, String userId);
 
     /**
      * Delegates the task to another user. This means that the assignee is set and the delegation state is set to {@link DelegationState#PENDING}. If no owner is set on the task, the owner is set to

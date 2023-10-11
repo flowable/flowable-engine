@@ -13,10 +13,8 @@
 package org.flowable.common.engine.impl.el;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;

@@ -10,6 +10,7 @@ create table ACT_RU_TASK (
     SCOPE_TYPE_ varchar(255),
     SCOPE_DEFINITION_ID_ varchar(255),
     PROPAGATED_STAGE_INST_ID_ varchar(255),
+    STATE_ varchar(255),
     NAME_ varchar(255),
     PARENT_TASK_ID_ varchar(64),
     DESCRIPTION_ varchar(4000),
@@ -19,6 +20,13 @@ create table ACT_RU_TASK (
     DELEGATION_ varchar(64),
     PRIORITY_ integer,
     CREATE_TIME_ timestamp(3) NULL,
+    IN_PROGRESS_TIME_ datetime(3),
+    IN_PROGRESS_STARTED_BY_ varchar(255),
+    CLAIM_TIME_ datetime(3),
+    CLAIMED_BY_ varchar(255),
+    SUSPENDED_TIME_ datetime(3),
+    SUSPENDED_BY_ varchar(255),
+    IN_PROGRESS_DUE_DATE_ datetime(3),
     DUE_DATE_ datetime(3),
     CATEGORY_ varchar(255),
     SUSPENSION_STATE_ integer,
@@ -37,4 +45,4 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '7.0.0.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '7.0.1.0', 1);
