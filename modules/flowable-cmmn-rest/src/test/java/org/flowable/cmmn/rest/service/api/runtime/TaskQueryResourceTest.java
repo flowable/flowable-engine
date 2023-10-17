@@ -84,6 +84,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             ObjectNode requestNode = objectMapper.createObjectNode();
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), adhocTask.getId());
 
+            // ID filtering
+            requestNode.removeAll();
+            requestNode.put("taskId", adhocTask.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+
             // Name filtering
             requestNode.removeAll();
             requestNode.put("name", "Name one");

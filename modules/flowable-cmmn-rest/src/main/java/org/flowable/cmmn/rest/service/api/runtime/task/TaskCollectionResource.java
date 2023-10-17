@@ -118,6 +118,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         TaskQueryRequest request = new TaskQueryRequest();
 
         // Populate filter-parameters
+        if (requestParams.containsKey("taskId")) {
+            request.setTaskId(requestParams.get("taskId"));
+        }
+
         if (requestParams.containsKey("name")) {
             request.setName(requestParams.get("name"));
         }

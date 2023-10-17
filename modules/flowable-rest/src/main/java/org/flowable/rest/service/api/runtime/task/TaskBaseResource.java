@@ -142,6 +142,9 @@ public class TaskBaseResource {
         TaskQuery taskQuery = taskService.createTaskQuery();
 
         // Populate filter-parameters
+        if (request.getTaskId() != null) {
+            taskQuery.taskId(request.getTaskId());
+        }
         if (request.getName() != null) {
             taskQuery.taskName(request.getName());
         }

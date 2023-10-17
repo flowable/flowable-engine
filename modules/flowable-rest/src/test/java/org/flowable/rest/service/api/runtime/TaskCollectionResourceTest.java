@@ -170,6 +170,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
             assertResultsPresentInDataResponse(url, adhocTask.getId(), processTask.getId());
 
+            // ID filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskId=" + encode(adhocTask.getId());
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
             // Name filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?name=" + encode("Name one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());

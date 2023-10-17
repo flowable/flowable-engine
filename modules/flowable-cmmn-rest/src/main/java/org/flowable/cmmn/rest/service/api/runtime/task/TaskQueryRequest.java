@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class TaskQueryRequest extends PaginateRequest {
 
+    protected String taskId;
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
@@ -84,6 +85,14 @@ public class TaskQueryRequest extends PaginateRequest {
     protected List<String> categoryIn;
     protected List<String> categoryNotIn;
     protected Boolean withoutCategory;
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getName() {
         return name;
