@@ -8972,7 +8972,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "taskId" : "6",
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           }
         }
@@ -9041,7 +9041,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "taskId" : "6",
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           }
         }
@@ -9192,7 +9192,7 @@ The response body contains the binary value of the variable. When the variable i
           "revision" : 2,
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           },
           "propertyId": null,
@@ -9259,7 +9259,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "revision" : 2,
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           },
           "propertyId" : null,
