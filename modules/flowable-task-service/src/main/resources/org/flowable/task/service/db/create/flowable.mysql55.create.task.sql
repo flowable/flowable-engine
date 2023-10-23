@@ -32,7 +32,6 @@ create table ACT_RU_TASK (
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
     FORM_KEY_ varchar(255),
-    CLAIM_TIME_ datetime,
     IS_COUNT_ENABLED_ TINYINT,
     VAR_COUNT_ integer,
     ID_LINK_COUNT_ integer,
