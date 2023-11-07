@@ -47,6 +47,7 @@ import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
+import org.flowable.cmmn.converter.export.PlanItemDefinitionExport;
 import org.flowable.cmmn.converter.export.StageExport;
 import org.flowable.cmmn.converter.export.TextAnnotationExport;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
@@ -294,7 +295,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
                 Stage planModel = caseModel.getPlanModel();
 
-                StageExport.getInstance().writePlanItemDefinition(model, planModel, xtw);
+                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw);
 
                 // end case element
                 xtw.writeEndElement();

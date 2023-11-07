@@ -8,9 +8,9 @@ Flowable (V7)
     ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/u/flowable/flowable-rest)
 
 [License:  
-	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
+	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/main/LICENSE)
 
-![Flowable Actions CI](https://github.com/flowable/flowable-engine/workflows/Flowable%20Main%20Build/badge.svg?branch=master)
+![Flowable Actions CI](https://github.com/flowable/flowable-engine/actions/workflows/main.yml/badge.svg?branch=main)
 
 Homepage: https://www.flowable.org/
 
