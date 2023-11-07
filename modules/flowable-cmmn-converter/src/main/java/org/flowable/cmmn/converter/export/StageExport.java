@@ -29,7 +29,7 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         return instance;
     }
 
-    private StageExport() {
+    protected StageExport() {
     }
 
     @Override
