@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,11 +35,14 @@ import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis Federico
@@ -1218,22 +1222,760 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
 
         assertProcessEnded(processInstance.getId());
     }
-
+    
     @Test
-    @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
-    public void testMigrateSimpleActivityToActivityInsideMultiInstanceSubProcess() {
+    public void testMigrateParallelMultiInstanceTaskWithLocalVariables() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task-local-variable.bpmn20.xml");
 
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // MI subProcess root execution, actual subProcess and 1 task
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("task");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(startProcessDefinition.getId());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("kermit");
+        List<Integer> loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            runtimeService.setVariableLocal(execution.getId(), "localVar", "test");
+            taskService.setAssignee(miTask.getId(), "othervalue");
+        }
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("othervalue");
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task-local-variable.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("task");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(migrateToProcessDefinition.getId());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("kermit");
+        loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "task", "task");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "task", "task", "task", "task");
+        }
+
+        // Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "task", "task", "afterMultiInstance");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "task", "task", "task", "task", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
-
+    
     @Test
-    @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
-    public void testMigrateSimpleActivityToMultiInstanceSubProcessNestedInsideMultiInstanceSubProcess() {
+    public void testMigrateParallelMultiInstanceTaskWithLocalVariablesWithMigrationMapping() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task-local-variable.bpmn20.xml");
 
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // MI subProcess root execution, actual subProcess and 1 task
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("task");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(startProcessDefinition.getId());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("kermit");
+        List<Integer> loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            runtimeService.setVariableLocal(execution.getId(), "localVar", "test");
+            taskService.setAssignee(miTask.getId(), "othervalue");
+        }
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("othervalue");
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-task-local-variable.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("task", "task"));
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("task");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(migrateToProcessDefinition.getId());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsOnly("kermit");
+        loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "task", "task");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "task", "task", "task", "task");
+        }
+
+        // Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "task", "task", "afterMultiInstance");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "task", "task", "task", "task", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
-
+    
     @Test
-    @Disabled("Not supported - Cannot migrate to an arbitrary activity inside an MI subProcess")
-    public void testMigrateMultiInstanceSubProcessActivityToNestedMultiInstanceSubProcessActivity() {
+    public void testMigrateParallelMultiInstanceSubProcessWithLocalVariables() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-local-variable.bpmn20.xml");
+
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // MI subProcess root execution, actual subProcess and 1 task
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("subTask1");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(startProcessDefinition.getId());
+        List<Integer> loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            runtimeService.setVariableLocal(execution.getId(), "localVar", "test");
+        }
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-local-variable.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(5);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("subTask1");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(migrateToProcessDefinition.getId());
+        loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1");
+        }
+
+        // Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1", "afterMultiInstance");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMigrateParallelMultiInstanceSubProcessWithLocalVariablesWithMigrationMapping() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-local-variable.bpmn20.xml");
+
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // MI subProcess root execution, actual subProcess and 1 task
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("subTask1");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(startProcessDefinition.getId());
+        List<Integer> loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            runtimeService.setVariableLocal(execution.getId(), "localVar", "test");
+        }
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-local-variable.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("subTask1", "subTask1"));
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(5);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subTask1", "subTask1");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsOnly("subTask1");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId)
+                .containsOnly(migrateToProcessDefinition.getId());
+        loopCounters = tasks.stream().map(aTask -> taskService.getVariable(aTask.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(0, 1);
+
+        for (Task miTask : tasks) {
+            Execution execution = runtimeService.createExecutionQuery().executionId(miTask.getExecutionId()).singleResult();
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1");
+        }
+
+        // Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1", "afterMultiInstance");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "subTask1", "subTask1", "subTask1", "subTask1", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMigrateParallelMultiInstanceServiceTaskWithLocalVariables() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-servicetask.bpmn20.xml");
+
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Integer> loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1);
+
+        for (Execution miExecution : executions) {
+            runtimeService.setVariableLocal(miExecution.getId(), "localVar", "test");
+        }
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-servicetask.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("task", "task", "task");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1);
+        
+
+        for (Execution miExecution : executions) {
+            assertThat(runtimeService.getVariableLocal(miExecution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance");
+        }
+        
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("afterMultiInstance");
+        
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "afterMultiInstance");
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "serviceTask", "task", "task");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMigrateParallelMultiInstanceSubProcessWithServiceTaskAndLocalVariables() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-servicetask.bpmn20.xml");
+
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subtask", "subtask");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Integer> loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1, 0, 1);
+
+        for (Execution miExecution : executions) {
+            runtimeService.setVariableLocal(miExecution.getId(), "localVar", "test");
+        }
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-subprocess-servicetask.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(5);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelMISubProcess", "parallelMISubProcess", "parallelMISubProcess", "subtask", "subtask");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1, 0, 1);
+        
+
+        for (Execution miExecution : executions) {
+            assertThat(runtimeService.getVariableLocal(miExecution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance");
+        }
+        
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("afterMultiInstance");
+        
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "afterMultiInstance");
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "serviceTask", "subtask", "subtask");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMigrateParallelMultiInstanceCallActivityWithLocalVariables() {
+        ProcessDefinition startProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-callactivity-local-variable.bpmn20.xml");
+        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+
+        // Start the processInstance
+        Map<String, Object> variableMap = new HashMap<>();
+        ArrayNode collectionArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode element1Node = collectionArray.addObject();
+        element1Node.put("name", "John Doe");
+        element1Node.put("age", 30);
+        ObjectNode element2Node = collectionArray.addObject();
+        element2Node.put("name", "Jane Doe");
+        element2Node.put("age", 29);
+        variableMap.put("myCollection", collectionArray);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(startProcessDefinition.getId(), variableMap);
+
+        // Progress to the MI subProcess
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("beforeMultiInstance");
+        completeTask(task);
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("callActivity", "callActivity", "callActivity");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(startProcessDefinition.getId());
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances")
+                .containsExactly(2, 0);
+        List<Integer> loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1);
+
+        for (Execution miExecution : executions) {
+            runtimeService.setVariableLocal(miExecution.getId(), "localVar", "test");
+        }
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(startProcessDefinition, processInstance, "userTask", "beforeMultiInstance");
+            checkActivityInstances(startProcessDefinition, processInstance, "callActivity", "callActivity", "callActivity");
+        }
+        
+        ProcessDefinition migrateToProcessDefinition = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/parallel-multi-instance-callactivity-local-variable.bpmn20.xml");
+        
+        // Prepare and action the migration
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrateToProcessDefinition.getId());
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("callActivity", "callActivity", "callActivity");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(migrateToProcessDefinition.getId());
+        loopCounters = executions.stream().map(anExecution -> runtimeService.getVariable(anExecution.getId(), "loopCounter", Integer.class))
+                .collect(Collectors.toList());
+        assertThat(loopCounters).containsExactlyInAnyOrder(null, 0, 1);
+        
+
+        for (Execution miExecution : executions) {
+            assertThat(runtimeService.getVariableLocal(miExecution.getId(), "localVar")).isEqualTo("test");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance");
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "callActivity", "callActivity", "callActivity", "callActivity", "callActivity");
+        }
+        
+        List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+        assertThat(subProcessInstances).hasSize(2);
+        for (ProcessInstance subProcessInstance : subProcessInstances) {
+            completeProcessInstanceTasks(subProcessInstance.getId()); 
+        }
+        
+        completeProcessInstanceTasks(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "userTask", "beforeMultiInstance", "afterMultiInstance");
+            checkActivityInstances(migrateToProcessDefinition, processInstance, "callActivity", "callActivity", "callActivity", "callActivity", "callActivity");
+
+            checkTaskInstance(migrateToProcessDefinition, processInstance, "beforeMultiInstance", "afterMultiInstance");
+        }
+
+        assertProcessEnded(processInstance.getId());
     }
 
     @Test

@@ -34,6 +34,7 @@ public class ProcessInstanceChangeState {
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
+    protected HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution = new HashMap<>();
     protected HashMap<StartEvent, ExecutionEntity> pendingEventSubProcessesStartEvents = new HashMap<>();
 
     public ProcessInstanceChangeState() {
@@ -98,6 +99,18 @@ public class ProcessInstanceChangeState {
 
     public void addCreatedEmbeddedSubProcess(String key, ExecutionEntity executionEntity) {
         this.createdEmbeddedSubProcess.put(key, executionEntity);
+    }
+
+    public HashMap<String, ExecutionEntity> getCreatedMultiInstanceRootExecution() {
+        return createdMultiInstanceRootExecution;
+    }
+
+    public void setCreatedMultiInstanceRootExecution(HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution) {
+        this.createdMultiInstanceRootExecution = createdMultiInstanceRootExecution;
+    }
+    
+    public void addCreatedMultiInstanceRootExecution(String key, ExecutionEntity executionEntity) {
+        this.createdMultiInstanceRootExecution.put(key, executionEntity);
     }
 
     public Map<String, List<ExecutionEntity>> getProcessInstanceActiveEmbeddedExecutions() {
