@@ -42,11 +42,13 @@ import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
@@ -66,6 +68,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer.FlowElementMoveEntry;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
@@ -81,6 +84,7 @@ import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.IOParameterUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
@@ -91,9 +95,11 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.TaskService;
@@ -116,7 +122,7 @@ public abstract class AbstractDynamicStateManager {
         List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
         if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
             for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
-                // Executions belonging to the same parent should move together - i.e multipleExecution to single activity
+                
                 Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<>();
                 Map<String, List<ExecutionEntity>> miExecutionsByParent = new HashMap<>();
                 for (String executionId : executionContainer.getExecutionIds()) {
@@ -129,26 +135,56 @@ public abstract class AbstractDynamicStateManager {
                     }
                     executionEntities.add(execution);
                 }
-                executionsByParent.values().forEach(executions -> {
+                
+                miExecutionsByParent.values().forEach(executions -> {
                     MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
+                    if (executions.get(0).getVariablesLocal() != null && !executions.get(0).getVariablesLocal().isEmpty()) {
+                        moveExecutionEntityContainer.addLocalVariableMap(executions.get(0).getActivityId(), executions.get(0).getVariablesLocal());
+                    }
                     if (executionContainer.getNewAssigneeId() != null) {
-                    	moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                        moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
                     }
                     if (executionContainer.getNewOwnerId() != null) {
-                    	moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
+                        moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
                     }
                     moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                 });
                 
-                miExecutionsByParent.values().forEach(executions -> {
-                    MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
-                    if (executionContainer.getNewAssigneeId() != null) {
-                    	moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                executionsByParent.values().forEach(executions -> {
+                    if (!miExecutionsByParent.isEmpty() && executions.size() > 1 && (executions.get(0).getCurrentFlowElement() instanceof Task || executions.get(0).getCurrentFlowElement() instanceof CallActivity)) {
+                        for (ExecutionEntity execution : executions) {
+                            List<ExecutionEntity> miExecutionList = new ArrayList<>();
+                            miExecutionList.add(execution);
+                            MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(miExecutionList, executionContainer.getMoveToActivityIds());
+                        
+                            if (execution.getVariablesLocal() != null && !execution.getVariablesLocal().isEmpty()) {
+                                moveExecutionEntityContainer.addLocalVariableMap(execution.getActivityId(), execution.getVariablesLocal());
+                            }
+                            
+                            if (executionContainer.getNewAssigneeId() != null) {
+                                moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                            }
+                            if (executionContainer.getNewOwnerId() != null) {
+                                moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
+                            }
+                            moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
+                        }
+                    
+                    } else {
+                        MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
+                        for (ExecutionEntity execution : executions) {
+                            if (execution.getVariablesLocal() != null && !execution.getVariablesLocal().isEmpty()) {
+                                moveExecutionEntityContainer.addLocalVariableMap(execution.getActivityId(), execution.getVariablesLocal());
+                            }
+                        }
+                        if (executionContainer.getNewAssigneeId() != null) {
+                        	moveExecutionEntityContainer.setNewAssigneeId(executionContainer.getNewAssigneeId());
+                        }
+                        if (executionContainer.getNewOwnerId() != null) {
+                        	moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
+                        }
+                        moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                     }
-                    if (executionContainer.getNewOwnerId() != null) {
-                    	moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
-                    }
-                    moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                 });
             }
         }
@@ -498,8 +534,22 @@ public abstract class AbstractDynamicStateManager {
                         CommandContextUtil.getAgenda(commandContext).planContinueProcessWithMigrationContextOperation(newChildExecution, migrationContext);
 
                     } else {
-                        CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(newChildExecution);
-
+                        if (newChildExecution.isMultiInstanceRoot() && (newChildExecution.getCurrentFlowElement() instanceof Task || newChildExecution.getCurrentFlowElement() instanceof CallActivity)) {
+                            continue;
+                        }
+                        
+                        if (newChildExecution.getCurrentFlowElement() instanceof Task && ((Task) newChildExecution.getCurrentFlowElement()).isAsynchronous()) {
+                            JobService jobService = CommandContextUtil.getJobService(commandContext);
+                            
+                            JobEntity job = JobUtil.createJob(newChildExecution, newChildExecution.getCurrentFlowElement(), AsyncContinuationJobHandler.TYPE, CommandContextUtil.getProcessEngineConfiguration(commandContext));
+                            
+                            Task task = (Task) newChildExecution.getCurrentFlowElement();
+                            jobService.createAsyncJob(job, task.isExclusive());
+                            jobService.scheduleAsyncJob(job);
+                        
+                        } else {
+                            CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(newChildExecution);
+                        }
                     }
                 }
             }
@@ -662,7 +712,7 @@ public abstract class AbstractDynamicStateManager {
         ExecutionEntity defaultContinueParentExecution = moveExecutionEntityContainer.getContinueParentExecution(movingExecutions.get(0).getId());
         Set<String> movingExecutionIds = movingExecutions.stream().map(ExecutionEntity::getId).collect(Collectors.toSet());
 
-        //Build the subProcess hierarchy
+        // Build the subProcess hierarchy
         for (SubProcess subProcess : subProcessesToCreate.values()) {
             if (!processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(subProcess.getId())) {
                 ExecutionEntity embeddedSubProcess = createEmbeddedSubProcessHierarchy(subProcess, defaultContinueParentExecution, subProcessesToCreate, movingExecutionIds, processInstanceChangeState, commandContext);
@@ -670,20 +720,27 @@ public abstract class AbstractDynamicStateManager {
             }
         }
 
-        //Adds the execution (leaf) to the subProcess
+        // Adds the execution (leaf) to the subProcess
         List<ExecutionEntity> newChildExecutions = new ArrayList<>();
         for (FlowElementMoveEntry flowElementMoveEntry : moveToFlowElements) {
             FlowElement newFlowElement = flowElementMoveEntry.getNewFlowElement();
             ExecutionEntity parentExecution;
             if (newFlowElement.getSubProcess() != null && processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(newFlowElement.getSubProcess().getId())) {
                 parentExecution = processInstanceChangeState.getCreatedEmbeddedSubProcesses().get(newFlowElement.getSubProcess().getId());
+            
+            } else if ((newFlowElement instanceof Task || newFlowElement instanceof CallActivity) && isFlowElementMultiInstance(newFlowElement) && !movingExecutions.get(0).isMultiInstanceRoot() &&
+                    processInstanceChangeState.getCreatedMultiInstanceRootExecution().containsKey(newFlowElement.getId())) {
+                
+                parentExecution = processInstanceChangeState.getCreatedMultiInstanceRootExecution().get(newFlowElement.getId());
+                
             } else {
                 parentExecution = defaultContinueParentExecution;
             }
 
             if (isEventSubProcessStart(newFlowElement)) {
-                //EventSubProcessStarts are created later if the eventSubProcess was not created already during another move
+                // EventSubProcessStarts are created later if the eventSubProcess was not created already during another move
                 processInstanceChangeState.addPendingEventSubProcessStartEvent((StartEvent) newFlowElement, parentExecution);
+                
             } else {
                 ExecutionEntity newChildExecution;
                 if (moveExecutionEntityContainer.isDirectExecutionMigration() && isDirectFlowElementExecutionMigration(flowElementMoveEntry.originalFlowElement, flowElementMoveEntry.newFlowElement)) {
@@ -696,6 +753,16 @@ public abstract class AbstractDynamicStateManager {
 
                 if (newChildExecution != null) {
 
+                    if (moveExecutionEntityContainer.getFlowElementLocalVariableMap().containsKey(newFlowElement.getId())) {
+                        newChildExecution.setVariablesLocal(moveExecutionEntityContainer.getFlowElementLocalVariableMap().get(newFlowElement.getId()));
+                    }
+                    
+                    if (movingExecutions.get(0).isMultiInstanceRoot() && isFlowElementMultiInstance(newFlowElement) && hasSameMultiInstanceConfig(movingExecutions.get(0).getCurrentFlowElement(), newFlowElement)) {
+                        newChildExecution.setMultiInstanceRoot(true);
+                        newChildExecution.setActive(false);
+                        processInstanceChangeState.addCreatedMultiInstanceRootExecution(newFlowElement.getId(), newChildExecution);
+                    }
+                    
                     if (newFlowElement instanceof UserTask
                             && !moveExecutionEntityContainer.hasNewExecutionId(newChildExecution.getId())) {
 
@@ -710,17 +777,20 @@ public abstract class AbstractDynamicStateManager {
                     }
 
                     if (newFlowElement instanceof CallActivity && !moveExecutionEntityContainer.isDirectExecutionMigration()) {
-                        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
-
-                        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
-                        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                            eventDispatcher.dispatchEvent(
-                                FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
-                                    newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement),
-                                processEngineConfiguration.getEngineCfgKey());
+                        
+                        if (!newChildExecution.isMultiInstanceRoot()) {
+                            processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newChildExecution);
+    
+                            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+                            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                                eventDispatcher.dispatchEvent(
+                                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, newFlowElement.getId(), newFlowElement.getName(), newChildExecution.getId(),
+                                        newChildExecution.getProcessInstanceId(), newChildExecution.getProcessDefinitionId(), newFlowElement),
+                                    processEngineConfiguration.getEngineCfgKey());
+                            }
                         }
 
-                        //start boundary events of new call activity
+                        // start boundary events of new call activity
                         CallActivity callActivity = (CallActivity) newFlowElement;
                         List<BoundaryEvent> boundaryEvents = callActivity.getBoundaryEvents();
                         if (CollectionUtil.isNotEmpty(boundaryEvents)) {
@@ -1158,6 +1228,36 @@ public abstract class AbstractDynamicStateManager {
             return ((Activity) flowElement).getLoopCharacteristics() != null;
         }
         return false;
+    }
+    
+    protected boolean hasSameMultiInstanceConfig(FlowElement sourceElement, FlowElement targetElement) {
+        MultiInstanceLoopCharacteristics sourceMIConfig = null;
+        if (sourceElement instanceof Activity) {
+            sourceMIConfig = ((Activity) sourceElement).getLoopCharacteristics();
+        }
+        
+        MultiInstanceLoopCharacteristics targetMIConfig = null;
+        if (targetElement instanceof Activity) {
+            targetMIConfig = ((Activity) targetElement).getLoopCharacteristics();
+        }
+        
+        if (sourceMIConfig == null || targetMIConfig == null) {
+            return false;
+        }
+        
+        if (sourceMIConfig.isSequential() != targetMIConfig.isSequential()) {
+            return false;
+        }
+        
+        if (sourceMIConfig.getLoopCardinality() != null && !sourceMIConfig.getLoopCardinality().equals(targetMIConfig.getLoopCardinality())) {
+            return false;
+        }
+        
+        if (targetMIConfig.getLoopCardinality() != null && !targetMIConfig.getLoopCardinality().equals(sourceMIConfig.getLoopCardinality())) {
+            return false;
+        }
+        
+        return true;
     }
 
     protected void processCreatedEventSubProcess(EventSubProcess eventSubProcess, ExecutionEntity eventSubProcessExecution, Set<String> movingExecutionIds, CommandContext commandContext) {
