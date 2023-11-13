@@ -669,11 +669,49 @@ class KafkaChannelDefinitionProcessorTest {
                 + "}");
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
 
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .hasSize(1));
+
+        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("name", "Kermit the Frog 1"),
+                    tuple("receivedTopic", "test-customer-multi-partition"),
+                    tuple("receivedPartition", 0),
+                    tuple("receivedOffset", 0L)
+                );
+
         producerRecord = new ProducerRecord<>("test-customer-multi-partition", 1, null, "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog 2\""
                 + "}");
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .hasSize(2));
+
+        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("name", "Kermit the Frog 2"),
+                    tuple("receivedTopic", "test-customer-multi-partition"),
+                    tuple("receivedPartition", 1),
+                    tuple("receivedOffset", 0L)
+                );
 
         producerRecord = new ProducerRecord<>("test-customer-multi-partition", 0, null, "{"
                 + "    \"eventKey\": \"test\","
@@ -688,29 +726,6 @@ class KafkaChannelDefinitionProcessorTest {
                 .extracting(EventRegistryEvent::getType)
                 .hasSize(3));
 
-        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
-
-        assertThat(event).isNotNull();
-        assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 1"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 0),
-                tuple("receivedOffset", 0L)
-            );
-
-        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
-
-        assertThat(event).isNotNull();
-        assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 2"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 1),
-                tuple("receivedOffset", 0L)
-            );
 
         event = (EventInstance) testEventConsumer.getEvents().get(2).getEventObject();
 
