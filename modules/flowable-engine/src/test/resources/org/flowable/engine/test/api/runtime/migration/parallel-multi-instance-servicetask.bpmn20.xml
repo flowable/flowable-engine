@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="parallelMultiInstanceSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeMultiInstance"/>
+        <userTask id="beforeMultiInstance"/>
+        <sequenceFlow sourceRef="beforeMultiInstance" targetRef="task"/>
+
+        <serviceTask id="task" flowable:expression="${'test'}" flowable:async="true">
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="myCollection" flowable:elementVariable="myElement" />
+        </serviceTask>
+
+        <sequenceFlow id="flow2" sourceRef="task" targetRef="afterMultiInstance"/>
+        <userTask id="afterMultiInstance"/>
+        <sequenceFlow id="flow3" sourceRef="afterMultiInstance" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>
