@@ -1441,7 +1441,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 	        .contains("parallelTasks");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            checkActivityInstances(procDefTwoTasks, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "parallelTasks");
+            checkActivityInstances(procDefTwoTasks, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks");
 
             checkTaskInstance(procDefTwoTasks, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "parallelTasks");
         }
@@ -1449,7 +1449,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         completeProcessInstanceTasks(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            checkActivityInstances(procDefTwoTasks, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "parallelTasks");
+            checkActivityInstances(procDefTwoTasks, processInstance, "userTask", "beforeMultiInstance", "parallelTasks", "parallelTasks");
 
             checkTaskInstance(procDefTwoTasks, processInstance, "beforeMultiInstance", "parallelTasks", "parallelTasks", "parallelTasks", "parallelTasks");
         }

@@ -1048,7 +1048,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEnded;
     }
 
-    public boolean setIsEnded() {
+    public boolean getIsEnded() {
         return isEnded;
     }
 
