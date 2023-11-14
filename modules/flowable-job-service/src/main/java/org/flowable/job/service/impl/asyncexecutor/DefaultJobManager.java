@@ -350,19 +350,10 @@ public class DefaultJobManager implements JobManager {
                 return;
             }
 
-            HistoryJobEntity newJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
-            copyHistoryJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(jobEntity);
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
 
         } else if (job instanceof JobEntity) {
-
-            // Deleting the old job and inserting it again with another id,
-            // will avoid that the job is immediately is picked up again (for example
-            // when doing lots of exclusive jobs for the same process instance)
 
             JobEntity jobEntity = jobServiceConfiguration.getJobEntityManager().findById(job.getId());
 
@@ -372,13 +363,8 @@ public class DefaultJobManager implements JobManager {
                 return;
             }
 
-            JobEntity newJobEntity = jobServiceConfiguration.getJobEntityManager().create();
-            copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
 
             // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
             // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
@@ -393,13 +379,8 @@ public class DefaultJobManager implements JobManager {
                 return;
             }
 
-            ExternalWorkerJobEntity newJobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().create();
-            copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
         } else if (job instanceof TimerJobEntity) {
             jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
         } else {
