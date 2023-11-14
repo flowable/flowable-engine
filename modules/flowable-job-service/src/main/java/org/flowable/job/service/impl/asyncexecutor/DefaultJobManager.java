@@ -332,7 +332,12 @@ public class DefaultJobManager implements JobManager {
 
         if (job instanceof HistoryJob) {
 
-            HistoryJobEntity jobEntity = (HistoryJobEntity) job;
+            HistoryJobEntity jobEntity = jobServiceConfiguration.getHistoryJobEntityManager().findById(job.getId());
+            if (jobEntity == null) {
+                LOGGER.debug("History Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
 
             HistoryJobEntity newJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
             copyHistoryJobInfo(newJobEntity, jobEntity);
@@ -348,7 +353,13 @@ public class DefaultJobManager implements JobManager {
             // will avoid that the job is immediately is picked up again (for example
             // when doing lots of exclusive jobs for the same process instance)
 
-            JobEntity jobEntity = (JobEntity) job;
+            JobEntity jobEntity = jobServiceConfiguration.getJobEntityManager().findById(job.getId());
+
+            if (jobEntity == null) {
+                LOGGER.debug("Async Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
 
             JobEntity newJobEntity = jobServiceConfiguration.getJobEntityManager().create();
             copyJobInfo(newJobEntity, jobEntity);
@@ -363,7 +374,13 @@ public class DefaultJobManager implements JobManager {
             // as the chance of failure will be high.
 
         } else if (job instanceof ExternalWorkerJobEntity) {
-            ExternalWorkerJobEntity jobEntity = (ExternalWorkerJobEntity) job;
+            ExternalWorkerJobEntity jobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().findById(job.getId());
+
+            if (jobEntity == null) {
+                LOGGER.debug("External Worker Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
 
             ExternalWorkerJobEntity newJobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().create();
             copyJobInfo(newJobEntity, jobEntity);

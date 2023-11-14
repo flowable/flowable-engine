@@ -148,13 +148,15 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
-            String lockOwner;
-            Date lockExpirationTime;
+            String lockOwner = null;
+            Date lockExpirationTime = null;
 
             if (job instanceof JobInfoEntity) {
                 lockOwner = ((JobInfoEntity) job).getLockOwner();
                 lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
-            } else {
+            }
+
+            if (lockOwner == null || lockExpirationTime == null) {
                 int lockMillis = processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
                 GregorianCalendar lockCal = new GregorianCalendar();
                 lockCal.setTime(processEngineConfiguration.getClock().getCurrentTime());
