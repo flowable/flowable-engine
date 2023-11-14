@@ -157,7 +157,7 @@ public class BulkUpdateJobLockTest extends JobExecutorTestCase  {
             return null;
         });
 
-        for (Job job : managementService.createJobQuery().list()) {
+        for (HistoryJob job : managementService.createHistoryJobQuery().list()) {
             assertThat(((HistoryJobEntity) job).getLockOwner()).isEqualTo("test");
             assertThat(((HistoryJobEntity) job).getLockExpirationTime()).isNotNull();
         }
