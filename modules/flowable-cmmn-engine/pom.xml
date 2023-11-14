@@ -312,10 +312,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-copy-logging</id>
@@ -375,10 +373,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -432,10 +428,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -489,10 +483,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -647,8 +639,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
