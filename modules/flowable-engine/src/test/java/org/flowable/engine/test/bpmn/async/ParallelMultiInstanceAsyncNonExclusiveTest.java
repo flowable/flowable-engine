@@ -110,7 +110,7 @@ class ParallelMultiInstanceAsyncNonExclusiveTest extends CustomConfigurationFlow
         protected CountDownLatch executeAsyncRunnableLatch;
 
         protected CustomCommandInvoker() {
-            super(((commandContext, runnable) -> runnable.run()), null);
+            super(((commandContext, runnable) -> runnable.run()));
         }
 
         @Override
