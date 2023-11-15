@@ -720,6 +720,11 @@
 					<artifactId>jib-maven-plugin</artifactId>
 					<version>${jib-maven-plugin.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.4</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

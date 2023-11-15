@@ -68,13 +68,14 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     @Override
     protected void lockJobScopeInternal(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        String lockOwner;
-        Date lockExpirationTime;
+        String lockOwner = null;
+        Date lockExpirationTime = null;
 
         if (job instanceof JobInfoEntity) {
             lockOwner = ((JobInfoEntity) job).getLockOwner();
             lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
-        } else {
+        }
+        if (lockOwner == null || lockExpirationTime == null) {
             int lockMillis = cmmnEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
             GregorianCalendar lockCal = new GregorianCalendar();
             lockCal.setTime(cmmnEngineConfiguration.getClock().getCurrentTime());
