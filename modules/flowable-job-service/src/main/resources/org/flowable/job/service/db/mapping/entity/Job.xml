@@ -251,7 +251,7 @@
     </delete>
 
     <delete id="deleteJobsByExecutionId" parameterType="string">
-        delete from ${prefix}ACT_RU_JOB where PROCESS_INSTANCE_ID_ = #{id}
+        delete from ${prefix}ACT_RU_JOB where EXECUTION_ID_ = #{id}
     </delete>
 
     <!-- JOB UPDATE STATEMENTS -->
