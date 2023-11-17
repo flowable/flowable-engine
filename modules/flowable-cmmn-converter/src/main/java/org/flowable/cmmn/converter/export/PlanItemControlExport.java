@@ -80,6 +80,10 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                         ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
             }
+            if (repetitionRule.isIgnoreRepetitionCounterVariable()) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                        ATTRIBUTE_IGNORE_REPETITION_COUNTER_VARIABLE, "true");
+            }
             if (repetitionRule.getMaxInstanceCount() != null) {
                 if (repetitionRule.getMaxInstanceCount() == -1) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
