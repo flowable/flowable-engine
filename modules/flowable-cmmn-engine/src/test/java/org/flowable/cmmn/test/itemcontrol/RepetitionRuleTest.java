@@ -492,6 +492,7 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
                 .start();
 
         List<Task> tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
                 .orderByTaskPriority().asc()
                 .list();
 
@@ -516,6 +517,43 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.getVariables(tasks.get(2).getId()))
                 .containsOnly(
                         entry("repetitionCounter", 3),
+                        entry("item", "three"),
+                        entry("itemIndex", 2),
+                        entry("initiator", null)
+                );
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testPlanItemLocalVariablesWithCollectionIgnoreCounter() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .transientVariable("myCollection", Arrays.asList("one", "two", "three"))
+                .start();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+
+        assertThat(tasks).hasSize(3);
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(0).getId()))
+                .containsOnly(
+                        entry("item", "one"),
+                        entry("itemIndex", 0),
+                        entry("initiator", null)
+                );
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(1).getId()))
+                .containsOnly(
+                        entry("item", "two"),
+                        entry("itemIndex", 1),
+                        entry("initiator", null)
+                );
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(2).getId()))
+                .containsOnly(
                         entry("item", "three"),
                         entry("itemIndex", 2),
                         entry("initiator", null)
@@ -563,6 +601,33 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
 
         assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testPlanItemLocalVariablesIgnoreCounter() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .variable("initiator", "johndoe")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getVariables(task.getId()))
+                .containsOnly(
+                        entry("initiator", "johndoe")
+                );
+
+        cmmnTaskService.complete(task.getId());
+
+        task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getVariables(task.getId()))
+                .containsOnly(
+                        entry("initiator", "johndoe")
+                );
     }
 
     @Test
