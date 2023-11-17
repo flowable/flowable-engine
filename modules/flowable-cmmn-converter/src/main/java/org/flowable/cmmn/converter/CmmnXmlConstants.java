@@ -197,6 +197,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
+    String ATTRIBUTE_IGNORE_REPETITION_COUNTER_VARIABLE = "ignoreCounterVariable";
     String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";
     String ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME = "collectionVariable";
     String ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME = "elementVariable";

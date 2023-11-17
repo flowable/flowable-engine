@@ -37,11 +37,16 @@ public class PlanItemInstanceUtil {
         Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
 
         if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
-            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            if (localVariables == null) {
-                localVariables = new HashMap<>(0);
+            RepetitionRule repetitionRule = planItemInstanceEntityToCopy.getPlanItem().getItemControl().getRepetitionRule();
+            
+            if (repetitionRule.getAggregations() != null || !repetitionRule.isIgnoreRepetitionCounterVariable()) {
+                int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
+                if (localVariables == null) {
+                    localVariables = new HashMap<>(0);
+                }
+                
+                localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
             }
-            localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
         }
 
         PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
@@ -167,6 +172,10 @@ public class PlanItemInstanceUtil {
             return counter.intValue();
         }
     }
+    
+    public static boolean hasIgnoreCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
+        return repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().isIgnoreRepetitionCounterVariable();
+    }
 
     public static String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
         String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
@@ -191,7 +200,9 @@ public class PlanItemInstanceUtil {
         CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(childPlanItemInstanceEntity);
 
         // The repetition counter is 1 based
-        childPlanItemInstanceEntity.setVariableLocal(PlanItemInstanceUtil.getCounterVariable(childPlanItemInstanceEntity), index + 1);
+        if (repetitionRule.getAggregations() != null || !repetitionRule.isIgnoreRepetitionCounterVariable()) {
+            childPlanItemInstanceEntity.setVariableLocal(PlanItemInstanceUtil.getCounterVariable(childPlanItemInstanceEntity), index + 1);
+        }
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;
