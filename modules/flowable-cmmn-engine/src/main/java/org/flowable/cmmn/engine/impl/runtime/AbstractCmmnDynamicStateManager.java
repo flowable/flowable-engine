@@ -67,6 +67,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -1139,8 +1140,11 @@ public abstract class AbstractCmmnDynamicStateManager {
             .create();
 
         if (hasRepetitionRule(planItemInstanceEntityToCopy)) {
-            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            setRepetitionCounter(planItemInstanceEntity, counter);
+            RepetitionRule repetitionRule = planItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule();
+            if (repetitionRule.getAggregations() != null || !repetitionRule.isIgnoreRepetitionCounterVariable()) {
+                int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
+                setRepetitionCounter(planItemInstanceEntity, counter);
+            }
         }
 
         return planItemInstanceEntity;

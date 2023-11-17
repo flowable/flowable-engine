@@ -44,6 +44,12 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
 
             repetitionRule.setRepetitionCounterVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
                     CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
+            
+            
+            String ignoreRepetitionCounterVariableValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_IGNORE_REPETITION_COUNTER_VARIABLE);
+            if ("true".equalsIgnoreCase(ignoreRepetitionCounterVariableValue)) {
+                repetitionRule.setIgnoreRepetitionCounterVariable(true);
+            }
 
             String maxInstanceCountValue = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME);
             if (maxInstanceCountValue == null) {
