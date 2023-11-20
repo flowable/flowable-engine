@@ -19,6 +19,7 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 import org.flowable.editor.language.xml.util.ConversionDirection;
 
@@ -32,6 +33,18 @@ class ExtensionsConverterTest {
         FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("theTask");
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get("test");
         assertThat(extensionElements).hasSize(1);
+        
+        SequenceFlow sequenceFlow = (SequenceFlow) bpmnModel.getMainProcess().getFlowElement("flow1");
+        assertThat(sequenceFlow.getExtensionElements()).hasSize(2);
+        
+        List<ExtensionElement> myElements = sequenceFlow.getExtensionElements().get("condition");
+        assertThat(myElements).hasSize(1);
+        ExtensionElement myElement = myElements.get(0);
+        assertThat(myElement.getAttributeValue(null, "name")).isEqualTo("test");
+        myElements = myElement.getChildElements().get("condition");
+        assertThat(myElements).hasSize(1);
+        myElement = myElements.get(0);
+        assertThat(myElement.getAttributeValue(null, "ref")).isEqualTo("test");
     }
 
     // We are only converting one direction since the XML location changes when we do it both ways
