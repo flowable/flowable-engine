@@ -45,6 +45,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     protected String handlerType;
     protected Collection<String> handlerTypes;
     protected String processDefinitionId;
+    protected String processDefinitionKey;
     protected String category;
     protected String categoryLike;
     protected String elementId;
@@ -55,6 +56,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     protected String scopeType;
     protected boolean withoutScopeType;
     protected String scopeDefinitionId;
+    protected String caseDefinitionKey;
     protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
@@ -125,6 +127,15 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public SuspendedJobQueryImpl processDefinitionKey(String processDefinitionKey) {
+        if (processDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided process definition key is null");
+        }
+        this.processDefinitionKey = processDefinitionKey;
         return this;
     }
     
@@ -229,6 +240,15 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         }
         scopeDefinitionId(caseDefinitionId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public SuspendedJobQueryImpl caseDefinitionKey(String caseDefinitionKey) {
+        if (caseDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition key is null");
+        }
+        this.caseDefinitionKey = caseDefinitionKey;
         return this;
     }
     
@@ -524,6 +544,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
+
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
     
     public String getCategory() {
         return category;
@@ -563,6 +587,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
     }
 
     public String getCorrelationId() {

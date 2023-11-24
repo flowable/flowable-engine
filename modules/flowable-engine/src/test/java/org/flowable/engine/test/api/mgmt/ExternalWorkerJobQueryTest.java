@@ -117,6 +117,23 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryByProcessDefinitionKey() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().processDefinitionKey(processInstance1.getProcessDefinitionKey());
+        assertThat(query.count()).isEqualTo(4);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
+
+        query = managementService.createExternalWorkerJobQuery().processDefinitionKey("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
     public void testQueryByExecutionId() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 

@@ -92,9 +92,20 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testByProcessDefinitionId() {
-        String processDefinitionid = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).count()).isEqualTo(3);
-        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionid).list()).hasSize(3);
+        String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionId).count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().processDefinitionId(processDefinitionId).list()).hasSize(3);
+    }
+
+    @Test
+    public void testByProcessDefinitionKey() {
+        String processDefinitionKey = repositoryService.createProcessDefinitionQuery().singleResult().getKey();
+        assertThat(managementService.createTimerJobQuery().processDefinitionKey(processDefinitionKey).count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().processDefinitionKey(processDefinitionKey).list()).hasSize(3);
+
+        assertThat(managementService.createTimerJobQuery().processDefinitionKey("invalid").singleResult()).isNull();
+        assertThat(managementService.createTimerJobQuery().processDefinitionKey("invalid").count()).isZero();
+        assertThat(managementService.createTimerJobQuery().processDefinitionKey("invalid").list()).isEmpty();
     }
     
     @Test
