@@ -127,8 +127,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         }
         Map<String, Object> taskVariables = null;
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (formInfo != null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
                 formService.validateFormFields(task.getTaskDefinitionKey(), "userTask", task.getProcessInstanceId(), 
@@ -161,7 +161,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             TaskHelper.completeTask(task, userId, taskVariables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
         }
 
-
+        if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+            processEngineConfiguration.getUserTaskStateInterceptor().handleCompleteWithForm(task, formInfo, userId, outcome, taskVariables);
+        }
 
         return null;
     }

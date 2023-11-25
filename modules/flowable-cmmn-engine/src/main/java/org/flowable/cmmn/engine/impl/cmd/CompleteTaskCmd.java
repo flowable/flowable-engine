@@ -146,6 +146,10 @@ public class CompleteTaskCmd implements Command<Void> {
             TaskHelper.completeTask(taskEntity, userId, cmmnEngineConfiguration);
         }
         
+        if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+            cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleComplete(taskEntity, userId);
+        }
+        
         return null;
     }
 

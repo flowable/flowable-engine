@@ -19,6 +19,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -114,6 +116,12 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
         TaskHelper.completeTask(task, userId, variables, variablesLocal, transientVariables, 
                 transientVariablesLocal, commandContext);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+            processEngineConfiguration.getUserTaskStateInterceptor().handleComplete(task, userId);
+        }
+        
         return null;
     }
 

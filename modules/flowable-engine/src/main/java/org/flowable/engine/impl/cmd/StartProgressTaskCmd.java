@@ -44,6 +44,10 @@ public class StartProgressTaskCmd extends NeedsActiveTaskCmd<Void> {
         
         HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
         historicTaskService.recordTaskInfoChange(task, updateTime, processEngineConfiguration);
+        
+        if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+            processEngineConfiguration.getUserTaskStateInterceptor().handleInProgressStart(task, userId);
+        }
 
         return null;
     }

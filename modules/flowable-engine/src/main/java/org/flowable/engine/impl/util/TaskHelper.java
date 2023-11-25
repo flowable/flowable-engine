@@ -86,7 +86,6 @@ public class TaskHelper {
                 taskEntity.setVariables(variables);
 
             }
-
         }
 
         if (localTransientVariables != null && !localTransientVariables.isEmpty()) {
@@ -104,7 +103,6 @@ public class TaskHelper {
                 taskEntity.setTransientVariables(transientVariables);
 
             }
-
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
