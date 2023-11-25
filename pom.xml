@@ -14,14 +14,14 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.1.4</spring.boot.version>
-		<spring.framework.version>6.0.12</spring.framework.version>
-		<spring.security.version>6.1.4</spring.security.version>
-		<spring.amqp.version>3.0.9</spring.amqp.version>
-		<spring.kafka.version>3.0.10</spring.kafka.version>
+		<spring.boot.version>3.1.5</spring.boot.version>
+		<spring.framework.version>6.0.13</spring.framework.version>
+		<spring.security.version>6.1.5</spring.security.version>
+		<spring.amqp.version>3.0.10</spring.amqp.version>
+		<spring.kafka.version>3.0.12</spring.kafka.version>
 		<spring.ldap.version>3.1.1</spring.ldap.version>
 		<reactor-netty.version>1.1.8</reactor-netty.version>
-		<jackson.version>2.15.2</jackson.version>
+		<jackson.version>2.15.3</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>4.0.0</camel.version>
 		<cxf.version>4.0.2</cxf.version>
@@ -161,7 +161,7 @@
 			<dependency>
 				<groupId>jakarta.xml.bind</groupId>
 				<artifactId>jakarta.xml.bind-api</artifactId>
-				<version>4.0.0</version>
+				<version>4.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
@@ -270,7 +270,7 @@
 			<dependency>
 				<groupId>org.hibernate.orm</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>6.2.9.Final</version>
+				<version>6.2.13.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.groovy</groupId>
