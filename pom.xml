@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.1.5</spring.boot.version>
-		<spring.framework.version>6.0.13</spring.framework.version>
+		<spring.boot.version>3.1.6</spring.boot.version>
+		<spring.framework.version>6.0.14</spring.framework.version>
 		<spring.security.version>6.1.5</spring.security.version>
 		<spring.amqp.version>3.0.10</spring.amqp.version>
-		<spring.kafka.version>3.0.12</spring.kafka.version>
+		<spring.kafka.version>3.0.13</spring.kafka.version>
 		<spring.ldap.version>3.1.1</spring.ldap.version>
 		<reactor-netty.version>1.1.8</reactor-netty.version>
 		<jackson.version>2.15.3</jackson.version>
@@ -166,12 +166,12 @@
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
 				<artifactId>jaxb-runtime</artifactId>
-				<version>4.0.2</version>
+				<version>4.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>4.0.2</version>
+				<version>4.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>jakarta.servlet</groupId>
@@ -252,7 +252,7 @@
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.8.0</version>
+				<version>11.5.9.0</version>
 			</dependency>
 			<!-- Web service -->
 			<dependency>
