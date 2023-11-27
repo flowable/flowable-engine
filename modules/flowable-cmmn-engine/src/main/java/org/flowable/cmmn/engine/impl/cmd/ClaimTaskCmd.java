@@ -54,6 +54,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId, cmmnEngineConfiguration);
+                
+                if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+                    cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleClaim(task, userId);
+                }
             }
             
         } else {
@@ -70,6 +74,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 
                 // Task should be assigned to no one
                 TaskHelper.changeTaskAssignee(task, null, cmmnEngineConfiguration);
+                
+                if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+                    cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleUnclaim(task, userId);
+                }
             }
         }
 

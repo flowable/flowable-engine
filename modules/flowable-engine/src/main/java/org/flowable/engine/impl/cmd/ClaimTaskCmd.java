@@ -16,6 +16,7 @@ import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.TaskHelper;
@@ -45,8 +46,9 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             return null;
         }
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (userId != null) {
-            Clock clock = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock();
+            Clock clock = processEngineConfiguration.getClock();
             task.setClaimTime(clock.getCurrentTime());
             task.setClaimedBy(userId);
             task.setState(Task.CLAIMED);
@@ -61,6 +63,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId);
+                
+                if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+                    processEngineConfiguration.getUserTaskStateInterceptor().handleClaim(task, userId);
+                }
             }
             
             CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, userId, IdentityLinkType.ASSIGNEE, true);
@@ -81,6 +87,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
     
                 // Task should be assigned to no one
                 TaskHelper.changeTaskAssignee(task, null);
+                
+                if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+                    processEngineConfiguration.getUserTaskStateInterceptor().handleUnclaim(task, userId);
+                }
                 
                 CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
             }

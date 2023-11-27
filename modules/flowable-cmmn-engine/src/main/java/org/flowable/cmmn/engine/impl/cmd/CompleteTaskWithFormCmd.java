@@ -147,9 +147,17 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
                             task.getScopeType(), taskVariables, task.getTenantId());
 
             completeTask(commandContext, task, taskVariables);
+            
+            if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+                cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleCompleteWithForm(task, formInfo, userId, outcome, taskVariables);
+            }
 
         } else {
             completeTask(commandContext, task, variables);
+            
+            if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+                cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleComplete(task, userId);
+            }
         }
         
         return null;
