@@ -884,14 +884,16 @@ public abstract class AbstractCmmnDynamicStateManager {
             cmmnHistoryManager.recordPlanItemInstanceCreated(newPlanItemInstance);
 
             createChildPlanItemInstancesForStage(Collections.singletonList(newPlanItemInstance), runtimePlanItemInstanceMap,
-                    caseInstanceChangeState.getTerminatedPlanItemInstances(), Collections.singleton(planItem.getId()), commandContext);
+                    caseInstanceChangeState.getTerminatedPlanItemInstances(), Collections.singleton(planItem.getId()), 
+                    caseInstanceChangeState, commandContext);
         }
 
         return newPlanItemInstance;
     }
 
     protected void createChildPlanItemInstancesForStage(List<PlanItemInstanceEntity> newPlanItemInstances, Map<String, List<PlanItemInstanceEntity>> runtimePlanItemInstanceMap,
-            Map<String, PlanItemInstanceEntity> terminatedPlanItemInstances, Set<String> newPlanItemInstanceIds, CommandContext commandContext) {
+            Map<String, PlanItemInstanceEntity> terminatedPlanItemInstances, Set<String> newPlanItemInstanceIds, 
+            CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
         
         if (newPlanItemInstances.size() == 0) {
             return;
@@ -902,7 +904,8 @@ public abstract class AbstractCmmnDynamicStateManager {
         if (planItem != null && planItem.getParentStage() != null) {
             for (PlanItem stagePlanItem : planItem.getParentStage().getPlanItems()) {
                 if (!newPlanItemInstanceIds.contains(stagePlanItem.getId()) && !runtimePlanItemInstanceMap.containsKey(stagePlanItem.getPlanItemDefinition().getId()) 
-                        && !terminatedPlanItemInstances.containsKey(stagePlanItem.getPlanItemDefinition().getId())) {
+                        && !terminatedPlanItemInstances.containsKey(stagePlanItem.getPlanItemDefinition().getId())
+                        && !caseInstanceChangeState.getCurrentPlanItemInstances().containsKey(stagePlanItem.getPlanItemDefinition().getId())) {
                     
                     PlanItemInstance parentStagePlanItem = newPlanItemInstance.getStagePlanItemInstanceEntity();
                     if (parentStagePlanItem == null && newPlanItemInstance.getStageInstanceId() != null) {
@@ -910,7 +913,6 @@ public abstract class AbstractCmmnDynamicStateManager {
                     }
                     
                     if (stagePlanItem.getPlanItemDefinition() instanceof Stage) {
-
                         PlanItemInstanceEntity childStagePlanItemInstance = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
                             .createPlanItemInstanceEntityBuilder()
                             .planItem(stagePlanItem)
