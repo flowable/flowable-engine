@@ -145,6 +145,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId) {
+        getEventSubscriptionEntityManager().updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId);
+    }
+
+    @Override
     public void updateEventSubscription(EventSubscriptionEntity eventSubscription) {
         getEventSubscriptionEntityManager().update(eventSubscription);
     }

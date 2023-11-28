@@ -315,6 +315,16 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("oldProcessDefinitionId", oldProcessDefinitionId);
+        params.put("newProcessDefinitionId", newProcessDefinitionId);
+        params.put("eventType", eventType);
+        params.put("activityId", activityId);
+        getDbSqlSession().directUpdate("updateEventSubscriptionProcessDefinitionId", params);
+    }
+
+    @Override
     public boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", eventSubscriptionId);

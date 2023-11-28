@@ -72,6 +72,8 @@ public interface EventSubscriptionService {
     void insertEventSubscription(EventSubscriptionEntity eventSubscription);
     
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
+
+    void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId);
     
     void updateEventSubscription(EventSubscriptionEntity eventSubscription);
 

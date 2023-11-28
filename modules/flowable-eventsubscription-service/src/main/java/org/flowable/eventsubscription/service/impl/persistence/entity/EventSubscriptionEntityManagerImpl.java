@@ -198,6 +198,11 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId) {
+        dataManager.updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId);
+    }
+
+    @Override
     public boolean lockEventSubscription(String eventSubscriptionId) {
         EventSubscriptionServiceConfiguration serviceConfiguration = getServiceConfiguration();
 

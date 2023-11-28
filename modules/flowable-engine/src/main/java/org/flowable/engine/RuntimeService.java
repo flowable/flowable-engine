@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.event.ProcessStartEventSubscriptionBuilder;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -1357,6 +1358,19 @@ public interface RuntimeService {
     void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
     
     void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
+
+    /**
+     * Creates a new event subscription builder to register a subscription to start a new process instance based on an event with a particular set of
+     * correlation parameter values. In order for this to work, the process definition needs to have an event-registry based start event with a
+     * dynamic, manual subscription based behavior and the registered correlation parameter values within the builder need to be based on
+     * actual correlation parameter definitions within the event model the start event is based on.
+     * Register one or more correlation parameter value with in the builder before invoking the
+     * {@link ProcessStartEventSubscriptionBuilder#registerProcessStartEventSubscription()} method to create and register the subscription.
+     *
+     * @param processDefinitionKey the key of the process definition to register a start subscription for
+     * @return the subscription builder
+     */
+    ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder(String processDefinitionKey);
 
     /**
      * Sets the name for the process instance with the given id.

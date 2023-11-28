@@ -1085,6 +1085,15 @@
     where TENANT_ID_ = #{oldTenantId, jdbcType=VARCHAR}
   </update>
 
+ <!-- process definition id update -->
+   <update id="updateEventSubscriptionProcessDefinitionId" parameterType="map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR
+    set PROC_DEF_ID_ = #{newProcessDefinitionId, jdbcType=VARCHAR}
+    where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
     set

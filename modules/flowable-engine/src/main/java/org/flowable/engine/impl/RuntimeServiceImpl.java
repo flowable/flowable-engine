@@ -27,6 +27,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.event.ProcessStartEventSubscriptionBuilder;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
@@ -64,6 +65,7 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.RegisterProcessStartEventSubscriptionCmd;
 import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
@@ -81,6 +83,7 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
+import org.flowable.engine.impl.event.ProcessStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -738,6 +741,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder(String processDefinitionKey) {
+        return new ProcessStartEventSubscriptionBuilderImpl(this, processDefinitionKey);
+    }
+
+    @Override
     public void setProcessInstanceName(String processInstanceId, String name) {
         commandExecutor.execute(new SetProcessInstanceNameCmd(processInstanceId, name));
     }
@@ -803,6 +811,10 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         } else {
             throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey provided");
         }
+    }
+
+    public void registerProcessStartEventSubscription(ProcessStartEventSubscriptionBuilderImpl builder) {
+        commandExecutor.execute(new RegisterProcessStartEventSubscriptionCmd(builder));
     }
 
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
