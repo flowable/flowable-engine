@@ -26,6 +26,8 @@ public interface BatchEntityManager extends EntityManager<BatchEntity> {
     List<Batch> findAllBatches();
     
     List<Batch> findBatchesByQueryCriteria(BatchQueryImpl batchQuery);
+
+    List<String> findBatchIdsByQueryCriteria(BatchQueryImpl batchQuery);
     
     long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery);
 

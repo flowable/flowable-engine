@@ -60,6 +60,12 @@ public class MybatisCmmnDeploymentDataManager extends AbstractCmmnDataManager<Cm
     public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery) {
         return getDbSqlSession().selectList("selectCmmnDeploymentsByQueryCriteria", deploymentQuery);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findDeploymentIdsByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectCmmnDeploymentIdsByQueryCriteria", deploymentQuery);
+    }
     
     @Override
     public long findDeploymentCountByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery) {

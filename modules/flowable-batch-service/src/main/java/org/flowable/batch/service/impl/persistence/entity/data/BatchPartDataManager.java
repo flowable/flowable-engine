@@ -29,5 +29,7 @@ public interface BatchPartDataManager extends DataManager<BatchPartEntity> {
 
     List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQueryImpl batchPartQuery);
 
+    List<String> findBatchPartIdsByQueryCriteria(BatchPartQueryImpl batchPartQuery);
+
     long findBatchPartCountByQueryCriteria(BatchPartQueryImpl batchPartQuery);
 }

@@ -239,6 +239,11 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return CommandContextUtil.getModelEntityManager(commandContext).findModelsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getModelEntityManager(commandContext).findModelIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getId() {

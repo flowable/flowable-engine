@@ -315,6 +315,7 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
 
     private void verifyQueryResults(ProcessDefinitionQuery query, int countExpected) {
         assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.listIds()).hasSize(countExpected);
         assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {

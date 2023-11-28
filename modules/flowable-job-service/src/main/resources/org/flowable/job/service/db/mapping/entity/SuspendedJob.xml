@@ -242,6 +242,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectSuspendedJobIdsByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectSuspendedJobByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectSuspendedJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectSuspendedJobByQueryCriteriaSql" />

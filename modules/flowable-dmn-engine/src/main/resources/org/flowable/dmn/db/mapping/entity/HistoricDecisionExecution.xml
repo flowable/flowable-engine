@@ -150,6 +150,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectHistoricDecisionExecutionIdsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectHistoricDecisionExecutionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>

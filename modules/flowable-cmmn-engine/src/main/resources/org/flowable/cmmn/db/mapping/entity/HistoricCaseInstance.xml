@@ -244,6 +244,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectHistoricCaseInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        select RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultType="long">
         select count(distinct RES.ID_)
         <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />

@@ -55,6 +55,12 @@ public class MybatisDmnDeploymentDataManager extends AbstractDmnDataManager<DmnD
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findDeploymentIdsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectDmnDeploymentIdsByQueryCriteria", deploymentQuery);
+    }
+
+    @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return getDbSqlSession().getSqlSession().selectList("selectDmnResourceNamesByDeploymentId", deploymentId);
     }

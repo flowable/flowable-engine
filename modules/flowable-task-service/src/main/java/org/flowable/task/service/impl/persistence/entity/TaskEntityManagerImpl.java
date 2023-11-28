@@ -168,6 +168,11 @@ public class TaskEntityManagerImpl extends AbstractTaskServiceEntityManager<Task
     }
 
     @Override
+    public List<String> findTaskIdsByQueryCriteria(TaskQueryImpl taskQuery) {
+        return dataManager.findTaskIdsByQueryCriteria(taskQuery);
+    }
+
+    @Override
     public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
         return dataManager.findTasksWithRelatedEntitiesByQueryCriteria(taskQuery);
     }

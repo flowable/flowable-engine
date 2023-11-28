@@ -59,11 +59,15 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
     @Test
     public void testQueryNoParams() {
         assertThat(appRepositoryService.createDeploymentQuery().list()).hasSize(2);
+        assertThat(appRepositoryService.createDeploymentQuery().listIds()).hasSize(2);
         assertThat(appRepositoryService.createDeploymentQuery().count()).isEqualTo(2);
 
         assertThat(appRepositoryService.createDeploymentQuery().list())
             .extracting(AppDeployment::getId)
             .containsExactlyInAnyOrder(deploymentId1, deploymentId2);
+
+        assertThat(appRepositoryService.createDeploymentQuery().listIds())
+                .containsExactlyInAnyOrder(deploymentId1, deploymentId2);
     }
     
     @Test
@@ -71,10 +75,12 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult()).isNotNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult().getId()).isEqualTo(deploymentId1);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).listIds()).hasSize(1);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
         
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).singleResult()).isNotNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).listIds()).hasSize(1);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
     }
     
@@ -82,12 +88,14 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
     public void testQueryByInvalidDeploymentId() {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").listIds()).isEmpty();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByDeploymentIds() {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).list()).hasSize(2);
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).listIds()).hasSize(2);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId2, "dummy")).singleResult()).isNotNull();
     }
 
@@ -95,6 +103,7 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
     public void testQueryByInvalidDeploymentIds() {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).singleResult()).isNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).list()).isEmpty();
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).listIds()).isEmpty();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentIds(Collections.singletonList("invalid")).count()).isZero();
         assertThatThrownBy(() -> appRepositoryService.createDeploymentQuery().deploymentIds(null))
                 .isInstanceOf(FlowableIllegalArgumentException.class)
@@ -121,10 +130,12 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult()).isNotNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("test%").singleResult().getId()).isEqualTo(deploymentId2);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("test%").list()).hasSize(1);
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("test%").listIds()).hasSize(1);
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("test%").count()).isEqualTo(1);
         
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").singleResult()).isNull();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").list()).isEmpty();
+        assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").listIds()).isEmpty();
         assertThat(appRepositoryService.createDeploymentQuery().deploymentNameLike("inval%").count()).isZero();
     }
     

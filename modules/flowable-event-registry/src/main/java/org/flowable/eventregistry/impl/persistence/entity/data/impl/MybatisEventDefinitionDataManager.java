@@ -86,6 +86,12 @@ public class MybatisEventDefinitionDataManager extends AbstractEventDataManager<
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findEventDefinitionIdsByQueryCriteria(EventDefinitionQueryImpl eventDefinitionQuery) {
+        return getDbSqlSession().selectList("selectEventDefinitionIdsByQueryCriteria", eventDefinitionQuery);
+    }
+
+    @Override
     public long findEventDefinitionCountByQueryCriteria(EventDefinitionQueryImpl eventDefinitionQuery) {
         return (Long) getDbSqlSession().selectOne("selectEventDefinitionCountByQueryCriteria", eventDefinitionQuery);
     }

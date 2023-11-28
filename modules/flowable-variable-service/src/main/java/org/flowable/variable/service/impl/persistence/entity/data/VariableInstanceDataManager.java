@@ -35,6 +35,8 @@ public interface VariableInstanceDataManager extends DataManager<VariableInstanc
 
     List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
 
+    List<String> findVariableInstanceIdsByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
+
     List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);

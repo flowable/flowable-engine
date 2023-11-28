@@ -22,4 +22,6 @@ public interface ExecutionQueryInterceptor {
     void beforeExecutionQueryExecute(ExecutionQuery executionQuery);
     
     void afterExecutionQueryExecute(ExecutionQuery executionQuery, List<Execution> executions);
+
+    void afterExecutionIdsQueryExecute(ExecutionQuery executionQuery, List<String> executions);
 }

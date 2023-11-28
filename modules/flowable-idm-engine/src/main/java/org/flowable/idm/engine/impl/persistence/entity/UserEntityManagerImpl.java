@@ -88,6 +88,11 @@ public class UserEntityManagerImpl
     }
 
     @Override
+    public List<String> findUserIdsByQueryCriteria(UserQueryImpl query) {
+        return dataManager.findUserIdsByQueryCriteria(query);
+    }
+
+    @Override
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
         return dataManager.findUserCountByQueryCriteria(query);
     }

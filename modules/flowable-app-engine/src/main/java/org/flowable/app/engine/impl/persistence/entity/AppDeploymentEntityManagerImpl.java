@@ -79,6 +79,11 @@ public class AppDeploymentEntityManagerImpl
     public List<AppDeployment> findDeploymentsByQueryCriteria(AppDeploymentQuery deploymentQuery) {
         return dataManager.findDeploymentsByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
     }
+
+    @Override
+    public List<String> findDeploymentIdsByQueryCriteria(AppDeploymentQuery deploymentQuery) {
+        return dataManager.findDeploymentIdsByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
+    }
     
     @Override
     public long findDeploymentCountByQueryCriteria(AppDeploymentQuery deploymentQuery) {

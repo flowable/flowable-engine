@@ -27,6 +27,8 @@ public interface ChannelDefinitionEntityManager extends EntityManager<ChannelDef
 
     List<ChannelDefinition> findChannelDefinitionsByQueryCriteria(ChannelDefinitionQueryImpl eventQuery);
 
+    List<String> findChannelDefinitionIdsByQueryCriteria(ChannelDefinitionQueryImpl eventQuery);
+
     long findChannelDefinitionCountByQueryCriteria(ChannelDefinitionQueryImpl eventQuery);
 
     ChannelDefinitionEntity findChannelDefinitionByDeploymentAndKey(String deploymentId, String channelDefinitionKey);

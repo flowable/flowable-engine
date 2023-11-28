@@ -27,6 +27,8 @@ public interface ModelDataManager extends DataManager<ModelEntity> {
 
     List<Model> findModelsByQueryCriteria(ModelQueryImpl query);
 
+    List<String> findModelIdsByQueryCriteria(ModelQueryImpl query);
+
     long findModelCountByQueryCriteria(ModelQueryImpl query);
 
     List<Model> findModelsByNativeQuery(Map<String, Object> parameterMap);

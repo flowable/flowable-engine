@@ -45,6 +45,11 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     /**
+     * Executes a {@link JobQueryImpl} and returns list of job ids
+     */
+    List<String> findJobIdsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
+
+    /**
      * Same as {@link #findJobsByQueryCriteria(SuspendedJobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);

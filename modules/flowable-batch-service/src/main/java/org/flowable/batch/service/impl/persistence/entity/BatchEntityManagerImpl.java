@@ -48,6 +48,11 @@ public class BatchEntityManagerImpl
     }
 
     @Override
+    public List<String> findBatchIdsByQueryCriteria(BatchQueryImpl batchQuery) {
+        return dataManager.findBatchIdsByQueryCriteria(batchQuery);
+    }
+
+    @Override
     public long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery) {
         return dataManager.findBatchCountByQueryCriteria(batchQuery);
     }

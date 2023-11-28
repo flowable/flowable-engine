@@ -50,6 +50,14 @@
     ${orderBy}
     <if test="needsPaging">${limitAfter}</if>
   </select>
+
+  <select id="selectPrivilegeIdsByQueryCriteria" parameterType="org.flowable.idm.engine.impl.PrivilegeQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectPrivilegeByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
   
    <select id="selectPrivilegeCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.PrivilegeQueryImpl" resultType="long">
     select count(RES.ID_)

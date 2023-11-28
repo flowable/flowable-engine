@@ -50,6 +50,11 @@ public class EventDefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findEventDefinitionIdsByQueryCriteria(EventDefinitionQueryImpl eventQuery) {
+        return dataManager.findEventDefinitionIdsByQueryCriteria(eventQuery);
+    }
+
+    @Override
     public long findEventDefinitionCountByQueryCriteria(EventDefinitionQueryImpl eventQuery) {
         return dataManager.findEventDefinitionCountByQueryCriteria(eventQuery);
     }

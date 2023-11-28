@@ -137,6 +137,11 @@ public class GenericEventListenerInstanceQueryImpl implements GenericEventListen
     }
 
     @Override
+    public List<String> listIds() {
+        return innerQuery.listIds();
+    }
+
+    @Override
     public List<GenericEventListenerInstance> listPage(int firstResult, int maxResults) {
         return convertPlanItemInstances(innerQuery.listPage(firstResult, maxResults));
     }

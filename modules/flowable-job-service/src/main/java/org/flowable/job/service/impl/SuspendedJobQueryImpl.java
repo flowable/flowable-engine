@@ -467,6 +467,11 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         return jobServiceConfiguration.getSuspendedJobEntityManager().findJobsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return jobServiceConfiguration.getSuspendedJobEntityManager().findJobIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     public String getProcessInstanceId() {

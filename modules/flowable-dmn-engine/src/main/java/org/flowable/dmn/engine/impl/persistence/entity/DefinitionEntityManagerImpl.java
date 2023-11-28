@@ -56,6 +56,11 @@ public class DefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findDecisionIdsByQueryCriteria(DecisionQueryImpl DefinitionQuery) {
+        return dataManager.findDecisionIdsByQueryCriteria(DefinitionQuery);
+    }
+
+    @Override
     public long findDecisionCountByQueryCriteria(DecisionQueryImpl DefinitionQuery) {
         return dataManager.findDecisionCountByQueryCriteria(DefinitionQuery);
     }

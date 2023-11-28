@@ -32,4 +32,6 @@ public interface AppDeploymentDataManager extends DataManager<AppDeploymentEntit
 
     List<AppDeployment> findDeploymentsByQueryCriteria(AppDeploymentQueryImpl deploymentQuery);
 
+    List<String> findDeploymentIdsByQueryCriteria(AppDeploymentQueryImpl deploymentQuery);
+
 }

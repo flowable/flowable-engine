@@ -32,6 +32,8 @@ public interface GroupEntityManager extends EntityManager<GroupEntity> {
 
     List<Group> findGroupByQueryCriteria(GroupQueryImpl query);
 
+    List<String> findGroupIdsByQueryCriteria(GroupQueryImpl query);
+
     long findGroupCountByQueryCriteria(GroupQueryImpl query);
 
     List<Group> findGroupsByUser(String userId);

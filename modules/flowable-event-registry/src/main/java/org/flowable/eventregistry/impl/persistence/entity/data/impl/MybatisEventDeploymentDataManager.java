@@ -54,6 +54,13 @@ public class MybatisEventDeploymentDataManager extends AbstractEventDataManager<
         return getDbSqlSession().selectList("selectEventDeploymentsByQueryCriteria", deploymentQuery);
     }
 
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findDeploymentIdsByQueryCriteria(EventDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectEventDeploymentIdsByQueryCriteria", deploymentQuery);
+    }
+
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return getDbSqlSession().getSqlSession().selectList("selectEventResourceNamesByDeploymentId", deploymentId);

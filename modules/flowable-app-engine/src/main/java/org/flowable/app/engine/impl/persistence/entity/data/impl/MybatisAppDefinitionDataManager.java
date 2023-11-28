@@ -124,6 +124,12 @@ public class MybatisAppDefinitionDataManager extends AbstractAppDataManager<AppD
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findAppDefinitionIdsByQueryCriteria(AppDefinitionQueryImpl appDefinitionQuery) {
+        return getDbSqlSession().selectList("selectAppDefinitionIdsByQueryCriteria", appDefinitionQuery);
+    }
+
+    @Override
     public long findAppDefinitionCountByQueryCriteria(AppDefinitionQueryImpl appDefinitionQuery) {
         return (Long) getDbSqlSession().selectOne("selectAppDefinitionCountByQueryCriteria", appDefinitionQuery);
     }

@@ -45,6 +45,11 @@ public class HistoricMilestoneInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricMilestoneInstanceIdsByQueryCriteria(HistoricMilestoneInstanceQuery query) {
+        return dataManager.findHistoricMilestoneInstanceIdsByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
+    }
+
+    @Override
     public long findHistoricMilestoneInstanceCountByQueryCriteria(HistoricMilestoneInstanceQuery query) {
         return dataManager.findHistoricMilestoneInstancesCountByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
     }

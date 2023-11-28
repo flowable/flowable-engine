@@ -153,6 +153,11 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getGroupEntityManager(commandContext).findGroupIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////////////////
 
     @Override

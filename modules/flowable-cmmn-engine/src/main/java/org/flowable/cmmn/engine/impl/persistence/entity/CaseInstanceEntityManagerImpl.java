@@ -85,6 +85,11 @@ public class CaseInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findIdsByCriteria(CaseInstanceQuery query) {
+        return dataManager.findIdsByCriteria((CaseInstanceQueryImpl) query);
+    }
+
+    @Override
     public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQuery query) {
         return dataManager.findWithVariablesByCriteria((CaseInstanceQueryImpl) query);
     }

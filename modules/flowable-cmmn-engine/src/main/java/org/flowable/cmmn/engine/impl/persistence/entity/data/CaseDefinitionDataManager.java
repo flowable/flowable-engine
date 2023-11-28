@@ -46,6 +46,8 @@ public interface CaseDefinitionDataManager extends DataManager<CaseDefinitionEnt
     
     List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery);
 
+    List<String> findCaseDefinitionIdsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery);
+
     long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery);
 
 }

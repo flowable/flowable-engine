@@ -240,6 +240,19 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findExecutionIdsByQueryCriteria(ExecutionQueryImpl executionQuery) {
+        // False -> executions should not be cached if using executionTreeFetching
+        boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        setSafeInValueLists(executionQuery);
+        if (useCache) {
+            return getDbSqlSession().selectList("selectExecutionIdsByQueryCriteria", executionQuery, getManagedEntityClass());
+        } else {
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectExecutionIdsByQueryCriteria", executionQuery);
+        }
+    }
+
+    @Override
     public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
         setSafeInValueLists(processInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectProcessInstanceCountByQueryCriteria", processInstanceQuery);
@@ -255,6 +268,19 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
             return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, getManagedEntityClass());
         } else {
             return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceByQueryCriteria", processInstanceQuery, getManagedEntityClass());
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        // False -> executions should not be cached if using executionTreeFetching
+        boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        setSafeInValueLists(processInstanceQuery);
+        if (useCache) {
+            return getDbSqlSession().selectList("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery, getManagedEntityClass());
+        } else {
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery, getManagedEntityClass());
         }
     }
 

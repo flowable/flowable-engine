@@ -50,6 +50,12 @@ public class MybatisMilestoneInstanceDataManager extends AbstractCmmnDataManager
     public List<MilestoneInstance> findMilestoneInstancesByQueryCriteria(MilestoneInstanceQueryImpl query) {
         return getDbSqlSession().selectList("selectMilestoneInstancesByQueryCriteria", query, getManagedEntityClass());
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findMilestoneInstanceIdsByQueryCriteria(MilestoneInstanceQueryImpl query) {
+        return getDbSqlSession().selectList("selectMilestoneInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
     
     @Override
     public long findMilestoneInstancesCountByQueryCriteria(MilestoneInstanceQueryImpl query) {

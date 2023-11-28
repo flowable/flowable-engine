@@ -36,6 +36,8 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 
+    List<String> findHistoricVariableInstanceIdsByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
+
     HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
     
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId);

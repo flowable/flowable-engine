@@ -89,21 +89,26 @@ public class AppDefinitionQueryTest extends FlowableAppTestCase {
     @Test
     public void testQueryByDeploymentId() {
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).listIds()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
 
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).listIds()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
 
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).listIds()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).count()).isEqualTo(1);
         
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).listIds()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentId() {
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").listIds()).isEmpty();
         assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").count()).isZero();
     }
 
@@ -222,9 +227,11 @@ public class AppDefinitionQueryTest extends FlowableAppTestCase {
     @Test
     public void testQueryByAppDefinitionName() {
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").listIds()).hasSize(3);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").count()).isEqualTo(3);
 
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").listIds()).hasSize(1);
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").count()).isEqualTo(1);
 
         assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").singleResult().getDeploymentId())

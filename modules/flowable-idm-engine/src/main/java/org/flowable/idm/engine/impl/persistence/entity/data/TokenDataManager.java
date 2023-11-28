@@ -27,6 +27,8 @@ public interface TokenDataManager extends DataManager<TokenEntity> {
 
     List<Token> findTokenByQueryCriteria(TokenQueryImpl query);
 
+    List<String> findTokenIdsByQueryCriteria(TokenQueryImpl query);
+
     long findTokenCountByQueryCriteria(TokenQueryImpl query);
 
     List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap);

@@ -150,6 +150,11 @@ public class CaseDefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findCaseDefinitionIdsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
+        return dataManager.findCaseDefinitionIdsByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
+    }
+
+    @Override
     public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery) {
         return dataManager.findCaseDefinitionCountByQueryCriteria((CaseDefinitionQueryImpl) caseDefinitionQuery);
     }

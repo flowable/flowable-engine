@@ -32,6 +32,8 @@ public interface HistoricTaskLogEntryEntityManager extends EntityManager<Histori
 
     List<HistoricTaskLogEntry> findHistoricTaskLogEntriesByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
+    List<String> findHistoricTaskLogEntryIdsByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
+
     long findHistoricTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery);
 
     List<HistoricTaskLogEntry> findHistoricTaskLogEntriesByNativeQueryCriteria(Map<String, Object> nativeHistoricTaskLogEntryQuery);

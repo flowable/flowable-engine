@@ -91,4 +91,10 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
         return CommandContextUtil.getDbSqlSession(commandContext).selectList("selectAttachmentByQueryCriteria", this);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getDbSqlSession(commandContext).selectList("selectAttachmentIdsByQueryCriteria", this);
+    }
+
 }

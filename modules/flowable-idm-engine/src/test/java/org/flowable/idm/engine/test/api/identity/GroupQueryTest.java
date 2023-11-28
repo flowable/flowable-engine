@@ -256,6 +256,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
     private void verifyQueryResults(GroupQuery query, int countExpected) {
         assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.listIds()).hasSize(countExpected);
         assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {

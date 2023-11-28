@@ -35,6 +35,8 @@ public interface UserEntityManager extends EntityManager<UserEntity> {
 
     List<User> findUserByQueryCriteria(UserQueryImpl query);
 
+    List<String> findUserIdsByQueryCriteria(UserQueryImpl query);
+
     long findUserCountByQueryCriteria(UserQueryImpl query);
 
     UserQuery createNewUserQuery();

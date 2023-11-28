@@ -29,6 +29,8 @@ public interface EventDeploymentDataManager extends DataManager<EventDeploymentE
 
     List<EventDeployment> findDeploymentsByQueryCriteria(EventDeploymentQueryImpl deploymentQuery);
 
+    List<String> findDeploymentIdsByQueryCriteria(EventDeploymentQueryImpl deploymentQuery);
+
     List<String> getDeploymentResourceNames(String deploymentId);
 
     List<EventDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);

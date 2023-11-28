@@ -57,6 +57,11 @@ public class TokenEntityManagerImpl
     }
 
     @Override
+    public List<String> findTokenIdsByQueryCriteria(TokenQueryImpl query) {
+        return dataManager.findTokenIdsByQueryCriteria(query);
+    }
+
+    @Override
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
         return dataManager.findTokenCountByQueryCriteria(query);
     }

@@ -84,6 +84,11 @@ public class ExternalWorkerJobEntityManagerImpl
     }
 
     @Override
+    public List<String> findJobIdsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {
+        return dataManager.findJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {
         return dataManager.findJobCountByQueryCriteria(jobQuery);
     }

@@ -242,6 +242,25 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return tasks;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+
+        ensureVariablesInitialized();
+
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor()
+                    .beforeHistoricTaskQueryExecute(this);
+        }
+
+        List<String> taskIds = taskServiceConfiguration.getHistoricTaskInstanceEntityManager().findHistoricTaskInstanceIdsByQueryCriteria(this);
+
+        if (taskServiceConfiguration.getHistoricTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getHistoricTaskQueryInterceptor().afterHistoricTaskIdsQueryExecute(this, taskIds);
+        }
+
+        return taskIds;
+    }
+
     protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricTaskInstance> results, boolean local) {
         for (HistoricTaskInstance task : results) {
             if (Objects.equals(taskId, task.getId())) {

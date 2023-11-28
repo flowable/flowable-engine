@@ -43,6 +43,8 @@ public interface HistoricDetailDataManager extends DataManager<HistoricDetailEnt
 
     List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
+    List<String> findHistoricDetailIdsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
+
     List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);

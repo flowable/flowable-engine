@@ -56,6 +56,11 @@ public class HistoricPlanItemInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findIdsByCriteria(HistoricPlanItemInstanceQuery query) {
+        return dataManager.findIdsByCriteria((HistoricPlanItemInstanceQueryImpl) query);
+    }
+
+    @Override
     public long countByCriteria(HistoricPlanItemInstanceQuery query) {
         return dataManager.countByCriteria((HistoricPlanItemInstanceQueryImpl) query);
     }

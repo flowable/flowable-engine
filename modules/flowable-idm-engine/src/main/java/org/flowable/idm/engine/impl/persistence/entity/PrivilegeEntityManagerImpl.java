@@ -43,6 +43,11 @@ public class PrivilegeEntityManagerImpl
     }
 
     @Override
+    public List<String> findPrivilegeIdsByQueryCriteria(PrivilegeQueryImpl query) {
+        return dataManager.findPrivilegeIdsByQueryCriteria(query);
+    }
+
+    @Override
     public long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query) {
         return dataManager.findPrivilegeCountByQueryCriteria(query);
     }

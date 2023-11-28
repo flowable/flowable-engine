@@ -39,6 +39,11 @@ public class HistoricTaskLogEntryEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricTaskLogEntryIdsByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery) {
+        return getDataManager().findHistoricTaskLogEntryIdsByQueryCriteria(taskLogEntryQuery);
+    }
+
+    @Override
     public long findHistoricTaskLogEntriesCountByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery) {
         return getDataManager().findHistoricTaskLogEntriesCountByQueryCriteria(taskLogEntryQuery);
     }

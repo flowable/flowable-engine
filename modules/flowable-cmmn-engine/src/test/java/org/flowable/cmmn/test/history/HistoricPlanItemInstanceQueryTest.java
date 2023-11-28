@@ -54,6 +54,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list()).hasSize(20);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().listIds()).hasSize(20);
         }
     }
 
@@ -63,6 +64,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         for (String caseInstanceId : caseInstanceIds) {
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).list()).hasSize(4);
+                assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).listIds()).hasSize(4);
             }
         }
     }
@@ -76,6 +78,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .planItemInstanceName("Stage one")
                 .singleResult();
             assertThat(planItemInstance).isNotNull();
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceStageInstanceId(planItemInstance.getId()).listIds()).hasSize(2);
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceStageInstanceId(planItemInstance.getId()).count()).isEqualTo(2);
         }
     }
@@ -87,6 +90,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricPlanItemInstance> planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
             for (HistoricPlanItemInstance planItemInstance : planItemInstances) {
+                assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).listIds()).hasSize(1);
                 assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstance.getId()).count()).isEqualTo(1);
             }
         }
@@ -97,6 +101,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(4);
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceElementId("planItem3").listIds()).hasSize(4);
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceElementId("planItem3").list()).hasSize(4);
         }
     }
@@ -106,6 +111,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(9);
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("B").listIds()).hasSize(9);
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceName("B").list()).hasSize(9);
         }
     }

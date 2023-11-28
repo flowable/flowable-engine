@@ -33,6 +33,8 @@ public interface HistoricCaseInstanceDataManager extends DataManager<HistoricCas
     List<String> findHistoricCaseInstanceIdsByParentIds(Collection<String> caseInstanceIds);
     
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query);
+
+    List<String> findIdsByCriteria(HistoricCaseInstanceQueryImpl query);
     
     long countByCriteria(HistoricCaseInstanceQueryImpl query);
 

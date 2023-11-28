@@ -522,6 +522,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return historicPlanItems;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findIdsByCriteria(this);
+    }
+
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }

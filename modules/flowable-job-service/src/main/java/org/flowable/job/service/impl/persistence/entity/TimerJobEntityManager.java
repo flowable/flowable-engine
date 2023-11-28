@@ -67,6 +67,11 @@ public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEnti
     List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     /**
+     * Executes a {@link JobQueryImpl} and returns job ids.
+     */
+    List<String> findJobIdsByQueryCriteria(TimerJobQueryImpl jobQuery);
+
+    /**
      * Same as {@link #findJobsByQueryCriteria(TimerJobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);

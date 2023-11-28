@@ -60,6 +60,15 @@ public class HistoricProcessInstanceEntityManagerImpl
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricProcessInstanceIdsByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        if (getHistoryManager().isHistoryEnabled()) {
+            return dataManager.findHistoricProcessInstanceIdsByQueryCriteria(historicProcessInstanceQuery);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
         if (getHistoryManager().isHistoryEnabled()) {
             return dataManager.findHistoricProcessInstancesAndVariablesByQueryCriteria(historicProcessInstanceQuery);

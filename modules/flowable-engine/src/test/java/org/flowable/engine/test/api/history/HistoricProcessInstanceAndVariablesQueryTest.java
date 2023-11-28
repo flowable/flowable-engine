@@ -94,6 +94,9 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
             assertThat(instanceList).hasSize(6);
 
+            List<String> instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().listIds();
+            assertThat(instanceListIds).hasSize(6);
+
             instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
             assertThat(instanceList).hasSize(4);
             processInstance = instanceList.get(0);
@@ -103,6 +106,9 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                             entry("test", "test"),
                             entry("test2", "test2"));
             assertThat(instanceList.get(0).getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_KEY);
+
+            instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listIds();
+            assertThat(instanceListIds).hasSize(4);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY_2)
                     .singleResult();
@@ -212,6 +218,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         taskService.setVariableLocal(task.getId(), "localVar", "test");
         
         assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").listIds()).isEmpty();
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
@@ -220,7 +227,10 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             assertThat(variableMap).containsExactly(entry("anothertest", 123));
             
             assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").listIds()).isEmpty();
+
             assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").listIds()).hasSize(1);
         }
     }
 

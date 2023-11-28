@@ -92,6 +92,13 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findHistoryJobIdsByQueryCriteria(HistoryJobQueryImpl jobQuery) {
+        final String query = "selectHistoryJobIdsByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery);
+    }
+
+    @Override
     public long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return (Long) getDbSqlSession().selectOne("selectHistoryJobCountByQueryCriteria", jobQuery);
     }

@@ -118,6 +118,11 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
+    public List<String> findEventSubscriptionIdsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
+        return dataManager.findEventSubscriptionIdsByQueryCriteria(eventSubscriptionQueryImpl);
+    }
+
+    @Override
     public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
         return dataManager.findMessageEventSubscriptionsByProcessInstanceAndEventName(processInstanceId, eventName);
     }

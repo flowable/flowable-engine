@@ -126,6 +126,14 @@
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
   </select>
+
+  <select id="selectHistoricMilestoneInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectHistoricMilestoneInstancesByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
   
   <select id="selectHistoricMilestoneInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl" resultType="long">
         select count(RES.ID_)

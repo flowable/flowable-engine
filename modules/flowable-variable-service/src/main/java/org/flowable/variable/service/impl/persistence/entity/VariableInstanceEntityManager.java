@@ -45,6 +45,8 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
     InternalVariableInstanceQuery createInternalVariableInstanceQuery();
     
     List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
+
+    List<String> findVariableInstanceIdsByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
     
     long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
 

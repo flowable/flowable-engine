@@ -66,6 +66,9 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
     @Override
     public abstract List<U> executeList(CommandContext commandContext);
 
+    @Override
+    public abstract List<String> executeListIds(CommandContext commandContext);
+
     public T variableValueEquals(String name, Object value) {
         return variableValueEquals(name, value, true);
     }

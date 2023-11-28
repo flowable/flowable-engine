@@ -66,6 +66,12 @@ public class CustomTaskQuery extends AbstractQuery<CustomTaskQuery, CustomTask> 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getDbSqlSession(commandContext).selectList("selectCustomTaskIdsByQueryCriteria", this);
+    }
+
+    @Override
     public long executeCount(CommandContext commandContext) {
         return (Long) CommandContextUtil.getDbSqlSession(commandContext).selectOne("selectCustomTaskCountByQueryCriteria", this);
     }

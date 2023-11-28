@@ -39,6 +39,8 @@ public interface AppDefinitionEntityManager extends EntityManager<AppDefinitionE
     
     List<AppDefinition> findAppDefinitionsByQueryCriteria(AppDefinitionQuery appDefinitionQuery);
 
+    List<String> findAppDefinitionIdsByQueryCriteria(AppDefinitionQuery appDefinitionQuery);
+
     long findAppDefinitionCountByQueryCriteria(AppDefinitionQuery appDefinitionQuery);
 
 }

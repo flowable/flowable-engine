@@ -680,7 +680,13 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
 
         return planItems;
     }
-    
+
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findIdsByCriteria(this);
+    }
+
     @Override
     public PlanItemInstanceQuery orderByCreateTime() {
         this.orderProperty = PlanItemInstanceQueryProperty.CREATE_TIME;

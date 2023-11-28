@@ -66,6 +66,11 @@ public class VariableInstanceEntityManagerImpl
     public List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
         return dataManager.findVariableInstancesByQueryCriteria(variableInstanceQuery);
     }
+
+    @Override
+    public List<String> findVariableInstanceIdsByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return dataManager.findVariableInstanceIdsByQueryCriteria(variableInstanceQuery);
+    }
     
     @Override
     public List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap) {

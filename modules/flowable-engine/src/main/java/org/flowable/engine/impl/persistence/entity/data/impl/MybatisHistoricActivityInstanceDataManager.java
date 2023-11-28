@@ -103,6 +103,11 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
     }
 
     @Override
+    public List<String> findHistoricActivityInstanceIdsByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        return getDbSqlSession().selectList("selectHistoricActivityInstanceIdsByQueryCriteria", historicActivityInstanceQuery);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectHistoricActivityInstanceByNativeQuery", parameterMap);

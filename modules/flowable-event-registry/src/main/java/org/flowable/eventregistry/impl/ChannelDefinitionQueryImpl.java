@@ -379,6 +379,11 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
         return CommandContextUtil.getChannelDefinitionEntityManager(commandContext).findChannelDefinitionsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getChannelDefinitionEntityManager(commandContext).findChannelDefinitionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {

@@ -58,6 +58,8 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
      */
     List<ExternalWorkerJob> findJobsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
+    List<String> findJobIdsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
+
     /**
      * Same as {@link #findJobsByQueryCriteria(ExternalWorkerJobQueryImpl)}, but only returns a count and not the instances itself.
      */

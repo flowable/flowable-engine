@@ -124,6 +124,14 @@
     ${orderBy}
     <if test="needsPaging">${limitAfter}</if>
   </select>
+
+  <select id="selectTokenIdsByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectTokenByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
   
    <select id="selectTokenCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultType="long">
     select count(RES.ID_)

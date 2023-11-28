@@ -83,6 +83,12 @@ public class MybatisChannelDefinitionDataManager extends AbstractEventDataManage
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findChannelDefinitionIdsByQueryCriteria(ChannelDefinitionQueryImpl ChannelDefinitionQuery) {
+        return getDbSqlSession().selectList("selectChannelDefinitionIdsByQueryCriteria", ChannelDefinitionQuery);
+    }
+
+    @Override
     public long findChannelDefinitionCountByQueryCriteria(ChannelDefinitionQueryImpl ChannelDefinitionQuery) {
         return (Long) getDbSqlSession().selectOne("selectChannelDefinitionCountByQueryCriteria", ChannelDefinitionQuery);
     }

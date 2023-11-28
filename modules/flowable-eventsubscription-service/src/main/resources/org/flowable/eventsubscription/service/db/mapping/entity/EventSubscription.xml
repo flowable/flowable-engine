@@ -55,6 +55,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+    <select id="selectEventSubscriptionIdsByQueryCriteria" parameterType="org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>

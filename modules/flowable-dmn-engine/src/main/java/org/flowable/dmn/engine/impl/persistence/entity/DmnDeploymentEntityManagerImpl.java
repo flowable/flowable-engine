@@ -76,6 +76,11 @@ public class DmnDeploymentEntityManagerImpl
     }
 
     @Override
+    public List<String> findDeploymentIdsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
+        return dataManager.findDeploymentIdsByQueryCriteria(deploymentQuery);
+    }
+
+    @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return dataManager.getDeploymentResourceNames(deploymentId);
     }

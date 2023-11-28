@@ -32,6 +32,8 @@ public interface AppDeploymentEntityManager extends EntityManager<AppDeploymentE
     AppDeploymentQuery createDeploymentQuery();
     
     List<AppDeployment> findDeploymentsByQueryCriteria(AppDeploymentQuery deploymentQuery);
+
+    List<String> findDeploymentIdsByQueryCriteria(AppDeploymentQuery deploymentQuery);
     
     long findDeploymentCountByQueryCriteria(AppDeploymentQuery deploymentQuery);
 

@@ -404,6 +404,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return jobServiceConfiguration.getTimerJobEntityManager().findJobsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return jobServiceConfiguration.getTimerJobEntityManager().findJobIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     public String getProcessInstanceId() {

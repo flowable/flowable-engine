@@ -85,8 +85,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                             entry("testVar2", 123)
                     );
 
-            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().list();
-            assertThat(tasks).hasSize(3);
+            assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(3);
+            assertThat(historyService.createHistoricTaskInstanceQuery().listIds()).hasSize(3);
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("gonzo").singleResult();
             assertThat(task.getProcessVariables()).isEmpty();
@@ -137,7 +137,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             task = historyService.createHistoricTaskInstanceQuery().taskVariableValueLikeIgnoreCase("testVar", "somevaria2%").singleResult();
             assertThat(task).isNull();
 
-            tasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().taskInvolvedUser("kermit").orderByTaskCreateTime().asc()
+            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().taskInvolvedUser("kermit").orderByTaskCreateTime().asc()
                     .list();
             assertThat(tasks).hasSize(3);
             assertThat(tasks.get(0).getTaskLocalVariables())
@@ -178,7 +178,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-            task = (HistoricTaskInstance) historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().finished().singleResult();
+            task = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().finished().singleResult();
             variableMap = task.getTaskLocalVariables();
             assertThat(task.getProcessVariables()).isEmpty();
             assertThat(variableMap)
@@ -189,6 +189,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
+                    .isEqualTo(taskId);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).listIds().get(0))
                     .isEqualTo(taskId);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).singleResult().getId())
                     .isEqualTo(taskId);

@@ -28,6 +28,8 @@ public interface BatchPartEntityManager extends EntityManager<BatchPartEntity> {
 
     List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQuery batchPartQuery);
 
+    List<String> findBatchPartIdsByQueryCriteria(BatchPartQuery batchPartQuery);
+
     long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery);
 
     BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType);

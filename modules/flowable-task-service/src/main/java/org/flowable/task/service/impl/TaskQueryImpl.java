@@ -2160,6 +2160,23 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return tasks;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+
+        List<String> tasks = taskServiceConfiguration.getTaskEntityManager().findTaskIdsByQueryCriteria(this);
+
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().afterTaskIdsQueryExecute(this, tasks);
+        }
+
+        return tasks;
+    }
+
     protected void addCachedVariableForQueryById(CommandContext commandContext, List<Task> results, boolean local) {
         for (Task task : results) {
             if (Objects.equals(taskId, task.getId())) {
@@ -2615,6 +2632,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public List<Task> list() {
         cachedCandidateGroups = null;
         return super.list();
+    }
+
+    @Override
+    public List<String> listIds() {
+        cachedCandidateGroups = null;
+        return super.listIds();
     }
 
     @Override

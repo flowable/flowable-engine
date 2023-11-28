@@ -603,6 +603,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectExecutionIdsByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
         select count(distinct RES.ID_)
         <include refid="selectExecutionsByQueryCriteriaSql"/>
@@ -613,6 +621,14 @@
         <if test="needsPaging">${limitBefore}</if>
         SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as
         ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.CATEGORY_ as ProcessDefinitionCategory, P.DEPLOYMENT_ID_ as DeploymentId
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
         <include refid="selectExecutionsByQueryCriteriaSql"/>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>

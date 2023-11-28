@@ -31,6 +31,8 @@ public interface HistoricPlanItemInstanceEntityManager extends EntityManager<His
 
     List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQuery query);
 
+    List<String> findIdsByCriteria(HistoricPlanItemInstanceQuery query);
+
     List<HistoricPlanItemInstance> findByCaseDefinitionId(String caseDefinitionId);
 
     long countByCriteria(HistoricPlanItemInstanceQuery query);

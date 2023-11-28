@@ -32,6 +32,8 @@ public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity>
 
     List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
+    List<String> findJobIdsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
+
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);

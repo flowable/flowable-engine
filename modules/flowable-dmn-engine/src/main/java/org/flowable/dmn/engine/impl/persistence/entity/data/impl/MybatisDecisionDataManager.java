@@ -87,6 +87,13 @@ public class MybatisDecisionDataManager extends AbstractDmnDataManager<DecisionE
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findDecisionIdsByQueryCriteria(DecisionQueryImpl DecisionQuery) {
+        return getDbSqlSession().selectList("selectDecisionIdsByQueryCriteria", DecisionQuery);
+    }
+
+
+    @Override
     public long findDecisionCountByQueryCriteria(DecisionQueryImpl DecisionQuery) {
         return (Long) getDbSqlSession().selectOne("selectDecisionCountByQueryCriteria", DecisionQuery);
     }

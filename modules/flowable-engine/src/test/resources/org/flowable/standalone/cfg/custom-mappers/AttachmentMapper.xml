@@ -29,7 +29,15 @@
     <include refid="selectAttachmentByQueryCriteriaSql"/>
 	${orderBy}
 	<if test="needsPaging">${limitAfter}</if>
-</select>
+  </select>
+
+  <select id="selectAttachmentIdsByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultType="string">
+	<if test="needsPaging">${limitBefore}</if>
+	SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+	<include refid="selectAttachmentByQueryCriteriaSql"/>
+	${orderBy}
+	<if test="needsPaging">${limitAfter}</if>
+  </select>
   
   <sql id="selectAttachmentByQueryCriteriaSql">
   from ${prefix}ACT_HI_ATTACHMENT RES

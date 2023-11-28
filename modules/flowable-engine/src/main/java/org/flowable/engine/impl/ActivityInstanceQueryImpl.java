@@ -67,6 +67,11 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getActivityInstanceEntityManager(commandContext).findActivityInstanceIdsByQueryCriteria(this);
+    }
+
+    @Override
     public ActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;

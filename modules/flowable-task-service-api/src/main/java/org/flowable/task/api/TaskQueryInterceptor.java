@@ -19,4 +19,6 @@ public interface TaskQueryInterceptor {
     void beforeTaskQueryExecute(TaskQuery taskQuery);
     
     void afterTaskQueryExecute(TaskQuery taskQuery, List<Task> tasks);
+
+    void afterTaskIdsQueryExecute(TaskQuery taskQuery, List<String> tasks);
 }

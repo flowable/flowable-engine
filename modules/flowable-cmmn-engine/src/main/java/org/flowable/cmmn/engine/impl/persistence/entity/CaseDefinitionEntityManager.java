@@ -43,6 +43,8 @@ public interface CaseDefinitionEntityManager extends EntityManager<CaseDefinitio
     
     List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);
 
+    List<String> findCaseDefinitionIdsByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);
+
     long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQuery caseDefinitionQuery);
 
 }

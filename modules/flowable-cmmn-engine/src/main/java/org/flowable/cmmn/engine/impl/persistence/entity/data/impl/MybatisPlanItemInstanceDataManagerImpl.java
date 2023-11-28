@@ -119,7 +119,13 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         setSafeInValueLists(planItemInstanceQuery);
         return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
     }
-    
+
+    @Override
+    public List<String> findIdsByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        setSafeInValueLists(planItemInstanceQuery);
+        return getDbSqlSession().selectList("selectPlanItemInstanceIdsByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
+    }
+
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deletePlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());

@@ -129,4 +129,9 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
         return CommandContextUtil.getPrivilegeEntityManager(commandContext).findPrivilegeByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getPrivilegeEntityManager(commandContext).findPrivilegeIdsByQueryCriteria(this);
+    }
+
 }

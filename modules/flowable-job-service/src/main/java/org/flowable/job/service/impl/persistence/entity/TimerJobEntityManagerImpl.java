@@ -102,6 +102,11 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
+    public List<String> findJobIdsByQueryCriteria(TimerJobQueryImpl jobQuery) {
+        return dataManager.findJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery) {
         return dataManager.findJobCountByQueryCriteria(jobQuery);
     }

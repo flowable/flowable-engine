@@ -433,6 +433,12 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return processDefinitions;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {

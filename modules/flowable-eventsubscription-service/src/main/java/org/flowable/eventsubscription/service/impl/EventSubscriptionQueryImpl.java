@@ -522,6 +522,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     @Override

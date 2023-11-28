@@ -209,6 +209,11 @@ public class TokenQueryImpl extends AbstractQuery<TokenQuery, Token> implements 
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getTokenEntityManager(commandContext).findTokenIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////////////////////
 
     @Override

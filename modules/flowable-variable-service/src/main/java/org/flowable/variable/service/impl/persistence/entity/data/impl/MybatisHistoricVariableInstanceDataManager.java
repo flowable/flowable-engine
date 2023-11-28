@@ -91,6 +91,12 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findHistoricVariableInstanceIdsByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+        return getDbSqlSession().selectList("selectHistoricVariableInstanceIdsByQueryCriteria", historicProcessVariableQuery);
+    }
+
+    @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
         return (HistoricVariableInstanceEntity) getDbSqlSession().selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
     }

@@ -123,6 +123,18 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> listIds() {
+        this.resultType = ResultType.LIST_IDS;
+        if (commandExecutor != null) {
+            return (List<String>) commandExecutor.execute(this);
+        }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
+        return executeListIds(Context.getCommandContext());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
@@ -164,6 +176,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
             return executeSingleResult(commandContext);
         } else if (resultType == ResultType.LIST_PAGE) {
             return executeList(commandContext);
+        } else if (resultType == ResultType.LIST_IDS) {
+            return executeListIds(commandContext);
         } else {
             return executeCount(commandContext);
         }
@@ -175,6 +189,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
      * Executes the actual query to retrieve the list of results.
      */
     public abstract List<U> executeList(CommandContext commandContext);
+
+    public abstract List<String> executeListIds(CommandContext commandContext);
 
     public U executeSingleResult(CommandContext commandContext) {
         List<U> results = executeList(commandContext);

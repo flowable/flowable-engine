@@ -63,10 +63,12 @@ public class DeploymentQueryTest extends AbstractFlowableDmnTest {
     public void testQueryById() {
         assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult()).isNotNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).listIds()).hasSize(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
 
         assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").listIds()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
     }
     
@@ -74,40 +76,48 @@ public class DeploymentQueryTest extends AbstractFlowableDmnTest {
     public void testQueryByName() {
         assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.dmn").singleResult()).isNotNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.dmn").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.dmn").listIds()).hasSize(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentName("test2.dmn").count()).isEqualTo(1);
 
         assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").singleResult()).isNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").listIds()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentName("invalid").count()).isZero();
     }
     
     @Test
     public void testQueryByNameLike() {
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").listIds()).hasSize(3);
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("test%").count()).isEqualTo(3);
 
         assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").singleResult()).isNull();
-        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").list()).isEmpty();
-        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva").count()).isZero();
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").listIds()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("inva%").count()).isZero();
     }
     
     @Test
     public void testQueryByCategory() {
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").singleResult()).isNotNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").listIds()).hasSize(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("testCategoryC").count()).isEqualTo(1);
 
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").singleResult()).isNull();
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").listIds()).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().deploymentCategory("inva%").count()).isZero();
     }
     
     @Test
     public void testQueryByCategoryNotEquals() {
         assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").listIds()).hasSize(2);
         assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("testCategoryC").count()).isEqualTo(2);
 
         assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").list()).hasSize(3);
+        assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").listIds()).hasSize(3);
         assertThat(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("invalid").count()).isEqualTo(3);
     }
     

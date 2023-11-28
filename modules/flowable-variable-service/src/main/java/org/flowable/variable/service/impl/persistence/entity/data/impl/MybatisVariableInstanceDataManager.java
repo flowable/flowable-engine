@@ -92,6 +92,12 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     public List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
         return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findVariableInstanceIdsByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+        return getDbSqlSession().selectList("selectVariableInstanceIdsByQueryCriteria", variableInstanceQuery);
+    }
     
     @Override
     @SuppressWarnings("unchecked")

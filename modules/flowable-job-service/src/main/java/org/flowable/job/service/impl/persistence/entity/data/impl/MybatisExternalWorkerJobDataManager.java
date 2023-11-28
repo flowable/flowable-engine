@@ -109,6 +109,12 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findJobIdsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {
+        return getDbSqlSession().selectList("selectExternalWorkerJobIdsByQueryCriteria", jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {
         return (Long) getDbSqlSession().selectOne("selectExternalWorkerJobCountByQueryCriteria", jobQuery);
     }

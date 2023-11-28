@@ -429,6 +429,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return jobServiceConfiguration.getDeadLetterJobEntityManager().findJobsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return jobServiceConfiguration.getDeadLetterJobEntityManager().findJobIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     public String getProcessInstanceId() {

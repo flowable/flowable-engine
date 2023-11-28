@@ -83,6 +83,13 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findProcessDefinitionIdsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        setSafeInValueLists(processDefinitionQuery);
+        return getDbSqlSession().selectList("selectProcessDefinitionIdsByQueryCriteria", processDefinitionQuery);
+    }
+
+    @Override
     public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
         setSafeInValueLists(processDefinitionQuery);
         return (Long) getDbSqlSession().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);

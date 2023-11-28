@@ -122,6 +122,11 @@ public class HistoricDetailEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricDetailIdsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+        return dataManager.findHistoricDetailIdsByQueryCriteria(historicVariableUpdateQuery);
+    }
+
+    @Override
     public void deleteHistoricDetailsByTaskId(String taskId) {
         if (getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.FULL)) {
             List<HistoricDetailEntity> details = dataManager.findHistoricDetailsByTaskId(taskId);

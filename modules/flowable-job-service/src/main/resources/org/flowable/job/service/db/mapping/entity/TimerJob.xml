@@ -56,6 +56,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectTimerJobIdsByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectTimerJobByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectTimerJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectTimerJobByQueryCriteriaSql" />

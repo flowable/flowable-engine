@@ -41,6 +41,8 @@ public interface HistoricActivityInstanceDataManager extends DataManager<Histori
 
     List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
 
+    List<String> findHistoricActivityInstanceIdsByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
+
     List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);

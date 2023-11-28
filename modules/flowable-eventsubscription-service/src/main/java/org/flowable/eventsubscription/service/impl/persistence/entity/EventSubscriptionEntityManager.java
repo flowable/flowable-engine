@@ -80,6 +80,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     
     List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
+    List<String> findEventSubscriptionIdsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
+
     long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
     /* Find (signal) */

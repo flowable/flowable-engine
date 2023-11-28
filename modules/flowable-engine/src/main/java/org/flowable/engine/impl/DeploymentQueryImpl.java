@@ -263,6 +263,11 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////////////////
 
     public String getDeploymentId() {

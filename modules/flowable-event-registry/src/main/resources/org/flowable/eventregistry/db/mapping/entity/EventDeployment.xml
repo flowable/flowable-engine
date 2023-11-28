@@ -83,6 +83,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectEventDeploymentIdsByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectEventDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectEventDeploymentCountByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectEventDeploymentsByQueryCriteriaSql"/>

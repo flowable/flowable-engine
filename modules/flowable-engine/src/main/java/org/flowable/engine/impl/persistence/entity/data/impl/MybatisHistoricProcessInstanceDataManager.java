@@ -82,6 +82,13 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricProcessInstanceIdsByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        setSafeInValueLists(historicProcessInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
         setSafeInValueLists(historicProcessInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());

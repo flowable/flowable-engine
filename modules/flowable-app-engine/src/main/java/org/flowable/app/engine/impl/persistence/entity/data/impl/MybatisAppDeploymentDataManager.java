@@ -60,7 +60,12 @@ public class MybatisAppDeploymentDataManager extends AbstractAppDataManager<AppD
     public List<AppDeployment> findDeploymentsByQueryCriteria(AppDeploymentQueryImpl deploymentQuery) {
         return getDbSqlSession().selectList("selectAppDeploymentsByQueryCriteria", deploymentQuery);
     }
-    
+
+    @Override
+    public List<String> findDeploymentIdsByQueryCriteria(AppDeploymentQueryImpl deploymentQuery) {
+        return getDbSqlSession().selectList("selectAppDeploymentIdsByQueryCriteria", deploymentQuery);
+    }
+
     @Override
     public long findDeploymentCountByQueryCriteria(AppDeploymentQueryImpl deploymentQuery) {
         return (Long) getDbSqlSession().selectOne("selectAppDeploymentCountByQueryCriteria", deploymentQuery);

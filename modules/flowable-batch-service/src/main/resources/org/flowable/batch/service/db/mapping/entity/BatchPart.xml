@@ -149,6 +149,16 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectBatchPartIdsByQueryCriteria" parameterType="org.flowable.batch.service.impl.BatchPartQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        from ${prefix}FLW_RU_BATCH_PART RES
+        inner join ${prefix}FLW_RU_BATCH BATCH_ on RES.BATCH_ID_ = BATCH_.ID_
+        <include refid="commonSelectBatchPartsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectBatchPartCountByQueryCriteria" parameterType="org.flowable.batch.service.impl.BatchPartQueryImpl" resultType="long">
         select count(distinct RES.ID_)
         from ${prefix}FLW_RU_BATCH_PART RES

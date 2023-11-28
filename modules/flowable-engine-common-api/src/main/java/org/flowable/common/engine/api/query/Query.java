@@ -58,6 +58,11 @@ public interface Query<T extends Query<?, ?>, U extends Object> {
     List<U> list();
 
     /**
+     * Executes the query and get a list of ids as the result.
+     */
+    List<String> listIds();
+
+    /**
      * Executes the query and get a list of entities as the result.
      */
     List<U> listPage(int firstResult, int maxResults);

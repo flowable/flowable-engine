@@ -147,6 +147,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
         return historicDetails;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailIdsByQueryCriteria(this);
+    }
+
     // order by
     // /////////////////////////////////////////////////////////////////
 

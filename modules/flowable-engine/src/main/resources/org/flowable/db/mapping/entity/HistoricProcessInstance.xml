@@ -378,6 +378,15 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectHistoricProcessInstanceIdsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl"
+            resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
         select count(distinct RES.ID_)
         <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>

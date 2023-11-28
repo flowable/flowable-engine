@@ -39,6 +39,8 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
 
     List<ActivityInstance> findActivityInstancesByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
 
+    List<String> findActivityInstanceIdsByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
+
     List<ActivityInstance> findActivityInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);

@@ -244,6 +244,17 @@
     ${orderBy}
     <if test="needsPaging">${limitAfter}</if>
   </select>
+
+  <select id="selectHistoricActivityInstanceIdsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value="RES"/>
+        <property name="queryTablePrefix" value="RES."/>
+    </include>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+ </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
     select count(RES.ID_)

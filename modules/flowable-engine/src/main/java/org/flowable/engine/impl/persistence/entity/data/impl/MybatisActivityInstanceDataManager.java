@@ -106,6 +106,12 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findActivityInstanceIdsByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery) {
+        return getDbSqlSession().selectList("selectActivityInstanceIdsByQueryCriteria", activityInstanceQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<ActivityInstance> findActivityInstancesByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectActivityInstanceByNativeQuery", parameterMap);
     }

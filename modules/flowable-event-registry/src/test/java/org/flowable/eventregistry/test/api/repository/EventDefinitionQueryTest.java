@@ -68,6 +68,7 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                 .containsExactlyInAnyOrder(
                         tuple("one", deployment1Id)
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent1").listIds()).hasSize(1);
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
 
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent2").list())
@@ -76,9 +77,11 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", deployment2Id),
                         tuple("two", deployment2Id)
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent2").listIds()).hasSize(2);
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("parent2").count()).isEqualTo(2);
 
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("unknown").listIds()).isEmpty();
         assertThat(repositoryService.createEventDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
     }
 
@@ -94,6 +97,7 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", "My first Event"),
                         tuple("two", "My second event")
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().listIds()).hasSize(2);
         assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(2);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%event").list())
@@ -101,6 +105,7 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                 .containsExactlyInAnyOrder(
                         tuple("two", "My second event")
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%event").listIds()).hasSize(1);
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%event").count()).isEqualTo(1);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%Event").list())
@@ -108,6 +113,7 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                 .containsExactlyInAnyOrder(
                         tuple("one", "My first Event")
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%Event").listIds()).hasSize(1);
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLike("%Event").count()).isEqualTo(1);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%event").list())
@@ -116,6 +122,7 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", "My first Event"),
                         tuple("two", "My second event")
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%event").listIds()).hasSize(2);
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%event").count()).isEqualTo(2);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%Event").list())
@@ -124,11 +131,13 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", "My first Event"),
                         tuple("two", "My second event")
                 );
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%Event").listIds()).hasSize(2);
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%Event").count()).isEqualTo(2);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%dummy").list())
                 .extracting(EventDefinition::getKey, EventDefinition::getName)
                 .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%dummy").listIds()).isEmpty();
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionNameLikeIgnoreCase("%dummy").count()).isZero();
     }
 
@@ -142,21 +151,25 @@ class EventDefinitionQueryTest extends AbstractFlowableEventTest {
         assertThat(repositoryService.createEventDefinitionQuery().list())
                 .extracting(EventDefinition::getKey)
                 .containsExactlyInAnyOrder("one", "one-test", "two");
+        assertThat(repositoryService.createEventDefinitionQuery().listIds()).hasSize(3);
         assertThat(repositoryService.createEventDefinitionQuery().count()).isEqualTo(3);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLike("%Ne%").list())
                 .extracting(EventDefinition::getKey)
                 .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLike("%Ne%").listIds()).isEmpty();
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLike("%Ne%").count()).isZero();
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%Ne%").list())
                 .extracting(EventDefinition::getKey)
                 .containsExactlyInAnyOrder("one", "one-test");
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%Ne%").listIds()).hasSize(2);
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%Ne%").count()).isEqualTo(2);
 
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%dummy").list())
                 .extracting(EventDefinition::getKey)
                 .isEmpty();
+        assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%dummy").listIds()).isEmpty();
         assertThat(repositoryService.createEventDefinitionQuery().eventDefinitionKeyLikeIgnoreCase("%dummy").count()).isZero();
     }
 }

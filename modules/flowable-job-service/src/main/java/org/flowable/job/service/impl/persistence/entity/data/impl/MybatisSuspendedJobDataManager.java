@@ -66,6 +66,12 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findJobIdsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
+        return getDbSqlSession().selectList("selectSuspendedJobIdsByQueryCriteria", jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
         return (Long) getDbSqlSession().selectOne("selectSuspendedJobCountByQueryCriteria", jobQuery);
     }

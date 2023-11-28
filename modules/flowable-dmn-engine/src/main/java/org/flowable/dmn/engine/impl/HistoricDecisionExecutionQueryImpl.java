@@ -219,6 +219,11 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionIdsByQueryCriteria(this);
+    }
+
+    @Override
     public void delete() {
         if (commandExecutor != null) {
             commandExecutor.execute(new DeleteHistoricDecisionExecutionsByQueryCmd(this));

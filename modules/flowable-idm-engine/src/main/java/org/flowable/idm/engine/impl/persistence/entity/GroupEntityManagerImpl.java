@@ -71,6 +71,11 @@ public class GroupEntityManagerImpl
     }
 
     @Override
+    public List<String> findGroupIdsByQueryCriteria(GroupQueryImpl query) {
+        return dataManager.findGroupIdsByQueryCriteria(query);
+    }
+
+    @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
         return dataManager.findGroupCountByQueryCriteria(query);
     }

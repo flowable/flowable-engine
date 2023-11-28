@@ -29,6 +29,8 @@ public interface DmnDeploymentDataManager extends DataManager<DmnDeploymentEntit
 
     List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
 
+    List<String> findDeploymentIdsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery);
+
     List<String> getDeploymentResourceNames(String deploymentId);
 
     List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);

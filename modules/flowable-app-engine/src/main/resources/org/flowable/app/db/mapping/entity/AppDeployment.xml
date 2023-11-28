@@ -102,6 +102,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectAppDeploymentIdsByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectAppDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectAppDeploymentCountByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectAppDeploymentsByQueryCriteriaSql"/>

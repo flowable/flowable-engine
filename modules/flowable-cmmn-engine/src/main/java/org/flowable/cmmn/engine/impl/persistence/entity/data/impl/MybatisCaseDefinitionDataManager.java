@@ -142,6 +142,13 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findCaseDefinitionIdsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        setSafeInValueLists(caseDefinitionQuery);
+        return getDbSqlSession().selectList("selectCaseDefinitionIdsByQueryCriteria", caseDefinitionQuery);
+    }
+
+    @Override
     public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
         setSafeInValueLists(caseDefinitionQuery);
         return (Long) getDbSqlSession().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);

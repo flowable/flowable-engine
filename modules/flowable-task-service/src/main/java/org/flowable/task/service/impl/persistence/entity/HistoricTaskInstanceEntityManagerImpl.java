@@ -84,6 +84,15 @@ public class HistoricTaskInstanceEntityManagerImpl
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricTaskInstanceIdsByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        if (serviceConfiguration.isHistoryEnabled()) {
+            return dataManager.findHistoricTaskInstanceIdsByQueryCriteria(historicTaskInstanceQuery);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
         if (serviceConfiguration.isHistoryEnabled()) {
             return dataManager.findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(historicTaskInstanceQuery);

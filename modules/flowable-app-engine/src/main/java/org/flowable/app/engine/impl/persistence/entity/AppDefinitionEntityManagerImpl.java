@@ -80,6 +80,11 @@ public class AppDefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findAppDefinitionIdsByQueryCriteria(AppDefinitionQuery appDefinitionQuery) {
+        return dataManager.findAppDefinitionIdsByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
+    }
+
+    @Override
     public long findAppDefinitionCountByQueryCriteria(AppDefinitionQuery appDefinitionQuery) {
         return dataManager.findAppDefinitionCountByQueryCriteria((AppDefinitionQueryImpl) appDefinitionQuery);
     }
