@@ -430,7 +430,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
 
         return getVariableServiceConfiguration().getVariableService()
@@ -444,7 +444,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
         return getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
@@ -952,7 +952,22 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
 
     @Override
     public String toString() {
-        return "Task[id=" + id + ", key=" + taskDefinitionKey + ", name=" + name + "]";
+        StringBuilder strb = new StringBuilder();
+        strb.append("Task[");
+        strb.append("id=").append(id);
+        strb.append(", key=").append(taskDefinitionKey);
+        strb.append(", name=").append(name);
+        if (executionId != null) {
+            strb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId)
+                    .append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeId != null) {
+            strb.append(", scopeInstanceId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        strb.append("]");
+        return strb.toString();
     }
 
     @Override

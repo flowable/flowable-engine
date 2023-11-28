@@ -967,7 +967,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskParams.put("${execution.myParam}", "myValue");
         assertThatThrownBy(() -> taskService.complete(task.getId(), taskParams))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${execution.myParam}");
+                .hasMessageStartingWith("Error while evaluating expression: ${execution.myParam} with Execution[")
+                .hasMessageContainingAll(" - definition 'twoTasksProcess:1:", " - activity 'firstTask'");
     }
 
     @Test
@@ -2056,31 +2057,33 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
+        String taskErrorString = "Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "]";
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId()))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId(), true))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId(), "test"))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         String idLists[] = { task.getId() };
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists)))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists), true))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists), "test"))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
     }
 
     @Test

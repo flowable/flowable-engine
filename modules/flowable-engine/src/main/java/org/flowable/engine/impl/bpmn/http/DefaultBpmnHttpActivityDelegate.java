@@ -86,7 +86,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             if (e instanceof FlowableException) {
                 throw (FlowableException) e;
             } else {
-                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution.getId(), e);
+                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution, e);
             }
         }
 

@@ -319,7 +319,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 .findTasksByExecutionId(execution.getId()); // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                throw new FlowableException("UserTask should not be signalled before complete");
+                throw new FlowableException("UserTask should not be signalled before complete for " + taskEntity);
             }
         }
 

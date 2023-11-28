@@ -108,7 +108,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             handleSequenceFlow();
 
         } else {
-            throw new FlowableException("Programmatic error: this operation needs either a FlowNode or a SequenceFlow as current FlowElement");
+            throw new FlowableException("Programmatic error: this operation needs either a FlowNode or a SequenceFlow as current FlowElement for " + execution);
 
         }
     }
@@ -248,7 +248,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 agenda.planEndExecutionOperation(execution);
 
             } else {
-                throw new FlowableException("No outgoing sequence flow of element '" + flowNode.getId() + "' could be selected for continuing the process");
+                throw new FlowableException("No outgoing sequence flow of element '" + flowNode.getId() + "' could be selected for continuing the process for " + execution);
             }
 
         } else {

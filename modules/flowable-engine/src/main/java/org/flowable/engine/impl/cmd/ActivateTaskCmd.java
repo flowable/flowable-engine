@@ -52,11 +52,11 @@ public class ActivateTaskCmd implements Command<Void> {
         }
 
         if (task.isDeleted()) {
-            throw new FlowableException("Task " + taskId + " is already deleted");
+            throw new FlowableException(task + " is already deleted");
         }
 
         if (!task.isSuspended()) {
-            throw new FlowableException("Task " + taskId + " is not suspended, so can't be activated");
+            throw new FlowableException(task + " is not suspended, so can't be activated");
         }
         
         Clock clock = processEngineConfiguration.getClock();

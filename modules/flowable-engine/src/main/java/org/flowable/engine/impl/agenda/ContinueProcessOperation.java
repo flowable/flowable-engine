@@ -89,7 +89,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         } else if (currentFlowElement instanceof SequenceFlow) {
             continueThroughSequenceFlow((SequenceFlow) currentFlowElement);
         } else {
-            throw new FlowableException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". Halting.");
+            throw new FlowableException("Programmatic error: no current flow element found or invalid type: " + currentFlowElement + ". For " + execution + ". Halting.");
         }
     }
 
@@ -233,7 +233,7 @@ public class ContinueProcessOperation extends AbstractOperation {
             }
             
         } else {
-            throw new FlowableException("Expected an activity behavior in flow node " + flowNode.getId());
+            throw new FlowableException("Expected an activity behavior in flow node " + flowNode.getId() + " for " + execution);
         }
     }
     

@@ -59,7 +59,7 @@ public class AsyncLeaveActivePlanItemInstanceOperation extends AbstractChangePla
         if (planItemDefinition instanceof Task) {
             createAsyncJob((Task) planItemDefinition);
         } else {
-            throw new FlowableException("Programmatic error: this operation can only be planned for Task plan item definitions");
+            throw new FlowableException("Programmatic error: this operation can only be planned for Task plan item definitions. " + planItemInstanceEntity);
         }
     }
 

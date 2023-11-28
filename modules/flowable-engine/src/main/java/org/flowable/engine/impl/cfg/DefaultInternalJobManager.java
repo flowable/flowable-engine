@@ -219,7 +219,7 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                         jobEntity.setEndDate((Date) endDateValue);
                     } else {
                         throw new FlowableException("Timer '" + ((ExecutionEntity) variableScope).getActivityId()
-                                + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                                + "' in " + variableScope + " was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
                     }
 
                     if (jobEntity.getEndDate() == null) {

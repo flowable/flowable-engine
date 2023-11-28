@@ -60,8 +60,8 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot resolve a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot resolve";
     }
 
 }

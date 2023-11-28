@@ -308,4 +308,17 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
         this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricCaseInstance[id=").append(id)
+                .append(", caseDefinitionId=").append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+
+        return sb.toString();
+    }
 }

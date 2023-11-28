@@ -107,7 +107,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
             dataOutputAssociations = serviceTask.getDataOutputAssociations();
 
         } else {
-            throw new FlowableException("Unsupported flow element type " + flowElement);
+            throw new FlowableException("Unsupported flow element type " + flowElement + " in " + execution);
         }
 
         MessageInstance message = null;

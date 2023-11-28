@@ -473,7 +473,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCompleteTaskAndAddGroupIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
-        String taskId = taskService.createTaskQuery().singleResult().getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        String taskId = task.getId();
 
         assertThatThrownBy(() -> managementService.executeCommand(context -> {
             taskService.complete(taskId);
@@ -481,14 +482,16 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
             return null;
         }))
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Task is already deleted");
+                .hasMessage("Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                        + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "] is already deleted");
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCompleteTaskAndAddUserIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
-        String taskId = taskService.createTaskQuery().singleResult().getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        String taskId = task.getId();
 
         assertThatThrownBy(() -> managementService.executeCommand(context -> {
             taskService.complete(taskId);
@@ -496,7 +499,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
             return null;
         }))
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Task is already deleted");
+                .hasMessage("Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                        + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "] is already deleted");
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,

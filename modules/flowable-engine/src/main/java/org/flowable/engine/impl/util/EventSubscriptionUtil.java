@@ -77,7 +77,7 @@ public class EventSubscriptionUtil {
 
         EventHandler eventHandler = processEngineConfiguration.getEventHandler(eventSubscriptionEntity.getEventType());
         if (eventHandler == null) {
-            throw new FlowableException("Could not find eventhandler for event of type '" + eventSubscriptionEntity.getEventType() + "'.");
+            throw new FlowableException("Could not find eventhandler for event of type '" + eventSubscriptionEntity.getEventType() + "' for " + eventSubscriptionEntity);
         }
         eventHandler.handleEvent(eventSubscriptionEntity, payload, CommandContextUtil.getCommandContext());
     }
@@ -99,7 +99,7 @@ public class EventSubscriptionUtil {
             FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
     
             if (currentFlowElement == null) {
-                throw new FlowableException("Error while sending signal for event subscription '" + eventSubscriptionEntity.getId() + "': " + "no activity associated with event subscription");
+                throw new FlowableException("Error while sending signal for " + eventSubscriptionEntity + " no activity associated with event subscription");
             }
             
             EventSubscriptionUtil.processPayloadMap(payload, execution, currentFlowElement, commandContext);

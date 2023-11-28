@@ -42,7 +42,7 @@ public class DefaultOutboundEventProcessor implements OutboundEventProcessor {
     @Override
     public void sendEvent(EventInstance eventInstance, Collection<ChannelModel> channelModels) {
         if (channelModels == null || channelModels.isEmpty()) {
-            throw new FlowableException("No channel model set for outgoing event " + eventInstance.getEventKey());
+            throw new FlowableException("No channel model set for outgoing " + eventInstance);
         }
 
         for (ChannelModel channelModel : channelModels) {

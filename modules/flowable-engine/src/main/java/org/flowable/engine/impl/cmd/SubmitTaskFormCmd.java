@@ -77,8 +77,8 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot submit a form to a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot submit a form to";
     }
 
 }

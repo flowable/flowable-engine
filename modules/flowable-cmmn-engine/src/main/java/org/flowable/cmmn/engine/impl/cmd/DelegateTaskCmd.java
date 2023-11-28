@@ -47,8 +47,8 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot delegate a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot delegate";
     }
 
 }

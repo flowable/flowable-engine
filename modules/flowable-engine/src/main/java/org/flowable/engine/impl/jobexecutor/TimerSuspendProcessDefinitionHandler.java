@@ -43,7 +43,7 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
             JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
             suspendProcessInstances = getIncludeProcessInstances(configNode);
         } catch (Exception e) {
-            throw new FlowableException("Error reading json value " + configuration, e);
+            throw new FlowableException("Error reading json value " + configuration + " for " + job, e);
         }
 
         String processDefinitionId = job.getProcessDefinitionId();

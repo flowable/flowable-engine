@@ -53,7 +53,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         FlowElement startElement = getStartElement(subProcess);
 
         if (startElement == null) {
-            throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
+            throw new FlowableException("No initial activity found for subprocess " + subProcess.getId() + " in " + execution);
         }
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
@@ -101,7 +101,9 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         if (flowElement instanceof SubProcess) {
             subProcess = (SubProcess) flowElement;
         } else {
-            throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
+            throw new FlowableException(
+                    "Programmatic error: sub process behaviour can only be applied to a SubProcess instance, but got an instance of " + flowElement + " for "
+                            + execution);
         }
         return subProcess;
     }

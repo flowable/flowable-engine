@@ -54,8 +54,8 @@ public class RemoveExecutionVariablesCmd extends NeedsActiveExecutionCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot remove variables because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot remove variables from";
     }
 
 }

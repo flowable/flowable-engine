@@ -98,7 +98,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     @Override
     public void handleSignalEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> variables) {
         if (StringUtils.isEmpty(eventSubscription.getSubScopeId())) {
-            throw new FlowableException("Plan item instance for event subscription can not be found with empty sub scope id value");
+            throw new FlowableException("Plan item instance for " + eventSubscription + " can not be found with empty sub scope id value");
         }
         
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
@@ -107,7 +107,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
                         .singleResult();
         
         if (planItemInstance == null) {
-            throw new FlowableException("Plan item instance for event subscription can not be found with sub scope id " + eventSubscription.getSubScopeId());
+            throw new FlowableException("Plan item instance for " + eventSubscription + " can not be found with sub scope id " + eventSubscription.getSubScopeId());
         }
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())

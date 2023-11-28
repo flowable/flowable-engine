@@ -79,7 +79,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
 
         if (eventSubscriptions.isEmpty()) {
-            throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
+            throw new FlowableException(execution + " does not have a subscription to a message event with name '" + messageName + "'");
         }
 
         // there can be only one:
@@ -89,4 +89,8 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
         return null;
     }
 
+    @Override
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot receive message for";
+    }
 }

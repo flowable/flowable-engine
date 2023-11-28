@@ -69,7 +69,7 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
                     CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, exitType, exitEventType);
 
                 } else {
-                    throw new FlowableException("Programmatic error: unsupported transition " + transition);
+                    throw new FlowableException("Programmatic error: unsupported transition " + transition + " for " + planItemInstanceEntity);
 
                 }
 

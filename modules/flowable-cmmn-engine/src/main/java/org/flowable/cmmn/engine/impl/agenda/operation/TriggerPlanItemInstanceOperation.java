@@ -54,7 +54,7 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
         Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
         if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
             throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
-                    + CmmnTriggerableActivityBehavior.class + " interface");
+                    + CmmnTriggerableActivityBehavior.class + " interface in " + planItemInstanceEntity);
         }
         CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
         if (behavior instanceof CoreCmmnTriggerableActivityBehavior) {

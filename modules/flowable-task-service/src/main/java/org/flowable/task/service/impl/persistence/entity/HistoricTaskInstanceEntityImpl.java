@@ -653,7 +653,21 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     
     @Override
     public String toString() {
-        return "HistoricTaskInstanceEntity[id=" + id + "]";
+        StringBuilder strb = new StringBuilder();
+        strb.append("HistoricTaskInstanceEntity[");
+        strb.append("id=").append(id);
+        strb.append(", key=").append(taskDefinitionKey);
+        if (executionId != null) {
+            strb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId)
+                    .append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeId != null) {
+            strb.append(", scopeInstanceId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        strb.append("]");
+        return strb.toString();
     }
 
 }

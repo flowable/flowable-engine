@@ -96,7 +96,7 @@ public class ScriptingEngines {
         } catch (ScriptException e) {
             DefaultScriptTrace scriptTrace = DefaultScriptTrace.errorTrace(Duration.ofNanos(System.nanoTime() - startNanos), request, e);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Caught exception evaluating script. {}{}{}", request.getLanguage(), System.lineSeparator(),
+                LOGGER.debug("Caught exception evaluating script for {}. {}{}{}", request.getVariableContainer(), request.getLanguage(), System.lineSeparator(),
                         request.getScript());
             }
             enhanceScriptTrace(request, scriptTrace);
@@ -115,7 +115,7 @@ public class ScriptingEngines {
         try {
             listener.onScriptTrace(scriptTrace);
         } catch (Exception e) {
-            LOGGER.warn("Exception while executing scriptTraceListener: {}", e.getMessage(), e);
+            LOGGER.warn("Exception while executing scriptTraceListener: {} with {}", listener, scriptTrace, e);
         }
     }
 

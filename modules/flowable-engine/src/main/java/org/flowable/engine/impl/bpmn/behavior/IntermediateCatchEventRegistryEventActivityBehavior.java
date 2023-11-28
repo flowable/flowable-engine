@@ -82,7 +82,7 @@ public class IntermediateCatchEventRegistryEventActivityBehavior extends Interme
         }
 
         if (key == null) {
-            throw new FlowableException("Could not resolve key for: " + eventDefinitionKey);
+            throw new FlowableException("Could not resolve key for: " + eventDefinitionKey + " in " + executionEntity);
         }
 
         return key.toString();

@@ -126,7 +126,7 @@ public class TimerUtil {
             
         } else if (dueDateValue != null) {
             throw new FlowableException("Timer '" + executionEntity.getActivityId()
-                    + "' was not configured with a valid duration/time, either hand in a java.util.Date or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                    + "' in " + executionEntity + " was not configured with a valid duration/time, either hand in a java.util.Date or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
         }
 
         if (duedate == null && dueDateString != null) {
@@ -176,7 +176,11 @@ public class TimerUtil {
             }
             
         } else {
-            throw new FlowableException("Due date could not be determined for timer job " + dueDateString);
+            StringBuilder sb = new StringBuilder("Due date could not be determined for timer job ").append(dueDateString);
+            if (executionEntity != null) {
+                sb.append(" for ").append(executionEntity);
+            }
+            throw new FlowableException(sb.toString());
         }
 
         if (StringUtils.isNotEmpty(timerEventDefinition.getTimeCycle())) {

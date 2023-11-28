@@ -465,4 +465,30 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricPlanItemInstance with id: ")
+                .append(id);
+
+        if (getName() != null) {
+            sb.append(", name: ").append(getName());
+        }
+        sb.append(", definitionId: ")
+                .append(planItemDefinitionId)
+                .append(", state: ")
+                .append(state);
+
+        sb
+                .append(", caseInstanceId: ")
+                .append(caseInstanceId)
+                .append(", caseDefinitionId: ")
+                .append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        return sb.toString();
+    }
 }

@@ -340,7 +340,8 @@ public class EmailSendTaskTest extends EmailTestCase {
     public void testMissingAnyRecipientAddress() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
-            .hasMessage("No recipient could be found for sending email");
+            .hasMessageStartingWith("No recipient could be found for sending email for Execution[")
+            .hasMessageContainingAll(" - definition 'missingAnyRecipientAddress:1:", " - activity 'sendMail'");
     }
 
     @Test
@@ -349,7 +350,8 @@ public class EmailSendTaskTest extends EmailTestCase {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
-            .hasMessage("No recipient could be found for sending email");
+            .hasMessageStartingWith("No recipient could be found for sending email for Execution[")
+            .hasMessageContainingAll(" - definition 'missingAnyRecipientAddress:1:", " - activity 'sendMail'");
     }
 
     @Test

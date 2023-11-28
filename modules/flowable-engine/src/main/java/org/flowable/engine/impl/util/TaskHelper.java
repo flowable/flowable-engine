@@ -68,7 +68,7 @@ public class TaskHelper {
             Map<String, Object> transientVariables, Map<String, Object> localTransientVariables, CommandContext commandContext) {
 
         if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
-            throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
+            throw new FlowableException("A delegated " + taskEntity + " cannot be completed, but should be resolved instead.");
         }
 
         if (localVariables != null && !localVariables.isEmpty()) {
@@ -492,9 +492,9 @@ public class TaskHelper {
 
         if (task != null) {
             if (task.getExecutionId() != null) {
-                throw new FlowableException("The task cannot be deleted because is part of a running process");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running process");
             } else if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
-                throw new FlowableException("The task cannot be deleted because is part of a running case");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running case");
             }
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
@@ -610,7 +610,7 @@ public class TaskHelper {
                     expressionManager.createExpression(formFieldValidationExpression).getValue(variableContainer)
                 );
                 if (formFieldValidationValue == null) {
-                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value");
+                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value for " + variableContainer);
                 }
                 return formFieldValidationValue;
             }

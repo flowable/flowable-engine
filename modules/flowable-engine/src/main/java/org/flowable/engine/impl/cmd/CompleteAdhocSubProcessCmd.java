@@ -47,12 +47,12 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         }
 
         if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
-            throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
+            throw new FlowableException("The current flow element of the requested " + execution + " is not an ad-hoc sub process");
         }
 
         List<? extends ExecutionEntity> childExecutions = execution.getExecutions();
         if (childExecutions.size() > 0) {
-            throw new FlowableException("Ad-hoc sub process has running child executions that need to be completed first");
+            throw new FlowableException("Ad-hoc sub process has running child executions that need to be completed first. " + execution);
         }
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(execution.getParent());

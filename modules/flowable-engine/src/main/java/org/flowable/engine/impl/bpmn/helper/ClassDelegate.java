@@ -222,7 +222,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                 }
             }
         } else {
-            throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 
@@ -237,7 +237,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance instanceof SubProcessActivityBehavior) {
             ((SubProcessActivityBehavior) activityBehaviorInstance).completing(execution, subProcessInstance);
         } else {
-            throw new FlowableException("completing() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("completing() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 
@@ -250,7 +250,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance instanceof SubProcessActivityBehavior) {
             ((SubProcessActivityBehavior) activityBehaviorInstance).completed(execution);
         } else {
-            throw new FlowableException("completed() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("completed() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 

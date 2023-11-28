@@ -652,7 +652,8 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             assertThatThrownBy(() -> processEngineTaskService.deleteTask(caseTasks.get(0).getId()))
                     .isExactlyInstanceOf(FlowableException.class)
-                    .hasMessageContaining("The task cannot be deleted")
+                    .hasMessageContaining("The Task[")
+                    .hasMessageContaining("cannot be deleted")
                     .hasMessageContaining("running case");
 
             cmmnTaskService.complete(caseTasks.get(0).getId());

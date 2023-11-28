@@ -397,7 +397,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
         List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
         if (taskEntities == null || taskEntities.isEmpty()) {
-            throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
+            throw new FlowableException("No task entity found for " + planItemInstance);
         }
 
         // Should be only one

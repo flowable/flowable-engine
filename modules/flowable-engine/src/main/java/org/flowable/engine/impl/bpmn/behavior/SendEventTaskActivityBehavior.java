@@ -147,7 +147,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         }
 
         if (eventModel == null) {
-            throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType());
+            throw new FlowableException("No event definition found for event key " + sendEventServiceTask.getEventType() + " for " + execution);
         }
         return eventModel;
     }
@@ -193,7 +193,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         if (channelKeys.isEmpty()) {
             if (!sendOnSystemChannel) {
                 // If the event is going to be send on the system channel then it is allowed to not define any other channels
-                throw new FlowableException("No channel keys configured");
+                throw new FlowableException("No channel keys configured for " + execution);
             } else {
                 return Collections.emptyList();
             }

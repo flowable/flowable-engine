@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 
 /**
@@ -249,4 +250,41 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
         return true;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName().replace("EntityImpl", "")).append("[")
+                .append("id=").append(id)
+                .append(", eventType=").append(eventType);
+
+        if (activityId != null) {
+            sb.append(", activityId=").append(activityId);
+        }
+
+        if (executionId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId);
+        } else if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeType=").append(scopeType)
+                    .append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+
+        if (processDefinitionId != null) {
+            sb.append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeDefinitionId != null) {
+            if (scopeId == null) {
+                sb.append(", scopeType=").append(scopeType);
+            }
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+
+        sb.append("]");
+        return sb.toString();
+    }
 }

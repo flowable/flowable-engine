@@ -700,7 +700,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
@@ -767,7 +771,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
@@ -910,7 +918,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
@@ -1001,7 +1013,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
@@ -1096,7 +1112,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
@@ -1201,7 +1221,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
             cmmnMigrationService.createCaseInstanceMigrationBuilder()
                     .migrateToCaseDefinition(destinationDefinition.getId())
                     .migrate(caseInstance.getId());
-        }).isInstanceOf(FlowableException.class).hasMessage("Plan item could not be found for planItem1");
+        }).isInstanceOf(FlowableException.class)
+                .hasMessageStartingWith("Plan item could not be found for PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
+                        "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + destinationDefinition.getId());
 
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())

@@ -93,7 +93,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         try {
             executeScript(execution);
         } catch (FlowableException e) {
-            LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
+            LOGGER.warn("Exception while executing {} : {}", execution, e.getMessage());
 
             noErrors = false;
             Throwable rootCause = ExceptionUtils.getRootCause(e);
@@ -122,8 +122,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
         if (null != result) {
             if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
-                throw new FlowableException(String.format("Error evaluating juel script: \"%s\" of activity id: %s of process definition id: %s",
-                        script, execution.getCurrentActivityId(), execution.getProcessDefinitionId()));
+                throw new FlowableException("Error evaluating juel script: \"" + script + "\" for " + execution);
             }
         }
 

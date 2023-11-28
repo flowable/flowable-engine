@@ -492,8 +492,12 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
             managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker1");
             
         }).isInstanceOf(FlowableException.class)
-          .hasMessageContaining("Job is locked with a different worker id");
-        
+                .hasMessage("ExternalWorkerJobEntity[id=" + worker2Job.getId()
+                        + ", jobHandlerType=external-worker-complete, jobType=externalWorker, elementId=externalCustomer1, correlationId="
+                        + worker2Job.getCorrelationId() + ", processInstanceId=" + worker2Job.getProcessInstanceId()
+                        + ", executionId=" + worker2Job.getExecutionId() + ", processDefinitionId=" + worker2Job.getProcessDefinitionId()
+                        + "] is locked with a different worker id");
+
         managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker2");
         
         assertThat(query.count()).isEqualTo(0);

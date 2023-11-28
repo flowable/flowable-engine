@@ -501,7 +501,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                     Object stageValueObject = stageExpression.getValue(planItemInstanceEntity);
                     if (!(stageValueObject instanceof Boolean)) {
                         throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
-                                        includeInStageOverviewValue + ": " + stageValueObject);
+                                        includeInStageOverviewValue + ": " + stageValueObject + " for " + planItemInstanceEntity);
                     }
                     
                     showInOverview = (Boolean) stageValueObject;

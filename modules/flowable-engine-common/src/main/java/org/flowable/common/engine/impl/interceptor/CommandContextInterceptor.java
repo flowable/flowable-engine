@@ -135,7 +135,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
             if (exception instanceof FlowableException) {
                 throw (FlowableException) exception;
             } else {
-                throw new FlowableException("Exception during command execution", exception);
+                throw new FlowableException("Exception during execution of command " + command, exception);
             }
         }
 
