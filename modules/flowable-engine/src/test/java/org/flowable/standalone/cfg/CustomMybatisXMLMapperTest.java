@@ -41,7 +41,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
         final String taskId = createTask("4", null, null, 0);
 
-        CustomTask customTask = managementService.executeCommand(new Command<CustomTask>() {
+        CustomTask customTask = managementService.executeCommand(new Command<>() {
 
             @Override
             public CustomTask execute(CommandContext commandContext) {
@@ -69,7 +69,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
             createTask(String.valueOf(i), null, null, 0);
         }
 
-        List<CustomTask> tasks = managementService.executeCommand(new Command<List<CustomTask>>() {
+        List<CustomTask> tasks = managementService.executeCommand(new Command<>() {
 
             @SuppressWarnings("unchecked")
             @Override

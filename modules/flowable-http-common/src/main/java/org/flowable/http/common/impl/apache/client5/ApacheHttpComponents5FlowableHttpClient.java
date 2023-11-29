@@ -322,7 +322,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                     SimpleResponseConsumer.create(),
                     null,
                     context,
-                    new FutureCallback<SimpleHttpResponse>() {
+                    new FutureCallback<>() {
 
                         @Override
                         public void completed(SimpleHttpResponse result) {

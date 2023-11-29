@@ -1418,7 +1418,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         // The aggregated variables should be deleted now too
 
-        List<VariableInstanceEntity> variableInstanceEntities = managementService.executeCommand(new Command<List<VariableInstanceEntity>>() {
+        List<VariableInstanceEntity> variableInstanceEntities = managementService.executeCommand(new Command<>() {
 
             @Override
             public List<VariableInstanceEntity> execute(CommandContext commandContext) {

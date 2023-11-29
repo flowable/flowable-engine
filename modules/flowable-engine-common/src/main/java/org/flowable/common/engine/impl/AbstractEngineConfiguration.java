@@ -1066,7 +1066,7 @@ public abstract class AbstractEngineConfiguration {
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                allConfigurators.sort(new Comparator<EngineConfigurator>() {
+                allConfigurators.sort(new Comparator<>() {
 
                     @Override
                     public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {

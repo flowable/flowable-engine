@@ -349,7 +349,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 .getChannelModelByKey("test-channel");
         DefaultInboundEventProcessingPipeline<Customer> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<Customer>) inboundChannelModel
                 .getInboundEventProcessingPipeline();
-        inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<Customer>() {
+        inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<>() {
 
             @Override
             public Customer deserialize(Object rawEvent) {
@@ -362,7 +362,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
         });
 
-        inboundEventProcessingPipeline.setInboundEventKeyDetector(new InboundEventKeyDetector<Customer> () {
+        inboundEventProcessingPipeline.setInboundEventKeyDetector(new InboundEventKeyDetector<>() {
 
             @Override
             public String detectEventDefinitionKey(Customer payload) {
@@ -370,7 +370,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
             }
         });
         
-        inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<Customer>() {
+        inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<>() {
 
             @Override
             public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer) {

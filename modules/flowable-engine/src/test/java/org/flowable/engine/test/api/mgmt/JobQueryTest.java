@@ -122,7 +122,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         timerThreeFireTime = new Date(t3.getTime() + ONE_HOUR);
 
         // Create one message
-        messageId = commandExecutor.execute(new Command<String>() {
+        messageId = commandExecutor.execute(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {
@@ -1005,7 +1005,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private JobEntity createJobWithType(String type) {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        return commandExecutor.execute(new Command<JobEntity>() {
+        return commandExecutor.execute(new Command<>() {
 
             @Override
             public JobEntity execute(CommandContext commandContext) {
@@ -1035,7 +1035,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private JobEntity createJobWithHandlerType(String handlerType) {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        return commandExecutor.execute(new Command<JobEntity>() {
+        return commandExecutor.execute(new Command<>() {
 
             @Override
             public JobEntity execute(CommandContext commandContext) {

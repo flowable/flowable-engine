@@ -92,7 +92,7 @@ public abstract class InternalFlowableIdmExtension implements AfterEachCallback,
                 idmEngine.getIdmEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<Void>() {
+                new Command<>() {
 
                     @Override
                     public Void execute(CommandContext commandContext) {

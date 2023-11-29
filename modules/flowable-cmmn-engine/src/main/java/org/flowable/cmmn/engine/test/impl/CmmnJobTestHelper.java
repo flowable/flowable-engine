@@ -40,12 +40,12 @@ public class CmmnJobTestHelper {
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
         
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
 
             @Override
             public Boolean call() {
                 return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
-                || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+                        || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
             }
 
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
@@ -54,7 +54,7 @@ public class CmmnJobTestHelper {
     public static void waitForJobExecutorToProcessAllAsyncJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait,
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
 
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
 
             @Override
             public Boolean call() {
@@ -71,13 +71,13 @@ public class CmmnJobTestHelper {
     public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
         
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<Boolean>() {
-            
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<>() {
+
             @Override
             public Boolean call() {
                 return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
             }
-            
+
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 

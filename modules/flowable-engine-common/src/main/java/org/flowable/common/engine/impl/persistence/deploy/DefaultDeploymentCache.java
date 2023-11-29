@@ -41,21 +41,23 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
      * Cache which has a hard limit: no more elements will be cached than the limit.
      */
     public DefaultDeploymentCache(final int limit) {
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, T>(limit + 1, 0.75f, true) { // +1 is needed, because the entry is inserted first, before it is removed
-            // 0.75 is the default (see javadocs)
-            // true will keep the 'access-order', which is needed to have a real LRU cache
-            private static final long serialVersionUID = 1L;
+        this.cache = Collections.synchronizedMap(
+                new LinkedHashMap<>(limit + 1, 0.75f, true) { // +1 is needed, because the entry is inserted first, before it is removed
 
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
-                boolean removeEldest = size() > limit;
-                if (removeEldest && LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
-                }
-                return removeEldest;
-            }
+                    // 0.75 is the default (see javadocs)
+                    // true will keep the 'access-order', which is needed to have a real LRU cache
+                    private static final long serialVersionUID = 1L;
 
-        });
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
+                        boolean removeEldest = size() > limit;
+                        if (removeEldest && LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("Cache limit is reached, {} will be evicted", eldest.getKey());
+                        }
+                        return removeEldest;
+                    }
+
+                });
     }
 
     @Override

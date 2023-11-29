@@ -54,29 +54,29 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 .withLocalVariableForAllActivities("var1ForNewActivity2.x", "varValue")
                 .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567);
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
                         put("var2ForNewActivity2.x", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
@@ -86,7 +86,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");
@@ -114,29 +114,29 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         String definitionId = "someProcessId";
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.1", "varValue");
                         put("var2ForNewActivity2.1", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.2", "varValue");
@@ -146,7 +146,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        Map<String, Object> varsForNewActivity2_1 = new HashMap<String, Object>() {
+        Map<String, Object> varsForNewActivity2_1 = new HashMap<>() {
 
             {
                 put("var1ForNewActivity2.1", "varValue");
@@ -154,7 +154,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        Map<String, Object> varsForNewActivity2_2 = new HashMap<String, Object>() {
+        Map<String, Object> varsForNewActivity2_2 = new HashMap<>() {
 
             {
                 put("var1ForNewActivity2.2", "varValue");
@@ -162,7 +162,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");
@@ -376,7 +376,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2")
                 .withLocalVariable("variableDouble", 12345.6789);
 
-        HashMap<String, Object> processInstanceVars = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVars = new HashMap<>() {
 
             {
                 put("instanceVar1", "stringValue");
@@ -444,29 +444,29 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 .inSubProcessOfCallActivityId("subProcKey", 2)
                 .inParentProcessOfCallActivityId("someCallActivityId");
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
                         put("var2ForNewActivity2.x", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
@@ -476,7 +476,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");

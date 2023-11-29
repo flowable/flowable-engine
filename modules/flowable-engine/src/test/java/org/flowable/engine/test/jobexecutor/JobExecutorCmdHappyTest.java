@@ -38,7 +38,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     public void testJobCommandsWithMessage() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 
-        String jobId = commandExecutor.execute(new Command<String>() {
+        String jobId = commandExecutor.execute(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {
@@ -71,7 +71,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 
-        String jobId = commandExecutor.execute(new Command<String>() {
+        String jobId = commandExecutor.execute(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {

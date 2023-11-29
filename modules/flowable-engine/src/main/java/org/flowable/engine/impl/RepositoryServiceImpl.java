@@ -87,7 +87,7 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public DeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<DeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
             @Override
             public DeploymentBuilder execute(CommandContext commandContext) {
                 return new DeploymentBuilderImpl(RepositoryServiceImpl.this);

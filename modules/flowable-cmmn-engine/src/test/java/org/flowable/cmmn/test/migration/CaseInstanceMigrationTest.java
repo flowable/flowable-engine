@@ -3086,13 +3086,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
         cmmnTaskService.complete(firstTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3114,13 +3114,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3194,13 +3194,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
         cmmnTaskService.complete(firstTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3222,13 +3222,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3302,13 +3302,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task zeroTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask0").singleResult();
         cmmnTaskService.complete(zeroTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3331,13 +3331,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(0);
@@ -3420,13 +3420,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         
         cmmnTaskService.complete(task.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3449,13 +3449,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(0);
@@ -3552,13 +3552,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         
         cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test2");
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3582,13 +3582,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3868,13 +3868,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
         cmmnTaskService.complete(firstTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3896,13 +3896,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3957,13 +3957,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask1").singleResult();
         cmmnTaskService.complete(firstTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -3985,13 +3985,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -4046,13 +4046,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("stageHumanTask1").singleResult();
         cmmnTaskService.complete(firstTask.getId());
         
-        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        List<SentryPartInstanceEntity> sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);
@@ -4074,13 +4074,13 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
         assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
         
-        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
+        sentryPartInstances = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
                 return cmmnEngineConfiguration.getSentryPartInstanceEntityManager().findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
             }
-            
+
         });
         
         assertThat(sentryPartInstances).hasSize(1);

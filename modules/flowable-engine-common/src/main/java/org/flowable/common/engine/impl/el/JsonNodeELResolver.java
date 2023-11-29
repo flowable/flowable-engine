@@ -88,7 +88,7 @@ public class JsonNodeELResolver extends ELResolver {
         if (isResolvable(base)) {
             JsonNode node = (JsonNode) base;
             final Iterator<String> keys = node.fieldNames();
-            return new Iterator<FeatureDescriptor>() {
+            return new Iterator<>() {
                 @Override
                 public boolean hasNext() {
                     return keys.hasNext();

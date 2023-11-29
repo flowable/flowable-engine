@@ -43,7 +43,7 @@ public class ParallelMultiInstanceAsyncTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelSubprocessTest", variables);
 
-        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 60000L, 1000L, new Callable<Boolean>() {
+        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 60000L, 1000L, new Callable<>() {
 
             @Override
             public Boolean call() throws Exception {
