@@ -99,11 +99,12 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         }
 
         public void testSendXmlEvent() {
-            String event = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                    + "<customerEvent>\n"
-                    + "    <customerId>12345</customerId>\n"
-                    + "    <name>Customer name</name>\n"
-                    + "</customerEvent>";
+            String event = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <customerEvent>
+                        <customerId>12345</customerId>
+                        <name>Customer name</name>
+                    </customerEvent>""";
 
             eventRegistry.eventReceived(inboundChannelModel, event);
         }

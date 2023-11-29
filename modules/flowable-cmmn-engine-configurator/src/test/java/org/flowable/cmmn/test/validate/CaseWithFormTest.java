@@ -53,28 +53,30 @@ import org.mockito.quality.Strictness;
  */
 public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
-    public static final String ONE_TASK_CASE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\"\n"
-            + "             xmlns:flowable=\"http://flowable.org/cmmn\"\n"
-            + "\n"
-            + "             targetNamespace=\"http://flowable.org/cmmn\">\n"
-            + "\n"
-            + "\n"
-            + "    <case id=\"oneTaskCaseWithForm\">\n"
-            + "        <casePlanModel id=\"myPlanModel\" name=\"My CasePlanModel\" flowable:formKey=\"form1\" flowable:formFieldValidation=\"CASE_VALIDATE_VALUE\">\n"
-            + "\n"
-            + "            <planItem id=\"planItem1\" name=\"Task One\" definitionRef=\"theTask\" />\n"
-            + "\n"
-            + "            <humanTask id=\"theTask\" name=\"The Task\" flowable:formKey=\"form1\" flowable:formFieldValidation=\"TASK_VALIDATE_VALUE\">\n"
-            + "                <extensionElements>\n"
-            + "                    <flowable:taskListener event=\"create\" class=\"org.flowable.cmmn.test.validate.SideEffectTaskListener\"></flowable:taskListener>\n"
-            + "                    <flowable:taskListener event=\"complete\" class=\"org.flowable.cmmn.test.validate.SideEffectTaskListener\"></flowable:taskListener>\n"
-            + "                </extensionElements>\n"
-            + "            </humanTask>\n"
-            + "\n"
-            + "        </casePlanModel>\n"
-            + "    </case>\n"
-            + "</definitions>\n";
+    public static final String ONE_TASK_CASE = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                         xmlns:flowable="http://flowable.org/cmmn"
+
+                         targetNamespace="http://flowable.org/cmmn">
+
+
+                <case id="oneTaskCaseWithForm">
+                    <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="form1" flowable:formFieldValidation="CASE_VALIDATE_VALUE">
+
+                        <planItem id="planItem1" name="Task One" definitionRef="theTask" />
+
+                        <humanTask id="theTask" name="The Task" flowable:formKey="form1" flowable:formFieldValidation="TASK_VALIDATE_VALUE">
+                            <extensionElements>
+                                <flowable:taskListener event="create" class="org.flowable.cmmn.test.validate.SideEffectTaskListener"></flowable:taskListener>
+                                <flowable:taskListener event="complete" class="org.flowable.cmmn.test.validate.SideEffectTaskListener"></flowable:taskListener>
+                            </extensionElements>
+                        </humanTask>
+
+                    </casePlanModel>
+                </case>
+            </definitions>
+            """;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
