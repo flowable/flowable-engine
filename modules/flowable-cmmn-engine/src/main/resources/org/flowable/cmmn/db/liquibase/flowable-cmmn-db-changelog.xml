@@ -585,4 +585,10 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="18" author="flowable">
+        <createIndex tableName="ACT_CMMN_HI_PLAN_ITEM_INST" indexName="ACT_IDX_HI_PLAN_ITEM_INST_CASE">
+            <column name="CASE_INST_ID_"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
