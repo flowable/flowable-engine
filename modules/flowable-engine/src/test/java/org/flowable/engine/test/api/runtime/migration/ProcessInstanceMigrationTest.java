@@ -3837,18 +3837,19 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder().preUpgradeScript(new Script("groovy",
-                "import com.fasterxml.jackson.databind.ObjectMapper\n"
-                        + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
-                        + "import org.flowable.engine.impl.context.Context\n"
-                        + "\n"
-                        + "List<String> list  = execution.getVariable('listVariable')\n"
-                        + "\n"
-                        + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
-                        + "\n"
-                        + "ArrayNode jsonArray = mapper.createArrayNode()\n"
-                        + "list.each {jsonArray.add(it)}\n"
-                        + "\n"
-                        + "execution.setVariable(\"listVariable\", jsonArray)"))
+                        """
+                                import com.fasterxml.jackson.databind.ObjectMapper
+                                import com.fasterxml.jackson.databind.node.ArrayNode
+                                import org.flowable.engine.impl.context.Context
+
+                                List<String> list  = execution.getVariable('listVariable')
+
+                                ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()
+
+                                ArrayNode jsonArray = mapper.createArrayNode()
+                                list.each {jsonArray.add(it)}
+
+                                execution.setVariable("listVariable", jsonArray)"""))
                 .migrateToProcessDefinition(targetProcessDefinition.getId())
                 .migrate(processInstanceToMigrate.getId());
 
@@ -3945,18 +3946,19 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 "org/flowable/engine/test/api/runtime/migration/json-variable-process.bpmn20.xml");
 
         processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeScript(new Script("groovy",
-                "import com.fasterxml.jackson.databind.ObjectMapper\n"
-                        + "import com.fasterxml.jackson.databind.node.ArrayNode\n"
-                        + "import org.flowable.engine.impl.context.Context\n"
-                        + "\n"
-                        + "List<String> list  = execution.getVariable('listVariable')\n"
-                        + "\n"
-                        + "ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()\n"
-                        + "\n"
-                        + "ArrayNode jsonArray = mapper.createArrayNode()\n"
-                        + "list.each {jsonArray.add(it)}\n"
-                        + "\n"
-                        + "execution.setVariable(\"listVariable\", jsonArray)"))
+                        """
+                                import com.fasterxml.jackson.databind.ObjectMapper
+                                import com.fasterxml.jackson.databind.node.ArrayNode
+                                import org.flowable.engine.impl.context.Context
+
+                                List<String> list  = execution.getVariable('listVariable')
+
+                                ObjectMapper mapper = Context.getProcessEngineConfiguration().getObjectMapper()
+
+                                ArrayNode jsonArray = mapper.createArrayNode()
+                                list.each {jsonArray.add(it)}
+
+                                execution.setVariable("listVariable", jsonArray)"""))
                 .migrateToProcessDefinition(targetProcessDefinition.getId())
                 .migrate(processInstanceToMigrate.getId());
 

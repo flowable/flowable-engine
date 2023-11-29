@@ -128,9 +128,10 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
 
         String from = "ordershipping@flowable.org";
         String recipient = "johndoe@flowable.com";
-        String headers = "X-Attribute1: value1\n"
-            + "X-Attribute2: value2\n"
-            + "X-Attribute3: value3";
+        String headers = """
+                X-Attribute1: value1
+                X-Attribute2: value2
+                X-Attribute3: value3""";
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("sender", from);
