@@ -14,6 +14,7 @@ package org.flowable.eventregistry.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class EventRegistryProcessingInfo {
 
@@ -37,5 +38,12 @@ public class EventRegistryProcessingInfo {
 
     public void setEventConsumerInfos(List<EventConsumerInfo> eventConsumerInfos) {
         this.eventConsumerInfos = eventConsumerInfos;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("eventConsumerInfos=" + eventConsumerInfos)
+                .toString();
     }
 }
