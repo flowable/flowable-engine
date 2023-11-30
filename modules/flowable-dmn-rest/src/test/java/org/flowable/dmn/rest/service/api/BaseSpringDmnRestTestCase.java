@@ -15,7 +15,6 @@ package org.flowable.dmn.rest.service.api;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -223,11 +222,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
     protected String encode(String string) {
         if (string != null) {
-            try {
-                return URLEncoder.encode(string, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-            }
+            return URLEncoder.encode(string, StandardCharsets.UTF_8);
         }
         return null;
     }

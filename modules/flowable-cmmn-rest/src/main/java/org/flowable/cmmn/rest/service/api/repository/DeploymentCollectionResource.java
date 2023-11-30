@@ -16,8 +16,8 @@ package org.flowable.cmmn.rest.service.api.repository;
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -257,11 +257,7 @@ public class DeploymentCollectionResource {
 
     protected String decode(String string) {
         if (string != null) {
-            try {
-                return URLDecoder.decode(string, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-            }
+            return URLDecoder.decode(string, StandardCharsets.UTF_8);
         }
         return null;
     }
