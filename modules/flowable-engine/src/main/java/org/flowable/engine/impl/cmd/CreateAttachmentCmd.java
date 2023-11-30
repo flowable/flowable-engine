@@ -144,7 +144,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
         }
 
         if (task.isSuspended()) {
-            throw new FlowableException("It is not allowed to add an attachment to a suspended task");
+            throw new FlowableException("It is not allowed to add an attachment to a suspended " + task);
         }
 
         return task;
@@ -158,7 +158,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
         }
 
         if (execution.isSuspended()) {
-            throw new FlowableException("It is not allowed to add an attachment to a suspended process instance");
+            throw new FlowableException("It is not allowed to add an attachment to a suspended " + execution);
         }
 
         return execution;

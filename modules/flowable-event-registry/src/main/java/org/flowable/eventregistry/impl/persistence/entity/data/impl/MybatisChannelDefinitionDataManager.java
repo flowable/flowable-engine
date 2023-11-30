@@ -130,7 +130,7 @@ public class MybatisChannelDefinitionDataManager extends AbstractEventDataManage
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " event definitions with key = '" + channelDefinitionKey + "' and version = '" + eventVersion + "'.");
+            throw new FlowableException("There are " + results.size() + " event definitions with key = '" + channelDefinitionKey + "' and version = '" + eventVersion + "' in tenant = '" + tenantId + "'.");
         }
         return null;
     }

@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.Validate;
 
@@ -93,12 +93,7 @@ public class AttachmentsBean implements Serializable {
 
         @Override
         public InputStream getInputStream() {
-            try {
-                return new ByteArrayInputStream(content.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // this should not happen, since utf-8 is supported in stock jdk, but anyway
-                return new ByteArrayInputStream(content.getBytes());
-            }
+            return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override

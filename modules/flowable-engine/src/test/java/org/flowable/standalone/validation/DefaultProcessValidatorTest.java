@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -260,7 +259,7 @@ public class DefaultProcessValidatorTest {
     }
 
     @Test
-    public void testWarningError() throws UnsupportedEncodingException, XMLStreamException {
+    public void testWarningError() throws XMLStreamException {
         String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"
                 + "  <process id='exclusiveGwDefaultSequenceFlow'> " + "    <startEvent id='theStart' /> "

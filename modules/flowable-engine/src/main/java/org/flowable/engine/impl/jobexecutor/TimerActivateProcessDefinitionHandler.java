@@ -43,7 +43,7 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
             JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
             activateProcessInstances = getIncludeProcessInstances(configNode);
         } catch (Exception e) {
-            throw new FlowableException("Error reading json value " + configuration, e);
+            throw new FlowableException("Error reading json value " + configuration + " for job " + job, e);
         }
 
         String processDefinitionId = job.getProcessDefinitionId();

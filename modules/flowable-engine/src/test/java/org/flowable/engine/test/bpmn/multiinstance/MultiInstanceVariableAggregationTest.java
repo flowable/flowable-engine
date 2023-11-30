@@ -917,7 +917,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                         .setValue("testUser", execution);
                 return null;
             });
-        }).hasMessage("Error while evaluating expression: ${reviews[0].userId}");
+        }).hasMessageStartingWith("Error while evaluating expression: ${reviews[0].userId} with ProcessInstance[")
+            .hasMessageContaining(" - definition 'myProcess:1:");
 
         reviewsInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
 

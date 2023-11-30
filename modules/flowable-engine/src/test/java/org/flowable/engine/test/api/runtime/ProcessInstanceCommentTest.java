@@ -52,7 +52,7 @@ public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
             runtimeService.suspendProcessInstanceById(processInstance.getId());
             assertThatThrownBy(() -> taskService.addComment(null, processInstance.getId(), "Hello World 2"))
                     .isInstanceOf(FlowableException.class)
-                    .hasMessageContaining("Cannot add a comment to a suspended execution");
+                    .hasMessage("Cannot add a comment to a suspended ProcessInstance[" + processInstance.getId() + "] - definition '" + processInstance.getProcessDefinitionId() + "'");
 
             // Delete comments again
             taskService.deleteComments(null, processInstance.getId());

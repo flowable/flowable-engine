@@ -51,8 +51,8 @@ public class SuspendTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot suspend on a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot suspend";
     }
 
 }

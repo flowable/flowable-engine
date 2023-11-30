@@ -208,7 +208,7 @@ public class ExecuteAsyncRunnable implements Runnable {
         }
         
         LOGGER.error("Unable to handle exception {} for job {}.", exception, job);
-        throw new FlowableException("Unable to handle exception " + exception.getMessage() + " for job " + job.getId() + ".", exception);
+        throw new FlowableException("Unable to handle exception " + exception.getMessage() + " for " + job + ".", exception);
     }
 
 }

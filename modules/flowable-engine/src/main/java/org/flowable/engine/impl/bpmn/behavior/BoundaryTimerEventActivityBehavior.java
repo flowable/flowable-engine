@@ -42,7 +42,7 @@ public class BoundaryTimerEventActivityBehavior extends BoundaryEventActivityBeh
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         if (!(execution.getCurrentFlowElement() instanceof BoundaryEvent)) {
-            throw new FlowableException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event");
+            throw new FlowableException("Programmatic error: " + this.getClass() + " should not be used for anything else than a boundary event for " + executionEntity);
         }
 
         TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, execution.getCurrentFlowElement(),

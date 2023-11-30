@@ -85,8 +85,8 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot claim a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot claim";
     }
 
 }

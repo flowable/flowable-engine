@@ -61,7 +61,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (fieldExtension == null || ((fieldExtension.getStringValue() == null || fieldExtension.getStringValue().length() == 0) &&
                 (fieldExtension.getExpression() == null || fieldExtension.getExpression().length() == 0))) {
 
-            throw new FlowableException("decisionTableReferenceKey is a required field extension for the dmn task " + task.getId());
+            throw new FlowableException("decisionTableReferenceKey is a required field extension for the dmn task " + task.getId() + " in " + execution);
         }
 
         String activeDecisionKey = null;
@@ -110,7 +110,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + " in " + execution);
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
@@ -126,14 +126,14 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
             if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorString != null) {
                 if ("true".equalsIgnoreCase(throwErrorString)) {
-                    throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
+                    throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input. In " + execution);
                     
                 } else if (!"false".equalsIgnoreCase(throwErrorString)) {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
                     if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
-                        throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
+                        throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input. In " + execution);
                     }
                 }
             }

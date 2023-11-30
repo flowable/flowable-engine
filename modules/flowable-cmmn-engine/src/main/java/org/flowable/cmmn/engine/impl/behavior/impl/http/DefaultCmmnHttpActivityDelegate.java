@@ -74,7 +74,8 @@ public class DefaultCmmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             if (e instanceof FlowableException) {
                 throw (FlowableException) e;
             } else {
-                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + planItemInstance.getId(), e);
+                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in plan item instance " + planItemInstance.getId() + " in plan item "
+                        + planItemInstance.getPlanItemDefinitionId() + " in case definition " + planItemInstance.getCaseDefinitionId(), e);
             }
         }
 

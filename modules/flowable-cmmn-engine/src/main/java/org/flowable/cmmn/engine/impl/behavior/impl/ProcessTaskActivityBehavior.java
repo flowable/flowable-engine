@@ -69,7 +69,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
-            throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found");
+            throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found for " + planItemInstanceEntity);
         }
 
         String externalRef = null;
@@ -81,7 +81,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             externalRef = processRef;
         }
         if (StringUtils.isEmpty(externalRef)) {
-            throw new FlowableException("Could not start process instance: no externalRef defined");
+            throw new FlowableException("Could not start process instance: no externalRef defined for " + planItemInstanceEntity);
         }
 
         Map<String, Object> inParametersMap = new HashMap<>();
@@ -147,7 +147,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
         if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
-                    + planItemInstance.getReferenceType() + "' not supported");
+                    + planItemInstance.getReferenceType() + "' not supported for " + planItemInstance);
         }
 
         // Need to be set before planning the complete operation
@@ -182,7 +182,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
             deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS + " for " + delegatePlanItemInstance);
         }
     }
 

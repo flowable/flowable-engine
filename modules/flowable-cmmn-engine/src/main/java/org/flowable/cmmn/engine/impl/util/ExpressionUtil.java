@@ -45,7 +45,7 @@ public class ExpressionUtil {
         } else if (evaluationResult instanceof String) {
             return "true".equals(((String) evaluationResult).toLowerCase());
         } else {
-            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
+            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value with " + variableContainer);
         }
     }
 

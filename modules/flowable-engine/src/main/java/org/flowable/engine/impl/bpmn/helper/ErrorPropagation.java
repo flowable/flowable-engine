@@ -224,7 +224,7 @@ public class ErrorPropagation {
             executeEventHandler(matchingEvent, parentExecution, currentExecution, errorVariableContainer);
 
         } else {
-            throw new FlowableException("No matching parent execution for error code " + errorId + " found");
+            throw new FlowableException("No matching parent execution for error code " + errorId + " found for " + delegateExecution);
         }
     }
 

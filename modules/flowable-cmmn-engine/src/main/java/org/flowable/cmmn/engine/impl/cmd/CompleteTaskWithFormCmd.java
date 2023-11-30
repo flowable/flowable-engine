@@ -109,7 +109,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (StringUtils.isNotEmpty(task.getProcessInstanceId())) {
-            throw new FlowableException("The task instance is created by the process engine and should be completed via the process engine API");
+            throw new FlowableException(task + " is created by the process engine and should be completed via the process engine API");
         }
         
         FormService formService = CommandContextUtil.getFormService(commandContext);
@@ -180,7 +180,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         String planItemInstanceId = task.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {
-            throw new FlowableException("Could not find plan item instance for task " + taskId);
+            throw new FlowableException("Could not find plan item instance for " + task);
         }
 
         if (taskVariables != null) {
@@ -222,8 +222,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot complete a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot complete";
     }
 
 }

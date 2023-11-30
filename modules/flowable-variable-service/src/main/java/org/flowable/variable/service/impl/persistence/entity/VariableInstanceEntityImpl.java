@@ -324,6 +324,27 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
         sb.append("id=").append(id);
         sb.append(", name=").append(name);
         sb.append(", type=").append(type != null ? type.getTypeName() : "null");
+        if (executionId != null) {
+            sb.append(", executionId=").append(executionId);
+        }
+        if (processInstanceId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId);
+        }
+        if (processDefinitionId != null) {
+            sb.append(", processDefinitionId=").append(processDefinitionId);
+        }
+        if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId);
+        }
+        if (subScopeId != null) {
+            sb.append(", subScopeId=").append(subScopeId);
+        }
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
         if (longValue != null) {
             sb.append(", longValue=").append(longValue);
         }

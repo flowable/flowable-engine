@@ -42,10 +42,10 @@ public class ScriptCondition implements Condition {
                 .variableContainer(execution);
         Object result = scriptingEngines.evaluate(builder.build()).getResult();
         if (result == null) {
-            throw new FlowableException("condition script returns null: " + expression);
+            throw new FlowableException("condition script returns null: " + expression + " for " + execution);
         }
         if (!(result instanceof Boolean)) {
-            throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ")");
+            throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ") for " + execution);
         }
         return (Boolean) result;
     }

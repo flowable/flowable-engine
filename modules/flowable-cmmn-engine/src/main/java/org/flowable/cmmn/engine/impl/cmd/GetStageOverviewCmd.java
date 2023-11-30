@@ -139,7 +139,7 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
         Object stageValueObject = stageExpression.getValue(variableContainer);
         if (!(stageValueObject instanceof Boolean)) {
             throw new FlowableException("Include in stage overview expression does not resolve to a boolean value " + 
-                            includeInStageOverview + ": " + stageValueObject);
+                            includeInStageOverview + ": " + stageValueObject + " for " + variableContainer);
         }
         
         return (Boolean) stageValueObject;

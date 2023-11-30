@@ -143,7 +143,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         ChannelEventKeyDetection keyDetection = channelModel.getChannelEventKeyDetection();
 
         if (keyDetection == null) {
-            throw new FlowableException("A channel key detection value is required");
+            throw new FlowableException("A channel key detection value is required for inbound channel " + channelModel.getKey());
         }
 
         if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
@@ -207,7 +207,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
         ChannelEventKeyDetection keyDetection = channelModel.getChannelEventKeyDetection();
         if (keyDetection == null) {
-            throw new FlowableException("A channel key detection value is required");
+            throw new FlowableException("A channel key detection value is required for inbound channel " + channelModel.getKey());
         }
 
         if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
@@ -306,7 +306,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         ChannelEventKeyDetection keyDetection = channelModel.getChannelEventKeyDetection();
 
         if (keyDetection == null) {
-            throw new FlowableException("A channel key detection value is required");
+            throw new FlowableException("A channel key detection value is required for inbound channel " + channelModel.getKey());
         }
 
         if (StringUtils.isNotEmpty(keyDetection.getDelegateExpression())) {

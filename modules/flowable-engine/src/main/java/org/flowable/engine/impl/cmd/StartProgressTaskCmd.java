@@ -53,8 +53,8 @@ public class StartProgressTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot start progress on a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot start progress on";
     }
 
 }

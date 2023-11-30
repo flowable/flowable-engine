@@ -40,7 +40,7 @@ public class AppResourceConverterImpl implements AppResourceConverter {
         try {
             return objectMapper.writeValueAsString(appModel);
         } catch (Exception e) {
-            throw new FlowableException("Error writing app model to json", e);
+            throw new FlowableException("Error writing app model " + appModel.getKey() + " to json", e);
         }
     }
 }

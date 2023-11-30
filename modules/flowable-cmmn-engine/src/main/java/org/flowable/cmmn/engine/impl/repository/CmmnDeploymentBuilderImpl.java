@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.repository;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -31,8 +31,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.IoUtil;
 
 public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
-
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient CmmnRepositoryServiceImpl repositoryService;
     protected transient CmmnResourceEntityManager resourceEntityManager;
@@ -93,11 +91,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
         CmmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }

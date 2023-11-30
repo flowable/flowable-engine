@@ -244,7 +244,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testNullExpressionOnTimer", variables))
                 .as("Expected wrong due date exception")
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("Due date could not be determined for timer job null");
+                .hasMessageStartingWith("Due date could not be determined for timer job null for Execution[")
+                .hasMessageContainingAll(" - definition 'testNullExpressionOnTimer:1:", " - activity 'boundaryTimer'");
     }
     
     @Test
@@ -278,7 +279,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("test-timers", variables).getProcessInstanceId())
                 .as("Expected wrong due date exception")
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("Due date could not be determined for timer job 0 0 0 1 1 ? 2000");
+                .hasMessageStartingWith("Due date could not be determined for timer job 0 0 0 1 1 ? 2000 for Execution[")
+                .hasMessageContainingAll(" - definition 'test-timers:1:", " - activity 'remind-reviewer-event'");
     }
 
     @Test

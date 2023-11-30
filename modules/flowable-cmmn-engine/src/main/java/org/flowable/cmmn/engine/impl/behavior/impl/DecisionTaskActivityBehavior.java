@@ -60,7 +60,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         DmnDecisionService dmnRuleService = CommandContextUtil.getDmnRuleService(commandContext);
         if (dmnRuleService == null) {
-            throw new FlowableException("Could not execute decision instance: no dmn service found.");
+            throw new FlowableException("Could not execute decision instance: no dmn service found. For " + planItemInstanceEntity);
         }
 
         String externalRef = null;
@@ -76,7 +76,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
             
             if (StringUtils.isEmpty(externalRef)) {
-                throw new FlowableException("Could not execute decision: no externalRef defined");
+                throw new FlowableException("Could not execute decision: no externalRef defined for " + planItemInstanceEntity);
             }
         }
 
@@ -111,25 +111,25 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer == null) {
-            throw new FlowableException("DMN decision with key " + externalRef + " was not executed.");
+            throw new FlowableException("DMN decision with key " + externalRef + " was not executed. For " + planItemInstanceEntity);
         }
         
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + ". For " + planItemInstanceEntity);
         }
 
         /* Throw error if there were no rules hit when the flag indicates to do this. */
         String throwErrorFieldValue = getFieldString(EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
         if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue != null) {
             if ("true".equalsIgnoreCase(throwErrorFieldValue)) {
-                throw new FlowableException("DMN decision with key " + externalRef + " did not hit any rules for the provided input.");
+                throw new FlowableException("DMN decision with key " + externalRef + " did not hit any rules for the provided input. For " + planItemInstanceEntity);
             
             } else if (!"false".equalsIgnoreCase(throwErrorFieldValue)) {
                 Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(throwErrorFieldValue);
                 Object expressionValue = expression.getValue(planItemInstanceEntity);
                 
                 if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
-                    throw new FlowableException("DMN decision with key " + externalRef + " did not hit any rules for the provided input.");
+                    throw new FlowableException("DMN decision with key " + externalRef + " did not hit any rules for the provided input. For " + planItemInstanceEntity);
                 }
             }
         }

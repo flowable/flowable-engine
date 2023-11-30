@@ -120,7 +120,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             if (topicValue != null && !topicValue.toString().isEmpty()) {
                 job.setJobHandlerConfiguration(topicValue.toString());
             } else {
-                throw new FlowableException("Expression " + jobTopicExpression + " did not evaluate to a valid value (non empty String). Was: " + topicValue);
+                throw new FlowableException("Expression " + jobTopicExpression + " did not evaluate to a valid value (non empty String). Was: " + topicValue + ". For " + execution);
             }
 
             jobService.insertExternalWorkerJob(job);

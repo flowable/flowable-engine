@@ -60,7 +60,7 @@ public class DelegateHelper {
             delegateExecution.setCurrentFlowElement(flowElement);
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, false);
         } else {
-            throw new FlowableException(sequenceFlowId + " does not match a sequence flow");
+            throw new FlowableException(sequenceFlowId + " does not match a sequence flow for " + delegateExecution);
         }
     }
 
@@ -81,7 +81,7 @@ public class DelegateHelper {
         BpmnModel bpmnModel = getBpmnModel(execution);
         FlowElement flowElement = bpmnModel.getFlowElement(execution.getCurrentActivityId());
         if (flowElement == null) {
-            throw new FlowableException("Could not find a FlowElement for activityId " + execution.getCurrentActivityId());
+            throw new FlowableException("Could not find a FlowElement for activityId " + execution.getCurrentActivityId() + " in " + execution);
         }
         return flowElement;
     }

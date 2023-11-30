@@ -57,7 +57,7 @@ public class BoundaryCancelEventActivityBehavior extends BoundaryEventActivityBe
         }
 
         if (subProcessExecution == null) {
-            throw new FlowableException("No execution found for sub process of boundary cancel event " + boundaryEvent.getId());
+            throw new FlowableException("No execution found for sub process of boundary cancel event " + boundaryEvent.getId() + " for " + execution);
         }
 
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();

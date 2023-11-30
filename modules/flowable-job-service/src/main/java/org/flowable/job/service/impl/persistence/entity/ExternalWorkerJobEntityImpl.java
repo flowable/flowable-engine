@@ -57,9 +57,4 @@ public class ExternalWorkerJobEntityImpl extends AbstractJobEntityImpl implement
         this.lockExpirationTime = claimedUntil;
     }
 
-    @Override
-    public String toString() {
-        return "ExternalWorkerJobEntity [id=" + id + "]";
-    }
-
 }

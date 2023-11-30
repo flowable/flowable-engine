@@ -85,8 +85,8 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot trigger an execution that is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot trigger";
     }
 
 }

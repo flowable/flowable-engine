@@ -58,7 +58,7 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (!(flowElement instanceof CaseServiceTask)) {
-            throw new FlowableException("No execution could be found with a case service task for id " + executionId);
+            throw new FlowableException("No execution could be found with a case service task for " + execution);
         }
         
         CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
@@ -71,11 +71,11 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
             if (innerActivityBehavior instanceof CaseTaskActivityBehavior) {
                 ((CaseTaskActivityBehavior) innerActivityBehavior).triggerCaseTask(execution, variables);
             } else {
-                throw new FlowableException("Multi instance inner behavior " + innerActivityBehavior + " is not supported");
+                throw new FlowableException("Multi instance inner behavior " + innerActivityBehavior + " is not supported for " + execution);
             }
             ((MultiInstanceActivityBehavior) behavior).leave(execution);
         } else {
-                throw new FlowableException("Behavior " + behavior + " is not supported for a case task");
+                throw new FlowableException("Behavior " + behavior + " is not supported for a case task for " + execution);
         }
 
         return null;

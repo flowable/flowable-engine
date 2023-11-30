@@ -110,7 +110,7 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
         String charSetStr = getStringFromField(charset, variableContainer);
 
         if (toList.isEmpty() && ccList.isEmpty() && bccList.isEmpty()) {
-            throw new FlowableException("No recipient could be found for sending email");
+            throw new FlowableException("No recipient could be found for sending email for " + variableContainer);
         }
 
         if (htmlStr == null && textStr == null) {
@@ -162,16 +162,16 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
         if (value instanceof Collection<?> collection) {
             if (!collection.isEmpty()) {
                 for (Object object : collection) {
-                    addExpressionValueAttachment(message, object);
+                    addExpressionValueAttachment(message, object, variableContainer);
                 }
             }
         } else {
-            addExpressionValueAttachment(message, value);
+            addExpressionValueAttachment(message, value, variableContainer);
         }
 
     }
 
-    protected void addExpressionValueAttachment(MailMessage message, Object value) {
+    protected void addExpressionValueAttachment(MailMessage message, Object value, V variableContainer) {
         if (value instanceof File file) {
             if (fileExists(file)) {
                 message.addAttachment(new FileDataSource(file));
@@ -185,12 +185,12 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
 
         } else if (value instanceof File[] files) {
             for (File file : files) {
-                addExpressionValueAttachment(message, file);
+                addExpressionValueAttachment(message, file, variableContainer);
             }
 
         } else if (value instanceof String[] filenames) {
             for (String filename : filenames) {
-                addExpressionValueAttachment(message, filename);
+                addExpressionValueAttachment(message, filename, variableContainer);
             }
 
         } else if (value instanceof DataSource dataSource) {
@@ -198,7 +198,7 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
 
         } else if (value instanceof DataSource[] dataSources) {
             for (DataSource dataSource : dataSources) {
-                addExpressionValueAttachment(message, dataSource);
+                addExpressionValueAttachment(message, dataSource, variableContainer);
             }
 
         } else if (value instanceof ContentItem contentItem) {
@@ -206,11 +206,11 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
 
         } else if (value instanceof ContentItem[] contentItems) {
             for (ContentItem contentItem : contentItems) {
-                addExpressionValueAttachment(message, contentItem);
+                addExpressionValueAttachment(message, contentItem, variableContainer);
             }
 
         } else {
-            throw new FlowableException("Invalid attachment type: " + value.getClass());
+            throw new FlowableException("Invalid attachment type: " + value.getClass() + " for " + variableContainer);
         }
 
     }

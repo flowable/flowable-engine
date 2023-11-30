@@ -139,7 +139,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         if (timerDueDate == null) {
             throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
                     + "java.time.Instant, "
-                    + "an ISO8601 date/duration/repetition string or a cron expression");
+                    + "an ISO8601 date/duration/repetition string or a cron expression for " + planItemInstance);
         }
 
         scheduleTimerJob(commandContext, planItemInstance, timerValue, timerDueDate, isRepeating);

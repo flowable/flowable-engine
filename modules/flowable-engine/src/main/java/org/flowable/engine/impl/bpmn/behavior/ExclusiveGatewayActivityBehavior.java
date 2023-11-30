@@ -110,7 +110,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
             } else {
 
                 // No sequence flow could be found, not even a default one
-                throw new FlowableException("No outgoing sequence flow of the exclusive gateway '" + exclusiveGateway.getId() + "' could be selected for continuing the process");
+                throw new FlowableException("No outgoing sequence flow of the exclusive gateway '" + exclusiveGateway.getId() + "' could be selected for continuing " + execution);
             }
         }
 

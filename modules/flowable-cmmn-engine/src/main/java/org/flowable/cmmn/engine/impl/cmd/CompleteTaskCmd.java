@@ -86,7 +86,7 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         if (StringUtils.isNotEmpty(taskEntity.getProcessInstanceId())) {
-            throw new FlowableException("The task instance is created by the process engine and should be completed via the process engine API");
+            throw new FlowableException(taskEntity + " is created by the process engine and should be completed via the process engine API");
         }
         
         String planItemInstanceId = taskEntity.getSubScopeId();
@@ -94,7 +94,7 @@ public class CompleteTaskCmd implements Command<Void> {
         if (planItemInstanceId != null) {
             planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
             if (planItemInstanceEntity == null) {
-                throw new FlowableException("Could not find plan item instance for task " + taskId);
+                throw new FlowableException("Could not find plan item instance for " + taskEntity);
             }
         }
         

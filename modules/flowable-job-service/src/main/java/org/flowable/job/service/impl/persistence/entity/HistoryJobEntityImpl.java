@@ -262,7 +262,19 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
 
     @Override
     public String toString() {
-        return "HistoryJobEntity [id=" + id + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoryJobEntity[").append("id=").append(id)
+                .append(", jobHandlerType=").append(jobHandlerType);
+
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

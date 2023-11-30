@@ -50,7 +50,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
             throw new FlowableObjectNotFoundException("No historic case instance found with id: " + caseInstanceId, HistoricCaseInstance.class);
         }
         if (instance.getEndTime() == null) {
-            throw new FlowableException("Case instance is still running, cannot delete historic case instance: " + caseInstanceId);
+            throw new FlowableException("Case instance is still running, cannot delete " + instance);
         }
 
         cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceDeleted(caseInstanceId, instance.getTenantId());

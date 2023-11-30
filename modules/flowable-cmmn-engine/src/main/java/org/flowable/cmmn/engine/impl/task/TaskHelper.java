@@ -70,9 +70,9 @@ public class TaskHelper {
         TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (task != null) {
             if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
-                throw new FlowableException("The task cannot be deleted because is part of a running case instance");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running case instance");
             } else if (task.getExecutionId() != null) {
-                throw new FlowableException("The task cannot be deleted because is part of a running process instance");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running process instance");
             }
             deleteTask(task, deleteReason, cascade, true, cmmnEngineConfiguration);
             
@@ -252,7 +252,7 @@ public class TaskHelper {
                     expressionManager.createExpression(formFieldValidationExpression).getValue(variableContainer)
                 );
                 if (formFieldValidationValue == null) {
-                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value");
+                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value for " + variableContainer);
                 }
                 return formFieldValidationValue;
             }

@@ -70,7 +70,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
         }
 
         if (key == null) {
-            throw new FlowableException("Could not resolve key from expression: " + eventDefinitionKeyExpression);
+            throw new FlowableException("Could not resolve key from expression: " + eventDefinitionKeyExpression + " for " + planItemInstanceEntity);
         }
 
         return key.toString();

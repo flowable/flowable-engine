@@ -147,7 +147,7 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'.");
+            throw new FlowableException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "' in tenant='" + tenantId + "'.");
         }
         return null;
     }

@@ -178,7 +178,7 @@ public class EventSubscriptionManager {
             if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) { // processInstanceId != null or not empty -> it's a message related to an execution
                 // the event subscription has no instance-id, so it's a message start event
                 throw new FlowableException("Cannot deploy process definition '" + processDefinition.getResourceName()
-                        + "': there already is a message event subscription for the message with name '" + messageName + "'.");
+                        + "': there already is a message event subscription for the message with name '" + messageName + "'. For " + eventSubscriptionEntity);
             }
         }
 

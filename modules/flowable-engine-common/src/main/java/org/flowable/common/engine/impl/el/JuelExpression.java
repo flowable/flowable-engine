@@ -51,13 +51,13 @@ public class JuelExpression implements Expression {
         try {
             return resolveGetValueExpression(elContext);
         } catch (PropertyNotFoundException pnfe) {
-            throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
+            throw new FlowableException("Unknown property used in expression: " + expressionText + " with " + variableContainer, pnfe);
         } catch (MethodNotFoundException mnfe) {
-            throw new FlowableException("Unknown method used in expression: " + expressionText, mnfe);
+            throw new FlowableException("Unknown method used in expression: " + expressionText + " with " + variableContainer, mnfe);
         } catch (FlowableException ex) {
             throw ex;
         } catch (Exception e) {
-            throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+            throw new FlowableException("Error while evaluating expression: " + expressionText + " with " + variableContainer, e);
         } finally {
             elContext.putContext(EvaluationState.class, originalValueContext);
             elContext.putContext(VariableContainer.class, originalVariableContainer);
@@ -79,7 +79,7 @@ public class JuelExpression implements Expression {
         try {
             resolveSetValueExpression(value, elContext);
         } catch (Exception e) {
-            throw new FlowableException("Error while evaluating expression: " + expressionText, e);
+            throw new FlowableException("Error while evaluating expression: " + expressionText + " with " + variableContainer, e);
         } finally {
             elContext.putContext(EvaluationState.class, originalValueContext);
             elContext.putContext(VariableContainer.class, originalVariableContainer);

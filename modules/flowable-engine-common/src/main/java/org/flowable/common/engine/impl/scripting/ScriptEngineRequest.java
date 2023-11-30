@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.scripting;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -182,5 +183,15 @@ public class ScriptEngineRequest {
      */
     public ScriptTraceEnhancer getTraceEnhancer() {
         return traceEnhancer;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ScriptEngineRequest.class.getSimpleName() + "[", "]")
+                .add("language='" + language + "'")
+                .add("script='" + script + "'")
+                .add("variableContainer=" + variableContainer)
+                .add("storeScriptVariables=" + storeScriptVariables)
+                .toString();
     }
 }

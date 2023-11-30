@@ -67,14 +67,14 @@ public class ExternalWorkerCombinedScopeTest extends AbstractProcessEngineIntegr
 
         assertThatThrownBy(() -> processEngineManagementService.createExternalWorkerCompletionBuilder(cmmnAcquiredJob.getId(), "cmmnWorker").complete())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("External worker job with id " + cmmnAcquiredJob.getId()
-                        + " is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
+                .hasMessageContaining("ExternalWorkerJobEntity[id=" + cmmnAcquiredJob.getId())
+                .hasMessageContaining("is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
 
         assertThatThrownBy(
                 () -> processEngineManagementService.createExternalWorkerCompletionBuilder(cmmnAcquiredJob.getId(), "cmmnWorker").bpmnError("errorCode"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("External worker job with id " + cmmnAcquiredJob.getId()
-                        + " is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
+                .hasMessageContaining("ExternalWorkerJobEntity[id=" + cmmnAcquiredJob.getId())
+                .hasMessageContaining("is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
 
         cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(cmmnAcquiredJob.getId(), "cmmnWorker").complete();
 
@@ -91,13 +91,13 @@ public class ExternalWorkerCombinedScopeTest extends AbstractProcessEngineIntegr
 
         assertThatThrownBy(() -> cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(bpmnAcquiredJob.getId(), "bpmnWorker").complete())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("External worker job with id " + bpmnAcquiredJob.getId()
-                        + " is not cmmn scoped. This command can only handle cmmn scoped external worker jobs");
+                .hasMessageContaining("ExternalWorkerJobEntity[id=" + bpmnAcquiredJob.getId())
+                .hasMessageContaining("is not cmmn scoped. This command can only handle cmmn scoped external worker jobs");
 
         assertThatThrownBy(() -> cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(bpmnAcquiredJob.getId(), "bpmnWorker").terminate())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("External worker job with id " + bpmnAcquiredJob.getId()
-                        + " is not cmmn scoped. This command can only handle cmmn scoped external worker jobs");
+                .hasMessageContaining("ExternalWorkerJobEntity[id=" + bpmnAcquiredJob.getId())
+                .hasMessageContaining("is not cmmn scoped. This command can only handle cmmn scoped external worker jobs");
 
         processEngineManagementService.createExternalWorkerCompletionBuilder(bpmnAcquiredJob.getId(), "bpmnWorker").complete();
 

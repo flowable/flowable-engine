@@ -66,7 +66,7 @@ public class InjectParallelUserTaskCmd extends AbstractDynamicInjectionCmd imple
         TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         FlowElement flowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
         if (!(flowElement instanceof UserTask)) {
-            throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
+            throw new FlowableException("No UserTask instance found for " + taskEntity);
         }
         
         UserTask userTask = (UserTask) flowElement;

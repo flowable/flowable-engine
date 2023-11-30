@@ -334,7 +334,7 @@ public class DefaultJobManager implements JobManager {
             }
 
         } else {
-            throw new FlowableException("Only jobs with type JobEntity are supported to be executed");
+            throw new FlowableException("Only jobs with type JobEntity are supported to be executed. It was " + job);
         }
     }
 
@@ -547,16 +547,16 @@ public class DefaultJobManager implements JobManager {
                     jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
                 } else {
                     throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() + 
-                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + jobEntity);
                 }
                 
             } else {
                 throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() +
-                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + jobEntity);
             }
             
         } else {
-            throw new FlowableException("Job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
+            throw new FlowableException(jobEntity + " has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -569,16 +569,16 @@ public class DefaultJobManager implements JobManager {
                     jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext(), jobServiceConfiguration);
                 } else {
                     throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() +
-                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + historyJobEntity);
                 }
                 
             } else {
                 throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() + 
-                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + historyJobEntity);
             }
             
         } else {
-            throw new FlowableException("Async history job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
+            throw new FlowableException("Async " + historyJobEntity + " has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 

@@ -92,7 +92,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
-            throw new FlowableException("The task instance is created by the cmmn engine and should be completed via the cmmn engine API");
+            throw new FlowableException("The " + task + " is created by the cmmn engine and should be completed via the cmmn engine API");
         }
         
         // Backwards compatibility
@@ -126,7 +126,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot complete a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot complete";
     }
 }

@@ -659,6 +659,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
             .append(planItemDefinitionId)
             .append(", state: ")
             .append(state);
+
+        if (elementId != null) {
+            stringBuilder.append(", elementId: ").append(elementId);
+        }
+
+        stringBuilder
+                .append(", caseInstanceId: ")
+                .append(caseInstanceId)
+                .append(", caseDefinitionId: ")
+                .append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            stringBuilder.append(", tenantId=").append(tenantId);
+        }
         return stringBuilder.toString();
     }
 }

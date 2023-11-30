@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
@@ -361,6 +362,22 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     @Override
     public String toString() {
-        return "HistoricProcessInstanceEntity[superProcessInstanceId=" + superProcessInstanceId + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricProcessInstanceEntity[id=").append(getId())
+                .append(", definition=").append(getProcessDefinitionId());
+        if (superProcessInstanceId != null) {
+            sb.append(", superProcessInstanceId=").append(superProcessInstanceId);
+        }
+
+        if (referenceId != null) {
+            sb.append(", referenceId=").append(referenceId)
+                    .append(", referenceType=").append(referenceType);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
