@@ -14,6 +14,7 @@ package org.flowable.engine.impl.delegate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -171,5 +172,16 @@ public class ReadOnlyDelegateExecutionImpl implements ReadOnlyDelegateExecution 
     @Override
     public boolean hasVariable(String variableName) {
         return variables.containsKey(variableName);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("id='" + id + "'")
+                .add("currentActivityId='" + currentActivityId + "'")
+                .add("processInstanceId='" + processInstanceId + "'")
+                .add("processDefinitionId='" + processDefinitionId + "'")
+                .add("tenantId='" + tenantId + "'")
+                .toString();
     }
 }
