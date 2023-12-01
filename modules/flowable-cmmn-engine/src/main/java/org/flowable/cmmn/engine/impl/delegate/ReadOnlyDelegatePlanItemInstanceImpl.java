@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.delegate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
@@ -270,5 +271,17 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public PlanItem getPlanItem() {
         return planItem;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("id='" + id + "'")
+                .add("planItemDefinitionId='" + planItemDefinitionId + "'")
+                .add("elementId='" + elementId + "'")
+                .add("caseInstanceId='" + caseInstanceId + "'")
+                .add("caseDefinitionId='" + caseDefinitionId + "'")
+                .add("tenantId='" + tenantId + "'")
+                .toString();
     }
 }

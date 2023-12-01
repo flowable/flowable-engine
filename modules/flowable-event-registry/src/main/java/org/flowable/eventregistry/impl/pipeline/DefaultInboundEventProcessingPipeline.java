@@ -31,12 +31,16 @@ import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
 public class DefaultInboundEventProcessingPipeline<T> implements InboundEventProcessingPipeline {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected EventRepositoryService eventRepositoryService;
     protected InboundEventDeserializer<T> inboundEventDeserializer;
@@ -63,6 +67,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     @Override
     public Collection<EventRegistryEvent> run(InboundChannelModel inboundChannel, InboundEvent inboundEvent) {
 
+        boolean debugLoggingEnabled = logger.isDebugEnabled();
+        if (debugLoggingEnabled) {
+            logger.debug("Running inbound pipeline for inbound {} channel {}. Inbound event: {}", inboundChannel.getChannelType(), inboundChannel.getKey(), inboundEvent);
+        }
+
         T deserializedBody = deserialize(inboundEvent.getBody());
 
         FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody, inboundChannel);
@@ -76,6 +85,11 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
             multiTenant = true;
         }
 
+        if (debugLoggingEnabled) {
+            logger.debug("Detected event {} and tenant {} for inbound {} channel {}. Inbound event: {}", eventKey, tenantId, inboundChannel.getChannelType(),
+                    inboundChannel.getKey(), inboundEvent);
+        }
+
         EventModel eventModel = multiTenant ? eventRepositoryService.getEventModelByKey(eventKey, tenantId) : eventRepositoryService.getEventModelByKey(eventKey);
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
@@ -84,7 +98,18 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
             tenantId
         );
 
-        return transform(eventInstance);
+        if (debugLoggingEnabled) {
+            logger.debug("Transforming {} for inbound {} channel {}. Inbound event: {}", eventInstance, inboundChannel.getChannelType(),
+                    inboundChannel.getKey(), inboundEvent);
+        }
+        Collection<EventRegistryEvent> registryEvents = transform(eventInstance);
+
+        if (debugLoggingEnabled) {
+            logger.debug("Transformed {} to {} for inbound {} channel {}. Inbound event: {}", eventInstance, registryEvents, inboundChannel.getChannelType(),
+                    inboundChannel.getKey(), inboundEvent);
+        }
+
+        return registryEvents;
     }
 
     public T deserialize(Object rawEvent) {

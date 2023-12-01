@@ -495,6 +495,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
             sb.append(", tenantId=").append(tenantId);
         }
 
+        sb.append("]");
+
         return sb.toString();
     }
 }

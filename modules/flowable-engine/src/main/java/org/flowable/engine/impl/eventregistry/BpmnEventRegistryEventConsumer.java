@@ -31,6 +31,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.eventregistry.api.EventConsumerInfo;
@@ -74,6 +75,9 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.BPMN, eventInstance, correlationKeys);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Found {} for {}", eventSubscriptions, eventInstance);
+        }
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getExecutionId(),
@@ -88,30 +92,21 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     protected void handleEventSubscription(RuntimeService runtimeService, EventSubscription eventSubscription,
             EventInstance eventInstance, Collection<CorrelationKey> correlationKeys, EventConsumerInfo eventConsumerInfo) {
 
-        if (eventSubscription.getExecutionId() != null) {
+        String executionId = eventSubscription.getExecutionId();
+        if (executionId != null) {
 
             // When an executionId is set, this means that the process instance is waiting at that step for an event
 
             Map<String, Object> transientVariableMap = new HashMap<>();
             transientVariableMap.put(EventConstants.EVENT_INSTANCE, eventInstance);
-            runtimeService.trigger(eventSubscription.getExecutionId(), null, transientVariableMap);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Triggering execution {} with {}", executionId, eventInstance);
+            }
+            runtimeService.trigger(executionId, null, transientVariableMap);
 
-        } else if (eventSubscription.getProcessDefinitionId() != null
-                && eventSubscription.getProcessInstanceId() == null && eventSubscription.getExecutionId() == null) {
+        } else if (eventSubscription.getProcessDefinitionId() != null && eventSubscription.getProcessInstanceId() == null) {
 
             // If there is no execution/process instance set, but a definition id is set, this means that it's a start event
-
-            ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
-                    .processDefinitionId(eventSubscription.getProcessDefinitionId())
-                    .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
-
-            if (StringUtils.isNotEmpty(eventSubscription.getActivityId())) {
-                processInstanceBuilder.startEventId(eventSubscription.getActivityId());
-            }
-            
-            if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
-            }
 
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
@@ -170,7 +165,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                     return;
                                 }
 
-                                startProcessInstance(processInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_PROCESS);
+                                startProcessInstance(runtimeService, eventSubscription, eventInstance, correlationKeyWithAllParameters);
                                 return;
 
                             } finally {
@@ -188,7 +183,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
 
                     } else {
-                        startProcessInstance(processInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_PROCESS);
+                        startProcessInstance(runtimeService, eventSubscription, eventInstance, correlationKeyWithAllParameters);
                         return;
                     }
 
@@ -196,8 +191,10 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
             }
 
-            startProcessInstance(processInstanceBuilder, null, null);
+            startProcessInstance(runtimeService, eventSubscription, eventInstance, null);
 
+        } else {
+            LOGGER.warn("Ignoring {}. It was acquired by the bpmn event consumer, but it is not used", eventSubscription);
         }
 
     }
@@ -217,19 +214,47 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         return processInstanceQuery.count();
     }
 
-    protected void startProcessInstance(ProcessInstanceBuilder processInstanceBuilder, String referenceId, String referenceType) {
+    protected void startProcessInstance(RuntimeService runtimeService, EventSubscription eventSubscription, EventInstance eventInstance,
+            CorrelationKey correlationKey) {
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionId(eventSubscription.getProcessDefinitionId())
+                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
-        if (referenceId != null) {
-            processInstanceBuilder.referenceId(referenceId);
-        }
-        if (referenceType != null) {
-            processInstanceBuilder.referenceType(referenceType);
+        if (StringUtils.isNotEmpty(eventSubscription.getActivityId())) {
+            processInstanceBuilder.startEventId(eventSubscription.getActivityId());
         }
 
+        if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+            processInstanceBuilder.overrideProcessDefinitionTenantId(eventInstance.getTenantId());
+        }
+
+        if (correlationKey != null) {
+            processInstanceBuilder
+                    .referenceId(correlationKey.getValue())
+                    .referenceType(ReferenceTypes.EVENT_PROCESS);
+        }
+
+        boolean debugLoggingEnabled = LOGGER.isDebugEnabled();
         if (processEngineConfiguration.isEventRegistryStartProcessInstanceAsync()) {
-            processInstanceBuilder.startAsync();
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Async starting process instance for {} with {}", eventSubscription, eventInstance);
+            }
+
+            ProcessInstance processInstance = processInstanceBuilder.startAsync();
+
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Started {} async for {} with {}", processInstance, eventSubscription, eventInstance);
+            }
         } else {
-            processInstanceBuilder.start();
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Starting process instance for {} with {}", eventSubscription, eventInstance);
+            }
+
+            ProcessInstance processInstance = processInstanceBuilder.start();
+
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Started {} for {} with {}", processInstance, eventSubscription, eventInstance);
+            }
         }
     }
 

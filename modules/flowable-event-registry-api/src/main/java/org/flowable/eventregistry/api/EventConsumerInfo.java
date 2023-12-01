@@ -12,6 +12,8 @@
  */
 package org.flowable.eventregistry.api;
 
+import java.util.StringJoiner;
+
 public class EventConsumerInfo {
 
     protected String eventSubscriptionId;
@@ -58,5 +60,16 @@ public class EventConsumerInfo {
     }
     public void setHasExistingInstancesForUniqueCorrelation(boolean hasExistingInstancesForUniqueCorrelation) {
         this.hasExistingInstancesForUniqueCorrelation = hasExistingInstancesForUniqueCorrelation;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("eventSubscriptionId='" + eventSubscriptionId + "'")
+                .add("subScopeId='" + subScopeId + "'")
+                .add("scopeType='" + scopeType + "'")
+                .add("scopeDefinitionId='" + scopeDefinitionId + "'")
+                .add("hasExistingInstancesForUniqueCorrelation=" + hasExistingInstancesForUniqueCorrelation)
+                .toString();
     }
 }
