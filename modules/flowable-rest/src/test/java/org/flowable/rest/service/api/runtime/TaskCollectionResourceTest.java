@@ -526,7 +526,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
     })
-    public void testQueryByRootProcessInstanceId() throws IOException {
+    public void testQueryByRootScopeId() throws IOException {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
@@ -561,7 +561,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
     })
-    public void testQueryByParentProcessInstanceId() throws IOException {
+    public void testQueryParentScopeId() throws IOException {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 

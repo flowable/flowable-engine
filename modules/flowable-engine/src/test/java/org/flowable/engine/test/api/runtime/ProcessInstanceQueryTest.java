@@ -2365,7 +2365,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByRootProcessInstanceId() {
+    public void testQueryByRootScopeId() {
         runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
         List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
 
@@ -2386,7 +2386,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByParentProcessInstanceId() {
+    public void testQueryParentScopeId() {
         ProcessInstance validationProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 

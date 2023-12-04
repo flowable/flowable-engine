@@ -924,7 +924,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByRootInstanceId() {
+    public void testQueryByRootScopeId() {
         runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
         List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
@@ -954,7 +954,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByParentInstanceId() {
+    public void testQueryByRootScopeId() {
         runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 

@@ -379,7 +379,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
     })
-    public void testQueryByRootProcessInstanceId() {
+    public void testQueryByRootScopeId() {
 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
@@ -418,7 +418,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
     })
-    public void testQueryByParentCaseInstanceId() {
+    public void testQueryParentScopeId() {
 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();

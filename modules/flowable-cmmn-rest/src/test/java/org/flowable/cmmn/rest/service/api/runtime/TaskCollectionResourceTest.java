@@ -503,7 +503,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasks.cmmn"
     })
-    public void testQueryByRootCaseInstanceId() throws IOException {
+    public void testQueryRootScopeId() throws IOException {
 
         runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
@@ -549,7 +549,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasks.cmmn"
     })
-    public void testQueryByParentCaseInstanceId() throws IOException {
+    public void testQueryParentScopeId() throws IOException {
 
         runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();

@@ -4803,7 +4803,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByRootProcessInstanceId() {
+    public void testQueryByRootScopeId() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
@@ -4831,7 +4831,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/simpleInnerCallActivity2TaskProcess.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-    public void testQueryByParentProcessInstanceId() {
+    public void testQueryParentScopeId() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
