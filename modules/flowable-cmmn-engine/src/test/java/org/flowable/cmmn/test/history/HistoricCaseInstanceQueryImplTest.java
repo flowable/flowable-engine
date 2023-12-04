@@ -1729,7 +1729,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
     })
-    public void testQueryParentScopeId() {
+    public void testQueryByParentScopeId() {
 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         List<String> validationList = cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();

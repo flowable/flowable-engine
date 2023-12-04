@@ -829,8 +829,9 @@
               -->
             and LINK.REF_SCOPE_ID_ not in (
                 select INNERLINK.REF_SCOPE_ID_
-                from ACT_RU_ENTITYLINK as INNERLINK WHERE INNERLINK.ROOT_SCOPE_ID_ = #{parentScopeId}
-                AND INNERLINK.HIERARCHY_TYPE_ != 'root'
+                from ACT_RU_ENTITYLINK as INNERLINK WHERE
+                    INNERLINK.ROOT_SCOPE_ID_ = #{parentScopeId}
+                    AND INNERLINK.HIERARCHY_TYPE_ != 'root'
                 )
           )
       </if>
