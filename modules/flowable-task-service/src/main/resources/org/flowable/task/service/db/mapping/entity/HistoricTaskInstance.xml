@@ -1464,16 +1464,17 @@
             -->
             and LINK.REF_SCOPE_ID_ not in (
                 select INNERLINK.REF_SCOPE_ID_
-                from ACT_HI_ENTITYLINK as INNERLINK WHERE INNERLINK.ROOT_SCOPE_ID_ = #{parentScopeId}
-                AND INNERLINK.HIERARCHY_TYPE_ != 'root'
+                from ACT_HI_ENTITYLINK as INNERLINK WHERE
+                    INNERLINK.ROOT_SCOPE_ID_ = #{parentScopeId}
+                    AND INNERLINK.HIERARCHY_TYPE_ != 'root'
             )
           )
       </if>
       <if test="rootScopeId != null">
           and exists(
-          select 1 from ACT_HI_ENTITYLINK as LINK where
-          LINK.REF_SCOPE_ID_ = RES.ID_
-          and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+            select 1 from ACT_HI_ENTITYLINK as LINK where
+                LINK.REF_SCOPE_ID_ = RES.ID_
+                and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
           )
       </if>
       <if test="candidateUser != null || candidateGroups != null">
