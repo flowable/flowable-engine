@@ -363,6 +363,13 @@ public class TaskBaseResource {
             taskQuery.taskWithoutCategory();
         }
 
+        if (request.getRootScopeId() != null) {
+            taskQuery.taskRootScopeId(request.getRootScopeId());
+        }
+        if (request.getParentScopeId() != null) {
+            taskQuery.taskParentScopeId(request.getParentScopeId());
+        }
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }

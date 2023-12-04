@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -496,4 +497,88 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
     }
+
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+    })
+    public void testQueryByRootCaseInstanceId() throws IOException {
+
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance oneTaskCaseCaseTaskPlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask2").singleResult();
+
+        PlanItemInstance theTaskPlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(oneTaskCaseCaseTaskPlanItemInstance.getReferenceId()).singleResult();
+
+        Task oneTaskTask = taskService.createTaskQuery().taskId(theTaskPlanItemInstance.getReferenceId()).singleResult();
+
+        PlanItemInstance innerCasePlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask1").singleResult();
+
+        List<PlanItemInstance> innerPlanItemInstances = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
+                .list();
+
+        Task innerTask1 = taskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
+        Task innerTask2 = taskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?rootScopeId="
+                + caseInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + oneTaskTask.getId() + "' },"
+                        + "    { id: '" + innerTask1.getId() + "' },"
+                        + "    { id: '" + innerTask2.getId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCase.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+    })
+    public void testQueryByParentCaseInstanceId() throws IOException {
+
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        PlanItemInstance innerCasePlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask1").singleResult();
+
+        List<PlanItemInstance> innerPlanItemInstances = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
+                .list();
+
+        Task innerTask1 = taskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
+        Task innerTask2 = taskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?parentScopeId="
+                + innerCasePlanItemInstance.getReferenceId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + innerTask1.getId() + "' },"
+                        + "    { id: '" + innerTask2.getId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
 }

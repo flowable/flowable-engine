@@ -15,14 +15,18 @@ package org.flowable.engine.test.api.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -453,4 +457,72 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         }
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootProcessInstanceId() {
+        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> actualIdList = new ArrayList<>(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
+        actualIdList.removeAll(validationList);
+        actualIdList.remove(processInstance.getId());
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery().processInstanceRootScopeId(processInstance.getId()).list();
+        assertThat(result).extracting(HistoricProcessInstance::getId).containsAll(actualIdList);
+        assertThat(result).extracting(HistoricProcessInstance::getId).doesNotContainAnyElementsOf(validationList);
+
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentProcessInstanceId() {
+        ProcessInstance validationProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .list();
+        Set<String> processInstanceIds = activityInstances.stream().map(HistoricActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
+
+        HistoricProcessInstance innerProcessWithCallActivity = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds)
+                .processDefinitionKey("simpleInnerParallelCallActivity")
+                .singleResult();
+
+        HistoricProcessInstance oneTaskProcess = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds)
+                .processDefinitionKey("oneTaskProcess")
+                .singleResult();
+
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(innerProcessWithCallActivity.getId(), "simpleInnerParallelCallActivity"),
+                        tuple(oneTaskProcess.getId(), "oneTaskProcess")
+                );
+
+        assertThat(result).extracting(HistoricProcessInstance::getId).doesNotContain(
+                validationProcessInstance.getId()
+        );
+
+        result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(innerProcessWithCallActivity.getId()).list();
+        activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(innerProcessWithCallActivity.getId()).list();
+        processInstanceIds = activityInstances.stream().map(HistoricActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId)
+                .containsAll(processInstanceIds);
+        assertThat(result).extracting(HistoricProcessInstance::getId).doesNotContain(
+                validationProcessInstance.getId()
+        );
+    }
 }

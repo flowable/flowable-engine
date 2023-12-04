@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -31,6 +33,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -329,6 +333,100 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
             assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
             assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
         }
+
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() throws IOException {
+
+        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> actualIdList = new ArrayList<>(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
+        actualIdList.removeAll(validationList);
+        actualIdList.remove(processInstance.getId());
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES)
+                + "?rootScopeId=" + processInstance.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + actualIdList.get(0) + "' },"
+                        + "    { id: '" + actualIdList.get(1) + "' },"
+                        + "    { id: '" + actualIdList.get(2) + "' },"
+                        + "    { id: '" + actualIdList.get(3) + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() throws IOException {
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("simpleParallelCallActivity").start();
+
+        ProcessInstance caseInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("simpleParallelCallActivity").start();
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(caseInstance.getId()).list();
+
+        Set<String> instanceIds = activityInstances.stream().map(HistoricActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
+
+        HistoricProcessInstance innerProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceIds(instanceIds)
+                .processDefinitionKey("simpleInnerParallelCallActivity")
+                .singleResult();
+
+        HistoricProcessInstance oneTaskProcess = historyService.createHistoricProcessInstanceQuery().processInstanceIds(instanceIds)
+                .processDefinitionKey("oneTaskProcess")
+                .singleResult();
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?parentScopeId="
+                + caseInstance.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + innerProcessInstance.getId() + "' },"
+                        + "    { id: '" + oneTaskProcess.getId() + "' }"
+                        + "  ]"
+                        + "}");
+
+        activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(innerProcessInstance.getId()).list();
+        List<String> instanceIdsList = activityInstances.stream().filter(activityInstance -> activityInstance.getCalledProcessInstanceId() != null)
+                .map(HistoricActivityInstance::getCalledProcessInstanceId).toList();
+
+        url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?parentScopeId="
+                + innerProcessInstance.getId();
+        response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + instanceIdsList.get(0) + "' },"
+                        + "    { id: '" + instanceIdsList.get(1) + "' }"
+                        + "  ]"
+                        + "}");
 
     }
 }

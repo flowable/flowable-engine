@@ -290,6 +290,13 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.isIgnoreTaskAssignee()) {
             query.ignoreAssigneeValue();
         }
+
+        if (queryRequest.getRootScopeId() != null) {
+            query.taskRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.taskParentScopeId(queryRequest.getParentScopeId());
+        }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);

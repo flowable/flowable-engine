@@ -41,6 +41,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
@@ -1258,6 +1259,47 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+    public void testGetCaseInstanceByRootScopeId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml").deploy();
+
+        ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("oneCaseTask");
+
+        ActivityInstance caseTaskActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
+                .processInstanceId(processInstance.getId())
+                .singleResult();
+
+        String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
+                .getReferenceId();
+
+        CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceRootScopeId(processInstance.getId()).singleResult();
+
+        assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
+    public void testGetCaseInstanceBParentScopeId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml").deploy();
+
+        ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("oneCaseTask");
+
+        ActivityInstance caseTaskActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
+                .processInstanceId(processInstance.getId())
+                .singleResult();
+
+        String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
+                .getReferenceId();
+
+        CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentScopeId(processInstance.getId()).singleResult();
+
+        assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
+
+    }
+
 
 
     static class ClearExecutionReferenceCmd implements Command<Void> {

@@ -82,6 +82,8 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected Boolean withoutProcessInstanceId;
     protected String taskCandidateGroup;
     protected boolean ignoreTaskAssignee;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     public String getTaskId() {
         return taskId;
@@ -514,5 +516,21 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setPlanItemInstanceId(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
     }
 }

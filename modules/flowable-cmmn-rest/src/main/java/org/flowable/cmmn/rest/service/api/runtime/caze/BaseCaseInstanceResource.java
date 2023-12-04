@@ -99,6 +99,12 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceNameLikeIgnoreCase() != null) {
             query.caseInstanceNameLikeIgnoreCase(queryRequest.getCaseInstanceNameLikeIgnoreCase());
         }
+        if (queryRequest.getRootScopeId() != null) {
+            query.caseInstanceRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.caseInstanceParentScopeId(queryRequest.getParentScopeId());
+        }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }

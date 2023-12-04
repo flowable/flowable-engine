@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -2356,5 +2357,65 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(
                         tuple("With string value", processWithStringValue.getId())
                 );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootProcessInstanceId() {
+        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        List<String> actualIdList = new ArrayList<>(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
+        actualIdList.removeAll(validationList);
+        actualIdList.remove(processInstance.getId());
+
+        List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceRootScopeId(processInstance.getId()).list();
+
+        assertThat(result).extracting(ProcessInstance::getId).containsAll(actualIdList);
+        assertThat(result).extracting(ProcessInstance::getId).doesNotContainAnyElementsOf(validationList);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentProcessInstanceId() {
+        ProcessInstance validationProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
+        assertThat(result)
+                .extracting(ProcessInstance::getRootProcessInstanceId, ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(processInstance.getId(), "simpleInnerParallelCallActivity"),
+                        tuple(processInstance.getId(), "oneTaskProcess")
+                );
+
+        assertThat(result).extracting(ProcessInstance::getId).doesNotContain(
+                validationProcessInstance.getId()
+        );
+
+        ProcessInstance innerParallelCallActivity = runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleInnerParallelCallActivity")
+                .singleResult();
+
+        result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(innerParallelCallActivity.getId()).list();
+
+        assertThat(result)
+                .extracting(ProcessInstance::getRootProcessInstanceId, ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(processInstance.getId(), "oneTaskProcess"),
+                        tuple(processInstance.getId(), "oneTaskProcess")
+                );
+
+        assertThat(result).extracting(ProcessInstance::getId).doesNotContain(
+                validationProcessInstance.getId()
+        );
     }
 }

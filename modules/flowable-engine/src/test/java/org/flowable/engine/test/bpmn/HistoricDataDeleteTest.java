@@ -1194,6 +1194,8 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processInstanceWithoutTenantId", "withoutTenantId");
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantId", "tenantId");
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLike", "tenantIdLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceParentScopeId", "processInstanceParentScopeIdOrValue");
+        methodNameToExpectedQueryPropertyName.put("processInstanceRootScopeId", "processInstanceRootScopeIdOrValue");
         Set<String> methodsToIgnore = new HashSet<>();
         methodsToIgnore.add("limitProcessInstanceVariables");
         methodsToIgnore.add("includeProcessVariables");

@@ -373,4 +373,73 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
             assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().list()).hasSize(0);
         }
     }
+
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+    })
+    public void testQueryByRootProcessInstanceId() {
+
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance oneTaskCaseCaseTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask2").singleResult();
+
+        PlanItemInstance theTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(oneTaskCaseCaseTaskPlanItemInstance.getReferenceId()).singleResult();
+
+        Task oneTaskTask = cmmnTaskService.createTaskQuery().taskId(theTaskPlanItemInstance.getReferenceId()).singleResult();
+
+        PlanItemInstance innerCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask1").singleResult();
+
+        List<PlanItemInstance> innerPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
+                .list();
+
+        Task innerTask1 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
+        Task innerTask2 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+
+        List<Task> result = cmmnTaskService.createTaskQuery().taskRootScopeId(caseInstance.getId()).list();
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskTask.getId(),
+                        innerTask1.getId(),
+                        innerTask2.getId()
+                );
+    }
+
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+    })
+    public void testQueryByParentCaseInstanceId() {
+
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        PlanItemInstance innerCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTask1").singleResult();
+
+        List<PlanItemInstance> innerPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
+                .list();
+
+        Task innerTask1 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
+        Task innerTask2 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+
+        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(innerCasePlanItemInstance.getCaseInstanceId()).list();
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        innerTask1.getId(),
+                        innerTask2.getId()
+                );
+    }
 }

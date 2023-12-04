@@ -27,6 +27,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkInfo;
@@ -991,6 +992,68 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     );
         }
     }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootProcessInstanceId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
+
+        Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
+        Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskRootScopeId(processInstance.getId()).list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId()
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity2TaskProcess.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentProcessInstanceId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        Execution task1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("simpleInnerParallelCallActivity").activityId("formTask1").singleResult();
+
+        Execution task2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("simpleInnerParallelCallActivity").activityId("formTask2").singleResult();
+
+        Task task1 = taskService.createTaskQuery().executionId(task1Execution.getId()).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(task2Execution.getId()).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskParentScopeId(task2Execution.getProcessInstanceId()).list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId()
+                );
+    }
+
+
 
     /**
      * Generates some test tasks. - 2 tasks where kermit is a candidate and 1 task where gonzo is assignee

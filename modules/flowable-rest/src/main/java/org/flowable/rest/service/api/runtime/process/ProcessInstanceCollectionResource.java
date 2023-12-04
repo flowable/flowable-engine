@@ -86,6 +86,8 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return process instances in which the given user is involved.", paramType = "query"),
         @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only return process instance which are suspended. If false, only return process instances which are not suspended (active).", paramType = "query"),
         @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "Only return process instances which have the given super process-instance id (for processes that have a call-activities).", paramType = "query"),
+        @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return process instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return process instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
         @ApiImplicitParam(name = "subProcessInstanceId", dataType = "string", value = "Only return process instances which have the given sub process-instance id (for processes started as a call-activity).", paramType = "query"),
         @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which are not sub processes.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
@@ -171,6 +173,14 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
         if (allRequestParams.containsKey("suspended")) {
             queryRequest.setSuspended(Boolean.valueOf(allRequestParams.get("suspended")));
+        }
+
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
         }
 
         if (allRequestParams.containsKey("superProcessInstanceId")) {
