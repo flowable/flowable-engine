@@ -421,7 +421,6 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     public void testQueryByParentScopeId() {
 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         PlanItemInstance innerCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -434,7 +433,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         Task innerTask1 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
         Task innerTask2 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
 
-        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(innerCasePlanItemInstance.getCaseInstanceId()).list();
+        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(innerCasePlanItemInstance.getReferenceId()).list();
         assertThat(result)
                 .extracting(Task::getId)
                 .containsExactlyInAnyOrder(

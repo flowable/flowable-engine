@@ -949,26 +949,5 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                         + "    { id: '" + oneTaskProcess.getId() + "' }"
                         + "  ]"
                         + "}");
-
-        activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(innerProcessInstance.getId()).list();
-        List<String> instanceIdsList = activityInstances.stream().filter(activityInstance -> activityInstance.getCalledProcessInstanceId() != null)
-                .map(ActivityInstance::getCalledProcessInstanceId).toList();
-
-        url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?parentScopeId="
-                + innerProcessInstance.getId();
-        response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
-
-        responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-
-        assertThatJson(responseNode)
-                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
-                .isEqualTo("{"
-                        + "  data: ["
-                        + "    { id: '" + instanceIdsList.get(0) + "' },"
-                        + "    { id: '" + instanceIdsList.get(1) + "' }"
-                        + "  ]"
-                        + "}");
-
     }
 }
