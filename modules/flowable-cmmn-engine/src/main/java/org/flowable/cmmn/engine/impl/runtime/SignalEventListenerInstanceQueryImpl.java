@@ -147,6 +147,11 @@ public class SignalEventListenerInstanceQueryImpl implements SignalEventListener
         return convertPlanItemInstances(innerQuery.listPage(firstResult, maxResults));
     }
 
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        return innerQuery.listIdsPage(firstResult, maxResults);
+    }
+
     protected List<SignalEventListenerInstance> convertPlanItemInstances(List<PlanItemInstance> instances) {
         if (instances == null) {
             return null;

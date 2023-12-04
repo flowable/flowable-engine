@@ -179,4 +179,9 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
         return wrappedHistoricVariableInstanceQuery.listPage(firstResult, maxResults);
     }
 
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        return wrappedHistoricVariableInstanceQuery.listIdsPage(firstResult, maxResults);
+    }
+
 }

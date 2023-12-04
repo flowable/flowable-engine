@@ -65,6 +65,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .extracting(ExternalWorkerJob::getProcessInstanceId)
                 .containsOnly(processInstance.getId());
         assertThat(query.listIds()).hasSize(2);
+        assertThat(query.listIdsPage(0, 10)).hasSize(2);
     }
 
     @Test
@@ -88,6 +89,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.singleResult()).isNull();
     }
     

@@ -178,4 +178,9 @@ public class CmmnVariableInstanceQueryImpl implements VariableInstanceQuery {
         return wrappedVariableInstanceQuery.listPage(firstResult, maxResults);
     }
 
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        return wrappedVariableInstanceQuery.listIdsPage(firstResult, maxResults);
+    }
+
 }

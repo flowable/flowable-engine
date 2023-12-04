@@ -54,6 +54,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     @Test
@@ -63,6 +64,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         for (CaseInstance caseInstance : caseInstances) {
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).listIds()).hasSize(1);
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).listIdsPage(0, 10)).hasSize(1);
         }
     }
 
@@ -89,6 +91,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(caseDefinition).isNotNull();
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionId(caseDefinition.getId()).list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionId(caseDefinition.getId()).listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionId(caseDefinition.getId()).listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     @Test
@@ -97,6 +100,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(caseDefinition).isNotNull();
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey(caseDefinition.getKey()).list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey(caseDefinition.getKey()).listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey(caseDefinition.getKey()).listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     @Test
@@ -105,6 +109,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(caseDefinition).isNotNull();
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     public void testQueryByCaseDefinitionKeyLikeIgnoreCase() {
@@ -112,15 +117,18 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(caseDefinition).isNotNull();
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     @Test
     public void testQueryByCaseDefinitionKeyIn() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertThat(caseDefinition).isNotNull();
-        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(),"dummyKey")).list())
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(), "dummyKey")).list())
                 .hasSize(NR_CASE_INSTANCES);
-        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(),"dummyKey")).listIds())
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(), "dummyKey")).listIds())
+                .hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(), "dummyKey")).listIdsPage(0, 10))
                 .hasSize(NR_CASE_INSTANCES);
     }
 
@@ -130,18 +138,20 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(deployment).isNotNull();
         assertThat(cmmnTaskService.createTaskQuery().cmmnDeploymentId(deployment.getId()).list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().cmmnDeploymentId(deployment.getId()).listIds()).hasSize(NR_CASE_INSTANCES);
+        assertThat(cmmnTaskService.createTaskQuery().cmmnDeploymentId(deployment.getId()).listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
     }
 
     @Test
     public void testQueryByAssignee() {
         assertThat(cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").listIds()).hasSize(NR_CASE_INSTANCES);
-        
+        assertThat(cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
+
         List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").list();
         assertThat(caseInstances).hasSize(5);
-        
+
         String caseInstanceId = caseInstances.get(0).getId();
-        
+
         Task task = cmmnTaskService.createTaskQuery().taskAssignee("johnDoe").caseInstanceId(caseInstanceId).singleResult();
         assertThat(task.getAssignee()).isEqualTo("johnDoe");
         assertThat(task.getScopeId()).isEqualTo(caseInstanceId);
@@ -165,9 +175,10 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     public void testQueryWithoutProcessInstanceId() {
         assertThat(cmmnTaskService.createTaskQuery().withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
         assertThat(cmmnTaskService.createTaskQuery().withoutProcessInstanceId().listIds()).hasSize(NR_CASE_INSTANCES);
-        
+        assertThat(cmmnTaskService.createTaskQuery().withoutProcessInstanceId().listIdsPage(0, 10)).hasSize(NR_CASE_INSTANCES);
+
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
-        
+
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("unexisting").withoutProcessInstanceId().list()).hasSize(0);
     }
     
@@ -177,6 +188,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().list()).hasSize(0);
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().listIds()).hasSize(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().listIdsPage(0, 10)).hasSize(0);
     }
 
     @Test

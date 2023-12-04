@@ -87,6 +87,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(3);
             assertThat(historyService.createHistoricTaskInstanceQuery().listIds()).hasSize(3);
+            assertThat(historyService.createHistoricTaskInstanceQuery().listIdsPage(0, 10)).hasSize(3);
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("gonzo").singleResult();
             assertThat(task.getProcessVariables()).isEmpty();
@@ -191,6 +192,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).list().get(0).getId())
                     .isEqualTo(taskId);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).listIds().get(0))
+                    .isEqualTo(taskId);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).listIdsPage(0, 10).get(0))
                     .isEqualTo(taskId);
             assertThat(historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(Collections.singleton("testGroup")).singleResult().getId())
                     .isEqualTo(taskId);

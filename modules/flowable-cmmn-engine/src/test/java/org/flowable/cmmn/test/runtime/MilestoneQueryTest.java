@@ -50,6 +50,8 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
 
         List<String> milestoneInstanceIds = cmmnRuntimeService.createMilestoneInstanceQuery().listIds();
         assertThat(milestoneInstanceIds).isEmpty();
+        milestoneInstanceIds = cmmnRuntimeService.createMilestoneInstanceQuery().listIdsPage(0, 10);
+        assertThat(milestoneInstanceIds).isEmpty();
 
         //event triggering
         setClockTo(new Date(System.currentTimeMillis() + 60_000L));
@@ -84,6 +86,7 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).listIds()).hasSize(3);
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).listIdsPage(0, 10)).hasSize(3);
 
         //There are two named milestones
         MilestoneInstance abcMilestone = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("abcMilestone").singleResult();

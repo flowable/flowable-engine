@@ -86,6 +86,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         assertThat(instanceList).hasSize(7);
         assertThat(runtimeService.createProcessInstanceQuery().includeProcessVariables().listIds()).hasSize(7);
+        assertThat(runtimeService.createProcessInstanceQuery().includeProcessVariables().listIdsPage(0, 10)).hasSize(7);
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLike("casetest", "MyCase%").singleResult();

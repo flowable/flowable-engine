@@ -71,6 +71,7 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", deployment1Id)
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent1").listIds()).hasSize(1);
+        assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent1").listIdsPage(0, 10)).hasSize(1);
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
 
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent2").list())
@@ -80,10 +81,11 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("two", deployment2Id)
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent2").listIds()).hasSize(2);
+        assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent2").listIdsPage(0, 10)).hasSize(2);
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("parent2").count()).isEqualTo(2);
 
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
-        assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("unknown").listIds()).isEmpty();
+        assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("unknown").listIdsPage(0, 10)).isEmpty();
         assertThat(repositoryService.createChannelDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
     }
 
@@ -102,6 +104,7 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("two", "Two channel")
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().listIds()).hasSize(3);
+        assertThat(repositoryService.createChannelDefinitionQuery().listIdsPage(0, 10)).hasSize(3);
         assertThat(repositoryService.createChannelDefinitionQuery().count()).isEqualTo(3);
 
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%channel").list())
@@ -110,6 +113,7 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("two", "Two channel")
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%channel").listIds()).hasSize(1);
+        assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%channel").listIdsPage(0, 10)).hasSize(1);
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%channel").count()).isEqualTo(1);
 
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%Channel").list())
@@ -118,6 +122,7 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("one", "One Channel")
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%Channel").listIds()).hasSize(1);
+        assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%Channel").listIdsPage(0, 10)).hasSize(1);
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLike("%Channel").count()).isEqualTo(1);
 
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%channel").list())
@@ -127,6 +132,7 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("two", "Two channel")
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%channel").listIds()).hasSize(2);
+        assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%channel").listIdsPage(0, 10)).hasSize(2);
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%channel").count()).isEqualTo(2);
 
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%Channel").list())
@@ -136,12 +142,14 @@ class ChannelDefinitionQueryTest extends AbstractFlowableEventTest {
                         tuple("two", "Two channel")
                 );
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%Channel").listIds()).hasSize(2);
+        assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%Channel").listIdsPage(0, 10)).hasSize(2);
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%Channel").count()).isEqualTo(2);
 
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%dummy").list())
                 .extracting(ChannelDefinition::getKey, ChannelDefinition::getName)
                 .isEmpty();
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%dummy").listIds()).isEmpty();
+        assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%dummy").listIdsPage(0, 10)).isEmpty();
         assertThat(repositoryService.createChannelDefinitionQuery().channelDefinitionNameLikeIgnoreCase("%dummy").count()).isZero();
     }
 

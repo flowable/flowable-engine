@@ -1840,7 +1840,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery withoutTaskDueDate() {
         return withoutDueDate();
     }
-    
+
     @Override
     public TaskQuery taskInProgressStartDueDate(Date dueDate) {
         if (orActive) {
@@ -2644,6 +2644,12 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public List<Task> listPage(int firstResult, int maxResults) {
         cachedCandidateGroups = null;
         return super.listPage(firstResult, maxResults);
+    }
+
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        cachedCandidateGroups = null;
+        return super.listIdsPage(firstResult, maxResults);
     }
 
     @Override

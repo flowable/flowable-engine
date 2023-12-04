@@ -157,6 +157,29 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        this.firstResult = firstResult;
+        this.maxResults = maxResults;
+        if (this.maxResults >= 0) {
+            if (this.firstResult < 0) {
+                this.firstResult = 0;
+            }
+        } else {
+            if (this.firstResult >= 0) {
+                this.maxResults = Integer.MAX_VALUE;
+            }
+        }
+        this.resultType = ResultType.LIST_IDS_PAGE;
+        if (commandExecutor != null) {
+            return (List<String>) commandExecutor.execute(this);
+        }
+        // The execute has a checkQueryOk() call as well, so no need to do the call earlier
+        checkQueryOk();
+        return executeListIds(Context.getCommandContext());
+    }
+
+    @Override
     public long count() {
         this.resultType = ResultType.COUNT;
         if (commandExecutor != null) {
@@ -177,6 +200,8 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         } else if (resultType == ResultType.LIST_PAGE) {
             return executeList(commandContext);
         } else if (resultType == ResultType.LIST_IDS) {
+            return executeListIds(commandContext);
+        } else if (resultType == ResultType.LIST_IDS_PAGE) {
             return executeListIds(commandContext);
         } else {
             return executeCount(commandContext);

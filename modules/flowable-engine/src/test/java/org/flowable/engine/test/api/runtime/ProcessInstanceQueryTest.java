@@ -101,6 +101,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(PROCESS_DEPLOY_COUNT);
         assertThat(query.list()).hasSize(PROCESS_DEPLOY_COUNT);
         assertThat(query.listIds()).hasSize(PROCESS_DEPLOY_COUNT);
+        assertThat(query.listIdsPage(0, 10)).hasSize(PROCESS_DEPLOY_COUNT);
     }
 
     @Test
@@ -116,6 +117,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
         assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
         assertThat(query.listIds()).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        assertThat(query.listIdsPage(0, 10)).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
         assertThat(query.singleResult()).isNotNull();
     }
 
@@ -124,6 +126,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").singleResult()).isNull();
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").list()).isEmpty();
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").listIds()).isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").listIdsPage(0, 10)).isEmpty();
     }
 
     @Test
@@ -132,6 +135,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
         assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
         assertThat(query.listIds()).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+        assertThat(query.listIdsPage(0, 10)).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
         assertThatThrownBy(() -> query.singleResult())
                 .isExactlyInstanceOf(FlowableException.class);
     }
@@ -146,6 +150,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(PROCESS_DEPLOY_COUNT);
         assertThat(query.list()).hasSize(PROCESS_DEPLOY_COUNT);
         assertThat(query.listIds()).hasSize(PROCESS_DEPLOY_COUNT);
+        assertThat(query.listIdsPage(0, PROCESS_DEPLOY_COUNT)).hasSize(PROCESS_DEPLOY_COUNT);
         assertThatThrownBy(() -> query.singleResult())
                 .isExactlyInstanceOf(FlowableException.class);
     }
@@ -165,6 +170,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult()).isNotNull();
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).list()).hasSize(1);
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).listIds().get(0)).isEqualTo(processInstanceId);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).listIdsPage(0, 10).get(0)).isEqualTo(processInstanceId);
         }
     }
 
@@ -210,6 +216,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceName("new name").singleResult()).isNotNull();
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceName("new name").list()).hasSize(1);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceName("new name").listIds()).hasSize(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceName("new name").listIdsPage(0, 10)).hasSize(1);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceName("unexisting").singleResult()).isNull();
     }
@@ -220,7 +227,10 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceName("new name").processDefinitionId("undefined").endOr().singleResult())
                 .isNotNull();
         assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceName("new name").processDefinitionId("undefined").endOr().list()).hasSize(1);
-        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceName("new name").processDefinitionId("undefined").endOr().listIds()).hasSize(1);
+        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceName("new name").processDefinitionId("undefined").endOr().listIds()).hasSize(
+                1);
+        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceName("new name").processDefinitionId("undefined").endOr()
+                .listIdsPage(0, 10)).hasSize(1);
 
         assertThat(runtimeService.createProcessInstanceQuery()
                 .or()
@@ -253,6 +263,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceNameLike("% name").singleResult()).isNotNull();
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceNameLike("new name").list()).hasSize(1);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceNameLike("new name").listIds()).hasSize(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceNameLike("new name").listIdsPage(0, 10)).hasSize(1);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceNameLike("%nope").singleResult()).isNull();
     }
@@ -264,7 +275,9 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .isNotNull();
         assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("new name").processDefinitionId("undefined").endOr().list())
                 .hasSize(1);
-        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("new name").processDefinitionId("undefined").endOr().listIds())
+        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("new name").processDefinitionId("undefined").endOr().listIds());
+        assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("new name").processDefinitionId("undefined").endOr()
+                .listIdsPage(0, 10))
                 .hasSize(1);
 
         assertThat(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%nope").processDefinitionId("undefined").endOr().singleResult())
@@ -402,6 +415,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(PROCESS_DEPLOY_COUNT);
         assertThat(query.list()).hasSize(PROCESS_DEPLOY_COUNT);
         assertThat(query.listIds()).hasSize(PROCESS_DEPLOY_COUNT);
+        assertThat(query.listIdsPage(0, PROCESS_DEPLOY_COUNT)).hasSize(PROCESS_DEPLOY_COUNT);
         assertThatThrownBy(() -> query.singleResult())
                 .isExactlyInstanceOf(FlowableException.class);
     }

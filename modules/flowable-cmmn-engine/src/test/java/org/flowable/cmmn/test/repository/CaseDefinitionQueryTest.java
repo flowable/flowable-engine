@@ -74,6 +74,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     public void testQueryNoParams() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list()).hasSize(4);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().listIds()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().listIdsPage(0, 10)).hasSize(4);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().count()).isEqualTo(4);
     }
 
@@ -81,14 +82,17 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     public void testQueryByDeploymentId() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).list()).hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).listIds()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).listIdsPage(0, 10)).hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId1).count()).isEqualTo(2);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).listIds()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).listIdsPage(0, 10)).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).list()).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).listIds()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).listIdsPage(0, 10)).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId3).count()).isEqualTo(1);
     }
 
@@ -96,6 +100,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     public void testQueryByInvalidDeploymentId() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").list()).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").listIds()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").listIdsPage(0, 10)).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentId("invalid").count()).isZero();
     }
 
@@ -106,11 +111,15 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3)))
                 .listIds()).hasSize(4);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3)))
+                .listIdsPage(0, 10)).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3)))
                 .count()).isEqualTo(4);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).list())
                 .hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).listIds())
+                .hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).listIdsPage(0, 10))
                 .hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).count())
                 .isEqualTo(2);
@@ -119,12 +128,17 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
                 .hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).listIds())
                 .hasSize(2);
+        assertThat(
+                cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).listIdsPage(0, 10))
+                .hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).count())
                 .isEqualTo(2);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).list())
                 .hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).listIds())
+                .hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).listIdsPage(0, 10))
                 .hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).count())
                 .isEqualTo(1);
@@ -149,6 +163,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
                         tuple("myCase", deployment1.getId())
                 );
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent1").listIds()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent1").listIdsPage(0, 10)).hasSize(1);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").list())
@@ -158,10 +173,12 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
                         tuple("myCase2", deployment2.getId())
                 );
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").listIds()).hasSize(2);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").listIdsPage(0, 10)).hasSize(2);
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").count()).isEqualTo(2);
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").listIds()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").listIdsPage(0, 10)).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
     }
 
