@@ -1210,4 +1210,13 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
     }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
 }

@@ -191,6 +191,8 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "caseInstanceName", query.getCaseInstanceName());
         putIfNotNull(queryNode, "caseInstanceNameLike", query.getCaseInstanceNameLike());
         putIfNotNull(queryNode, "caseInstanceNameLikeIgnoreCase", query.getCaseInstanceNameLikeIgnoreCase());
+        putIfNotNull(queryNode, "caseInstanceRootScopeId", query.getRootScopeId());
+        putIfNotNull(queryNode, "caseInstanceParentScopeId", query.getParentScopeId());
         putIfNotNull(queryNode, "businessKey", query.getBusinessKey());
         putIfNotNull(queryNode, "businessStatus", query.getBusinessStatus());
         putIfNotNull(queryNode, "state", query.getState());

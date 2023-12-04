@@ -560,7 +560,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         List<HistoricCaseInstance> result = historyService.createHistoricCaseInstanceQuery().caseInstanceParentScopeId(caseInstance.getId()).list();
 
         CloseableHttpResponse response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?rootScopeId=" + caseInstance.getId()),
+                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?parentScopeId=" + caseInstance.getId()),
                 HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -583,7 +583,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         List<String> instanceIdsList = historicPlanItemInstances.stream().map(HistoricPlanItemInstance::getReferenceId).toList();
 
         response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?rootScopeId=" + innerCaseWithCaseTasks.getId()),
+                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?parentScopeId=" + innerCaseWithCaseTasks.getId()),
                 HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);

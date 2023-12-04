@@ -251,7 +251,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public HistoricProcessInstanceQuery processInstanceRootScopeId(String rootScopeId) {
         if (inOrStatement) {
-            this.currentOrQueryObject.rootScopeId = this.rootScopeId;
+            this.currentOrQueryObject.rootScopeId = rootScopeId;
         } else {
             this.rootScopeId = rootScopeId;
         }

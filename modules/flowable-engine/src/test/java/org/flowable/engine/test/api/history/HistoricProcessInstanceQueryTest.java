@@ -26,7 +26,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -516,7 +515,8 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
 
         result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(innerProcessWithCallActivity.getId()).list();
         activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(innerProcessWithCallActivity.getId()).list();
-        processInstanceIds = activityInstances.stream().map(HistoricActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
+        processInstanceIds = activityInstances.stream().filter(historicActivityInstance -> historicActivityInstance.getCalledProcessInstanceId() != null)
+                .map(HistoricActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
 
         assertThat(result)
                 .extracting(HistoricProcessInstance::getId)

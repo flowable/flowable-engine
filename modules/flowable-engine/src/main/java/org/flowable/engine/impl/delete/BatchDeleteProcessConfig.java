@@ -302,6 +302,12 @@ public class BatchDeleteProcessConfig {
                 case "orQueryObjects":
                     populateOrQueryObjects(value, query, engineConfiguration);
                     break;
+                case "processInstanceRootScopeId":
+                    query.processInstanceRootScopeId(value.textValue());
+                    break;
+                case "processInstanceParentScopeId":
+                    query.processInstanceParentScopeId(value.textValue());
+                    break;
                 default:
                     throw new FlowableIllegalArgumentException("Query property " + property + " is not supported");
             }
