@@ -53,6 +53,8 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return historic case instances with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return historic case instances like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given name ignoring case.", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic case instance.", paramType = "query"),
@@ -123,6 +125,14 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         
         if (allRequestParams.get("businessStatus") != null) {
             queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setCaseInstanceRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setCaseInstanceParentScopeId(allRequestParams.get("parentScopeId"));
         }
 
         if (allRequestParams.get("involvedUser") != null) {

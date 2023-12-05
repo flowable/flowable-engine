@@ -395,6 +395,19 @@
             <if test="nameLikeIgnoreCase != null">
                 and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
             </if>
+            <if test="parentScopeId != null">
+                and EXISTS(select 1 from ACT_RU_ENTITYLINK as LINK where
+                    LINK.SCOPE_ID_ = #{parentScopeId}
+                    and LINK.REF_SCOPE_ID_ = RES.ID_
+                    and LINK.HIERARCHY_TYPE_ = 'parent'
+                )
+            </if>
+            <if test="rootScopeId != null">
+                and exists(select 1 from ACT_RU_ENTITYLINK as LINK where
+                    LINK.REF_SCOPE_ID_ = RES.ID_
+                    and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+                )
+            </if>
             <if test="businessKey != null">
                 and RES.BUSINESS_KEY_ = #{businessKey}
             </if>
@@ -718,6 +731,19 @@
 			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
 			            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
 			        </if>
+                    <if test="orQueryObject.parentScopeId != null">
+                        or EXISTS(select 1 from ACT_RU_ENTITYLINK as LINK where
+                            LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+                            and LINK.REF_SCOPE_ID_ = RES.ID_
+                            and LINK.HIERARCHY_TYPE_ = 'parent'
+                        )
+                    </if>
+                    <if test="orQueryObject.rootScopeId != null">
+                        or exists(select 1 from ACT_RU_ENTITYLINK as LINK where
+                            LINK.REF_SCOPE_ID_ = RES.ID_
+                            and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+                        )
+                    </if>
                     <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
                         or
                         <trim prefix="(" prefixOverrides="AND" suffix=")">

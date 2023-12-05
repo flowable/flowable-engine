@@ -2056,4 +2056,44 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         
     }
 
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/oneCaseTaskCase.cmmn",
+            "org/flowable/cmmn/test/oneProcessTaskV2.cmmn"
+    })
+    public void testGetProcessInstanceByRootScopeId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCaseTask").start();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        PlanItemInstance subCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(planItemInstance.getReferenceId())
+                .singleResult();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().processInstanceRootScopeId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(subCasePlanItemInstance.getReferenceId()).isEqualTo(processInstance.getId());
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/oneCaseTaskCase.cmmn",
+            "org/flowable/cmmn/test/oneProcessTaskV2.cmmn"
+    })
+    public void testGetProcessInstanceByParentScopeId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCaseTask").start();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        PlanItemInstance subCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(planItemInstance.getReferenceId())
+                .singleResult();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
+                .processInstanceParentScopeId(subCasePlanItemInstance.getCaseInstanceId())
+                .singleResult();
+
+        assertThat(subCasePlanItemInstance.getReferenceId()).isEqualTo(processInstance.getId());
+
+    }
 }

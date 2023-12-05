@@ -43,6 +43,8 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private String processDefinitionCategory;
     private Integer processDefinitionVersion;
     private String processDefinitionEngineVersion;
+    private String rootScopeId;
+    private String parentScopeId;
     private String deploymentId;
     private List<String> deploymentIdIn;
     private String superProcessInstanceId;
@@ -334,5 +336,21 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setTenantIdLike(String tenantIdLike) {
         this.tenantIdLike = tenantIdLike;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
     }
 }

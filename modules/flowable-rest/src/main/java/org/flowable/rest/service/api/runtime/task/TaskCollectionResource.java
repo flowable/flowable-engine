@@ -113,6 +113,8 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "categoryIn", dataType = "string", value = "Select tasks for the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotIn", dataType = "string", value = "Select tasks which are not assigned to the given categories. Does not return tasks without categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return tasks which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return tasks which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
@@ -350,6 +352,14 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("categoryNotIn")) {
             request.setCategoryNotIn(csvToList("categoryNotIn", requestParams));
+        }
+
+        if (requestParams.containsKey("rootScopeId")) {
+            request.setRootScopeId(requestParams.get("rootScopeId"));
+        }
+
+        if (requestParams.containsKey("parentScopeId")) {
+            request.setParentScopeId(requestParams.get("parentScopeId"));
         }
 
         return getTasksFromQueryRequest(request, requestParams);
