@@ -32,8 +32,8 @@ import org.junit.jupiter.api.Test;
  */
 public class AsyncJobCategoryTest extends PluggableFlowableTestCase {
 
-    private final static String MATCHING_CATEGORY = "testCategory";
-    private final static String NON_MATCHING_CATEGORY = "nonMatchingCategory";
+    private static final String MATCHING_CATEGORY = "testCategory";
+    private static final String NON_MATCHING_CATEGORY = "nonMatchingCategory";
 
     protected List<String> originalEnabledJobCategories;
 
