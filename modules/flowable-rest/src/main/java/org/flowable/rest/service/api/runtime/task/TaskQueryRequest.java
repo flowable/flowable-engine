@@ -89,7 +89,6 @@ public class TaskQueryRequest extends PaginateRequest {
     protected String rootScopeId;
     protected String parentScopeId;
 
-
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processInstanceVariables;
 
