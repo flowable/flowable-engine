@@ -1064,16 +1064,7 @@
         and EXISTS(select 1 from ACT_RU_ENTITYLINK as LINK where
             LINK.SCOPE_ID_ = #{parentScopeId}
             and LINK.REF_SCOPE_ID_ = RES.ID_
-            <!-- if a root is also the parent, we do not store the additional link.
-            To get only the children of a process instance, we need to filter out all instances that are under the same root, but got different parents
-            what's left are the children of a root instance.
-            -->
-            and LINK.REF_SCOPE_ID_ not in (
-              select INNERLINK.REF_SCOPE_ID_
-              from ACT_RU_ENTITYLINK as INNERLINK WHERE
-                INNERLINK.ROOT_SCOPE_ID_ = #{parentScopeId}
-                AND INNERLINK.HIERARCHY_TYPE_ != 'root'
-            )
+            and LINK.HIERARCHY_TYPE_ = 'parent'
         )
       </if>
       <if test="rootScopeId != null">

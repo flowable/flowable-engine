@@ -19,13 +19,11 @@
     </sequenceFlow>
     <callActivity id="callActivity1" name="Call activity" calledElement="simpleInnerParallelCallActivity" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
       <extensionElements>
-        <flowable:static-process-key><![CDATA[simpleInnerParallelCallActivity]]></flowable:static-process-key>
         <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
       </extensionElements>
     </callActivity>
     <callActivity id="callActivity2" name="Call activity" calledElement="oneTaskProcess" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
       <extensionElements>
-        <flowable:static-process-key><![CDATA[oneTaskProcess]]></flowable:static-process-key>
         <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
       </extensionElements>
     </callActivity>

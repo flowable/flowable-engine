@@ -28,8 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -881,18 +879,33 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     @Test
     @Deployment(resources = {
             "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
-            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
+
     })
     public void testQueryByRootScopeId() throws IOException {
-
         runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
-        List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
-
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
-        List<String> actualIdList = new ArrayList<>(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
-        actualIdList.removeAll(validationList);
-        actualIdList.remove(processInstance.getId());
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance thirdLevelCallActivity1_1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(secondLevelCallActivity1_1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
 
         String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION)
                 + "?rootScopeId=" + processInstance.getId();
@@ -904,39 +917,39 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("{"
                         + "  data: ["
-                        + "    { id: '" + actualIdList.get(0) + "' },"
-                        + "    { id: '" + actualIdList.get(1) + "' },"
-                        + "    { id: '" + actualIdList.get(2) + "' },"
-                        + "    { id: '" + actualIdList.get(3) + "' }"
+                        + "    { id: '" + firstLevelCallActivity1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity1_1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + thirdLevelCallActivity1_1_1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity1_2.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + firstLevelCallActivity2.getCalledProcessInstanceId() + "' }"
                         + "  ]"
                         + "}");
+
     }
 
     @Test
     @Deployment(resources = {
             "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
-            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity2TaskProcess.bpmn20.xml",
-            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml"
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
     })
     public void testQueryByParentScopeId() throws IOException {
-        runtimeService.createProcessInstanceBuilder().processDefinitionKey("simpleParallelCallActivity").start();
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
-        ProcessInstance caseInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("simpleParallelCallActivity").start();
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
 
-        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
-                .processInstanceId(caseInstance.getId()).list();
-
-        Set<String> instanceIds = activityInstances.stream().map(ActivityInstance::getCalledProcessInstanceId).collect(Collectors.toSet());
-
-        ProcessInstance innerProcessInstance = runtimeService.createProcessInstanceQuery().processInstanceIds(instanceIds)
-                .processDefinitionKey("simpleInnerParallelCallActivity")
-                .singleResult();
-
-        ProcessInstance oneTaskProcess = runtimeService.createProcessInstanceQuery().processInstanceIds(instanceIds).processDefinitionKey("oneTaskProcess")
-                .singleResult();
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
 
         String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?parentScopeId="
-                + caseInstance.getId();
+                + firstLevelCallActivity1.getCalledProcessInstanceId();
         CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -945,8 +958,8 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("{"
                         + "  data: ["
-                        + "    { id: '" + innerProcessInstance.getId() + "' },"
-                        + "    { id: '" + oneTaskProcess.getId() + "' }"
+                        + "    { id: '" + secondLevelCallActivity1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity2.getCalledProcessInstanceId() + "' }"
                         + "  ]"
                         + "}");
     }

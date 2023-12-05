@@ -11,7 +11,7 @@
 
             <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
 
-            <processTask id="theProcess" processRef="oneTaskProcess" />
+            <processTask id="theProcess" processRef="oneTask" />
 
         </casePlanModel>
     </case>

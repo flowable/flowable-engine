@@ -31,13 +31,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
@@ -2363,6 +2363,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByRootScopeId() {
@@ -2370,13 +2371,38 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         List<String> validationList = runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
-        List<String> actualIdList = new ArrayList<>(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
-        actualIdList.removeAll(validationList);
-        actualIdList.remove(processInstance.getId());
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance thirdLevelCallActivity1_1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(secondLevelCallActivity1_1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
 
         List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceRootScopeId(processInstance.getId()).list();
 
-        assertThat(result).extracting(ProcessInstance::getId).containsAll(actualIdList);
+        assertThat(result)
+                .extracting(ProcessInstance::getId, ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(firstLevelCallActivity1.getCalledProcessInstanceId(), "simpleInnerParallelCallActivity"),
+                        tuple(secondLevelCallActivity1_1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(thirdLevelCallActivity1_1_1.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(secondLevelCallActivity1_2.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(firstLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
+
         assertThat(result).extracting(ProcessInstance::getId).doesNotContainAnyElementsOf(validationList);
     }
 
@@ -2384,6 +2410,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByParentScopeId() {
@@ -2391,27 +2418,29 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
         List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
-        assertThat(result)
-                .extracting(ProcessInstance::getRootProcessInstanceId, ProcessInstance::getProcessDefinitionKey)
-                .containsExactlyInAnyOrder(
-                        tuple(processInstance.getId(), "simpleInnerParallelCallActivity"),
-                        tuple(processInstance.getId(), "oneTaskProcess")
-                );
+        assertThat(result).isEmpty();
 
         assertThat(result).extracting(ProcessInstance::getId).doesNotContain(
                 validationProcessInstance.getId()
         );
 
-        ProcessInstance innerParallelCallActivity = runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleInnerParallelCallActivity")
-                .singleResult();
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
 
-        result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(innerParallelCallActivity.getId()).list();
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(firstLevelCallActivity1.getCalledProcessInstanceId()).list();
 
         assertThat(result)
-                .extracting(ProcessInstance::getRootProcessInstanceId, ProcessInstance::getProcessDefinitionKey)
+                .extracting(ProcessInstance::getId, ProcessInstance::getProcessDefinitionKey)
                 .containsExactlyInAnyOrder(
-                        tuple(processInstance.getId(), "oneTaskProcess"),
-                        tuple(processInstance.getId(), "oneTaskProcess")
+                        tuple(secondLevelCallActivity1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(secondLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
                 );
 
         assertThat(result).extracting(ProcessInstance::getId).doesNotContain(

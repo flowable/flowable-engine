@@ -4796,11 +4796,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 );
     }
 
-
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByRootScopeId() {
@@ -4814,6 +4814,14 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
         Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
 
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
         List<Task> taskList = taskService.createTaskQuery().taskRootScopeId(processInstance.getId()).list();
 
         assertThat(taskList)
@@ -4821,36 +4829,38 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(
                         task1.getId(),
                         task2.getId(),
-                        task3.getId()
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
                 );
     }
 
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
-            "org/flowable/engine/test/api/simpleInnerCallActivity2TaskProcess.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByParentScopeId() {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
-        Execution task1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
-                .processDefinitionKey("simpleInnerParallelCallActivity").activityId("formTask1").singleResult();
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
 
-        Execution task2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
-                .processDefinitionKey("simpleInnerParallelCallActivity").activityId("formTask2").singleResult();
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
 
-        Task task1 = taskService.createTaskQuery().executionId(task1Execution.getId()).singleResult();
-        Task task2 = taskService.createTaskQuery().executionId(task2Execution.getId()).singleResult();
-
-        List<Task> taskList = taskService.createTaskQuery().taskParentScopeId(task2Execution.getProcessInstanceId()).list();
+        List<Task> taskList = taskService.createTaskQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).list();
 
         assertThat(taskList)
                 .extracting(Task::getId)
                 .containsExactlyInAnyOrder(
-                        task1.getId(),
-                        task2.getId()
+                        formTask1.getId(),
+                        formTask2.getId()
                 );
     }
 

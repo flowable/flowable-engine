@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -37,9 +35,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
@@ -504,16 +501,27 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
     })
     public void testQueryByRootScopeId() throws IOException {
-
         runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        List<String> validationList = runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        List<String> actualIdList = new java.util.ArrayList<>(runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList());
-        actualIdList.removeAll(validationList);
-        actualIdList.remove(caseInstance.getId());
+
+        PlanItemInstance oneTaskCasePlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
         taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
 
         String url =
@@ -526,10 +534,10 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("{"
                         + "  data: ["
-                        + "    { id: '" + actualIdList.get(0) + "' },"
-                        + "    { id: '" + actualIdList.get(1) + "' },"
-                        + "    { id: '" + actualIdList.get(2) + "' },"
-                        + "    { id: '" + actualIdList.get(3) + "' }"
+                        + "    { id: '" + oneTaskCasePlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + caseTaskWithHumanTasksPlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + oneTaskCase2PlanItemInstance.getReferenceId() + "' }"
                         + "  ]"
                         + "}");
     }
@@ -537,31 +545,29 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
     })
     public void testQueryByParentScopeId() throws IOException {
         runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        List<String> validationList = runtimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
-
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
         taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
 
-        List<HistoricPlanItemInstance> planItemInstances = historyService.createHistoricPlanItemInstanceQuery()
-                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-        Set<String> instanceIds = planItemInstances.stream().map(HistoricPlanItemInstance::getReferenceId).collect(Collectors.toSet());
-
-        HistoricCaseInstance innerCaseWithCaseTasks = historyService.createHistoricCaseInstanceQuery().caseInstanceIds(instanceIds)
-                .caseDefinitionKey("simpleInnerCase")
-                .singleResult();
-
-        HistoricCaseInstance oneTaskCase = historyService.createHistoricCaseInstanceQuery().caseInstanceIds(instanceIds).caseDefinitionKey("oneTaskCase")
-                .singleResult();
-
-        List<HistoricCaseInstance> result = historyService.createHistoricCaseInstanceQuery().caseInstanceParentScopeId(caseInstance.getId()).list();
-
-        CloseableHttpResponse response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?parentScopeId=" + caseInstance.getId()),
-                HttpStatus.SC_OK);
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?parentScopeId="
+                + caseTaskWithHumanTasksPlanItemInstance.getReferenceId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -569,34 +575,10 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("{"
                         + "  data: ["
-                        + "    { id: '" + innerCaseWithCaseTasks.getId() + "' },"
-                        + "    { id: '" + oneTaskCase.getId() + "' }"
+                        + "    { id: '" + oneTaskCase2PlanItemInstance.getReferenceId() + "' }"
                         + "  ]"
                         + "}");
 
-        assertThat(result).extracting(HistoricCaseInstance::getId).doesNotContainAnyElementsOf(validationList);
-
-        result = historyService.createHistoricCaseInstanceQuery().caseInstanceParentScopeId(innerCaseWithCaseTasks.getId()).list();
-
-        List<HistoricPlanItemInstance> historicPlanItemInstances = historyService.createHistoricPlanItemInstanceQuery()
-                .planItemInstanceCaseInstanceId(innerCaseWithCaseTasks.getId()).list();
-        List<String> instanceIdsList = historicPlanItemInstances.stream().map(HistoricPlanItemInstance::getReferenceId).toList();
-
-        response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + "cmmn-history/historic-case-instances?parentScopeId=" + innerCaseWithCaseTasks.getId()),
-                HttpStatus.SC_OK);
-        responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-        assertThatJson(responseNode)
-                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
-                .isEqualTo("{"
-                        + "  data: ["
-                        + "    { id: '" + instanceIdsList.get(0) + "' },"
-                        + "    { id: '" + instanceIdsList.get(1) + "' }"
-                        + "  ]"
-                        + "}");
-
-        assertThat(result).extracting(HistoricCaseInstance::getId).doesNotContainAnyElementsOf(validationList);
     }
 
 

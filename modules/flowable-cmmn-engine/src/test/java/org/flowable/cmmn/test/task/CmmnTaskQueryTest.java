@@ -377,68 +377,78 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     @Test
     @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
             "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
-            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
     })
     public void testQueryByRootScopeId() {
-
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
 
-        PlanItemInstance oneTaskCaseCaseTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemDefinitionId("caseTask2").singleResult();
+        PlanItemInstance oneTaskCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
 
-        PlanItemInstance theTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(oneTaskCaseCaseTaskPlanItemInstance.getReferenceId()).singleResult();
+        Task oneTaskCaseTask1 = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCasePlanItemInstance.getReferenceId()).singleResult();
 
-        Task oneTaskTask = cmmnTaskService.createTaskQuery().taskId(theTaskPlanItemInstance.getReferenceId()).singleResult();
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
 
-        PlanItemInstance innerCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemDefinitionId("caseTask1").singleResult();
+        Task caseTaskSimpleCaseWithCaseTasksTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId()).singleResult();
 
-        List<PlanItemInstance> innerPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
-                .list();
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
 
-        Task innerTask1 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
-        Task innerTask2 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+        List<Task> twoHumanTasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+        Task oneTaskCaseTask2 = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase2PlanItemInstance.getReferenceId()).singleResult();
 
         List<Task> result = cmmnTaskService.createTaskQuery().taskRootScopeId(caseInstance.getId()).list();
         assertThat(result)
                 .extracting(Task::getId)
                 .containsExactlyInAnyOrder(
-                        oneTaskTask.getId(),
-                        innerTask1.getId(),
-                        innerTask2.getId()
+                        oneTaskCaseTask1.getId(),
+                        oneTaskCaseTask2.getId(),
+                        twoHumanTasks.get(0).getId(),
+                        twoHumanTasks.get(1).getId(),
+                        caseTaskSimpleCaseWithCaseTasksTask.getId()
                 );
     }
 
     @Test
     @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
             "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
-            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasks.cmmn"
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
     })
     public void testQueryByParentScopeId() {
-
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
-        PlanItemInstance innerCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemDefinitionId("caseTask1").singleResult();
 
-        List<PlanItemInstance> innerPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(innerCasePlanItemInstance.getReferenceId())
-                .list();
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
 
-        Task innerTask1 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(0).getReferenceId()).singleResult();
-        Task innerTask2 = cmmnTaskService.createTaskQuery().taskId(innerPlanItemInstances.get(1).getReferenceId()).singleResult();
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
 
-        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(innerCasePlanItemInstance.getReferenceId()).list();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
         assertThat(result)
                 .extracting(Task::getId)
                 .containsExactlyInAnyOrder(
-                        innerTask1.getId(),
-                        innerTask2.getId()
+                        planItemInstances.get(0).getReferenceId(),
+                        planItemInstances.get(1).getReferenceId()
                 );
     }
+
 }

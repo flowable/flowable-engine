@@ -922,17 +922,27 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByRootScopeId() {
-        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
         List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
                 .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
 
         Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
         Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
         Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
 
         taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
 
@@ -943,32 +953,40 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
                 .containsExactlyInAnyOrder(
                         task1.getId(),
                         task2.getId(),
-                        task3.getId()
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
                 );
-
     }
 
     @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
             "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
             "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
     public void testQueryByParentScopeId() {
-        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
 
-        ActivityInstance taskCallActivity = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("callActivity2")
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
                 .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(taskCallActivity.getCalledProcessInstanceId()).list();
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
         taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
-        List<HistoricTaskInstance> result =  historyService.createHistoricTaskInstanceQuery().taskParentScopeId(taskCallActivity.getCalledProcessInstanceId()).list();
 
-        assertThat(result)
+        List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).list();
+
+        assertThat(taskList)
                 .extracting(HistoricTaskInstance::getId)
                 .containsExactlyInAnyOrder(
-                        tasks.get(0).getId()
+                        formTask1.getId(),
+                        formTask2.getId()
                 );
     }
 
