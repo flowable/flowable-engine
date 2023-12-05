@@ -133,11 +133,11 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         }
 
         if (allRequestParams.containsKey("rootScopeId")) {
-            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+            queryRequest.setCaseInstanceRootScopeId(allRequestParams.get("rootScopeId"));
         }
 
         if (allRequestParams.containsKey("parentScopeId")) {
-            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
+            queryRequest.setCaseInstanceParentScopeId(allRequestParams.get("parentScopeId"));
         }
 
         if (allRequestParams.containsKey("businessKey")) {
