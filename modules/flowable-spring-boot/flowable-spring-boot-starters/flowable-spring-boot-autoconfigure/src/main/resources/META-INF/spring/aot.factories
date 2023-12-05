@@ -1,0 +1,5 @@
+org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor=\
+org.flowable.spring.aot.FlowableBeanFactoryInitializationAotProcessor,\
+org.flowable.spring.aot.FlowableMybatisMappersBeanFactoryInitializationAotProcessor,\
+org.flowable.spring.aot.MybatisGlobalBeanFactoryInitializationAotProcessor,\
+org.flowable.spring.aot.MybatisApplicationSpecificBeanFactoryInitializationAotProcessor
