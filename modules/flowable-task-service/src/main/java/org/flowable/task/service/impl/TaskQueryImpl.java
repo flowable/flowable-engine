@@ -145,6 +145,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String caseDefinitionKey;
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected Collection<String> caseDefinitionKeys;
     protected Date inProgressStartDueDate;
     protected Date inProgressStartDueBefore;
@@ -1611,6 +1613,32 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.scopedVariableNotExists(name, ScopeTypes.CMMN);
         } else {
             this.scopedVariableNotExists(name, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskRootScopeId(String rootScopeId) {
+        if (rootScopeId == null) {
+            throw new FlowableIllegalArgumentException("Task parentScopeId is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.rootScopeId = rootScopeId;
+        } else {
+            this.rootScopeId = rootScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskParentScopeId(String parentScopeId) {
+        if (parentScopeId == null) {
+            throw new FlowableIllegalArgumentException("Task parentScopeId is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.parentScopeId = parentScopeId;
+        } else {
+            this.parentScopeId = parentScopeId;
         }
         return this;
     }

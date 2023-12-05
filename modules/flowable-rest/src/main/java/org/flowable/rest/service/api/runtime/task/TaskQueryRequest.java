@@ -86,6 +86,8 @@ public class TaskQueryRequest extends PaginateRequest {
     protected List<String> categoryIn;
     protected List<String> categoryNotIn;
     protected Boolean withoutCategory;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processInstanceVariables;
@@ -570,5 +572,21 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setWithoutCategory(Boolean withoutCategory) {
         this.withoutCategory = withoutCategory;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
     }
 }

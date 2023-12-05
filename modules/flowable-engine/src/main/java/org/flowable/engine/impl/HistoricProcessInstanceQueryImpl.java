@@ -95,6 +95,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected String callbackId;
     protected String callbackType;
     protected boolean withoutCallbackId;
@@ -242,6 +244,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.businessStatusLike = businessStatusLike;
         } else {
             this.businessStatusLike = businessStatusLike;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceRootScopeId(String rootScopeId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeId = rootScopeId;
+        } else {
+            this.rootScopeId = rootScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceParentScopeId(String parentId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeId = parentId;
+        } else {
+            this.parentScopeId = parentId;
         }
         return this;
     }
@@ -1286,5 +1308,13 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
     }
 }

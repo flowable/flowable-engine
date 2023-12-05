@@ -894,6 +894,16 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T caseVariableNotExists(String name);
 
     /**
+     * Only selects tasks which with the given root scope id
+     */
+    T taskRootScopeId(String parentScopeId);
+
+    /**
+     * Only selects tasks which with the given parent scope id
+     */
+    T taskParentScopeId(String parentScopeId);
+
+    /**
      * Include local task variables in the task query result
      */
     T includeTaskLocalVariables();
