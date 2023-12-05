@@ -497,6 +497,18 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                         tuple(secondLevelCallActivity1_2.getCalledProcessInstanceId(), "oneTaskProcess"),
                         tuple(firstLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
                 );
+
+        result = historyService.createHistoricProcessInstanceQuery().or().processInstanceRootScopeId(processInstance.getId()).endOr().list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(firstLevelCallActivity1.getCalledProcessInstanceId(), "simpleInnerParallelCallActivity"),
+                        tuple(secondLevelCallActivity1_1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(thirdLevelCallActivity1_1_1.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(secondLevelCallActivity1_2.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(firstLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
     }
 
     @Test
@@ -526,6 +538,16 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         assertThat(result).isEmpty();
 
         result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(firstLevelCallActivity1.getCalledProcessInstanceId()).list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(secondLevelCallActivity1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(secondLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
+
+        result = historyService.createHistoricProcessInstanceQuery().or().processInstanceParentScopeId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .endOr().list();
 
         assertThat(result)
                 .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)

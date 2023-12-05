@@ -1615,6 +1615,16 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                         caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
                         oneTaskCase2PlanItemInstance.getReferenceId()
                 );
+
+        result = cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceRootScopeId(caseInstance.getId()).endOr().list();
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCasePlanItemInstance.getReferenceId(),
+                        caseTaskWithHumanTasksPlanItemInstance.getReferenceId(),
+                        caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
     }
 
     @Test
@@ -1639,7 +1649,17 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
                 .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
 
-        List<CaseInstance> result = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+        List<CaseInstance> result = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
+
+        result = cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).endOr()
+                .list();
 
         assertThat(result)
                 .extracting(CaseInstance::getId)

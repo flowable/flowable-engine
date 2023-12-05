@@ -870,6 +870,19 @@
             or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
             I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
         </if>
+        <if test="orQueryObject.parentScopeId != null">
+            or EXISTS(select 1 from ACT_HI_ENTITYLINK as LINK where
+                LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+                and LINK.REF_SCOPE_ID_ = RES.ID_
+                and LINK.HIERARCHY_TYPE_ = 'parent'
+            )
+        </if>
+        <if test="orQueryObject.rootScopeId != null">
+            or exists(select 1 from ACT_HI_ENTITYLINK as LINK where
+                LINK.REF_SCOPE_ID_ = RES.ID_
+                and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+            )
+        </if>
     </sql>
 
     <select id="selectHistoricCaseInstancesByCaseDefinitionId" resultMap="historicCaseInstanceResultMap">

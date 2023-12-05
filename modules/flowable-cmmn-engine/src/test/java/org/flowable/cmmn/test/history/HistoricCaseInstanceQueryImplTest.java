@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -1738,6 +1737,16 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                         caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
                         oneTaskCase2PlanItemInstance.getReferenceId()
                 );
+
+        result = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseInstanceRootScopeId(caseInstance.getId()).endOr().list();
+        assertThat(result)
+                .extracting(HistoricCaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCasePlanItemInstance.getReferenceId(),
+                        caseTaskWithHumanTasksPlanItemInstance.getReferenceId(),
+                        caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
     }
 
     @Test
@@ -1748,7 +1757,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
     })
     public void testQueryByParentScopeId() {
-               cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
 
         PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -1766,6 +1775,14 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
         List<HistoricCaseInstance> result = cmmnHistoryService.createHistoricCaseInstanceQuery()
                 .caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+        assertThat(result)
+                .extracting(HistoricCaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
+
+        result = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .endOr().list();
         assertThat(result)
                 .extracting(HistoricCaseInstance::getId)
                 .containsExactlyInAnyOrder(

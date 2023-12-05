@@ -1031,6 +1031,18 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                         formTask1.getId(),
                         formTask2.getId()
                 );
+
+        taskList = historyService.createHistoricTaskInstanceQuery().or().taskRootScopeId(processInstance.getId()).endOr().list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
     }
 
     @Test
@@ -1054,6 +1066,16 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
         taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
         List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId())
+                .list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+
+        taskList = historyService.createHistoricTaskInstanceQuery().or().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).endOr()
                 .list();
 
         assertThat(taskList)

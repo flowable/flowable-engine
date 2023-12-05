@@ -1273,20 +1273,20 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
 
             ActivityInstance callActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
-                .processInstanceId(processInstance.getId())
-                .singleResult();
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
 
             ActivityInstance caseTaskActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
                     .processInstanceId(callActivity.getCalledProcessInstanceId())
                     .singleResult();
 
-        String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
-                .getReferenceId();
+            String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
+                    .getReferenceId();
 
-            CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentScopeId(callActivity.getCalledProcessInstanceId())
+            CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceRootScopeId(processInstance.getId())
                     .singleResult();
 
-        assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
+            assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
@@ -1304,31 +1304,29 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
         try {
             processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml").deploy();
 
-        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml").deploy();
+            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml").deploy();
 
-        ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
 
-        ActivityInstance callActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
-                .processInstanceId(processInstance.getId())
-                .singleResult();
+            ActivityInstance callActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
 
-        ActivityInstance caseTaskActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
-                .processInstanceId(callActivity.getCalledProcessInstanceId())
-                .singleResult();
+            ActivityInstance caseTaskActivity = processEngineRuntimeService.createActivityInstanceQuery().activityId("theTask")
+                    .processInstanceId(callActivity.getCalledProcessInstanceId())
+                    .singleResult();
 
-        String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
-                .getReferenceId();
+            String caseInstanceId = processEngineRuntimeService.createExecutionQuery().executionId(caseTaskActivity.getExecutionId()).singleResult()
+                    .getReferenceId();
 
-        CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentScopeId(callActivity.getCalledProcessInstanceId())
-                .singleResult();
+            CaseInstance loadedCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentScopeId(callActivity.getCalledProcessInstanceId())
+                    .singleResult();
 
-        assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
+            assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-
-
 
     static class ClearExecutionReferenceCmd implements Command<Void> {
 

@@ -418,6 +418,17 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
                         twoHumanTasks.get(1).getId(),
                         caseTaskSimpleCaseWithCaseTasksTask.getId()
                 );
+
+        result = cmmnTaskService.createTaskQuery().or().taskRootScopeId(caseInstance.getId()).endOr().list();
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCaseTask1.getId(),
+                        oneTaskCaseTask2.getId(),
+                        twoHumanTasks.get(0).getId(),
+                        twoHumanTasks.get(1).getId(),
+                        caseTaskSimpleCaseWithCaseTasksTask.getId()
+                );
     }
 
     @Test
@@ -442,6 +453,15 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
 
         List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        planItemInstances.get(0).getReferenceId(),
+                        planItemInstances.get(1).getReferenceId()
+                );
+
+        result = cmmnTaskService.createTaskQuery().or().taskParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).endOr().list();
 
         assertThat(result)
                 .extracting(Task::getId)

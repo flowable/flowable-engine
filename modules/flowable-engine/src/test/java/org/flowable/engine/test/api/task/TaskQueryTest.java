@@ -4833,6 +4833,18 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                         formTask1.getId(),
                         formTask2.getId()
                 );
+
+        taskList = taskService.createTaskQuery().or().taskRootScopeId(processInstance.getId()).endOr().list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
     }
 
     @Test
@@ -4855,6 +4867,15 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
 
         List<Task> taskList = taskService.createTaskQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+
+        taskList = taskService.createTaskQuery().or().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).endOr().list();
 
         assertThat(taskList)
                 .extracting(Task::getId)
