@@ -39,8 +39,11 @@ spec:
               ### generate new with; echo -n "<username:<passwd>" | base64
               #value: Basic cmVzdC1hZG1pbjp0ZXN0
               value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
+          initialDelaySeconds: {{ .Values.rest.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.rest.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.rest.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.rest.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.rest.readinessProbe.failureThreshold }}
         livenessProbe:
           httpGet:
             path: {{ .Values.rest.contextPath }}/actuator/health
@@ -51,9 +54,11 @@ spec:
               ### generate new with; echo -n "<username:<passwd>" | base64
               #value: Basic cmVzdC1hZG1pbjp0ZXN0
               value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
-          initialDelaySeconds: 60
-          timeoutSeconds: 10
-          failureThreshold: 10
+          initialDelaySeconds: {{ .Values.rest.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.rest.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.rest.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.rest.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.rest.livenessProbe.failureThreshold }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-{{ include "flowable.template" . }}-configmap
