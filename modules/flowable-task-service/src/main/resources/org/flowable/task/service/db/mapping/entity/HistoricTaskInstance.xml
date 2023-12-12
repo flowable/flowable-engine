@@ -1455,7 +1455,7 @@
         and (${queryTablePrefix}DELETE_REASON_ = '' or ${queryTablePrefix}DELETE_REASON_ is null)
       </if>
       <if test="parentScopeId != null">
-          and EXISTS(select 1 from ACT_HI_ENTITYLINK as LINK where
+          and EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
             LINK.SCOPE_ID_ = #{parentScopeId}
             and LINK.REF_SCOPE_ID_ = RES.ID_
             and LINK.HIERARCHY_TYPE_ = 'parent'
@@ -1463,7 +1463,7 @@
       </if>
       <if test="rootScopeId != null">
           and exists(
-            select 1 from ACT_HI_ENTITYLINK as LINK where
+            select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
                 LINK.REF_SCOPE_ID_ = RES.ID_
                 and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
           )
@@ -1861,7 +1861,7 @@
           )
       </if>
       <if test="orQueryObject.parentScopeId != null">
-          or EXISTS(select 1 from ACT_HI_ENTITYLINK as LINK where
+          or EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
           LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
           and LINK.REF_SCOPE_ID_ = RES.ID_
           and LINK.HIERARCHY_TYPE_ = 'parent'
@@ -1869,7 +1869,7 @@
       </if>
       <if test="orQueryObject.rootScopeId != null">
           or exists(
-          select 1 from ACT_HI_ENTITYLINK as LINK where
+          select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
           LINK.REF_SCOPE_ID_ = RES.ID_
           and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
           )
