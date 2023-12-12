@@ -90,22 +90,20 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
     @Test
     @Deployment(resources = {
-            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testStaticEventRegistryProcessStart.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
-    public void testDynamicEventRegistryProcessStartWithNonMatchingManualSubscription() {
-        // manually register start subscription, but with different correlation than the actual event being sent
-        runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
-            .addCorrelationParameterValue("customer", "test")
-            .addCorrelationParameterValue("action", "start")
-            .registerProcessStartEventSubscription();
+    public void testDynamicEventRegistryProcessStartWithoutProcessDefinition() {
+        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+            // manually register start subscription, but with different correlation than the actual event being sent
+            runtimeService.createProcessStartEventSubscriptionBuilder()
+                .addCorrelationParameterValue("customer", "test")
+                .addCorrelationParameterValue("action", "start")
+                .registerProcessStartEventSubscription();
+        });
 
-        sendEvent("kermit", "start");
-
-        // there must be no running process instance as we didn't create a manual subscription yet
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(exception.getMessage()).isEqualTo("The process definition must be provided using the key for the subscription to be registered.");
     }
 
     @Test
@@ -117,7 +115,8 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
     public void testDynamicEventRegistryProcessStartWithIllegalManualSubscriptionForWrongStartEvent() {
         FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
             // manually register start subscription, but with different correlation than the actual event being sent
-            runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryStaticStartTestProcess")
+            runtimeService.createProcessStartEventSubscriptionBuilder()
+                .processDefinitionKey("eventRegistryStaticStartTestProcess")
                 .addCorrelationParameterValue("customer", "test")
                 .addCorrelationParameterValue("action", "start")
                 .registerProcessStartEventSubscription();
@@ -132,10 +131,32 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
+    public void testDynamicEventRegistryProcessStartWithNonMatchingManualSubscription() {
+        // manually register start subscription, but with different correlation than the actual event being sent
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "test")
+            .addCorrelationParameterValue("action", "start")
+            .registerProcessStartEventSubscription();
+
+        sendEvent("kermit", "start");
+
+        // there must be no running process instance as we didn't create a manual subscription yet
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
     public void testDynamicEventRegistryProcessStartWithIllegalManualSubscriptionForWrongCorrelation() {
         FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
             // manually register start subscription, but with different correlation than the actual event being sent
-            runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
+            runtimeService.createProcessStartEventSubscriptionBuilder()
+                .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("invalidCorrelationParameter", "test")
                 .addCorrelationParameterValue("action", "start")
                 .registerProcessStartEventSubscription();
@@ -152,9 +173,38 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
     })
     public void testDynamicEventRegistryProcessStartWithMatchingManualSubscription() {
         // manually register start subscription, matching the event correlation sent later
-        runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
+            .registerProcessStartEventSubscription();
+
+        sendEvent("kermit", "start");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder("eventRegistryDynamicStartTestProcess");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+            .isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartWithMatchingManualSubscriptionVersion2() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
             .registerProcessStartEventSubscription();
 
         sendEvent("kermit", "start");
@@ -224,7 +274,8 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
     })
     public void testDynamicEventRegistryProcessStartAfterRedeployment() {
         // manually register start subscription, matching the event correlation sent later
-        runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .registerProcessStartEventSubscription();
@@ -242,6 +293,11 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         assertThat(runtimeService.createProcessInstanceQuery().list())
             .isEmpty();
+
+        // the scope definition key must be present in the subscription
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getScopeDefinitionKey)
+            .containsExactlyInAnyOrder("eventRegistryDynamicStartTestProcess");
 
         // redeploy the process definition (which must not remove the subscriptions, but rather update them to the newest version)
         ProcessDefinition processDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
@@ -268,6 +324,66 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
     @Test
     @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterRedeploymentWithoutAutoUpdate() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        sendEvent("kermit", "start");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder("eventRegistryDynamicStartTestProcess");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+            .isEmpty();
+
+        // the scope definition key must not be present in the event subscription
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getScopeDefinitionKey).containsOnlyNulls();
+
+        // search the first process definition as we don't have auto-update in the subscription
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        // redeploy the process definition (which must not remove the subscriptions, but rather update them to the newest version)
+        ProcessDefinition latestProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .isEmpty();
+        } finally {
+            deleteDeployment(latestProcessDefinition.getDeploymentId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
             "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
@@ -277,7 +393,8 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         try {
             // manually register start subscriptions
-            runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
+            runtimeService.createProcessStartEventSubscriptionBuilder()
+                .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("customer", "kermit")
                 .addCorrelationParameterValue("action", "start")
                 .registerProcessStartEventSubscription();
@@ -287,7 +404,8 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             correlationParameters.put("action", "start");
             String correlationConfig1 = getEventRegistry().generateKey(correlationParameters);
 
-            runtimeService.createProcessStartEventSubscriptionBuilder("eventRegistryDynamicStartTestProcess")
+            runtimeService.createProcessStartEventSubscriptionBuilder()
+                .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("customer", "frog")
                 .addCorrelationParameterValue("action", "end")
                 .registerProcessStartEventSubscription();

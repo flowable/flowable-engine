@@ -28,6 +28,29 @@ import java.util.Map;
 public interface ProcessStartEventSubscriptionBuilder {
 
     /**
+     * Set the process definition to be started using a manually added subscription by its key. By default, always the latest version is
+     * used to start a new process instance, unless you use {@link #doNotUpdateToLatestVersionAutomatically()} to mark the builder to stick to
+     * exactly the current version of the process definition and don't update it, if a new version would be deployed later on.
+     * This method is mandatory and will throw an exception when trying to register a subscription where the process definition key was not set or
+     * is null.
+     *
+     * @param processDefinitionKey the key of the process definition to be started a new instance of when the subscription has a match at runtime
+     * @return the builder to be used for method chaining
+     */
+    ProcessStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey);
+
+    /**
+     * Mark the subscription to not use the latest process definition automatically, should there be a new version deployed after the subscription
+     * was created. This means, adding the subscription will always stick to the current version of the process definition, and it will NOT be updated
+     * automatically should there be a new version deployed later on. By default, when this method is not invoked on the builder, the subscription will
+     * be updated automatically to the latest version when a new version of the process definition is deployed.
+     * The subscription can still be updated to the latest version by manually migrating it to whatever version you want.
+     *
+     * @return the builder to be used for method chaining
+     */
+    ProcessStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically();
+
+    /**
      * Adds a specific correlation parameter value for the subscription, which means this value needs to exactly match the event
      * payload in order to trigger the process start (along with all registered correlation parameter values of course).
      *

@@ -71,13 +71,13 @@ public class EventSubscriptionManager {
             List<StartEventInfo> eventRegistryStartEvents = getEventRegistryStartEventEventTypes(previousProcessDefinition);
             if (eventRegistryStartEvents != null) {
                 for (StartEventInfo eventRegistryStartEvent : eventRegistryStartEvents) {
-                    if (eventRegistryStartEvent.isDynamic()) {
+                    if (eventRegistryStartEvent.dynamic()) {
                         // for a dynamic, manual subscription behavior, we must not remove the old subscriptions, but rather update them
                         // to the newest process definition id, as they have been manually added before
-                        updateOldEventSubscriptionsImpl(previousProcessDefinition, processDefinition, eventRegistryStartEvent.getEventType(), eventRegistryStartEvent.getActivityId());
+                        updateOldEventSubscriptionsImpl(previousProcessDefinition, processDefinition, eventRegistryStartEvent.eventType(), eventRegistryStartEvent.activityId());
                     } else {
                         // for a static starting behavior, we always remove the old subscription and recreate it with the new definition
-                        removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEvent.getEventType());
+                        removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEvent.eventType());
                     }
                 }
             }
@@ -115,26 +115,8 @@ public class EventSubscriptionManager {
         return result;
     }
 
-    class StartEventInfo {
-        protected String eventType;
-        protected String activityId;
-        protected boolean dynamic;
-        public StartEventInfo(String eventType, String activityId, boolean dynamic) {
-            this.eventType = eventType;
-            this.activityId = activityId;
-            this.dynamic = dynamic;
-        }
-        public String getEventType() {
-            return eventType;
-        }
-        public String getActivityId() {
-            return activityId;
-        }
-        public boolean isDynamic() {
-            return dynamic;
-        }
+    protected record StartEventInfo(String eventType, String activityId, boolean dynamic) {
     }
-
 
     protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
         // remove all subscriptions for the previous version

@@ -1092,6 +1092,7 @@
     where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
     and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
     and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    and SCOPE_DEFINITION_KEY_ is not null
   </update>
 
   <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">

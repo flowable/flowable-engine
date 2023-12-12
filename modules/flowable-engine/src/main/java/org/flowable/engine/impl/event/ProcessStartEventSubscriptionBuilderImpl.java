@@ -15,6 +15,7 @@ package org.flowable.engine.impl.event;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.event.ProcessStartEventSubscriptionBuilder;
 import org.flowable.engine.impl.RuntimeServiceImpl;
@@ -27,12 +28,24 @@ import org.flowable.engine.impl.RuntimeServiceImpl;
 public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEventSubscriptionBuilder {
 
     protected final RuntimeServiceImpl runtimeService;
-    protected final String processDefinitionKey;
+    protected String processDefinitionKey;
+    protected boolean doNotUpdateToLatestVersionAutomatically;
     protected final Map<String, Object> correlationParameterValues = new HashMap<>();
 
-    public ProcessStartEventSubscriptionBuilderImpl(RuntimeServiceImpl runtimeService, String processDefinitionKey) {
+    public ProcessStartEventSubscriptionBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
+    }
+
+    @Override
+    public ProcessStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
+        return this;
+    }
+
+    @Override
+    public ProcessStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically() {
+        this.doNotUpdateToLatestVersionAutomatically = true;
+        return this;
     }
 
     @Override
@@ -51,12 +64,20 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
         return processDefinitionKey;
     }
 
+    public boolean isDoNotUpdateToLatestVersionAutomatically() {
+        return doNotUpdateToLatestVersionAutomatically;
+    }
+
     public Map<String, Object> getCorrelationParameterValues() {
         return correlationParameterValues;
     }
 
     @Override
     public void registerProcessStartEventSubscription() {
+        if (StringUtils.isEmpty(processDefinitionKey)) {
+            throw new FlowableIllegalArgumentException("The process definition must be provided using the key for the subscription to be registered.");
+        }
+
         if (correlationParameterValues.isEmpty()) {
             throw new FlowableIllegalArgumentException(
                 "At least one correlation parameter value must be provided for a dynamic process start event subscription, "

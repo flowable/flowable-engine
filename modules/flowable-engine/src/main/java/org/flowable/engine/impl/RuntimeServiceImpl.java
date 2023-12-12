@@ -741,8 +741,8 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder(String processDefinitionKey) {
-        return new ProcessStartEventSubscriptionBuilderImpl(this, processDefinitionKey);
+    public ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder() {
+        return new ProcessStartEventSubscriptionBuilderImpl(this);
     }
 
     @Override

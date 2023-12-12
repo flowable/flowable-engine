@@ -73,7 +73,9 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
                     String eventDefinitionKey = eventTypeElements.get(0).getElementText();
                     String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, commandContext);
 
-                    insertEventRegistryEvent(eventDefinitionKey, startEvent, processDefinition, correlationKey, commandContext);
+                    insertEventRegistryEvent(eventDefinitionKey, builder.isDoNotUpdateToLatestVersionAutomatically(), startEvent, processDefinition,
+                        correlationKey, commandContext);
+
                     subscriptionCreated = true;
                 }
             }
@@ -110,8 +112,8 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
             + "with key '" + eventModel.getKey() + "'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
-    protected void insertEventRegistryEvent(String eventDefinitionKey, StartEvent startEvent, ProcessDefinition processDefinition, String correlationKey,
-        CommandContext commandContext) {
+    protected void insertEventRegistryEvent(String eventDefinitionKey, boolean doNotUpdateToLatestVersionAutomatically, StartEvent startEvent,
+        ProcessDefinition processDefinition, String correlationKey, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         EventSubscriptionBuilder eventSubscriptionBuilder = eventSubscriptionService.createEventSubscriptionBuilder()
@@ -123,6 +125,11 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
 
         if (processDefinition.getTenantId() != null) {
             eventSubscriptionBuilder.tenantId(processDefinition.getTenantId());
+        }
+
+        // if we need to update the process definition to the latest version upon new deployment, also set the definition key, not just the process definition id
+        if (!doNotUpdateToLatestVersionAutomatically) {
+            eventSubscriptionBuilder.scopeDefinitionKey(processDefinition.getKey());
         }
 
         EventSubscription eventSubscription = eventSubscriptionBuilder.create();

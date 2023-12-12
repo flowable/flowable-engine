@@ -1367,10 +1367,9 @@ public interface RuntimeService {
      * Register one or more correlation parameter value with in the builder before invoking the
      * {@link ProcessStartEventSubscriptionBuilder#registerProcessStartEventSubscription()} method to create and register the subscription.
      *
-     * @param processDefinitionKey the key of the process definition to register a start subscription for
      * @return the subscription builder
      */
-    ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder(String processDefinitionKey);
+    ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder();
 
     /**
      * Sets the name for the process instance with the given id.
