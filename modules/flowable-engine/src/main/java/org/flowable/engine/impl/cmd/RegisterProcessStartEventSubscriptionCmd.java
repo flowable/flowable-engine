@@ -44,7 +44,7 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
  *
  * @author Micha Kiener
  */
-public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
+public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSubscription>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,11 +55,11 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
     }
 
     @Override
-    public Void execute(CommandContext commandContext) {
+    public EventSubscription execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = getProcessDefinition(commandContext);
         Process process = getProcess(processDefinition.getId(), commandContext);
 
-        boolean subscriptionCreated = false;
+        EventSubscription eventSubscription = null;
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
         for (StartEvent startEvent : startEvents) {
             // looking for a start event based on an event-registry event subscription
@@ -70,23 +70,27 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
                 if (correlationConfiguration != null && correlationConfiguration.size() > 0 &&
                     "manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
 
+                    // currently, only one event-registry start event is supported for manual subscriptions
+                    if (eventSubscription != null) {
+                        throw new FlowableIllegalArgumentException("The process definition with key " + processDefinition.getKey()
+                            + " has more than one event-registry start events based on manually registered subscriptions, which is currently not supported.");
+                    }
+
                     String eventDefinitionKey = eventTypeElements.get(0).getElementText();
                     String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, commandContext);
 
-                    insertEventRegistryEvent(eventDefinitionKey, builder.isDoNotUpdateToLatestVersionAutomatically(), startEvent, processDefinition,
+                    eventSubscription = insertEventRegistryEvent(eventDefinitionKey, builder.isDoNotUpdateToLatestVersionAutomatically(), startEvent, processDefinition,
                         correlationKey, commandContext);
-
-                    subscriptionCreated = true;
                 }
             }
         }
 
-        if (!subscriptionCreated) {
+        if (eventSubscription == null) {
             throw new FlowableIllegalArgumentException("The process definition with key '" + builder.getProcessDefinitionKey()
                 + "' does not have an event-registry based start event with a manual subscription behavior.");
         }
 
-        return null;
+        return eventSubscription;
     }
 
     protected String generateCorrelationConfiguration(String eventDefinitionKey, CommandContext commandContext) {
@@ -112,7 +116,7 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
             + "with key '" + eventModel.getKey() + "'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
-    protected void insertEventRegistryEvent(String eventDefinitionKey, boolean doNotUpdateToLatestVersionAutomatically, StartEvent startEvent,
+    protected EventSubscription insertEventRegistryEvent(String eventDefinitionKey, boolean doNotUpdateToLatestVersionAutomatically, StartEvent startEvent,
         ProcessDefinition processDefinition, String correlationKey, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
@@ -134,6 +138,8 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<Void>, 
 
         EventSubscription eventSubscription = eventSubscriptionBuilder.create();
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+
+        return eventSubscription;
     }
 
     protected ProcessDefinition getProcessDefinition(CommandContext commandContext) {

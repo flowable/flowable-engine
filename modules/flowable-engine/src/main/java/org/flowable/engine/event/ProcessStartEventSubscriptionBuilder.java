@@ -14,6 +14,8 @@ package org.flowable.engine.event;
 
 import java.util.Map;
 
+import org.flowable.eventsubscription.api.EventSubscription;
+
 /**
  * A builder API to create an event subscription to start an event-based process instance whenever an event with a very specific
  * combination of correlation values occurs.
@@ -72,5 +74,5 @@ public interface ProcessStartEventSubscriptionBuilder {
     /**
      * Creates the event subscription with the registered combination of correlation parameter values and saves it.
      */
-    void registerProcessStartEventSubscription();
+    EventSubscription registerProcessStartEventSubscription();
 }

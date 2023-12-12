@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.event.ProcessStartEventSubscriptionBuilder;
 import org.flowable.engine.impl.RuntimeServiceImpl;
+import org.flowable.eventsubscription.api.EventSubscription;
 
 /**
  * A default implementation for the process start event subscription builder.
@@ -73,7 +74,7 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
     }
 
     @Override
-    public void registerProcessStartEventSubscription() {
+    public EventSubscription registerProcessStartEventSubscription() {
         if (StringUtils.isEmpty(processDefinitionKey)) {
             throw new FlowableIllegalArgumentException("The process definition must be provided using the key for the subscription to be registered.");
         }
@@ -84,6 +85,6 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
                     + "otherwise the process would get started on all events, regardless their correlation parameter values.");
         }
 
-        runtimeService.registerProcessStartEventSubscription(this);
+        return runtimeService.registerProcessStartEventSubscription(this);
     }
 }

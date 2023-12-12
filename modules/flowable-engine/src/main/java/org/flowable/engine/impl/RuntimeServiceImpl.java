@@ -98,6 +98,7 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -813,8 +814,8 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         }
     }
 
-    public void registerProcessStartEventSubscription(ProcessStartEventSubscriptionBuilderImpl builder) {
-        commandExecutor.execute(new RegisterProcessStartEventSubscriptionCmd(builder));
+    public EventSubscription registerProcessStartEventSubscription(ProcessStartEventSubscriptionBuilderImpl builder) {
+        return commandExecutor.execute(new RegisterProcessStartEventSubscriptionCmd(builder));
     }
 
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {

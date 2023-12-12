@@ -173,11 +173,13 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
     })
     public void testDynamicEventRegistryProcessStartWithMatchingManualSubscription() {
         // manually register start subscription, matching the event correlation sent later
-        runtimeService.createProcessStartEventSubscriptionBuilder()
+        EventSubscription eventSubscription = runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .registerProcessStartEventSubscription();
+
+        assertThat(eventSubscription).isNotNull().extracting(EventSubscription::getScopeDefinitionKey).isEqualTo("eventRegistryDynamicStartTestProcess");
 
         sendEvent("kermit", "start");
 
