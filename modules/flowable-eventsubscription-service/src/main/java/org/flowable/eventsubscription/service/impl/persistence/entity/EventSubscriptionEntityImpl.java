@@ -40,6 +40,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     protected String subScopeId;
     protected String scopeId;
     protected String scopeDefinitionId;
+    protected String scopeDefinitionKey;
     protected String scopeType;
     protected Date lockTime;
     protected String lockOwner;
@@ -63,6 +64,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
         persistentState.put("subScopeId", this.subScopeId);
         persistentState.put("scopeId", this.scopeId);
         persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
+        persistentState.put("scopeDefinitionKey", this.scopeDefinitionKey);
         persistentState.put("scopeType", this.scopeType);
         persistentState.put("tenantId", this.tenantId);
         return persistentState;
@@ -181,6 +183,16 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     }
 
     @Override
+    public String getScopeDefinitionKey() {
+        return scopeDefinitionKey;
+    }
+
+    @Override
+    public void setScopeDefinitionKey(String scopeDefinitionKey) {
+        this.scopeDefinitionKey = scopeDefinitionKey;
+    }
+
+    @Override
     public String getScopeType() {
         return scopeType;
     }
@@ -278,6 +290,10 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
                 sb.append(", scopeType=").append(scopeType);
             }
             sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        
+        if (scopeDefinitionKey != null) {
+            sb.append(", scopeDefinitionKey=").append(scopeDefinitionKey);
         }
 
         if (StringUtils.isNotEmpty(tenantId)) {

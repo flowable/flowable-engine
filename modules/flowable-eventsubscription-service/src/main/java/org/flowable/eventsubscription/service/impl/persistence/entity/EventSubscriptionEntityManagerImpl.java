@@ -271,6 +271,7 @@ public class EventSubscriptionEntityManagerImpl
         subscriptionEntity.setSubScopeId(eventSubscriptionBuilder.getSubScopeId());
         subscriptionEntity.setScopeId(eventSubscriptionBuilder.getScopeId());
         subscriptionEntity.setScopeDefinitionId(eventSubscriptionBuilder.getScopeDefinitionId());
+        subscriptionEntity.setScopeDefinitionKey(eventSubscriptionBuilder.getScopeDefinitionKey());
         subscriptionEntity.setScopeType(eventSubscriptionBuilder.getScopeType());
         
         if (eventSubscriptionBuilder.getTenantId() != null) {
@@ -283,7 +284,6 @@ public class EventSubscriptionEntityManagerImpl
     }
     
     protected MessageEventSubscriptionEntity insertMessageEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
-        
         MessageEventSubscriptionEntity subscriptionEntity = createMessageEventSubscription();
         subscriptionEntity.setExecutionId(eventSubscriptionBuilder.getExecutionId());
         subscriptionEntity.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
@@ -291,6 +291,7 @@ public class EventSubscriptionEntityManagerImpl
 
         subscriptionEntity.setActivityId(eventSubscriptionBuilder.getActivityId());
         subscriptionEntity.setProcessDefinitionId(eventSubscriptionBuilder.getProcessDefinitionId());
+        subscriptionEntity.setScopeDefinitionKey(eventSubscriptionBuilder.getScopeDefinitionKey());
         if (eventSubscriptionBuilder.getTenantId() != null) {
             subscriptionEntity.setTenantId(eventSubscriptionBuilder.getTenantId());
         }
@@ -303,7 +304,6 @@ public class EventSubscriptionEntityManagerImpl
     }
     
     protected CompensateEventSubscriptionEntity insertCompensationEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
-        
         CompensateEventSubscriptionEntity eventSubscription = createCompensateEventSubscription();
         eventSubscription.setExecutionId(eventSubscriptionBuilder.getExecutionId());
         eventSubscription.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
@@ -329,6 +329,7 @@ public class EventSubscriptionEntityManagerImpl
         eventSubscription.setSubScopeId(eventSubscriptionBuilder.getSubScopeId());
         eventSubscription.setScopeId(eventSubscriptionBuilder.getScopeId());
         eventSubscription.setScopeDefinitionId(eventSubscriptionBuilder.getScopeDefinitionId());
+        eventSubscription.setScopeDefinitionKey(eventSubscriptionBuilder.getScopeDefinitionKey());
         eventSubscription.setScopeType(eventSubscriptionBuilder.getScopeType());
 
         if (eventSubscriptionBuilder.getTenantId() != null) {

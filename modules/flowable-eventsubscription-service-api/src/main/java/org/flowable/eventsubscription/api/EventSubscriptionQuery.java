@@ -75,6 +75,9 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
     /** Only select event subscriptions without a scope definition id value. **/
     EventSubscriptionQuery withoutScopeDefinitionId();
     
+    /** Only select event subscriptions which have a scope definition key with the given value. **/
+    EventSubscriptionQuery scopeDefinitionKey(String scopeDefinitionKey);
+    
     /** Only select event subscriptions which have a scope type with the given value. **/
     EventSubscriptionQuery scopeType(String scopeType);
 

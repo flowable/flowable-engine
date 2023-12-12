@@ -72,6 +72,11 @@ public interface EventSubscription {
     String getScopeDefinitionId();
     
     /**
+     * Key of the scope definition for this event subscription.
+     */
+    String getScopeDefinitionKey();
+    
+    /**
      * Scope type for this event subscription.
      */
     String getScopeType();
