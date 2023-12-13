@@ -37,7 +37,7 @@ public class EventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher 
         return Objects.equals(processDefinitionId, eventSubscriptionEntity.getProcessDefinitionId())
             && Objects.equals(eventType, eventSubscriptionEntity.getEventType())
             && Objects.equals(activityId, eventSubscriptionEntity.getActivityId())
-            && Objects.equals(configuration, eventSubscriptionEntity.getConfiguration());
+            && (configuration == null || Objects.equals(configuration, eventSubscriptionEntity.getConfiguration()));
     }
 
 }

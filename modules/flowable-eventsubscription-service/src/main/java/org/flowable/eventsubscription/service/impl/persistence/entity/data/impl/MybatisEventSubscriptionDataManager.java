@@ -320,13 +320,13 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
 
     @Override
     public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId,
-        boolean isAutoUpdate, String configuration) {
+        String scopeDefinitionKey, String configuration) {
         Map<String, Object> params = new HashMap<>();
+        params.put("scopeDefinitionKey", scopeDefinitionKey);
         params.put("oldProcessDefinitionId", oldProcessDefinitionId);
         params.put("newProcessDefinitionId", newProcessDefinitionId);
         params.put("eventType", eventType);
         params.put("activityId", activityId);
-        params.put("autoUpdate", isAutoUpdate);
         if (StringUtils.isNotBlank(configuration)) {
             params.put("configuration", configuration);
         }

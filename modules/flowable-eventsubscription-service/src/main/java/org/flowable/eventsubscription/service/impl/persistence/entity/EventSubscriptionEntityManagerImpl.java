@@ -198,8 +198,8 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
-    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, boolean isAutoUpdate, String configuration) {
-        dataManager.updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId, isAutoUpdate, configuration);
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration) {
+        dataManager.updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId, scopeDefinitionKey, configuration);
     }
 
     @Override

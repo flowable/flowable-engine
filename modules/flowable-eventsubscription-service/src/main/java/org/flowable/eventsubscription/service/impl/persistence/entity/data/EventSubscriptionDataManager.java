@@ -73,7 +73,7 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
 
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
 
-    void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, boolean isAutoUpdate, String configuration);
+    void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration);
 
     boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime);
 

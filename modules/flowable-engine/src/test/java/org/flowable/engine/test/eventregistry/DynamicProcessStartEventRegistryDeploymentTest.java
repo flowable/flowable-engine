@@ -100,7 +100,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             runtimeService.createProcessStartEventSubscriptionBuilder()
                 .addCorrelationParameterValue("customer", "test")
                 .addCorrelationParameterValue("action", "start")
-                .registerProcessStartEventSubscription();
+                .subscribe();
         });
 
         assertThat(exception.getMessage()).isEqualTo("The process definition must be provided using the key for the subscription to be registered.");
@@ -119,10 +119,12 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
                 .processDefinitionKey("eventRegistryStaticStartTestProcess")
                 .addCorrelationParameterValue("customer", "test")
                 .addCorrelationParameterValue("action", "start")
-                .registerProcessStartEventSubscription();
+                .subscribe();
         });
 
-        assertThat(exception.getMessage()).isEqualTo("The process definition with key 'eventRegistryStaticStartTestProcess' does not have an event-registry based start event with a manual subscription behavior.");
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("eventRegistryStaticStartTestProcess").latestVersion().singleResult();
+
+        assertThat(exception.getMessage()).isEqualTo("The process definition with id '" + processDefinition.getId() + "' does not have an event-registry based start event with a manual subscription behavior.");
     }
 
     @Test
@@ -137,7 +139,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "test")
             .addCorrelationParameterValue("action", "start")
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         sendEvent("kermit", "start");
 
@@ -158,7 +160,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
                 .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("invalidCorrelationParameter", "test")
                 .addCorrelationParameterValue("action", "start")
-                .registerProcessStartEventSubscription();
+                .subscribe();
         });
 
         assertThat(exception.getMessage()).isEqualTo("There is no correlation parameter with name 'invalidCorrelationParameter' defined in event model with key 'simpleTest'. You can only subscribe for an event with a combination of valid correlation parameters.");
@@ -176,7 +178,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         assertThat(eventSubscription).isNotNull().extracting(EventSubscription::getScopeDefinitionKey).isEqualTo("eventRegistryDynamicStartTestProcess");
 
@@ -205,7 +207,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         sendEvent("kermit", "start");
 
@@ -249,8 +251,8 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             sendEvent("kermit", "start");
 
             assertThat(runtimeService.createProcessInstanceQuery().list())
-                .extracting(ProcessInstance::getProcessDefinitionKey)
-                .containsExactlyInAnyOrder("eventRegistryStaticStartTestProcess");
+                .extracting(ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(processDefinition.getId());
 
             task = taskService.createTaskQuery().singleResult();
             assertThat(task).isNotNull();
@@ -275,7 +277,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         sendEvent("kermit", "start");
 
@@ -330,7 +332,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         sendEvent("kermit", "start");
 
@@ -390,7 +392,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
                 .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("customer", "kermit")
                 .addCorrelationParameterValue("action", "start")
-                .registerProcessStartEventSubscription();
+                .subscribe();
 
             Map<String, Object> correlationParameters = new HashMap<>();
             correlationParameters.put("customer", "kermit");
@@ -401,7 +403,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
                 .processDefinitionKey("eventRegistryDynamicStartTestProcess")
                 .addCorrelationParameterValue("customer", "frog")
                 .addCorrelationParameterValue("action", "end")
-                .registerProcessStartEventSubscription();
+                .subscribe();
 
             correlationParameters.put("customer", "frog");
             correlationParameters.put("action", "end");
@@ -433,14 +435,14 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "frog")
             .addCorrelationParameterValue("action", "end")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         // search the first process definition as we don't have auto-update in the subscriptions
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
@@ -473,7 +475,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             // now migrate to the latest process definition manually
             runtimeService.createProcessStartEventSubscriptionModificationBuilder()
                 .processDefinitionId(processDefinition.getId())
-                .migrateToLatestProcessDefinitionVersion();
+                .migrateToLatestProcessDefinition();
 
             assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
                 .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId)
@@ -511,14 +513,14 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "frog")
             .addCorrelationParameterValue("action", "end")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
 
         Map<String, Object> correlationParameters = new ListOrderedMap<>();
@@ -562,7 +564,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             runtimeService.createProcessStartEventSubscriptionModificationBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
-                .migrateToLatestProcessDefinitionVersion();
+                .migrateToLatestProcessDefinition();
 
             assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
                 .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
@@ -600,14 +602,14 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "frog")
             .addCorrelationParameterValue("action", "end")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
 
         Map<String, Object> correlationParameters = new ListOrderedMap<>();
@@ -651,7 +653,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             runtimeService.createProcessStartEventSubscriptionModificationBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
-                .migrateToProcessDefinitionVersion(newProcessDefinition.getId());
+                .migrateToProcessDefinition(newProcessDefinition.getId());
 
             assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
                 .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
@@ -689,14 +691,14 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "frog")
             .addCorrelationParameterValue("action", "end")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
 
         Map<String, Object> correlationParameters = new ListOrderedMap<>();
@@ -737,7 +739,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
             // now migrate to the latest process definition manually
-            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+            runtimeService.createProcessStartEventSubscriptionDeletionBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
                 .deleteSubscriptions();
@@ -779,14 +781,14 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             .addCorrelationParameterValue("customer", "kermit")
             .addCorrelationParameterValue("action", "start")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
         runtimeService.createProcessStartEventSubscriptionBuilder()
             .processDefinitionKey("eventRegistryDynamicStartTestProcess")
             .addCorrelationParameterValue("customer", "frog")
             .addCorrelationParameterValue("action", "end")
             .doNotUpdateToLatestVersionAutomatically()
-            .registerProcessStartEventSubscription();
+            .subscribe();
 
 
         Map<String, Object> correlationParameters = new ListOrderedMap<>();
@@ -827,7 +829,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
             // now migrate to the latest process definition manually
-            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+            runtimeService.createProcessStartEventSubscriptionDeletionBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .deleteSubscriptions();
 

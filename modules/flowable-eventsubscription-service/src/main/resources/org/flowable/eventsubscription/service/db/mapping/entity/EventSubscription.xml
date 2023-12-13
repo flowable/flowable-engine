@@ -1092,8 +1092,8 @@
     where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
     and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
     and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
-    <if test="autoUpdate == true">
-        and SCOPE_DEFINITION_KEY_ is not null
+    <if test="scopeDefinitionKey != null">
+        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR}
     </if>
     <if test="configuration != null">
         and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}

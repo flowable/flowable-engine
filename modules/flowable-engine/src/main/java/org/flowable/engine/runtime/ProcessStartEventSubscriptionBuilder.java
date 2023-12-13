@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.event;
+package org.flowable.engine.runtime;
 
 import java.util.Map;
 
@@ -72,7 +72,15 @@ public interface ProcessStartEventSubscriptionBuilder {
     ProcessStartEventSubscriptionBuilder addCorrelationParameterValues(Map<String, Object> parameters);
 
     /**
+     * Set the tenant id for the subscription.
+     *
+     * @param tenantId the id of the tenant
+     * @return the builder to be used for method chaining
+     */
+    ProcessStartEventSubscriptionBuilder tenantId(String tenantId);
+
+    /**
      * Creates the event subscription with the registered combination of correlation parameter values and saves it.
      */
-    EventSubscription registerProcessStartEventSubscription();
+    EventSubscription subscribe();
 }

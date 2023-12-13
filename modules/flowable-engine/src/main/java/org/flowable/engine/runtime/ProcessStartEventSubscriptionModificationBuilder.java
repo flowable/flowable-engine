@@ -10,18 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.event;
+package org.flowable.engine.runtime;
 
 import java.util.Map;
 
 import org.flowable.engine.RuntimeService;
 
 /**
- * A builder API to modify or delete a manually created process start event subscription which was created and registered using the
+ * A builder API to modify a manually created process start event subscription which was created and registered using the
  * {@link RuntimeService#createProcessStartEventSubscriptionBuilder()} builder API.
  * With this API you can modify one or more such subscriptions like migrating to a specific version of a process definition (if you choose to not automatically
- * migrate then to the latest version upon deployment of a new version). Or you can even delete one or more subscriptions based on the correlation parameter
- * values and event type.
+ * migrate then to the latest version upon deployment of a new version).
  *
  * @author Micha Kiener
  */
@@ -36,10 +35,10 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
     ProcessStartEventSubscriptionModificationBuilder processDefinitionId(String processDefinitionId);
 
     /**
-     * Adds a specific correlation parameter value for the subscription to be modified or deleted. If you register the same correlation parameter values
-     * as when creating and registering the event subscription, only that particular one will be modified or deleted with this builder.
-     * If you want to modify or delete all manually created subscriptions, don't register any correlation parameter values, which would result in all matching
-     * the provided process definition and event-registry start event will be modified or deleted.
+     * Adds a specific correlation parameter value for the subscription to be modified. If you register the same correlation parameter values as when creating
+     * and registering the event subscription, only that particular one will be modified with this builder.
+     * If you want to modify all manually created subscriptions, don't register any correlation parameter values, which would result in all matching
+     * the provided process definition and event-registry start event will be modified.
      *
      * @param parameterName the name of the correlation parameter
      * @param parameterValue the value of the correlation parameter
@@ -48,7 +47,7 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
     ProcessStartEventSubscriptionModificationBuilder addCorrelationParameterValue(String parameterName, Object parameterValue);
 
     /**
-     * Registers a list of correlation parameter values for the subscription(s) to be modified or deleted.
+     * Registers a list of correlation parameter values for the subscription(s) to be modified.
      *
      * @param parameters the map of correlation parameter values to be registered for the subscription
      * @return the builder to be used for method chaining
@@ -59,16 +58,11 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
      * Migrate all the matching event subscriptions to the latest process definition, which should be done if you want to manually upgrade the subscriptions
      * to the latest version of the process definition.
      */
-    void migrateToLatestProcessDefinitionVersion();
+    void migrateToLatestProcessDefinition();
 
     /**
      * Migrate all matching event subscriptions to the specific process definition.
      * @param processDefinitionId the id of the process definition to migrate to
      */
-    void migrateToProcessDefinitionVersion(String processDefinitionId);
-
-    /**
-     * Deletes all the matching event subscriptions.
-     */
-    void deleteSubscriptions();
+    void migrateToProcessDefinition(String processDefinitionId);
 }

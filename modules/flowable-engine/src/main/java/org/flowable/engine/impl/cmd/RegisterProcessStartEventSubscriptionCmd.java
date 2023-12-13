@@ -24,7 +24,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.event.ProcessStartEventSubscriptionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -49,7 +49,7 @@ public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessSta
 
     @Override
     public EventSubscription execute(CommandContext commandContext) {
-        ProcessDefinition processDefinition = getLatestProcessDefinitionByKey(builder.getProcessDefinitionKey(), commandContext);
+        ProcessDefinition processDefinition = getLatestProcessDefinitionByKey(builder.getProcessDefinitionKey(), builder.getTenantId(), commandContext);
         Process process = getProcess(processDefinition.getId(), commandContext);
 
         EventSubscription eventSubscription = null;
@@ -61,11 +61,11 @@ public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessSta
                 // looking for a dynamic, manually subscribed behavior of the event-registry start event
                 List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
                 if (correlationConfiguration != null && correlationConfiguration.size() > 0 &&
-                    "manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
+                    BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
 
                     // currently, only one event-registry start event is supported for manual subscriptions
                     if (eventSubscription != null) {
-                        throw new FlowableIllegalArgumentException("The process definition with key " + processDefinition.getKey()
+                        throw new FlowableIllegalArgumentException("The process definition with id " + processDefinition.getId()
                             + " has more than one event-registry start events based on manually registered subscriptions, which is currently not supported.");
                     }
 
@@ -79,7 +79,7 @@ public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessSta
         }
 
         if (eventSubscription == null) {
-            throw new FlowableIllegalArgumentException("The process definition with key '" + builder.getProcessDefinitionKey()
+            throw new FlowableIllegalArgumentException("The process definition with id '" + processDefinition.getId()
                 + "' does not have an event-registry based start event with a manual subscription behavior.");
         }
 

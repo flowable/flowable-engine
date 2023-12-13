@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -23,6 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -57,13 +59,18 @@ public abstract class AbstractProcessStartEventSubscriptionCmd {
             + "with key '" + eventModel.getKey() + "'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
-    protected ProcessDefinition getLatestProcessDefinitionByKey(String processDefinitionKey, CommandContext commandContext) {
+    protected ProcessDefinition getLatestProcessDefinitionByKey(String processDefinitionKey, String tenantId, CommandContext commandContext) {
         RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getRepositoryService();
 
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
             .processDefinitionKey(processDefinitionKey)
-            .latestVersion()
-            .singleResult();
+            .latestVersion();
+
+        if (StringUtils.isNotBlank(tenantId)) {
+            query.processDefinitionTenantId(tenantId);
+        }
+
+        ProcessDefinition processDefinition = query.singleResult();
 
         if (processDefinition == null) {
             throw new FlowableIllegalArgumentException("No deployed process definition found for key '" + processDefinitionKey + "'.");

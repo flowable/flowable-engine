@@ -102,7 +102,7 @@ public class EventSubscriptionManager {
                             // check the starting behavior of the event-registry start event, if it is dynamic with manual subscriptions, add it to the
                             // result with a true boolean, otherwise with false
                             List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
-                            if (correlationConfiguration != null && correlationConfiguration.size() > 0 && "manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
+                            if (correlationConfiguration != null && correlationConfiguration.size() > 0 && BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
                                 result.add(new StartEventInfo(eventType, startEvent.getId(), true));
                             } else {
                                 result.add(new StartEventInfo(eventType, startEvent.getId(), false));
@@ -137,7 +137,7 @@ public class EventSubscriptionManager {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionProcessDefinitionId(
-            previousProcessDefinition.getId(), processDefinition.getId(), eventType, activityId, true, null);
+            previousProcessDefinition.getId(), processDefinition.getId(), eventType, activityId, processDefinition.getKey(), null);
     }
 
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
@@ -226,7 +226,7 @@ public class EventSubscriptionManager {
          // check, if we have a dynamic event-based start for that process definition
         List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
         if (correlationConfiguration != null && correlationConfiguration.size() > 0) {
-            if ("manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
+            if (BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
                 return;
             }
         }

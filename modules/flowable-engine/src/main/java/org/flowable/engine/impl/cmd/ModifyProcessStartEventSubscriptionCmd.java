@@ -22,45 +22,33 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.event.ProcessStartEventSubscriptionModificationBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionModificationBuilderImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
- * This command either modifies or deletes event subscriptions with a process start event and optional correlation parameter values.
+ * This command either modifies event subscriptions with a process start event and optional correlation parameter values.
  *
  * @author Micha Kiener
  */
-public class ModifyOrDeleteProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
+public class ModifyProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     protected final ProcessStartEventSubscriptionModificationBuilderImpl builder;
-    protected final boolean isModificationCmd;
 
-    public ModifyOrDeleteProcessStartEventSubscriptionCmd(ProcessStartEventSubscriptionModificationBuilderImpl builder, boolean isModificationCmd) {
+    public ModifyProcessStartEventSubscriptionCmd(ProcessStartEventSubscriptionModificationBuilderImpl builder) {
         this.builder = builder;
-        this.isModificationCmd = isModificationCmd;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (isModificationCmd) {
-            migrateSubscriptionsToProcessDefinition(commandContext);
-        } else {
-            deleteSubscriptions(commandContext);
-        }
-
-        return null;
-    }
-
-    protected void migrateSubscriptionsToProcessDefinition(CommandContext commandContext) {
         ProcessDefinition newProcessDefinition;
         if (builder.hasNewProcessDefinitionId()) {
             newProcessDefinition = getProcessDefinitionById(builder.getNewProcessDefinitionId(), commandContext);
         } else {
             // no explicit process definition provided, so use latest one
             ProcessDefinition processDefinition = getProcessDefinitionById(builder.getProcessDefinitionId(), commandContext);
-            newProcessDefinition = getLatestProcessDefinitionByKey(processDefinition.getKey(), commandContext);
+            newProcessDefinition = getLatestProcessDefinitionByKey(processDefinition.getKey(), processDefinition.getTenantId(), commandContext);
         }
 
         if (newProcessDefinition == null) {
@@ -79,7 +67,7 @@ public class ModifyOrDeleteProcessStartEventSubscriptionCmd extends AbstractProc
                 // looking for a dynamic, manually subscribed behavior of the event-registry start event
                 List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
                 if (correlationConfiguration != null && correlationConfiguration.size() > 0 &&
-                    "manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
+                    BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
 
                     String eventDefinitionKey = eventTypeElements.get(0).getElementText();
                     String correlationKey = null;
@@ -89,36 +77,11 @@ public class ModifyOrDeleteProcessStartEventSubscriptionCmd extends AbstractProc
                     }
 
                     getEventSubscriptionService(commandContext).updateEventSubscriptionProcessDefinitionId(builder.getProcessDefinitionId(), newProcessDefinition.getId(),
-                        eventDefinitionKey, startEvent.getId(), false, correlationKey);
+                        eventDefinitionKey, startEvent.getId(), null, correlationKey);
                 }
             }
         }
-    }
 
-    protected void deleteSubscriptions(CommandContext commandContext) {
-        Process process = getProcess(builder.getProcessDefinitionId(), commandContext);
-
-        List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
-        for (StartEvent startEvent : startEvents) {
-            // looking for a start event based on an event-registry event subscription
-            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-            if (eventTypeElements != null && eventTypeElements.size() > 0) {
-                // looking for a dynamic, manually subscribed behavior of the event-registry start event
-                List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
-                if (correlationConfiguration != null && correlationConfiguration.size() > 0 &&
-                    "manualSubscriptions".equals(correlationConfiguration.get(0).getElementText())) {
-
-                    String eventDefinitionKey = eventTypeElements.get(0).getElementText();
-                    String correlationKey = null;
-
-                    if (builder.hasCorrelationParameterValues()) {
-                        correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getCorrelationParameterValues(), commandContext);
-                    }
-
-                    getEventSubscriptionService(commandContext).deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(builder.getProcessDefinitionId(),
-                        eventDefinitionKey, startEvent.getId(), correlationKey);
-                }
-            }
-        }
+        return null;
     }
 }
