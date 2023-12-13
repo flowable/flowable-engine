@@ -13,13 +13,9 @@
 package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
@@ -27,14 +23,11 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.ProcessStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.eventregistry.model.EventModel;
-import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -44,7 +37,7 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
  *
  * @author Micha Kiener
  */
-public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSubscription>, Serializable {
+public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<EventSubscription>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,7 +49,7 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSu
 
     @Override
     public EventSubscription execute(CommandContext commandContext) {
-        ProcessDefinition processDefinition = getProcessDefinition(commandContext);
+        ProcessDefinition processDefinition = getLatestProcessDefinitionByKey(builder.getProcessDefinitionKey(), commandContext);
         Process process = getProcess(processDefinition.getId(), commandContext);
 
         EventSubscription eventSubscription = null;
@@ -77,7 +70,7 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSu
                     }
 
                     String eventDefinitionKey = eventTypeElements.get(0).getElementText();
-                    String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, commandContext);
+                    String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getCorrelationParameterValues(), commandContext);
 
                     eventSubscription = insertEventRegistryEvent(eventDefinitionKey, builder.isDoNotUpdateToLatestVersionAutomatically(), startEvent, processDefinition,
                         correlationKey, commandContext);
@@ -91,29 +84,6 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSu
         }
 
         return eventSubscription;
-    }
-
-    protected String generateCorrelationConfiguration(String eventDefinitionKey, CommandContext commandContext) {
-        EventModel eventModel = getEventModel(eventDefinitionKey, commandContext);
-        Map<String, Object> correlationParameters = new HashMap<>();
-        for (Map.Entry<String, Object> correlationValue : builder.getCorrelationParameterValues().entrySet()) {
-            // make sure the correlation parameter value is based on a valid, defined correlation parameter within the event model
-            checkEventModelCorrelationParameter(eventModel, correlationValue.getKey());
-            correlationParameters.put(correlationValue.getKey(), correlationValue.getValue());
-        }
-
-        return CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
-    }
-
-    protected void checkEventModelCorrelationParameter(EventModel eventModel, String correlationParameterName) {
-        Collection<EventPayload> correlationParameters = eventModel.getCorrelationParameters();
-        for (EventPayload correlationParameter : correlationParameters) {
-            if (correlationParameter.getName().equals(correlationParameterName)) {
-                return;
-            }
-        }
-        throw new FlowableIllegalArgumentException("There is no correlation parameter with name '" + correlationParameterName + "' defined in event model "
-            + "with key '" + eventModel.getKey() + "'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
     protected EventSubscription insertEventRegistryEvent(String eventDefinitionKey, boolean doNotUpdateToLatestVersionAutomatically, StartEvent startEvent,
@@ -140,33 +110,5 @@ public class RegisterProcessStartEventSubscriptionCmd implements Command<EventSu
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
 
         return eventSubscription;
-    }
-
-    protected ProcessDefinition getProcessDefinition(CommandContext commandContext) {
-        RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getRepositoryService();
-
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey(builder.getProcessDefinitionKey())
-            .latestVersion()
-            .singleResult();
-
-        if (processDefinition == null) {
-            throw new FlowableIllegalArgumentException("No deployed process definition found for key '" + builder.getProcessDefinitionKey() + "'.");
-        }
-        return processDefinition;
-    }
-
-    protected Process getProcess(String processDefinitionId, CommandContext commandContext) {
-        RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getRepositoryService();
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
-        return bpmnModel.getMainProcess();
-    }
-
-    protected EventModel getEventModel(String eventDefinitionKey, CommandContext commandContext) {
-        EventModel eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(eventDefinitionKey);
-        if (eventModel == null) {
-            throw new FlowableIllegalArgumentException("Could not find event model with key '" + eventDefinitionKey + "'.");
-        }
-        return eventModel;
     }
 }

@@ -1075,7 +1075,7 @@
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
-  
+
   <!--  tenantId update -->
    <update id="updateTenantIdOfEventSubscriptions" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
@@ -1086,14 +1086,19 @@
   </update>
 
  <!-- process definition id update -->
-   <update id="updateEventSubscriptionProcessDefinitionId" parameterType="map">
+   <update id="updateManualProcessStartEventSubscriptionWithProcessDefinitionId" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
     set PROC_DEF_ID_ = #{newProcessDefinitionId, jdbcType=VARCHAR}
     where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
     and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
     and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
-    and SCOPE_DEFINITION_KEY_ is not null
-  </update>
+    <if test="autoUpdate == true">
+        and SCOPE_DEFINITION_KEY_ is not null
+    </if>
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
+   </update>
 
   <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
@@ -1156,5 +1161,15 @@
      and SCOPE_ID_ is null
   </delete>
 
+ <!-- delete manual subscriptions for process start -->
+  <delete id="deleteManualProcessStartEventSubscriptions" parameterType="map">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where
+    PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
+  </delete>
 
 </mapper>

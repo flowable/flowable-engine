@@ -27,11 +27,10 @@ import org.flowable.eventsubscription.api.EventSubscription;
  * @author Micha Kiener
  */
 public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEventSubscriptionBuilder {
-
     protected final RuntimeServiceImpl runtimeService;
     protected String processDefinitionKey;
-    protected boolean doNotUpdateToLatestVersionAutomatically;
     protected final Map<String, Object> correlationParameterValues = new HashMap<>();
+    protected boolean doNotUpdateToLatestVersionAutomatically;
 
     public ProcessStartEventSubscriptionBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
@@ -65,16 +64,21 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
         return processDefinitionKey;
     }
 
-    public boolean isDoNotUpdateToLatestVersionAutomatically() {
-        return doNotUpdateToLatestVersionAutomatically;
-    }
-
     public Map<String, Object> getCorrelationParameterValues() {
         return correlationParameterValues;
     }
 
+    public boolean isDoNotUpdateToLatestVersionAutomatically() {
+        return doNotUpdateToLatestVersionAutomatically;
+    }
+
     @Override
     public EventSubscription registerProcessStartEventSubscription() {
+        checkValidInformation();
+        return runtimeService.registerProcessStartEventSubscription(this);
+    }
+
+    protected void checkValidInformation() {
         if (StringUtils.isEmpty(processDefinitionKey)) {
             throw new FlowableIllegalArgumentException("The process definition must be provided using the key for the subscription to be registered.");
         }
@@ -84,7 +88,5 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
                 "At least one correlation parameter value must be provided for a dynamic process start event subscription, "
                     + "otherwise the process would get started on all events, regardless their correlation parameter values.");
         }
-
-        return runtimeService.registerProcessStartEventSubscription(this);
     }
 }

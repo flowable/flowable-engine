@@ -137,7 +137,7 @@ public class EventSubscriptionManager {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionProcessDefinitionId(
-            previousProcessDefinition.getId(), processDefinition.getId(), eventType, activityId);
+            previousProcessDefinition.getId(), processDefinition.getId(), eventType, activityId, true, null);
     }
 
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {

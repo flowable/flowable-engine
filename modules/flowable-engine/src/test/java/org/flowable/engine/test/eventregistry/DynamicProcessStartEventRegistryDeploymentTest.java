@@ -32,6 +32,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import liquibase.repackaged.org.apache.commons.collections4.map.ListOrderedMap;
+
 /**
  * Various tests for event-registry based process starts, both static and dynamic and the handling of the event subscriptions.
  *
@@ -70,8 +72,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
     }
 
     @Test
@@ -84,8 +85,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
         sendEvent("kermit", "start");
 
         // there must be no running process instance as we didn't create a manual subscription yet
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
     }
 
     @Test
@@ -142,8 +142,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
         sendEvent("kermit", "start");
 
         // there must be no running process instance as we didn't create a manual subscription yet
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
     }
 
     @Test
@@ -192,8 +191,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
     }
 
     @Test
@@ -220,8 +218,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
     }
 
     @Test
@@ -242,8 +239,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         // redeploy the process definition (which removes and re-adds the static start subscription)
         ProcessDefinition processDefinition = deployProcessDefinition("testStaticEventRegistryProcessStart.bpmn20.xml",
@@ -261,8 +257,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
             taskService.complete(task.getId());
 
-            assertThat(runtimeService.createProcessInstanceQuery().list())
-                .isEmpty();
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
         } finally {
             deleteDeployment(processDefinition.getDeploymentId());
         }
@@ -293,8 +288,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         // the scope definition key must be present in the subscription
         assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
@@ -317,8 +311,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
             taskService.complete(task.getId());
 
-            assertThat(runtimeService.createProcessInstanceQuery().list())
-                .isEmpty();
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
         } finally {
             deleteDeployment(processDefinition.getDeploymentId());
         }
@@ -350,8 +343,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
         taskService.complete(task.getId());
 
-        assertThat(runtimeService.createProcessInstanceQuery().list())
-            .isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
 
         // the scope definition key must not be present in the event subscription
         assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
@@ -377,8 +369,7 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
             taskService.complete(task.getId());
 
-            assertThat(runtimeService.createProcessInstanceQuery().list())
-                .isEmpty();
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
         } finally {
             deleteDeployment(latestProcessDefinition.getDeploymentId());
         }
@@ -429,6 +420,428 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
         assertThat(runtimeService.createEventSubscriptionQuery().processDefinitionId(processDefinition.getId()).list()).isEmpty();
     }
 
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterSubscriptionMigration() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "frog")
+            .addCorrelationParameterValue("action", "end")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        // search the first process definition as we don't have auto-update in the subscriptions
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId)
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1"),
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1"));
+
+        // redeploy the process definition (which must not remove or update the existing subscriptions)
+        ProcessDefinition newProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            // now migrate to the latest process definition manually
+            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .migrateToLatestProcessDefinitionVersion();
+
+            assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+                .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId)
+                .containsExactlyInAnyOrder(
+                    Tuple.tuple(newProcessDefinition.getId(), "bpmnStartEvent_1"),
+                    Tuple.tuple(newProcessDefinition.getId(), "bpmnStartEvent_1"));
+
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", newProcessDefinition.getId()));
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+        } finally {
+            deleteDeployment(newProcessDefinition.getDeploymentId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterSingleSubscriptionMigration() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "frog")
+            .addCorrelationParameterValue("action", "end")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+
+        Map<String, Object> correlationParameters = new ListOrderedMap<>();
+        correlationParameters.put("customer", "kermit");
+        correlationParameters.put("action", "start");
+        String correlationConfig1 = getEventRegistry().generateKey(correlationParameters);
+
+        correlationParameters.put("customer", "frog");
+        correlationParameters.put("action", "end");
+        String correlationConfig2 = getEventRegistry().generateKey(correlationParameters);
+
+        // search the first process definition as we don't have auto-update in the subscriptions
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig1),
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2));
+
+        // redeploy the process definition (which must not remove or update the existing subscriptions)
+        ProcessDefinition newProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            // now migrate to the latest process definition manually
+            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
+                .migrateToLatestProcessDefinitionVersion();
+
+            assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+                .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+                .containsExactlyInAnyOrder(
+                    Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2),
+                    Tuple.tuple(newProcessDefinition.getId(), "bpmnStartEvent_1", correlationConfig1));
+
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", newProcessDefinition.getId()));
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+        } finally {
+            deleteDeployment(newProcessDefinition.getDeploymentId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterSingleSubscriptionMigrationToSpecificVersion() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "frog")
+            .addCorrelationParameterValue("action", "end")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+
+        Map<String, Object> correlationParameters = new ListOrderedMap<>();
+        correlationParameters.put("customer", "kermit");
+        correlationParameters.put("action", "start");
+        String correlationConfig1 = getEventRegistry().generateKey(correlationParameters);
+
+        correlationParameters.put("customer", "frog");
+        correlationParameters.put("action", "end");
+        String correlationConfig2 = getEventRegistry().generateKey(correlationParameters);
+
+        // search the first process definition as we don't have auto-update in the subscriptions
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig1),
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2));
+
+        // redeploy the process definition (which must not remove or update the existing subscriptions)
+        ProcessDefinition newProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            // now migrate to the latest process definition manually
+            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
+                .migrateToProcessDefinitionVersion(newProcessDefinition.getId());
+
+            assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+                .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+                .containsExactlyInAnyOrder(
+                    Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2),
+                    Tuple.tuple(newProcessDefinition.getId(), "bpmnStartEvent_1", correlationConfig1));
+
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", newProcessDefinition.getId()));
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+        } finally {
+            deleteDeployment(newProcessDefinition.getDeploymentId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterSingleSubscriptionDeletion() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "frog")
+            .addCorrelationParameterValue("action", "end")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+
+        Map<String, Object> correlationParameters = new ListOrderedMap<>();
+        correlationParameters.put("customer", "kermit");
+        correlationParameters.put("action", "start");
+        String correlationConfig1 = getEventRegistry().generateKey(correlationParameters);
+
+        correlationParameters.put("customer", "frog");
+        correlationParameters.put("action", "end");
+        String correlationConfig2 = getEventRegistry().generateKey(correlationParameters);
+
+        // search the first process definition as we don't have auto-update in the subscriptions
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig1),
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2));
+
+        // redeploy the process definition (which must not remove or update the existing subscriptions)
+        ProcessDefinition newProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            // now migrate to the latest process definition manually
+            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .addCorrelationParameterValues(Map.of("customer", "kermit", "action", "start"))
+                .deleteSubscriptions();
+
+            assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+                .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+                .containsExactlyInAnyOrder(Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2));
+
+            sendEvent("kermit", "start");
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            sendEvent("frog", "end");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+        } finally {
+            deleteDeployment(newProcessDefinition.getDeploymentId());
+        }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testDynamicEventRegistryProcessStartAfterAllSubscriptionDeletion() {
+        // manually register start subscription, matching the event correlation sent later
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "kermit")
+            .addCorrelationParameterValue("action", "start")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+        runtimeService.createProcessStartEventSubscriptionBuilder()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+            .addCorrelationParameterValue("customer", "frog")
+            .addCorrelationParameterValue("action", "end")
+            .doNotUpdateToLatestVersionAutomatically()
+            .registerProcessStartEventSubscription();
+
+
+        Map<String, Object> correlationParameters = new ListOrderedMap<>();
+        correlationParameters.put("customer", "kermit");
+        correlationParameters.put("action", "start");
+        String correlationConfig1 = getEventRegistry().generateKey(correlationParameters);
+
+        correlationParameters.put("customer", "frog");
+        correlationParameters.put("action", "end");
+        String correlationConfig2 = getEventRegistry().generateKey(correlationParameters);
+
+        // search the first process definition as we don't have auto-update in the subscriptions
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("eventRegistryDynamicStartTestProcess").latestVersion().singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list())
+            .extracting(EventSubscription::getProcessDefinitionId, EventSubscription::getActivityId, EventSubscription::getConfiguration)
+            .containsExactlyInAnyOrder(
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig1),
+                Tuple.tuple(processDefinition.getId(), "bpmnStartEvent_1", correlationConfig2));
+
+        // redeploy the process definition (which must not remove or update the existing subscriptions)
+        ProcessDefinition newProcessDefinition = deployProcessDefinition("eventRegistryDynamicStartTestProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml");
+
+        try {
+            sendEvent("kermit", "start");
+
+            assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventRegistryDynamicStartTestProcess", processDefinition.getId()));
+
+            Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            // now migrate to the latest process definition manually
+            runtimeService.createProcessStartEventSubscriptionModificationBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .deleteSubscriptions();
+
+            assertThat(runtimeService.createEventSubscriptionQuery().eventType("simpleTest").list()).isEmpty();
+
+            sendEvent("kermit", "start");
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+            sendEvent("frog", "end");
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+        } finally {
+            deleteDeployment(newProcessDefinition.getDeploymentId());
+        }
+    }
 
     protected ProcessInstance sendEvent(String customerId, String action) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()

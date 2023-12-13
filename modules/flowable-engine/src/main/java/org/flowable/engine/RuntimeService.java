@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.event.ProcessStartEventSubscriptionBuilder;
+import org.flowable.engine.event.ProcessStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ActivityInstanceQuery;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
@@ -1370,6 +1371,14 @@ public interface RuntimeService {
      * @return the subscription builder
      */
     ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder();
+
+    /**
+     * Creates a new event subscription modification builder to modify or delete one or more previously registered process start event subscriptions based
+     * on a particular process definition and with an optional combination of correlation parameter values.
+     *
+     * @return the subscription modification builder
+     */
+    ProcessStartEventSubscriptionModificationBuilder createProcessStartEventSubscriptionModificationBuilder();
 
     /**
      * Sets the name for the process instance with the given id.
