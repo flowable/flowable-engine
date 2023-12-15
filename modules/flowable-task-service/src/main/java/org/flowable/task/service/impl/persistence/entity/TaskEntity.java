@@ -90,6 +90,10 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     void setAssigneeValue(String assignee);
     
     void setOwnerValue(String owner);
+    
+    String getTempCompletedBy();
+    
+    void setTempCompletedBy(String completedBy);
 
     List<VariableInstanceEntity> getQueryVariables();
 }

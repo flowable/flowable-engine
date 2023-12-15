@@ -26,7 +26,6 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -206,6 +205,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         if (transientVariablesLocal != null) {
             task.setTransientVariablesLocal(transientVariablesLocal);
         }
+        
+        if (userId != null) {
+            task.setTempCompletedBy(userId);
+        }
 
         logUserTaskCompleted(task, cmmnEngineConfiguration);
 
@@ -215,9 +218,6 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         
         cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_COMPLETE);
 
-        if (StringUtils.isNotEmpty(userId)) {
-            Authentication.setAuthenticatedUserId(userId);
-        }
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
     }
 

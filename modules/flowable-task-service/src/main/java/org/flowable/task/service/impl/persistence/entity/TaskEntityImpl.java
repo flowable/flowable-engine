@@ -119,6 +119,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     // Non-persisted
     protected String eventName;
     protected String eventHandlerId;
+    protected String tempCompletedBy;
     protected List<VariableInstanceEntity> queryVariables;
     protected List<IdentityLinkEntity> queryIdentityLinks;
     protected boolean forcedUpdate;
@@ -708,6 +709,16 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     @Override
     public void setEventHandlerId(String eventHandlerId) {
         this.eventHandlerId = eventHandlerId;
+    }
+    
+    @Override
+    public String getTempCompletedBy() {
+        return tempCompletedBy;
+    }
+
+    @Override
+    public void setTempCompletedBy(String tempCompletedBy) {
+        this.tempCompletedBy = tempCompletedBy;
     }
 
     @Override

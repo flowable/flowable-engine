@@ -198,6 +198,11 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration) {
+        dataManager.updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId, scopeDefinitionKey, configuration);
+    }
+
+    @Override
     public boolean lockEventSubscription(String eventSubscriptionId) {
         EventSubscriptionServiceConfiguration serviceConfiguration = getServiceConfiguration();
 
@@ -240,6 +245,11 @@ public class EventSubscriptionEntityManagerImpl
     @Override
     public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
         dataManager.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(scopeDefinitionId, scopeType);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration) {
+        dataManager.deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(processDefinitionId, eventType, activityId, configuration);
     }
 
     protected SignalEventSubscriptionEntity insertSignalEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {

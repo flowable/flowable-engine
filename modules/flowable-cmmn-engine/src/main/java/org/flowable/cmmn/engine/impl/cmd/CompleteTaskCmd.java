@@ -27,7 +27,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
@@ -137,9 +136,10 @@ public class CompleteTaskCmd implements Command<Void> {
                         "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
             
-            if (StringUtils.isNotEmpty(userId)) {
-                Authentication.setAuthenticatedUserId(userId);
+            if (userId != null) {
+                taskEntity.setTempCompletedBy(userId);
             }
+            
             CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
             
         } else {
