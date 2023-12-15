@@ -40,6 +40,7 @@ import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
+import org.flowable.engine.impl.cmd.DeleteProcessStartEventSubscriptionCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
 import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
@@ -64,6 +65,8 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.ModifyProcessStartEventSubscriptionCmd;
+import org.flowable.engine.impl.cmd.RegisterProcessStartEventSubscriptionCmd;
 import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
@@ -83,6 +86,9 @@ import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionDeletionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionModificationBuilderImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
@@ -92,9 +98,13 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessStartEventSubscriptionBuilder;
+import org.flowable.engine.runtime.ProcessStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -738,6 +748,21 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder() {
+        return new ProcessStartEventSubscriptionBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessStartEventSubscriptionModificationBuilder createProcessStartEventSubscriptionModificationBuilder() {
+        return new ProcessStartEventSubscriptionModificationBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessStartEventSubscriptionDeletionBuilder createProcessStartEventSubscriptionDeletionBuilder() {
+        return new ProcessStartEventSubscriptionDeletionBuilderImpl(this);
+    }
+
+    @Override
     public void setProcessInstanceName(String processInstanceId, String name) {
         commandExecutor.execute(new SetProcessInstanceNameCmd(processInstanceId, name));
     }
@@ -803,6 +828,18 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         } else {
             throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey provided");
         }
+    }
+
+    public EventSubscription registerProcessStartEventSubscription(ProcessStartEventSubscriptionBuilderImpl builder) {
+        return commandExecutor.execute(new RegisterProcessStartEventSubscriptionCmd(builder));
+    }
+
+    public void migrateProcessStartEventSubscriptionsToProcessDefinitionVersion(ProcessStartEventSubscriptionModificationBuilderImpl builder) {
+        commandExecutor.execute(new ModifyProcessStartEventSubscriptionCmd(builder));
+    }
+
+    public void deleteProcessStartEventSubscriptions(ProcessStartEventSubscriptionDeletionBuilderImpl builder) {
+        commandExecutor.execute(new DeleteProcessStartEventSubscriptionCmd(builder));
     }
 
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {

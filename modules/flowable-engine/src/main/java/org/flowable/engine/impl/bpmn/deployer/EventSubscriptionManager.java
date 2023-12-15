@@ -12,9 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
@@ -59,27 +58,34 @@ public class EventSubscriptionManager {
         }
     }
 
-    protected void removeObsoleteSignalEventSubScription(ProcessDefinitionEntity previousProcessDefinition) {
+    protected void removeObsoleteSignalEventSubscription(ProcessDefinitionEntity previousProcessDefinition) {
         // remove all subscriptions for the previous version
         if (previousProcessDefinition != null) {
             removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, SignalEventHandler.EVENT_HANDLER_TYPE);
         }
     }
 
-    protected void removeObsoleteEventRegistryEventSubScription(ProcessDefinitionEntity previousProcessDefinition) {
-        // remove all subscriptions for the previous version
+    protected void removeOrUpdateObsoleteEventRegistryEventSubscription(ProcessDefinitionEntity previousProcessDefinition, ProcessDefinitionEntity processDefinition) {
+        // remove all subscriptions for the previous version or update them for a dynamic, manual subscription behavior
         if (previousProcessDefinition != null) {
-            Set<String> eventRegistryStartEventEventTypes = getEventRegistryStartEventEventTypes(previousProcessDefinition);
-            if (eventRegistryStartEventEventTypes != null) {
-                for (String eventRegistryStartEventEventType : eventRegistryStartEventEventTypes) {
-                    removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEventEventType);
+            List<StartEventInfo> eventRegistryStartEvents = getEventRegistryStartEventEventTypes(previousProcessDefinition);
+            if (eventRegistryStartEvents != null) {
+                for (StartEventInfo eventRegistryStartEvent : eventRegistryStartEvents) {
+                    if (eventRegistryStartEvent.dynamic()) {
+                        // for a dynamic, manual subscription behavior, we must not remove the old subscriptions, but rather update them
+                        // to the newest process definition id, as they have been manually added before
+                        updateOldEventSubscriptionsImpl(previousProcessDefinition, processDefinition, eventRegistryStartEvent.eventType(), eventRegistryStartEvent.activityId());
+                    } else {
+                        // for a static starting behavior, we always remove the old subscription and recreate it with the new definition
+                        removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEvent.eventType());
+                    }
                 }
             }
         }
     }
 
-    protected Set<String> getEventRegistryStartEventEventTypes(ProcessDefinitionEntity previousProcessDefinition) {
-        Set<String> result = null;
+    protected List<StartEventInfo> getEventRegistryStartEventEventTypes(ProcessDefinitionEntity previousProcessDefinition) {
+        List<StartEventInfo> result = null;
         Process process = ProcessDefinitionUtil.getProcess(previousProcessDefinition.getId());
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, true);
         if (!startEvents.isEmpty()) {
@@ -90,15 +96,26 @@ public class EventSubscriptionManager {
                         String eventType = eventTypeElements.get(0).getElementText();
                         if (StringUtils.isNotEmpty(eventType)) {
                             if (result == null) {
-                                result = new HashSet<>();
+                                result = new ArrayList<>();
                             }
-                            result.add(eventType);
+
+                            // check the starting behavior of the event-registry start event, if it is dynamic with manual subscriptions, add it to the
+                            // result with a true boolean, otherwise with false
+                            List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
+                            if (correlationConfiguration != null && correlationConfiguration.size() > 0 && BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
+                                result.add(new StartEventInfo(eventType, startEvent.getId(), true));
+                            } else {
+                                result.add(new StartEventInfo(eventType, startEvent.getId(), false));
+                            }
                         }
                     }
                 }
             }
         }
         return result;
+    }
+
+    protected record StartEventInfo(String eventType, String activityId, boolean dynamic) {
     }
 
     protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
@@ -112,6 +129,15 @@ public class EventSubscriptionManager {
             eventSubscriptionService.deleteEventSubscription(eventSubscriptionEntity);
             CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscriptionEntity);
         }
+    }
+
+    protected void updateOldEventSubscriptionsImpl(ProcessDefinitionEntity previousProcessDefinition, ProcessDefinitionEntity processDefinition,
+        String eventType, String activityId) {
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
+        processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionProcessDefinitionId(
+            previousProcessDefinition.getId(), processDefinition.getId(), eventType, activityId, processDefinition.getKey(), null);
     }
 
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
@@ -197,6 +223,14 @@ public class EventSubscriptionManager {
     }
     
     protected void insertEventRegistryEvent(String eventDefinitionKey, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
+         // check, if we have a dynamic event-based start for that process definition
+        List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
+        if (correlationConfiguration != null && correlationConfiguration.size() > 0) {
+            if (BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
+                return;
+            }
+        }
+
         CommandContext commandContext = Context.getCommandContext();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();

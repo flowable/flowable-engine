@@ -170,8 +170,8 @@ public class BpmnDeploymentHelper {
         BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
 
         eventSubscriptionManager.removeObsoleteMessageEventSubscriptions(previousProcessDefinition);
-        eventSubscriptionManager.removeObsoleteSignalEventSubScription(previousProcessDefinition);
-        eventSubscriptionManager.removeObsoleteEventRegistryEventSubScription(previousProcessDefinition);
+        eventSubscriptionManager.removeObsoleteSignalEventSubscription(previousProcessDefinition);
+        eventSubscriptionManager.removeOrUpdateObsoleteEventRegistryEventSubscription(previousProcessDefinition, processDefinition);
         eventSubscriptionManager.addEventSubscriptions(processDefinition, process, bpmnModel);
 
         timerManager.removeObsoleteTimers(processDefinition);
