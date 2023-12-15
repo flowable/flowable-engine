@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
@@ -325,6 +326,7 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
+import org.springframework.util.CollectionUtils;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes, 
@@ -1735,9 +1737,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
             this.jobServiceConfiguration.setJobExecutionScope(this.jobExecutionScope);
             this.jobServiceConfiguration.setHistoryJobExecutionScope(this.historyJobExecutionScope);
-            
+
             if (enabledJobCategories != null) {
                 this.jobServiceConfiguration.setEnabledJobCategories(enabledJobCategories);
+            }
+
+            if (StringUtils.isNoneBlank(defaultJobCategory)) {
+                if (!CollectionUtils.isEmpty(enabledJobCategories)) {
+                    enabledJobCategories.add(defaultJobCategory);
+                }
+                this.jobServiceConfiguration.setEnabledJobCategories(List.of(defaultJobCategory));
             }
 
             this.jobServiceConfiguration.setConfigurators(jobServiceConfigurators);

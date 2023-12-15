@@ -33,7 +33,7 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 public class JobUtil {
 
     public static JobEntity createJob(CaseInstanceEntity caseInstance, BaseElement baseElement, String jobHandlerType,
-            CmmnEngineConfiguration cmmnEngineConfiguration) {
+                                      CmmnEngineConfiguration cmmnEngineConfiguration) {
         JobEntity job = createJob((VariableContainer) caseInstance, baseElement, jobHandlerType, cmmnEngineConfiguration);
 
         job.setScopeId(caseInstance.getId());
@@ -62,18 +62,22 @@ public class JobUtil {
             job.setElementName(((CaseElement) baseElement).getName());
         }
 
-        List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(variableContainer);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
+        if (StringUtils.isEmpty(cmmnEngineConfiguration.getDefaultJobCategory())) {
+            List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                    Object categoryValue = categoryExpression.getValue(variableContainer);
+                    if (categoryValue != null) {
+                        job.setCategory(categoryValue.toString());
+                    }
                 }
             }
+        } else {
+            String category = cmmnEngineConfiguration.getDefaultJobCategory();
+            job.setCategory(category);
         }
-
 
         job.setTenantId(variableContainer.getTenantId());
 

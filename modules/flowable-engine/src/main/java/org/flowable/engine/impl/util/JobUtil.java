@@ -45,17 +45,24 @@ public class JobUtil {
         }
         job.setJobHandlerType(jobHandlerType);
 
-        List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(execution);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
+
+        if (StringUtils.isEmpty(processEngineConfiguration.getDefaultJobCategory())) {
+            List<ExtensionElement> jobCategoryElements = baseElement.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                    Object categoryValue = categoryExpression.getValue(execution);
+                    if (categoryValue != null) {
+                        job.setCategory(categoryValue.toString());
+                    }
                 }
             }
+        } else {
+            String category = processEngineConfiguration.getDefaultJobCategory();
+            job.setCategory(category);
         }
+
 
         // Inherit tenant id (if applicable)
         if (execution.getTenantId() != null) {
