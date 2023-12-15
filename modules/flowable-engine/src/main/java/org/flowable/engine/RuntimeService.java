@@ -37,9 +37,9 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.runtime.ProcessStartEventSubscriptionBuilder;
-import org.flowable.engine.runtime.ProcessStartEventSubscriptionDeletionBuilder;
-import org.flowable.engine.runtime.ProcessStartEventSubscriptionModificationBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
@@ -1367,11 +1367,11 @@ public interface RuntimeService {
      * dynamic, manual subscription based behavior and the registered correlation parameter values within the builder need to be based on
      * actual correlation parameter definitions within the event model the start event is based on.
      * Register one or more correlation parameter value with in the builder before invoking the
-     * {@link ProcessStartEventSubscriptionBuilder#subscribe()} method to create and register the subscription.
+     * {@link ProcessInstanceStartEventSubscriptionBuilder#subscribe()} method to create and register the subscription.
      *
      * @return the subscription builder
      */
-    ProcessStartEventSubscriptionBuilder createProcessStartEventSubscriptionBuilder();
+    ProcessInstanceStartEventSubscriptionBuilder createProcessInstanceStartEventSubscriptionBuilder();
 
     /**
      * Creates a new event subscription modification builder to modify one or more previously registered process start event subscriptions based
@@ -1379,7 +1379,7 @@ public interface RuntimeService {
      *
      * @return the subscription modification builder
      */
-    ProcessStartEventSubscriptionModificationBuilder createProcessStartEventSubscriptionModificationBuilder();
+    ProcessInstanceStartEventSubscriptionModificationBuilder createProcessInstanceStartEventSubscriptionModificationBuilder();
 
     /**
      * Creates a new event subscription deletion builder delete one or more previously registered process start event subscriptions based
@@ -1387,7 +1387,7 @@ public interface RuntimeService {
      *
      * @return the subscription deletion builder
      */
-    ProcessStartEventSubscriptionDeletionBuilder createProcessStartEventSubscriptionDeletionBuilder();
+    ProcessInstanceStartEventSubscriptionDeletionBuilder createProcessInstanceStartEventSubscriptionDeletionBuilder();
 
     /**
      * Sets the name for the process instance with the given id.

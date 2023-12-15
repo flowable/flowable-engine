@@ -16,7 +16,7 @@
     <startEvent id="bpmnStartEvent_1" isInterrupting="false">
       <extensionElements>
         <flowable:eventType><![CDATA[simpleTest]]></flowable:eventType>
-        <flowable:startEventCorrelationConfiguration><![CDATA[manualSubscriptions]]></flowable:startEventCorrelationConfiguration>
+        <flowable:startEventCorrelationConfiguration><![CDATA[manualSubscription]]></flowable:startEventCorrelationConfiguration>
         <flowable:eventOutParameter source="customer" target="customer"></flowable:eventOutParameter>
         <flowable:eventOutParameter source="name" target="name"></flowable:eventOutParameter>
         <flowable:eventOutParameter source="action" target="action"></flowable:eventOutParameter>

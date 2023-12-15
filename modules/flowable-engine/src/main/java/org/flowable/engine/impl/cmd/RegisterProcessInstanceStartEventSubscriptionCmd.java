@@ -24,7 +24,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -37,13 +37,13 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
  *
  * @author Micha Kiener
  */
-public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<EventSubscription>, Serializable {
+public class RegisterProcessInstanceStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<EventSubscription>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected final ProcessStartEventSubscriptionBuilderImpl builder;
+    protected final ProcessInstanceStartEventSubscriptionBuilderImpl builder;
 
-    public RegisterProcessStartEventSubscriptionCmd(ProcessStartEventSubscriptionBuilderImpl builder) {
+    public RegisterProcessInstanceStartEventSubscriptionCmd(ProcessInstanceStartEventSubscriptionBuilderImpl builder) {
         this.builder = builder;
     }
 
@@ -70,7 +70,8 @@ public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessSta
                     }
 
                     String eventDefinitionKey = eventTypeElements.get(0).getElementText();
-                    String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getCorrelationParameterValues(), commandContext);
+                    String correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getTenantId(), 
+                            builder.getCorrelationParameterValues(), commandContext);
 
                     eventSubscription = insertEventRegistryEvent(eventDefinitionKey, builder.isDoNotUpdateToLatestVersionAutomatically(), startEvent, processDefinition,
                         correlationKey, commandContext);
@@ -87,7 +88,8 @@ public class RegisterProcessStartEventSubscriptionCmd extends AbstractProcessSta
     }
 
     protected EventSubscription insertEventRegistryEvent(String eventDefinitionKey, boolean doNotUpdateToLatestVersionAutomatically, StartEvent startEvent,
-        ProcessDefinition processDefinition, String correlationKey, CommandContext commandContext) {
+            ProcessDefinition processDefinition, String correlationKey, CommandContext commandContext) {
+        
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         EventSubscriptionBuilder eventSubscriptionBuilder = eventSubscriptionService.createEventSubscriptionBuilder()

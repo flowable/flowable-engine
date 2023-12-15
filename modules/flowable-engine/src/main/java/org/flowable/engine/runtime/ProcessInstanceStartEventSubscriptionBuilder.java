@@ -27,7 +27,7 @@ import org.flowable.eventsubscription.api.EventSubscription;
  *
  * @author Micha Kiener
  */
-public interface ProcessStartEventSubscriptionBuilder {
+public interface ProcessInstanceStartEventSubscriptionBuilder {
 
     /**
      * Set the process definition to be started using a manually added subscription by its key. By default, always the latest version is
@@ -39,7 +39,7 @@ public interface ProcessStartEventSubscriptionBuilder {
      * @param processDefinitionKey the key of the process definition to be started a new instance of when the subscription has a match at runtime
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey);
+    ProcessInstanceStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey);
 
     /**
      * Mark the subscription to not use the latest process definition automatically, should there be a new version deployed after the subscription
@@ -50,7 +50,7 @@ public interface ProcessStartEventSubscriptionBuilder {
      *
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically();
+    ProcessInstanceStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically();
 
     /**
      * Adds a specific correlation parameter value for the subscription, which means this value needs to exactly match the event
@@ -60,7 +60,7 @@ public interface ProcessStartEventSubscriptionBuilder {
      * @param parameterValue the value of the correlation parameter
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue);
+    ProcessInstanceStartEventSubscriptionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue);
 
     /**
      * Registers a list of correlation parameter values for the subscription. The result is the same as registering
@@ -69,7 +69,7 @@ public interface ProcessStartEventSubscriptionBuilder {
      * @param parameters the map of correlation parameter values to be registered for the subscription
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionBuilder addCorrelationParameterValues(Map<String, Object> parameters);
+    ProcessInstanceStartEventSubscriptionBuilder addCorrelationParameterValues(Map<String, Object> parameters);
 
     /**
      * Set the tenant id for the subscription.
@@ -77,7 +77,7 @@ public interface ProcessStartEventSubscriptionBuilder {
      * @param tenantId the id of the tenant
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionBuilder tenantId(String tenantId);
+    ProcessInstanceStartEventSubscriptionBuilder tenantId(String tenantId);
 
     /**
      * Creates the event subscription with the registered combination of correlation parameter values and saves it.

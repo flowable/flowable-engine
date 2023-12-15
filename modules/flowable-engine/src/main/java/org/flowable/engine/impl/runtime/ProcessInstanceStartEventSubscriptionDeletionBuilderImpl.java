@@ -18,42 +18,54 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
-import org.flowable.engine.runtime.ProcessStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
 
 /**
  * The implementation for a process start event subscription deletion builder.
  *
  * @author Micha Kiener
  */
-public class ProcessStartEventSubscriptionDeletionBuilderImpl implements ProcessStartEventSubscriptionDeletionBuilder {
-protected final RuntimeServiceImpl runtimeService;
+public class ProcessInstanceStartEventSubscriptionDeletionBuilderImpl implements ProcessInstanceStartEventSubscriptionDeletionBuilder {
+    
+    protected final RuntimeServiceImpl runtimeService;
     protected String processDefinitionId;
+    protected String tenantId;
     protected final Map<String, Object> correlationParameterValues = new HashMap<>();
 
-    public ProcessStartEventSubscriptionDeletionBuilderImpl(RuntimeServiceImpl runtimeService) {
+    public ProcessInstanceStartEventSubscriptionDeletionBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
     }
 
     @Override
-    public ProcessStartEventSubscriptionDeletionBuilder processDefinitionId(String processDefinitionId) {
+    public ProcessInstanceStartEventSubscriptionDeletionBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceStartEventSubscriptionDeletionBuilder tenantId(String tenantId) {
+        this.tenantId = tenantId;
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionDeletionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue) {
+    public ProcessInstanceStartEventSubscriptionDeletionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue) {
         correlationParameterValues.put(parameterName, parameterValue);
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionDeletionBuilder addCorrelationParameterValues(Map<String, Object> parameters) {
+    public ProcessInstanceStartEventSubscriptionDeletionBuilder addCorrelationParameterValues(Map<String, Object> parameters) {
         correlationParameterValues.putAll(parameters);
         return this;
     }
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    public String getTenantId() {
+        return tenantId;
     }
 
     public boolean hasCorrelationParameterValues() {
@@ -67,7 +79,7 @@ protected final RuntimeServiceImpl runtimeService;
     @Override
     public void deleteSubscriptions() {
         checkValidInformation();
-        runtimeService.deleteProcessStartEventSubscriptions(this);
+        runtimeService.deleteProcessInstanceStartEventSubscriptions(this);
     }
 
     protected void checkValidInformation() {

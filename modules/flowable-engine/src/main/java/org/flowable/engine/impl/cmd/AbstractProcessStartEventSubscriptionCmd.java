@@ -20,11 +20,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -36,8 +40,8 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
  */
 public abstract class AbstractProcessStartEventSubscriptionCmd {
 
-    protected String generateCorrelationConfiguration(String eventDefinitionKey, Map<String, Object> correlationParameterValues, CommandContext commandContext) {
-        EventModel eventModel = getEventModel(eventDefinitionKey, commandContext);
+    protected String generateCorrelationConfiguration(String eventDefinitionKey, String tenantId, Map<String, Object> correlationParameterValues, CommandContext commandContext) {
+        EventModel eventModel = getEventModel(eventDefinitionKey, tenantId, commandContext);
         Map<String, Object> correlationParameters = new HashMap<>();
         for (Map.Entry<String, Object> correlationValue : correlationParameterValues.entrySet()) {
             // make sure the correlation parameter value is based on a valid, defined correlation parameter within the event model
@@ -60,21 +64,47 @@ public abstract class AbstractProcessStartEventSubscriptionCmd {
     }
 
     protected ProcessDefinition getLatestProcessDefinitionByKey(String processDefinitionKey, String tenantId, CommandContext commandContext) {
-        RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getRepositoryService();
+        ProcessDefinitionEntityManager processDefinitionEntityManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+        ProcessDefinition processDefinition = null;
+        if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
+            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
 
-        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery()
-            .processDefinitionKey(processDefinitionKey)
-            .latestVersion();
+            if (processDefinition == null) {
+                throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
+            }
 
-        if (StringUtils.isNotBlank(tenantId)) {
-            query.processDefinitionTenantId(tenantId);
+        } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+
+            processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+
+            if (processDefinition == null) {
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                if (processEngineConfiguration.isFallbackToDefaultTenant()) {
+                    String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
+                    if (StringUtils.isNotEmpty(defaultTenant)) {
+                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
+                        
+                    } else {
+                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
+                    }
+                    
+                    if (processDefinition == null) {
+                        throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey +
+                            "'. Fallback to default tenant was also applied.", ProcessDefinition.class);
+                    }
+                    
+                } else {
+                    throw new FlowableObjectNotFoundException("Process definition with key '" + processDefinitionKey +
+                        "' and tenantId '"+ tenantId +"' was not found", ProcessDefinition.class);
+                }
+            }
+
         }
-
-        ProcessDefinition processDefinition = query.singleResult();
-
+        
         if (processDefinition == null) {
             throw new FlowableIllegalArgumentException("No deployed process definition found for key '" + processDefinitionKey + "'.");
         }
+        
         return processDefinition;
     }
 
@@ -97,8 +127,8 @@ public abstract class AbstractProcessStartEventSubscriptionCmd {
         return bpmnModel.getMainProcess();
     }
 
-    protected EventModel getEventModel(String eventDefinitionKey, CommandContext commandContext) {
-        EventModel eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(eventDefinitionKey);
+    protected EventModel getEventModel(String eventDefinitionKey, String tenantId, CommandContext commandContext) {
+        EventModel eventModel = CommandContextUtil.getEventRepositoryService(commandContext).getEventModelByKey(eventDefinitionKey, tenantId);
         if (eventModel == null) {
             throw new FlowableIllegalArgumentException("Could not find event model with key '" + eventDefinitionKey + "'.");
         }

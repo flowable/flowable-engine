@@ -19,45 +19,27 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionModificationBuilderImpl;
-import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilderImpl;
 
 /**
  * This command either modifies event subscriptions with a process start event and optional correlation parameter values.
  *
  * @author Micha Kiener
  */
-public class ModifyProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
-
+public class DeleteProcessInstanceStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected final ProcessStartEventSubscriptionModificationBuilderImpl builder;
+    protected final ProcessInstanceStartEventSubscriptionDeletionBuilderImpl builder;
 
-    public ModifyProcessStartEventSubscriptionCmd(ProcessStartEventSubscriptionModificationBuilderImpl builder) {
+    public DeleteProcessInstanceStartEventSubscriptionCmd(ProcessInstanceStartEventSubscriptionDeletionBuilderImpl builder) {
         this.builder = builder;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ProcessDefinition newProcessDefinition;
-        if (builder.hasNewProcessDefinitionId()) {
-            newProcessDefinition = getProcessDefinitionById(builder.getNewProcessDefinitionId(), commandContext);
-        } else {
-            // no explicit process definition provided, so use latest one
-            ProcessDefinition processDefinition = getProcessDefinitionById(builder.getProcessDefinitionId(), commandContext);
-            newProcessDefinition = getLatestProcessDefinitionByKey(processDefinition.getKey(), processDefinition.getTenantId(), commandContext);
-        }
-
-        if (newProcessDefinition == null) {
-            throw new FlowableIllegalArgumentException("Cannot find process definition with id " + (builder.hasNewProcessDefinitionId() ?
-                builder.getNewProcessDefinitionId() :
-                builder.getProcessDefinitionId()));
-        }
-
-        Process process = getProcess(newProcessDefinition.getId(), commandContext);
+        Process process = getProcess(builder.getProcessDefinitionId(), commandContext);
 
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
         for (StartEvent startEvent : startEvents) {
@@ -73,11 +55,12 @@ public class ModifyProcessStartEventSubscriptionCmd extends AbstractProcessStart
                     String correlationKey = null;
 
                     if (builder.hasCorrelationParameterValues()) {
-                        correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getCorrelationParameterValues(), commandContext);
+                        correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getTenantId(), 
+                                builder.getCorrelationParameterValues(), commandContext);
                     }
 
-                    getEventSubscriptionService(commandContext).updateEventSubscriptionProcessDefinitionId(builder.getProcessDefinitionId(), newProcessDefinition.getId(),
-                        eventDefinitionKey, startEvent.getId(), null, correlationKey);
+                    getEventSubscriptionService(commandContext).deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(builder.getProcessDefinitionId(),
+                        eventDefinitionKey, startEvent.getId(), correlationKey);
                 }
             }
         }

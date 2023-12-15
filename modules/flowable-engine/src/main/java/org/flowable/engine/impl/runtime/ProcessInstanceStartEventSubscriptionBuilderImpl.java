@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.ProcessStartEventSubscriptionBuilder;
 import org.flowable.engine.impl.RuntimeServiceImpl;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
 import org.flowable.eventsubscription.api.EventSubscription;
 
 /**
@@ -26,43 +26,43 @@ import org.flowable.eventsubscription.api.EventSubscription;
  *
  * @author Micha Kiener
  */
-public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEventSubscriptionBuilder {
+public class ProcessInstanceStartEventSubscriptionBuilderImpl implements ProcessInstanceStartEventSubscriptionBuilder {
     protected final RuntimeServiceImpl runtimeService;
     protected String processDefinitionKey;
     protected String tenantId;
     protected final Map<String, Object> correlationParameterValues = new HashMap<>();
     protected boolean doNotUpdateToLatestVersionAutomatically;
 
-    public ProcessStartEventSubscriptionBuilderImpl(RuntimeServiceImpl runtimeService) {
+    public ProcessInstanceStartEventSubscriptionBuilderImpl(RuntimeServiceImpl runtimeService) {
         this.runtimeService = runtimeService;
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey) {
+    public ProcessInstanceStartEventSubscriptionBuilder processDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically() {
+    public ProcessInstanceStartEventSubscriptionBuilder doNotUpdateToLatestVersionAutomatically() {
         this.doNotUpdateToLatestVersionAutomatically = true;
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue) {
+    public ProcessInstanceStartEventSubscriptionBuilder addCorrelationParameterValue(String parameterName, Object parameterValue) {
         correlationParameterValues.put(parameterName, parameterValue);
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder addCorrelationParameterValues(Map<String, Object> parameters) {
+    public ProcessInstanceStartEventSubscriptionBuilder addCorrelationParameterValues(Map<String, Object> parameters) {
         correlationParameterValues.putAll(parameters);
         return this;
     }
 
     @Override
-    public ProcessStartEventSubscriptionBuilder tenantId(String tenantId) {
+    public ProcessInstanceStartEventSubscriptionBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
         return this;
     }
@@ -86,7 +86,7 @@ public class ProcessStartEventSubscriptionBuilderImpl implements ProcessStartEve
     @Override
     public EventSubscription subscribe() {
         checkValidInformation();
-        return runtimeService.registerProcessStartEventSubscription(this);
+        return runtimeService.registerProcessInstanceStartEventSubscription(this);
     }
 
     protected void checkValidInformation() {

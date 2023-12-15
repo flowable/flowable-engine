@@ -24,7 +24,7 @@ import org.flowable.engine.RuntimeService;
  *
  * @author Micha Kiener
  */
-public interface ProcessStartEventSubscriptionModificationBuilder {
+public interface ProcessInstanceStartEventSubscriptionModificationBuilder {
 
     /**
      * Set the process definition using its specific id the manually created subscription is based on. This is mandatory and must be provided.
@@ -32,7 +32,15 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
      * @param processDefinitionId the id of the process definition the subscription is based on (an exact version of it)
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionModificationBuilder processDefinitionId(String processDefinitionId);
+    ProcessInstanceStartEventSubscriptionModificationBuilder processDefinitionId(String processDefinitionId);
+    
+    /**
+     * Set the tenant id in case you are running in a multi tenant environment and the event model needs to be retrieved from a specific tenant.
+     *
+     * @param tenantId the id of the tenant the subscription is created for
+     * @return the builder to be used for method chaining
+     */
+    ProcessInstanceStartEventSubscriptionModificationBuilder tenantId(String tenantId);
 
     /**
      * Adds a specific correlation parameter value for the subscription to be modified. If you register the same correlation parameter values as when creating
@@ -44,7 +52,7 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
      * @param parameterValue the value of the correlation parameter
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionModificationBuilder addCorrelationParameterValue(String parameterName, Object parameterValue);
+    ProcessInstanceStartEventSubscriptionModificationBuilder addCorrelationParameterValue(String parameterName, Object parameterValue);
 
     /**
      * Registers a list of correlation parameter values for the subscription(s) to be modified.
@@ -52,7 +60,7 @@ public interface ProcessStartEventSubscriptionModificationBuilder {
      * @param parameters the map of correlation parameter values to be registered for the subscription
      * @return the builder to be used for method chaining
      */
-    ProcessStartEventSubscriptionModificationBuilder addCorrelationParameterValues(Map<String, Object> parameters);
+    ProcessInstanceStartEventSubscriptionModificationBuilder addCorrelationParameterValues(Map<String, Object> parameters);
 
     /**
      * Migrate all the matching event subscriptions to the latest process definition, which should be done if you want to manually upgrade the subscriptions

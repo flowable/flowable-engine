@@ -54,14 +54,14 @@ public class EventSubscriptionManager {
     protected void removeObsoleteMessageEventSubscriptions(ProcessDefinitionEntity previousProcessDefinition) {
         // remove all subscriptions for the previous version
         if (previousProcessDefinition != null) {
-            removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, MessageEventHandler.EVENT_HANDLER_TYPE);
+            removeObsoleteEventSubscriptions(previousProcessDefinition, MessageEventHandler.EVENT_HANDLER_TYPE);
         }
     }
 
     protected void removeObsoleteSignalEventSubscription(ProcessDefinitionEntity previousProcessDefinition) {
         // remove all subscriptions for the previous version
         if (previousProcessDefinition != null) {
-            removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, SignalEventHandler.EVENT_HANDLER_TYPE);
+            removeObsoleteEventSubscriptions(previousProcessDefinition, SignalEventHandler.EVENT_HANDLER_TYPE);
         }
     }
 
@@ -74,10 +74,10 @@ public class EventSubscriptionManager {
                     if (eventRegistryStartEvent.dynamic()) {
                         // for a dynamic, manual subscription behavior, we must not remove the old subscriptions, but rather update them
                         // to the newest process definition id, as they have been manually added before
-                        updateOldEventSubscriptionsImpl(previousProcessDefinition, processDefinition, eventRegistryStartEvent.eventType(), eventRegistryStartEvent.activityId());
+                        updateOldEventSubscriptions(previousProcessDefinition, processDefinition, eventRegistryStartEvent.eventType(), eventRegistryStartEvent.activityId());
                     } else {
                         // for a static starting behavior, we always remove the old subscription and recreate it with the new definition
-                        removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEvent.eventType());
+                        removeObsoleteEventSubscriptions(previousProcessDefinition, eventRegistryStartEvent.eventType());
                     }
                 }
             }
@@ -118,7 +118,7 @@ public class EventSubscriptionManager {
     protected record StartEventInfo(String eventType, String activityId, boolean dynamic) {
     }
 
-    protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
+    protected void removeObsoleteEventSubscriptions(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
         // remove all subscriptions for the previous version
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
@@ -131,7 +131,7 @@ public class EventSubscriptionManager {
         }
     }
 
-    protected void updateOldEventSubscriptionsImpl(ProcessDefinitionEntity previousProcessDefinition, ProcessDefinitionEntity processDefinition,
+    protected void updateOldEventSubscriptions(ProcessDefinitionEntity previousProcessDefinition, ProcessDefinitionEntity processDefinition,
         String eventType, String activityId) {
         CommandContext commandContext = Context.getCommandContext();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);

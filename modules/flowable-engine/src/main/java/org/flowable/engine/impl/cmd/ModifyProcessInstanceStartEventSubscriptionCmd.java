@@ -19,27 +19,45 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.runtime.ProcessStartEventSubscriptionDeletionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionModificationBuilderImpl;
+import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * This command either modifies event subscriptions with a process start event and optional correlation parameter values.
  *
  * @author Micha Kiener
  */
-public class DeleteProcessStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
+public class ModifyProcessInstanceStartEventSubscriptionCmd extends AbstractProcessStartEventSubscriptionCmd implements Command<Void>, Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    protected final ProcessStartEventSubscriptionDeletionBuilderImpl builder;
+    protected final ProcessInstanceStartEventSubscriptionModificationBuilderImpl builder;
 
-    public DeleteProcessStartEventSubscriptionCmd(ProcessStartEventSubscriptionDeletionBuilderImpl builder) {
+    public ModifyProcessInstanceStartEventSubscriptionCmd(ProcessInstanceStartEventSubscriptionModificationBuilderImpl builder) {
         this.builder = builder;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        Process process = getProcess(builder.getProcessDefinitionId(), commandContext);
+        ProcessDefinition newProcessDefinition;
+        if (builder.hasNewProcessDefinitionId()) {
+            newProcessDefinition = getProcessDefinitionById(builder.getNewProcessDefinitionId(), commandContext);
+        } else {
+            // no explicit process definition provided, so use latest one
+            ProcessDefinition processDefinition = getProcessDefinitionById(builder.getProcessDefinitionId(), commandContext);
+            newProcessDefinition = getLatestProcessDefinitionByKey(processDefinition.getKey(), processDefinition.getTenantId(), commandContext);
+        }
+
+        if (newProcessDefinition == null) {
+            throw new FlowableIllegalArgumentException("Cannot find process definition with id " + (builder.hasNewProcessDefinitionId() ?
+                builder.getNewProcessDefinitionId() :
+                builder.getProcessDefinitionId()));
+        }
+
+        Process process = getProcess(newProcessDefinition.getId(), commandContext);
 
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
         for (StartEvent startEvent : startEvents) {
@@ -55,11 +73,12 @@ public class DeleteProcessStartEventSubscriptionCmd extends AbstractProcessStart
                     String correlationKey = null;
 
                     if (builder.hasCorrelationParameterValues()) {
-                        correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getCorrelationParameterValues(), commandContext);
+                        correlationKey = generateCorrelationConfiguration(eventDefinitionKey, builder.getTenantId(), 
+                                builder.getCorrelationParameterValues(), commandContext);
                     }
 
-                    getEventSubscriptionService(commandContext).deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(builder.getProcessDefinitionId(),
-                        eventDefinitionKey, startEvent.getId(), correlationKey);
+                    getEventSubscriptionService(commandContext).updateEventSubscriptionProcessDefinitionId(builder.getProcessDefinitionId(), newProcessDefinition.getId(),
+                        eventDefinitionKey, startEvent.getId(), null, correlationKey);
                 }
             }
         }
