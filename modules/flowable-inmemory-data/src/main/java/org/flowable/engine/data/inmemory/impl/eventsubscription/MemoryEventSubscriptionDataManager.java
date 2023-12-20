@@ -103,12 +103,64 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
     }
 
     @Override
+    public boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("updateEventSubscriptionLockTime {} {} {} {}", eventSubscriptionId, lockDate, lockOwner, currentTime);
+        }
+
+        EventSubscriptionEntity entity = findById(eventSubscriptionId);
+        if (entity == null) {
+            return false;
+        }
+        if (entity.getLockTime() == null || entity.getLockTime().before(lockDate)) {
+            entity.setLockTime(lockDate);
+            entity.setLockOwner(lockOwner);
+            update(entity);
+            return true;
+        }
+        return false;
+
+    }
+
+    @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType,
+                    String activityId, String scopeDefinitionKey, String configuration) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("updateEventSubscriptionProcessDefinitionId {} {} {} {} {} {}", oldProcessDefinitionId, newProcessDefinitionId, eventType,
+                            activityId, scopeDefinitionKey, configuration);
+        }
+
+        getData().values().stream().filter(item -> {
+            if (item.getProcessDefinitionId() == null || !item.getProcessDefinitionId().equals(oldProcessDefinitionId)) {
+                return false;
+            }
+            if (item.getEventType() == null || !item.getEventType().equals(eventType)) {
+                return false;
+            }
+            if (item.getActivityId() == null || !item.getActivityId().equals(activityId)) {
+                return false;
+            }
+            if (scopeDefinitionKey != null && (item.getScopeDefinitionKey() == null || !item.getScopeDefinitionKey().equals(scopeDefinitionKey))) {
+                return false;
+            }
+            if (configuration != null && (item.getConfiguration() == null || !item.getConfiguration().equals(scopeDefinitionKey))) {
+                return false;
+            }
+
+            return true;
+
+        }).forEach(item -> item.setProcessDefinitionId(newProcessDefinitionId));
+
+    }
+
+    @Override
     public EventSubscriptionEntity findById(String entityId) {
         return doFindById(entityId);
     }
 
     @Override
-    public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId, String eventName) {
+    public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(String processInstanceId,
+                    String eventName) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findMessageEventSubscriptionsByProcessInstanceAndEventName {} {}", processInstanceId, eventName);
         }
@@ -127,7 +179,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
         ExecutionDataManager executionDataManager = processEngineConfiguration.getExecutionDataManager();
         return getData().values().stream().filter(item -> {
             boolean match = item.getEventName() != null && item.getEventName().equals(eventName)
-                            && (tenantId != null && tenantId.equals(item.getTenantId()) || tenantId == null && StringUtils.isEmpty(item.getTenantId()))
+                            && (tenantId != null && tenantId.equals(item.getTenantId())
+                                            || tenantId == null && StringUtils.isEmpty(item.getTenantId()))
                             && item instanceof SignalEventSubscriptionEntity;
             if (!match) {
                 return false;
@@ -202,7 +255,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
     }
 
     @Override
-    public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type) {
+    public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId,
+                    String type) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findEventSubscriptionsByProcessInstanceAndActivityId {} {} {}", processInstanceId, activityId, type);
         }
@@ -229,11 +283,13 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             LOGGER.trace("findEventSubscriptionsBySubScopeId {}", subScopeId);
         }
 
-        return getData().values().stream().filter(item -> item.getSubScopeId() != null && item.getSubScopeId().equals(subScopeId)).collect(Collectors.toList());
+        return getData().values().stream().filter(item -> item.getSubScopeId() != null && item.getSubScopeId().equals(subScopeId))
+                        .collect(Collectors.toList());
     }
 
     @Override
-    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId,
+                    String tenantId) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findEventSubscriptionsByTypeAndProcessDefinitionId {} {} {}", type, processDefinitionId, tenantId);
         }
@@ -253,8 +309,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             LOGGER.trace("findEventSubscriptionsByScopeIdAndType {} {}", scopeId, type);
         }
 
-        return getData().values().stream().filter(item -> item.getScopeId() != null && item.getScopeId().equals(scopeId) && item.getEventType() != null
-                        && item.getEventType().equals(type)).collect(Collectors.toList());
+        return getData().values().stream().filter(item -> item.getScopeId() != null && item.getScopeId().equals(scopeId)
+                        && item.getEventType() != null && item.getEventType().equals(type)).collect(Collectors.toList());
     }
 
     @Override
@@ -263,8 +319,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             LOGGER.trace("findEventSubscriptionsByName {} {} {}", type, eventName, tenantId);
         }
 
-        return getData().values().stream().filter(item -> item.getEventName() != null && item.getEventName().equals(eventName) && item.getEventType() != null
-                        && item.getEventType().equals(type)
+        return getData().values().stream().filter(item -> item.getEventName() != null && item.getEventName().equals(eventName)
+                        && item.getEventType() != null && item.getEventType().equals(type)
                         && (tenantId != null && tenantId.equals(item.getTenantId()) || tenantId == null && StringUtils.isEmpty(item.getTenantId())))
                         .collect(Collectors.toList());
     }
@@ -290,7 +346,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
         // See selectMessageStartEventSubscriptionByName in
         // org.flowable.eventsubscription.service.db.entity.mapping.EventSubscription.xml
         item.getExecutionId() == null && item.getEventName() != null && item.getEventName().equals(messageName) && item.getExecutionId() == null
-                        && item instanceof MessageEventSubscriptionEntity).map(item -> (MessageEventSubscriptionEntity) item).findFirst().orElse(null);
+                        && item instanceof MessageEventSubscriptionEntity).map(item -> (MessageEventSubscriptionEntity) item).findFirst()
+                        .orElse(null);
     }
 
     @Override
@@ -318,7 +375,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             }
             if (eventSubscriptionQueryImpl.getOrQueryObjects() != null && !eventSubscriptionQueryImpl.getOrQueryObjects().isEmpty()) {
                 // Nested OR query objects (in reality only one can exist)
-                if (eventSubscriptionQueryImpl.getOrQueryObjects().stream().noneMatch(nestedQuery -> filterEventSubscription(item, nestedQuery, true))) {
+                if (eventSubscriptionQueryImpl.getOrQueryObjects().stream()
+                                .noneMatch(nestedQuery -> filterEventSubscription(item, nestedQuery, true))) {
                     return false;
                 }
             }
@@ -380,7 +438,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             LOGGER.trace("deleteEventSubscriptionsForScopeDefinitionIdAndType {} {}", scopeDefinitionId, scopeType);
         }
         getData().entrySet()
-                        .removeIf(entry -> entry.getValue().getScopeDefinitionId() != null && entry.getValue().getScopeDefinitionId().equals(scopeDefinitionId)
+                        .removeIf(entry -> entry.getValue().getScopeDefinitionId() != null
+                                        && entry.getValue().getScopeDefinitionId().equals(scopeDefinitionId)
                                         && entry.getValue().getScopeType() != null && entry.getValue().getScopeType().equals(scopeType));
     }
 
@@ -391,28 +450,24 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
         }
         getData().entrySet()
                         .removeIf(entry -> entry.getValue().getScopeId() == null && entry.getValue().getScopeDefinitionId() != null
-                                        && entry.getValue().getScopeDefinitionId().equals(scopeDefinitionId) && entry.getValue().getScopeType() != null
-                                        && entry.getValue().getScopeType().equals(scopeType));
+                                        && entry.getValue().getScopeDefinitionId().equals(scopeDefinitionId)
+                                        && entry.getValue().getScopeType() != null && entry.getValue().getScopeType().equals(scopeType));
     }
 
     @Override
-    public boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime) {
+    public void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId,
+                    String configuration) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("updateEventSubscriptionLockTime {} {} {} {}", eventSubscriptionId, lockDate, lockOwner, currentTime);
+            LOGGER.trace("deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent {} {} {} {}", processDefinitionId, eventType, activityId,
+                            configuration);
         }
-
-        EventSubscriptionEntity entity = findById(eventSubscriptionId);
-        if (entity == null) {
-            return false;
-        }
-        if (entity.getLockTime() == null || entity.getLockTime().before(lockDate)) {
-            entity.setLockTime(lockDate);
-            entity.setLockOwner(lockOwner);
-            update(entity);
-            return true;
-        }
-        return false;
-
+        getData().entrySet()
+                        .removeIf(entry -> entry.getValue().getProcessDefinitionId() != null
+                                        && entry.getValue().getProcessDefinitionId().equals(processDefinitionId)
+                                        && entry.getValue().getEventType() != null && entry.getValue().getEventType().equals(eventType)
+                                        && entry.getValue().getActivityId() != null && entry.getValue().getActivityId().equals(activityId)
+                                        && (configuration == null || (entry.getValue().getConfiguration() != null
+                                                        && entry.getValue().getConfiguration().equals(configuration))));
     }
 
     @Override
@@ -512,6 +567,13 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             }
         }
 
+        if (query.getScopeDefinitionId() != null) {
+            retVal = QueryUtil.matchReturn(query.getScopeDefinitionId().equals(item.getScopeDefinitionId()), isOrQuery);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.isWithoutScopeId()) {
             retVal = QueryUtil.matchReturn(item.getScopeId() == null, isOrQuery);
             if (retVal != null) {
@@ -519,8 +581,8 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             }
         }
 
-        if (query.getScopeDefinitionId() != null) {
-            retVal = QueryUtil.matchReturn(query.getScopeDefinitionId().equals(item.getScopeDefinitionId()), isOrQuery);
+        if (query.getScopeDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(query.getScopeDefinitionKey().equals(item.getScopeDefinitionKey()), isOrQuery);
             if (retVal != null) {
                 return retVal;
             }

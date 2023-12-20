@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.data.inmemory.util.MapProvider;
 import org.flowable.engine.data.inmemory.util.QueryUtil;
@@ -41,8 +42,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryDeadLetterJobDataManager.class);
 
     public MemoryDeadLetterJobDataManager(MapProvider mapProvider, ProcessEngineConfiguration processEngineConfiguration,
-                    JobServiceConfiguration jobServiceConfiguration) {
-        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration);
+                    JobServiceConfiguration jobServiceConfiguration, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration, cmmnEngineConfiguration);
     }
 
     @Override
@@ -89,7 +90,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsByProcessInstanceId {}", processInstanceId);
         }
-        return getData().values().stream().filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
+        return getData().values().stream()
+                        .filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
                         .collect(Collectors.toList());
     }
 
@@ -98,8 +100,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobByCorrelationId {}", correlationId);
         }
-        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId)).findFirst()
-                        .orElse(null);
+        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId))
+                        .findFirst().orElse(null);
     }
 
     @Override
@@ -183,6 +185,14 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
                 return retVal;
             }
         }
+
+        if (query.getProcessDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasProcessDefinition(query.getProcessDefinitionKey(), item.getProcessInstanceId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCategory() != null) {
             retVal = QueryUtil.matchReturn(query.getCategory().equals(item.getCategory()), false);
             if (retVal != null) {
@@ -246,6 +256,13 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
             }
         }
 
+        if (query.getCaseDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasCaseDefinition(query.getCaseDefinitionKey(), item.getScopeDefinitionId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCorrelationId() != null) {
             retVal = QueryUtil.matchReturn(query.getCorrelationId().equals(item.getCorrelationId()), false);
             if (retVal != null) {
@@ -254,7 +271,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
         }
 
         if (query.isExecutable()) {
-            retVal = QueryUtil.matchReturn(item.getDuedate() == null ? true : (item.getDuedate().equals(now) || item.getDuedate().before(now)), false);
+            retVal = QueryUtil.matchReturn(item.getDuedate() == null ? true : (item.getDuedate().equals(now) || item.getDuedate().before(now)),
+                            false);
             if (retVal != null) {
                 return retVal;
             }
@@ -290,7 +308,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
 
         if (query.getDuedateHigherThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual()) || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual())
+                                            || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;
@@ -306,7 +325,8 @@ public class MemoryDeadLetterJobDataManager extends AbstractJobMemoryDataManager
 
         if (query.getDuedateLowerThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual()) || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual())
+                                            || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;

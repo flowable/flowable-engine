@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -40,15 +41,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author ikaakkola (Qvantel Finland Oy)
  */
-public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataManager<ExternalWorkerJobEntity> implements ExternalWorkerJobDataManager {
+public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataManager<ExternalWorkerJobEntity>
+                implements ExternalWorkerJobDataManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryExternalWorkerJobDataManager.class);
 
-    private IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    private final IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
 
     public MemoryExternalWorkerJobDataManager(MapProvider mapProvider, ProcessEngineConfiguration processEngineConfiguration,
-                    JobServiceConfiguration jobServiceConfiguration, IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
-        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration);
+                    JobServiceConfiguration jobServiceConfiguration, IdentityLinkServiceConfiguration identityLinkServiceConfiguration,
+                    CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration, cmmnEngineConfiguration);
         this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
     }
 
@@ -96,10 +99,11 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsByProcessInstanceId {}", processInstanceId);
         }
-        return getData().values().stream().filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
+        return getData().values().stream()
+                        .filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
                         .collect(Collectors.toList());
     }
-    
+
     @Override
     public List<ExternalWorkerJobEntity> findJobsByWorkerId(String workerId) {
         if (LOGGER.isTraceEnabled()) {
@@ -114,8 +118,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobByCorrelationId {}", correlationId);
         }
-        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId)).findFirst()
-                        .orElse(null);
+        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId))
+                        .findFirst().orElse(null);
     }
 
     @Override
@@ -124,6 +128,15 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
             LOGGER.trace("findJobCountByQueryCriteria {}", jobQuery);
         }
         return findJobsByQueryCriteria(jobQuery).size();
+    }
+
+    @Override
+    public List<ExternalWorkerJobEntity> findJobsByWorkerIdAndTenantId(String workerId, String tenantId) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("findJobsByWorkerIdAndTenantId {}", workerId, tenantId);
+        }
+        return getData().values().stream().filter(item -> item.getLockOwner() != null && item.getLockOwner().equals(workerId)
+                        && item.getTenantId() != null && item.getTenantId().equals(tenantId)).collect(Collectors.toList());
     }
 
     @Override
@@ -168,7 +181,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
 
             // Matched
             return true;
-        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(), page == null ? -1 : page.getMaxResults());
+        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(),
+                        page == null ? -1 : page.getMaxResults());
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsToExecute results {}", r);
@@ -212,7 +226,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
             }
 
             return false;
-        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(), page == null ? -1 : page.getMaxResults());
+        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(),
+                        page == null ? -1 : page.getMaxResults());
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findExpiredJobs results {}", r);
@@ -294,8 +309,10 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         }
 
         if (builder.getAuthorizedUser() != null) {
-            retVal = QueryUtil.matchReturn(identityLinkServiceConfiguration.getIdentityLinkDataManager().findIdentityLinkByScopeIdScopeTypeUserGroupAndType(
-                            item.getCorrelationId(), "externalWorker", builder.getAuthorizedUser(), null, null).isEmpty(), false);
+            retVal = QueryUtil.matchReturn(
+                            identityLinkServiceConfiguration.getIdentityLinkDataManager().findIdentityLinkByScopeIdScopeTypeUserGroupAndType(
+                                            item.getCorrelationId(), "externalWorker", builder.getAuthorizedUser(), null, null).isEmpty(),
+                            false);
             if (retVal != null) {
                 return retVal;
             }
@@ -305,7 +322,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
             Collection<String> groups = builder.getAuthorizedGroups();
             retVal = QueryUtil.matchReturn(groups.stream().anyMatch(group -> {
                 return !identityLinkServiceConfiguration.getIdentityLinkDataManager()
-                                .findIdentityLinkByScopeIdScopeTypeUserGroupAndType(item.getCorrelationId(), "externalWorker", null, group, null).isEmpty();
+                                .findIdentityLinkByScopeIdScopeTypeUserGroupAndType(item.getCorrelationId(), "externalWorker", null, group, null)
+                                .isEmpty();
             }), false);
             if (retVal != null) {
                 return retVal;
@@ -367,6 +385,14 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
                 return retVal;
             }
         }
+
+        if (query.getProcessDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasProcessDefinition(query.getProcessDefinitionKey(), item.getProcessInstanceId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCategory() != null) {
             retVal = QueryUtil.matchReturn(query.getCategory().equals(item.getCategory()), false);
             if (retVal != null) {
@@ -430,6 +456,13 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
             }
         }
 
+        if (query.getCaseDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasCaseDefinition(query.getCaseDefinitionKey(), item.getScopeDefinitionId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCorrelationId() != null) {
             retVal = QueryUtil.matchReturn(query.getCorrelationId().equals(item.getCorrelationId()), false);
             if (retVal != null) {
@@ -446,7 +479,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
 
         if (query.getDuedateHigherThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual()) || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual())
+                                            || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;
@@ -462,7 +496,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
 
         if (query.getDuedateLowerThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual()) || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual())
+                                            || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;
@@ -526,8 +561,10 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         }
 
         if (query.getAuthorizedUser() != null) {
-            retVal = QueryUtil.matchReturn(identityLinkServiceConfiguration.getIdentityLinkDataManager().findIdentityLinkByScopeIdScopeTypeUserGroupAndType(
-                            item.getCorrelationId(), "externalWorker", query.getAuthorizedUser(), null, null).isEmpty(), false);
+            retVal = QueryUtil.matchReturn(
+                            identityLinkServiceConfiguration.getIdentityLinkDataManager().findIdentityLinkByScopeIdScopeTypeUserGroupAndType(
+                                            item.getCorrelationId(), "externalWorker", query.getAuthorizedUser(), null, null).isEmpty(),
+                            false);
             if (retVal != null) {
                 return retVal;
             }
@@ -537,7 +574,8 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
             Collection<String> groups = query.getAuthorizedGroups();
             retVal = QueryUtil.matchReturn(groups.stream().anyMatch(group -> {
                 return !identityLinkServiceConfiguration.getIdentityLinkDataManager()
-                                .findIdentityLinkByScopeIdScopeTypeUserGroupAndType(item.getCorrelationId(), "externalWorker", null, group, null).isEmpty();
+                                .findIdentityLinkByScopeIdScopeTypeUserGroupAndType(item.getCorrelationId(), "externalWorker", null, group, null)
+                                .isEmpty();
             }), false);
             if (retVal != null) {
                 return retVal;
@@ -553,4 +591,5 @@ public class MemoryExternalWorkerJobDataManager extends AbstractJobMemoryDataMan
         }
         return sortAndPaginate(collect, JobComparator.resolve(query.getOrderBy()), query.getFirstResult(), query.getMaxResults());
     }
+
 }

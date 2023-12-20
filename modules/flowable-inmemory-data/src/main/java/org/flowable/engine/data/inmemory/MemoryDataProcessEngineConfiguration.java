@@ -15,6 +15,7 @@ package org.flowable.engine.data.inmemory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -37,14 +38,11 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.JobServiceConfiguration;
 
 /**
- * A {@link ProcessEngineConfiguration} that uses the In-Memory (non-database)
- * {@link DataManager}s for entity types which have one available.
+ * A {@link ProcessEngineConfiguration} that uses the In-Memory (non-database) {@link DataManager}s for entity types which have one available.
  * 
  * <p>
- * Entity types that do not have a Memory (non-database) implementation
- * available will fallback to use the default database DataManager
- * implementations. It is suggested that the process engine is configured to use
- * an in-memory database (eg. h2 or hsqldb) when enabling the Memory
+ * Entity types that do not have a Memory (non-database) implementation available will fallback to use the default database DataManager
+ * implementations. It is suggested that the process engine is configured to use an in-memory database (eg. h2 or hsqldb) when enabling the Memory
  * DataManagers.
  * 
  * @author ikaakkola (Qvantel Finland Oy)
@@ -80,6 +78,18 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
         return interceptors;
     }
 
+    @Override
+    public int getMaxLengthString() {
+        // in-memory data does not have database specific limits on string length
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int getMaxLengthStringVariableType() {
+        // in-memory data does not have database specific limits on string length
+        return Integer.MAX_VALUE;
+    }
+
     /**
      * @return The MapProvider this engine configuration uses
      */
@@ -89,8 +99,7 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
 
     /**
      * @param mapProvider
-     *            The MapProvider to use. Must be set before the engine
-     *            confiuration is initialized.
+     *            The MapProvider to use. Must be set before the engine confiuration is initialized.
      */
     public void setMapProvider(MapProvider mapProvider) {
         this.mapProvider = mapProvider;
@@ -122,13 +131,14 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
         // we have to overwrite them after all components are initialized (as
         // there is no way to set the Data Managers of the various service
         // configurations of the process engine, eg. JobServiceConfiguration is
-        // created and initialized in a single call with no way to intercept)
-        enableMemoryDataManagers(this, mapProvider);
+        // created and initialized in a single call with no way to intercept).
+        //
+        // This default init does not support queries referencing CMMN engine data.
+        enableMemoryDataManagers(this, null, mapProvider);
     }
 
     /**
-     * Notify all registered Memory {@link DataManager}s of an event relevant to
-     * them.
+     * Notify all registered Memory {@link DataManager}s of an event relevant to them.
      * 
      * @param type
      *            Event type
@@ -141,12 +151,10 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
     }
 
     /**
-     * Notify all registered Memory {@link DataManager}s of an event relevant to
-     * them.
+     * Notify all registered Memory {@link DataManager}s of an event relevant to them.
      * 
      * @param target
-     *            ProcessEngineConfiguration to lookup DataManagers to notify
-     *            from
+     *            ProcessEngineConfiguration to lookup DataManagers to notify from
      * @param type
      *            Event type
      */
@@ -174,15 +182,20 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
     /**
      * Enable In-Memory data managers for the given ProcessEngineConfiguration.
      * <p>
-     * The given engine configuration must have been initialized before
-     * attempting to enable In-Memory data managers for it. The easiest way to
-     * accomplish this, is to either use this
-     * {@link org.flowable.engine.ProcessEngineConfiguration} implementation or
-     * create a custom {@link org.flowable.engine.ProcessEngineConfiguration}
-     * that calls this method in
+     * The given engine configuration must have been initialized before attempting to enable In-Memory data managers for it. The easiest way to
+     * accomplish this, is to either use this {@link org.flowable.engine.ProcessEngineConfiguration} implementation or create a custom
+     * {@link org.flowable.engine.ProcessEngineConfiguration} that calls this method in
      * {@link org.flowable.engine.ProcessEngineConfiguration#configuratorsAfterInit()}.
+     * 
+     * @param target
+     *            ProcessEngineConfigurationImpl to configure with
+     * @param cmmnEngineConfiguration
+     *            Optional CmmnEngineConfiguration to configure with. If not provided, Data operations referencing CMMN data will fail
+     * @param mapProvider
+     *            MapProvider instance
      */
-    public static void enableMemoryDataManagers(ProcessEngineConfigurationImpl target, MapProvider mapProvider) {
+    public static void enableMemoryDataManagers(ProcessEngineConfigurationImpl target, CmmnEngineConfiguration cmmnEngineConfiguration,
+                    MapProvider mapProvider) {
         // ByteArrays are not (yet) enabled as there are non-memory services
         // that use ACT_GE_BYTEARRAY:
         //
@@ -195,7 +208,8 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
 
         // Executions
         target.setExecutionDataManager(new MemoryExecutionDataManager(mapProvider, target, target.getVariableServiceConfiguration(),
-                        target.getEventSubscriptionServiceConfiguration(), target.getIdentityLinkServiceConfiguration(), target.getJobServiceConfiguration()));
+                        target.getEventSubscriptionServiceConfiguration(), target.getIdentityLinkServiceConfiguration(),
+                        target.getJobServiceConfiguration()));
 
         // Activities
         target.setActivityInstanceDataManager(new MemoryActivityInstanceDataManager(mapProvider, target));
@@ -204,18 +218,22 @@ public class MemoryDataProcessEngineConfiguration extends ProcessEngineConfigura
         target.getTaskServiceConfiguration().setTaskDataManager(new MemoryTaskDataManager(mapProvider, target));
 
         // Event subscriptions
-        target.getEventSubscriptionServiceConfiguration().setEventSubscriptionDataManager(new MemoryEventSubscriptionDataManager(mapProvider, target));
+        target.getEventSubscriptionServiceConfiguration()
+                        .setEventSubscriptionDataManager(new MemoryEventSubscriptionDataManager(mapProvider, target));
 
         // Identity links
         target.getIdentityLinkServiceConfiguration().setIdentityLinkDataManager(new MemoryIdentityLinkDataManager(mapProvider, target));
 
         // Jobs
         JobServiceConfiguration jobConfig = target.getJobServiceConfiguration();
-        jobConfig.setDeadLetterJobDataManager(new MemoryDeadLetterJobDataManager(mapProvider, target, target.getJobServiceConfiguration()));
-        jobConfig.setJobDataManager(new MemoryJobDataManager(mapProvider, target, target.getJobServiceConfiguration()));
-        jobConfig.setSuspendedJobDataManager(new MemorySuspendedJobDataManager(mapProvider, target, target.getJobServiceConfiguration()));
-        jobConfig.setTimerJobDataManager(new MemoryTimerJobDataManager(mapProvider, target, target.getJobServiceConfiguration()));
+        jobConfig.setDeadLetterJobDataManager(
+                        new MemoryDeadLetterJobDataManager(mapProvider, target, target.getJobServiceConfiguration(), cmmnEngineConfiguration));
+        jobConfig.setJobDataManager(new MemoryJobDataManager(mapProvider, target, target.getJobServiceConfiguration(), cmmnEngineConfiguration));
+        jobConfig.setSuspendedJobDataManager(
+                        new MemorySuspendedJobDataManager(mapProvider, target, target.getJobServiceConfiguration(), cmmnEngineConfiguration));
+        jobConfig.setTimerJobDataManager(
+                        new MemoryTimerJobDataManager(mapProvider, target, target.getJobServiceConfiguration(), cmmnEngineConfiguration));
         jobConfig.setExternalWorkerJobDataManager(new MemoryExternalWorkerJobDataManager(mapProvider, target, target.getJobServiceConfiguration(),
-                        target.getIdentityLinkServiceConfiguration()));
+                        target.getIdentityLinkServiceConfiguration(), cmmnEngineConfiguration));
     }
 }

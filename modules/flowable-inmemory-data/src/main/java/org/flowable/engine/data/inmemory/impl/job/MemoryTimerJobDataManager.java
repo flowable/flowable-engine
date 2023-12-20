@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.data.inmemory.util.MapProvider;
@@ -43,8 +44,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryTimerJobDataManager.class);
 
     public MemoryTimerJobDataManager(MapProvider mapProvider, ProcessEngineConfiguration processEngineConfiguration,
-                    JobServiceConfiguration jobServiceConfiguration) {
-        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration);
+                    JobServiceConfiguration jobServiceConfiguration, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(LOGGER, mapProvider, processEngineConfiguration, jobServiceConfiguration, cmmnEngineConfiguration);
     }
 
     @Override
@@ -105,7 +106,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
 
             // Matched
             return true;
-        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(), page == null ? -1 : page.getMaxResults());
+        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(),
+                        page == null ? -1 : page.getMaxResults());
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsToExecute results {}", r);
@@ -141,7 +143,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
             }
 
             return false;
-        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(), page == null ? -1 : page.getMaxResults());
+        }).collect(Collectors.toList()), JobComparator.getDefault(), page == null ? -1 : page.getFirstResult(),
+                        page == null ? -1 : page.getMaxResults());
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findExpiredJobs results {}", r);
@@ -163,7 +166,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsByProcessInstanceId {}", processInstanceId);
         }
-        return getData().values().stream().filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
+        return getData().values().stream()
+                        .filter(item -> item.getProcessInstanceId() != null && item.getProcessInstanceId().equals(processInstanceId))
                         .collect(Collectors.toList());
     }
 
@@ -172,8 +176,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobByCorrelationId {}", correlationId);
         }
-        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId)).findFirst()
-                        .orElse(null);
+        return getData().values().stream().filter(item -> item.getCorrelationId() != null && item.getCorrelationId().equals(correlationId))
+                        .findFirst().orElse(null);
     }
 
     @Override
@@ -193,28 +197,27 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
             LOGGER.trace("findJobsByTypeAndProcessDefinitionKeyNoTenantId {} {}", jobHandlerType, processDefinitionKey);
         }
 
-        List<String> procDefs = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey)
-                        .list().stream().filter(item -> StringUtils.isEmpty(item.getTenantId())).map(item -> item.getId()).collect(Collectors.toList());
-        return getData().values().stream()
-                        .filter(item -> item.getJobHandlerType() != null && item.getJobHandlerType().equals(jobHandlerType)
-                                        && item.getProcessDefinitionId() != null
-                                        && procDefs.stream().anyMatch(defId -> item.getProcessDefinitionId().equals(defId)))
+        List<String> procDefs = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery()
+                        .processDefinitionKey(processDefinitionKey).list().stream().filter(item -> StringUtils.isEmpty(item.getTenantId()))
+                        .map(item -> item.getId()).collect(Collectors.toList());
+        return getData().values().stream().filter(item -> item.getJobHandlerType() != null && item.getJobHandlerType().equals(jobHandlerType)
+                        && item.getProcessDefinitionId() != null && procDefs.stream().anyMatch(defId -> item.getProcessDefinitionId().equals(defId)))
                         .collect(Collectors.toList());
     }
 
     @Override
-    public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
+    public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey,
+                    String tenantId) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("findJobsByTypeAndProcessDefinitionKeyAndTenantId {} {} {}", jobHandlerType, processDefinitionKey, tenantId);
         }
 
-        List<String> procDefs = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey)
-                        .list().stream().filter(item -> item.getTenantId() != null && item.getTenantId().equals(tenantId)).map(item -> item.getId())
+        List<String> procDefs = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery()
+                        .processDefinitionKey(processDefinitionKey).list().stream()
+                        .filter(item -> item.getTenantId() != null && item.getTenantId().equals(tenantId)).map(item -> item.getId())
                         .collect(Collectors.toList());
-        return getData().values().stream()
-                        .filter(item -> item.getJobHandlerType() != null && item.getJobHandlerType().equals(jobHandlerType)
-                                        && item.getProcessDefinitionId() != null
-                                        && procDefs.stream().anyMatch(defId -> item.getProcessDefinitionId().equals(defId)))
+        return getData().values().stream().filter(item -> item.getJobHandlerType() != null && item.getJobHandlerType().equals(jobHandlerType)
+                        && item.getProcessDefinitionId() != null && procDefs.stream().anyMatch(defId -> item.getProcessDefinitionId().equals(defId)))
                         .collect(Collectors.toList());
     }
 
@@ -247,11 +250,12 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        List<ProcessDefinition> definitions = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery().deploymentId(deploymentId)
-                        .list();
-        getData().values().stream().filter(item -> definitions.stream().anyMatch(def -> def.getId().equals(item.getProcessDefinitionId()))).forEach(item -> {
-            item.setTenantId(newTenantId);
-        });
+        List<ProcessDefinition> definitions = getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery()
+                        .deploymentId(deploymentId).list();
+        getData().values().stream().filter(item -> definitions.stream().anyMatch(def -> def.getId().equals(item.getProcessDefinitionId())))
+                        .forEach(item -> {
+                            item.setTenantId(newTenantId);
+                        });
     }
 
     @Override
@@ -337,6 +341,14 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
                 return retVal;
             }
         }
+
+        if (query.getProcessDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasProcessDefinition(query.getProcessDefinitionKey(), item.getProcessInstanceId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCategory() != null) {
             retVal = QueryUtil.matchReturn(query.getCategory().equals(item.getCategory()), false);
             if (retVal != null) {
@@ -400,6 +412,13 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
             }
         }
 
+        if (query.getCaseDefinitionKey() != null) {
+            retVal = QueryUtil.matchReturn(hasCaseDefinition(query.getCaseDefinitionKey(), item.getScopeDefinitionId()), false);
+            if (retVal != null) {
+                return retVal;
+            }
+        }
+
         if (query.getCorrelationId() != null) {
             retVal = QueryUtil.matchReturn(query.getCorrelationId().equals(item.getCorrelationId()), false);
             if (retVal != null) {
@@ -422,7 +441,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
         }
 
         if (query.isExecutable()) {
-            retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false : (item.getDuedate().equals(now) || item.getDuedate().before(now)), false);
+            retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false : (item.getDuedate().equals(now) || item.getDuedate().before(now)),
+                            false);
             if (retVal != null) {
                 return retVal;
             }
@@ -436,7 +456,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
 
         if (query.getDuedateHigherThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual()) || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateHigherThanOrEqual())
+                                            || item.getDuedate().after(query.getDuedateHigherThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;
@@ -452,7 +473,8 @@ public class MemoryTimerJobDataManager extends AbstractJobMemoryDataManager<Time
 
         if (query.getDuedateLowerThanOrEqual() != null) {
             retVal = QueryUtil.matchReturn(item.getDuedate() == null ? false
-                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual()) || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
+                            : (item.getDuedate().equals(query.getDuedateLowerThanOrEqual())
+                                            || item.getDuedate().before(query.getDuedateLowerThanOrEqual())),
                             false);
             if (retVal != null) {
                 return retVal;

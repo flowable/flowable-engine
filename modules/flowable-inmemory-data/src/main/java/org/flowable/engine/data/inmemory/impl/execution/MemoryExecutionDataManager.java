@@ -22,13 +22,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.impl.runtime.Clock;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.data.inmemory.AbstractMemoryDataManager;
 import org.flowable.engine.data.inmemory.util.MapProvider;
 import org.flowable.engine.data.inmemory.util.QueryUtil;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.IdentityLinkQueryObject;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
@@ -54,7 +54,7 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryExecutionDataManager.class);
 
-    private final ProcessEngineConfiguration processEngineConfiguration;
+    private final ProcessEngineConfigurationImpl processEngineConfiguration;
 
     private final VariableServiceConfiguration variableServiceConfiguration;
 
@@ -64,7 +64,7 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
 
     private final JobServiceConfiguration jobServiceConfiguration;
 
-    public MemoryExecutionDataManager(MapProvider mapProvider, ProcessEngineConfiguration processEngineConfiguration,
+    public MemoryExecutionDataManager(MapProvider mapProvider, ProcessEngineConfigurationImpl processEngineConfiguration,
                     VariableServiceConfiguration variableServiceConfiguration, EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration,
                     IdentityLinkServiceConfiguration identityLinkServiceConfiguration, JobServiceConfiguration jobServiceConfiguration) {
         super(LOGGER, mapProvider, processEngineConfiguration.getIdGenerator());
@@ -633,6 +633,16 @@ public class MemoryExecutionDataManager extends AbstractMemoryDataManager<Execut
             if (retVal != null) {
                 return retVal;
             }
+        }
+        
+        if (query.getRootScopeId() != null) {
+            // TODO: support for entity links
+            throw new IllegalStateException("Cannot query execution with RootScopeId, EntityLinks not supported by this DataManager implementation");
+        }
+
+        if (query.getParentScopeId() != null) {
+            // TODO: support for entity links
+            throw new IllegalStateException("Cannot query execution with ParentScopeId, EntityLinks not supported by this DataManager implementation");
         }
 
         if (query.getSuspensionState() != null) {

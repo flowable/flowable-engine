@@ -15,6 +15,7 @@ package org.flowable.engine.data.inmemory.impl.job;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.data.inmemory.AbstractMemoryDataManager;
@@ -26,8 +27,7 @@ import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity
 import org.slf4j.Logger;
 
 /**
- * Abstract base class for {@link org.flowable.job.api.AbstractJobEntity}
- * in-memory data manager implementations.
+ * Abstract base class for {@link org.flowable.job.api.AbstractJobEntity} in-memory data manager implementations.
  * 
  * @author ikaakkola (Qvantel Finland Oy)
  */
@@ -41,19 +41,23 @@ public class AbstractJobMemoryDataManager<T extends AbstractRuntimeJobEntity> ex
 
     private final JobServiceConfiguration jobServiceConfiguration;
 
+    private final CmmnEngineConfiguration cmmnEngineConfiguration;
+
     public AbstractJobMemoryDataManager(Logger logger, MapProvider mapProvider, ProcessEngineConfiguration processEngineConfiguration,
-                    JobServiceConfiguration jobServiceConfiguration) {
+                    JobServiceConfiguration jobServiceConfiguration, CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(logger, mapProvider, jobServiceConfiguration.getIdGenerator());
         this.processEngineConfiguration = processEngineConfiguration;
         this.jobServiceConfiguration = jobServiceConfiguration;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     protected void internalUpdateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        List<ProcessDefinition> definitions = processEngineConfiguration.getRepositoryService().createProcessDefinitionQuery().deploymentId(deploymentId)
-                        .list();
-        getData().values().stream().filter(item -> definitions.stream().anyMatch(def -> def.getId().equals(item.getProcessDefinitionId()))).forEach(item -> {
-            item.setTenantId(newTenantId);
-        });
+        List<ProcessDefinition> definitions = processEngineConfiguration.getRepositoryService().createProcessDefinitionQuery()
+                        .deploymentId(deploymentId).list();
+        getData().values().stream().filter(item -> definitions.stream().anyMatch(def -> def.getId().equals(item.getProcessDefinitionId())))
+                        .forEach(item -> {
+                            item.setTenantId(newTenantId);
+                        });
     }
 
     protected ProcessEngineConfiguration getProcessEngineConfiguration() {
@@ -64,6 +68,10 @@ public class AbstractJobMemoryDataManager<T extends AbstractRuntimeJobEntity> ex
         return jobServiceConfiguration;
     }
 
+    protected CmmnEngineConfiguration getCmmnEngineConfiguration() {
+        return cmmnEngineConfiguration;
+    }
+
     protected void doDeleteJobsByExecutionId(String executionId) {
         getData().entrySet().removeIf(item -> executionId != null && executionId.equals(item.getValue().getExecutionId()));
     }
@@ -72,8 +80,30 @@ public class AbstractJobMemoryDataManager<T extends AbstractRuntimeJobEntity> ex
         if (logger.isTraceEnabled()) {
             logger.trace("findJobsByScopeIdAndSubScopeId {} {}", scopeId, subScopeId);
         }
-        return getData().values().stream().filter(item -> item.getScopeId() != null && item.getScopeId().equals(scopeId) && item.getSubScopeId() != null
-                        && item.getSubScopeId().equals(subScopeId)).collect(Collectors.toList());
+        return getData().values().stream().filter(item -> item.getScopeId() != null && item.getScopeId().equals(scopeId)
+                        && item.getSubScopeId() != null && item.getSubScopeId().equals(subScopeId)).collect(Collectors.toList());
+    }
+
+    protected List<String> getDefinitionIdsForDefinitionKey(String processDefinitionKey) {
+        return getProcessEngineConfiguration().getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).list()
+                        .stream().map(def -> def.getId()).collect(Collectors.toList());
+    }
+
+    protected boolean hasProcessDefinition(String processDefinitionKey, String processDefinitionId) {
+        return getDefinitionIdsForDefinitionKey(processDefinitionKey).stream().anyMatch(id -> id.equals(processDefinitionId));
+    }
+
+    protected List<String> getCaseDefinitionIdsForDefinitionKey(String caseDefinitionKey) {
+        if (cmmnEngineConfiguration == null) {
+            throw new IllegalStateException(
+                            "Attempt to query ExternalWorkerJob with Case Definition Key, but CmmnEngine is not enabled or available");
+        }
+        return cmmnEngineConfiguration.getCmmnRepositoryService().createCaseDefinitionQuery().caseDefinitionKey(caseDefinitionKey).list().stream()
+                        .map(def -> def.getId()).collect(Collectors.toList());
+    }
+
+    protected boolean hasCaseDefinition(String caseDefinitionKey, String caseDefinitionId) {
+        return getCaseDefinitionIdsForDefinitionKey(caseDefinitionKey).stream().anyMatch(id -> id.equals(caseDefinitionId));
     }
 
     protected List<Job> sortAndLimitJobs(List<Job> collect, AbstractQuery< ? , Job> query) {

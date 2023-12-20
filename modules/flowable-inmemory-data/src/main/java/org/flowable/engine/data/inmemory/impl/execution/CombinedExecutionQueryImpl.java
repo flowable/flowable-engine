@@ -27,8 +27,7 @@ import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.QueryVariableValue;
 
 /**
- * An execution query that wraps either an {@link ExecutionQueryImpl} or a
- * {@link ProcessInstanceQueryImpl} as they both end up targeting 'executions'
+ * An execution query that wraps either an {@link ExecutionQueryImpl} or a {@link ProcessInstanceQueryImpl} as they both end up targeting 'executions'
  * table.
  *
  * @author ikaakkola (Qvantel Finland Oy)
@@ -225,6 +224,14 @@ public class CombinedExecutionQueryImpl {
         return executionQuery != null ? executionQuery.getNameLike() : processInstanceQuery.getNameLike();
     }
 
+    public String getRootScopeId() {
+        return executionQuery != null ? executionQuery.getRootScopeId() : processInstanceQuery.getRootScopeId();
+    }
+
+    public String getParentScopeId() {
+        return executionQuery != null ? executionQuery.getParentScopeId() : null;
+    }
+
     public String getNameLikeIgnoreCase() {
         return executionQuery != null ? executionQuery.getNameLikeIgnoreCase() : processInstanceQuery.getNameLikeIgnoreCase();
     }
@@ -273,12 +280,14 @@ public class CombinedExecutionQueryImpl {
             if (executionQuery.getOrQueryObjects() == null || executionQuery.getOrQueryObjects().isEmpty()) {
                 return Collections.emptyList();
             }
-            return executionQuery.getOrQueryObjects().stream().map(obj -> new CombinedExecutionQueryImpl(obj).setOrQuery(true)).collect(Collectors.toList());
+            return executionQuery.getOrQueryObjects().stream().map(obj -> new CombinedExecutionQueryImpl(obj).setOrQuery(true))
+                            .collect(Collectors.toList());
         }
         if (processInstanceQuery.getOrQueryObjects() == null || processInstanceQuery.getOrQueryObjects().isEmpty()) {
             return Collections.emptyList();
         }
-        return processInstanceQuery.getOrQueryObjects().stream().map(obj -> new CombinedExecutionQueryImpl(obj).setOrQuery(true)).collect(Collectors.toList());
+        return processInstanceQuery.getOrQueryObjects().stream().map(obj -> new CombinedExecutionQueryImpl(obj).setOrQuery(true))
+                        .collect(Collectors.toList());
     }
 
     public Date getStartedBefore() {
@@ -304,7 +313,7 @@ public class CombinedExecutionQueryImpl {
     public int getMaxResults() {
         return executionQuery != null ? executionQuery.getMaxResults() : processInstanceQuery.getMaxResults();
     }
-    
+
     public boolean isWithJobException() {
         // not supported on execution query
         return processInstanceQuery != null ? processInstanceQuery.isWithJobException() : false;
