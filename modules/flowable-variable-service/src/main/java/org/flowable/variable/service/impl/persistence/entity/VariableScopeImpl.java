@@ -73,7 +73,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext == null) {
-                throw new FlowableException("lazy loading outside command context");
+                throw new FlowableException("lazy loading outside command context for " + this);
             }
             Collection<VariableInstanceEntity> variableInstancesList = loadVariableInstances();
             for (VariableInstanceEntity variableInstance : variableInstancesList) {
@@ -791,7 +791,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         ensureVariableInstancesInitialized();
 
         if (variableInstances.containsKey(variableName)) {
-            throw new FlowableException("variable '" + variableName + "' already exists. Use setVariableLocal if you want to overwrite the value");
+            throw new FlowableException("variable '" + variableName + "' already exists. Use setVariableLocal if you want to overwrite the value for " + this);
         }
 
         createVariableInstance(variableName, value);

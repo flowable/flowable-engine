@@ -34,7 +34,10 @@ public interface DeleteQuery<T extends DeleteQuery<T, U>, U> {
      * the respective deletion for the particular model) which is owned by another engine (e.g. a process for the cmmn engine).
      * Use the specific deletion methods on the respective history services otherwise: they delete with cascading to all
      * other engines, but are not as performant as the bulk delete here.
+     * @deprecated in favour of using {@link BatchDeleteQuery#deleteSequentiallyUsingBatch(int, String)}
+     * or {@link #delete()} if the query does not support batch delete
      */
+    @Deprecated
     void deleteWithRelatedData();
 
 }

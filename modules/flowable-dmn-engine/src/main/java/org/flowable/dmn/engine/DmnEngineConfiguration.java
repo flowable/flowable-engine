@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
@@ -149,6 +150,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     // EXPRESSION MANAGER /////////////////////////////////////////////
     protected ExpressionManager expressionManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
     protected Collection<ELResolver> preDefaultELResolvers;
@@ -451,6 +453,10 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
                 postDefaultELResolvers.forEach(dmnExpressionManager::addPostDefaultResolver);
             }
 
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(dmnExpressionManager));
+            }
+
             expressionManager = dmnExpressionManager;
         }
 
@@ -460,7 +466,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new DmnCommandInvoker();
+            commandInvoker = new DmnCommandInvoker(agendaOperationExecutionListeners);
         }
     }
     public void initDmnEngineAgendaFactory() {
@@ -816,6 +822,19 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public DmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
+    }
+
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
         return this;
     }
 

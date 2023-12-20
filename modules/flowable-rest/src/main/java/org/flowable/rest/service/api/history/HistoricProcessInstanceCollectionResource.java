@@ -55,6 +55,8 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "processDefinitionCategory", dataType = "string", value = "The process definition category of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionVersion", dataType = "string", value = "The process definition version of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "The deployment id of the historic process instance.", paramType = "query"),
+        @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return process instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return process instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
         @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return instances with a businessKey like this key.", paramType = "query"),
         @ApiImplicitParam(name = "activeActivityId", dataType = "string", value = "Only return instances which have an active activity instance with the provided activity id.", paramType = "query"),
@@ -119,6 +121,14 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             queryRequest.setProcessDefinitionVersion(Integer.valueOf(allRequestParams.get("processDefinitionVersion")));
         }
         
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
+        }
+
         if (allRequestParams.get("deploymentId") != null) {
             queryRequest.setDeploymentId(allRequestParams.get("deploymentId"));
         }

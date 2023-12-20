@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.impl.agenda;
 
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.agenda.operation.DmnOperation;
@@ -40,6 +41,12 @@ public class DefaultDmnEngineAgenda extends AbstractAgenda implements DmnEngineA
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Planned {}", operation);
         }
+    }
+
+    @Override
+    protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        // The DMN engine has no future operations
+        return null;
     }
 
     @Override

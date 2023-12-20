@@ -370,16 +370,9 @@ Configuring a mail server is optional. Flowable supports sending e-mails in busi
 
 ## History configuration
 
-Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](bpmn/ch11-History.md#history) of the engine. See [history configuration](bpmn/ch11-History.md#history-configuration) for more details.
+Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](bpmn/ch10-History.md#history) of the engine. See [history configuration](bpmn/ch10-History.md#history-configuration) for more details.
 
     <property name="history" value="audit" />
-
-## Async history configuration
-
-\[Experimental\] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence.
-See [async history configuration](bpmn/ch11-History.md#async-history-configuration) for more details.
-
-    <property name="asyncHistoryEnabled" value="true" />
 
 ## Exposing configuration beans in expressions and scripts
 

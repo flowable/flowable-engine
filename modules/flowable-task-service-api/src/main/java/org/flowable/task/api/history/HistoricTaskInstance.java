@@ -41,6 +41,11 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
 
     /** Time when the task was deleted or completed. */
     Date getEndTime();
+    
+    /**
+     * User reference that has completed the task.
+     */
+    String getCompletedBy();
 
     /**
      * Difference between {@link #getEndTime()} and {@link #getStartTime()} in milliseconds.
@@ -51,9 +56,5 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
      * Difference between {@link #getEndTime()} and {@link #getClaimTime()} in milliseconds.
      */
     Long getWorkTimeInMillis();
-
-    /** Time when the task was claimed. */
-    @Override
-    Date getClaimTime();
 
 }

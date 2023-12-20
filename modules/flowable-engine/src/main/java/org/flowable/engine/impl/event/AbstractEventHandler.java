@@ -33,7 +33,7 @@ public abstract class AbstractEventHandler implements EventHandler {
         FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
 
         if (currentFlowElement == null) {
-            throw new FlowableException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': " + "no activity associated with event subscription");
+            throw new FlowableException("Error while sending signal for " + eventSubscription + ": no activity associated with event subscription");
         }
 
         EventSubscriptionUtil.processPayloadMap(payload, execution, currentFlowElement, commandContext);

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
@@ -46,6 +47,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String processDefinitionKey;
     protected String processDefinitionName;
     protected Integer processDefinitionVersion;
+    protected String processDefinitionCategory;
     protected String deploymentId;
     protected String callbackId;
     protected String callbackType;
@@ -68,6 +70,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         this.processDefinitionKey = processInstance.getProcessDefinitionKey();
         this.processDefinitionName = processInstance.getProcessDefinitionName();
         this.processDefinitionVersion = processInstance.getProcessDefinitionVersion();
+        this.processDefinitionCategory = processInstance.getProcessDefinitionCategory();
         this.deploymentId = processInstance.getDeploymentId();
         this.startActivityId = processInstance.getStartActivityId();
         this.startTime = processInstance.getStartTime();
@@ -101,6 +104,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("processDefinitionKey", processDefinitionKey);
         persistentState.put("processDefinitionName", processDefinitionName);
         persistentState.put("processDefinitionVersion", processDefinitionVersion);
+        persistentState.put("processDefinitionCategory", processDefinitionCategory);
         persistentState.put("deploymentId", deploymentId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
@@ -259,6 +263,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     @Override
+    public String getProcessDefinitionCategory() {
+        return processDefinitionCategory;
+    }
+
+    @Override
+    public void setProcessDefinitionCategory(String processDefinitionCategory) {
+        this.processDefinitionCategory = processDefinitionCategory;
+    }
+
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -348,6 +362,22 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     @Override
     public String toString() {
-        return "HistoricProcessInstanceEntity[superProcessInstanceId=" + superProcessInstanceId + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricProcessInstanceEntity[id=").append(getId())
+                .append(", definition=").append(getProcessDefinitionId());
+        if (superProcessInstanceId != null) {
+            sb.append(", superProcessInstanceId=").append(superProcessInstanceId);
+        }
+
+        if (referenceId != null) {
+            sb.append(", referenceId=").append(referenceId)
+                    .append(", referenceType=").append(referenceType);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

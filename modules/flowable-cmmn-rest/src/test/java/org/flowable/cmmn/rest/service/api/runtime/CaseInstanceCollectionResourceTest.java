@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -37,6 +38,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
@@ -846,4 +848,85 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         httpPost.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
+
+
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryByRootScopeId() throws IOException {
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance oneTaskCasePlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        String url =
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?rootScopeId=" + caseInstance.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + oneTaskCasePlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + caseTaskWithHumanTasksPlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId() + "' },"
+                        + "    { id: '" + oneTaskCase2PlanItemInstance.getReferenceId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryByParentScopeId() throws IOException {
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        String url = SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?parentScopeId="
+                + caseTaskWithHumanTasksPlanItemInstance.getReferenceId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + oneTaskCase2PlanItemInstance.getReferenceId() + "' }"
+                        + "  ]"
+                        + "}");
+
+    }
+
 }

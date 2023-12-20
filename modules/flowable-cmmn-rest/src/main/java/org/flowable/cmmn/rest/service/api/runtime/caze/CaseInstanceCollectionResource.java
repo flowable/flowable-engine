@@ -68,6 +68,8 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return case instances with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return case instances like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given name ignoring case.", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceParentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
@@ -128,6 +130,14 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         
         if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
             queryRequest.setCaseInstanceNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
+        }
+
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setCaseInstanceRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setCaseInstanceParentScopeId(allRequestParams.get("parentScopeId"));
         }
 
         if (allRequestParams.containsKey("businessKey")) {

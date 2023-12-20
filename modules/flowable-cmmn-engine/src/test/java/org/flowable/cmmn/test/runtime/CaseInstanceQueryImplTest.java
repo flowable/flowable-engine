@@ -36,6 +36,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CaseLocalizationManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
@@ -62,6 +63,7 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         this.deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
                 .deploy());
 
         cmmnRuntimeService.createCaseInstanceBuilder()
@@ -204,6 +206,39 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefinedId")
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
+    }
+
+    @Test
+    public void getCaseInstanceByCaseDefinitionIds() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .caseInstanceId(caseInstance1.getId())
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionIds(Set.of(caseInstance1.getCaseDefinitionId(), caseInstance2.getCaseDefinitionId()))
+                .caseInstanceId("undefinedId")
+                .endOr()
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(caseInstance1.getId(), caseInstance2.getId());
     }
 
     @Test
@@ -1543,6 +1578,93 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .extracting(CaseInstance::getName, CaseInstance::getId)
                 .containsExactlyInAnyOrder(
                         tuple("With string value", caseInstance1.getId())
+                );
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryByRootScopeId() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance oneTaskCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        List<CaseInstance> result = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceRootScopeId(caseInstance.getId()).list();
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCasePlanItemInstance.getReferenceId(),
+                        caseTaskWithHumanTasksPlanItemInstance.getReferenceId(),
+                        caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
+
+        result = cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceRootScopeId(caseInstance.getId()).endOr().list();
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCasePlanItemInstance.getReferenceId(),
+                        caseTaskWithHumanTasksPlanItemInstance.getReferenceId(),
+                        caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId(),
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryByParentScopeId() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        List<CaseInstance> result = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCase2PlanItemInstance.getReferenceId()
+                );
+
+        result = cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).endOr()
+                .list();
+
+        assertThat(result)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCase2PlanItemInstance.getReferenceId()
                 );
     }
 }

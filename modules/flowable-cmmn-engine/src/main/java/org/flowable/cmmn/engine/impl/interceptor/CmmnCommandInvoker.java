@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
@@ -28,6 +30,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.slf4j.Logger;
@@ -41,9 +44,11 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnCommandInvoker.class);
 
     protected AgendaOperationRunner agendaOperationRunner;
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
-    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner, Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
         this.agendaOperationRunner = agendaOperationRunner;
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
     }
 
     @SuppressWarnings("unchecked")
@@ -70,7 +75,38 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+            executeExecutionListenersBeforeExecute(commandContext, runnable);
+            try {
+                executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+            } catch (Throwable throwable) {
+                executeExecutionListenersAfterException(commandContext, runnable, throwable);
+                ExceptionUtil.sneakyThrow(throwable);
+            }
+            executeExecutionListenersAfterExecute(commandContext, runnable);
+        }
+    }
+
+    protected void executeExecutionListenersBeforeExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterException(CommandContext commandContext, Runnable runnable, Throwable throwable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecuteException(commandContext, runnable, throwable);
+            }
         }
     }
 

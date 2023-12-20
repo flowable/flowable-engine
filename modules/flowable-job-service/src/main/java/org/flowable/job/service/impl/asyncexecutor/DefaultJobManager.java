@@ -334,7 +334,7 @@ public class DefaultJobManager implements JobManager {
             }
 
         } else {
-            throw new FlowableException("Only jobs with type JobEntity are supported to be executed");
+            throw new FlowableException("Only jobs with type JobEntity are supported to be executed. It was " + job);
         }
     }
 
@@ -343,46 +343,44 @@ public class DefaultJobManager implements JobManager {
 
         if (job instanceof HistoryJob) {
 
-            HistoryJobEntity jobEntity = (HistoryJobEntity) job;
+            HistoryJobEntity jobEntity = jobServiceConfiguration.getHistoryJobEntityManager().findById(job.getId());
+            if (jobEntity == null) {
+                LOGGER.debug("History Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
 
-            HistoryJobEntity newJobEntity = jobServiceConfiguration.getHistoryJobEntityManager().create();
-            copyHistoryJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getHistoryJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(jobEntity);
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
 
         } else if (job instanceof JobEntity) {
 
-            // Deleting the old job and inserting it again with another id,
-            // will avoid that the job is immediately is picked up again (for example
-            // when doing lots of exclusive jobs for the same process instance)
+            JobEntity jobEntity = jobServiceConfiguration.getJobEntityManager().findById(job.getId());
 
-            JobEntity jobEntity = (JobEntity) job;
+            if (jobEntity == null) {
+                LOGGER.debug("Async Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
 
-            JobEntity newJobEntity = jobServiceConfiguration.getJobEntityManager().create();
-            copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getJobEntityManager().delete(jobEntity.getId());
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
 
             // We're not calling triggerExecutorIfNeeded here after the insert. The unacquire happened
             // for a reason (eg queue full or exclusive lock failure). No need to try it immediately again,
             // as the chance of failure will be high.
 
         } else if (job instanceof ExternalWorkerJobEntity) {
-            ExternalWorkerJobEntity jobEntity = (ExternalWorkerJobEntity) job;
+            ExternalWorkerJobEntity jobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().findById(job.getId());
 
-            ExternalWorkerJobEntity newJobEntity = jobServiceConfiguration.getExternalWorkerJobEntityManager().create();
-            copyJobInfo(newJobEntity, jobEntity);
-            newJobEntity.setId(null); // We want a new id to be assigned to this job
-            newJobEntity.setLockExpirationTime(null);
-            newJobEntity.setLockOwner(null);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().insert(newJobEntity);
-            jobServiceConfiguration.getExternalWorkerJobEntityManager().delete(jobEntity.getId());
+            if (jobEntity == null) {
+                LOGGER.debug("External Worker Job {} does not exist anymore and will not be unacquired. It has most likely been deleted "
+                        + "e.g. as part of another concurrent part of a process / case instance.", job.getId());
+                return;
+            }
+
+            jobEntity.setLockExpirationTime(null);
+            jobEntity.setLockOwner(null);
         } else if (job instanceof TimerJobEntity) {
             jobServiceConfiguration.getTimerJobEntityManager().resetExpiredJob(job.getId());
         } else {
@@ -549,16 +547,16 @@ public class DefaultJobManager implements JobManager {
                     jobHandler.execute(jobEntity, jobEntity.getJobHandlerConfiguration(), variableScope, getCommandContext());
                 } else {
                     throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() + 
-                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + jobEntity);
                 }
                 
             } else {
                 throw new FlowableException("No job handler registered for type " + jobEntity.getJobHandlerType() +
-                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + jobEntity);
             }
             
         } else {
-            throw new FlowableException("Job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
+            throw new FlowableException(jobEntity + " has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -571,16 +569,16 @@ public class DefaultJobManager implements JobManager {
                     jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext(), jobServiceConfiguration);
                 } else {
                     throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() +
-                                    " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                    " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + historyJobEntity);
                 }
                 
             } else {
                 throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() + 
-                                " in job config for engine: " + jobServiceConfiguration.getEngineName());
+                                " in job config for engine: " + jobServiceConfiguration.getEngineName() + " for " + historyJobEntity);
             }
             
         } else {
-            throw new FlowableException("Async history job has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
+            throw new FlowableException("Async " + historyJobEntity + " has no job handler type in job config for engine: " + jobServiceConfiguration.getEngineName());
         }
     }
 

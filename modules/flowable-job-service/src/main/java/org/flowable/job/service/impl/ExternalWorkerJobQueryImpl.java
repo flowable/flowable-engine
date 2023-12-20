@@ -44,6 +44,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String handlerType;
     protected Collection<String> handlerTypes;
     protected String processDefinitionId;
+    protected String processDefinitionKey;
     protected String category;
     protected String categoryLike;
     protected String elementId;
@@ -54,6 +55,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String scopeType;
     protected boolean withoutScopeType;
     protected String scopeDefinitionId;
+    protected String caseDefinitionKey;
     protected String correlationId;
     protected Date duedateHigherThan;
     protected Date duedateLowerThan;
@@ -123,6 +125,15 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public ExternalWorkerJobQuery processDefinitionKey(String processDefinitionKey) {
+        if (processDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided process definition key is null");
+        }
+        this.processDefinitionKey = processDefinitionKey;
         return this;
     }
 
@@ -227,6 +238,15 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
         }
         scopeDefinitionId(caseDefinitionId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public ExternalWorkerJobQuery caseDefinitionKey(String caseDefinitionKey) {
+        if (caseDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition key is null");
+        }
+        this.caseDefinitionKey = caseDefinitionKey;
         return this;
     }
 
@@ -474,6 +494,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
         return processDefinitionId;
     }
 
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
+
     public String getCategory() {
         return category;
     }
@@ -512,6 +536,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
     }
 
     public String getCorrelationId() {

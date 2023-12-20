@@ -113,6 +113,42 @@ public interface CaseInstanceMigrationBuilder {
      * @see WaitingForRepetitionPlanItemDefinitionMapping
      */
     CaseInstanceMigrationBuilder removeWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping mapping);
+    
+    /**
+     * Adds a mapping for a plan item id to new plan item id. This should not be needed in general, but there are cases where the plan item can have a new plan item id
+     * between different versions, and that's why this option is added.
+     *
+     * @param mapping Mapping from an existing plan item id to a new plan item id
+     * @return Returns the builder
+     * @see ChangePlanItemIdMapping
+     */
+    CaseInstanceMigrationBuilder addChangePlanItemIdMapping(ChangePlanItemIdMapping mapping);
+    
+    /**
+     * Adds a mapping for a plan item definition id to a new plan item definition id to change the plan item id. This should not be needed in general, 
+     * but there are cases where the plan item can have a new plan item id between different versions, and that's why this option is added.
+     *
+     * @param mapping Mapping from an existing plan item definition id to a new plan item definition id to change the plan item id
+     * @return Returns the builder
+     * @see ChangePlanItemIdWithDefinitionIdMapping
+     */
+    CaseInstanceMigrationBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
+
+    /**
+     * Specifies an expression which is executed before the migration starts.
+     *
+     * @param preUpgradeExpression the expression e.g. ${mySpringBean.doSomething()}
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder withPreUpgradeExpression(String preUpgradeExpression);
+
+    /**
+     * Specifies an expression which is executed after the migration is finished.
+     *
+     * @param postUpgradeExpression the expression e.g. ${mySpringBean.doSomething()}
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder withPostUpgradeExpression(String postUpgradeExpression);
 
     /**
      * Specifies a case instance variable that will also be available during the case migration

@@ -374,6 +374,7 @@
     <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="VARCHAR" />
     <result property="processDefinitionVersion" column="ProcessDefinitionVersion" jdbcType="INTEGER" />
+    <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DeploymentId" jdbcType="VARCHAR" />
 
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
@@ -474,6 +475,7 @@
     <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="VARCHAR" />
     <result property="processDefinitionVersion" column="ProcessDefinitionVersion" jdbcType="INTEGER" />
+      <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DeploymentId" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
@@ -581,71 +583,77 @@
   	and IS_ACTIVE_ = #{parameter.isActive}
   </select>
 
-  <select id="selectExecutionsByParentExecutionAndActivityIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
-    select *
-    from ${prefix}ACT_RU_EXECUTION
-    where PARENT_ID_ = #{parameter.parentExecutionId}
-    and ACT_ID_ in
-    <foreach item="activityId" collection="parameter.activityIds" open="(" separator="," close=")">
-          #{activityId}
-    </foreach>
-  </select>
+    <select id="selectExecutionsByParentExecutionAndActivityIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject"
+            resultMap="executionResultMap">
+        select *
+        from ${prefix}ACT_RU_EXECUTION
+        where PARENT_ID_ = #{parameter.parentExecutionId}
+        and ACT_ID_ in
+        <foreach item="activityId" collection="parameter.activityIds" open="(" separator="," close=")">
+            #{activityId}
+        </foreach>
+    </select>
 
-  <select id="selectExecutionsByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
-    <if test="needsPaging">${limitBefore}</if>
-    SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="needsPaging">${limitAfter}</if>
-  </select>
+    <select id="selectExecutionsByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as
+        ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.CATEGORY_ as ProcessDefinitionCategory, P.DEPLOYMENT_ID_ as DeploymentId
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
 
-  <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
-  </select>
+    <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
+        select count(distinct RES.ID_)
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+    </select>
 
-  <!--  same as selectExecutionsByQueryCriteria, but with different parameterType -->
-  <select id="selectProcessInstanceByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceResultMap">
-    <if test="needsPaging">${limitBefore}</if>
-    SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="needsPaging">${limitAfter}</if>
-  </select>
+    <!--  same as selectExecutionsByQueryCriteria, but with different parameterType -->
+    <select id="selectProcessInstanceByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as
+        ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.CATEGORY_ as ProcessDefinitionCategory, P.DEPLOYMENT_ID_ as DeploymentId
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
 
-  <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
-  </select>
+    <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultType="long">
+        select count(distinct RES.ID_)
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+    </select>
 
-  <sql id="selectExecutionsByQueryCriteriaSql">
-    from ${prefix}ACT_RU_EXECUTION RES
-    <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->
-    inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
-    <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
-  </sql>
+    <sql id="selectExecutionsByQueryCriteriaSql">
+        from ${prefix}ACT_RU_EXECUTION RES
+        <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->
+        inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+        <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
+    </sql>
 
-  <select id="selectProcessInstanceWithVariablesByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceAndVariablesResultMap">
-    SELECT RES.*,
-    VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
-    VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
-    VAR.META_INFO_ as VAR_META_INFO_,
-    VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
-    VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
-    FROM (
+    <select id="selectProcessInstanceWithVariablesByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl"
+            resultMap="processInstanceAndVariablesResultMap">
+        SELECT RES.*,
+        VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+        VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
+        VAR.META_INFO_ as VAR_META_INFO_,
+        VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+        VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+        FROM (
         <!-- top 100 percent is only needed when doing order by in a subselect -->
         <if test="needsPaging">${limitBefore}</if>
-        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
+        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_
+        as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.CATEGORY_ as ProcessDefinitionCategory,
+        P.DEPLOYMENT_ID_ as DeploymentId
         <include refid="selectProcessInstanceWithVariablesByQueryCriteriaSql"/>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
-    ) RES
-    left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
-    <if test="needsProcessDefinitionOuterJoin">
-        inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
-    </if>
-    ${outerJoinOrderBy}
-  </select>
+        ) RES
+        left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+        <if test="needsProcessDefinitionOuterJoin">
+            inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+        </if>
+        ${outerJoinOrderBy}
+    </select>
 
   <sql id="selectProcessInstanceWithVariablesByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXECUTION RES
@@ -810,6 +818,19 @@
       </if>
       <if test="nameLikeIgnoreCase != null">
         and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+      </if>
+      <if test="parentScopeId != null">
+          and EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+            LINK.SCOPE_ID_ = #{parentScopeId}
+            and LINK.REF_SCOPE_ID_ = RES.ID_
+            and LINK.HIERARCHY_TYPE_ = 'parent'
+          )
+      </if>
+      <if test="rootScopeId != null">
+          and exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+            LINK.REF_SCOPE_ID_ = RES.ID_
+            and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+            )
       </if>
       <if test="activeActivityId != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
@@ -1091,6 +1112,19 @@
           </if>
           <if test="orQueryObject.nameLikeIgnoreCase != null">
             or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.parentScopeId != null">
+              or EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+              LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+              and LINK.REF_SCOPE_ID_ = RES.ID_
+              and LINK.HIERARCHY_TYPE_ = 'parent'
+              )
+          </if>
+          <if test="orQueryObject.rootScopeId != null">
+              or exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+              LINK.REF_SCOPE_ID_ = RES.ID_
+              and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+              )
           </if>
           <if test="orQueryObject.activeActivityId != null">
 	        or EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{orQueryObject.activeActivityId} and A.END_TIME_ is null)

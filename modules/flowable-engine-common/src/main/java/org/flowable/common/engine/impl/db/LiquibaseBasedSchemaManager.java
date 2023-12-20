@@ -68,7 +68,10 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
 
     public void initSchema(String databaseSchemaUpdate) {
         try {
-            if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
+            if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
+                runForLiquibase(this::schemaCreate);
+            }
+            else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
                 runForLiquibase(this::schemaCreate);
 
             } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {

@@ -57,7 +57,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
     @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
-        List<Map<String, Object>> decisionResult = null;
+        List<Map<String, Object>> decisionResults;
 
         if (ruleResults.size() > 1 && CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false) {
             Map<String, Object> lastResult = new HashMap<>();
@@ -71,11 +71,12 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
             }
 
             executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; multiple valid rules. Setting last valid rule result as final result.", getHitPolicyName()));
-            decisionResult = Collections.singletonList(lastResult);
+            decisionResults = Collections.singletonList(lastResult);
         } else {
-            decisionResult = ruleResults;
+            decisionResults = ruleResults;
         }
 
-        executionContext.getAuditContainer().setDecisionResult(decisionResult);
+        updateStackWithDecisionResults(decisionResults, executionContext);
+        executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 }

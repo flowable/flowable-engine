@@ -390,7 +390,47 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     
     @Override
     public String toString() {
-        return getClass().getName() + " [id=" + id + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName().replace("Impl", "")).append("[")
+                .append("id=").append(id)
+                .append(", jobHandlerType=").append(jobHandlerType)
+                .append(", jobType=").append(jobType);
+
+        if (category != null) {
+            sb.append(", category=").append(category);
+        }
+
+        if (elementId != null) {
+            sb.append(", elementId=").append(elementId);
+        }
+
+        if (correlationId != null) {
+            sb.append(", correlationId=").append(correlationId);
+        }
+
+        if (executionId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId);
+        } else if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeType=").append(scopeType);
+        }
+
+        if (processDefinitionId != null) {
+            sb.append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeDefinitionId != null) {
+            if (scopeId == null) {
+                sb.append(", scopeType=").append(scopeType);
+            }
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

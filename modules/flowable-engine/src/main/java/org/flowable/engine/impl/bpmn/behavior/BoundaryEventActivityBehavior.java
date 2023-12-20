@@ -82,7 +82,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         }
 
         if (parentScopeExecution == null) {
-            throw new FlowableException("Programmatic error: no parent scope execution found for boundary event");
+            throw new FlowableException("Programmatic error: no parent scope execution found for boundary event for " + executionEntity);
         }
 
         if (attachedRefScopeExecution.getCurrentFlowElement() instanceof FlowNode) {
@@ -136,7 +136,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         }
 
         if (scopeExecution == null) {
-            throw new FlowableException("Programmatic error: no parent scope execution found for boundary event");
+            throw new FlowableException("Programmatic error: no parent scope execution found for boundary event for " + executionEntity);
         }
 
         CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityEnd(executionEntity, null);

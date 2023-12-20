@@ -260,6 +260,7 @@
     <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" /> 
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionVersion" column="PROC_DEF_VERSION_" jdbcType="INTEGER" />
+    <result property="processDefinitionCategory" column="PROC_DEF_CATEGORY_" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
@@ -288,6 +289,7 @@
     <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" /> 
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionVersion" column="PROC_DEF_VERSION_" jdbcType="INTEGER" />
+    <result property="processDefinitionCategory" column="PROC_DEF_CATEGORY_" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
@@ -324,10 +326,15 @@
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
   
   <select id="selectHistoricProcessInstance" resultMap="historicProcessInstanceResultMap">
-    select RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
-    from ${prefix}ACT_HI_PROCINST RES
-    left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
-    where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      select RES.*,
+             DEF.KEY_           as PROC_DEF_KEY_,
+             DEF.NAME_          as PROC_DEF_NAME_,
+             DEF.VERSION_       as PROC_DEF_VERSION_,
+             DEF.CATEGORY_      as PROC_DEF_CATEGORY_,
+             DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+      from ${prefix}ACT_HI_PROCINST RES
+               left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </select>
 
   <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
@@ -337,44 +344,51 @@
   </select>
   
   <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicProcessInstanceResultMap">
-    select RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
-    from ${prefix}ACT_HI_PROCINST RES
-    left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
-    where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
+      select RES.*,
+             DEF.KEY_           as PROC_DEF_KEY_,
+             DEF.NAME_          as PROC_DEF_NAME_,
+             DEF.VERSION_       as PROC_DEF_VERSION_,
+             DEF.CATEGORY_      as PROC_DEF_CATEGORY_,
+             DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+      from ${prefix}ACT_HI_PROCINST RES
+               left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+      where SUPER_PROCESS_INSTANCE_ID_ = #{parameter}
   </select>
   
   <select id="selectHistoricProcessInstanceIdsBySuperProcessInstanceIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_ from ${prefix}ACT_HI_PROCINST where 
     <foreach item="listItem" index="listIndex" collection="parameter">
         <if test="listIndex &gt; 0">
-        or
+            or
         </if>
-        SUPER_PROCESS_INSTANCE_ID_ in 
+        SUPER_PROCESS_INSTANCE_ID_ in
         <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+            #{item}
         </foreach>
     </foreach>
   </select>
 
-  <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
-    <if test="needsPaging">${limitBefore}</if>
-    SELECT RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
-    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="needsPaging">${limitAfter}</if>
-  </select>
-  
-  <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
-    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
-  </select>
-  
-  <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">  
-    from ${prefix}ACT_HI_PROCINST RES
-    <!--
-            Doing a join on the definition table is OK, since it is a 1:1 relationship.
-            This has to be an outer join because historic data might exists, but definitions might have been deleted
-    -->
+    <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl"
+            resultMap="historicProcessInstanceResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_,
+        DEF.CATEGORY_ as PROC_DEF_CATEGORY_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+        <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
+        select count(distinct RES.ID_)
+        <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    </select>
+
+    <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
+        from ${prefix}ACT_HI_PROCINST RES
+        <!--
+                Doing a join on the definition table is OK, since it is a 1:1 relationship.
+                This has to be an outer join because historic data might exists, but definitions might have been deleted
+        -->
     left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     <include refid="commonSelectHistoricProcessInstancesByQueryCriteriaSql"/>
   </sql>
@@ -395,19 +409,20 @@
       VAR.TEXT2_ as VAR_TEXT2_,
       VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_,
       VAR.LONG_ as VAR_LONG_
-    FROM (
-        <!-- top 100 percent is only needed when doing order by in a subselect -->
-        <if test="needsPaging">${limitBefore}</if>
-        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
-        <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql"/>
-        ${orderBy}
-        <if test="needsPaging">${limitAfter}</if>
-    ) RES
-    left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
-    <if test="needsProcessDefinitionOuterJoin">
-        left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
-    </if>
-    ${outerJoinOrderBy}
+      FROM (
+      <!-- top 100 percent is only needed when doing order by in a subselect -->
+      <if test="needsPaging">${limitBefore}</if>
+      SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as
+      PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.CATEGORY_ as PROC_DEF_CATEGORY_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+      <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql"/>
+      ${orderBy}
+      <if test="needsPaging">${limitAfter}</if>
+      ) RES
+      left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+      <if test="needsProcessDefinitionOuterJoin">
+          left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+      </if>
+      ${outerJoinOrderBy}
   </select>
   
   <sql id="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql">
@@ -852,7 +867,20 @@
         and ${queryTablePrefix}NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+          and lower(${queryTablePrefix}NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+      </if>
+      <if test="parentScopeId != null">
+          and EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
+            LINK.SCOPE_ID_ = #{parentScopeId}
+            and LINK.REF_SCOPE_ID_ = RES.ID_
+            and LINK.HIERARCHY_TYPE_ = 'parent'
+          )
+      </if>
+      <if test="rootScopeId != null">
+          and exists(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
+          LINK.REF_SCOPE_ID_ = RES.ID_
+          and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+          )
       </if>
   </sql>
   
@@ -984,6 +1012,19 @@
       </if>
       <if test="orQueryObject.nameLikeIgnoreCase != null">
         or lower(${queryTablePrefix}NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.parentScopeId != null">
+          or EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
+          LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+          and LINK.REF_SCOPE_ID_ = RES.ID_
+          and LINK.HIERARCHY_TYPE_ = 'parent'
+          )
+      </if>
+      <if test="orQueryObject.rootScopeId != null">
+          or exists(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
+            LINK.REF_SCOPE_ID_ = RES.ID_
+            and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+          )
       </if>
   </sql>
   

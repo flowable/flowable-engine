@@ -96,8 +96,11 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
                 .as("Starting process should result in error in script")
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining(
-                        "Error evaluating juel script: \"execution.setVariable(\"myVar\", scriptVar)\" of activity id: theScriptTaskWithJuel of process definition id: testErrorInScript");
+                .hasMessageContainingAll(
+                        "Error evaluating juel script: \"execution.setVariable(\"myVar\", scriptVar)\" for Execution[ id",
+                        " - definition 'testErrorInScript:1:",
+                        " - activity 'theScriptTaskWithJuel'"
+                );
     }
 
     /**

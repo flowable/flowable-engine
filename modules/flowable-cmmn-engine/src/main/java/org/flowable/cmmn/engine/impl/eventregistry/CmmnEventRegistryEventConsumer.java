@@ -19,12 +19,17 @@ import java.util.Objects;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.lock.LockManager;
@@ -72,41 +77,56 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
         Collection<CorrelationKey> correlationKeys = generateCorrelationKeys(eventInstance.getCorrelationParameterInstances());
         List<EventSubscription> eventSubscriptions = findEventSubscriptions(ScopeTypes.CMMN, eventInstance, correlationKeys);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Found {} for {}", eventSubscriptions, eventInstance);
+        }
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         for (EventSubscription eventSubscription : eventSubscriptions) {
             EventConsumerInfo eventConsumerInfo = new EventConsumerInfo(eventSubscription.getId(), eventSubscription.getSubScopeId(), 
                     eventSubscription.getScopeDefinitionId(), ScopeTypes.CMMN);
-            handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
-            eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
+            boolean eventSubscriptionHandled = handleEventSubscription(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeys, eventConsumerInfo);
+            
+            if (eventSubscriptionHandled) {
+                eventRegistryProcessingInfo.addEventConsumerInfo(eventConsumerInfo);
+            }
         }
 
         return eventRegistryProcessingInfo;
     }
 
-    protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
+    protected boolean handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
             EventInstance eventInstance, Collection<CorrelationKey> correlationKeys, EventConsumerInfo eventConsumerInfo) {
 
-        if (eventSubscription.getSubScopeId() != null) {
+        String planItemInstanceId = eventSubscription.getSubScopeId();
+        if (planItemInstanceId != null) {
 
             // When a subscope id is set, this means that a plan item instance is waiting for the event
 
-            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventSubscription.getSubScopeId())
-                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance)
-                .trigger();
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(
+                    planItemInstanceId).singleResult();
+            CmmnModel cmmnModel = cmmnEngineConfiguration.getCmmnRepositoryService().getCmmnModel(planItemInstanceEntity.getCaseDefinitionId());
+            PlanItem planItem = cmmnModel.findPlanItemByPlanItemDefinitionId(planItemInstanceEntity.getPlanItemDefinitionId());
+            if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())
+                    || (planItem != null && planItem.getPlanItemDefinition() instanceof EventListener
+                    && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))) {
 
-        } else if (eventSubscription.getScopeDefinitionId() != null
-                && eventSubscription.getScopeId() == null
-                && eventSubscription.getSubScopeId() == null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Triggering {} with {}", planItemInstanceEntity, eventInstance);
+                }
+                cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId)
+                    .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance)
+                    .trigger();
+                
+            } else {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Ignoring {} because {} was not in the right state", eventInstance, planItemInstanceEntity);
+                }
+                return false;
+            }
+
+        } else if (eventSubscription.getScopeDefinitionId() != null && eventSubscription.getScopeId() == null) {
 
             // If there is no scope/subscope id set, but there is a scope definition id set, it's an event that starts a case
-
-            CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionId(eventSubscription.getScopeDefinitionId())
-                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
-
-            if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
-                caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
-            }
 
             if (correlationKeys != null) {
                 String startCorrelationConfiguration = getStartCorrelationConfiguration(eventSubscription);
@@ -122,7 +142,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                         // Returning, no new instance should be started
                         eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                         LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
-                        return;
+                        return true;
 
                     } else if (cmmnEngineConfiguration.isEventRegistryUniqueCaseInstanceCheckWithLock()) {
 
@@ -161,11 +181,11 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                                     // Returning, no new instance should be started
                                     eventConsumerInfo.setHasExistingInstancesForUniqueCorrelation(true);
                                     LOGGER.debug("Event received to start a new case instance, but a unique instance already exists.");
-                                    return;
+                                    return true;
                                 }
 
-                                startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
-                                return;
+                                startCaseInstance(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeyWithAllParameters);
+                                return true;
 
                             } finally {
                                 lockManager.releaseAndDeleteLock();
@@ -173,24 +193,23 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                             }
 
                         } else {
-                            LOGGER.info(
-                                    "Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.",
-                                    countLockName);
-                            return;
+                            LOGGER.info("Lock for {} was not acquired. This means that another event has already acquired that lock and will start a new case instance. Ignoring this one.", countLockName);
+                            return true;
 
                         }
 
                     } else {
-                        startCaseInstance(caseInstanceBuilder, correlationKeyWithAllParameters.getValue(), ReferenceTypes.EVENT_CASE);
-                        return;
+                        startCaseInstance(cmmnRuntimeService, eventSubscription, eventInstance, correlationKeyWithAllParameters);
+                        return true;
                     }
 
                 }
             }
 
-            startCaseInstance(caseInstanceBuilder, null, null);
-
+            startCaseInstance(cmmnRuntimeService, eventSubscription, eventInstance, null);
         }
+        
+        return true;
     }
 
     protected long countCaseInstances(CmmnRuntimeService cmmnRuntimeService, EventInstance eventInstance,
@@ -208,19 +227,42 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
         return caseInstanceQuery.count();
     }
 
-    protected void startCaseInstance(CaseInstanceBuilder caseInstanceBuilder, String referenceId, String referenceType) {
+    protected void startCaseInstance(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription, EventInstance eventInstance,
+            CorrelationKey correlationKey) {
+        CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(eventSubscription.getScopeDefinitionId())
+                .transientVariable(EventConstants.EVENT_INSTANCE, eventInstance);
 
-        if (referenceId != null) {
-            caseInstanceBuilder.referenceId(referenceId);
-        }
-        if (referenceType != null) {
-            caseInstanceBuilder.referenceType(referenceType);
+        if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+            caseInstanceBuilder.overrideCaseDefinitionTenantId(eventInstance.getTenantId());
         }
 
+        if (correlationKey != null) {
+            caseInstanceBuilder.referenceId(correlationKey.getValue())
+                    .referenceType(ReferenceTypes.EVENT_CASE);
+        }
+
+        boolean debugLoggingEnabled = LOGGER.isDebugEnabled();
         if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
-            caseInstanceBuilder.startAsync();
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Async starting case instance for {} with {}", eventSubscription, eventInstance);
+            }
+
+            CaseInstance caseInstance = caseInstanceBuilder.startAsync();
+
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Started {} async for {} with {}", caseInstance, eventSubscription, eventInstance);
+            }
         } else {
-            caseInstanceBuilder.start();
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Starting case instance for {} with {}", eventSubscription, eventInstance);
+            }
+
+            CaseInstance caseInstance = caseInstanceBuilder.start();
+
+            if (debugLoggingEnabled) {
+                LOGGER.debug("Started {} for {} with {}", caseInstance, eventSubscription, eventInstance);
+            }
         }
     }
 

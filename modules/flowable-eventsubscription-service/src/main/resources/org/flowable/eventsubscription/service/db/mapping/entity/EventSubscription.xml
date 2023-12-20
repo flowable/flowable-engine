@@ -26,6 +26,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR" />
+    <result property="scopeDefinitionKey" column="SCOPE_DEFINITION_KEY_" jdbcType="VARCHAR" />
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
     <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
@@ -105,6 +106,9 @@
       <if test="withoutScopeDefinitionId">
         and RES.SCOPE_DEFINITION_ID_ IS NULL
       </if>
+      <if test="scopeDefinitionKey != null">
+        and RES.SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey}
+      </if>
       <if test="scopeType != null">
         and RES.SCOPE_TYPE_ = #{scopeType}
       </if>
@@ -182,6 +186,9 @@
               </if>
               <if test="orQueryObject.withoutScopeDefinitionId">
                   or RES.SCOPE_DEFINITION_ID_ IS NULL
+              </if>
+              <if test="orQueryObject.scopeDefinitionKey != null">
+                  or RES.SCOPE_DEFINITION_KEY_ = #{orQueryObject.scopeDefinitionKey}
               </if>
               <if test="orQueryObject.scopeType != null">
                   or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
@@ -393,6 +400,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
            	TENANT_ID_
     )
@@ -408,6 +416,7 @@
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeDefinitionKey, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
     )
@@ -428,6 +437,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
             TENANT_ID_
     )
@@ -445,6 +455,7 @@
            #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
            #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
@@ -467,6 +478,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
             TENANT_ID_
           ) VALUES 
@@ -482,6 +494,7 @@
            #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{messageEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
            #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
            #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
@@ -524,6 +537,9 @@
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
       </if>
+      <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+      </if>
       <if test="originalPersistentState.scopeType != scopeType">
            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
       </if>
@@ -558,6 +574,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
            	TENANT_ID_
     )
@@ -573,6 +590,7 @@
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeDefinitionKey, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}         
     )
@@ -593,6 +611,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
             TENANT_ID_
     )
@@ -610,6 +629,7 @@
          #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
          #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
          #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{signalEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
          #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
          #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
      </foreach>
@@ -632,6 +652,7 @@
           SUB_SCOPE_ID_,
           SCOPE_ID_,
           SCOPE_DEFINITION_ID_,
+          SCOPE_DEFINITION_KEY_,
           SCOPE_TYPE_,
           TENANT_ID_
           )
@@ -648,6 +669,7 @@
            #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
            #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
            #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+           #{signalEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
            #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
            #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
      </foreach>
@@ -683,6 +705,9 @@
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
@@ -721,6 +746,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
            	TENANT_ID_
     )
@@ -736,6 +762,7 @@
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeDefinitionKey, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
     )
@@ -756,6 +783,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
             TENANT_ID_
     )
@@ -773,6 +801,7 @@
          #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
          #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
@@ -795,6 +824,7 @@
           SUB_SCOPE_ID_,
           SCOPE_ID_,
           SCOPE_DEFINITION_ID_,
+          SCOPE_DEFINITION_KEY_,
           SCOPE_TYPE_,
           TENANT_ID_
         )
@@ -811,6 +841,7 @@
          #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
          #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
          #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
       </foreach>
@@ -846,6 +877,9 @@
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
@@ -884,6 +918,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
            	TENANT_ID_
     )
@@ -899,6 +934,7 @@
             #{subScopeId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
+            #{scopeDefinitionKey, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
     )
@@ -919,6 +955,7 @@
         SUB_SCOPE_ID_,
         SCOPE_ID_,
         SCOPE_DEFINITION_ID_,
+        SCOPE_DEFINITION_KEY_,
         SCOPE_TYPE_,
         TENANT_ID_
         )
@@ -936,6 +973,7 @@
             #{eventSubscription.subScopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
             #{eventSubscription.scopeType, jdbcType=VARCHAR},
             #{eventSubscription.tenantId, jdbcType=VARCHAR})
         </foreach>
@@ -958,6 +996,7 @@
             SUB_SCOPE_ID_,
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
+            SCOPE_DEFINITION_KEY_,
             SCOPE_TYPE_,
             TENANT_ID_
             )
@@ -974,6 +1013,7 @@
             #{eventSubscription.subScopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
+            #{eventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
             #{eventSubscription.scopeType, jdbcType=VARCHAR},
             #{eventSubscription.tenantId, jdbcType=VARCHAR})
         </foreach>
@@ -1013,6 +1053,9 @@
             <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
                 SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
+                SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
@@ -1032,7 +1075,7 @@
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
-  
+
   <!--  tenantId update -->
    <update id="updateTenantIdOfEventSubscriptions" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
@@ -1041,6 +1084,21 @@
     </set>
     where TENANT_ID_ = #{oldTenantId, jdbcType=VARCHAR}
   </update>
+
+ <!-- process definition id update -->
+   <update id="updateManualProcessStartEventSubscriptionWithProcessDefinitionId" parameterType="map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR
+    set PROC_DEF_ID_ = #{newProcessDefinitionId, jdbcType=VARCHAR}
+    where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    <if test="scopeDefinitionKey != null">
+        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR}
+    </if>
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
+   </update>
 
   <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
@@ -1103,5 +1161,15 @@
      and SCOPE_ID_ is null
   </delete>
 
+ <!-- delete manual subscriptions for process start -->
+  <delete id="deleteManualProcessStartEventSubscriptions" parameterType="map">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where
+    PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
+  </delete>
 
 </mapper>

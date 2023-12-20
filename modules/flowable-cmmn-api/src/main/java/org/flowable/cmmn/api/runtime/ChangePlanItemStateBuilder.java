@@ -94,6 +94,30 @@ public interface ChangePlanItemStateBuilder {
     ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds);
     
     /**
+     * Add plan item id mapping. This should not be needed in general, but there are cases where the existing plan item id 
+     * is different from the new plan item id, and for this reason this option is provided.
+     */
+    ChangePlanItemStateBuilder changePlanItemId(String existingPlanItemId, String newPlanItemId);
+    
+    /**
+     * Add plan item id mapping. This should not be needed in general, but there are cases where the existing plan item id 
+     * is different from the new plan item id, and for this reason this option is provided.
+     */
+    ChangePlanItemStateBuilder changePlanItemIds(Map<String, String> changePlanItemIdMap);
+    
+    /**
+     * Add plan item id mapping with definition id. This should not be needed in general, but there are cases where the existing plan item id 
+     * is different from the new plan item id, and for this reason this option is provided.
+     */
+    ChangePlanItemStateBuilder changePlanItemIdWithDefinitionId(String existingPlanItemDefinitionId, String newPlanItemDefinitionId);
+    
+    /**
+     * Add plan item id mapping with definition id. This should not be needed in general, but there are cases where the existing plan item id 
+     * is different from the new plan item id, and for this reason this option is provided.
+     */
+    ChangePlanItemStateBuilder changePlanItemIdsWithDefinitionId(Map<String, String> changePlanItemIdWithDefinitionIdMap);
+    
+    /**
      * Set the case variable that should be set as part of the change plan item state action.
      */
     ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue);

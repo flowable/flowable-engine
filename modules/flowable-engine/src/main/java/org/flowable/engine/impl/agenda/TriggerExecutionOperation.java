@@ -69,19 +69,19 @@ public class TriggerExecutionOperation extends AbstractOperation {
 
 
             } else {
-                throw new FlowableException("Cannot trigger execution with id " + execution.getId()
+                throw new FlowableException("Cannot trigger " + execution
                     + " : the activityBehavior " + activityBehavior.getClass() + " does not implement the "
                     + TriggerableActivityBehavior.class.getName() + " interface");
 
             }
 
         } else if (currentFlowElement == null) {
-            throw new FlowableException("Cannot trigger execution with id " + execution.getId()
+            throw new FlowableException("Cannot trigger " + execution
                     + " : no current flow element found. Check the execution id that is being passed "
                     + "(it should not be a process instance execution, but a child execution currently referencing a flow element).");
 
         } else {
-            throw new FlowableException("Programmatic error: cannot trigger execution, invalid flowelement type found: "
+            throw new FlowableException("Programmatic error: cannot trigger " + execution + ", invalid flow element type found: "
                     + currentFlowElement.getClass().getName() + ".");
 
         }

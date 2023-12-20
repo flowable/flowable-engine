@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Test;
 
 /**
@@ -55,6 +56,33 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task after service task");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate")).isEqualTo("executed");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAsyncServiceTaskCurrentTenant() {
+        CaseInstance noTenantCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAsyncServiceTask")
+                .start();
+        CaseInstance flowableCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAsyncServiceTask")
+                .overrideCaseDefinitionTenantId("flowable")
+                .start();
+        CaseInstance muppetsCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAsyncServiceTask")
+                .overrideCaseDefinitionTenantId("muppets")
+                .start();
+        assertThat(cmmnRuntimeService.hasVariable(noTenantCase.getId(), "currentTenantVar")).isFalse();
+        assertThat(cmmnRuntimeService.hasVariable(flowableCase.getId(), "currentTenantVar")).isFalse();
+        assertThat(cmmnRuntimeService.hasVariable(muppetsCase.getId(), "currentTenantVar")).isFalse();
+
+        waitForJobExecutorToProcessAllJobs();
+
+        VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(noTenantCase.getId(), "currentTenantVar");
+        assertThat(variableInstance).isNotNull();
+        assertThat((String) variableInstance.getValue()).isNullOrEmpty();
+        assertThat(cmmnRuntimeService.getVariable(flowableCase.getId(), "currentTenantVar")).isEqualTo("flowable");
+        assertThat(cmmnRuntimeService.getVariable(muppetsCase.getId(), "currentTenantVar")).isEqualTo("muppets");
     }
     
     @Test

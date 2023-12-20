@@ -34,8 +34,8 @@ import org.junit.Test;
  */
 public class AsyncJobCategoryTest extends FlowableCmmnTestCase {
 
-    private final static String MATCHING_CATEGORY = "cmmnCategory";
-    private final static String NON_MATCHING_CATEGORY = "nonMatchingCategory";
+    private static final String MATCHING_CATEGORY = "cmmnCategory";
+    private static final String NON_MATCHING_CATEGORY = "nonMatchingCategory";
 
     protected List<String> originalEnabledJobCategories;
 

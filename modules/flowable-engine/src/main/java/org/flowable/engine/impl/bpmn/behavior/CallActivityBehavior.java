@@ -249,7 +249,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
                 processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment(), processEngineConfiguration);
                 break;
             default:
-                throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "]");
+                throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "] in " + execution);
         }
         return processDefinition;
     }
@@ -284,7 +284,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
-            throw new FlowableException("Cannot complete process instance. Parent process instance " + executionEntity.getId() + " is suspended");
+            throw new FlowableException("Cannot complete process instance. Parent process instance " + executionEntity + " is suspended");
         }
 
         leave(execution);

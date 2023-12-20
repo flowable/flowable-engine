@@ -190,18 +190,42 @@ public interface TaskService {
      *             when the task doesn't exist.
      */
     void unclaim(String taskId);
-
+    
     /**
-     * Called when the task is successfully executed.
+     * Set the task state to in progress. No check is done whether the user is known by the identity component.
      * 
      * @param taskId
-     *            the id of the task to complete, cannot be null.
+     *            task to change the state, cannot be null.
+     * @param userId
+     *            user that puts the task in progress.
      * @throws FlowableObjectNotFoundException
-     *             when no task exists with the given id.
-     * @throws FlowableException
-     *             when this task is {@link DelegationState#PENDING} delegation.
+     *             when the task doesn't exist.
      */
-    void complete(String taskId);
+    void startProgress(String taskId, String userId);
+    
+    /**
+     * Suspends the task. No check is done whether the user is known by the identity component.
+     * 
+     * @param taskId
+     *            task to suspend, cannot be null.
+     * @param userId
+     *            user that suspends the task.
+     * @throws FlowableObjectNotFoundException
+     *             when the task doesn't exist.
+     */
+    void suspendTask(String taskId, String userId);
+    
+    /**
+     * Activates the task. No check is done whether the user is known by the identity component.
+     * 
+     * @param taskId
+     *            task to activate, cannot be null.
+     * @param userId
+     *            user that activates the task.
+     * @throws FlowableObjectNotFoundException
+     *             when the task doesn't exist.
+     */
+    void activateTask(String taskId, String userId);
 
     /**
      * Delegates the task to another user. This means that the assignee is set and the delegation state is set to {@link DelegationState#PENDING}. If no owner is set on the task, the owner is set to
@@ -244,6 +268,32 @@ public interface TaskService {
     void resolveTask(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables);
 
     /**
+     * Called when the task is successfully executed.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     * @throws FlowableException
+     *             when this task is {@link DelegationState#PENDING} delegation.
+     */
+    void complete(String taskId);
+    
+    /**
+     * Called when the task is successfully executed.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param userId
+     *            user that completes the task.
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     * @throws FlowableException
+     *             when this task is {@link DelegationState#PENDING} delegation.
+     */
+    void complete(String taskId, String userId);
+    
+    /**
      * Called when the task is successfully executed, and the required task parameters are given by the end-user.
      * 
      * @param taskId
@@ -254,11 +304,30 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void complete(String taskId, Map<String, Object> variables);
+    
+    /**
+     * Called when the task is successfully executed, and the required task parameters are given by the end-user.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param userId
+     *            user that completes the task.
+     * @param variables
+     *            task parameters. May be null or empty.
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     */
+    void complete(String taskId, String userId, Map<String, Object> variables);
 
     /**
      * Similar to {@link #complete(String, Map)}, but allows to set transient variables too.
      */
     void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables);
+    
+    /**
+     * Similar to {@link #complete(String, String, Map)}, but allows to set transient variables too.
+     */
+    void complete(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables);
 
     /**
      * Called when the task is successfully executed, and the required task parameters are given by the end-user.
@@ -273,6 +342,22 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void complete(String taskId, Map<String, Object> variables, boolean localScope);
+    
+    /**
+     * Called when the task is successfully executed, and the required task parameters are given by the end-user.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param userId
+     *            user that completes the task.
+     * @param variables
+     *            task parameters. May be null or empty.
+     * @param localScope
+     *            If true, the provided variables will be stored task-local, instead of process instance wide (which is the default for {@link #complete(String, Map)}).
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     */
+    void complete(String taskId, String userId, Map<String, Object> variables, boolean localScope);
 
     /**
      * Called when the task is successfully executed, and the task form has been submitted.
@@ -289,6 +374,25 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
+    
+    /**
+     * Called when the task is successfully executed, and the task form has been submitted.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param formDefinitionId
+     *            the id of the form definition that is filled-in to complete the task, cannot be null.
+     * @param outcome
+     *            the outcome of the completed form, can be null.
+     * @param userId
+     *            user that completes the task.
+     * @param variables
+     *            values of the completed form. May be null or empty.
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     */
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, 
+            String userId, Map<String, Object> variables);
 
     /**
      * Called when the task is successfully executed, and the task form has been submitted.
@@ -307,8 +411,29 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
-                              Map<String, Object> variables, Map<String, Object> transientVariables);
-
+            Map<String, Object> variables, Map<String, Object> transientVariables);
+    
+    /**
+     * Called when the task is successfully executed, and the task form has been submitted.
+     *
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param formDefinitionId
+     *            the id of the form definition that is filled-in to complete the task, cannot be null.
+     * @param outcome
+     *            the outcome of the completed form, can be null.
+     * @param userId
+     *            user that completes the task.
+     * @param variables
+     *            values of the completed form. May be null or empty.
+     * @param transientVariables
+     *            additional transient values that need to added to the process instance transient variables. May be null or empty.
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     */
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId, 
+            Map<String, Object> variables, Map<String, Object> transientVariables);
+    
     /**
      * Called when the task is successfully executed, and the task form has been submitted.
      * 
@@ -326,6 +451,27 @@ public interface TaskService {
      *             when no task exists with the given id.
      */
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            Map<String, Object> variables, boolean localScope);
+
+    /**
+     * Called when the task is successfully executed, and the task form has been submitted.
+     * 
+     * @param taskId
+     *            the id of the task to complete, cannot be null.
+     * @param formDefinitionId
+     *            the id of the form definition that is filled-in to complete the task, cannot be null.
+     * @param outcome
+     *            the outcome of the completed form, can be null.
+     * @param userId
+     *            user that completes the task.
+     * @param variables
+     *            values of the completed form. May be null or empty.
+     * @param localScope
+     *            If true, the provided variables will be stored task-local, instead of process instance wide (which is the default for {@link #complete(String, Map)}).
+     * @throws FlowableObjectNotFoundException
+     *             when no task exists with the given id.
+     */
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId,
             Map<String, Object> variables, boolean localScope);
 
     /**

@@ -19,15 +19,14 @@ The distribution contains most of the sources as JAR files. The source code for 
 
 ## Required software
 
-### JDK 8+
+### JDK 17+
 
-Flowable runs on a JDK higher than or equal to version 8. Go to [Oracle Java SE downloads](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and click on button "Download JDK". There are installation instructions on that page as well. To verify that your installation was successful, run java -version on the command line. That should print the installed version of your JDK.
+Flowable runs on a JDK higher than or equal to version 17. Go to [Oracle Java SE downloads](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and click on button "Download JDK". There are installation instructions on that page as well. To verify that your installation was successful, run java -version on the command line. That should print the installed version of your JDK.
 
-### IDE
+### Modeling
 
-Flowable development can be done with the IDE of your choice. If you would like to use the Flowable Designer then you need Eclipse Mars or Neon.
-Download the Eclipse distribution of your choice from [the Eclipse download page](http://www.eclipse.org/downloads/). Unzip the downloaded file and then you should be able to start it with the Eclipse file in the directory eclipse.
-Further on in this guide, there is a section on [installing our eclipse designer plugin](bpmn/ch13-Designer.md#installation).
+Flowable offers a free to use Flowable Cloud Design application, which you can use to model CMMN, BPMN, DMN and other model types.
+You can register via the Flowable account registration page to get started [Flowable account registration page](https://www.flowable.com/account/open-source).
 
 ## Reporting problems
 

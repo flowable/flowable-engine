@@ -8,9 +8,9 @@ Flowable (V7)
     ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/u/flowable/flowable-rest)
 
 [License:  
-	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
+	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/main/LICENSE)
 
-![Flowable Actions CI](https://github.com/flowable/flowable-engine/workflows/Flowable%20Main%20Build/badge.svg?branch=master)
+![Flowable Actions CI](https://github.com/flowable/flowable-engine/actions/workflows/main.yml/badge.svg?branch=main)
 
 Homepage: https://www.flowable.org/
 
@@ -38,6 +38,10 @@ The distribution contains most of the sources as jar files. The source code of F
 Flowable V7 runs on a Java higher than or equal to version 17. Use the JDK packaged with your Linux distribution or go to [adoptium.net](https://adoptium.net/) and click on the *Latest LTS Release* button. There are installation instructions on that page as well. To verify that your installation was successful, run `java -version` on the command line. That should print the installed version of your JDK.
 
 [Flowable V6](https://github.com/flowable/flowable-engine/tree/flowable6.x) is still maintained and supports Java 8+.
+
+### Flowable Design
+
+Flowable offers a free to use Flowable Cloud Design application, which you can use to model CMMN, BPMN, DMN and other model types. You can register via the Flowable account registration page to get started https://www.flowable.com/account/open-source.
 
 ### Contributing
 

@@ -51,7 +51,7 @@ public class UnacquireExternalWorkerJobCmd implements Command<Void> {
         }
         
         if (!jobEntity.getLockOwner().equals(workerId)) {
-            throw new FlowableException("Job is locked with a different worker id");
+            throw new FlowableException(jobEntity + " is locked with a different worker id");
         }
 
         jobEntity.setLockExpirationTime(null);

@@ -119,6 +119,66 @@ class ExternalWorkerUnacquireJobResourceTest {
         
         assertThat(managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(1);
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/external/job/rest/service/api/simpleExternalWorkerJob.bpmn20.xml")
+    void unacquireBpmnJobsWithTenantId() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .overrideProcessDefinitionTenantId("tenant1")
+                .start();
+        
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .overrideProcessDefinitionTenantId("tenant1")
+                .start();
+        
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker1");
+        
+        assertThat(managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
+
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("workerId", "testWorker1");
+        request.put("tenantId", "tenant1");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/service/unacquire/jobs", request, String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.NO_CONTENT);
+        
+        assertThat(managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(0);
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/external/job/rest/service/api/simpleExternalWorkerJob.bpmn20.xml")
+    void unacquireBpmnJobsWithWrongTenantId() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .overrideProcessDefinitionTenantId("tenant1")
+                .start();
+        
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .overrideProcessDefinitionTenantId("tenant2")
+                .start();
+        
+        managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker1");
+        
+        assertThat(managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
+
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("workerId", "testWorker1");
+        request.put("tenantId", "tenant1");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/service/unacquire/jobs", request, String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.BAD_REQUEST);
+        
+        assertThat(managementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
+    }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/external/job/rest/service/api/simpleExternalWorkerJob.cmmn")
@@ -168,6 +228,66 @@ class ExternalWorkerUnacquireJobResourceTest {
         assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.NO_CONTENT);
         
         assertThat(cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(1);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/external/job/rest/service/api/simpleExternalWorkerJob.cmmn")
+    void unacquireCmmnJobsWithTenantId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant1")
+                .start();
+        
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant1")
+                .start();
+        
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker1");
+        
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
+
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("workerId", "testWorker1");
+        request.put("tenantId", "tenant1");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/service/unacquire/jobs", request, String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.NO_CONTENT);
+        
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(0);
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/external/job/rest/service/api/simpleExternalWorkerJob.cmmn")
+    void unacquireCmmnJobsWithWrongTenantId() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant1")
+                .start();
+        
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant2")
+                .start();
+        
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(10))
+                .acquireAndLock(2, "testWorker1");
+        
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
+
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("workerId", "testWorker1");
+        request.put("tenantId", "tenant1");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/service/unacquire/jobs", request, String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.BAD_REQUEST);
+        
+        assertThat(cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").count()).isEqualTo(2);
     }
     
     @Test

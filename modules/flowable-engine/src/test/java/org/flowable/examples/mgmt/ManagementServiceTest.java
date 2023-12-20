@@ -15,9 +15,14 @@ package org.flowable.examples.mgmt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -26,6 +31,7 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
@@ -80,7 +86,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix + "ACT_RU_TASK");
         assertThat(tableMetaData.getColumnTypes()).hasSameSizeAs(tableMetaData.getColumnNames());
-        assertThat(tableMetaData.getColumnNames()).hasSize(30);
+        assertThat(tableMetaData.getColumnNames()).hasSize(37);
  
         int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
         int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");
@@ -92,6 +98,54 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         assertOneOf(new String[] { "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR", "CHARACTER VARYING" }, tableMetaData.getColumnTypes().get(assigneeIndex));
         assertOneOf(new String[] { "TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME" }, tableMetaData.getColumnTypes().get(createTimeIndex));
+    }
+
+    @Test
+    public void testTableCountWithCustomTablesWithoutActOrFlwPrefix() {
+        String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+        try {
+
+            managementService.executeCommand(commandContext -> {
+                DataSource dataSource = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        .getDataSource();
+
+                try (Connection connection = dataSource.getConnection()) {
+                    PreparedStatement statement = connection.prepareStatement("create table " + tablePrefix + "FLWTEST(id varchar(10))");
+                    statement.execute();
+
+                    statement = connection.prepareStatement("create table " + tablePrefix + "ACTIVITY_TEST(id varchar(10))");
+                    statement.execute();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            });
+
+            // ManagementService#getTableCount returns the counts of the flowable tables (tables with the FLW_ and ACT_ prefix)
+            // Therefore, the FLWTEST and ACTIVITY_TEST tables should not be included in the table count
+            Map<String, Long> tableCount = managementService.getTableCount();
+            assertThat(tableCount)
+                    .doesNotContainKeys(
+                            tablePrefix + "FLWTEST",
+                            tablePrefix + "ACTIVITY_TEST"
+                    );
+        } finally {
+            managementService.executeCommand(commandContext -> {
+                DataSource dataSource = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        .getDataSource();
+
+                try (Connection connection = dataSource.getConnection()) {
+                    PreparedStatement statement = connection.prepareStatement("drop table " + tablePrefix + "FLWTEST");
+                    statement.execute();
+
+                    statement = connection.prepareStatement("drop table " + tablePrefix + "ACTIVITY_TEST");
+                    statement.execute();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            });
+        }
     }
 
     private void assertOneOf(String[] possibleValues, String currentValue) {

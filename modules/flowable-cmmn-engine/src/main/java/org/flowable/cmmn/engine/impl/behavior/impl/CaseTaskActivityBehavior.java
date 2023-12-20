@@ -80,7 +80,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         }
         if (StringUtils.isEmpty(caseDefinitionKey)) {
-            throw new FlowableException("Could not start case instance: no case reference defined");
+            throw new FlowableException("Could not start case instance: no case reference defined in " + planItemInstanceEntity);
         }
 
         CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseDefinitionKey);
@@ -233,7 +233,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             }
             
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE + " for " + delegatePlanItemInstance);
         }
     }
 

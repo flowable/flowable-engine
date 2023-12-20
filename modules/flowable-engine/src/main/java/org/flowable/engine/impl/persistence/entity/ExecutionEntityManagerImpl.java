@@ -256,6 +256,7 @@ public class ExecutionEntityManagerImpl
         processInstanceExecution.setProcessDefinitionKey(processDefinition.getKey());
         processInstanceExecution.setProcessDefinitionName(processDefinition.getName());
         processInstanceExecution.setProcessDefinitionVersion(processDefinition.getVersion());
+        processInstanceExecution.setProcessDefinitionCategory(processDefinition.getCategory());
         processInstanceExecution.setDeploymentId(processDefinition.getDeploymentId());
         processInstanceExecution.setBusinessKey(businessKey);
         processInstanceExecution.setBusinessStatus(businessStatus);
@@ -472,7 +473,7 @@ public class ExecutionEntityManagerImpl
                     subProcessActivityBehavior.completed(superExecution);
                 } catch (Exception e) {
                     throw new FlowableException("Could not complete parent process instance for call activity with process instance execution " 
-                                + processInstanceExecution.getId(), e);
+                                + processInstanceExecution, e);
                 }
             }
         }

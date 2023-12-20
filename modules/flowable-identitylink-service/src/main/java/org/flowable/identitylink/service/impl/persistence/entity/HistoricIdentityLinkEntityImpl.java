@@ -201,4 +201,34 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("IdentityLinkEntity[id=").append(id);
+        sb.append(", type=").append(type);
+        if (userId != null) {
+            sb.append(", userId=").append(userId);
+        }
+        if (groupId != null) {
+            sb.append(", groupId=").append(groupId);
+        }
+        if (taskId != null) {
+            sb.append(", taskId=").append(taskId);
+        }
+        if (processInstanceId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId);
+        }
+        if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId);
+        }
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

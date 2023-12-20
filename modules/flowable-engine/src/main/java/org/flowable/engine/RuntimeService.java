@@ -37,6 +37,9 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
@@ -1357,6 +1360,34 @@ public interface RuntimeService {
     void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
     
     void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
+
+    /**
+     * Creates a new event subscription builder to register a subscription to start a new process instance based on an event with a particular set of
+     * correlation parameter values. In order for this to work, the process definition needs to have an event-registry based start event with a
+     * dynamic, manual subscription based behavior and the registered correlation parameter values within the builder need to be based on
+     * actual correlation parameter definitions within the event model the start event is based on.
+     * Register one or more correlation parameter value with in the builder before invoking the
+     * {@link ProcessInstanceStartEventSubscriptionBuilder#subscribe()} method to create and register the subscription.
+     *
+     * @return the subscription builder
+     */
+    ProcessInstanceStartEventSubscriptionBuilder createProcessInstanceStartEventSubscriptionBuilder();
+
+    /**
+     * Creates a new event subscription modification builder to modify one or more previously registered process start event subscriptions based
+     * on a particular process definition and with an optional combination of correlation parameter values.
+     *
+     * @return the subscription modification builder
+     */
+    ProcessInstanceStartEventSubscriptionModificationBuilder createProcessInstanceStartEventSubscriptionModificationBuilder();
+
+    /**
+     * Creates a new event subscription deletion builder delete one or more previously registered process start event subscriptions based
+     * on a particular process definition and with an optional combination of correlation parameter values.
+     *
+     * @return the subscription deletion builder
+     */
+    ProcessInstanceStartEventSubscriptionDeletionBuilder createProcessInstanceStartEventSubscriptionDeletionBuilder();
 
     /**
      * Sets the name for the process instance with the given id.

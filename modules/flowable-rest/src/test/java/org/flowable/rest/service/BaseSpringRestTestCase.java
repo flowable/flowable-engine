@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -393,11 +392,7 @@ public class BaseSpringRestTestCase {
 
     protected String encode(String string) {
         if (string != null) {
-            try {
-                return URLEncoder.encode(string, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-            }
+            return URLEncoder.encode(string, StandardCharsets.UTF_8);
         }
         return null;
     }

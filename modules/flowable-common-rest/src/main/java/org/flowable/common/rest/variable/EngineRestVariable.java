@@ -37,7 +37,7 @@ public class EngineRestVariable {
         this.name = name;
     }
 
-    @ApiModelProperty(example = "string", value = "Type of the variable.", notes = " When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done.")
+    @ApiModelProperty(example = "string", value = "Type of the variable.", notes = "When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done. Some known types are: string, integer, long, short, double, instant, date, localDate, localDateTime, boolean, json")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getType() {
         return type;

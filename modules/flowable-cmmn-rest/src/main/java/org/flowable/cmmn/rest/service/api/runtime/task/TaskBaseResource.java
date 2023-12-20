@@ -140,6 +140,9 @@ public class TaskBaseResource {
         TaskQuery taskQuery = taskService.createTaskQuery();
 
         // Populate filter-parameters
+        if (request.getTaskId() != null) {
+            taskQuery.taskId(request.getTaskId());
+        }
         if (request.getName() != null) {
             taskQuery.taskName(request.getName());
         }
@@ -336,6 +339,12 @@ public class TaskBaseResource {
 
         if (Boolean.TRUE.equals(request.getWithoutCategory())) {
             taskQuery.taskWithoutCategory();
+        }
+        if (request.getRootScopeId() != null) {
+            taskQuery.taskRootScopeId(request.getRootScopeId());
+        }
+        if (request.getParentScopeId() != null) {
+            taskQuery.taskParentScopeId(request.getParentScopeId());
         }
 
         if (restApiInterceptor != null) {

@@ -39,6 +39,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd implements Command<Void> {
     
     protected String taskId;
+    protected String userId;
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
@@ -49,12 +50,25 @@ public class CompleteTaskCmd implements Command<Void> {
         this.variables = variables;
         this.transientVariables = transientVariables;
     }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {  
+        this(taskId, variables, transientVariables);
+        this.userId = userId;
+    }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
             Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
         this(taskId, variables, transientVariables);
         this.variablesLocal = variablesLocal;
         this.transientVariablesLocal = transientVariablesLocal;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
     }
     
     @Override
@@ -71,7 +85,7 @@ public class CompleteTaskCmd implements Command<Void> {
         }
         
         if (StringUtils.isNotEmpty(taskEntity.getProcessInstanceId())) {
-            throw new FlowableException("The task instance is created by the process engine and should be completed via the process engine API");
+            throw new FlowableException(taskEntity + " is created by the process engine and should be completed via the process engine API");
         }
         
         String planItemInstanceId = taskEntity.getSubScopeId();
@@ -79,7 +93,7 @@ public class CompleteTaskCmd implements Command<Void> {
         if (planItemInstanceId != null) {
             planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
             if (planItemInstanceEntity == null) {
-                throw new FlowableException("Could not find plan item instance for task " + taskId);
+                throw new FlowableException("Could not find plan item instance for " + taskEntity);
             }
         }
         
@@ -122,10 +136,18 @@ public class CompleteTaskCmd implements Command<Void> {
                         "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
             
+            if (userId != null) {
+                taskEntity.setTempCompletedBy(userId);
+            }
+            
             CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
             
         } else {
-            TaskHelper.deleteTask(taskEntity, null, false, true, cmmnEngineConfiguration);
+            TaskHelper.completeTask(taskEntity, userId, cmmnEngineConfiguration);
+        }
+        
+        if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+            cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleComplete(taskEntity, userId);
         }
         
         return null;

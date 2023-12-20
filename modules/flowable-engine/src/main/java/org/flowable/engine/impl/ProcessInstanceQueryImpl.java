@@ -79,6 +79,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String callbackId;
@@ -536,6 +538,25 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return this;
     }
     
+    public ProcessInstanceQuery processInstanceRootScopeId(String rootId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeId = rootId;
+        } else {
+            this.rootScopeId = rootId;
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery processInstanceParentScopeId(String parentId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeId = parentId;
+        } else {
+            this.parentScopeId = parentId;
+        }
+        return this;
+    }
+
     @Override
     public ProcessInstanceQuery activeActivityId(String activityId) {
         if (inOrStatement) {
@@ -903,6 +924,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public Set<String> getProcessInstanceIds() {
         return processInstanceIds;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
     }
 
     public String getBusinessKey() {

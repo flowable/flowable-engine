@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -123,6 +124,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventResourceEntityManager resourceEntityManager;
 
     protected ExpressionManager expressionManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
     protected Collection<ELResolver> preDefaultELResolvers;
     protected Collection<ELResolver> preBeanELResolvers;
     protected Collection<ELResolver> postDefaultELResolvers;
@@ -289,6 +291,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
             if (postDefaultELResolvers != null) {
                 postDefaultELResolvers.forEach(eventRegistryExpressionManager::addPostDefaultResolver);
+            }
+
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(eventRegistryExpressionManager));
             }
 
             expressionManager = eventRegistryExpressionManager;
@@ -903,6 +909,19 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     @Override
     public EventRegistryEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
+    }
+
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
         return this;
     }
 

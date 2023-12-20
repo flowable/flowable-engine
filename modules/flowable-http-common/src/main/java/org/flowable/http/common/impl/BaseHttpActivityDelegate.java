@@ -259,7 +259,7 @@ public abstract class BaseHttpActivityDelegate {
             String headersString = ExpressionUtils.getStringFromField(requestHeaders, variableContainer);
             return HttpHeaders.parseFromString(headersString);
         } catch (FlowableIllegalArgumentException ex) {
-            throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID, ex);
+            throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID + " for " + variableContainer, ex);
         }
     }
 

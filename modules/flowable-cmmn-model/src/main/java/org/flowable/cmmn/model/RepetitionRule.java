@@ -27,6 +27,7 @@ public class RepetitionRule extends PlanItemRule {
     public static final String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
 
     protected String repetitionCounterVariableName;
+    protected boolean ignoreRepetitionCounterVariable;
     protected String collectionVariableName;
     protected String elementVariableName;
     protected String elementIndexVariableName;
@@ -43,6 +44,14 @@ public class RepetitionRule extends PlanItemRule {
 
     public void setRepetitionCounterVariableName(String repetitionCounterVariableName) {
         this.repetitionCounterVariableName = repetitionCounterVariableName;
+    }
+
+    public boolean isIgnoreRepetitionCounterVariable() {
+        return ignoreRepetitionCounterVariable;
+    }
+
+    public void setIgnoreRepetitionCounterVariable(boolean ignoreRepetitionCounterVariable) {
+        this.ignoreRepetitionCounterVariable = ignoreRepetitionCounterVariable;
     }
 
     public String getCollectionVariableName() {

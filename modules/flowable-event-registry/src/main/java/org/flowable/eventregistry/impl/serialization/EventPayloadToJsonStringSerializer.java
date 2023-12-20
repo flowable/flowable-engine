@@ -130,7 +130,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
         try {
             return objectMapper.writeValueAsString(objectNode);
         } catch (JsonProcessingException e) {
-            throw new FlowableException("Could not serialize event to json string", e);
+            throw new FlowableException("Could not serialize event to json string for " + eventInstance, e);
         }
     }
 

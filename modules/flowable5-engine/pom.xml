@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>7.0.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -331,10 +331,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -383,10 +381,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -436,10 +432,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -470,10 +464,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>configExecution</id>
@@ -537,10 +529,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>configExecution</id>
@@ -607,8 +597,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -650,10 +640,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -701,8 +689,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -745,8 +733,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -805,8 +793,8 @@
 						</configuration>
 					</plugin>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>

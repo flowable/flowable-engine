@@ -39,6 +39,8 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -46,6 +48,8 @@ import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -1231,8 +1235,12 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
             cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker2");
 
         }).isInstanceOf(FlowableException.class)
-            .hasMessageContaining("Job is locked with a different worker id");
-        
+                .hasMessage("ExternalWorkerJobEntity[id=" + job.getId()
+                        + ", jobHandlerType=cmmn-external-worker-complete, jobType=externalWorker, elementId=externalWorkerTask, correlationId="
+                        + job.getCorrelationId() + ", scopeId=" + job.getScopeId()
+                        + ", subScopeId=" + job.getSubScopeId() + ", scopeType=cmmn, scopeDefinitionId=" + job.getScopeDefinitionId()
+                        + "] is locked with a different worker id");
+
         cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker1");
         assertThat(query.count()).isEqualTo(0);
 
@@ -1266,6 +1274,64 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(query.count()).isEqualTo(0);
 
         query = cmmnManagementService.createExternalWorkerJobQuery().jobId(job.getId());
+        job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
+    public void testUnaquireWithWorkerIdAndTenantId() {
+        CaseInstance tenant1Instance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant1")
+                .start();
+        
+        CaseInstance tenant2Instance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .overrideCaseDefinitionTenantId("tenant2")
+                .start();
+
+        cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+            .topic("simple", Duration.ofMinutes(10))
+            .acquireAndLock(2, "testWorker1");
+        
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1");
+        assertThat(query.count()).isEqualTo(2);
+        assertThat(query.list())
+            .extracting(ExternalWorkerJob::getElementId)
+            .containsExactlyInAnyOrder("externalWorkerTask", "externalWorkerTask");
+        
+        assertThatThrownBy(() -> {
+            cmmnManagementService.unacquireAllExternalWorkerJobsForWorker("testWorker1", "tenant1");
+            
+        }).isInstanceOf(FlowableException.class)
+          .hasMessageContaining("provided worker id has external worker jobs from different tenant");
+        
+        ExternalWorkerJobEntity worker1Tenant2Job = (ExternalWorkerJobEntity) cmmnManagementService.createExternalWorkerJobQuery().lockOwner("testWorker1").jobTenantId("tenant2").singleResult();
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                ExternalWorkerJobEntityManager externalWorkerJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+                worker1Tenant2Job.setTenantId("tenant1");
+                externalWorkerJobEntityManager.update(worker1Tenant2Job);
+                
+                return null;
+            }
+        });
+
+        cmmnManagementService.unacquireAllExternalWorkerJobsForWorker("testWorker1");
+        
+        assertThat(query.count()).isEqualTo(0);
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().scopeId(tenant1Instance.getId());
+        ExternalWorkerJob job = query.singleResult();
+        assertThat(job.getLockOwner()).isNull();
+        assertThat(job.getLockExpirationTime()).isNull();
+        
+        query = cmmnManagementService.createExternalWorkerJobQuery().scopeId(tenant2Instance.getId());
         job = query.singleResult();
         assertThat(job.getLockOwner()).isNull();
         assertThat(job.getLockExpirationTime()).isNull();

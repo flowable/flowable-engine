@@ -148,13 +148,15 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         ExecutionEntityManager executionEntityManager = getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
-            String lockOwner;
-            Date lockExpirationTime;
+            String lockOwner = null;
+            Date lockExpirationTime = null;
 
             if (job instanceof JobInfoEntity) {
                 lockOwner = ((JobInfoEntity) job).getLockOwner();
                 lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
-            } else {
+            }
+
+            if (lockOwner == null || lockExpirationTime == null) {
                 int lockMillis = processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
                 GregorianCalendar lockCal = new GregorianCalendar();
                 lockCal.setTime(processEngineConfiguration.getClock().getCurrentTime());
@@ -217,7 +219,7 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                         jobEntity.setEndDate((Date) endDateValue);
                     } else {
                         throw new FlowableException("Timer '" + ((ExecutionEntity) variableScope).getActivityId()
-                                + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                                + "' in " + variableScope + " was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
                     }
 
                     if (jobEntity.getEndDate() == null) {

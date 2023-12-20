@@ -56,13 +56,13 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
             }
 
             if (execution == null) {
-                throw new FlowableException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
+                throw new FlowableException("No execution context active and event (" + event + ") is not related to an execution. No compensation event can be thrown.");
             }
 
             try {
                 ErrorPropagation.propagateError(errorCode, execution);
             } catch (Exception e) {
-                throw new FlowableException("Error while propagating error-event", e);
+                throw new FlowableException("Error while propagating error-event for " + execution, e);
             }
         }
     }

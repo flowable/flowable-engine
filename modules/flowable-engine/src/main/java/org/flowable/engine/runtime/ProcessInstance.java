@@ -48,6 +48,11 @@ public interface ProcessInstance extends Execution {
     Integer getProcessDefinitionVersion();
 
     /**
+     * The category of the process definition of the process instance.
+     */
+    String getProcessDefinitionCategory();
+
+    /**
      * The deployment id of the process definition of the process instance.
      */
     String getDeploymentId();

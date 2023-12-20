@@ -52,6 +52,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected String businessKey;
     protected String businessStatus;
     protected String caseInstanceId;
@@ -121,6 +123,20 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.caseDefinitionId = caseDefinitionId;
         } else {
             this.caseDefinitionId = caseDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionIds(Set<String> caseDefinitionIds) {
+        if (caseDefinitionIds == null) {
+            throw new FlowableIllegalArgumentException("Case definition ids is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionIds = caseDefinitionIds;
+        } else {
+            this.caseDefinitionIds = caseDefinitionIds;
         }
         return this;
     }
@@ -242,6 +258,32 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.nameLikeIgnoreCase = nameLikeIgnoreCase;
         } else {
             this.nameLikeIgnoreCase = nameLikeIgnoreCase;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceRootScopeId(String rootScopeId) {
+        if (rootScopeId == null) {
+            throw new FlowableIllegalArgumentException("rootScopeId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeId = rootScopeId;
+        } else {
+            this.rootScopeId = rootScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceParentScopeId(String parentScopeId) {
+        if (parentScopeId == null) {
+            throw new FlowableIllegalArgumentException("parentScopeId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeId = parentScopeId;
+        } else {
+            this.parentScopeId = parentScopeId;
         }
         return this;
     }

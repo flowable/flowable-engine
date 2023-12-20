@@ -168,9 +168,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime) {
+    public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String userId, String deleteReason, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordTaskEnd(task, execution, deleteReason, endTime);
+            historyManager.recordTaskEnd(task, execution, userId, deleteReason, endTime);
         }
     }
 

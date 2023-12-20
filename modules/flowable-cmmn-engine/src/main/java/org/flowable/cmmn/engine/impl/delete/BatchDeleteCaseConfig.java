@@ -284,6 +284,12 @@ public class BatchDeleteCaseConfig {
                 case "orQueryObjects":
                     populateOrQueryObjects(value, query, engineConfiguration);
                     break;
+                case "caseInstanceRootScopeId":
+                    query.caseInstanceRootScopeId(value.textValue());
+                    break;
+                case "caseInstanceParentScopeId":
+                    query.caseInstanceParentScopeId(value.textValue());
+                    break;
                 default:
                     throw new FlowableIllegalArgumentException("Query property " + property + " is not supported");
             }

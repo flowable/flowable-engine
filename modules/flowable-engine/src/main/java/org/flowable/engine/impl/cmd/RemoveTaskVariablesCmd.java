@@ -55,8 +55,8 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot remove variables from a suspended task.";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot remove variables from";
     }
 
 }

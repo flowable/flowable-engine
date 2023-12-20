@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -224,7 +225,7 @@ public class ErrorPropagation {
             executeEventHandler(matchingEvent, parentExecution, currentExecution, errorVariableContainer);
 
         } else {
-            throw new FlowableException("No matching parent execution for error code " + errorId + " found");
+            throw new FlowableException("No matching parent execution for error code " + errorId + " found for " + delegateExecution);
         }
     }
 
@@ -620,6 +621,14 @@ public class ErrorPropagation {
         @Override
         public String getTenantId() {
             return tenantId;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                    .add("additionalDataContainer=" + additionalDataContainer)
+                    .add("tenantId='" + tenantId + "'")
+                    .toString();
         }
     }
 

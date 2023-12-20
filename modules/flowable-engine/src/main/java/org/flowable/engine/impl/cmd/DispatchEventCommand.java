@@ -45,7 +45,7 @@ public class DispatchEventCommand implements Command<Void> {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
         } else {
-            throw new FlowableException("Message dispatcher is disabled, cannot dispatch event");
+            throw new FlowableException("Message dispatcher is disabled, cannot dispatch " + event);
         }
 
         return null;

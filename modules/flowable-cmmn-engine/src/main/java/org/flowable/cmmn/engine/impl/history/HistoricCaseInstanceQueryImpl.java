@@ -63,6 +63,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseInstanceName;
     protected String caseInstanceNameLike;
     protected String caseInstanceNameLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected String businessKey;
     protected String businessStatus;
     protected String caseInstanceParentId;
@@ -270,6 +272,33 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return this;
     }
     
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceRootScopeId(String rootScopeId) {
+        if (rootScopeId == null) {
+            throw new FlowableIllegalArgumentException("rootScopeId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeId = rootScopeId;
+        } else {
+            this.rootScopeId = rootScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceParentScopeId(String parentScopeId) {
+        if (parentScopeId == null) {
+            throw new FlowableIllegalArgumentException("parentScopeId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeId = parentScopeId;
+        } else {
+            this.parentScopeId = parentScopeId;
+        }
+        return this;
+    }
+
+
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceBusinessStatus(String businessStatus) {
         if (businessStatus == null) {
@@ -695,6 +724,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         if (commandExecutor != null) {
             CommandConfig config = new CommandConfig().transactionRequiresNew();
@@ -1180,4 +1210,13 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
     }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
 }

@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -158,8 +158,26 @@
         </dependency>
         <dependency>
             <groupId>org.apache.aries.spifly</groupId>
-            <artifactId>org.apache.aries.spifly.dynamic.framework.extension</artifactId>
-            <version>1.3.5</version>
+            <artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>
+            <version>1.3.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>9.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>9.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -90,6 +90,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
 
     /**
+     * Only select historic process instances with a root instance with a name like the given value.
+     */
+    HistoricProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
+
+    /**
+     * Only select historic process instances with the given parent process instance id.
+     */
+    HistoricProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
+    /**
      * Only select historic process instances that are defined by a process definition with the given deployment identifier.
      */
     HistoricProcessInstanceQuery deploymentId(String deploymentId);

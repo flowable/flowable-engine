@@ -122,7 +122,7 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
             return expressionValue.toString();
         }
         
-        throw new FlowableException("Unable to resolve expression value for " + value);
+        throw new FlowableException("Unable to resolve expression value for " + value + " in " + planItemInstanceEntity);
     }
     
     protected Collection<String> getExpressionListValue(String value, PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager) {

@@ -15,7 +15,7 @@ package org.flowable.eventregistry.impl.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -34,7 +34,6 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 public class EventDeploymentBuilderImpl implements EventDeploymentBuilder, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient EventRepositoryServiceImpl repositoryService;
     protected transient EventResourceEntityManager resourceEntityManager;
@@ -94,11 +93,7 @@ public class EventDeploymentBuilderImpl implements EventDeploymentBuilder, Seria
 
         EventResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get event definition bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }

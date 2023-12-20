@@ -28,6 +28,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
@@ -195,6 +196,7 @@ import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
+import org.flowable.cmmn.engine.interceptor.HumanTaskStateInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
@@ -213,6 +215,7 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.ServiceConfigurator;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
@@ -333,6 +336,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String cmmnEngineName = CmmnEngines.NAME_DEFAULT;
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
+    protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
     protected DynamicCmmnService dynamicCmmnService = new DynamicCmmnServiceImpl(this);
@@ -385,6 +389,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
+    protected HumanTaskStateInterceptor humanTaskStateInterceptor;
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
     protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
@@ -418,6 +423,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean enableCaseDefinitionHistoryLevel;
 
     protected ExpressionManager expressionManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
     protected List<FlowableAstFunctionCreator> astFunctionCreators;
@@ -949,6 +955,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 cmmnExpressionManager.setExpressionCache(new DefaultDeploymentCache<>(expressionCacheSize));
                 cmmnExpressionManager.setExpressionTextLengthCacheLimit(expressionTextLengthCacheLimit);
             }
+
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(cmmnExpressionManager));
+            }
             
             expressionManager = cmmnExpressionManager;
         }
@@ -1004,7 +1014,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public void initCommandInvoker() {
         if (this.commandInvoker == null) {
-            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner);
+            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner, agendaOperationExecutionListeners);
         }
     }
 
@@ -2065,6 +2075,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return agendaFutureMaxWaitTimeoutProvider;
+    }
+
+    public CmmnEngineConfiguration setAgendaFutureMaxWaitTimeoutProvider(AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider) {
+        this.agendaFutureMaxWaitTimeoutProvider = agendaFutureMaxWaitTimeoutProvider;
+        return this;
+    }
+
     @Override
     public CmmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
@@ -2543,6 +2562,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public HumanTaskStateInterceptor getHumanTaskStateInterceptor() {
+        return humanTaskStateInterceptor;
+    }
+
+    public CmmnEngineConfiguration setHumanTaskStateInterceptor(HumanTaskStateInterceptor humanTaskStateInterceptor) {
+        this.humanTaskStateInterceptor = humanTaskStateInterceptor;
+        return this;
+    }
+
     public CreateCasePageTaskInterceptor getCreateCasePageTaskInterceptor() {
         return createCasePageTaskInterceptor;
     }
@@ -2638,6 +2666,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
     
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
+    }
+
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
+        return this;
+    }
+
     public boolean isExpressionCacheEnabled() {
         return isExpressionCacheEnabled;
     }

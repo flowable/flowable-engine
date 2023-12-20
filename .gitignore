@@ -9,15 +9,10 @@ target
 .DS_Store
 .vscode
 *.bpmn/
-/userguide/src/en/index.html
-userguide/src/en/output/
 migration.html
 /modules/**/bin
 modules/flowable-app-rest/.extract
 modules/flowable-app-rest/src/main/resources/static/docs/specfile
-userguide-dmn/src/en/output
-userguide-form/src/en/output
-userguide-cmmn/src/en/output
 docker/all-in-one/assets
 k8s/flowable/charts
 requirements.lock

@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.scripting;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class DefaultScriptTrace implements ScriptTrace, ScriptTraceEnhancer.ScriptTraceContext {
 
@@ -61,5 +62,15 @@ public class DefaultScriptTrace implements ScriptTrace, ScriptTraceEnhancer.Scri
     @Override
     public Duration getDuration() {
         return duration;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", DefaultScriptTrace.class.getSimpleName() + "[", "]")
+                .add("duration=" + duration)
+                .add("request=" + request)
+                .add("exception=" + exception)
+                .add("traceTags=" + traceTags)
+                .toString();
     }
 }

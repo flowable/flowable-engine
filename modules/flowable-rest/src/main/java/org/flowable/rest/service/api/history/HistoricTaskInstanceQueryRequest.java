@@ -90,6 +90,8 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected Boolean withoutDeleteReason;
     protected String taskCandidateGroup;
     protected boolean ignoreTaskAssignee;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     public String getTaskId() {
         return taskId;
@@ -588,4 +590,21 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
         this.ignoreTaskAssignee = ignoreTaskAssignee;
     }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
+    }
+
 }

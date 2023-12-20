@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class TaskQueryRequest extends PaginateRequest {
 
+    protected String taskId;
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
@@ -79,11 +80,20 @@ public class TaskQueryRequest extends PaginateRequest {
     protected Boolean withoutProcessInstanceId;
     protected String candidateOrAssigned;
     protected String category;
-
+    protected String rootScopeId;
+    protected String parentScopeId;
     private List<QueryVariable> taskVariables;
     protected List<String> categoryIn;
     protected List<String> categoryNotIn;
     protected Boolean withoutCategory;
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getName() {
         return name;
@@ -521,5 +531,21 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setWithoutCategory(Boolean withoutCategory) {
         this.withoutCategory = withoutCategory;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
     }
 }

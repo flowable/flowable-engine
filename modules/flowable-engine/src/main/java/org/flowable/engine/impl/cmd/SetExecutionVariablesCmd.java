@@ -76,8 +76,8 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot set variables because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot set variables to";
     }
 
 }

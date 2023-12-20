@@ -147,7 +147,7 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
-            throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity.getId() + " is suspended");
+            throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity + " is suspended");
         }
 
         // Set the reference id and type to null since the execution could be reused
