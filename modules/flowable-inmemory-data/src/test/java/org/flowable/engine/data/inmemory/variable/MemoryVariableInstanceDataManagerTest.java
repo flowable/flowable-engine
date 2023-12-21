@@ -15,7 +15,9 @@ package org.flowable.engine.data.inmemory.variable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -23,6 +25,7 @@ import org.flowable.engine.data.inmemory.MemoryDataManagerFlowableTestCase;
 import org.flowable.engine.data.inmemory.impl.variable.MemoryVariableInstanceDataManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.runtime.VariableInstanceQuery;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
@@ -43,6 +46,11 @@ public class MemoryVariableInstanceDataManagerTest extends MemoryDataManagerFlow
         variables.put("short", (short) 1);
         variables.put("double", 0.42d);
         variables.put("boolean", true);
+        StringBuilder largeString = new StringBuilder();
+        for (int i = 0; i < 8192 * 16; i++) {
+            largeString.append('a');
+        }
+        variables.put("largeString", largeString.toString());
         return variables;
     }
 
@@ -68,10 +76,14 @@ public class MemoryVariableInstanceDataManagerTest extends MemoryDataManagerFlow
                         .addClasspathResource("org/flowable/engine/test/inmemory/triggerableExecution.bpmn20.xml").deploy();
         try {
             Map<String, Object> variables = variables();
+            variables.put("serializable", new SerializableData("value"));
+
             ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("triggerableExecution", variables);
 
             VariableInstanceQueryImpl query = Mockito.spy(query());
             query.processInstanceId(instance.getId()).variableName("string").list();
+
+            assertVariables(variables, instance.getId());
 
             assertQueryMethods(VariableInstanceQueryImpl.class, query,
                             // not part of queries
@@ -109,7 +121,7 @@ public class MemoryVariableInstanceDataManagerTest extends MemoryDataManagerFlow
         try {
             Map<String, Object> variables = variables();
             ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("triggerableExecution", variables);
-            assertThat(query().processInstanceId(instance.getId()).variableNameLike("%tring").list()).hasSize(1);
+            assertThat(query().processInstanceId(instance.getId()).variableNameLike("%tring").list()).hasSize(2);
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
             processEngine.close();
@@ -158,7 +170,8 @@ public class MemoryVariableInstanceDataManagerTest extends MemoryDataManagerFlow
     public void testNativeQueryThrows() {
         MemoryVariableInstanceDataManager variableManager = getVariableInstanceDataManager();
         try {
-            assertThatThrownBy(() -> variableManager.findVariableInstanceCountByNativeQuery(new HashMap<>())).isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> variableManager.findVariableInstanceCountByNativeQuery(new HashMap<>()))
+                            .isInstanceOf(IllegalStateException.class);
             assertThatThrownBy(() -> variableManager.findVariableInstancesByNativeQuery(new HashMap<>())).isInstanceOf(IllegalStateException.class);
         } finally {
             processEngine.close();
@@ -169,4 +182,27 @@ public class MemoryVariableInstanceDataManagerTest extends MemoryDataManagerFlow
         return (VariableInstanceQueryImpl) processEngine.getRuntimeService().createVariableInstanceQuery();
     }
 
+    private void assertVariables(Map<String, Object> expected, String processInstanceId) {
+        VariableInstanceQueryImpl query = query();
+        query.processInstanceId(processInstanceId);
+        List<VariableInstance> result = query.list();
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(expected.size());
+    }
+
+    public static class SerializableData implements Serializable {
+
+        private static final long serialVersionUID = -8908949167912134164L;
+
+        private String data;
+
+        public SerializableData(String data) {
+            this.data = data;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+    }
 }

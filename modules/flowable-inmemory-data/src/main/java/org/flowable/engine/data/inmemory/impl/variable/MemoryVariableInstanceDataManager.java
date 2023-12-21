@@ -26,7 +26,6 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class MemoryVariableInstanceDataManager extends AbstractMemoryDataManager
 
     @Override
     public VariableInstanceEntity create() {
-        VariableInstanceEntityImpl variableInstanceEntity = new VariableInstanceEntityImpl();
+        MemoryVariableInstanceEntityImpl variableInstanceEntity = new MemoryVariableInstanceEntityImpl();
         variableInstanceEntity.setRevision(0);
         return variableInstanceEntity;
     }
@@ -107,7 +106,8 @@ public class MemoryVariableInstanceDataManager extends AbstractMemoryDataManager
                 return false;
             }
 
-            if (internalVariableInstanceQuery.getExecutionId() != null && !internalVariableInstanceQuery.getExecutionId().equals(var.getExecutionId())) {
+            if (internalVariableInstanceQuery.getExecutionId() != null
+                            && !internalVariableInstanceQuery.getExecutionId().equals(var.getExecutionId())) {
                 return false;
             }
 
@@ -197,11 +197,13 @@ public class MemoryVariableInstanceDataManager extends AbstractMemoryDataManager
                 return false;
             }
 
-            if (variableInstanceQuery.getTaskIds() != null && !variableInstanceQuery.getTaskIds().stream().anyMatch(tid -> tid.equals(var.getTaskId()))) {
+            if (variableInstanceQuery.getTaskIds() != null
+                            && !variableInstanceQuery.getTaskIds().stream().anyMatch(tid -> tid.equals(var.getTaskId()))) {
                 return false;
             }
 
-            if (variableInstanceQuery.getProcessInstanceId() != null && !variableInstanceQuery.getProcessInstanceId().equals(var.getProcessInstanceId())) {
+            if (variableInstanceQuery.getProcessInstanceId() != null
+                            && !variableInstanceQuery.getProcessInstanceId().equals(var.getProcessInstanceId())) {
                 return false;
             }
 
@@ -250,11 +252,13 @@ public class MemoryVariableInstanceDataManager extends AbstractMemoryDataManager
                 return false;
             }
 
-            if (variableInstanceQuery.getVariableNameLike() != null && !QueryUtil.queryLike(variableInstanceQuery.getVariableNameLike(), var.getName())) {
+            if (variableInstanceQuery.getVariableNameLike() != null
+                            && !QueryUtil.queryLike(variableInstanceQuery.getVariableNameLike(), var.getName())) {
                 return false;
             }
 
-            if (variableInstanceQuery.getQueryVariableValue() != null && !QueryUtil.variableMatches(variableInstanceQuery.getQueryVariableValue(), var)) {
+            if (variableInstanceQuery.getQueryVariableValue() != null
+                            && !QueryUtil.variableMatches(variableInstanceQuery.getQueryVariableValue(), var)) {
                 return false;
             }
 
