@@ -28,8 +28,11 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single plan item instance resource.
@@ -143,6 +146,52 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
 
         planItem = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(planItem).isNull();
+    }
+
+    /**
+     * Test action on a single plan item instance.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/twoHumanTaskCase.cmmn" })
+    public void testGetEndedPlanItems() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(2);
+        PlanItemInstance planItem = planItems.get(0);
+
+        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItem.getId());
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+        Task task = taskService.createTaskQuery().planItemInstanceId(planItem.getId()).singleResult();
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode).when(Option.IGNORING_EXTRA_FIELDS).isEqualTo(
+                "{"
+                        + "  'id': '" + planItem.getId() + "',"
+                        + "  'name': 'Task One',"
+                        + "  'caseInstanceId': '" + caseInstance.getId() + "',"
+                        + "  'planItemDefinitionId': 'task1',"
+                        + "  'planItemDefinitionType': 'humantask',"
+                        + "  'state': 'active',"
+                        + "  'referenceId': '" + task.getId() + "'"
+                        + "}"
+        );
+
+        taskService.complete(task.getId());
+
+        response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(responseNode).when(Option.IGNORING_EXTRA_FIELDS).isEqualTo(
+                "{"
+                        + "  'id': '" + planItem.getId() + "',"
+                        + "  'name': 'Task One',"
+                        + "  'caseInstanceId': '" + caseInstance.getId() + "',"
+                        + "  'planItemDefinitionId': 'task1',"
+                        + "  'planItemDefinitionType': 'humantask',"
+                        + "  'state': 'completed',"
+                        + "  'referenceId': '" + task.getId() + "'"
+                        + "}"
+        );
     }
 
 }
