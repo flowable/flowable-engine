@@ -149,7 +149,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test action on a single plan item instance.
+     * Test retrieving ended plan item instance
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItems() throws Exception {
