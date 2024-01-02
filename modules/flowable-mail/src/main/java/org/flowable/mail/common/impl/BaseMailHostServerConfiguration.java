@@ -21,6 +21,7 @@ public class BaseMailHostServerConfiguration implements MailHostServerConfigurat
 
     protected int port = 25;
     protected Transport transport = Transport.SMTP;
+    protected boolean startTlsEnabled;
 
     protected String user;
     protected String password;
@@ -50,6 +51,15 @@ public class BaseMailHostServerConfiguration implements MailHostServerConfigurat
 
     public void setTransport(Transport transport) {
         this.transport = transport;
+    }
+
+    @Override
+    public boolean isStartTlsEnabled() {
+        return startTlsEnabled;
+    }
+
+    public void setStartTlsEnabled(boolean startTlsEnabled) {
+        this.startTlsEnabled = startTlsEnabled;
     }
 
     @Override
