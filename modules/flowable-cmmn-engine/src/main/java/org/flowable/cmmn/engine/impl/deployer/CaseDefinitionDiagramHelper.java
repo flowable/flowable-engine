@@ -78,7 +78,7 @@ public class CaseDefinitionDiagramHelper {
                 && CommandContextUtil.getCmmnEngineConfiguration().isCreateDiagramOnDeploy()) {
 
             // If the 'getProcessDiagramResourceNameFromDeployment' call returns null, it means
-            // no diagram image for the process definition was provided in the deployment resources.
+            // no diagram image for the case definition was provided in the deployment resources.
             return ResourceNameUtil.getCaseDiagramResourceNameFromDeployment(caseDefinition, deployment.getResources()) == null;
         }
 

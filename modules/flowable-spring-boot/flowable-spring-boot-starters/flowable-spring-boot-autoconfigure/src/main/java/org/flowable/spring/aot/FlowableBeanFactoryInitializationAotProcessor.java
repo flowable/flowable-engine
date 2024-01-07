@@ -26,6 +26,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.common.engine.api.query.Query;
 import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl;
@@ -41,6 +42,7 @@ import org.flowable.variable.service.impl.QueryVariableValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aot.hint.MemberCategory;
+import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.TypeReference;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotContribution;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor;
@@ -68,14 +70,25 @@ class FlowableBeanFactoryInitializationAotProcessor implements BeanFactoryInitia
 
 
     private Set<Resource> processResources() {
-        return resources("processes/**/*.bpmn20.xml");
+        return resources("processes/**/*.bpmn20.xml", "processes/**/*.bpmn20");
+    }
+
+    private Set<Resource> caseResources() {
+        return resources("cases/**/*.cmmn", "cases/**/*.cmmn.xml");
+    }
+
+    private Set<Resource> ruleResources() {
+        return resources("dmn/**/*.dmn", "cases/**/*.dmn.xml");
     }
 
     private Set<Resource> flowablePersistenceResources() throws Exception {
 
         var resources = new HashSet<Resource>();
         resources.addAll(resources("org/flowable/**/*.sql", "org/flowable/**/*.xml", "org/flowable/**/*.txt", "org/flowable/**/*.xsd", "org/flowable/**/*.properties"));
+
         resources.addAll(processResources());
+        resources.addAll(caseResources());
+        resources.addAll(ruleResources());
 
         for (var e : "xml,yaml,yml".split(","))
             resources.add(new ClassPathResource("flowable-default." + e));
@@ -158,39 +171,8 @@ class FlowableBeanFactoryInitializationAotProcessor implements BeanFactoryInitia
                 }
 
 
-                // here lay dragons; we're going to attempt to proactively register aot hints for beans referenced within a process definition
-                var processDefinitions = this.processResources();
-                for (var processDefinitionXmlResource : processDefinitions) {
-                    Assert.state(processDefinitionXmlResource.exists(), "the process definition file [" + processDefinitionXmlResource.getFilename() +
-                            "] does not exist");
-
-                    hints.resources().registerResource(processDefinitionXmlResource);
-                    try (var in = processDefinitionXmlResource.getInputStream()) {
-
-                        var bpmnXMLConverter = new BpmnXMLConverter();
-                        var bpmnModel = bpmnXMLConverter.convertToBpmnModel(() -> in, false, false);
-                        var serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class);
-                        for (var st : serviceTasks) {
-                            if (st.getImplementationType().equals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION)) {
-                                var expression = st.getImplementation();
-                                var expressionWithoutDelimiters = expression.substring(2);
-                                expressionWithoutDelimiters = expressionWithoutDelimiters.substring(0, expressionWithoutDelimiters.length() - 1);
-                                var beanName = expressionWithoutDelimiters;
-                                try {
-                                    var beanDefinition = beanFactory.getBeanDefinition(beanName);
-                                    hints.reflection().registerType(TypeReference.of(beanDefinition.getBeanClassName()), MemberCategory.values());
-
-                                    log.debug("registering hint for bean name [" + beanName + "]");
-                                }//
-                                catch (Throwable throwable) {
-                                    log.error("couldn't find bean named [" + beanName + "]");
-                                }
-
-                            }
-                        }
-                    }
-                }
-
+                // here lay dragons; we're going to attempt to proactively register aot hints for beans referenced within definitions
+                registerAotHintsForReferencedBeans(beanFactory, hints);
 
             }//
             catch (Throwable throwable) {
@@ -199,6 +181,78 @@ class FlowableBeanFactoryInitializationAotProcessor implements BeanFactoryInitia
         };
     }
 
+    private void registerAotHintsForReferencedBeans(ConfigurableListableBeanFactory beanFactory, RuntimeHints hints) throws IOException {
+        registerAotHintForProcessDefinitionBeans(beanFactory, hints);
+        registerAotHintForCaseDefinitionBeans(beanFactory, hints);
+    }
+
+    protected void registerAotHintForProcessDefinitionBeans(ConfigurableListableBeanFactory beanFactory, RuntimeHints hints) throws IOException {
+        var processDefinitions = this.processResources();
+        for (var processDefinitionXmlResource : processDefinitions) {
+            Assert.state(processDefinitionXmlResource.exists(), "the process definition file [" + processDefinitionXmlResource.getFilename() +
+                    "] does not exist");
+
+            hints.resources().registerResource(processDefinitionXmlResource);
+            try (var in = processDefinitionXmlResource.getInputStream()) {
+
+                var bpmnXMLConverter = new BpmnXMLConverter();
+                var bpmnModel = bpmnXMLConverter.convertToBpmnModel(() -> in, false, false);
+                var serviceTasks = bpmnModel.getMainProcess().findFlowElementsOfType(ServiceTask.class);
+                for (var serviceTask : serviceTasks) {
+                    if (serviceTask.getImplementationType().equals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION)) {
+                        var expression = serviceTask.getImplementation();
+                        var expressionWithoutDelimiters = expression.substring(2);
+                        expressionWithoutDelimiters = expressionWithoutDelimiters.substring(0, expressionWithoutDelimiters.length() - 1);
+                        var beanName = expressionWithoutDelimiters;
+                        try {
+                            var beanDefinition = beanFactory.getBeanDefinition(beanName);
+                            hints.reflection().registerType(TypeReference.of(beanDefinition.getBeanClassName()), MemberCategory.values());
+
+                            log.debug("registering hint for bean name [" + beanName + "]");
+                        }
+                        catch (Throwable throwable) {
+                            log.error("couldn't find bean named [" + beanName + "]");
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    protected void registerAotHintForCaseDefinitionBeans(ConfigurableListableBeanFactory beanFactory, RuntimeHints hints) throws IOException {
+        var caseDefinitions = this.caseResources();
+        for (var caseDefinitionXmlResource : caseDefinitions) {
+            Assert.state(caseDefinitionXmlResource.exists(), "the case definition file [" + caseDefinitionXmlResource.getFilename() +
+                    "] does not exist");
+
+            hints.resources().registerResource(caseDefinitionXmlResource);
+            try (var in = caseDefinitionXmlResource.getInputStream()) {
+
+                var cmmXmlConverter = new CmmnXmlConverter();
+                var cmmnModel = cmmXmlConverter.convertToCmmnModel(() -> in, false, false);
+                var serviceTasks = cmmnModel.getPrimaryCase().findPlanItemDefinitionsOfType(org.flowable.cmmn.model.ServiceTask.class);
+                for (var serviceTask : serviceTasks) {
+                    if (serviceTask.getImplementationType().equals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION)) {
+                        var expression = serviceTask.getImplementation();
+                        var expressionWithoutDelimiters = expression.substring(2);
+                        expressionWithoutDelimiters = expressionWithoutDelimiters.substring(0, expressionWithoutDelimiters.length() - 1);
+                        var beanName = expressionWithoutDelimiters;
+                        try {
+                            var beanDefinition = beanFactory.getBeanDefinition(beanName);
+                            hints.reflection().registerType(TypeReference.of(beanDefinition.getBeanClassName()), MemberCategory.values());
+
+                            log.debug("registering hint for bean name [" + beanName + "]");
+                        }
+                        catch (Throwable throwable) {
+                            log.error("couldn't find bean named [" + beanName + "]");
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 
     private static <T> Set<T> from(T[] t) {
         return new HashSet<>(Arrays.asList(t));
