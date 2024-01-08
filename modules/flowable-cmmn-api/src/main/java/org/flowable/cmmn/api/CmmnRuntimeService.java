@@ -467,7 +467,7 @@ public interface CmmnRuntimeService {
     CaseInstanceStartEventSubscriptionModificationBuilder createCaseInstanceStartEventSubscriptionModificationBuilder();
 
     /**
-     * Creates a new event subscription deletion builder delete one or more previously registered case start event subscriptions based
+     * Creates a new event subscription deletion builder to delete one or more previously registered case start event subscriptions based
      * on a particular case definition and with an optional combination of correlation parameter values.
      *
      * @return the subscription deletion builder

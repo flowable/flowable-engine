@@ -22,7 +22,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
- * This command either modifies event subscriptions with a case start event and optional correlation parameter values.
+ * This command deletes event subscriptions with a case start event and optional correlation parameter values.
  *
  * @author Micha Kiener
  */

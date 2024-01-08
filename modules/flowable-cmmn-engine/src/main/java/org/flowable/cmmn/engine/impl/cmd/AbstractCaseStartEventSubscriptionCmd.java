@@ -98,7 +98,7 @@ public class AbstractCaseStartEventSubscriptionCmd {
                     
                 } else {
                     throw new FlowableObjectNotFoundException("Case definition with key '" + caseDefinitionKey +
-                        "' and tenantId '"+ tenantId +"' was not found", CaseDefinition.class);
+                        "' and tenantId '" + tenantId + "' was not found.", CaseDefinition.class);
                 }
             }
         }
