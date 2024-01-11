@@ -24,6 +24,7 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
+import org.flowable.eventregistry.api.InboundEventFilter;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
@@ -128,6 +129,12 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
         }
 
+        // by default, there is not filtering of events in place
+        InboundEventFilter<JsonNode> eventFilter = null;
+        if (StringUtils.isNotEmpty(channelModel.getEventFilterDelegateExpression())) {
+            eventFilter = resolveExpression(channelModel.getEventFilterDelegateExpression(), InboundEventFilter.class);
+        }
+
         InboundEventTenantDetector<JsonNode> eventTenantDetector = null; // By default no multi-tenancy is applied
 
         InboundEventPayloadExtractor<JsonNode> eventPayloadExtractor = createInboundEventPayloadExtractor(channelModel, JsonFieldToMapPayloadExtractor::new);
@@ -177,7 +184,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             }
         }
 
-        return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer,
+        return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer, eventFilter,
                 eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
     }
 
@@ -190,6 +197,12 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         } else {
             //noinspection unchecked
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
+        }
+
+        // by default, there is not filtering of events in place
+        InboundEventFilter<Document> eventFilter = null;
+        if (StringUtils.isNotEmpty(channelModel.getEventFilterDelegateExpression())) {
+            eventFilter = resolveExpression(channelModel.getEventFilterDelegateExpression(), InboundEventFilter.class);
         }
 
         InboundEventTenantDetector<Document> eventTenantDetector = null; // By default no multi-tenancy is applied
@@ -239,7 +252,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             }
         }
 
-        return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer,
+        return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer, eventFilter,
             eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
     }
 
@@ -282,6 +295,12 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             throw new FlowableException(
                 "The channel deserializer expression for the channel model with key " + channelModel.getKey()
                     + " was empty. The deserializerDelegateExpression has to be provided for a channel with an expression deserializer.");
+        }
+
+        // by default, there is not filtering of events in place
+        InboundEventFilter<?> eventFilter = null;
+        if (StringUtils.isNotEmpty(channelModel.getEventFilterDelegateExpression())) {
+            eventFilter = resolveExpression(channelModel.getEventFilterDelegateExpression(), InboundEventFilter.class);
         }
 
         InboundEventTenantDetector<?> eventTenantDetector = null; // By default no multi-tenancy is applied
@@ -343,7 +362,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         }
 
         //noinspection unchecked
-        return new DefaultInboundEventProcessingPipeline(eventRepositoryService, eventDeserializer,
+        return new DefaultInboundEventProcessingPipeline(eventRepositoryService, eventDeserializer, eventFilter,
             eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
     }
 

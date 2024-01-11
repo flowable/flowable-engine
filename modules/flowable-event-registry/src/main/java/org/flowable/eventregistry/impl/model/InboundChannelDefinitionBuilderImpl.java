@@ -341,6 +341,12 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
+        public InboundEventProcessingPipelineBuilder delegateExpressionEventFilter(String delegateExpression) {
+            channelModel.setEventFilterDelegateExpression(delegateExpression);
+            return this;
+        }
+
+        @Override
         public InboundEventKeyDetectorBuilder delegateExpressionDeserializer(String delegateExpression) {
             channelModel.setDeserializerType("expression");
             channelModel.setDeserializerDelegateExpression(delegateExpression);
