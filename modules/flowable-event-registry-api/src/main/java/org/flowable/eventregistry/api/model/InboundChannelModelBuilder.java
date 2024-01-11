@@ -215,6 +215,12 @@ public interface InboundChannelModelBuilder {
         InboundEventKeyXmlDetectorBuilder xmlDeserializer();
 
         /**
+         * Uses a delegate expression to filter the events before further processing.
+         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
+         */
+        InboundEventProcessingPipelineBuilder delegateExpressionEventFilter(String delegateExpression);
+
+        /**
          * Uses a delegate expression to deserialize the event.
          */
         InboundEventKeyDetectorBuilder delegateExpressionDeserializer(String delegateExpression);
