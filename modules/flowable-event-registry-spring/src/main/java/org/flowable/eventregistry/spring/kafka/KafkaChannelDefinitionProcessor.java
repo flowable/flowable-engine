@@ -84,11 +84,11 @@ import org.springframework.kafka.retrytopic.DefaultDestinationTopicProcessor;
 import org.springframework.kafka.retrytopic.DefaultDestinationTopicResolver;
 import org.springframework.kafka.retrytopic.DestinationTopic;
 import org.springframework.kafka.retrytopic.DestinationTopicProcessor;
-import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.kafka.retrytopic.ListenerContainerFactoryConfigurer;
 import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.retrytopic.RetryTopicSchedulerWrapper;
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
 import org.springframework.kafka.support.Suffixer;
 import org.springframework.kafka.support.TopicPartitionOffset;
@@ -1064,7 +1064,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         String fixedDelayTopicStrategy = resolveExpressionAsString(retry.getFixedDelayTopicStrategy(), "retry.fixedDelayTopicStrategy");
         // Different default from Spring Kafka
         resolvedRetryConfiguration.fixedDelayTopicStrategy =
-                fixedDelayTopicStrategy == null ? FixedDelayStrategy.SINGLE_TOPIC : FixedDelayStrategy.valueOf(fixedDelayTopicStrategy);
+                fixedDelayTopicStrategy == null ? SameIntervalTopicReuseStrategy.SINGLE_TOPIC : SameIntervalTopicReuseStrategy.valueOf(fixedDelayTopicStrategy);
 
         String topicSuffixingStrategy = resolveExpressionAsString(retry.getTopicSuffixingStrategy(), "retry.topicSuffixingStrategy");
         // Different default from Spring Kafka
@@ -1133,7 +1133,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         protected Integer attempts;
         protected String dltTopicSuffix;
         protected String retryTopicSuffix;
-        protected FixedDelayStrategy fixedDelayTopicStrategy;
+        protected SameIntervalTopicReuseStrategy fixedDelayTopicStrategy;
         protected TopicSuffixingStrategy topicSuffixingStrategy;
         protected SleepingBackOffPolicy<?> nonBlockingBackOff;
         protected boolean autoCreateTopics;
@@ -1151,3 +1151,6 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     }
 
 }
+
+
+@deprecated in favor of {@link SameIntervalTopicReuseStrategy}.
