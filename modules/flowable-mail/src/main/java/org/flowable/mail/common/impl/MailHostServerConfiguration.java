@@ -27,10 +27,11 @@ public non-sealed interface MailHostServerConfiguration extends MailServerConfig
 
     String password();
 
+    boolean isStartTlsEnabled();
+
     enum Transport {
         SMTP,
         SMTPS,
-        SMTPS_TLS,
     }
 
 }

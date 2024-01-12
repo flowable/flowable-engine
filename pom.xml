@@ -27,13 +27,13 @@
 		<cxf.version>4.0.2</cxf.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<groovy.version>4.0.16</groovy.version>
-		<jib-maven-plugin.version>3.3.1</jib-maven-plugin.version>
+		<jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
 		<hikari.version>5.0.1</hikari.version>
 		<maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
-		<maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
+		<maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
 		<mockito.version>5.5.0</mockito.version>
 		<!--
 		 	AssertJ 3.24.2 is pulling older byte buddy not compatible with Java 21.
@@ -542,7 +542,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
+				<version>3.12.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -553,7 +553,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
+				<version>3.2.3</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
@@ -568,7 +568,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>5.1.8</version>
+				<version>5.1.9</version>
 				<extensions>true</extensions>
 				<configuration>
 					<excludeDependencies>${flowable.osgi.exclude.dependencies}</excludeDependencies>
@@ -619,7 +619,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.4.1</version>
+					<version>3.6.3</version>
 					<configuration>
 						<source>${jdk.version}</source>
 					</configuration>
@@ -627,7 +627,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -637,12 +637,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.3.2</version>
+					<version>3.4.0</version>
 					<configuration>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 						<archive>
@@ -681,7 +681,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.3</version>
+					<version>3.0.1</version>
 					<configuration>
 						<mavenExecutorId>forked-path</mavenExecutorId>
 						<useReleaseProfile>false</useReleaseProfile>
@@ -713,7 +713,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.1.1</version>
 				</plugin>
 				<plugin>
 					<groupId>com.google.cloud.tools</groupId>
