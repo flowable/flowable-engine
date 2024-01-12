@@ -1151,6 +1151,3 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     }
 
 }
-
-
-@deprecated in favor of {@link SameIntervalTopicReuseStrategy}.
