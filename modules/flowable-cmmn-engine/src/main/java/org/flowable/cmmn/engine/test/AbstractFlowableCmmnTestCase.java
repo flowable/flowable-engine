@@ -39,11 +39,14 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DynamicCmmnService;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
@@ -110,6 +113,35 @@ public abstract class AbstractFlowableCmmnTestCase {
         addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn")
                 .deploy());
+    }
+
+    protected CaseDefinition deployCaseDefinition(String name, String path) {
+        CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+            .name(name)
+            .addClasspathResource(path)
+            .deploy();
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+            .deploymentId(deployment.getId()).singleResult();
+
+        return caseDefinition;
+    }
+
+    protected void deleteDeployment(String deploymentId) {
+        boolean isAsyncHistoryEnabled = cmmnEngineConfiguration.isAsyncHistoryEnabled();
+        CmmnHistoryManager asyncHistoryManager = null;
+        if (isAsyncHistoryEnabled) {
+            cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
+            asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+            cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
+        }
+
+        cmmnRepositoryService.deleteDeployment(deploymentId, true);
+
+        if (isAsyncHistoryEnabled) {
+            cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
+            cmmnEngineConfiguration.setCmmnHistoryManager(asyncHistoryManager);
+        }
     }
     
     protected Date setClockFixedToCurrentTime() {

@@ -221,6 +221,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
     String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
+    String START_EVENT_CORRELATION_MANUAL = "manualSubscription";
 
     String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
     String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";

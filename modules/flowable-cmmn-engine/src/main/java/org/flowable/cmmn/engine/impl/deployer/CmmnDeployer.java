@@ -13,10 +13,12 @@
 package org.flowable.cmmn.engine.impl.deployer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +36,7 @@ import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -194,12 +197,21 @@ public class CmmnDeployer implements EngineDeployer {
 
             CaseDefinitionEntity previousCaseDefinition = mapOfNewCaseDefinitionToPreviousVersion.get(caseDefinition);
             if (previousCaseDefinition != null) {
-                eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(previousCaseDefinition.getId(), ScopeTypes.CMMN);
+                if (isManualCorrelationSubscriptionConfiguration(parseResult, previousCaseDefinition)) {
+                    // for a dynamic event registry start event, we don't remove the manually registered subscriptions, but rather update them to the newest
+                    // case definition, if required
+                    String startEventType = getCaseModel(parseResult, previousCaseDefinition).getPrimaryCase().getStartEventType();
+                    updateOldEventSubscriptions(previousCaseDefinition, caseDefinition, startEventType);
+                } else {
+                    // for a static event registry start event, we delete the old subscription and will later create a new one
+                    eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(previousCaseDefinition.getId(), ScopeTypes.CMMN);
+                }
             }
 
+            // create new subscriptions, but only for static event registry start events
             Case caseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
             String startEventType = caseModel.getStartEventType();
-            if (startEventType != null) {
+            if (startEventType != null && !isManualCorrelationSubscriptionConfiguration(parseResult, caseDefinition)) {
                 eventSubscriptionService.createEventSubscriptionBuilder()
                     .eventType(startEventType)
                     .configuration(getEventCorrelationKey(caseModel))
@@ -208,8 +220,31 @@ public class CmmnDeployer implements EngineDeployer {
                     .tenantId(caseDefinition.getTenantId())
                     .create();
             }
-
         }
+    }
+
+    protected void updateOldEventSubscriptions(CaseDefinitionEntity previousCaseDefinition, CaseDefinitionEntity caseDefinition, String eventType) {
+        CommandContextUtil.getCmmnEngineConfiguration().getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionScopeDefinitionId(
+            previousCaseDefinition.getId(), caseDefinition.getId(), eventType, caseDefinition.getKey(), null);
+    }
+
+    protected CmmnModel getCaseModel(CmmnParseResult parseResult, CaseDefinitionEntity caseDefinition) {
+        CmmnModel caseModel = parseResult.getCmmnModelForCaseDefinition(caseDefinition);
+        if (caseModel == null) {
+            // if the case model is not contained in the parse result cache, load it manually
+            caseModel = CommandContextUtil.getCmmnEngineConfiguration().getCmmnRepositoryService().getCmmnModel(caseDefinition.getId());
+        }
+        return caseModel;
+    }
+
+    protected boolean isManualCorrelationSubscriptionConfiguration(CmmnParseResult parseResult, CaseDefinitionEntity caseDefinition) {
+        CmmnModel caseModel = getCaseModel(parseResult, caseDefinition);
+        List<ExtensionElement> correlationCfgExtensions = caseModel.getPrimaryCase().getExtensionElements()
+            .getOrDefault(CmmnXmlConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
+        if (!correlationCfgExtensions.isEmpty()) {
+            return Objects.equals(correlationCfgExtensions.get(0).getElementText(), CmmnXmlConstants.START_EVENT_CORRELATION_MANUAL);
+        }
+        return false;
     }
 
     protected String getEventCorrelationKey(Case caseModel) {
