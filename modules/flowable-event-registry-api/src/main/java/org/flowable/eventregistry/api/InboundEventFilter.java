@@ -28,10 +28,11 @@ public interface InboundEventFilter<T> {
      * Returns true, if the event should be further processed
      * or false if the event should be ignored and will not be processed any further.
      *
+     * @param eventDefinitionKey the key for the inbound event
      * @param event the inbound event information
      * @return true, if the event should continue to be processed, false, if the pipeline will ignore the event and stop any
      *      further processing
      */
-    boolean retain(FlowableEventInfo<T> event);
+    boolean retain(String eventDefinitionKey, FlowableEventInfo<T> event);
 
 }

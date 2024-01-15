@@ -81,17 +81,17 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
         FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody, inboundChannel);
 
+        String eventKey = detectEventDefinitionKey(event);
+
         // if there is a custom filter in place, invoke it to retain only the events that are wanted or to abort the pipeline
         if (inboundEventFilter != null) {
-            if (!inboundEventFilter.retain(event)) {
+            if (!inboundEventFilter.retain(eventKey, event)) {
                 if (debugLoggingEnabled) {
                     logger.debug("Inbound event {} on inbound {} channel {} was filtered out.", inboundEvent, inboundChannel.getChannelType(), inboundChannel.getKey());
                 }
                 return Collections.emptyList();
             }
         }
-
-        String eventKey = detectEventDefinitionKey(event);
 
         boolean multiTenant = false;
         String tenantId = AbstractEngineConfiguration.NO_TENANT_ID;

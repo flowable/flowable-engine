@@ -320,34 +320,34 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
         
         @Override
-        public InboundEventFilterJsonBuilder jsonDeserializer() {
+        public InboundEventKeyJsonDetectorBuilder jsonDeserializer() {
             channelModel.setDeserializerType("json");
 
             InboundEventProcessingPipelineBuilderImpl<JsonNode> jsonPipelineBuilder
                 = new InboundEventProcessingPipelineBuilderImpl<>(channelModel, eventRepository, channelDefinitionBuilder);
             this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = jsonPipelineBuilder;
 
-            return new InboundEventFilterJsonBuilderImpl(jsonPipelineBuilder);
+            return new InboundEventKeyJsonDetectorBuilderImpl(jsonPipelineBuilder);
         }
 
         @Override
-        public InboundEventFilterXmlBuilder xmlDeserializer() {
+        public InboundEventKeyXmlDetectorBuilder xmlDeserializer() {
             channelModel.setDeserializerType("xml");
             InboundEventProcessingPipelineBuilderImpl<Document> xmlPipelineBuilder
                 = new InboundEventProcessingPipelineBuilderImpl<>(channelModel, eventRepository, channelDefinitionBuilder);
             this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = xmlPipelineBuilder;
 
-            return new InboundEventFilterXmlBuilderImpl(xmlPipelineBuilder);
+            return new InboundEventKeyXmlDetectorBuilderImpl(xmlPipelineBuilder);
         }
 
         @Override
-        public InboundEventFilterBuilder delegateExpressionDeserializer(String delegateExpression) {
+        public InboundEventKeyDetectorBuilder delegateExpressionDeserializer(String delegateExpression) {
             channelModel.setDeserializerType("expression");
             channelModel.setDeserializerDelegateExpression(delegateExpression);
             InboundEventProcessingPipelineBuilderImpl customPipelineBuilder = new InboundEventProcessingPipelineBuilderImpl<>(channelModel,
                 eventRepository, channelDefinitionBuilder);
             this.channelDefinitionBuilder.inboundEventProcessingPipelineBuilder = customPipelineBuilder;
-            return new InboundEventFilterBuilderImpl(customPipelineBuilder);
+            return new InboundEventDefinitionKeyDetectorBuilderImpl(customPipelineBuilder);
         }
 
         @Override
@@ -357,51 +357,44 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
     }
 
-    public static class InboundEventFilterJsonBuilderImpl extends InboundEventKeyJsonDetectorBuilderImpl implements InboundEventFilterJsonBuilder {
+    public static class InboundEventFilterJsonBuilderImpl extends InboundEventTenantJsonDetectorBuilderImpl implements InboundEventFilterJsonBuilder {
 
         public InboundEventFilterJsonBuilderImpl(InboundEventProcessingPipelineBuilderImpl<JsonNode> inboundEventProcessingPipelineBuilder) {
             super(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventKeyJsonDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
+        public InboundEventTenantJsonDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
             inboundEventProcessingPipelineBuilder.channelModel.setEventFilterDelegateExpression(delegateExpression);
-            return new InboundEventKeyJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
     }
 
-    public static class InboundEventFilterXmlBuilderImpl extends InboundEventKeyXmlDetectorBuilderImpl implements InboundEventFilterXmlBuilder {
+    public static class InboundEventFilterXmlBuilderImpl extends InboundEventTenantXmlDetectorBuilderImpl implements InboundEventFilterXmlBuilder {
 
         public InboundEventFilterXmlBuilderImpl(InboundEventProcessingPipelineBuilderImpl<Document> inboundEventProcessingPipelineBuilder) {
             super(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventKeyXmlDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
+        public InboundEventTenantXmlDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
             inboundEventProcessingPipelineBuilder.channelModel.setEventFilterDelegateExpression(delegateExpression);
-            return new InboundEventKeyXmlDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventTenantXmlDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
     }
 
-    public static class InboundEventFilterBuilderImpl implements InboundEventFilterBuilder {
-
-        protected InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder;
+    public static class InboundEventFilterBuilderImpl extends InboundEventTenantDetectorBuilderImpl implements InboundEventFilterBuilder {
 
         public InboundEventFilterBuilderImpl(InboundEventProcessingPipelineBuilderImpl inboundEventProcessingPipelineBuilder) {
-            this.inboundEventProcessingPipelineBuilder = inboundEventProcessingPipelineBuilder;
+            super(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventKeyDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
+        public InboundEventTenantDetectorBuilder delegateExpressionEventFilter(String delegateExpression) {
             inboundEventProcessingPipelineBuilder.channelModel.setEventFilterDelegateExpression(delegateExpression);
-            return new InboundEventDefinitionKeyDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
-        }
-
-        @Override
-        public InboundEventTenantDetectorBuilder delegateExpressionKeyDetector(String delegateExpression) {
-            return null;
+            return new InboundEventTenantDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
     }
@@ -415,27 +408,27 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
-        public InboundEventTenantJsonDetectorBuilder fixedEventKey(String key) {
+        public InboundEventFilterJsonBuilder fixedEventKey(String key) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setFixedValue(key);
             this.inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterJsonBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonField(String field) {
+        public InboundEventFilterJsonBuilder detectEventKeyUsingJsonField(String field) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setJsonField(field);
             this.inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterJsonBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression) {
+        public InboundEventFilterJsonBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setJsonPointerExpression(jsonPointerExpression);
             this.inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantJsonDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterJsonBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
     }
 
@@ -448,19 +441,19 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
-        public InboundEventTenantXmlDetectorBuilder fixedEventKey(String key) {
+        public InboundEventFilterXmlBuilder fixedEventKey(String key) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setFixedValue(key);
             this.inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantXmlDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterXmlBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
         @Override
-        public InboundEventTenantXmlDetectorBuilder detectEventKeyUsingXPathExpression(String xPathExpression) {
+        public InboundEventFilterXmlBuilder detectEventKeyUsingXPathExpression(String xPathExpression) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setXmlXPathExpression(xPathExpression);
             this.inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantXmlDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterXmlBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
     }
@@ -474,11 +467,11 @@ public class InboundChannelDefinitionBuilderImpl implements InboundChannelModelB
         }
 
         @Override
-        public InboundEventTenantDetectorBuilder delegateExpressionKeyDetector(String delegateExpression) {
+        public InboundEventFilterBuilder delegateExpressionKeyDetector(String delegateExpression) {
             ChannelEventKeyDetection keyDetection = new ChannelEventKeyDetection();
             keyDetection.setDelegateExpression(delegateExpression);
             inboundEventProcessingPipelineBuilder.channelModel.setChannelEventKeyDetection(keyDetection);
-            return new InboundEventTenantDetectorBuilderImpl(inboundEventProcessingPipelineBuilder);
+            return new InboundEventFilterBuilderImpl(inboundEventProcessingPipelineBuilder);
         }
 
     }

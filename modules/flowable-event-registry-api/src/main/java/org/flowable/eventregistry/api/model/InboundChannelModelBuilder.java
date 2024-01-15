@@ -207,64 +207,22 @@ public interface InboundChannelModelBuilder {
         /**
          * Deserializes the event to JSON.
          */
-        InboundEventFilterJsonBuilder jsonDeserializer();
+        InboundEventKeyJsonDetectorBuilder jsonDeserializer();
 
         /**
          * Deserializes the event to XML.
          */
-        InboundEventFilterXmlBuilder xmlDeserializer();
+        InboundEventKeyXmlDetectorBuilder xmlDeserializer();
 
         /**
          * Uses a delegate expression to deserialize the event.
          */
-        InboundEventFilterBuilder delegateExpressionDeserializer(String delegateExpression);
+        InboundEventKeyDetectorBuilder delegateExpressionDeserializer(String delegateExpression);
 
         /**
          * Uses a delegate expression to determine the custom {@link InboundEventProcessingPipeline} instance.
          */
         InboundChannelModelBuilder eventProcessingPipeline(String delegateExpression);
-
-    }
-
-    /**
-     * Builder for the filtering out inbound JSON events.
-     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
-     */
-    interface InboundEventFilterJsonBuilder extends InboundEventKeyJsonDetectorBuilder {   // Extends because using filtering is optional
-
-        /**
-         * Uses a delegate expression to filter the events before further processing.
-         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
-         */
-        InboundEventKeyJsonDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
-
-    }
-
-    /**
-     * Builder for the filtering out inbound XML events.
-     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
-     */
-    interface InboundEventFilterXmlBuilder extends InboundEventKeyXmlDetectorBuilder {   // Extends because using filtering is optional
-
-        /**
-         * Uses a delegate expression to filter the events before further processing.
-         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
-         */
-        InboundEventKeyXmlDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
-
-    }
-
-    /**
-     * Builder for the filtering out inbound events.
-     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
-     */
-    interface InboundEventFilterBuilder extends InboundEventKeyDetectorBuilder {   // Extends because using filtering is optional
-
-        /**
-         * Uses a delegate expression to filter the events before further processing.
-         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
-         */
-        InboundEventKeyDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
 
     }
 
@@ -276,17 +234,17 @@ public interface InboundChannelModelBuilder {
         /**
          * Sets the event key to a hardcoded value. This is useful when the channel only receives one type of event.
          */
-        InboundEventTenantJsonDetectorBuilder fixedEventKey(String key);
+        InboundEventFilterJsonBuilder fixedEventKey(String key);
 
         /**
          * Determines the key of the event based on a top-level field in the JSON representation in the event.
          */
-        InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonField(String field);
+        InboundEventFilterJsonBuilder detectEventKeyUsingJsonField(String field);
 
         /**
          * Determines the key of the event using on a JSON Pointer expression to find the value.
          */
-        InboundEventTenantJsonDetectorBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression);
+        InboundEventFilterJsonBuilder detectEventKeyUsingJsonPointerExpression(String jsonPointerExpression);
 
     }
 
@@ -315,12 +273,12 @@ public interface InboundChannelModelBuilder {
         /**
          * Sets the event key to a hardcoded value. This is useful when the channel only receives one type of event.
          */
-        InboundEventTenantXmlDetectorBuilder fixedEventKey(String key);
+        InboundEventFilterXmlBuilder fixedEventKey(String key);
 
         /**
          * Determines the key of the event using on a XPATH expression to find the value.
          */
-        InboundEventTenantXmlDetectorBuilder detectEventKeyUsingXPathExpression(String xPathExpression);
+        InboundEventFilterXmlBuilder detectEventKeyUsingXPathExpression(String xPathExpression);
 
     }
 
@@ -349,7 +307,49 @@ public interface InboundChannelModelBuilder {
         /**
          * Uses delegate expression to determine the custom {@link InboundEventKeyDetector}.
          */
-        InboundEventTenantDetectorBuilder delegateExpressionKeyDetector(String delegateExpression);
+        InboundEventFilterBuilder delegateExpressionKeyDetector(String delegateExpression);
+
+    }
+
+    /**
+     * Builder for the filtering out inbound JSON events.
+     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
+     */
+    interface InboundEventFilterJsonBuilder extends InboundEventTenantJsonDetectorBuilder {   // Extends because using filtering is optional
+
+        /**
+         * Uses a delegate expression to filter the events before further processing.
+         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
+         */
+        InboundEventTenantJsonDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
+
+    }
+
+    /**
+     * Builder for the filtering out inbound XML events.
+     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
+     */
+    interface InboundEventFilterXmlBuilder extends InboundEventTenantXmlDetectorBuilder {   // Extends because using filtering is optional
+
+        /**
+         * Uses a delegate expression to filter the events before further processing.
+         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
+         */
+        InboundEventTenantXmlDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
+
+    }
+
+    /**
+     * Builder for the filtering out inbound events.
+     * If events are filtered out, the pipeline processing will stop there and no subsequent steps will be executed.
+     */
+    interface InboundEventFilterBuilder extends InboundEventTenantDetectorBuilder {   // Extends because using filtering is optional
+
+        /**
+         * Uses a delegate expression to filter the events before further processing.
+         * The expression needs to resolve to a bean implementing the {@link org.flowable.eventregistry.api.InboundEventFilter} interface.
+         */
+        InboundEventTenantDetectorBuilder delegateExpressionEventFilter(String delegateExpression);
 
     }
 

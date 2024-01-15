@@ -96,8 +96,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .resourceName("customTest.channel")
             .channelAdapter("${testInboundChannelAdapter}")
             .delegateExpressionDeserializer("${testInboundEventDeserializer}")
-            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionKeyDetector("${testInboundEventKeyDetector}")
+            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionTenantDetector("${testInboundEventTenantDetector}")
             .payloadExtractor("${testInboundEventPayloadExtractor}")
             .transformer("${testInboundEventTransformer}")
@@ -145,8 +145,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .resourceName("customTest.channel")
             .channelAdapter("${testInboundChannelAdapter}")
             .delegateExpressionDeserializer("${testInboundEventDeserializer}")
-            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionKeyDetector("${testInboundEventKeyDetector}")
+            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionTenantDetector("${testInboundEventTenantDetector}")
             .payloadExtractor("${testInboundEventPayloadExtractor}")
             .transformer("${testInboundEventTransformer}")
@@ -162,7 +162,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
 
         assertThat(testInboundEventDeserializer.counter.get()).isEqualTo(1);
         assertThat(testInboundEventFilter.counter.get()).isEqualTo(1);
-        assertThat(testInboundEventKeyDetector.counter.get()).isEqualTo(0);
+        assertThat(testInboundEventKeyDetector.counter.get()).isEqualTo(1);
         assertThat(testInboundEventTenantDetector.counter.get()).isEqualTo(0);
         assertThat(testInboundEventPayloadExtractor.payloadCounter.get()).isEqualTo(0);
         assertThat(testInboundEventTransformer.counter.get()).isEqualTo(0);
@@ -409,7 +409,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         }
 
         @Override
-        public boolean retain(FlowableEventInfo<String> event) {
+        public boolean retain(String eventDefinitionKey, FlowableEventInfo<String> event) {
             counter.incrementAndGet();
             return filter;
         }
