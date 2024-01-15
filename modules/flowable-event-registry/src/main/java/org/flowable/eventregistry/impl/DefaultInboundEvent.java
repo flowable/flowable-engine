@@ -48,4 +48,12 @@ public class DefaultInboundEvent implements InboundEvent {
     public Map<String, Object> getHeaders() {
         return headers;
     }
+
+    @Override
+    public String toString() {
+        return "DefaultInboundEvent{" +
+                "rawEvent=" + rawEvent +
+                ", headers=" + headers +
+                '}';
+    }
 }
