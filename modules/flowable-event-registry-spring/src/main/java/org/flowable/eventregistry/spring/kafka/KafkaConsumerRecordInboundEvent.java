@@ -60,4 +60,12 @@ public class KafkaConsumerRecordInboundEvent implements InboundEvent {
 
         return headers;
     }
+
+    @Override
+    public String toString() {
+        return "KafkaConsumerRecordInboundEvent{" +
+                "consumerRecord=" + consumerRecord +
+                ", headers=" + headers +
+                '}';
+    }
 }
