@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
@@ -350,7 +352,13 @@ public class ActivityInstanceEntityManagerImpl
         }
 
         if (execution.getCurrentFlowElement() != null) {
-            activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
+            if (StringUtils.isNotEmpty(execution.getCurrentFlowElement().getName())) {
+                Expression activityNameExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
+                        .createExpression(execution.getCurrentFlowElement().getName());
+                activityInstanceEntity.setActivityName(activityNameExpression.getValue(execution).toString());
+            } else {
+                activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
+            }
             activityInstanceEntity.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
         }
         Date now = getClock().getCurrentTime();

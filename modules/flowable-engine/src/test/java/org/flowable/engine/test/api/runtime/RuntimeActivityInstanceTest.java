@@ -520,4 +520,14 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessWithExpression.bpmn20.xml" })
+    public void testActivityNameIsResolved() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
+                .variable("testVar", "someTestValue").start();
+        ActivityInstance taskActivity = runtimeService.createActivityInstanceQuery().activityId("theTask").processInstanceId(processInstance.getId())
+                .singleResult();
+        assertThat(taskActivity.getActivityName()).isEqualTo("someTestValue");
+    }
+
 }
