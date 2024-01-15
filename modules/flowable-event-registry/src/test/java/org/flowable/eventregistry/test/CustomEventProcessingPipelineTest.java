@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
+import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
@@ -94,8 +95,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .key("customTestChannel")
             .resourceName("customTest.channel")
             .channelAdapter("${testInboundChannelAdapter}")
-            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionDeserializer("${testInboundEventDeserializer}")
+            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionKeyDetector("${testInboundEventKeyDetector}")
             .delegateExpressionTenantDetector("${testInboundEventTenantDetector}")
             .payloadExtractor("${testInboundEventPayloadExtractor}")
@@ -143,8 +144,8 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
             .key("customTestChannel")
             .resourceName("customTest.channel")
             .channelAdapter("${testInboundChannelAdapter}")
-            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionDeserializer("${testInboundEventDeserializer}")
+            .delegateExpressionEventFilter("${testInboundEventFilter}")
             .delegateExpressionKeyDetector("${testInboundEventKeyDetector}")
             .delegateExpressionTenantDetector("${testInboundEventTenantDetector}")
             .payloadExtractor("${testInboundEventPayloadExtractor}")
@@ -408,7 +409,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         }
 
         @Override
-        public boolean filter(String payload) {
+        public boolean retain(FlowableEventInfo<String> event) {
             counter.incrementAndGet();
             return filter;
         }

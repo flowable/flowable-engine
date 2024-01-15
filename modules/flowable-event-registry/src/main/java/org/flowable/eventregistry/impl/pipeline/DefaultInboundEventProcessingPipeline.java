@@ -81,9 +81,12 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
         FlowableEventInfo<T> event = new FlowableEventInfoImpl<>(inboundEvent, deserializedBody, inboundChannel);
 
-        // if there is a custom filter in place, invoke it to filter the event for further processing or to abort the pipeline
+        // if there is a custom filter in place, invoke it to retain only the events that are wanted or to abort the pipeline
         if (inboundEventFilter != null) {
-            if (!inboundEventFilter.filter(event)) {
+            if (!inboundEventFilter.retain(event)) {
+                if (debugLoggingEnabled) {
+                    logger.debug("Inbound event {} on inbound {} channel {} was filtered out.", inboundEvent, inboundChannel.getChannelType(), inboundChannel.getKey());
+                }
                 return Collections.emptyList();
             }
         }

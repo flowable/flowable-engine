@@ -25,16 +25,13 @@ package org.flowable.eventregistry.api;
 public interface InboundEventFilter<T> {
 
     /**
-     * Returns true, if the event should be further processed or false, if the event can be ignored and will not be processed
-     * any further and the pipeline will stop afterwards.
+     * Returns true, if the event should be further processed
+     * or false if the event should be ignored and will not be processed any further.
      *
-     * @param payload the payload  of the event
+     * @param event the inbound event information
      * @return true, if the event should continue to be processed, false, if the pipeline will ignore the event and stop any
      *      further processing
      */
-    boolean filter(T payload);
+    boolean retain(FlowableEventInfo<T> event);
 
-    default boolean filter(FlowableEventInfo<T> event) {
-        return filter(event.getPayload());
-    }
 }
