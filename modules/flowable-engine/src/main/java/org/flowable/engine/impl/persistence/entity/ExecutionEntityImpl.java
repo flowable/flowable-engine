@@ -1295,6 +1295,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public void setCurrentActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+    @Override
     public String getStartActivityId() {
         return startActivityId;
     }

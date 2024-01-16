@@ -355,12 +355,17 @@ public class ActivityInstanceEntityManagerImpl
             if (StringUtils.isNotEmpty(execution.getCurrentFlowElement().getName())) {
                 Expression activityNameExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
                         .createExpression(execution.getCurrentFlowElement().getName());
-                activityInstanceEntity.setActivityName(activityNameExpression.getValue(execution).toString());
+                String nameValue = activityNameExpression.getValue(execution).toString();
+
+                execution.setCurrentActivityName(nameValue);
+                activityInstanceEntity.setActivityName(nameValue);
             } else {
                 activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
             }
+
             activityInstanceEntity.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
         }
+
         Date now = getClock().getCurrentTime();
         activityInstanceEntity.setStartTime(now);
         
