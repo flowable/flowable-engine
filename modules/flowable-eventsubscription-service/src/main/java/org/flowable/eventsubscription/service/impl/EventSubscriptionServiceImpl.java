@@ -150,6 +150,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration) {
+        getEventSubscriptionEntityManager().updateEventSubscriptionScopeDefinitionId(oldScopeDefinitionId, newScopeDefinitionId, eventType, scopeDefinitionKey, configuration);
+    }
+
+    @Override
     public void updateEventSubscription(EventSubscriptionEntity eventSubscription) {
         getEventSubscriptionEntityManager().update(eventSubscription);
     }
@@ -197,6 +202,11 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(processDefinitionId, eventType, activityId, configuration);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(scopeDefinitionId, eventType, configuration);
     }
 
     public EventSubscription createEventSubscription(EventSubscriptionBuilder builder) {

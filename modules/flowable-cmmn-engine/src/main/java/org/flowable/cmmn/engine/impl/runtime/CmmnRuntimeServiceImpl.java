@@ -22,6 +22,9 @@ import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
@@ -39,6 +42,7 @@ import org.flowable.cmmn.engine.impl.cmd.ChangePlanItemStateCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.DeleteCaseInstanceStartEventSubscriptionCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteIdentityLinkForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DispatchEventCommand;
@@ -61,6 +65,8 @@ import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasCaseInstanceVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.HasPlanItemInstanceVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.ModifyCaseInstanceStartEventSubscriptionCmd;
+import org.flowable.cmmn.engine.impl.cmd.RegisterCaseInstanceStartEventSubscriptionCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceAssigneeCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveCaseInstanceOwnerCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveEventListenerCommand;
@@ -88,6 +94,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -455,4 +462,30 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
         commandExecutor.execute(new DispatchEventCommand(event));
     }
 
+    @Override
+    public CaseInstanceStartEventSubscriptionBuilder createCaseInstanceStartEventSubscriptionBuilder() {
+        return new CaseInstanceStartEventSubscriptionBuilderImpl(this);
+    }
+
+    @Override
+    public CaseInstanceStartEventSubscriptionModificationBuilder createCaseInstanceStartEventSubscriptionModificationBuilder() {
+        return new CaseInstanceStartEventSubscriptionModificationBuilderImpl(this);
+    }
+
+    @Override
+    public CaseInstanceStartEventSubscriptionDeletionBuilder createCaseInstanceStartEventSubscriptionDeletionBuilder() {
+        return new CaseInstanceStartEventSubscriptionDeletionBuilderImpl(this);
+    }
+
+    public EventSubscription registerCaseInstanceStartEventSubscription(CaseInstanceStartEventSubscriptionBuilderImpl builder) {
+        return commandExecutor.execute(new RegisterCaseInstanceStartEventSubscriptionCmd(builder));
+    }
+
+    public void migrateCaseInstanceStartEventSubscriptionsToCaseDefinitionVersion(CaseInstanceStartEventSubscriptionModificationBuilderImpl builder) {
+        commandExecutor.execute(new ModifyCaseInstanceStartEventSubscriptionCmd(builder));
+    }
+
+    public void deleteCaseInstanceStartEventSubscriptions(CaseInstanceStartEventSubscriptionDeletionBuilderImpl builder) {
+        commandExecutor.execute(new DeleteCaseInstanceStartEventSubscriptionCmd(builder));
+    }
 }

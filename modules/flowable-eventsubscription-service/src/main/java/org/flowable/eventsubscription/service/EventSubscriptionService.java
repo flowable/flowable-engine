@@ -74,7 +74,9 @@ public interface EventSubscriptionService {
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
 
     void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration);
-    
+
+    void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration);
+
     void updateEventSubscription(EventSubscriptionEntity eventSubscription);
 
     boolean lockEventSubscription(String eventSubscriptionId);
@@ -94,5 +96,7 @@ public interface EventSubscriptionService {
     void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
 
     void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
-    
+
+    void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration);
+
 }
