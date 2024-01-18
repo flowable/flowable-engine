@@ -39,8 +39,9 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
             }
         }
         processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
-        if(processEngineConfiguration.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)){
-            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        if (processEngineConfiguration.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
+                    .deleteHistoricVariableInstancesForNonExistingProcessInstances();
         }
         processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailForNonExistingProcessInstances();
 

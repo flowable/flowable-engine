@@ -101,9 +101,9 @@ public class HistoricVariableInstanceEntityManagerImpl
     @Override
     public void deleteHistoricVariableInstanceByProcessInstanceId(final String historicProcessInstanceId) {
         List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByProcessInstanceId(historicProcessInstanceId);
-            for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
-                delete(historicProcessVariable);
-            }
+        for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
+            delete(historicProcessVariable);
+        }
     }
 
     @Override
@@ -143,10 +143,10 @@ public class HistoricVariableInstanceEntityManagerImpl
 
     @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
-            List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByTaskId(taskId);
-            for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
-                delete(historicProcessVariable);
-            }
+        List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByTaskId(taskId);
+        for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
+            delete(historicProcessVariable);
+        }
     }
 
     @Override
@@ -166,12 +166,12 @@ public class HistoricVariableInstanceEntityManagerImpl
 
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
-            dataManager.deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        dataManager.deleteHistoricVariableInstancesForNonExistingProcessInstances();
     }
     
     @Override
     public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
-            dataManager.deleteHistoricVariableInstancesForNonExistingCaseInstances();
+        dataManager.deleteHistoricVariableInstancesForNonExistingCaseInstances();
     }
 
     @Override
