@@ -14,6 +14,7 @@ package org.flowable.engine.impl.history;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -80,6 +81,11 @@ public interface HistoryConfigurationSettings {
      * This method has an extra processDefinitionId parameter, for legacy reasons and should only be used in those exceptional situations.
      */
     boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity);
+
+    /**
+     * Returns whether history is enabled for variables for the provided historic process instance.
+     */
+    boolean isHistoryEnabledForVariables(HistoricProcessInstanceEntity historicProcessInstance);
 
     /**
      * Returns whether history is enabled for the provided identity link.

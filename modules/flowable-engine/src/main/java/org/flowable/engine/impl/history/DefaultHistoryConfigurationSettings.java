@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -279,6 +280,11 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     @Override
     public boolean isHistoryEnabledForVariableInstance(String processDefinitionId, VariableInstanceEntity variableInstanceEntity) {
         return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForVariables(HistoricProcessInstanceEntity historicProcessInstance) {
+        return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     @Override
