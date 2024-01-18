@@ -578,7 +578,9 @@ public class TaskHelper {
                 }
 
                 processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailsByTaskId(taskId);
-                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+                if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+                    processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+                }
                 processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(taskId);
 
                 historicTaskService.deleteHistoricTask(historicTaskInstance);

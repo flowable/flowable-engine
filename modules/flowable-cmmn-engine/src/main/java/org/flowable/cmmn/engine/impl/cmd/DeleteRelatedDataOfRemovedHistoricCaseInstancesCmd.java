@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
@@ -44,8 +45,9 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
             }
         }
         cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
-        cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();
-
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();
+        }
         return null;
     }
 

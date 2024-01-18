@@ -15,6 +15,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -38,7 +39,9 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
             }
         }
         processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
-        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        if(processEngineConfiguration.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)){
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        }
         processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailForNonExistingProcessInstances();
 
         return null;

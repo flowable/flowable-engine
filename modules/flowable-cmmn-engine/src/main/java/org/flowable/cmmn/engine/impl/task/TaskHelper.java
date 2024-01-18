@@ -209,8 +209,10 @@ public class TaskHelper {
                 for (HistoricTaskInstance subTask : subTasks) {
                     deleteHistoricTask(subTask.getId(), cmmnEngineConfiguration);
                 }
-    
-                cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+
+                if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+                    cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+                }
                 cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(taskId);
     
                 historicTaskService.deleteHistoricTask(historicTaskInstance);

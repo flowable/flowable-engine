@@ -129,7 +129,10 @@ public class ChangeHistoryLevelTest extends PluggableFlowableTestCase {
                 @Override
                 public Void execute(CommandContext commandContext) {
                     processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-                    processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+
+                    if (processEngineConfiguration.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+                        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+                    }
                     processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
                     
                     if (taskId != null) {

@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -101,12 +100,10 @@ public class HistoricVariableInstanceEntityManagerImpl
 
     @Override
     public void deleteHistoricVariableInstanceByProcessInstanceId(final String historicProcessInstanceId) {
-        if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByProcessInstanceId(historicProcessInstanceId);
+        List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByProcessInstanceId(historicProcessInstanceId);
             for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
                 delete(historicProcessVariable);
             }
-        }
     }
 
     @Override
@@ -146,12 +143,10 @@ public class HistoricVariableInstanceEntityManagerImpl
 
     @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
-        if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             List<HistoricVariableInstanceEntity> historicProcessVariables = dataManager.findHistoricVariableInstancesByTaskId(taskId);
             for (HistoricVariableInstanceEntity historicProcessVariable : historicProcessVariables) {
                 delete(historicProcessVariable);
             }
-        }
     }
 
     @Override
@@ -171,16 +166,12 @@ public class HistoricVariableInstanceEntityManagerImpl
 
     @Override
     public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
-        if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             dataManager.deleteHistoricVariableInstancesForNonExistingProcessInstances();
-        }
     }
     
     @Override
     public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
-        if (serviceConfiguration.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
             dataManager.deleteHistoricVariableInstancesForNonExistingCaseInstances();
-        }
     }
 
     @Override
