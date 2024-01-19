@@ -1098,6 +1098,19 @@
     <if test="configuration != null">
         and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
     </if>
+   </update> <!-- process definition id update -->
+
+   <update id="updateManualScopeStartEventSubscriptionWithScopeDefinitionId" parameterType="map">
+    update ${prefix}ACT_RU_EVENT_SUBSCR
+    set SCOPE_DEFINITION_ID_ = #{newScopeDefinitionId, jdbcType=VARCHAR}
+    where SCOPE_DEFINITION_ID_ = #{oldScopeDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    <if test="scopeDefinitionKey != null">
+        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR}
+    </if>
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
    </update>
 
   <update id="updateEventSubscriptionLockTime" parameterType="java.util.Map">
@@ -1167,6 +1180,15 @@
     PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
     and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
     and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    <if test="configuration != null">
+        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+    </if>
+  </delete>
+
+  <delete id="deleteManualScopeStartEventSubscriptions" parameterType="map">
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where
+    SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
     <if test="configuration != null">
         and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
     </if>

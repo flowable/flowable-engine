@@ -44,6 +44,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration);
 
+    void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration);
+
     boolean lockEventSubscription(String eventSubscriptionId);
 
     void unlockEventSubscription(String eventSubscriptionId);
@@ -61,6 +63,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
 
     void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
+
+    void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration);
 
     /* Find (generic) */
 
