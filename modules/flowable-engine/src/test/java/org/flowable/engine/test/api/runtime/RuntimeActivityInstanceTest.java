@@ -530,4 +530,33 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(taskActivity.getActivityName()).isEqualTo("someTestValue");
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcessWithBeanExpression.bpmn20.xml")
+    public void testTaskNameExpressionIsNotResolvedTwice() {
+        NameProvider nameProvider = new NameProvider();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().transientVariable("nameProvider", nameProvider)
+                .processDefinitionKey("oneTaskProcess").start();
+        ActivityInstance taskActivity = runtimeService.createActivityInstanceQuery().activityId("theTask").processInstanceId(processInstance.getId())
+                .singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        assertThat(taskActivity.getActivityName()).isEqualTo("someName");
+        assertThat(task.getName()).isEqualTo("someName");
+        assertThat(nameProvider.getCounter()).isEqualTo(1);
+
+    }
+
+    public static class NameProvider {
+
+        int counter = 0;
+
+        public String getName() {
+            counter++;
+            return "someName";
+        }
+
+        public int getCounter() {
+            return counter;
+        }
+    }
 }
