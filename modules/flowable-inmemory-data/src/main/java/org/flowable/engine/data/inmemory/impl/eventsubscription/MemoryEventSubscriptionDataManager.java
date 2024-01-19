@@ -143,13 +143,41 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
             if (scopeDefinitionKey != null && (item.getScopeDefinitionKey() == null || !item.getScopeDefinitionKey().equals(scopeDefinitionKey))) {
                 return false;
             }
-            if (configuration != null && (item.getConfiguration() == null || !item.getConfiguration().equals(scopeDefinitionKey))) {
+            if (configuration != null && (item.getConfiguration() == null || !item.getConfiguration().equals(configuration))) {
                 return false;
             }
 
             return true;
 
         }).forEach(item -> item.setProcessDefinitionId(newProcessDefinitionId));
+
+    }
+
+    @Override
+    public void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType,
+                    String scopeDefinitionKey, String configuration) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("updateEventSubscriptionScopeDefinitionId {} {} {} {} {}", oldScopeDefinitionId, newScopeDefinitionId, eventType,
+                            scopeDefinitionKey, configuration);
+        }
+
+        getData().values().stream().filter(item -> {
+            if (item.getScopeDefinitionId() == null || !item.getScopeDefinitionId().equals(oldScopeDefinitionId)) {
+                return false;
+            }
+            if (item.getEventType() == null || !item.getEventType().equals(eventType)) {
+                return false;
+            }
+            if (scopeDefinitionKey != null && (item.getScopeDefinitionKey() == null || !item.getScopeDefinitionKey().equals(scopeDefinitionKey))) {
+                return false;
+            }
+            if (configuration != null && (item.getConfiguration() == null || !item.getConfiguration().equals(configuration))) {
+                return false;
+            }
+
+            return true;
+
+        }).forEach(item -> item.setScopeDefinitionId(newScopeDefinitionId));
 
     }
 
@@ -468,6 +496,18 @@ public class MemoryEventSubscriptionDataManager extends AbstractMemoryDataManage
                                         && entry.getValue().getActivityId() != null && entry.getValue().getActivityId().equals(activityId)
                                         && (configuration == null || (entry.getValue().getConfiguration() != null
                                                         && entry.getValue().getConfiguration().equals(configuration))));
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent {} {} {}", scopeDefinitionId, eventType, configuration);
+        }
+        getData().entrySet().removeIf(entry -> entry.getValue().getScopeDefinitionId() != null
+                        && entry.getValue().getScopeDefinitionId().equals(scopeDefinitionId) && entry.getValue().getEventType() != null
+                        && entry.getValue().getEventType().equals(eventType) && (configuration == null || (entry.getValue().getConfiguration() != null
+                                        && entry.getValue().getConfiguration().equals(configuration))));
+
     }
 
     @Override
