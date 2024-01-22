@@ -158,6 +158,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setTaskDataManager(TaskDataManager taskDataManager) {
         this.taskDataManager = taskDataManager;
+        this.taskEntityManager.setDataManager(taskDataManager);
         return this;
     }
 
@@ -167,6 +168,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public TaskServiceConfiguration setHistoricTaskInstanceDataManager(HistoricTaskInstanceDataManager historicTaskInstanceDataManager) {
         this.historicTaskInstanceDataManager = historicTaskInstanceDataManager;
+        this.historicTaskInstanceEntityManager.setDataManager(historicTaskInstanceDataManager);
         return this;
     }
 

@@ -14,13 +14,13 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.util.Collection;
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
+import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricIdentityLinkEntityManager extends EntityManager<HistoricIdentityLinkEntity> {
+public interface HistoricIdentityLinkEntityManager extends MutableEntityManager<HistoricIdentityLinkEntity,HistoricIdentityLinkDataManager> {
 
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId);
 

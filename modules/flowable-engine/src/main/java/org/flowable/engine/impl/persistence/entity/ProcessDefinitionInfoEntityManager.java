@@ -12,12 +12,13 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
+import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public interface ProcessDefinitionInfoEntityManager extends EntityManager<ProcessDefinitionInfoEntity> {
+public interface ProcessDefinitionInfoEntityManager extends MutableEntityManager<ProcessDefinitionInfoEntity,ProcessDefinitionInfoDataManager> {
 
     void insertProcessDefinitionInfo(ProcessDefinitionInfoEntity processDefinitionInfo);
 

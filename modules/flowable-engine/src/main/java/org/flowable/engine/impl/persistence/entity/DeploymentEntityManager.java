@@ -14,15 +14,15 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.impl.DeploymentQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.repository.Deployment;
 
 /**
  * @author Joram Barrez
  */
-public interface DeploymentEntityManager extends EntityManager<DeploymentEntity> {
+public interface DeploymentEntityManager extends MutableEntityManager<DeploymentEntity,DeploymentDataManager> {
 
     List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 

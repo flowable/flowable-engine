@@ -14,15 +14,15 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.impl.ModelQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.repository.Model;
 
 /**
  * @author Joram Barrez
  */
-public interface ModelEntityManager extends EntityManager<ModelEntity> {
+public interface ModelEntityManager extends MutableEntityManager<ModelEntity,ModelDataManager> {
 
     void insertEditorSourceForModel(String modelId, byte[] modelSource);
 

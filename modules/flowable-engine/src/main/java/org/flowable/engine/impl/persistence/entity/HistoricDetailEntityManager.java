@@ -16,16 +16,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricDetailEntityManager extends EntityManager<HistoricDetailEntity> {
+public interface HistoricDetailEntityManager extends MutableEntityManager<HistoricDetailEntity,HistoricDetailDataManager> {
 
     HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId,
         Date createTime);

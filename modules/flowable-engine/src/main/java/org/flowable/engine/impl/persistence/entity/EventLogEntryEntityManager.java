@@ -13,14 +13,14 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface EventLogEntryEntityManager extends EntityManager<EventLogEntryEntity> {
+public interface EventLogEntryEntityManager extends MutableEntityManager<EventLogEntryEntity,EventLogEntryDataManager> {
 
     List<EventLogEntry> findAllEventLogEntries();
 

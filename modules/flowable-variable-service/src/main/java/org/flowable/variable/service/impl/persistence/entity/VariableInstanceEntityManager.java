@@ -15,16 +15,16 @@ package org.flowable.variable.service.impl.persistence.entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface VariableInstanceEntityManager extends EntityManager<VariableInstanceEntity> {
+public interface VariableInstanceEntityManager extends MutableEntityManager<VariableInstanceEntity,VariableInstanceDataManager> {
 
     /**
      * Creates a variable instance for the given tenant, name and value.

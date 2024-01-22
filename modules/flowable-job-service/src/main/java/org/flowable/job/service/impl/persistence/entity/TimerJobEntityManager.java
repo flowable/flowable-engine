@@ -13,11 +13,9 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -26,7 +24,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  * @author Tijs Rademakers
  * @author Vasile Dirla
  */
-public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEntity> {
+public interface TimerJobEntityManager extends MutableJobInfoEntityManager<TimerJobEntity,TimerJobDataManager> {
 
     /**
      * Insert the {@link TimerJobEntity}, similar to insert(TimerJobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the

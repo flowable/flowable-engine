@@ -15,17 +15,17 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataManager;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author martin.grofcik
  */
-public interface ActivityInstanceEntityManager extends EntityManager<ActivityInstanceEntity> {
+public interface ActivityInstanceEntityManager extends MutableEntityManager<ActivityInstanceEntity,ActivityInstanceDataManager> {
 
     ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution);
 

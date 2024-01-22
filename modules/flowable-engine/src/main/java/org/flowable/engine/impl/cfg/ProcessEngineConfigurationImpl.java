@@ -25,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -4011,12 +4010,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAttachmentDataManager(AttachmentDataManager attachmentDataManager) {
         this.attachmentDataManager = attachmentDataManager;
+        this.attachmentEntityManager.setDataManager(attachmentDataManager);
         return this;
     }
 
     @Override
     public ProcessEngineConfigurationImpl setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
         this.byteArrayDataManager = byteArrayDataManager;
+        this.byteArrayEntityManager.setDataManager(byteArrayDataManager);
         return this;
     }
 
@@ -4026,6 +4027,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setCommentDataManager(CommentDataManager commentDataManager) {
         this.commentDataManager = commentDataManager;
+        this.commentEntityManager.setDataManager(commentDataManager);
         return this;
     }
 
@@ -4035,6 +4037,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setDeploymentDataManager(DeploymentDataManager deploymentDataManager) {
         this.deploymentDataManager = deploymentDataManager;
+        this.deploymentEntityManager.setDataManager(deploymentDataManager);
         return this;
     }
 
@@ -4044,6 +4047,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEventLogEntryDataManager(EventLogEntryDataManager eventLogEntryDataManager) {
         this.eventLogEntryDataManager = eventLogEntryDataManager;
+        this.eventLogEntryEntityManager.setDataManager(eventLogEntryDataManager);
         return this;
     }
 
@@ -4053,6 +4057,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setExecutionDataManager(ExecutionDataManager executionDataManager) {
         this.executionDataManager = executionDataManager;
+        this.executionEntityManager.setDataManager(executionDataManager);
         return this;
     }
 
@@ -4062,6 +4067,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setActivityInstanceDataManager(ActivityInstanceDataManager activityInstanceDataManager) {
         this.activityInstanceDataManager = activityInstanceDataManager;
+        this.activityInstanceEntityManager.setDataManager(activityInstanceDataManager);
         return this;
     }
 
@@ -4071,6 +4077,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setHistoricActivityInstanceDataManager(HistoricActivityInstanceDataManager historicActivityInstanceDataManager) {
         this.historicActivityInstanceDataManager = historicActivityInstanceDataManager;
+        this.historicActivityInstanceEntityManager.setDataManager(historicActivityInstanceDataManager);
         return this;
     }
 
@@ -4080,6 +4087,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setHistoricDetailDataManager(HistoricDetailDataManager historicDetailDataManager) {
         this.historicDetailDataManager = historicDetailDataManager;
+        this.historicDetailEntityManager.setDataManager(historicDetailDataManager);
         return this;
     }
 
@@ -4089,6 +4097,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setHistoricProcessInstanceDataManager(HistoricProcessInstanceDataManager historicProcessInstanceDataManager) {
         this.historicProcessInstanceDataManager = historicProcessInstanceDataManager;
+        this.historicProcessInstanceEntityManager.setDataManager(historicProcessInstanceDataManager);
         return this;
     }
 
@@ -4098,6 +4107,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setModelDataManager(ModelDataManager modelDataManager) {
         this.modelDataManager = modelDataManager;
+        this.modelEntityManager.setDataManager(modelDataManager);
         return this;
     }
 
@@ -4107,6 +4117,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionDataManager(ProcessDefinitionDataManager processDefinitionDataManager) {
         this.processDefinitionDataManager = processDefinitionDataManager;
+        this.processDefinitionEntityManager.setDataManager(processDefinitionDataManager);
         return this;
     }
 
@@ -4116,12 +4127,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionInfoDataManager(ProcessDefinitionInfoDataManager processDefinitionInfoDataManager) {
         this.processDefinitionInfoDataManager = processDefinitionInfoDataManager;
+        this.processDefinitionInfoEntityManager.setDataManager(processDefinitionInfoDataManager);
         return this;
     }
 
     @Override
     public ProcessEngineConfigurationImpl setPropertyDataManager(PropertyDataManager propertyDataManager) {
         this.propertyDataManager = propertyDataManager;
+        this.propertyEntityManager.setDataManager(propertyDataManager);
         return this;
     }
 
@@ -4131,6 +4144,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setResourceDataManager(ResourceDataManager resourceDataManager) {
         this.resourceDataManager = resourceDataManager;
+        this.resourceEntityManager.setDataManager(resourceDataManager);
         return this;
     }
 

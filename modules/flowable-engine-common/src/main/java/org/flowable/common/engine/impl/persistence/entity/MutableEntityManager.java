@@ -12,15 +12,15 @@
  */
 package org.flowable.common.engine.impl.persistence.entity;
 
-import java.util.List;
-import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
- * @author Joram Barrez
+ * An {@link EntityManager} that allows the {@link DataManager} of the entity manager implementation to be reconfigured at runtime.
+ * 
+ * @author ikaakkola (Qvantel Finland Oy)
  */
-public interface PropertyEntityManager extends MutableEntityManager<PropertyEntity, PropertyDataManager> {
+public interface MutableEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>> extends EntityManager<EntityImpl> {
 
-    List<PropertyEntity> findAll();
+    void setDataManager(DM dataManager);
 
-    void directInsertProperty(String name, String value);
 }

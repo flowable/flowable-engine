@@ -14,15 +14,15 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * @author Joram Barrez
  */
-public interface ProcessDefinitionEntityManager extends EntityManager<ProcessDefinitionEntity> {
+public interface ProcessDefinitionEntityManager extends MutableEntityManager<ProcessDefinitionEntity,ProcessDefinitionDataManager> {
 
     ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey);
 

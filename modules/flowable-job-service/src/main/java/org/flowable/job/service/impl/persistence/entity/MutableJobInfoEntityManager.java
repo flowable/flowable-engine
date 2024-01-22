@@ -10,23 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.entity;
+package org.flowable.job.service.impl.persistence.entity;
 
-import java.util.Collection;
-import java.util.List;
 import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
-import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
- * @author Joram Barrez
+ * @author ikaakkola (Qvantel Finland Oy)
  */
-public interface AttachmentEntityManager extends MutableEntityManager<AttachmentEntity,AttachmentDataManager> {
+public interface MutableJobInfoEntityManager<T extends JobInfoEntity, DM extends DataManager<T>>
+                extends JobInfoEntityManager<T>, MutableEntityManager<T, DM> {
 
-    List<AttachmentEntity> findAttachmentsByProcessInstanceId(String processInstanceId);
-
-    List<AttachmentEntity> findAttachmentsByTaskId(String taskId);
-
-    void deleteAttachmentsByTaskId(String taskId);
-    
-    void bulkDeleteAttachmentsByTaskId(Collection<String> taskIds);
 }

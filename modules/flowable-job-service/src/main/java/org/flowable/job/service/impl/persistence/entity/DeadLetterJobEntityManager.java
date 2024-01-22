@@ -13,16 +13,15 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
-import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobEntity> {
+public interface DeadLetterJobEntityManager extends MutableEntityManager<DeadLetterJobEntity,DeadLetterJobDataManager> {
 
     /**
      * Find the deadletter job with the given correlation id.

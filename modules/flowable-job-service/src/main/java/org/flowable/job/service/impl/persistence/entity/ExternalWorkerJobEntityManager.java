@@ -13,18 +13,18 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
-
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 
 /**
  * {@link EntityManager} responsible for the {@link ExternalWorkerJobEntity} class.
  *
  * @author Filip Hrisafov
  */
-public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWorkerJobEntity>, JobInfoEntityManager<ExternalWorkerJobEntity> {
+public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWorkerJobEntity>, MutableJobInfoEntityManager<ExternalWorkerJobEntity,ExternalWorkerJobDataManager> {
 
     /**
      * Insert the {@link ExternalWorkerJobEntity}, similar to insert(ExternalWorkerJobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the

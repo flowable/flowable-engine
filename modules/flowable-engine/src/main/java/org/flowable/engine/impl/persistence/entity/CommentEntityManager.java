@@ -14,15 +14,15 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Collection;
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
+import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 
 /**
  * @author Joram Barrez
  */
-public interface CommentEntityManager extends EntityManager<CommentEntity> {
+public interface CommentEntityManager extends MutableEntityManager<CommentEntity,CommentDataManager> {
 
     List<Comment> findCommentsByTaskId(String taskId);
 

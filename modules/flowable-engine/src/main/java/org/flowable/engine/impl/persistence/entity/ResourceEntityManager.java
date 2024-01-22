@@ -13,13 +13,13 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
+import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface ResourceEntityManager extends EntityManager<ResourceEntity> {
+public interface ResourceEntityManager extends MutableEntityManager<ResourceEntity,ResourceDataManager> {
 
     List<ResourceEntity> findResourcesByDeploymentId(String deploymentId);
 

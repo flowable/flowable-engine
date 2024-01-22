@@ -13,16 +13,15 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 
 /**
  * @author Tijs Rademakers
  */
-public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEntity> {
+public interface SuspendedJobEntityManager extends MutableEntityManager<SuspendedJobEntity, SuspendedJobDataManager> {
 
     /**
      * Find the suspended job with the given correlation id.
@@ -53,5 +52,5 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
      * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-    
+
 }

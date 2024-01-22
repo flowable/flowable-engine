@@ -23,7 +23,7 @@ import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
  * @author Filip Hrisafov
  */
 public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>>
-    implements EntityManager<EntityImpl> {
+    implements MutableEntityManager<EntityImpl, DM> {
 
     protected DM dataManager;
     protected String engineType;
@@ -110,6 +110,11 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
         }
     }
 
+    @Override
+    public void setDataManager(DM dataManager) {
+        this.dataManager = dataManager;
+    }
+
     protected void fireEntityDeletedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
@@ -123,10 +128,6 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
 
     protected DM getDataManager() {
         return dataManager;
-    }
-
-    protected void setDataManager(DM dataManager) {
-        this.dataManager = dataManager;
     }
 
     protected abstract FlowableEventDispatcher getEventDispatcher();

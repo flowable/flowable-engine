@@ -15,15 +15,15 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricProcessInstanceEntityManager extends EntityManager<HistoricProcessInstanceEntity> {
+public interface HistoricProcessInstanceEntityManager extends MutableEntityManager<HistoricProcessInstanceEntity,HistoricProcessInstanceDataManager> {
 
     @Override
     HistoricProcessInstanceEntity create();

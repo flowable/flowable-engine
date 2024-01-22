@@ -109,6 +109,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
 
     public EventSubscriptionServiceConfiguration setEventSubscriptionDataManager(EventSubscriptionDataManager eventSubscriptionDataManager) {
         this.eventSubscriptionDataManager = eventSubscriptionDataManager;
+        this.eventSubscriptionEntityManager.setDataManager(eventSubscriptionDataManager);
         return this;
     }
     

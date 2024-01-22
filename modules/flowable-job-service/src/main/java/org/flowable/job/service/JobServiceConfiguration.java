@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,13 +20,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.ServiceConfigurator;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.job.service.impl.HistoryJobServiceImpl;
 import org.flowable.job.service.impl.JobServiceImpl;
 import org.flowable.job.service.impl.TimerJobServiceImpl;
@@ -61,11 +62,9 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobData
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
- * This service configuration contains all settings and instances around job execution and management.
- * Note that a {@link JobServiceConfiguration} is not shared between engines and instantiated for each engine.
+ * This service configuration contains all settings and instances around job execution and management. Note that a {@link JobServiceConfiguration} is
+ * not shared between engines and instantiated for each engine.
  * 
  * @author Tijs Rademakers
  */
@@ -116,22 +115,22 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected AsyncExecutor asyncExecutor;
     protected int asyncExecutorNumberOfRetries;
     protected int asyncExecutorResetExpiredJobsMaxTimeout;
-    
+
     protected String jobExecutionScope;
     protected Map<String, JobHandler> jobHandlers;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
     protected List<JobProcessor> jobProcessors;
-    
+
     protected List<String> enabledJobCategories;
-    
+
     protected AsyncExecutor asyncHistoryExecutor;
     protected int asyncHistoryExecutorNumberOfRetries;
     protected String historyJobExecutionScope;
-    
+
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobProcessor> historyJobProcessors;
-    
+
     public JobServiceConfiguration(String engineName) {
         super(engineName);
     }
@@ -304,6 +303,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setJobDataManager(JobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
+        this.jobEntityManager.setDataManager(jobDataManager);
         return this;
     }
 
@@ -313,6 +313,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setDeadLetterJobDataManager(DeadLetterJobDataManager deadLetterJobDataManager) {
         this.deadLetterJobDataManager = deadLetterJobDataManager;
+        this.deadLetterJobEntityManager.setDataManager(deadLetterJobDataManager);
         return this;
     }
 
@@ -322,6 +323,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setSuspendedJobDataManager(SuspendedJobDataManager suspendedJobDataManager) {
         this.suspendedJobDataManager = suspendedJobDataManager;
+        this.suspendedJobEntityManager.setDataManager(suspendedJobDataManager);
         return this;
     }
 
@@ -331,6 +333,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setTimerJobDataManager(TimerJobDataManager timerJobDataManager) {
         this.timerJobDataManager = timerJobDataManager;
+        this.timerJobEntityManager.setDataManager(timerJobDataManager);
         return this;
     }
 
@@ -340,6 +343,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setHistoryJobDataManager(HistoryJobDataManager historyJobDataManager) {
         this.historyJobDataManager = historyJobDataManager;
+        this.historyJobEntityManager.setDataManager(historyJobDataManager);
         return this;
     }
 
@@ -349,6 +353,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setExternalWorkerJobDataManager(ExternalWorkerJobDataManager externalWorkerJobDataManager) {
         this.externalWorkerJobDataManager = externalWorkerJobDataManager;
+        this.externalWorkerJobEntityManager.setDataManager(externalWorkerJobDataManager);
         return this;
     }
 
@@ -421,7 +426,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public void setInternalJobManager(InternalJobManager internalJobManager) {
         this.internalJobManager = internalJobManager;
     }
-    
+
     public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
         return internalJobCompatibilityManager;
     }
@@ -438,7 +443,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.asyncExecutor = asyncExecutor;
         return this;
     }
-    
+
     public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
@@ -447,7 +452,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
         return this;
     }
-    
+
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -465,7 +470,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.jobExecutionScope = jobExecutionScope;
         return this;
     }
-    
+
     public String getHistoryJobExecutionScope() {
         return historyJobExecutionScope;
     }
@@ -501,7 +506,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public JobServiceConfiguration addJobHandler(String type, JobHandler jobHandler) {
         if (this.jobHandlers == null) {
             this.jobHandlers = new HashMap<>();
@@ -523,7 +528,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return asyncRunnableExecutionExceptionHandlers;
     }
 
-    public JobServiceConfiguration setAsyncRunnableExecutionExceptionHandlers(List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers) {
+    public JobServiceConfiguration setAsyncRunnableExecutionExceptionHandlers(
+                    List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers) {
         this.asyncRunnableExecutionExceptionHandlers = asyncRunnableExecutionExceptionHandlers;
         return this;
     }
@@ -536,7 +542,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.historyJobHandlers = historyJobHandlers;
         return this;
     }
-    
+
     public JobServiceConfiguration addHistoryJobHandler(String type, HistoryJobHandler historyJobHandler) {
         if (this.historyJobHandlers == null) {
             this.historyJobHandlers = new HashMap<>();
@@ -599,7 +605,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public InternalJobParentStateResolver getJobParentStateResolver() {
         return jobParentStateResolver;
     }
-    
+
     public List<String> getEnabledJobCategories() {
         return enabledJobCategories;
     }
@@ -612,7 +618,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (enabledJobCategories == null) {
             enabledJobCategories = new ArrayList<>();
         }
-        
+
         enabledJobCategories.add(jobCategory);
     }
 

@@ -15,15 +15,15 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricTaskInstanceEntityManager extends EntityManager<HistoricTaskInstanceEntity> {
+public interface HistoricTaskInstanceEntityManager extends MutableEntityManager<HistoricTaskInstanceEntity,HistoricTaskInstanceDataManager> {
 
     HistoricTaskInstanceEntity create(TaskEntity task);
     

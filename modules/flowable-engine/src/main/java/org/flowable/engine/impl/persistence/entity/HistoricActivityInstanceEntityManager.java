@@ -15,16 +15,16 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricActivityInstanceEntityManager extends EntityManager<HistoricActivityInstanceEntity> {
+public interface HistoricActivityInstanceEntityManager extends MutableEntityManager<HistoricActivityInstanceEntity,HistoricActivityInstanceDataManager> {
 
     HistoricActivityInstanceEntity create(ActivityInstance activityInstance);
 

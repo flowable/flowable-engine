@@ -16,15 +16,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
+public interface HistoricVariableInstanceEntityManager extends MutableEntityManager<HistoricVariableInstanceEntity,HistoricVariableInstanceDataManager> {
 
     HistoricVariableInstanceEntity create(VariableInstanceEntity variableInstance, Date createTime);
 

@@ -16,11 +16,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -28,7 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 /**
  * @author Joram Barrez
  */
-public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
+public interface ExecutionEntityManager extends MutableEntityManager<ExecutionEntity,ExecutionDataManager> {
 
     ExecutionEntity createProcessInstanceExecution(ProcessDefinition processDefinition, String predefinedProcessInstanceId,
             String businessKey, String businessStatus, String processInstanceName, String callbackId, String callbackType, String referenceId,

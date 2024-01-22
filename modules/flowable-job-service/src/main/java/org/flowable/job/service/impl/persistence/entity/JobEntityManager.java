@@ -13,17 +13,16 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 
 /**
  * {@link EntityManager} responsible for the {@link JobEntity} class.
  *
  * @author Joram Barrez
  */
-public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntityManager<JobEntity> {
+public interface JobEntityManager extends MutableJobInfoEntityManager<JobEntity,JobDataManager> {
 
     /**
      * Insert the {@link JobEntity}, similar to insert(JobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the
@@ -48,4 +47,5 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
     
 
     void deleteJobsByExecutionId(String executionId);
+    
 }

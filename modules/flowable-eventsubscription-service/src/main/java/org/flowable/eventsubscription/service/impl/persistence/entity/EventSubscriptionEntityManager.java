@@ -13,16 +13,16 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.List;
-
-import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.MutableEntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.EventSubscriptionDataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface EventSubscriptionEntityManager extends EntityManager<EventSubscriptionEntity> {
+public interface EventSubscriptionEntityManager extends MutableEntityManager<EventSubscriptionEntity, EventSubscriptionDataManager> {
 
     /* Create entity */
 

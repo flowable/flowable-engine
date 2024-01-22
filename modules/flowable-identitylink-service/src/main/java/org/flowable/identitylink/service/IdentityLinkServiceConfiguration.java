@@ -12,6 +12,7 @@
  */
 package org.flowable.identitylink.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
@@ -24,8 +25,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricId
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisHistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -136,6 +135,7 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     public IdentityLinkServiceConfiguration setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
         this.identityLinkDataManager = identityLinkDataManager;
+        this.identityLinkEntityManager.setDataManager(identityLinkDataManager);
         return this;
     }
     
@@ -145,6 +145,7 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     public IdentityLinkServiceConfiguration setHistoricIdentityLinkDataManager(HistoricIdentityLinkDataManager historicIdentityLinkDataManager) {
         this.historicIdentityLinkDataManager = historicIdentityLinkDataManager;
+        this.historicIdentityLinkEntityManager.setDataManager(historicIdentityLinkDataManager);
         return this;
     }
 

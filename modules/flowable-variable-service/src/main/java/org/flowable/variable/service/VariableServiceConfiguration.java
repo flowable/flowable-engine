@@ -139,6 +139,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public VariableServiceConfiguration setVariableInstanceDataManager(VariableInstanceDataManager variableInstanceDataManager) {
         this.variableInstanceDataManager = variableInstanceDataManager;
+        this.variableInstanceEntityManager.setDataManager(variableInstanceDataManager);
         return this;
     }
     
@@ -148,6 +149,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public VariableServiceConfiguration setHistoricVariableInstanceDataManager(HistoricVariableInstanceDataManager historicVariableInstanceDataManager) {
         this.historicVariableInstanceDataManager = historicVariableInstanceDataManager;
+        this.historicVariableInstanceEntityManager.setDataManager(historicVariableInstanceDataManager);
         return this;
     }
 
