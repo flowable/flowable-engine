@@ -127,6 +127,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return this;
     }
 
+    @Override
     public DeadLetterJobQueryImpl processDefinitionKey(String processDefinitionKey) {
         if (processDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Provided process definition key is null");
@@ -464,6 +465,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public String getHandlerType() {
         return handlerType;
+    }
+
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
     }
 
     public boolean getExecutable() {
