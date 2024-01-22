@@ -442,6 +442,10 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
+
     public boolean getExecutable() {
         return executable;
     }

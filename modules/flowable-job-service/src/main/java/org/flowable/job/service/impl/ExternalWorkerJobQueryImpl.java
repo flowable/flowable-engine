@@ -450,6 +450,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
         return this.handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    } 
+
     public Date getNow() {
         return jobServiceConfiguration.getClock().getCurrentTime();
     }

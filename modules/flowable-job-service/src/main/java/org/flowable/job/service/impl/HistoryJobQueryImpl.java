@@ -198,6 +198,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this.handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
+
     public Date getNow() {
         return jobServiceConfiguration.getClock().getCurrentTime();
     }
