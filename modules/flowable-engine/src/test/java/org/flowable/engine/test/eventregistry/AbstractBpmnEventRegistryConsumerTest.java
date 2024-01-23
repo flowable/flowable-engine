@@ -95,7 +95,7 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
         }
 
         public void triggerTestEvent() {
-            triggerTestEvent(null);
+            triggerTestEvent((String) null);
         }
 
         public void triggerTestEvent(String customerId) {
@@ -108,6 +108,10 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
 
         public void triggerTestEvent(String customerId, String orderId) {
             ObjectNode eventNode = createTestEventNode(customerId, orderId);
+            triggerTestEvent(eventNode);
+        }
+
+        public void triggerTestEvent(ObjectNode eventNode) {
             try {
                 eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
             } catch (JsonProcessingException e) {
