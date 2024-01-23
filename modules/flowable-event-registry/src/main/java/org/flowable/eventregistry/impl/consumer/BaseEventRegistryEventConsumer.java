@@ -77,14 +77,52 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
             return Collections.emptySet();
         }
 
-        List<EventPayloadInstance> list = new ArrayList<>(correlationParameterInstances);
-        Collection<CorrelationKey> correlationKeys = new HashSet<>();
-        for (int i = 1; i <= list.size(); i++) {
-            for (int j = 0; j <= list.size() - i; j++) {
-                List<EventPayloadInstance> parameterSubList = list.subList(j, j + i);
-                String correlationKey = generateCorrelationKey(parameterSubList);
-                correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
+        int numberOfCorrelationParameters = correlationParameterInstances.size();
+        if (numberOfCorrelationParameters == 1) {
+            // size of 1 is handled in a special way in order to avoid creation of lists
+            String correlationKey = generateCorrelationKey(correlationParameterInstances);
+            return Collections.singleton(new CorrelationKey(correlationKey, correlationParameterInstances));
+        }
+
+        if (numberOfCorrelationParameters == 2) {
+            // size of 2 is handled in a special way in order to avoid creation of additional lists
+            Set<CorrelationKey> correlationKeys = new HashSet<>();
+
+            String allParametersCorrelationKey = generateCorrelationKey(correlationParameterInstances);
+            correlationKeys.add(new CorrelationKey(allParametersCorrelationKey, correlationParameterInstances));
+
+            for (EventPayloadInstance correlationParameterInstance : correlationParameterInstances) {
+                Set<EventPayloadInstance> singleParameterInstance = Collections.singleton(correlationParameterInstance);
+                String correlationKey = generateCorrelationKey(singleParameterInstance);
+                correlationKeys.add(new CorrelationKey(correlationKey, singleParameterInstance));
             }
+            return correlationKeys;
+        }
+
+        // The correlation keys are the power set of the correlation parameter instances minus the empty set.
+        // A power set is a set of all subsets including the empty set and the set itself.
+        // A power set has a size of 2^n where n is the size of the set.
+        // e.g. power set for [A, B] is [ [], [A], [B], [A, B] ]
+        // We are going to compute the correlation keys by iterating from 1 to 2^n and the binary representation of every iteration index
+        // will be used to determine if the index should be included in the set or not
+        // We will start from 1 because we want to skip the empty set
+        // This is an adaptation of https://simonhessner.de/calculate-power-set-set-of-all-subsets-in-python-without-recursion/
+        List<EventPayloadInstance> list = new ArrayList<>(correlationParameterInstances);
+        
+        int correlationKeysSize = Math.toIntExact((long) Math.pow(2, list.size()));
+        Collection<CorrelationKey> correlationKeys = new HashSet<>();
+
+        for (int counter = 1; counter < correlationKeysSize; counter++) {
+            Collection<EventPayloadInstance> subset = new ArrayList<>(list.size());
+            for (int i = 0; i < list.size(); i++) {
+                if ((counter & (1 << i)) > 0) {
+                    // Here we check if the index should be included in the combination
+                    subset.add(list.get(i));
+                }
+            }
+
+            String correlationKey = generateCorrelationKey(subset);
+            correlationKeys.add(new CorrelationKey(correlationKey, subset));
         }
 
         return correlationKeys;
