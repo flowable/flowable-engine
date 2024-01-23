@@ -27,9 +27,12 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BpmnEventRegistryConsumerTest extends AbstractBpmnEventRegistryConsumerTest {
 
@@ -120,6 +123,191 @@ public class BpmnEventRegistryConsumerTest extends AbstractBpmnEventRegistryCons
         
         eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("eventBoundary").singleResult();
         assertThat(eventSubscription).isNull();
+    }
+
+    @Test
+    @Deployment
+    public void testBoundaryEventWith3CorrelationsAllCombinations() {
+        // The BPMN has boundary events for each combination, the correlation matches a new task will be created
+        getEventRepositoryService().createEventModelBuilder()
+                .key("customer")
+                .resourceName("customer.event")
+                .correlationParameter("id", EventPayloadTypes.STRING)
+                .correlationParameter("first", EventPayloadTypes.STRING)
+                .correlationParameter("last", EventPayloadTypes.STRING)
+                .deploy();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("multiCorrelationProcess")
+                .variable("customerId", "1234")
+                .variable("customerFirstName", "John")
+                .variable("customerLastName", "Doe")
+                .start();
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("User task");
+
+        ObjectNode event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "customer")
+                .put("id", "1235")
+                .put("first", "Jane")
+                .put("last", "Doele");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("User task");
+
+        event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "customer")
+                .put("id", "1234")
+                .put("first", "John")
+                .put("last", "Doe");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(
+                        "User task",
+                        "Customer ID Task",
+                        "Customer ID and First Name Task",
+                        "Customer ID and Last Name Task",
+                        "Customer ID, First Name and Last Name Task",
+                        "First Name Task",
+                        "First Name and Last Name Task",
+                        "Last Name Task"
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testBoundaryEventWith4CorrelationsAllCombinations() {
+        // The BPMN has boundary events for each combination, the correlation matches a new task will be created
+        getEventRepositoryService().createEventModelBuilder()
+                .key("testEvent")
+                .resourceName("test.event")
+                .correlationParameter("id", EventPayloadTypes.STRING)
+                .correlationParameter("orderId", EventPayloadTypes.STRING)
+                .correlationParameter("firstName", EventPayloadTypes.STRING)
+                .correlationParameter("lastName", EventPayloadTypes.STRING)
+                .deploy();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("multiCorrelationProcess")
+                .variable("customerId", "customer-1")
+                .variable("orderId", "order-1")
+                .variable("firstName", "John")
+                .variable("lastName", "Doe")
+                .start();
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("User task");
+
+        ObjectNode event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "testEvent")
+                .put("id", "customer-2")
+                .put("orderId", "order-2")
+                .put("firstName", "Jane")
+                .put("lastName", "Doele");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("User task");
+
+        event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "testEvent")
+                .put("id", "customer-1")
+                .put("orderId", "order-1")
+                .put("firstName", "John")
+                .put("lastName", "Doe");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(
+                        "User task",
+                        "ID",
+                        "Order ID",
+                        "First Name",
+                        "Last Name",
+                        "ID and Order ID",
+                        "ID and First Name",
+                        "ID and Last Name",
+                        "Order ID and First Name",
+                        "Order ID and Last Name",
+                        "First Name and Last Name",
+                        "ID, Order ID and First Name",
+                        "ID, Order ID and Last Name",
+                        "ID, First Name and Last Name",
+                        "Order ID, First Name and Last Name",
+                        "ID, Order ID, First Name and Last Name"
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testBoundaryEventWith4CorrelationsAllCombinations.bpmn20.xml")
+    public void testBoundaryEventWith4CorrelationsSubsetOfCombinations() {
+        // The BPMN has boundary events for each combination, the correlation matches a new task will be created
+        // In this test we are going to match a subset of the tasks
+        getEventRepositoryService().createEventModelBuilder()
+                .key("testEvent")
+                .resourceName("test.event")
+                .correlationParameter("id", EventPayloadTypes.STRING)
+                .correlationParameter("orderId", EventPayloadTypes.STRING)
+                .correlationParameter("firstName", EventPayloadTypes.STRING)
+                .correlationParameter("lastName", EventPayloadTypes.STRING)
+                .deploy();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("multiCorrelationProcess")
+                .variable("customerId", "customer-1")
+                .variable("orderId", "order-1")
+                .variable("firstName", "John")
+                .variable("lastName", "Doe")
+                .start();
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder("User task");
+
+        ObjectNode event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "testEvent")
+                .put("id", "customer-2")
+                .put("orderId", "order-1")
+                .put("firstName", "Jane")
+                .put("lastName", "Doe");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(
+                        "User task",
+                        "Order ID",
+                        "Last Name",
+                        "Order ID and Last Name"
+                );
+
+        event = processEngineConfiguration.getObjectMapper().createObjectNode()
+                .put("type", "testEvent")
+                .put("id", "customer-2")
+                .put("orderId", "order-2")
+                .put("firstName", "John")
+                .put("lastName", "Smith");
+        inboundEventChannelAdapter.triggerTestEvent(event);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Task::getName)
+                .containsExactlyInAnyOrder(
+                        "User task",
+                        "Order ID",
+                        "Last Name",
+                        "Order ID and Last Name",
+                        // The first name is from the John Smith trigger
+                        "First Name"
+                );
     }
 
     @Test
