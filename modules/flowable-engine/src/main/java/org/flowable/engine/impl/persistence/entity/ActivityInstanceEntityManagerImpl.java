@@ -352,7 +352,9 @@ public class ActivityInstanceEntityManagerImpl
         }
 
         if (execution.getCurrentFlowElement() != null) {
-            if (StringUtils.isNotEmpty(execution.getCurrentFlowElement().getName())) {
+            if (StringUtils.isNotEmpty(execution.getCurrentFlowElement().getName())
+                    && (execution.getCurrentFlowElement().getName().contains("${")
+                    || execution.getCurrentFlowElement().getName().contains("#{"))) {
                 Expression activityNameExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
                         .createExpression(execution.getCurrentFlowElement().getName());
 
