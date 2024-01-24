@@ -528,6 +528,12 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         ActivityInstance taskActivity = runtimeService.createActivityInstanceQuery().activityId("theTask").processInstanceId(processInstance.getId())
                 .singleResult();
         assertThat(taskActivity.getActivityName()).isEqualTo("someTestValue");
+
+        ActivityInstance flowActivityInstance = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("flow1")
+                .singleResult();
+
+        assertThat(flowActivityInstance.getActivityName()).isEqualTo("someTestValue");
+
     }
 
     @Test

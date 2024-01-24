@@ -8,7 +8,7 @@
     <documentation>This is a process for testing purposes</documentation>
   
     <startEvent id="theStart" />
-    <sequenceFlow id="flow1"  sourceRef="theStart" targetRef="theTask" />
+    <sequenceFlow id="flow1"  name="${testVar}" sourceRef="theStart" targetRef="theTask" />
     <userTask id="theTask" name="${testVar}" />
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
     <endEvent id="theEnd" />
