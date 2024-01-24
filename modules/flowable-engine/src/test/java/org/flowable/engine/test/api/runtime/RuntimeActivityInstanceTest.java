@@ -537,6 +537,18 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/ServiceTaskWithNameExpression.bpmn20.xml" })
+    public void testServiceTaskWithNameExpression() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("noopProcess")
+                .variable("testVar", "someTestValue").start();
+        ActivityInstance taskActivity = runtimeService.createActivityInstanceQuery().activityId("noop").processInstanceId(processInstance.getId())
+                .singleResult();
+        assertThat(taskActivity.getActivityName()).isEqualTo("someTestValue");
+
+
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcessWithBeanExpression.bpmn20.xml")
     public void testTaskNameExpressionIsNotResolvedTwice() {
         NameProvider nameProvider = new NameProvider();
