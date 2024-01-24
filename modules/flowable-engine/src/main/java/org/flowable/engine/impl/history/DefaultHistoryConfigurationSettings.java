@@ -19,15 +19,16 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -283,7 +284,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForVariables(HistoricProcessInstanceEntity historicProcessInstance) {
+    public boolean isHistoryEnabledForVariables(HistoricProcessInstance historicProcessInstance) {
         return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
@@ -313,6 +314,11 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         String processDefinitionId = getProcessDefinitionId(entityLink);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance) {
+        return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     protected String getProcessDefinitionId(EntityLinkEntity entityLink) {

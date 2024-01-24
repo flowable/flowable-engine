@@ -13,12 +13,13 @@
 package org.flowable.engine.impl.history;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -85,7 +86,12 @@ public interface HistoryConfigurationSettings {
     /**
      * Returns whether history is enabled for variables for the provided historic process instance.
      */
-    boolean isHistoryEnabledForVariables(HistoricProcessInstanceEntity historicProcessInstance);
+    boolean isHistoryEnabledForVariables(HistoricProcessInstance historicProcessInstance);
+
+    /**
+     * Returns whether variable history is enabled for the provided historic task instance.
+     */
+    boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance);
 
     /**
      * Returns whether history is enabled for the provided identity link.
@@ -96,5 +102,4 @@ public interface HistoryConfigurationSettings {
      * Returns whether history is enabled for the provided entity link.
      */
     boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink);
-
 }
