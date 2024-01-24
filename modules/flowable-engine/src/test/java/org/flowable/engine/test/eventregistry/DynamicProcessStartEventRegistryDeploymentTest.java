@@ -75,6 +75,30 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
 
     @Test
     @Deployment(resources = {
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testStaticEventRegistryProcessWithCorrelationParameter.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
+    })
+    public void testStaticEventRegistryProcessWithCorrelationParameter() {
+        sendEvent("gonzo", "start");
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+
+        sendEvent("kermit", "start");
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+                .extracting(ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder("eventRegistryDynamicStartTestProcessWithCorrelationParameter");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+    }
+
+    @Test
+    @Deployment(resources = {
             "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.testDynamicEventRegistryProcessStart.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/DynamicProcessStartEventRegistryDeploymentTest.sendTestEventProcess.bpmn20.xml",
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
