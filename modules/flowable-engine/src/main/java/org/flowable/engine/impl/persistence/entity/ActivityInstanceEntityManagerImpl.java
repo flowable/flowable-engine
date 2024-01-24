@@ -355,10 +355,13 @@ public class ActivityInstanceEntityManagerImpl
             if (StringUtils.isNotEmpty(execution.getCurrentFlowElement().getName())) {
                 Expression activityNameExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
                         .createExpression(execution.getCurrentFlowElement().getName());
-                String nameValue = activityNameExpression.getValue(execution).toString();
 
-                execution.setCurrentActivityName(nameValue);
-                activityInstanceEntity.setActivityName(nameValue);
+                Object expressionValue = activityNameExpression.getValue(execution);
+                if (expressionValue != null) {
+                    String nameValue = expressionValue.toString();
+                    execution.setCurrentActivityName(nameValue);
+                    activityInstanceEntity.setActivityName(nameValue);
+                }
             } else {
                 activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
             }
