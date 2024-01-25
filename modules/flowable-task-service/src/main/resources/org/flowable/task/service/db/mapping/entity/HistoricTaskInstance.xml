@@ -1336,73 +1336,73 @@
         and ${queryTablePrefix}END_TIME_ is not null
       </if>
       <if test="state != null">
-        or ${queryTablePrefix}STATE_ = #{state}
+        and ${queryTablePrefix}STATE_ = #{state}
       </if>
       <if test="createTime != null">
-        or ${queryTablePrefix}START_TIME_ = #{createTime}
+        and ${queryTablePrefix}START_TIME_ = #{createTime}
       </if>
       <if test="createTimeBefore != null">
-        or ${queryTablePrefix}START_TIME_ &lt; #{createTimeBefore}
+        and ${queryTablePrefix}START_TIME_ &lt; #{createTimeBefore}
       </if>
       <if test="createTimeAfter != null">
-        or ${queryTablePrefix}START_TIME_ &gt; #{createTimeAfter}
+        and ${queryTablePrefix}START_TIME_ &gt; #{createTimeAfter}
       </if>
       <if test="inProgressStartTime != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ = #{inProgressStartTime}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ = #{inProgressStartTime}
       </if>
       <if test="inProgressStartTimeBefore != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{inProgressStartTimeBefore}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{inProgressStartTimeBefore}
       </if>
       <if test="inProgressStartTimeAfter != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{inProgressStartTimeAfter}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{inProgressStartTimeAfter}
       </if>
       <if test="inProgressStartedBy != null">
-        or ${queryTablePrefix}IN_PROGRESS_STARTED_BY = #{inProgressStartedBy}
+        and ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{inProgressStartedBy}
       </if>
       <if test="claimTime != null">
-        or ${queryTablePrefix}CLAIM_TIME_ = #{claimTime}
+        and ${queryTablePrefix}CLAIM_TIME_ = #{claimTime}
       </if>
       <if test="claimTimeBefore != null">
-        or ${queryTablePrefix}CLAIM_TIME_ &lt; #{claimTimeBefore}
+        and ${queryTablePrefix}CLAIM_TIME_ &lt; #{claimTimeBefore}
       </if>
       <if test="claimTimeAfter != null">
-        or ${queryTablePrefix}CLAIM_TIME_ &gt; #{claimTimeAfter}
+        and ${queryTablePrefix}CLAIM_TIME_ &gt; #{claimTimeAfter}
       </if>
       <if test="claimedBy != null">
-        or ${queryTablePrefix}CLAIMED_BY = #{claimedBy}
+        and ${queryTablePrefix}CLAIMED_BY_ = #{claimedBy}
       </if>
       <if test="suspendedTime != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ = #{suspendedTime}
+        and ${queryTablePrefix}SUSPENDED_TIME_ = #{suspendedTime}
       </if>
       <if test="suspendedTimeBefore != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{suspendedTimeBefore}
+        and ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{suspendedTimeBefore}
       </if>
       <if test="suspendedTimeAfter != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{suspendedTimeAfter}
+        and ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{suspendedTimeAfter}
       </if>
       <if test="suspendedBy != null">
-        or ${queryTablePrefix}SUSPENDED_BY = #{suspendedBy}
+        and ${queryTablePrefix}SUSPENDED_BY_ = #{suspendedBy}
       </if>
       <if test="completedTime != null">
-        or ${queryTablePrefix}END_TIME_ = #{completedTime}
+        and ${queryTablePrefix}END_TIME_ = #{completedTime}
       </if>
       <if test="completedTimeBefore != null">
-        or ${queryTablePrefix}END_TIME_ &lt; #{completedTimeBefore}
+        and ${queryTablePrefix}END_TIME_ &lt; #{completedTimeBefore}
       </if>
       <if test="completedTimeAfter != null">
-        or ${queryTablePrefix}END_TIME_ &gt; #{completedTimeAfter}
+        and ${queryTablePrefix}END_TIME_ &gt; #{completedTimeAfter}
       </if>
       <if test="completedBy != null">
-        or ${queryTablePrefix}COMPLETED_BY = #{completedBy}
+        and ${queryTablePrefix}COMPLETED_BY_ = #{completedBy}
       </if>
       <if test="inProgressStartDueDate != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{inProgressStartDueDate}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{inProgressStartDueDate}
       </if>
       <if test="inProgressStartDueBefore != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{inProgressStartDueBefore}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{inProgressStartDueBefore}
       </if>
       <if test="inProgressStartDueAfter != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{inProgressStartDueAfter}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{inProgressStartDueAfter}
       </if>
       <if test="dueDate != null">
         and ${queryTablePrefix}DUE_DATE_ = #{dueDate}
@@ -1705,7 +1705,7 @@
         or ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{orQueryObject.inProgressStartTimeAfter}
       </if>
       <if test="orQueryObject.inProgressStartedBy != null">
-        or ${queryTablePrefix}IN_PROGRESS_STARTED_BY = #{orQueryObject.inProgressStartedBy}
+        or ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{orQueryObject.inProgressStartedBy}
       </if>
       <if test="orQueryObject.claimTime != null">
         or ${queryTablePrefix}CLAIM_TIME_ = #{orQueryObject.claimTime}
@@ -1717,7 +1717,7 @@
         or ${queryTablePrefix}CLAIM_TIME_ &gt; #{orQueryObject.claimTimeAfter}
       </if>
       <if test="orQueryObject.claimedBy != null">
-        or ${queryTablePrefix}CLAIMED_BY = #{orQueryObject.claimedBy}
+        or ${queryTablePrefix}CLAIMED_BY_ = #{orQueryObject.claimedBy}
       </if>
       <if test="orQueryObject.suspendedTime != null">
         or ${queryTablePrefix}SUSPENDED_TIME_ = #{orQueryObject.suspendedTime}
@@ -1729,7 +1729,7 @@
         or ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{orQueryObject.suspendedTimeAfter}
       </if>
       <if test="orQueryObject.suspendedBy != null">
-        or ${queryTablePrefix}SUSPENDED_BY = #{orQueryObject.suspendedBy}
+        or ${queryTablePrefix}SUSPENDED_BY_ = #{orQueryObject.suspendedBy}
       </if>
       <if test="orQueryObject.completedTime != null">
         or ${queryTablePrefix}END_TIME_ = #{orQueryObject.completedTime}
@@ -1741,7 +1741,7 @@
         or ${queryTablePrefix}END_TIME_ &gt; #{orQueryObject.completedTimeAfter}
       </if>
       <if test="orQueryObject.completedBy != null">
-        or ${queryTablePrefix}COMPLETED_BY = #{orQueryObject.completedBy}
+        or ${queryTablePrefix}COMPLETED_BY_ = #{orQueryObject.completedBy}
       </if>
       <if test="orQueryObject.inProgressStartDueDate != null">
         or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{orQueryObject.inProgressStartDueDate}
