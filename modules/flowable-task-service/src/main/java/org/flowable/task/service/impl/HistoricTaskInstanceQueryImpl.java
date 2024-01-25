@@ -1699,6 +1699,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+
+    @Override
+    public HistoricTaskInstanceQuery taskCompletedBy(String completedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedBy = completedBy;
+        } else {
+            this.completedBy = completedBy;
+        }
+        return this;
+    }
     
     @Override
     public HistoricTaskInstanceQuery taskInProgressStartDueDate(Date dueDate) {
