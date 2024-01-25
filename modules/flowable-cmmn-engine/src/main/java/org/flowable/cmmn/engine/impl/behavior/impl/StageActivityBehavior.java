@@ -41,7 +41,10 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         if (planItemInstanceEntity.getName() == null && planItemInstanceEntity.getPlanItem().getName() != null) {
             Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+            Object nameExpressionValue = nameExpression.getValue(planItemInstanceEntity);
+            if (nameExpressionValue != null) {
+                planItemInstanceEntity.setName(nameExpressionValue.toString());
+            }
         }
 
         if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {

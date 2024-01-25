@@ -155,4 +155,6 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setOriginatingCurrentFlowElement(FlowElement flowElement);
 
     List<VariableInstanceEntity> getQueryVariables();
+
+    void setCurrentActivityName(String activityName);
 }

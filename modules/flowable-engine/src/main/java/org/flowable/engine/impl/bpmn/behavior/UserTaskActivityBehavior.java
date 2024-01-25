@@ -136,6 +136,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskCandidateGroups = userTask.getCandidateGroups();
             activeTaskIdVariableName = userTask.getTaskIdVariableName();
         }
+        if (execution.getCurrentActivityName() != null) {
+            activeTaskName = execution.getCurrentActivityName();
+        }
         
         CreateUserTaskBeforeContext beforeContext = new CreateUserTaskBeforeContext(userTask, execution, activeTaskName, activeTaskDescription, activeTaskDueDate, 
                         activeTaskPriority, activeTaskCategory, activeTaskFormKey, activeTaskSkipExpression, activeTaskAssignee, activeTaskOwner, 
