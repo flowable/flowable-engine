@@ -26,11 +26,11 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
     @Override
     public boolean handleException(final JobServiceConfiguration jobServiceConfiguration, final JobInfo job, final Throwable exception) {
         if (job != null && getAsyncHistoryJobHandlerTypes(jobServiceConfiguration).contains(job.getJobHandlerType())) {
-            return jobServiceConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+            return jobServiceConfiguration.getCommandExecutor().execute(new Command<>() {
                 @Override
                 public Boolean execute(CommandContext commandContext) {
                     CommandConfig commandConfig = jobServiceConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
-                    return jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
+                    return jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<>() {
                         @Override
                         public Boolean execute(CommandContext commandContext2) {
                             jobServiceConfiguration.getJobManager().unacquireWithDecrementRetries(job, exception);

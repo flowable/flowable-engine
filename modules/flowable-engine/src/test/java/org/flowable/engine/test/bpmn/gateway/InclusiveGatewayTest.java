@@ -142,7 +142,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(task1.getId());
 
         // Testing a bug: when the command is nested, the reuse flag gets set to true for the inner command context, never triggering the InactiveBehavior
-        managementService.executeCommand(new Command<Object>() {
+        managementService.executeCommand(new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
@@ -751,10 +751,11 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         assertThat(tasks).hasSize(1);
 
-        String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+        String executionId = processEngine.getManagementService().executeCommand(new Command<>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext,
+                        processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(instance.getProcessInstanceId());
 
                 List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()

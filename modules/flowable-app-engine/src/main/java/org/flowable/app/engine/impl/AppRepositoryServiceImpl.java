@@ -48,7 +48,8 @@ public class AppRepositoryServiceImpl extends CommonEngineServiceImpl<AppEngineC
 
     @Override
     public AppDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<AppDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
+
             @Override
             public AppDeploymentBuilder execute(CommandContext commandContext) {
                 return new AppDeploymentBuilderImpl();

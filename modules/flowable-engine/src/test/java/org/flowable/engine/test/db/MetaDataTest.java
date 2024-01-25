@@ -35,7 +35,7 @@ public class MetaDataTest extends PluggableFlowableTestCase {
 
     @Test
     public void testMetaData() {
-        ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
+        ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<>() {
             @Override
             public Object execute(CommandContext commandContext) {
                 // PRINT THE TABLE NAMES TO CHECK IF WE CAN USE METADATA INSTEAD
@@ -49,7 +49,8 @@ public class MetaDataTest extends PluggableFlowableTestCase {
                         ResultSetMetaData resultSetMetaData = tables.getMetaData();
                         int columnCount = resultSetMetaData.getColumnCount();
                         for (int i = 1; i <= columnCount; i++) {
-                            LOGGER.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i), tables.getString(i));
+                            LOGGER.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i),
+                                    tables.getString(i));
                         }
                         LOGGER.info("-------------------------------------------------------");
                     }

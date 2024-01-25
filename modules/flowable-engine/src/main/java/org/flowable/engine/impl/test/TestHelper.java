@@ -280,7 +280,7 @@ public abstract class TestHelper {
                 processEngine.getProcessEngineConfiguration(),
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 true,
-                new Command<Void>() {
+                new Command<>() {
                     @Override
                     public Void execute(CommandContext commandContext) {
                         SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();

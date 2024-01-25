@@ -30,7 +30,7 @@ public class CommandContextTest extends PluggableFlowableTestCase {
     @Test
     public void testCommandContextGetCurrentAfterException() {
         assertThatThrownBy(() -> {
-            processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
+            processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public Object execute(CommandContext commandContext) {

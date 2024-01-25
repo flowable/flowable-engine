@@ -224,7 +224,8 @@ public class AsyncExecutorTest {
             processEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
 
             final ProcessEngine processEngineCopy = processEngine;
-            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<>() {
+
                 @Override
                 public Boolean call() throws Exception {
                     long timerJobCount = processEngineCopy.getManagementService().createTimerJobQuery().count();
@@ -269,7 +270,8 @@ public class AsyncExecutorTest {
             processEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
 
             final ProcessEngine processEngineCopy = processEngine;
-            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<>() {
+
                 @Override
                 public Boolean call() throws Exception {
                     long timerJobCount = processEngineCopy.getManagementService().createTimerJobQuery().count();

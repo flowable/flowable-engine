@@ -67,14 +67,14 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
     public void createCaseInstanceWithoutCallBacks() {
         CmmnManagementServiceImpl cmmnManagementServiceImpl = (CmmnManagementServiceImpl) cmmnManagementService;
-        List<PlanItemInstanceEntity> planItemInstances = cmmnManagementServiceImpl.executeCommand(new Command<List<PlanItemInstanceEntity>>() {
-            
+        List<PlanItemInstanceEntity> planItemInstances = cmmnManagementServiceImpl.executeCommand(new Command<>() {
+
             @Override
             public List<PlanItemInstanceEntity> execute(CommandContext commandContext) {
                 CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                         .caseDefinitionKey("oneTaskCase")
                         .start();
-                
+
                 EntityCache entityCache = CommandContextUtil.getEntityCache();
                 List<PlanItemInstanceEntity> cachedPlanItemInstances = entityCache.findInCache(PlanItemInstanceEntity.class);
                 List<PlanItemInstanceEntity> scopedPlanItemInstances = null;
@@ -82,7 +82,7 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
                     scopedPlanItemInstances = cachedPlanItemInstances.stream().filter(planItemInstance ->
                             Objects.equals(caseInstance.getId(), planItemInstance.getCaseInstanceId())).collect(Collectors.toList());
                 }
-                
+
                 return scopedPlanItemInstances;
             }
         });

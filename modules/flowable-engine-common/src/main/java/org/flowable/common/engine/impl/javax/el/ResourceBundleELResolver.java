@@ -79,30 +79,30 @@ public class ResourceBundleELResolver extends ELResolver {
 	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (isResolvable(base)) {
 			final Enumeration<String> keys = ((ResourceBundle) base).getKeys();
-			return new Iterator<FeatureDescriptor>() {
+			return new Iterator<>() {
                 @Override
-				public boolean hasNext() {
-					return keys.hasMoreElements();
-				}
+                public boolean hasNext() {
+                    return keys.hasMoreElements();
+                }
                 @Override
-				public FeatureDescriptor next() {
-					FeatureDescriptor feature = new FeatureDescriptor();
-					feature.setDisplayName(keys.nextElement());
-					feature.setName(feature.getDisplayName());
-					feature.setShortDescription("");
-					feature.setExpert(true);
-					feature.setHidden(false);
-					feature.setPreferred(true);
-					feature.setValue(TYPE, String.class);
-					feature.setValue(RESOLVABLE_AT_DESIGN_TIME, true);
-					return feature;
-				}
+                public FeatureDescriptor next() {
+                    FeatureDescriptor feature = new FeatureDescriptor();
+                    feature.setDisplayName(keys.nextElement());
+                    feature.setName(feature.getDisplayName());
+                    feature.setShortDescription("");
+                    feature.setExpert(true);
+                    feature.setHidden(false);
+                    feature.setPreferred(true);
+                    feature.setValue(TYPE, String.class);
+                    feature.setValue(RESOLVABLE_AT_DESIGN_TIME, true);
+                    return feature;
+                }
                 @Override
-				public void remove() {
-					throw new UnsupportedOperationException("Cannot remove");
-					
-				}
-			};
+                public void remove() {
+                    throw new UnsupportedOperationException("Cannot remove");
+
+                }
+            };
 		}
 		return null;
 	}

@@ -30,7 +30,7 @@ import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdap
  */
 public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnDataManager<HistoricPlanItemInstanceEntity> implements HistoricPlanItemInstanceDataManager {
 
-    protected CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity> historicPlanItemInstanceByCaseDefinitionIdMatcher = new CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity>() {
+    protected CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity> historicPlanItemInstanceByCaseDefinitionIdMatcher = new CachedEntityMatcherAdapter<>() {
         @Override
         public boolean isRetained(HistoricPlanItemInstanceEntity entity, Object param) {
             return entity.getCaseDefinitionId().equals(param);

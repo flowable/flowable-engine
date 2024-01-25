@@ -96,31 +96,31 @@ public class MapELResolver extends ELResolver {
 		if (isResolvable(base)) {
 			Map<?, ?> map = (Map<?, ?>) base;
 			final Iterator<?> keys = map.keySet().iterator();
-			return new Iterator<FeatureDescriptor>() {
+			return new Iterator<>() {
                 @Override
-				public boolean hasNext() {
-					return keys.hasNext();
-				}
+                public boolean hasNext() {
+                    return keys.hasNext();
+                }
                 @Override
-				public FeatureDescriptor next() {
-					Object key = keys.next();
-					FeatureDescriptor feature = new FeatureDescriptor();
-					feature.setDisplayName(key == null ? "null" : key.toString());
-					feature.setName(feature.getDisplayName());
-					feature.setShortDescription("");
-					feature.setExpert(true);
-					feature.setHidden(false);
-					feature.setPreferred(true);
-					feature.setValue(TYPE, key == null ? null : key.getClass());
-					feature.setValue(RESOLVABLE_AT_DESIGN_TIME, true);
-					return feature;
-					
-				}
+                public FeatureDescriptor next() {
+                    Object key = keys.next();
+                    FeatureDescriptor feature = new FeatureDescriptor();
+                    feature.setDisplayName(key == null ? "null" : key.toString());
+                    feature.setName(feature.getDisplayName());
+                    feature.setShortDescription("");
+                    feature.setExpert(true);
+                    feature.setHidden(false);
+                    feature.setPreferred(true);
+                    feature.setValue(TYPE, key == null ? null : key.getClass());
+                    feature.setValue(RESOLVABLE_AT_DESIGN_TIME, true);
+                    return feature;
+
+                }
                 @Override
-				public void remove() {
-					throw new UnsupportedOperationException("cannot remove");
-				}
-			};
+                public void remove() {
+                    throw new UnsupportedOperationException("cannot remove");
+                }
+            };
 		}
 		return null;
 	}

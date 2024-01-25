@@ -67,7 +67,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("testSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -80,7 +80,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricDetailVariableInstanceUpdateEntity historicDetailEntity = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).orderByVariableName().asc().list().get(1);
             assertThat(historicDetailEntity.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -120,7 +120,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             validateEmptyHistoricDataForProcessInstance(processInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -130,7 +130,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             assertThat(byteArrayEntityAfterDelete).isNull();
             
-            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -179,7 +179,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(subProcessInstance.getId()).variableName("localSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -192,7 +192,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricDetailVariableInstanceUpdateEntity historicDetailEntity = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery().processInstanceId(subProcessInstance.getId()).orderByVariableName().asc().list().get(1);
             assertThat(historicDetailEntity.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -244,7 +244,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             validateEmptyHistoricDataForProcessInstance(processInstance.getId());
             validateEmptyHistoricDataForProcessInstance(subProcessInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -254,7 +254,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             assertThat(byteArrayEntityAfterDelete).isNull();
             
-            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -305,7 +305,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -318,7 +318,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             HistoricDetailVariableInstanceUpdateEntity historicDetailEntity = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery().taskId(task.getId()).orderByVariableName().asc().list().get(1);
             assertThat(historicDetailEntity.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntity = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -390,7 +390,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             validateEmptyHistoricDataForProcessInstance(processInstance.getId());
             validateEmptyHistoricDataForTask(task.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -400,7 +400,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             assertThat(byteArrayEntityAfterDelete).isNull();
             
-            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<ByteArrayEntity>() {
+            ByteArrayEntity historicDetailByteArrayEntityAfterDelete = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -436,14 +436,15 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             
             List<String> processInstanceIds = new ArrayList<>();
             processInstanceIds.add(processInstance.getId());
-            List<HistoricEntityLink> historicEntityLinks = managementService.executeCommand(new Command<List<HistoricEntityLink>>() {
+            List<HistoricEntityLink> historicEntityLinks = managementService.executeCommand(new Command<>() {
 
                 @Override
                 public List<HistoricEntityLink> execute(CommandContext commandContext) {
-                    return CommandContextUtil.getProcessEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getHistoricEntityLinkEntityManager()
+                    return CommandContextUtil.getProcessEngineConfiguration(commandContext).getEntityLinkServiceConfiguration()
+                            .getHistoricEntityLinkEntityManager()
                             .findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(processInstanceIds, ScopeTypes.BPMN, EntityLinkType.CHILD);
                 }
-                
+
             });
             
             assertThat(historicEntityLinks).hasSize(1);

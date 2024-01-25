@@ -75,7 +75,7 @@ public class ProcessInstanceMigrationDocumentConverter {
     }
 
     protected static <T> T convertFromJsonNodeToObject(JsonNode jsonNode, ObjectMapper objectMapper) {
-        return objectMapper.convertValue(jsonNode, new TypeReference<T>() {
+        return objectMapper.convertValue(jsonNode, new TypeReference<>() {
 
         });
     }
@@ -412,7 +412,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         @Override
         public ActivityMigrationMapping.ManyToOneMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
             JsonNode fromActivityIdsNode = jsonNode.get(FROM_ACTIVITY_IDS_JSON_PROPERTY);
-            List<String> fromActivityIds = objectMapper.convertValue(fromActivityIdsNode, new TypeReference<List<String>>() {
+            List<String> fromActivityIds = objectMapper.convertValue(fromActivityIdsNode, new TypeReference<>() {
 
             });
             String toActivityId = jsonNode.get(TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
@@ -462,7 +462,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         public ActivityMigrationMapping.OneToManyMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
             String fromActivityId = jsonNode.get(FROM_ACTIVITY_ID_JSON_PROPERTY).textValue();
             JsonNode toActivityIdsNode = jsonNode.get(TO_ACTIVITY_IDS_JSON_PROPERTY);
-            List<String> toActivityIds = objectMapper.convertValue(toActivityIdsNode, new TypeReference<List<String>>() {
+            List<String> toActivityIds = objectMapper.convertValue(toActivityIdsNode, new TypeReference<>() {
 
             });
 

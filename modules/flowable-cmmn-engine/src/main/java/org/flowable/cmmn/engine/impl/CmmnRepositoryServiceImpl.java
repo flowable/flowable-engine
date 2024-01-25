@@ -57,7 +57,8 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public CmmnDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<CmmnDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
+
             @Override
             public CmmnDeploymentBuilder execute(CommandContext commandContext) {
                 return new CmmnDeploymentBuilderImpl();

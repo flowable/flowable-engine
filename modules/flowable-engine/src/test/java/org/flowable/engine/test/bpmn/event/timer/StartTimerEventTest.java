@@ -159,7 +159,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     
             moveByMinutes(6);
-            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+            waitForJobExecutorOnCondition(4000, 500, new Callable<>() {
                 @Override
                 public Boolean call() throws Exception {
                     return 1 == piq.count();
@@ -169,7 +169,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             assertThat(jobQuery.count()).isEqualTo(1);
     
             moveByMinutes(6);
-            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+            waitForJobExecutorOnCondition(4000, 500, new Callable<>() {
                 @Override
                 public Boolean call() throws Exception {
                     return 2 == piq.count();
@@ -200,7 +200,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     
             moveByMinutes(6);
-            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+            waitForJobExecutorOnCondition(4000, 500, new Callable<>() {
                 @Override
                 public Boolean call() throws Exception {
                     return 1 == piq.count();
@@ -211,7 +211,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             assertThat(jobQuery.singleResult().getCategory()).isEqualTo("myCategory");
     
             moveByMinutes(6);
-            waitForJobExecutorOnCondition(4000, 500, new Callable<Boolean>() {
+            waitForJobExecutorOnCondition(4000, 500, new Callable<>() {
                 @Override
                 public Boolean call() throws Exception {
                     return 2 == piq.count();
@@ -417,7 +417,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             assertThat(jobQuery.count()).isEqualTo(1);
     
             moveByMinutes(5);
-            waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            waitForJobExecutorOnCondition(10000, 500, new Callable<>() {
                 @Override
                 public Boolean call() throws Exception {
                     // we check that correct version was started
@@ -788,8 +788,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
     }
     
     protected int getTimerJobsCount() {
-        int timerJobsCount = processEngineConfiguration.getCommandExecutor().execute(new Command<Integer>() {
-
+        int timerJobsCount = processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
             @Override
             public Integer execute(CommandContext commandContext) {
                 List<String> enabledCategories = processEngineConfiguration.getJobServiceConfiguration().getEnabledJobCategories();

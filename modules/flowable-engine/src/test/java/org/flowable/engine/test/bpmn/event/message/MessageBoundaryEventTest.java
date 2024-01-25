@@ -545,7 +545,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '1 hour and 5 seconds', the timer should fire.
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorOnCondition(7000L, 100L, new Callable<Boolean>() {
+        waitForJobExecutorOnCondition(7000L, 100L, new Callable<>() {
             @Override
             public Boolean call() throws Exception {
                 return taskService.createTaskQuery().count() == 2;
@@ -607,7 +607,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '2 hours and 5 seconds', the timer
         // should fire.
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
-        waitForJobExecutorOnCondition(10000L, 100L, new Callable<Boolean>() {
+        waitForJobExecutorOnCondition(10000L, 100L, new Callable<>() {
             @Override
             public Boolean call() throws Exception {
                 return taskService.createTaskQuery().count() == 2;
@@ -619,7 +619,7 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '3 hours and 5 seconds', the timer should fire again.
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((3 * 60 * 60 * 1000) + 5000)));
-        waitForJobExecutorOnCondition(2000L, 100L, new Callable<Boolean>() {
+        waitForJobExecutorOnCondition(2000L, 100L, new Callable<>() {
             @Override
             public Boolean call() throws Exception {
                 return taskService.createTaskQuery().list().size() == 3;

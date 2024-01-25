@@ -49,7 +49,7 @@ public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineC
 
     @Override
     public DmnDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<DmnDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
             @Override
             public DmnDeploymentBuilder execute(CommandContext commandContext) {
                 return new DmnDeploymentBuilderImpl();

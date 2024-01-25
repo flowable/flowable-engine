@@ -60,7 +60,7 @@ public class BulkUpdateJobLockTest extends JobExecutorTestCase  {
     @AfterEach
     public void cleanup() {
         // Need to use low level entity manager, as jobs can't be deleted if they're locked (i.e. not through mgmtService)
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
+        processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {

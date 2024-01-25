@@ -184,7 +184,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     }
 
     public Command<Void> getProcessEngineCloseCommand() {
-        return new Command<Void>() {
+        return new Command<>() {
             @Override
             public Void execute(CommandContext commandContext) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor().execute(new SchemaOperationProcessEngineClose());
