@@ -3,7 +3,7 @@
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-engage-process-palette">
-    <process id="eventRegistryDynamicStartTestProcessWithCorrelationParameter" name="Event Registry Dynamic Start Test Process With Correlation Parameter" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <process id="eventRegistryStaticStartTestProcessWithCorrelationParameters" name="Event Registry Dynamic Start Test Process With Correlation Parameter" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
         <extensionElements>
             <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
             <design:creationdate><![CDATA[2023-11-27T16:04:40.123Z]]></design:creationdate>
