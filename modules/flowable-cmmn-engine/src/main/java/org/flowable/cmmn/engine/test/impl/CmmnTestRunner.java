@@ -207,16 +207,16 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             cmmnEngineConfiguration,
             TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
             true,
-                new Command<>() {
+            new Command<>() {
 
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
+                    return null;
                 }
+            }
 
         );
     }
