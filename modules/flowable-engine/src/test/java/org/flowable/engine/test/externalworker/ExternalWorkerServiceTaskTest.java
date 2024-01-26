@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -935,6 +936,53 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .containsOnly(
                         entry("name", "gonzo")
                 );
+    }
+
+    @Test
+    @Deployment
+    void testSimpleParallel() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleParallelExternalWorker")
+                .start();
+
+        List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
+                .list();
+        assertThat(externalWorkerJobs)
+                .extracting(ExternalWorkerJob::getElementId, ExternalWorkerJob::getJobHandlerConfiguration)
+                .containsExactlyInAnyOrder(
+                        tuple("externalWorkerTask1", "simple"),
+                        tuple("externalWorkerTask2", "simple")
+                );
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(2, "testWorker");
+
+        //Both external worker tasks have the exclusive flag set
+        //so only one job can be acquired because they cannot be executed concurrently.
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob1 = acquiredJobs.get(0);
+
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob1.getId(), "testWorker")
+                .complete();
+
+        //Acquire the second external worker job
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(2, "testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob2 = acquiredJobs.get(0);
+
+        managementService.createExternalWorkerCompletionBuilder(acquiredJob2.getId(), "testWorker")
+                .complete();
+
+        assertThat(Arrays.asList(acquiredJob1.getElementId(), acquiredJob2.getElementId()))
+                .containsExactlyInAnyOrder("externalWorkerTask1", "externalWorkerTask2");
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
     }
 
     @Test

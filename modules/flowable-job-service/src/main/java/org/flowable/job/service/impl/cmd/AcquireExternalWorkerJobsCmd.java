@@ -15,8 +15,10 @@ package org.flowable.job.service.impl.cmd;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -73,25 +75,42 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
 
         int lockTimeInMillis = (int) builder.getLockDuration().abs().toMillis();
         List<AcquiredExternalWorkerJob> acquiredJobs = new ArrayList<>(jobs.size());
+        Set<String> jobLockIds = new HashSet<>();
 
         for (ExternalWorkerJobEntity job : jobs) {
-            lockJob(commandContext, job, lockTimeInMillis);
-            Map<String, Object> variables = null;
-            if (internalJobManager != null) {
-                VariableScope variableScope = internalJobManager.resolveVariableScope(job);
-                if (variableScope != null) {
-                    variables = variableScope.getVariables();
+            if (hasUnLockedJobScope(internalJobManager, job, jobLockIds)) {
+                lockJob(commandContext, job, lockTimeInMillis);
+                Map<String, Object> variables = null;
+                if (internalJobManager != null) {
+                    VariableScope variableScope = internalJobManager.resolveVariableScope(job);
+                    if (variableScope != null) {
+                        variables = variableScope.getVariables();
+                    }
+
+                    if (job.isExclusive()) {
+                        internalJobManager.lockJobScope(job);
+                        String jobLockId = internalJobManager.resolveJobLockId(job);
+                        if (jobLockId != null) {
+                            jobLockIds.add(jobLockId);
+                        }
+                    }
                 }
 
-                if (job.isExclusive()) {
-                    internalJobManager.lockJobScope(job);
-                }
+                acquiredJobs.add(new AcquiredExternalWorkerJobImpl(job, variables));
             }
-
-            acquiredJobs.add(new AcquiredExternalWorkerJobImpl(job, variables));
         }
 
         return acquiredJobs;
+    }
+
+    protected boolean hasUnLockedJobScope(InternalJobManager internalJobManager, ExternalWorkerJobEntity job, Set<String> jobLockIds) {
+        if (internalJobManager != null && job.isExclusive()) {
+            String jobLockId = internalJobManager.resolveJobLockId(job);
+            if (jobLockId != null && jobLockIds.contains(jobLockId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {
