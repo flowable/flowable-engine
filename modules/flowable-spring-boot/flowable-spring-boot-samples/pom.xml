@@ -31,6 +31,7 @@
         <module>flowable-spring-boot-sample-dmn</module>
         <module>flowable-spring-boot-sample-cmmn</module>
         <module>flowable-spring-boot-sample-ldap</module>
+        <module>flowable-spring-boot-sample-native</module>
         <module>flowable-spring-boot-sample-starter</module>
     </modules>
     <dependencies>
