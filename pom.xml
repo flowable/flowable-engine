@@ -14,9 +14,9 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.1.6</spring.boot.version>
-		<spring.framework.version>6.0.14</spring.framework.version>
-		<spring.security.version>6.1.5</spring.security.version>
+		<spring.boot.version>3.2.2</spring.boot.version>
+		<spring.framework.version>6.1.2</spring.framework.version>
+		<spring.security.version>6.2.0</spring.security.version>
 		<spring.amqp.version>3.0.10</spring.amqp.version>
 		<spring.kafka.version>3.0.13</spring.kafka.version>
 		<spring.ldap.version>3.1.1</spring.ldap.version>
@@ -150,7 +150,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents.client5</groupId>
 				<artifactId>httpclient5</artifactId>
-				<version>5.1.3</version>
+				<version>5.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.database.jdbc</groupId>
@@ -340,6 +340,11 @@
 				<version>${spring.framework.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.amqp</groupId>

@@ -23,11 +23,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.rest.api.jpa.model.Message;
-import org.flowable.rest.api.jpa.repository.MessageRepository;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,25 +33,13 @@ import net.javacrumbs.jsonunit.core.Option;
 
 public class JpaRestTest extends BaseJPARestTestCase {
     
-    protected MessageRepository messageRepository;
-    
-    @Before
-    public void initMessageRepository() {
-        this.messageRepository = appContext.getBean(MessageRepository.class);
-    }
-
     @Test
     @Deployment(resources = { "org/flowable/rest/api/jpa/jpa-process.bpmn20.xml" })
     public void testGetJpaVariableViaTaskVariablesCollections() throws Exception {
 
-        // Get JPA managed entity through the repository
-        Message message = messageRepository.findById(1L).orElse(null);
-        assertThat(message).isNotNull();
-        assertThat(message.getText()).isEqualTo("Hello World");
-
         // add the entity to the process variables and start the process
         Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("message", message);
+        processVariables.put("message", createDefaultTestMessage());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
         assertThat(processInstance).isNotNull();
@@ -84,14 +69,9 @@ public class JpaRestTest extends BaseJPARestTestCase {
     @Deployment(resources = { "org/flowable/rest/api/jpa/jpa-process.bpmn20.xml" })
     public void testGetJpaVariableViaTaskCollection() throws Exception {
 
-        // Get JPA managed entity through the repository
-        Message message = messageRepository.findById(1L).orElse(null);
-        assertThat(message).isNotNull();
-        assertThat(message.getText()).isEqualTo("Hello World");
-
         // add the entity to the process variables and start the process
         Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("message", message);
+        processVariables.put("message", createDefaultTestMessage());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
         assertThat(processInstance).isNotNull();
@@ -125,14 +105,9 @@ public class JpaRestTest extends BaseJPARestTestCase {
     @Deployment(resources = { "org/flowable/rest/api/jpa/jpa-process.bpmn20.xml" })
     public void testGetJpaVariableViaHistoricProcessCollection() throws Exception {
 
-        // Get JPA managed entity through the repository
-        Message message = messageRepository.findById(1L).orElse(null);
-        assertThat(message).isNotNull();
-        assertThat(message.getText()).isEqualTo("Hello World");
-
         // add the entity to the process variables and start the process
         Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("message", message);
+        processVariables.put("message", createDefaultTestMessage());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
         assertThat(processInstance).isNotNull();
@@ -168,14 +143,9 @@ public class JpaRestTest extends BaseJPARestTestCase {
     @Deployment(resources = { "org/flowable/rest/api/jpa/jpa-process.bpmn20.xml" })
     public void testGetJpaVariableViaHistoricVariablesCollections() throws Exception {
 
-        // Get JPA managed entity through the repository
-        Message message = messageRepository.findById(1L).orElse(null);
-        assertThat(message).isNotNull();
-        assertThat(message.getText()).isEqualTo("Hello World");
-
         // add the entity to the process variables and start the process
         Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("message", message);
+        processVariables.put("message", createDefaultTestMessage());
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("jpa-process", processVariables);
         assertThat(processInstance).isNotNull();

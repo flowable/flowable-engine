@@ -12,13 +12,22 @@
  */
 package org.flowable.rest.api.jpa;
 
+import org.flowable.rest.api.jpa.model.Message;
 import org.flowable.rest.conf.JPAApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class BaseJPARestTestCase extends BaseSpringRestTestCase {
 
     @Override
     protected Class<?> getConfigurationClass() {
         return JPAApplicationConfiguration.class;
+    }
+
+    protected Message createDefaultTestMessage() {
+        Message message = new Message();
+        ReflectionTestUtils.setField(message, "id", 1L);
+        ReflectionTestUtils.setField(message, "text", "Hello World");
+        return message;
     }
 }
