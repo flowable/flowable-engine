@@ -20,6 +20,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.NativeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +75,10 @@ public class CaseDefinitionDiagramHelper {
     }
 
     public boolean shouldCreateDiagram(CaseDefinitionEntity caseDefinition, EngineDeployment deployment) {
+        if (NativeUtil.inNativeImage()) {
+            // Do not create diagram in native image
+            return false;
+        }
         if (deployment.isNew() && caseDefinition.hasGraphicalNotation()
                 && CommandContextUtil.getCmmnEngineConfiguration().isCreateDiagramOnDeploy()) {
 
