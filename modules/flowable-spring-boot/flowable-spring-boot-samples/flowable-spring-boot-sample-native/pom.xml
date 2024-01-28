@@ -15,9 +15,12 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter</artifactId>
         </dependency>
+        <!--
+            Adding the jakarta persistence api due to https://github.com/spring-projects/spring-framework/issues/32155
+        -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -33,6 +36,8 @@
                 <configuration>
                     <buildArgs>
                         --enable-url-protocols=https
+                        --report-unsupported-elements-at-runtime
+                        -H:+BuildReport
                     </buildArgs>
                 </configuration>
             </plugin>
@@ -48,5 +53,117 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--
+        These profiles are usually added by spring-boot-starter-parent.
+        However, we are not using the spring-boot-starter-parent as a parent pom.
+        Therefore, we are adding them here.
+    -->
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jar-plugin</artifactId>
+                            <configuration>
+                                <archive>
+                                    <manifestEntries>
+                                        <Spring-Boot-Native-Processed>true</Spring-Boot-Native-Processed>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                            <configuration>
+                                <image>
+                                    <builder>paketobuildpacks/builder:tiny</builder>
+                                    <env>
+                                        <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                    </env>
+                                </image>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>process-aot</id>
+                                    <goals>
+                                        <goal>process-aot</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.graalvm.buildtools</groupId>
+                            <artifactId>native-maven-plugin</artifactId>
+                            <configuration>
+                                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                                <metadataRepository>
+                                    <enabled>true</enabled>
+                                </metadataRepository>
+                                <requiredVersion>22.3</requiredVersion>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>add-reachability-metadata</id>
+                                    <goals>
+                                        <goal>add-reachability-metadata</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>nativeTest</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit.platform</groupId>
+                    <artifactId>junit-platform-launcher</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>process-test-aot</id>
+                                <goals>
+                                    <goal>process-test-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+                            <requiredVersion>22.3</requiredVersion>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>native-test</id>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

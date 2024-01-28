@@ -1,0 +1,33 @@
+name: Flowable Graal Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
+
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  test_graal:
+    name: Linux Graal Native
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: 17
+        distribution: graalvm
+    - name: Cache Maven Repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Install
+      run: ./mvnw install -Pdistro ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
+    - name: Test
+      run: ./mvnw test -PnativeTest,native,distro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false -pl modules/flowable-spring-boot/flowable-spring-boot-samples/flowable-spring-boot-sample-native
