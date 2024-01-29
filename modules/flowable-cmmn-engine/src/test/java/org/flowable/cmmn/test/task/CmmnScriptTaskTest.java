@@ -19,7 +19,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -323,6 +325,25 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .hasMessage("Illegal argument in script");
 
         assertCaseInstanceNotEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testAccessCurrentScopeInformation() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAccessCurrentScopeInformation")
+                .start();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "theCaseInstanceId")).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "thePlanItemInstanceId")).isNotEqualTo(caseInstance.getId());
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceDefinitionType(PlanItemDefinitionType.SCRIPT_SERVICE_TASK)
+                    .singleResult();
+
+            assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "thePlanItemInstanceId")).isEqualTo(historicPlanItemInstance.getId());
+        }
     }
 
 
