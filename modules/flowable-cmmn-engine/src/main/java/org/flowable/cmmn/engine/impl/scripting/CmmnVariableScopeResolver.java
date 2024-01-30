@@ -102,12 +102,14 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (variableContainer instanceof CaseInstance) {
                 return variableContainer;
 
-            } else if (variableContainer instanceof PlanItemInstance planItemInstance) {
+            } else if (variableContainer instanceof PlanItemInstance) {
+                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
                 if (StringUtils.isNotEmpty(planItemInstance.getCaseInstanceId())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
                 }
 
-            } else if (variableContainer instanceof Task task) {
+            } else if (variableContainer instanceof Task) {
+                Task task = (Task) variableContainer;
                 if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
                 }
@@ -120,7 +122,8 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (variableContainer instanceof PlanItemInstance) {
                 return variableContainer;
 
-            }  else if (variableContainer instanceof Task task) {
+            }  else if (variableContainer instanceof Task) {
+                Task task = (Task) variableContainer;
                 if (StringUtils.isNotEmpty(task.getSubScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getPlanItemInstanceEntityManager().findById(task.getSubScopeId());
                 }
@@ -133,7 +136,8 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (variableContainer instanceof Task) {
                 return variableContainer;
 
-            } else  if (variableContainer instanceof PlanItemInstance planItemInstance) {
+            } else  if (variableContainer instanceof PlanItemInstance) {
+                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
                 return CommandContextUtil.getTaskService().findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
 
             } else {
