@@ -750,7 +750,7 @@ public abstract class AbstractEngineConfiguration {
                 initDbSqlSessionFactory();
             }
 
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
             
             if (isLoggingSessionEnabled()) {
                 if (!sessionFactories.containsKey(LoggingSession.class)) {
