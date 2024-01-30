@@ -13,6 +13,9 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -133,13 +136,19 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             } else if (timerValue instanceof Instant) {
                 timerDueDate = Date.from((Instant) timerValue);
 
+            } else if (timerValue instanceof LocalDate) {
+                timerDueDate = Date.from(((LocalDate) timerValue).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
+            } else if (timerValue instanceof LocalDateTime) {
+                timerDueDate = Date.from(((LocalDateTime) timerValue).atZone(ZoneId.systemDefault()).toInstant());
+
             }
         }
 
         if (timerDueDate == null) {
             throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
-                    + "java.time.Instant, "
-                    + "an ISO8601 date/duration/repetition string or a cron expression");
+                    + "java.time.Instant, java.time.LocalDate, java.time.LocalDateTime or "
+                    + "an ISO8601 date/duration/repetition string or a cron expression for " + planItemInstance);
         }
 
         scheduleTimerJob(commandContext, planItemInstance, timerValue, timerDueDate, isRepeating);

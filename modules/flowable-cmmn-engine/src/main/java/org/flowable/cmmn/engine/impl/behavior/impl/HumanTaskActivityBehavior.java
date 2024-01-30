@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -286,8 +287,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             if (dueDate != null) {
                 if (dueDate instanceof Date) {
                     taskEntity.setDueDate((Date) dueDate);
-                } else if (dueDate instanceof String) {
 
+                } else if (dueDate instanceof String) {
                     String dueDateString = (String) dueDate;
                     if (dueDateString.startsWith("P")) {
                         taskEntity.setDueDate(new DateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime())
@@ -298,13 +299,15 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
                 } else if (dueDate instanceof Instant) {
                     taskEntity.setDueDate(Date.from((Instant) dueDate));
+
                 } else if (dueDate instanceof LocalDate) {
-                    Date localDueDate = Date.from(((LocalDate) dueDate).atStartOfDay()
-                            .atZone(ZoneId.systemDefault())
-                            .toInstant());
-                    taskEntity.setDueDate(localDueDate);
+                    taskEntity.setDueDate(Date.from(((LocalDate) dueDate).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+
+                }  else if (dueDate instanceof LocalDateTime) {
+                    taskEntity.setDueDate(Date.from(((LocalDateTime) dueDate).atZone(ZoneId.systemDefault()).toInstant()));
+
                 } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate, LocalDateTime or Date string: " + beforeContext.getDueDate());
                 }
             }
         }
