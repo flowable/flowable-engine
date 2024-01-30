@@ -15,7 +15,11 @@ package org.flowable.cmmn.test.eventlistener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -738,6 +742,36 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.setVariable(caseInstance.getId(), "timerActive", true);
         assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testDateTypes() throws ParseException {
+        Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss XXX").parse("30-01-2024 10:28:00 +01:00");
+        Instant instant = date.toInstant();
+        LocalDate localDate = LocalDate.of(2024, 1, 30);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 30, 10, 22);
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testTimerEventDateTypes")
+                .variable("taskDate", date)
+                .variable("taskInstant", instant)
+                .variable("taskLocalDate", localDate)
+                .variable("taskLocalDateTime", localDateTime)
+                .variable("taskDateString", "2024-01-30T10:28:00+01:00")
+                .start();
+
+        // The case model has 5 timer event listeners, each with a user task afer it.
+        // The fact that the user task exists, means that the date variable was able to be parsed.
+
+        cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).list()
+                .forEach(t -> cmmnManagementService.moveTimerToExecutableJob(t.getId()));
+        cmmnManagementService.createJobQuery().list().forEach(j -> cmmnManagementService.executeJob(j.getId()));
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsExactlyInAnyOrder(
+                "dateTask", "instantTask", "localDateTask", "localDateTimeTask", "dateStringTask"
+        );
     }
 
 }
