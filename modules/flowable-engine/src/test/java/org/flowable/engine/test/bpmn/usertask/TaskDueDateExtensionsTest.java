@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThrows;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
@@ -49,25 +51,30 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
         Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("06-07-1986 12:10:00");
         LocalDate localDate = LocalDate.of(1986, 7, 6);
+        LocalDateTime localDateTime = LocalDateTime.of(1986, 7, 6, 12, 10);
         Instant instant = date.toInstant();
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", date);
         variables.put("instantVariable", instant);
         variables.put("localDateVariable", localDate);
+        variables.put("localDateTimeVariable", localDateTime);
 
         // Start process-instance, passing date that should be used as dueDate
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
         org.flowable.task.api.Task dateTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("dateTask").singleResult();
-        org.flowable.task.api.Task localDateTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("localDateTask").singleResult();
-        org.flowable.task.api.Task instantTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("instantTask").singleResult();
-
         assertThat(dateTask.getDueDate()).isEqualTo(date);
-        assertThat(instantTask.getDueDate()).isEqualTo(date);
 
+        org.flowable.task.api.Task localDateTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("localDateTask").singleResult();
         Date startOfDay = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         assertThat(localDateTask.getDueDate()).isEqualTo(startOfDay);
+
+        org.flowable.task.api.Task localDateTimeTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("localDateTimeTask").singleResult();
+        assertThat(localDateTimeTask.getDueDate()).isEqualTo(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+
+        org.flowable.task.api.Task instantTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("instantTask").singleResult();
+        assertThat(instantTask.getDueDate()).isEqualTo(date);
     }
 
     @Test
