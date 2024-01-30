@@ -14,6 +14,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -260,12 +261,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 } else if (dueDate instanceof Instant) {
                     task.setDueDate(Date.from((Instant) dueDate));
                 } else if (dueDate instanceof LocalDate) {
-                    Date localDueDate = Date.from(((LocalDate) dueDate).atStartOfDay()
-                            .atZone(ZoneId.systemDefault())
-                            .toInstant());
+                    Date localDueDate = Date.from(((LocalDate) dueDate).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                    task.setDueDate(localDueDate);
+                } else if (dueDate instanceof LocalDateTime) {
+                    Date localDueDate = Date.from(((LocalDateTime) dueDate).atZone(ZoneId.systemDefault()).toInstant());
                     task.setDueDate(localDueDate);
                 } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate or Date string: " + beforeContext.getDueDate());
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate, LocalDateTime or Date string: " + beforeContext.getDueDate());
                 }
             }
         }

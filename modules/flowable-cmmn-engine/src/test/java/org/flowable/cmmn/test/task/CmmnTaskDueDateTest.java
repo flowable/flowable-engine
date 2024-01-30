@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -29,7 +30,7 @@ import org.junit.Test;
 /**
  * @author Joram Barrez
  */
-public class CmmnDueDateTest extends FlowableCmmnTestCase {
+public class CmmnTaskDueDateTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
@@ -38,12 +39,14 @@ public class CmmnDueDateTest extends FlowableCmmnTestCase {
         Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss XXX").parse("30-01-2024 10:28:00 +01:00");
         Instant instant = date.toInstant();
         LocalDate localDate = LocalDate.of(2024, 1, 30);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 30, 10, 28);
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testDateTypes")
-                .variable("dateTask", date)
-                .variable("instantDate", instant)
+                .variable("date", date)
+                .variable("instant", instant)
                 .variable("localDate", localDate)
+                .variable("localDateTime", localDateTime)
                 .variable("stringDate", "2024-01-30T10:28:00+01:00")
                 .start();
 
@@ -53,6 +56,9 @@ public class CmmnDueDateTest extends FlowableCmmnTestCase {
 
         Date startOfDay = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("localDateTask").singleResult().getDueDate()).isEqualTo(startOfDay);
+
+        Date localDateTimeToDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("localDateTimeTask").singleResult().getDueDate()).isEqualTo(localDateTimeToDate);
 
     }
 

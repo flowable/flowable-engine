@@ -11,20 +11,21 @@
             <planItem id="planItemcmmnTask_2" name="instantTask" definitionRef="cmmnTask_2"></planItem>
             <planItem id="planItemcmmnTask_3" name="localDateTask" definitionRef="cmmnTask_3"></planItem>
             <planItem id="planItemcmmnTask_4" name="stringDateTask" definitionRef="cmmnTask_4"></planItem>
-            <humanTask id="cmmnTask_1" name="dateTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${dateTask}">
+            <planItem id="planItemcmmnTask_5" name="localDateTimeTask" definitionRef="cmmnTask_5"></planItem>
+            <humanTask id="cmmnTask_1" name="dateTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${date}">
                 <extensionElements>
                     <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                     <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                     <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
-                    <design:duedate-run><![CDATA[${dateTask}]]></design:duedate-run>
+                    <design:duedate-run><![CDATA[${date}]]></design:duedate-run>
                 </extensionElements>
             </humanTask>
-            <humanTask id="cmmnTask_2" name="instantTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${instantDate}">
+            <humanTask id="cmmnTask_2" name="instantTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${instant}">
                 <extensionElements>
                     <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                     <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                     <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
-                    <design:duedate-run><![CDATA[${instantTask}]]></design:duedate-run>
+                    <design:duedate-run><![CDATA[${instant}]]></design:duedate-run>
                 </extensionElements>
             </humanTask>
             <humanTask id="cmmnTask_3" name="localDateTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${localDate}">
@@ -43,6 +44,14 @@
                     <design:duedate-run><![CDATA[${stringDate}]]></design:duedate-run>
                 </extensionElements>
             </humanTask>
+            <humanTask id="cmmnTask_5" name="localDateTimeTask" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:dueDate="${localDateTime}">
+                <extensionElements>
+                    <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                    <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    <design:duedate-run><![CDATA[${localDateTime}]]></design:duedate-run>
+                </extensionElements>
+            </humanTask>
         </casePlanModel>
     </case>
     <cmmndi:CMMNDI>
@@ -52,19 +61,23 @@
                 <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
             </cmmndi:CMMNShape>
             <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_1" cmmnElementRef="planItemcmmnTask_1">
-                <dc:Bounds height="80.0" width="100.0" x="423.0" y="221.0"></dc:Bounds>
+                <dc:Bounds height="80.0" width="100.0" x="360.0" y="250.0"></dc:Bounds>
                 <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
             </cmmndi:CMMNShape>
             <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_2" cmmnElementRef="planItemcmmnTask_2">
-                <dc:Bounds height="80.0" width="100.0" x="595.0" y="221.0"></dc:Bounds>
+                <dc:Bounds height="80.0" width="100.0" x="505.0" y="250.0"></dc:Bounds>
                 <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
             </cmmndi:CMMNShape>
             <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_3" cmmnElementRef="planItemcmmnTask_3">
-                <dc:Bounds height="80.0" width="100.0" x="765.0" y="221.0"></dc:Bounds>
+                <dc:Bounds height="80.0" width="100.0" x="666.0" y="250.0"></dc:Bounds>
                 <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
             </cmmndi:CMMNShape>
             <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_4" cmmnElementRef="planItemcmmnTask_4">
-                <dc:Bounds height="80.0" width="100.0" x="939.0" y="221.0"></dc:Bounds>
+                <dc:Bounds height="80.0" width="100.0" x="808.0" y="250.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_5" cmmnElementRef="planItemcmmnTask_5">
+                <dc:Bounds height="80.0" width="100.0" x="970.0" y="249.0"></dc:Bounds>
                 <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
             </cmmndi:CMMNShape>
         </cmmndi:CMMNDiagram>
