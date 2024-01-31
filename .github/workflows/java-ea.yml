@@ -23,15 +23,14 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: 'Set up JDK'
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: jdk.java.net
+          release: EA
       - name: Install
-        # If installing the JDK is in a different step then wrong java would be used
         # Need to do install first in order for the OSGi tests to work
-        run: |
-          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Test
-        # If installing the JDK is in a different step then wrong java would be used
-        run: |
-          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+        run: ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true
