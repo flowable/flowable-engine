@@ -498,6 +498,27 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment
+    public void testTaskNameWithExpression() {
+        ProcessInstance processWithoutVariable = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+
+        ProcessInstance processWithVariable = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("testVar", "Task name")
+                .start();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processWithoutVariable.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("${testVar}");
+
+        task = taskService.createTaskQuery().processInstanceId(processWithVariable.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Task name");
+    }
+
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {
         
         protected int beforeCreateUserTaskCounter = 0;
