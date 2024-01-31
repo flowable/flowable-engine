@@ -1355,7 +1355,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 addSessionFactory(new AgendaSessionFactory(agendaFactory));
             }
 
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
 
             commandContextFactory.setSessionFactories(sessionFactories);
 

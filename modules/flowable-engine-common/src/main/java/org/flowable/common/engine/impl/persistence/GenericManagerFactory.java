@@ -13,6 +13,9 @@
 
 package org.flowable.common.engine.impl.persistence;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.Session;
@@ -25,13 +28,35 @@ import org.flowable.common.engine.impl.interceptor.SessionFactory;
 public class GenericManagerFactory implements SessionFactory {
 
     protected Class<? extends Session> typeClass;
-    protected Class<? extends Session> implementationClass;
+    protected Function<CommandContext, ? extends Session> sessionCreator;
 
-    public GenericManagerFactory(Class<? extends Session> typeClass, Class<? extends Session> implementationClass) {
-        this.typeClass = typeClass;
-        this.implementationClass = implementationClass;
+    public GenericManagerFactory(Class<? extends Session> typeClass, Supplier<? extends Session> sessionCreator) {
+        this(typeClass, context -> sessionCreator.get());
     }
 
+    public GenericManagerFactory(Class<? extends Session> typeClass, Function<CommandContext, ? extends Session> sessionCreator) {
+        this.typeClass = typeClass;
+        this.sessionCreator = sessionCreator;
+    }
+
+    /**
+     * @deprecated use {@link #GenericManagerFactory(Class, Supplier)} instead
+     */
+    @Deprecated
+    public GenericManagerFactory(Class<? extends Session> typeClass, Class<? extends Session> implementationClass) {
+        this(typeClass, commandContext -> {
+            try {
+                return implementationClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new FlowableException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
+            }
+        });
+    }
+
+    /**
+     * @deprecated use {@link #GenericManagerFactory(Class, Supplier)} instead
+     */
+    @Deprecated
     public GenericManagerFactory(Class<? extends Session> implementationClass) {
         this(implementationClass, implementationClass);
     }
@@ -43,10 +68,6 @@ public class GenericManagerFactory implements SessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
-        try {
-            return implementationClass.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new FlowableException("couldn't instantiate " + implementationClass.getName() + ": " + e.getMessage(), e);
-        }
+        return sessionCreator.apply(commandContext);
     }
 }
