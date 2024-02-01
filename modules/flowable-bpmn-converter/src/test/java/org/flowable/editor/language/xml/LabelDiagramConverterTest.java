@@ -18,9 +18,6 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-/**
- * @author Joram Barrez
- */
 class LabelDiagramConverterTest {
 
     @BpmnXmlConverterTest("labelProcess.bpmn")
