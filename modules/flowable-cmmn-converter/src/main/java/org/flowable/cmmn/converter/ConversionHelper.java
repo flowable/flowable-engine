@@ -31,6 +31,7 @@ import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -57,6 +58,7 @@ public class ConversionHelper {
     protected PlanItem currentPlanItem;
     protected CmmnDiShape currentDiShape;
     protected CmmnDiEdge currentDiEdge;
+    protected GraphicInfo currentLabelGraphicInfo;
 
     protected Map<Case, List<CaseElement>> caseElements = new HashMap<>();
     protected List<Stage> stages = new ArrayList<>();
@@ -353,6 +355,14 @@ public class ConversionHelper {
 
     public List<CmmnDiEdge> getDiEdges() {
         return diEdges;
+    }
+
+    public GraphicInfo getCurrentLabelGraphicInfo() {
+        return currentLabelGraphicInfo;
+    }
+
+    public void setCurrentLabelGraphicInfo(GraphicInfo labelGraphicInfo) {
+        this.currentLabelGraphicInfo = labelGraphicInfo;
     }
 
 }

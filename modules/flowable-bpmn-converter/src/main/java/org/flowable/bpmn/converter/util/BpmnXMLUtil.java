@@ -589,4 +589,29 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         }
         return false;
     }
+
+    public static void parseLabelElement(XMLStreamReader xtr, BpmnModel model, String BpmnElementId) throws Exception {
+        GraphicInfo labelGraphicInfo = new GraphicInfo();
+        BpmnXMLUtil.addXMLLocation(labelGraphicInfo, xtr);
+
+        if (xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION) != null
+                && !xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION).isEmpty()) {
+            labelGraphicInfo.setRotation(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION)).intValue());
+        }
+
+        while (xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isStartElement() && ELEMENT_DI_BOUNDS.equalsIgnoreCase(xtr.getLocalName())) {
+
+                labelGraphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_X)).intValue());
+                labelGraphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_Y)).intValue());
+                labelGraphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_WIDTH)).intValue());
+                labelGraphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_HEIGHT)).intValue());
+                model.addLabelGraphicInfo(BpmnElementId, labelGraphicInfo);
+                break;
+            } else if (xtr.isEndElement() && ELEMENT_DI_LABEL.equalsIgnoreCase(xtr.getLocalName())) {
+                break;
+            }
+        }
+    }
 }
