@@ -18,9 +18,6 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
-/**
- * @author Tijs Rademakers
- */
 public class LabelCmmnXmlConverterTest {
 
     @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/labelCase.cmmn")
