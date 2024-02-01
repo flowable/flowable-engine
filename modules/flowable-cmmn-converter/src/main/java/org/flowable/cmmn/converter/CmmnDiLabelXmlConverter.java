@@ -15,16 +15,13 @@ package org.flowable.cmmn.converter;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CmmnDiShape;
+import org.flowable.cmmn.model.GraphicInfo;
 
-/**
- * @author Tijs Rademakers
- */
-public class CmmnDiShapeXmlConverter extends BaseCmmnXmlConverter {
-    
+public class CmmnDiLabelXmlConverter extends BaseCmmnXmlConverter {
+
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_DI_SHAPE;
+        return CmmnXmlConstants.ELEMENT_DI_LABEL;
     }
     
     @Override
@@ -34,18 +31,20 @@ public class CmmnDiShapeXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CmmnDiShape diShape = new CmmnDiShape();
-        diShape.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
-        diShape.setCmmnElementRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_CMMN_ELEMENT_REF));
-        
-        conversionHelper.addDiShape(diShape);
-        
-        return diShape;
+        GraphicInfo labelGraphicInfo = new GraphicInfo();
+
+        if (xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_ROTATION) != null
+                && !xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_ROTATION).isEmpty()) {
+            labelGraphicInfo.setRotation(Double.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_ROTATION)).intValue());
+        }
+
+        conversionHelper.setCurrentLabelGraphicInfo(labelGraphicInfo);
+
+        return labelGraphicInfo;
     }
 
     @Override
     protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        conversionHelper.setCurrentDiShape(null);
+        conversionHelper.setCurrentLabelGraphicInfo(null);
     }
-    
 }

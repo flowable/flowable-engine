@@ -190,6 +190,12 @@ public class BPMNDIExport implements BpmnXMLConstants {
         xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
         xtw.writeEndElement();
 
+        GraphicInfo labelGraphicInfo = model.getLabelGraphicInfo(elementId);
+
+        if (labelGraphicInfo != null && flowElement != null && StringUtils.isNotEmpty(flowElement.getName())) {
+            addLabelElement(labelGraphicInfo, xtw);
+        }
+
         xtw.writeEndElement();
     }
     
@@ -231,16 +237,23 @@ public class BPMNDIExport implements BpmnXMLConstants {
         }
 
         if (labelGraphicInfo != null && hasName) {
-            xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_LABEL, BPMNDI_NAMESPACE);
-            xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
-            xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(labelGraphicInfo.getHeight()));
-            xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(labelGraphicInfo.getWidth()));
-            xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(labelGraphicInfo.getX()));
-            xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(labelGraphicInfo.getY()));
-            xtw.writeEndElement();
-            xtw.writeEndElement();
+            addLabelElement(labelGraphicInfo, xtw);
         }
 
+        xtw.writeEndElement();
+    }
+
+    protected static void addLabelElement(GraphicInfo labelGraphicInfo, XMLStreamWriter xtw) throws Exception {
+        xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_LABEL, BPMNDI_NAMESPACE);
+        if (labelGraphicInfo.getRotation() != 0) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_ROTATION, String.valueOf(labelGraphicInfo.getRotation()));
+        }
+        xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
+        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(labelGraphicInfo.getHeight()));
+        xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(labelGraphicInfo.getWidth()));
+        xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(labelGraphicInfo.getX()));
+        xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(labelGraphicInfo.getY()));
+        xtw.writeEndElement();
         xtw.writeEndElement();
     }
 }

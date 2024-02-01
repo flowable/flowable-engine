@@ -128,6 +128,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
+        addElementConverter(new CmmnDiLabelXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
         addElementConverter(new CmmnDiExtensionXmlConverter());
         addElementConverter(new StandardEventXmlConverter());
@@ -393,6 +394,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         // set DI elements
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
+            if (diShape.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diShape.getCmmnElementRef(), diShape.getLabelGraphicInfo());
+            }
         }
 
         processDiEdges(cmmnModel, conversionHelper.getDiEdges());
@@ -438,6 +442,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
             cmmnModel.addEdgeInfo(diEdge.getId(), diEdge);
             cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
+            if (diEdge.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diEdge.getId(), diEdge.getLabelGraphicInfo());
+            }
         }
     }
 
