@@ -43,5 +43,10 @@ public class CmmnDiEdgeXmlConverter extends BaseCmmnXmlConverter {
         
         return diEdge;
     }
+
+    @Override
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        conversionHelper.setCurrentDiEdge(null);
+    }
     
 }

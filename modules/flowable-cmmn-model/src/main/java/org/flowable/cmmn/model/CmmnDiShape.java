@@ -19,6 +19,7 @@ public class CmmnDiShape extends BaseElement {
 
     protected String cmmnElementRef;
     protected GraphicInfo graphicInfo;
+    protected GraphicInfo labelGraphicInfo;
     
     public String getCmmnElementRef() {
         return cmmnElementRef;
@@ -34,5 +35,13 @@ public class CmmnDiShape extends BaseElement {
     
     public void setGraphicInfo(GraphicInfo graphicInfo) {
         this.graphicInfo = graphicInfo;
+    }
+
+    public GraphicInfo getLabelGraphicInfo() {
+        return labelGraphicInfo;
+    }
+
+    public void setLabelGraphicInfo(GraphicInfo labelGraphicInfo) {
+        this.labelGraphicInfo = labelGraphicInfo;
     }
 }

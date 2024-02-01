@@ -25,6 +25,7 @@ public class CmmnDiEdge extends BaseElement {
     protected GraphicInfo sourceDockerInfo;
     protected GraphicInfo targetDockerInfo;
     protected List<GraphicInfo> waypoints = new ArrayList<>();
+    protected GraphicInfo labelGraphicInfo;
     
     public String getCmmnElementRef() {
         return cmmnElementRef;
@@ -68,5 +69,13 @@ public class CmmnDiEdge extends BaseElement {
 
     public void setWaypoints(List<GraphicInfo> waypoints) {
         this.waypoints = waypoints;
+    }
+
+    public GraphicInfo getLabelGraphicInfo() {
+        return labelGraphicInfo;
+    }
+
+    public void setLabelGraphicInfo(GraphicInfo labelGraphicInfo) {
+        this.labelGraphicInfo = labelGraphicInfo;
     }
 }

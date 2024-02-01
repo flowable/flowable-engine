@@ -34,13 +34,25 @@ public class CmmnDiBoundsXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        GraphicInfo graphicInfo = new GraphicInfo();
+        // If this Bounds element is in a Label element, there will be a currentLabelGraphicInfo available
+        GraphicInfo graphicInfo = null;
+        if (conversionHelper.getCurrentLabelGraphicInfo() != null) {
+            graphicInfo = conversionHelper.getCurrentLabelGraphicInfo();
+
+            if (conversionHelper.getCurrentDiEdge() != null) {
+                conversionHelper.getCurrentDiEdge().setLabelGraphicInfo(graphicInfo);
+            } else if (conversionHelper.getCurrentDiShape() != null) {
+                conversionHelper.getCurrentDiShape().setLabelGraphicInfo(graphicInfo);
+            }
+        } else {
+            graphicInfo = new GraphicInfo();
+            conversionHelper.getCurrentDiShape().setGraphicInfo(graphicInfo);
+        }
+
         graphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_X)));
         graphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_Y)));
         graphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_WIDTH)));
         graphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DI_HEIGHT)));
-        
-        conversionHelper.getCurrentDiShape().setGraphicInfo(graphicInfo);
         
         return graphicInfo;
     }
