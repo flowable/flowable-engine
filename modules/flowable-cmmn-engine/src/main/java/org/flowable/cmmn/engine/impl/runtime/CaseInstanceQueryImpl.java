@@ -854,6 +854,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+        return cmmnEngineConfiguration.getCaseInstanceEntityManager().findIdsByCriteria(this);
+    }
+
+    @Override
     public void enhanceCachedValue(CaseInstanceEntity caseInstance) {
         if (isIncludeCaseVariables()) {
             caseInstance.getQueryVariables().addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()

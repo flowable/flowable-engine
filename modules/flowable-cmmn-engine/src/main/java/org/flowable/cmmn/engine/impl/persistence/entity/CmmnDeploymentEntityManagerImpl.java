@@ -165,6 +165,11 @@ public class CmmnDeploymentEntityManagerImpl
     public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
         return dataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
+
+    @Override
+    public List<String> findDeploymentIdsByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
+        return dataManager.findDeploymentIdsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+    }
     
     @Override
     public long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {

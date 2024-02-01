@@ -311,6 +311,13 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         return variableInstances;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        return variableServiceConfiguration.getVariableInstanceEntityManager().findVariableInstanceIdsByQueryCriteria(this);
+    }
+
     // order by
     // /////////////////////////////////////////////////////////////////
 

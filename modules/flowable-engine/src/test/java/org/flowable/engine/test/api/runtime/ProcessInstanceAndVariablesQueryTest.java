@@ -85,6 +85,8 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         assertThat(instanceList).hasSize(7);
+        assertThat(runtimeService.createProcessInstanceQuery().includeProcessVariables().listIds()).hasSize(7);
+        assertThat(runtimeService.createProcessInstanceQuery().includeProcessVariables().listIdsPage(0, 10)).hasSize(7);
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLike("casetest", "MyCase%").singleResult();
@@ -239,6 +241,13 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
                 .variableValueLikeIgnoreCase("test", "%XYZ").endOr()
                 .list();
         assertThat(instanceList).hasSize(4);
+
+        List<String> instanceIdList = runtimeService
+                .createProcessInstanceQuery().or()
+                .variableValueLikeIgnoreCase("test", "TES%")
+                .variableValueLikeIgnoreCase("test", "%XYZ").endOr()
+                .listIds();
+        assertThat(instanceIdList).hasSize(4);
     }
 
 }

@@ -48,6 +48,11 @@ public class HistoricDecisionExecutionEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricDecisionExecutionIdsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
+        return dataManager.findHistoricDecisionExecutionIdsByQueryCriteria(decisionExecutionQuery);
+    }
+
+    @Override
     public long findHistoricDecisionExecutionCountByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
         return dataManager.findHistoricDecisionExecutionCountByQueryCriteria(decisionExecutionQuery);
     }

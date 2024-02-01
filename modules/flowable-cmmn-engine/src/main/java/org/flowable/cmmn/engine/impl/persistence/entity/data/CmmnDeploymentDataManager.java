@@ -32,4 +32,6 @@ public interface CmmnDeploymentDataManager extends DataManager<CmmnDeploymentEnt
 
     List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery);
 
+    List<String> findDeploymentIdsByQueryCriteria(CmmnDeploymentQueryImpl deploymentQuery);
+
 }

@@ -269,6 +269,15 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectVariableInstanceIdsByQueryCriteria" parameterType="org.flowable.variable.service.impl.VariableInstanceQueryImpl"
+            resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectVariableInstanceByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectVariableInstanceCountByQueryCriteria" parameterType="org.flowable.variable.service.impl.VariableInstanceQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectVariableInstanceByQueryCriteriaSql" />

@@ -50,6 +50,13 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findIdsByCriteria(HistoricPlanItemInstanceQueryImpl query) {
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectList("selectHistoricPlanItemInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricPlanItemInstance> findByCaseDefinitionId(String caseDefinitionId) {
         List<? extends HistoricPlanItemInstance> list = getList("selectHistoricPlanItemInstancesByCaseDefinitionId", caseDefinitionId, historicPlanItemInstanceByCaseDefinitionIdMatcher, true);
         return (List<HistoricPlanItemInstance>) list;

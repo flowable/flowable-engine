@@ -312,6 +312,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return historicVariableInstances;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        return variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceIdsByQueryCriteria(this);
+    }
+
     // order by
     // /////////////////////////////////////////////////////////////////
 

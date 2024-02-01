@@ -22,4 +22,6 @@ public interface ProcessInstanceQueryInterceptor {
     void beforeProcessInstanceQueryExecute(ProcessInstanceQuery processInstanceQuery);
     
     void afterProcessInstanceQueryExecute(ProcessInstanceQuery processInstanceQuery, List<ProcessInstance> processInstances);
+
+    void afterProcessInstanceIdsQueryExecute(ProcessInstanceQuery processInstanceQuery, List<String> processInstanceIds);
 }

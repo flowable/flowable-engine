@@ -157,6 +157,13 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findEventSubscriptionIdsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
+        final String query = "selectEventSubscriptionIdsByQueryCriteria";
+        return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl, getManagedEntityClass());
+    }
+
+    @Override
     public List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName) {
         Map<String, String> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);

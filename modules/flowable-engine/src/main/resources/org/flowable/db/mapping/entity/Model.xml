@@ -136,6 +136,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectModelIdsByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectModelsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectModelCountByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectModelsByQueryCriteriaSql"/>

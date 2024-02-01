@@ -49,6 +49,12 @@ public class MybatisTokenDataManager extends AbstractIdmDataManager<TokenEntity>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findTokenIdsByQueryCriteria(TokenQueryImpl query) {
+        return getDbSqlSession().selectList("selectTokenIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
+    @Override
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectTokenCountByQueryCriteria", query);
     }

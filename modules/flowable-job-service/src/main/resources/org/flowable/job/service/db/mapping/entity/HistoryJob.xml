@@ -79,6 +79,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectHistoryJobIdsByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoryJobByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectHistoryJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectHistoryJobByQueryCriteriaSql" />

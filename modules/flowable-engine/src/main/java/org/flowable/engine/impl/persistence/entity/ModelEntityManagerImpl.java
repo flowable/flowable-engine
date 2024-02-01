@@ -111,6 +111,11 @@ public class ModelEntityManagerImpl
     }
 
     @Override
+    public List<String> findModelIdsByQueryCriteria(ModelQueryImpl query) {
+        return dataManager.findModelIdsByQueryCriteria(query);
+    }
+
+    @Override
     public long findModelCountByQueryCriteria(ModelQueryImpl query) {
         return dataManager.findModelCountByQueryCriteria(query);
     }

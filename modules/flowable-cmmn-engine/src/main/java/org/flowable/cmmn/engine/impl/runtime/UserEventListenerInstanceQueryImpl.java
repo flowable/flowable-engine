@@ -145,8 +145,18 @@ public class UserEventListenerInstanceQueryImpl implements UserEventListenerInst
     }
 
     @Override
+    public List<String> listIds() {
+        return innerQuery.listIds();
+    }
+
+    @Override
     public List<UserEventListenerInstance> listPage(int firstResult, int maxResults) {
         return convertPlanItemInstances(innerQuery.listPage(firstResult, maxResults));
+    }
+
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        return innerQuery.listIdsPage(firstResult, maxResults);
     }
 
     protected List<UserEventListenerInstance> convertPlanItemInstances(List<PlanItemInstance> instances) {

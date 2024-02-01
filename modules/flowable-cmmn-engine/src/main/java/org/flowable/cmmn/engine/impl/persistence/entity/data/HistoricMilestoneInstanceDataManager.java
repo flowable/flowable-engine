@@ -27,6 +27,8 @@ public interface HistoricMilestoneInstanceDataManager extends DataManager<Histor
     
     List<HistoricMilestoneInstance> findHistoricMilestoneInstancesByQueryCriteria(HistoricMilestoneInstanceQueryImpl query);
 
+    List<String> findHistoricMilestoneInstanceIdsByQueryCriteria(HistoricMilestoneInstanceQueryImpl query);
+
     long findHistoricMilestoneInstancesCountByQueryCriteria(HistoricMilestoneInstanceQueryImpl query);
     
     void bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(Collection<String> caseInstanceIds);

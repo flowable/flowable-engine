@@ -129,6 +129,11 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
         return CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).findMilestoneInstancesByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).findMilestoneInstanceIdsByQueryCriteria(this);
+    }
+
     public String getMilestoneInstanceId() {
         return milestoneInstanceId;
     }

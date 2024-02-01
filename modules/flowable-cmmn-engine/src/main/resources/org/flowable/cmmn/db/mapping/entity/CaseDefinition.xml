@@ -172,6 +172,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectCaseDefinitionIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>

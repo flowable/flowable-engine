@@ -37,6 +37,8 @@ public interface HistoricDetailEntityManager extends EntityManager<HistoricDetai
 
     List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
+    List<String> findHistoricDetailIdsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
+
     void deleteHistoricDetailsByTaskId(String taskId);
 
     List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap);

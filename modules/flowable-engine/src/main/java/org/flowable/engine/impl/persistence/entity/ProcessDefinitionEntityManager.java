@@ -34,6 +34,8 @@ public interface ProcessDefinitionEntityManager extends EntityManager<ProcessDef
 
     List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
 
+    List<String> findProcessDefinitionIdsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
+
     long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery);
 
     ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey);

@@ -75,6 +75,13 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findJobIdsByQueryCriteria(TimerJobQueryImpl jobQuery) {
+        String query = "selectTimerJobIdsByQueryCriteria";
+        return getDbSqlSession().selectList(query, jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery) {
         return (Long) getDbSqlSession().selectOne("selectTimerJobCountByQueryCriteria", jobQuery);
     }

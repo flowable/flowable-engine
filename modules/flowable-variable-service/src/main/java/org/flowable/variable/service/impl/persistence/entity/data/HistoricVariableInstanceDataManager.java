@@ -34,6 +34,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 
+    List<String> findHistoricVariableInstanceIdsByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
+
     HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
     
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType);

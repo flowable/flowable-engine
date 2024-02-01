@@ -70,6 +70,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     public void testQueryNoCriteria() {
         ModelQuery query = repositoryService.createModelQuery();
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -80,6 +82,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertThat(model).isNotNull();
         assertThat(new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8)).isEqualTo("bytes");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -88,6 +92,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelName("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -98,6 +104,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         assertThat(model).isNotNull();
         assertThat(new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8)).isEqualTo("bytes");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -106,6 +114,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelNameLike("%invalid%");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -115,6 +125,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         Model model = query.singleResult();
         assertThat(model).isNotNull();
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -124,6 +136,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         Model model = query.singleResult();
         assertThat(model).isNotNull();
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -132,6 +146,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelKey("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -139,6 +155,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     public void testQueryByCategory() {
         ModelQuery query = repositoryService.createModelQuery().modelCategory("test");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -147,6 +165,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelCategory("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -154,6 +174,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     public void testQueryByCategoryLike() {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%te%");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -162,6 +184,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryLike("%invalid%");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -169,6 +193,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     public void testQueryByCategoryNotEquals() {
         ModelQuery query = repositoryService.createModelQuery().modelCategoryNotEquals("aap");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -176,6 +202,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
     public void testQueryByVersion() {
         ModelQuery query = repositoryService.createModelQuery().modelVersion(1);
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -217,6 +245,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
         ModelQuery query = repositoryService.createModelQuery().notDeployed();
         assertThat(query.count()).isEqualTo(1);
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
     }
 
     @Test
@@ -267,6 +297,8 @@ public class ModelQueryTest extends PluggableFlowableTestCase {
                 .containsExactly(tuple("my model", modelOneId));
 
         assertThat(repositoryService.createModelQuery().orderByModelId().asc().list()).hasSize(1);
+        assertThat(repositoryService.createModelQuery().orderByModelId().asc().listIds()).hasSize(1);
+        assertThat(repositoryService.createModelQuery().orderByModelId().asc().listIdsPage(0, 10)).hasSize(1);
     }
 
     @Test

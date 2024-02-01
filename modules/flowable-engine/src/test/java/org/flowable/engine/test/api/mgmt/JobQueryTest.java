@@ -1032,6 +1032,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private void verifyQueryResults(BaseJobQuery query, int countExpected) {
         assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.listIds()).hasSize(countExpected);
         assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {

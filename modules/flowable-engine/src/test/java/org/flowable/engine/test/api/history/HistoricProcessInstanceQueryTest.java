@@ -60,6 +60,13 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                     .extracting(HistoricProcessInstance::getName, HistoricProcessInstance::getDescription)
                     .containsExactly(tuple(null, null));
 
+            List<String> processIds = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).listIds();
+            assertThat(processIds)
+                    .containsExactly(processInstanceId);
+            processIds = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).listIdsPage(0, 10);
+            assertThat(processIds)
+                    .containsExactly(processInstanceId);
+
             processes = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).locale("en-GB").list();
             assertThat(processes)
                     .extracting(HistoricProcessInstance::getName, HistoricProcessInstance::getDescription)
@@ -125,6 +132,10 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("callbackId").list())
                     .extracting(HistoricProcessInstance::getId)
                     .contains(processInstance.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("callbackId").listIds())
+                    .contains(processInstance.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("callbackId").listIdsPage(0, 10))
+                    .contains(processInstance.getId());
 
             assertThat(historyService.createHistoricProcessInstanceQuery()
                     .or()
@@ -135,6 +146,8 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                     .contains(processInstance.getId());
 
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("invalid").list()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("invalid").listIds()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceCallbackId("invalid").listIdsPage(0, 10)).isEmpty();
         }
     }
 

@@ -41,6 +41,8 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
      */
     List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery);
 
+    List<String> findJobIdsByQueryCriteria(JobQueryImpl jobQuery);
+
     /**
      * Same as {@link #findJobsByQueryCriteria(JobQueryImpl)}, but only returns a count and not the instances itself.
      */

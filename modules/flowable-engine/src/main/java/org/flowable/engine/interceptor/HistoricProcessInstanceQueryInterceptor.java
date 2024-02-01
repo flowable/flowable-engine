@@ -22,4 +22,6 @@ public interface HistoricProcessInstanceQueryInterceptor {
     void beforeHistoricProcessInstanceQueryExecute(HistoricProcessInstanceQuery processInstanceQuery);
     
     void afterHistoricProcessInstanceQueryExecute(HistoricProcessInstanceQuery processInstanceQuery, List<HistoricProcessInstance> processInstances);
+
+    void afterHistoricProcessInstanceIdsQueryExecute(HistoricProcessInstanceQuery processInstanceQuery, List<String> processInstanceIds);
 }

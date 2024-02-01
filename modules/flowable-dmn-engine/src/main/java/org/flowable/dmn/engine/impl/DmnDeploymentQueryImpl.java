@@ -194,6 +194,11 @@ public class DmnDeploymentQueryImpl extends AbstractQuery<DmnDeploymentQuery, Dm
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////////////////
 
     public String getDeploymentId() {

@@ -28,6 +28,8 @@ public interface HistoricMilestoneInstanceEntityManager extends EntityManager<Hi
 
     List<HistoricMilestoneInstance> findHistoricMilestoneInstancesByQueryCriteria(HistoricMilestoneInstanceQuery query);
 
+    List<String> findHistoricMilestoneInstanceIdsByQueryCriteria(HistoricMilestoneInstanceQuery query);
+
     long findHistoricMilestoneInstanceCountByQueryCriteria(HistoricMilestoneInstanceQuery query);
     
     void bulkDeleteHistoricMilestoneInstancesForCaseInstanceIds(Collection<String> caseInstanceIds);

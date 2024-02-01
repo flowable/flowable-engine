@@ -29,6 +29,8 @@ public interface ExternalWorkerJobDataManager extends DataManager<ExternalWorker
 
     List<ExternalWorkerJob> findJobsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
+    List<String> findJobIdsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
+
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
     void deleteJobsByExecutionId(String executionId);

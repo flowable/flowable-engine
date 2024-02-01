@@ -56,6 +56,11 @@ public class HistoryJobEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoryJobIdsByQueryCriteria(HistoryJobQueryImpl jobQuery) {
+        return dataManager.findHistoryJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return dataManager.findHistoryJobCountByQueryCriteria(jobQuery);
     }

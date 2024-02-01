@@ -94,6 +94,11 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
             assertThat(instanceList).hasSize(6);
 
+            List<String> instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().listIds();
+            assertThat(instanceListIds).hasSize(6);
+            instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().listIdsPage(0, 10);
+            assertThat(instanceListIds).hasSize(6);
+
             instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
             assertThat(instanceList).hasSize(4);
             processInstance = instanceList.get(0);
@@ -103,6 +108,13 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                             entry("test", "test"),
                             entry("test2", "test2"));
             assertThat(instanceList.get(0).getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_KEY);
+
+            instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .listIds();
+            assertThat(instanceListIds).hasSize(4);
+            instanceListIds = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .listIdsPage(0, 10);
+            assertThat(instanceListIds).hasSize(4);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY_2)
                     .singleResult();
@@ -210,17 +222,24 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         ProcessInstance taskProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess3").singleResult();
         Task task = taskService.createTaskQuery().processInstanceId(taskProcessInstance.getId()).singleResult();
         taskService.setVariableLocal(task.getId(), "localVar", "test");
-        
+
         assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
-        
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").listIds()).isEmpty();
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").listIdsPage(0, 10)).isEmpty();
+
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", 123).singleResult();
             Map<String, Object> variableMap = processInstance.getProcessVariables();
             assertThat(variableMap).containsExactly(entry("anothertest", 123));
-            
+
             assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").listIds()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").listIdsPage(0, 10)).isEmpty();
+
             assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").listIds()).hasSize(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").listIdsPage(0, 10)).hasSize(1);
         }
     }
 

@@ -49,6 +49,12 @@ public class MybatisModelDataManager extends AbstractProcessDataManager<ModelEnt
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findModelIdsByQueryCriteria(ModelQueryImpl query) {
+        return getDbSqlSession().selectList("selectModelIdsByQueryCriteria", query);
+    }
+
+    @Override
     public long findModelCountByQueryCriteria(ModelQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectModelCountByQueryCriteria", query);
     }

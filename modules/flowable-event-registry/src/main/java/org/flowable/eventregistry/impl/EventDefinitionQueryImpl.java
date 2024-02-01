@@ -323,6 +323,11 @@ public class EventDefinitionQueryImpl extends AbstractQuery<EventDefinitionQuery
         return CommandContextUtil.getEventDefinitionEntityManager(commandContext).findEventDefinitionsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getEventDefinitionEntityManager(commandContext).findEventDefinitionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {

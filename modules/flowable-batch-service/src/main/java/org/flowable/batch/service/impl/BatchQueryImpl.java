@@ -206,6 +206,11 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return batchServiceConfiguration.getBatchEntityManager().findBatchIdsByQueryCriteria(this);
+    }
+
+    @Override
     public void delete() {
         if (commandExecutor != null) {
             commandExecutor.execute(context -> {

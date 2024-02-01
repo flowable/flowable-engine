@@ -1868,7 +1868,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery withoutTaskDueDate() {
         return withoutDueDate();
     }
-    
+
     @Override
     public TaskQuery taskInProgressStartDueDate(Date dueDate) {
         if (orActive) {
@@ -2183,6 +2183,23 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
             taskServiceConfiguration.getTaskQueryInterceptor()
                     .afterTaskQueryExecute(this, tasks);
+        }
+
+        return tasks;
+    }
+
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().beforeTaskQueryExecute(this);
+        }
+
+        List<String> tasks = taskServiceConfiguration.getTaskEntityManager().findTaskIdsByQueryCriteria(this);
+
+        if (taskServiceConfiguration.getTaskQueryInterceptor() != null) {
+            taskServiceConfiguration.getTaskQueryInterceptor().afterTaskIdsQueryExecute(this, tasks);
         }
 
         return tasks;
@@ -2646,9 +2663,21 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public List<String> listIds() {
+        cachedCandidateGroups = null;
+        return super.listIds();
+    }
+
+    @Override
     public List<Task> listPage(int firstResult, int maxResults) {
         cachedCandidateGroups = null;
         return super.listPage(firstResult, maxResults);
+    }
+
+    @Override
+    public List<String> listIdsPage(int firstResult, int maxResults) {
+        cachedCandidateGroups = null;
+        return super.listIdsPage(firstResult, maxResults);
     }
 
     @Override

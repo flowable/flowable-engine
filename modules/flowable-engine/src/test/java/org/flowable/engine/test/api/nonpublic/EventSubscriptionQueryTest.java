@@ -60,11 +60,13 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
             }
         });
 
-        List<EventSubscription> list = newEventSubscriptionQuery().eventName("messageName").list();
-        assertThat(list).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventName("messageName").list()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventName("messageName").listIds()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventName("messageName").listIdsPage(0, 10)).hasSize(2);
 
-        list = newEventSubscriptionQuery().eventName("messageName2").list();
-        assertThat(list).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventName("messageName2").list()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventName("messageName2").listIds()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventName("messageName2").listIdsPage(0, 10)).hasSize(1);
 
         cleanDb();
 
@@ -74,6 +76,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByEventType() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
             @Override
             public Void execute(CommandContext commandContext) {
                 EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
@@ -93,11 +96,13 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
             }
         });
 
-        List<EventSubscription> list = newEventSubscriptionQuery().eventType("signal").list();
-        assertThat(list).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventType("signal").list()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventType("signal").listIds()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().eventType("signal").listIdsPage(0, 10)).hasSize(1);
 
-        list = newEventSubscriptionQuery().eventType("message").list();
-        assertThat(list).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventType("message").list()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventType("message").listIds()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().eventType("message").listIdsPage(0, 10)).hasSize(2);
 
         cleanDb();
 
@@ -129,11 +134,13 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
             }
         });
 
-        List<EventSubscription> list = newEventSubscriptionQuery().activityId("someOtherActivity").list();
-        assertThat(list).hasSize(1);
+        assertThat(newEventSubscriptionQuery().activityId("someOtherActivity").list()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().activityId("someOtherActivity").listIds()).hasSize(1);
+        assertThat(newEventSubscriptionQuery().activityId("someOtherActivity").listIdsPage(0, 10)).hasSize(1);
 
-        list = newEventSubscriptionQuery().activityId("someActivity").eventType("message").list();
-        assertThat(list).hasSize(2);
+        assertThat(newEventSubscriptionQuery().activityId("someActivity").eventType("message").list()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().activityId("someActivity").eventType("message").listIds()).hasSize(2);
+        assertThat(newEventSubscriptionQuery().activityId("someActivity").eventType("message").listIdsPage(0, 10)).hasSize(2);
 
         cleanDb();
 

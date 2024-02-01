@@ -55,6 +55,8 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void testByCaseDefinitionId() {
         startInstances(5);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(20);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().listIds()).hasSize(20);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().listIdsPage(0, 100)).hasSize(20);
     }
 
     @Test
@@ -62,6 +64,8 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         List<String> caseInstanceIds = startInstances(3);
         for (String caseInstanceId : caseInstanceIds) {
             assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).list()).hasSize(4);
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).listIds()).hasSize(4);
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).listIdsPage(0, 10)).hasSize(4);
         }
     }
 
@@ -88,12 +92,16 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void testByElementId() {
         startInstances(4);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItem3").list()).hasSize(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItem3").listIds()).hasSize(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItem3").listIdsPage(0, 10)).hasSize(4);
     }
 
     @Test
     public void testByName() {
         startInstances(9);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").list()).hasSize(9);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").listIds()).hasSize(9);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").listIdsPage(0, 10)).hasSize(9);
     }
 
     @Test
@@ -101,12 +109,17 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ACTIVE).list()).hasSize(2);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().list()).hasSize(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().listIds()).hasSize(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().listIdsPage(0, 10)).hasSize(2);
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.AVAILABLE).list()).hasSize(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().list()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().listIds()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().listIdsPage(0, 10)).hasSize(1);
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.ENABLED).list()).hasSize(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().list()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().listIds()).hasSize(1);
     }
 
     @Test
@@ -114,6 +127,11 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(3);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).list()).hasSize(6);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).list()).hasSize(6);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).listIds()).hasSize(6);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).listIdsPage(0, 10)).hasSize(6);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).listIds()).hasSize(6);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.STAGE).listIdsPage(0, 10)).hasSize(6);
     }
 
     @Test
@@ -121,6 +139,11 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(2);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.HUMAN_TASK)).list()).hasSize(8);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.HUMAN_TASK)).listIds()).hasSize(8);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.HUMAN_TASK)).listIdsPage(0, 10)).hasSize(8);
     }
 
     @Test

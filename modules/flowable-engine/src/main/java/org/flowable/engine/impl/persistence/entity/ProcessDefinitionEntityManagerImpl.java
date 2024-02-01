@@ -75,6 +75,11 @@ public class ProcessDefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findProcessDefinitionIdsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        return dataManager.findProcessDefinitionIdsByQueryCriteria(processDefinitionQuery);
+    }
+
+    @Override
     public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
         return dataManager.findProcessDefinitionCountByQueryCriteria(processDefinitionQuery);
     }

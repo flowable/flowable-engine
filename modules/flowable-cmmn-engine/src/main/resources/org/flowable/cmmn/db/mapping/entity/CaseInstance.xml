@@ -300,6 +300,17 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectCaseInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        select RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->
+        inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        <include refid="commonSelectCaseInstancesByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="long">
         select count(distinct RES.ID_) from ${prefix}ACT_CMMN_RU_CASE_INST RES
         <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->

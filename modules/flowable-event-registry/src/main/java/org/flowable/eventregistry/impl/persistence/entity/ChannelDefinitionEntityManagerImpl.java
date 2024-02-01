@@ -50,6 +50,11 @@ public class ChannelDefinitionEntityManagerImpl
     }
 
     @Override
+    public List<String> findChannelDefinitionIdsByQueryCriteria(ChannelDefinitionQueryImpl channelQuery) {
+        return dataManager.findChannelDefinitionIdsByQueryCriteria(channelQuery);
+    }
+
+    @Override
     public long findChannelDefinitionCountByQueryCriteria(ChannelDefinitionQueryImpl channelQuery) {
         return dataManager.findChannelDefinitionCountByQueryCriteria(channelQuery);
     }

@@ -138,6 +138,11 @@ public class ExecutionEntityManagerImpl
     }
 
     @Override
+    public List<String> findExecutionIdsByQueryCriteria(ExecutionQueryImpl executionQuery) {
+        return dataManager.findExecutionIdsByQueryCriteria(executionQuery);
+    }
+
+    @Override
     public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
         return dataManager.findProcessInstanceCountByQueryCriteria(executionQuery);
     }
@@ -145,6 +150,11 @@ public class ExecutionEntityManagerImpl
     @Override
     public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
         return dataManager.findProcessInstanceByQueryCriteria(executionQuery);
+    }
+
+    @Override
+    public List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
+        return dataManager.findProcessInstanceIdsByQueryCriteria(executionQuery);
     }
 
     @Override

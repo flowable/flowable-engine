@@ -39,6 +39,14 @@
     ${orderBy}
     <if test="needsPaging">${limitAfter}</if>
   </select>
+
+  <select id="selectCustomTaskIdsByQueryCriteria" parameterType="org.flowable.standalone.cfg.CustomTaskQuery" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectCustomTaskByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
   
   <sql id="selectCustomTaskByQueryCriteriaSql">
   from ${prefix}ACT_RU_TASK RES

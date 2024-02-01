@@ -61,6 +61,11 @@ public class HistoricCaseInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findIdsByCriteria(HistoricCaseInstanceQuery query) {
+        return dataManager.findIdsByCriteria((HistoricCaseInstanceQueryImpl) query);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query) {
         return dataManager.findWithVariablesByQueryCriteria((HistoricCaseInstanceQueryImpl) query);

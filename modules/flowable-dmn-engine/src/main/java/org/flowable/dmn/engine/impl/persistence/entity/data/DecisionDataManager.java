@@ -39,6 +39,8 @@ public interface DecisionDataManager extends DataManager<DecisionEntity> {
 
     List<DmnDecision> findDecisionsByQueryCriteria(DecisionQueryImpl DefinitionQuery);
 
+    List<String> findDecisionIdsByQueryCriteria(DecisionQueryImpl DefinitionQuery);
+
     long findDecisionCountByQueryCriteria(DecisionQueryImpl DefinitionQuery);
 
     DecisionEntity findDecisionByDeploymentAndKey(String deploymentId, String definitionKey);

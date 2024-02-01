@@ -94,7 +94,15 @@
     ${orderBy}
     <if test="needsPaging">${limitAfter}</if>
   </select>
-  
+
+  <select id="selectGroupIdsByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectGroupByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
    <select id="selectGroupCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectGroupByQueryCriteriaSql" />

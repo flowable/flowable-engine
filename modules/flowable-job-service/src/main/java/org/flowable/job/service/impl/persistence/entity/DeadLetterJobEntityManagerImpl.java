@@ -55,6 +55,11 @@ public class DeadLetterJobEntityManagerImpl
     }
 
     @Override
+    public List<String> findJobIdsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
+        return dataManager.findJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
         return dataManager.findJobCountByQueryCriteria(jobQuery);
     }

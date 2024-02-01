@@ -60,6 +60,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryNoCriteria() {
         DeploymentQuery query = repositoryService.createDeploymentQuery();
         assertThat(query.list()).hasSize(2);
+        assertThat(query.listIds()).hasSize(2);
+        assertThat(query.listIdsPage(0, 10)).hasSize(2);
         assertThat(query.count()).isEqualTo(2);
 
         assertThatThrownBy(() -> query.singleResult())
@@ -71,6 +73,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentOneId);
         assertThat(query.singleResult()).isNotNull();
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -79,6 +83,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
 
         assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentId(null))
@@ -89,6 +95,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByDeploymentIds() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentOneId, deploymentTwoId, "dummy"));
         assertThat(query.list()).hasSize(2);
+        assertThat(query.listIds()).hasSize(2);
+        assertThat(query.listIdsPage(0, 10)).hasSize(2);
         assertThat(query.count()).isEqualTo(2);
     }
 
@@ -97,6 +105,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentIds(Arrays.asList("dummy", "invalid"));
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
 
         assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentIds(null))
@@ -109,6 +119,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/flowable/engine/test/repository/two.bpmn20.xml");
         assertThat(query.singleResult()).isNotNull();
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
     }
 
@@ -117,6 +129,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
 
         assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentName(null))
@@ -127,6 +141,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByNameLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%flowable%");
         assertThat(query.list()).hasSize(2);
+        assertThat(query.listIds()).hasSize(2);
+        assertThat(query.listIdsPage(0, 10)).hasSize(2);
         assertThat(query.count()).isEqualTo(2);
 
         assertThatThrownBy(() -> query.singleResult())
@@ -138,6 +154,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
 
         assertThatThrownBy(() -> repositoryService.createDeploymentQuery().deploymentNameLike(null))
@@ -148,6 +166,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByNameAndCategory() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentCategory("testCategory").deploymentNameLike("%flowable%");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
         assertThat(query.singleResult()).isNotNull();
     }
@@ -156,6 +176,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByProcessDefinitionKey() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKey("one");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
         assertThat(query.singleResult()).isNotNull();
     }
@@ -164,6 +186,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%o%");
         assertThat(query.list()).hasSize(2);
+        assertThat(query.listIds()).hasSize(2);
+        assertThat(query.listIdsPage(0, 10)).hasSize(2);
         assertThat(query.count()).isEqualTo(2);
     }
     
@@ -176,6 +200,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
 
         DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentId(deploymentId).processDefinitionKeyLike("%o%");
         assertThat(query.list()).hasSize(1);
+        assertThat(query.listIds()).hasSize(1);
+        assertThat(query.listIdsPage(0, 10)).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
         
         repositoryService.deleteDeployment(deploymentId, true);
@@ -185,6 +211,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByInvalidProcessDefinitionKeyLike() {
         DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("invalid");
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -197,6 +225,10 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
                         tuple("org/flowable/engine/test/repository/one.bpmn20.xml", deploymentOneId),
                         tuple("org/flowable/engine/test/repository/two.bpmn20.xml", deploymentTwoId)
                 );
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentName().asc().listIds())
+                .containsExactly(deploymentOneId, deploymentTwoId);
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentName().asc().listIdsPage(0, 10))
+                .containsExactly(deploymentOneId, deploymentTwoId);
 
         deployments = repositoryService.createDeploymentQuery().deploymentNameLike("%one%").orderByDeploymentName().asc().list();
         assertThat(deployments)
@@ -204,10 +236,18 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
                 .containsExactly(
                         tuple("org/flowable/engine/test/repository/one.bpmn20.xml", deploymentOneId)
                 );
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("%one%").orderByDeploymentName().asc().listIds())
+                .containsExactly(deploymentOneId);
+        assertThat(repositoryService.createDeploymentQuery().deploymentNameLike("%one%").orderByDeploymentName().asc().listIdsPage(0, 10))
+                .containsExactly(deploymentOneId);
 
         assertThat(repositoryService.createDeploymentQuery().orderByDeploymentId().asc().list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentId().asc().listIds()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentId().asc().listIdsPage(0, 10)).hasSize(2);
 
         assertThat(repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().listIds()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().listIdsPage(0, 10)).hasSize(2);
 
     }
 
@@ -239,6 +279,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").singleResult()).isNotNull();
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").singleResult().getId()).isEqualTo(deploymentId);
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").list()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").listIds()).hasSize(1);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").listIdsPage(0, 10)).hasSize(1);
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
     }
 
@@ -246,6 +288,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
     public void testQueryByInvalidParentDeploymentId() {
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").singleResult()).isNull();
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").list()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").listIds()).isEmpty();
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").listIdsPage(0, 10)).isEmpty();
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentId("invalid").count()).isZero();
     }
 
@@ -267,6 +311,8 @@ public class DeploymentQueryTest extends PluggableFlowableTestCase {
                 .getId();
         deploymentIdsForAutoCleanup.add(otherDeploymentId);
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "parent2", "dummy")).list()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "parent2", "dummy")).listIds()).hasSize(2);
+        assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "parent2", "dummy")).listIdsPage(0, 10)).hasSize(2);
         assertThat(repositoryService.createDeploymentQuery().parentDeploymentIds(Arrays.asList("parent1", "dummy")).singleResult()).isNotNull();
     }
 

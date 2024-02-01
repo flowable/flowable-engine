@@ -41,9 +41,13 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery);
 
+    List<String> findExecutionIdsByQueryCriteria(ExecutionQueryImpl executionQuery);
+
     long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
     List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
+    List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
     List<ExecutionEntity> findExecutionsByRootProcessInstanceId(String rootProcessInstanceId);
 

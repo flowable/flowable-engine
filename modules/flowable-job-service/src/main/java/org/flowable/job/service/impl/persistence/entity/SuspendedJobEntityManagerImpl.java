@@ -54,6 +54,11 @@ public class SuspendedJobEntityManagerImpl
     }
 
     @Override
+    public List<String> findJobIdsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
+        return dataManager.findJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
         return dataManager.findJobCountByQueryCriteria(jobQuery);
     }

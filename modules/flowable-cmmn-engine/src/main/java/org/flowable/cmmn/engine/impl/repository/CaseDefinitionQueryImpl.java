@@ -381,6 +381,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return caseDefinitionList;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {

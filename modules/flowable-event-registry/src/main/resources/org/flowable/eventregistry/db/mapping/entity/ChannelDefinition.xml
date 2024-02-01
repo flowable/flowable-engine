@@ -130,6 +130,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+    <select id="selectChannelDefinitionIdsByQueryCriteria" parameterType="org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectChannelDefinitionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
   <select id="selectChannelDefinitionCountByQueryCriteria" parameterType="org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectChannelDefinitionsByQueryCriteriaSql"/>

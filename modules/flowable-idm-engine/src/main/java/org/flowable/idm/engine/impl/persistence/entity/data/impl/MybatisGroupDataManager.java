@@ -49,6 +49,12 @@ public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findGroupIdsByQueryCriteria(GroupQueryImpl query) {
+        return getDbSqlSession().selectList("selectGroupIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
+    @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
     }

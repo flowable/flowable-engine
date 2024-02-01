@@ -59,11 +59,18 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
     @Test
     public void testQueryNoParams() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().listIds()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().listIdsPage(0, 10)).hasSize(2);
         assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(2);
 
         assertThat(cmmnRepositoryService.createDeploymentQuery().list())
                 .extracting(CmmnDeployment::getId)
                 .contains(deploymentId1, deploymentId2);
+
+        assertThat(cmmnRepositoryService.createDeploymentQuery().listIds())
+                .containsExactlyInAnyOrder(deploymentId1, deploymentId2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().listIdsPage(0, 10))
+                .containsExactlyInAnyOrder(deploymentId1, deploymentId2);
     }
 
     @Test
@@ -71,10 +78,14 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult()).isNotNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).singleResult().getId()).isEqualTo(deploymentId1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).listIds()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).listIdsPage(0, 10)).hasSize(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
 
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).singleResult()).isNotNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).listIds()).hasSize(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).listIdsPage(0, 10)).hasSize(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
     }
 
@@ -82,12 +93,18 @@ public class DeploymentQueryTest extends FlowableCmmnTestCase {
     public void testQueryByInvalidDeploymentId() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").singleResult()).isNull();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").listIds()).isEmpty();
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").listIdsPage(0, 10)).isEmpty();
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByDeploymentIds() {
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).list()).hasSize(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).listIds()).hasSize(2);
+        assertThat(
+                cmmnRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId1, deploymentId2, "dummy")).listIdsPage(0, 10)).hasSize(
+                2);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentIds(Arrays.asList(deploymentId2, "dummy")).singleResult()).isNotNull();
     }
 

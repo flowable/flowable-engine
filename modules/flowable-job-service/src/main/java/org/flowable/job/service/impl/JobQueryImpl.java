@@ -440,6 +440,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return jobServiceConfiguration.getJobEntityManager().findJobsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return jobServiceConfiguration.getJobEntityManager().findJobIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     public String getProcessInstanceId() {

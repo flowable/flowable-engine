@@ -34,6 +34,8 @@ public interface ChannelDefinitionDataManager extends DataManager<ChannelDefinit
 
     List<ChannelDefinition> findChannelDefinitionsByQueryCriteria(ChannelDefinitionQueryImpl channelDefinitionQuery);
 
+    List<String> findChannelDefinitionIdsByQueryCriteria(ChannelDefinitionQueryImpl channelDefinitionQuery);
+
     long findChannelDefinitionCountByQueryCriteria(ChannelDefinitionQueryImpl channelDefinitionQuery);
 
     ChannelDefinitionEntity findChannelDefinitionByDeploymentAndKey(String deploymentId, String channelDefinitionKey);

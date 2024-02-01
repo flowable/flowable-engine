@@ -37,6 +37,8 @@ public interface EventDefinitionDataManager extends DataManager<EventDefinitionE
 
     List<EventDefinition> findEventDefinitionsByQueryCriteria(EventDefinitionQueryImpl eventDefinitionQuery);
 
+    List<String> findEventDefinitionIdsByQueryCriteria(EventDefinitionQueryImpl eventDefinitionQuery);
+
     long findEventDefinitionCountByQueryCriteria(EventDefinitionQueryImpl eventDefinitionQuery);
 
     EventDefinitionEntity findEventDefinitionByDeploymentAndKey(String deploymentId, String eventDefinitionKey);

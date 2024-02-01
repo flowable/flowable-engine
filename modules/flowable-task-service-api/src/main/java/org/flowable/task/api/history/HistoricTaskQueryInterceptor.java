@@ -19,4 +19,6 @@ public interface HistoricTaskQueryInterceptor {
     void beforeHistoricTaskQueryExecute(HistoricTaskInstanceQuery taskQuery);
     
     void afterHistoricTaskQueryExecute(HistoricTaskInstanceQuery taskQuery, List<HistoricTaskInstance> historicTasks);
+
+    void afterHistoricTaskIdsQueryExecute(HistoricTaskInstanceQuery taskQuery, List<String> historicTaskIds);
 }

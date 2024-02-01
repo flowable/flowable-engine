@@ -677,6 +677,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return results;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+        return cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findIdsByCriteria(this);
+    }
+
     protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricCaseInstance> results) {
 
         // Unlike the CaseInstanceEntityImpl, variables are not stored on the HistoricCaseInstanceEntityImpl.

@@ -75,6 +75,11 @@ public class HistoricActivityInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricActivityInstanceIdsByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        return dataManager.findHistoricActivityInstanceIdsByQueryCriteria(historicActivityInstanceQuery);
+    }
+
+    @Override
     public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap) {
         return dataManager.findHistoricActivityInstancesByNativeQuery(parameterMap);
     }

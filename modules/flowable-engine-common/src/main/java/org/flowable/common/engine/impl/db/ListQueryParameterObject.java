@@ -29,7 +29,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 public class ListQueryParameterObject {
     
     public enum ResultType {
-        LIST, LIST_PAGE, SINGLE_RESULT, COUNT
+        LIST, LIST_IDS, LIST_PAGE, LIST_IDS_PAGE, SINGLE_RESULT, COUNT
     }
 
     protected static final OrderBy DEFAULT_ORDER_BY = new OrderBy("RES.ID_", "asc", null);

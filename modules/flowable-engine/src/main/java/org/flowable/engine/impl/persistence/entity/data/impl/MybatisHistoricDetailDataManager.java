@@ -111,6 +111,12 @@ public class MybatisHistoricDetailDataManager extends AbstractProcessDataManager
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<String> findHistoricDetailIdsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+        return getDbSqlSession().selectList("selectHistoricDetailIdsByQueryCriteria", historicVariableUpdateQuery);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<HistoricDetail> findHistoricDetailsByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectHistoricDetailByNativeQuery", parameterMap);
     }

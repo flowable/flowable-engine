@@ -88,7 +88,12 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByProcessDefinitionKey() {
         // Concurrent process with 3 executions for each process instance
         assertThat(runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).list()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).listIds()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).listIdsPage(0, 100)).hasSize(12);
+
         assertThat(runtimeService.createExecutionQuery().processDefinitionKey(SEQUENTIAL_PROCESS_KEY).list()).hasSize(2);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionKey(SEQUENTIAL_PROCESS_KEY).listIds()).hasSize(2);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionKey(SEQUENTIAL_PROCESS_KEY).listIdsPage(0, 10)).hasSize(2);
     }
 
     @Test
@@ -112,6 +117,8 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         ExecutionQuery query = runtimeService.createExecutionQuery().processDefinitionKey("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -119,6 +126,8 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByProcessDefinitionCategory() {
         // Concurrent process with 3 executions for each process instance
         assertThat(runtimeService.createExecutionQuery().processDefinitionCategory(CONCURRENT_PROCESS_CATEGORY).list()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionCategory(CONCURRENT_PROCESS_CATEGORY).listIds()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionCategory(CONCURRENT_PROCESS_CATEGORY).listIdsPage(0, 100)).hasSize(12);
         assertThat(runtimeService.createExecutionQuery().processDefinitionCategory(SEQUENTIAL_PROCESS_CATEGORY).list()).hasSize(2);
     }
 
@@ -127,6 +136,8 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         ExecutionQuery query = runtimeService.createExecutionQuery().processDefinitionCategory("invalid");
         assertThat(query.singleResult()).isNull();
         assertThat(query.list()).isEmpty();
+        assertThat(query.listIds()).isEmpty();
+        assertThat(query.listIdsPage(0, 10)).isEmpty();
         assertThat(query.count()).isZero();
     }
 
@@ -134,6 +145,8 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByProcessDefinitionName() {
         // Concurrent process with 3 executions for each process instance
         assertThat(runtimeService.createExecutionQuery().processDefinitionName(CONCURRENT_PROCESS_NAME).list()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionName(CONCURRENT_PROCESS_NAME).listIds()).hasSize(12);
+        assertThat(runtimeService.createExecutionQuery().processDefinitionName(CONCURRENT_PROCESS_NAME).listIdsPage(0, 100)).hasSize(12);
         assertThat(runtimeService.createExecutionQuery().processDefinitionName(SEQUENTIAL_PROCESS_NAME).list()).hasSize(2);
     }
 

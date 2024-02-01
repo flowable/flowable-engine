@@ -78,6 +78,12 @@ public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEn
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findBatchPartIdsByQueryCriteria(BatchPartQueryImpl batchPartQuery) {
+        return getDbSqlSession().selectList("selectBatchPartIdsByQueryCriteria", batchPartQuery, getManagedEntityClass());
+    }
+
+    @Override
     public long findBatchPartCountByQueryCriteria(BatchPartQueryImpl batchPartQuery) {
         return (Long) getDbSqlSession().selectOne("selectBatchPartCountByQueryCriteria", batchPartQuery);
     }

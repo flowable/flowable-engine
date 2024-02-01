@@ -998,6 +998,23 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return results;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
+        }
+
+        List<String> results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByQueryCriteria(this);
+
+        if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().afterHistoricProcessInstanceIdsQueryExecute(this, results);
+        }
+
+        return results;
+    }
+
     protected void addCachedVariableForQueryById(CommandContext commandContext, List<HistoricProcessInstance> results) {
 
         // Unlike the ExecutionEntityImpl, variables are not stored on the HistoricExecutionEntityImpl.

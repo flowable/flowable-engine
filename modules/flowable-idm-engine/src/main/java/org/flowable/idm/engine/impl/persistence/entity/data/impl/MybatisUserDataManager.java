@@ -49,6 +49,12 @@ public class MybatisUserDataManager extends AbstractIdmDataManager<UserEntity> i
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findUserIdsByQueryCriteria(UserQueryImpl query) {
+        return getDbSqlSession().selectList("selectUserIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
+    @Override
     public long findUserCountByQueryCriteria(UserQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
     }

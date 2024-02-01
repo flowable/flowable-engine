@@ -114,6 +114,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectDecisionIdsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectDecisionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectDecisionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectDecisionsByQueryCriteriaSql"/>

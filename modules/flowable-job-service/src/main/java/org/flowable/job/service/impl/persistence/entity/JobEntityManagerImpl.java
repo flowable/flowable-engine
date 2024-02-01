@@ -73,6 +73,11 @@ public class JobEntityManagerImpl
     }
 
     @Override
+    public List<String> findJobIdsByQueryCriteria(JobQueryImpl jobQuery) {
+        return dataManager.findJobIdsByQueryCriteria(jobQuery);
+    }
+
+    @Override
     public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
         return dataManager.findJobCountByQueryCriteria(jobQuery);
     }

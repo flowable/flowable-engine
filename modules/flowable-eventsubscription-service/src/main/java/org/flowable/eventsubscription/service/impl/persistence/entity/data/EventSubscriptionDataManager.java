@@ -41,6 +41,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
 
     List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
 
+    List<String> findEventSubscriptionIdsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl);
+
     List<MessageEventSubscriptionEntity> findMessageEventSubscriptionsByProcessInstanceAndEventName(final String processInstanceId, final String eventName);
 
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(final String eventName, final String tenantId);

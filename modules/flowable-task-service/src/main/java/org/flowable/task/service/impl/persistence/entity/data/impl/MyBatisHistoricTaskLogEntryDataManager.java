@@ -58,6 +58,11 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     }
 
     @Override
+    public List<String> findHistoricTaskLogEntryIdsByQueryCriteria(HistoricTaskLogEntryQueryImpl taskLogEntryQuery) {
+        return getDbSqlSession().selectList("selectHistoricTaskLogEntryIdsByQueryCriteria", taskLogEntryQuery);
+    }
+
+    @Override
     public void deleteHistoricTaskLogEntry(long logEntryNumber) {
         getDbSqlSession().delete("deleteHistoricTaskLogEntryByLogNumber", logEntryNumber, HistoricTaskLogEntryEntityImpl.class);
     }

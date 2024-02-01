@@ -44,6 +44,11 @@ public class MilestoneInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findMilestoneInstanceIdsByQueryCriteria(MilestoneInstanceQuery query) {
+        return dataManager.findMilestoneInstanceIdsByQueryCriteria((MilestoneInstanceQueryImpl) query);
+    }
+
+    @Override
     public long findMilestoneInstanceCountByQueryCriteria(MilestoneInstanceQuery query) {
         return dataManager.findMilestoneInstancesCountByQueryCriteria((MilestoneInstanceQueryImpl) query);
     }

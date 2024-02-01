@@ -29,6 +29,8 @@ public interface PrivilegeEntityManager extends EntityManager<PrivilegeEntity> {
 
     List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query);
 
+    List<String> findPrivilegeIdsByQueryCriteria(PrivilegeQueryImpl query);
+
     long findPrivilegeCountByQueryCriteria(PrivilegeQueryImpl query);
 
     List<Privilege> findPrivilegeByNativeQuery(Map<String, Object> parameterMap);

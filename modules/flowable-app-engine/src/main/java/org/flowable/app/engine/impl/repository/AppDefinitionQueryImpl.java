@@ -303,6 +303,11 @@ public class AppDefinitionQueryImpl extends AbstractQuery<AppDefinitionQuery, Ap
         return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getAppDefinitionEntityManager(commandContext).findAppDefinitionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {

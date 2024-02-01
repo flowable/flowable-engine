@@ -36,6 +36,8 @@ public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity>
 
     List<CaseInstance> findByCriteria(CaseInstanceQueryImpl query);
 
+    List<String> findIdsByCriteria(CaseInstanceQueryImpl query);
+
     List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQueryImpl query);
 
     long countByCriteria(CaseInstanceQueryImpl query);

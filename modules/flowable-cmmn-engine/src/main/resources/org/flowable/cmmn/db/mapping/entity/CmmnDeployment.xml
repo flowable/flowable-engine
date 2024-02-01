@@ -109,6 +109,14 @@
     <if test="needsPaging">${limitAfter}</if>
   </select>
 
+  <select id="selectCmmnDeploymentIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultType="string">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
   <select id="selectCmmnDeploymentCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectCmmnDeploymentsByQueryCriteriaSql"/>

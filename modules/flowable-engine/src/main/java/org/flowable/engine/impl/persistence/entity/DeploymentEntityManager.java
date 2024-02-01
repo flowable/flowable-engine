@@ -26,6 +26,8 @@ public interface DeploymentEntityManager extends EntityManager<DeploymentEntity>
 
     List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery);
 
+    List<String> findDeploymentIdsByQueryCriteria(DeploymentQueryImpl deploymentQuery);
+
     List<String> getDeploymentResourceNames(String deploymentId);
 
     List<Deployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap);

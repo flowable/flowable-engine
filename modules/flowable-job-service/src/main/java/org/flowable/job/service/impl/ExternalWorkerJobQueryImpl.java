@@ -432,6 +432,11 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
         return jobServiceConfiguration.getExternalWorkerJobEntityManager().findJobsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return jobServiceConfiguration.getExternalWorkerJobEntityManager().findJobIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////
 
     public String getProcessInstanceId() {

@@ -877,6 +877,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return (List<Execution>) executions;
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().beforeExecutionQueryExecute(this);
+        }
+
+        List<String> executionIds = processEngineConfiguration.getExecutionEntityManager().findExecutionIdsByQueryCriteria(this);
+
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().afterExecutionIdsQueryExecute(this, executionIds);
+        }
+
+        return executionIds;
+    }
+
     protected void localize(Execution execution, String activityId) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         executionEntity.setLocalizedName(null);

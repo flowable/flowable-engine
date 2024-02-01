@@ -117,6 +117,11 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
+    public List<String> findHistoricVariableInstanceIdsByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+        return dataManager.findHistoricVariableInstanceIdsByQueryCriteria(historicProcessVariableQuery);
+    }
+
+    @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
         return dataManager.findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
     }

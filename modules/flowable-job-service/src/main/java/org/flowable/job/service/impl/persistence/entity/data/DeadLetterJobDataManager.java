@@ -32,6 +32,8 @@ public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntit
 
     List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
+    List<String> findJobIdsByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
+
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);

@@ -62,6 +62,11 @@ public class BatchPartQueryImpl extends AbstractQuery<BatchPartQuery, BatchPart>
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return batchServiceConfiguration.getBatchPartEntityManager().findBatchPartIdsByQueryCriteria(this);
+    }
+
+    @Override
     public BatchPartQuery id(String id) {
         if (id == null) {
             throw new FlowableIllegalArgumentException("id is null");

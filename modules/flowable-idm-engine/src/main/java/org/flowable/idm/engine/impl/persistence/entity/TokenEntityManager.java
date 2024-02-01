@@ -33,6 +33,8 @@ public interface TokenEntityManager extends EntityManager<TokenEntity> {
 
     List<Token> findTokenByQueryCriteria(TokenQueryImpl query);
 
+    List<String> findTokenIdsByQueryCriteria(TokenQueryImpl query);
+
     long findTokenCountByQueryCriteria(TokenQueryImpl query);
 
     TokenQuery createNewTokenQuery();

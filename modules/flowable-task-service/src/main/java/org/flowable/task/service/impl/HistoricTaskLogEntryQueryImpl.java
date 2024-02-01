@@ -215,6 +215,11 @@ public class HistoricTaskLogEntryQueryImpl extends AbstractQuery<HistoricTaskLog
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return taskServiceConfiguration.getHistoricTaskLogEntryEntityManager().findHistoricTaskLogEntryIdsByQueryCriteria(this);
+    }
+
+    @Override
     public HistoricTaskLogEntryQuery orderByLogNumber() {
         orderBy(HistoricTaskLogEntryQueryProperty.LOG_NUMBER);
         return this;

@@ -167,6 +167,14 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
+    <select id="selectExternalWorkerJobIdsByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultType="string">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectExternalWorkerJobByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
     <select id="selectExternalWorkerJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectExternalWorkerJobByQueryCriteriaSql" />

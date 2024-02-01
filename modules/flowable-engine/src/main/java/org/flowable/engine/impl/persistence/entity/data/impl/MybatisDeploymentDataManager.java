@@ -55,6 +55,13 @@ public class MybatisDeploymentDataManager extends AbstractProcessDataManager<Dep
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> findDeploymentIdsByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
+        final String query = "selectDeploymentIdsByQueryCriteria";
+        return getDbSqlSession().selectList(query, deploymentQuery);
+    }
+
+    @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
     }

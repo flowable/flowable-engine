@@ -887,6 +887,23 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        ensureVariablesInitialized();
+
+        if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
+        }
+
+        List<String> processInstanceIds = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceIdsByQueryCriteria(this);
+
+        if (processEngineConfiguration.getProcessInstanceQueryInterceptor() != null) {
+            processEngineConfiguration.getProcessInstanceQueryInterceptor().afterProcessInstanceIdsQueryExecute(this, processInstanceIds);
+        }
+
+        return processInstanceIds;
+    }
+
+    @Override
     public void enhanceCachedValue(ExecutionEntity processInstance) {
         if (includeProcessVariables) {
             processInstance.getQueryVariables().addAll(processEngineConfiguration.getVariableServiceConfiguration()

@@ -29,6 +29,8 @@ public interface HistoricDecisionExecutionEntityManager extends EntityManager<Hi
 
     List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery);
 
+    List<String> findHistoricDecisionExecutionIdsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery);
+
     long findHistoricDecisionExecutionCountByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery);
     
     List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByNativeQuery(Map<String, Object> parameterMap);

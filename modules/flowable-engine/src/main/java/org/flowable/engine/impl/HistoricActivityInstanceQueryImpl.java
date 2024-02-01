@@ -78,6 +78,11 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     }
 
     @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceIdsByQueryCriteria(this);
+    }
+
+    @Override
     public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;

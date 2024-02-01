@@ -26,6 +26,8 @@ public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, Jo
 
     List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl query);
 
+    List<String> findHistoryJobIdsByQueryCriteria(HistoryJobQueryImpl query);
+
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl query);
     
 }

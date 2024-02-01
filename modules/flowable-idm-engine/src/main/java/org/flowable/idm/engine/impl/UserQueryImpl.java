@@ -268,6 +268,11 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return CommandContextUtil.getUserEntityManager(commandContext).findUserByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getUserEntityManager(commandContext).findUserIdsByQueryCriteria(this);
+    }
+
     // getters //////////////////////////////////////////////////////////
 
     @Override

@@ -32,6 +32,8 @@ public interface CmmnDeploymentEntityManager extends EntityManager<CmmnDeploymen
     CmmnDeploymentQuery createDeploymentQuery();
     
     List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery);
+
+    List<String> findDeploymentIdsByQueryCriteria(CmmnDeploymentQuery deploymentQuery);
     
     long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery);
 

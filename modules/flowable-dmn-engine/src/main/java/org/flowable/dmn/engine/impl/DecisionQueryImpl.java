@@ -329,6 +329,11 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
         return CommandContextUtil.getDecisionEntityManager(commandContext).findDecisionsByQueryCriteria(this);
     }
 
+    @Override
+    public List<String> executeListIds(CommandContext commandContext) {
+        return CommandContextUtil.getDecisionEntityManager(commandContext).findDecisionIdsByQueryCriteria(this);
+    }
+
     // getters ////////////////////////////////////////////
 
     public String getDeploymentId() {
