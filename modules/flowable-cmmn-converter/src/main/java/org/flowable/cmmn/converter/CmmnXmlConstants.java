@@ -243,5 +243,6 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DI_HEIGHT = "height";
     String ATTRIBUTE_DI_X = "x";
     String ATTRIBUTE_DI_Y = "y";
+    String ATTRIBUTE_DI_ROTATION = "rotation";
 
 }
