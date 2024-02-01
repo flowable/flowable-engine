@@ -245,7 +245,7 @@ public class BPMNDIExport implements BpmnXMLConstants {
 
     protected static void addLabelElement(GraphicInfo labelGraphicInfo, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_LABEL, BPMNDI_NAMESPACE);
-        if (labelGraphicInfo.getRotation() != 0) {
+        if (labelGraphicInfo.getRotation() > 0) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_ROTATION, String.valueOf(labelGraphicInfo.getRotation()));
         }
         xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
