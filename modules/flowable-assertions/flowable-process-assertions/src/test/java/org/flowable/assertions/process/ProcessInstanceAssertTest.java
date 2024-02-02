@@ -60,10 +60,11 @@ class ProcessInstanceAssertTest {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariable("variableName");
-        FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariable("variableName").isRunning();
-        FlowableProcessAssertions.assertThat(oneTaskProcess).isRunning().hasVariable("variableName");
-        assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariable("nonExistingVariable"))
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.hasVariable("variableName");
+        assertThatOneTaskProcess.hasVariable("variableName").isRunning();
+        assertThatOneTaskProcess.isRunning().hasVariable("variableName");
+        assertThatThrownBy(() -> assertThatOneTaskProcess.hasVariable("nonExistingVariable"))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("Expected process instance <oneTaskProcess, "+oneTaskProcess.getId()+"> has variable <nonExistingVariable> but variable does not exist.");
     }
@@ -96,9 +97,10 @@ class ProcessInstanceAssertTest {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotHaveVariable("NonExistingVariableName");
-        FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotHaveVariable("NonExistingVariableName").isRunning();
-        assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotHaveVariable("variableName"))
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.doesNotHaveVariable("NonExistingVariableName");
+        assertThatOneTaskProcess.doesNotHaveVariable("NonExistingVariableName").isRunning();
+        assertThatThrownBy(() -> assertThatOneTaskProcess.doesNotHaveVariable("variableName"))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("Expected process instance <oneTaskProcess, "+oneTaskProcess.getId()+"> does not have variable <variableName> but variable exists.");
     }
@@ -110,8 +112,9 @@ class ProcessInstanceAssertTest {
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotHaveVariable("variableName");
-        FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotHaveVariable("nonExistingVariable");
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.doesNotHaveVariable("variableName");
+        assertThatOneTaskProcess.doesNotHaveVariable("nonExistingVariable");
     }
 
     @Test
@@ -170,14 +173,15 @@ class ProcessInstanceAssertTest {
     void executions(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Running process has at least 2 active executions." +
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.as("Running process has at least 2 active executions." +
                         "(ProcessInstance + Child)")
                 .executions().extracting(Execution::getId).contains(oneTaskProcess.getId())
                         .hasSize(2);
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotExist().as("There must be no execution for the finished process.")
+        assertThatOneTaskProcess.doesNotExist().as("There must be no execution for the finished process.")
                 .executions().hasSize(0);
     }
 
@@ -186,23 +190,24 @@ class ProcessInstanceAssertTest {
     void variables(RuntimeService runtimeService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).variables().isEmpty();
-        assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariableWithValue("nonExistingVar", "anyValue"))
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.variables().isEmpty();
+        assertThatThrownBy(() -> assertThatOneTaskProcess.hasVariableWithValue("nonExistingVar", "anyValue"))
                 .isInstanceOf(AssertionError.class).hasMessage("Expected process instance <oneTaskProcess, "
                         +oneTaskProcess.getId()+"> has variable <nonExistingVar> but variable does not exist.");
 
         runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "initialValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).variables().extracting("name", "value").contains(Tuple.tuple("testVariable", "initialValue"));
-        FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariableWithValue("testVariable", "initialValue");
+        assertThatOneTaskProcess.variables().extracting("name", "value").contains(Tuple.tuple("testVariable", "initialValue"));
+        assertThatOneTaskProcess.hasVariableWithValue("testVariable", "initialValue");
 
         runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "updatedValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).variables().extracting("name", "value").contains(Tuple.tuple("testVariable", "updatedValue"));
-        FlowableProcessAssertions.assertThat(oneTaskProcess).hasVariableWithValue("testVariable", "updatedValue").isRunning();
+        assertThatOneTaskProcess.variables().extracting("name", "value").contains(Tuple.tuple("testVariable", "updatedValue"));
+        assertThatOneTaskProcess.hasVariableWithValue("testVariable", "updatedValue").isRunning();
 
         runtimeService.setVariable(oneTaskProcess.getId(), "firstVariable", "initialValue");
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variables are ordered by names ascending.")
+        assertThatOneTaskProcess.as("Variables are ordered by names ascending.")
                 .variables().extracting("name")
                 .containsExactly("firstVariable", "testVariable");
 
@@ -213,17 +218,18 @@ class ProcessInstanceAssertTest {
     void identityLinks(RuntimeService runtimeService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).identityLinks().isEmpty();
-        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().identityLinks().isEmpty();
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.identityLinks().isEmpty();
+        assertThatOneTaskProcess.inHistory().identityLinks().isEmpty();
 
         runtimeService.addUserIdentityLink(oneTaskProcess.getId(), "testUser", IdentityLinkType.ASSIGNEE);
         runtimeService.addGroupIdentityLink(oneTaskProcess.getId(), "testGroup", IdentityLinkType.CANDIDATE);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).identityLinks().hasSize(2)
+        assertThatOneTaskProcess.identityLinks().hasSize(2)
                 .extracting(IdentityLink::getUserId, IdentityLink::getGroupId, IdentityLink::getType)
                 .containsExactlyInAnyOrder(Tuple.tuple("testUser", null, IdentityLinkType.ASSIGNEE),
                         Tuple.tuple(null, "testGroup", IdentityLinkType.CANDIDATE));
-        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().identityLinks().hasSize(2)
+        assertThatOneTaskProcess.inHistory().identityLinks().hasSize(2)
                 .extracting(HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId, HistoricIdentityLink::getType)
                 .containsExactlyInAnyOrder(Tuple.tuple("testUser", null, IdentityLinkType.ASSIGNEE),
                         Tuple.tuple(null, "testGroup", IdentityLinkType.CANDIDATE));
@@ -236,25 +242,26 @@ class ProcessInstanceAssertTest {
                    TaskService taskService, ProcessEngineConfiguration processEngineConfiguration) {
         ProcessInstance oneTaskProcess = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").startAsync();
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Process instance is started asynchronously and did not reach userTask")
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.as("Process instance is started asynchronously and did not reach userTask")
                 .userTasks().isEmpty();
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Process instance is started asynchronously and did not reach userTask in history")
+        assertThatOneTaskProcess.as("Process instance is started asynchronously and did not reach userTask in history")
                 .inHistory().userTasks().isEmpty();
 
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10_000, 500);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Async executions executed and userTask reached.")
+        assertThatOneTaskProcess.as("Async executions executed and userTask reached.")
                 .userTasks().hasSize(1).extracting(Task::getTaskDefinitionKey).containsExactly("theTask");
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Async executions executed and userTask reached in history.")
+        assertThatOneTaskProcess.as("Async executions executed and userTask reached in history.")
                 .inHistory().userTasks().hasSize(1).extracting(HistoricTaskInstance::getTaskDefinitionKey)
                 .containsExactly("theTask");
 
         Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
         taskService.complete(task.getId());
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("User tasks are empty for non existing process").doesNotExist()
+        assertThatOneTaskProcess.as("User tasks are empty for non existing process").doesNotExist()
                 .userTasks().isEmpty();
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("The userTask is completed, but must exist in history.")
+        assertThatOneTaskProcess.as("The userTask is completed, but must exist in history.")
                 .inHistory().isFinished()
                 .userTasks().hasSize(1).extracting(HistoricTaskInstance::getTaskDefinitionKey)
                 .containsExactly("theTask");

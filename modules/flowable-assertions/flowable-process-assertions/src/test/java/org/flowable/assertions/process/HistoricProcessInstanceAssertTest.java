@@ -26,13 +26,14 @@ class HistoricProcessInstanceAssertTest {
     void isFinishedForFinishedProcessInstance(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().activities().extracting(HistoricActivityInstance::getActivityId).contains(
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.inHistory().activities().extracting(HistoricActivityInstance::getActivityId).contains(
                         "theStart", "theStart-theTask", "theTask"
                 );
 
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().isFinished()
+        assertThatOneTaskProcess.inHistory().isFinished()
             .activities().extracting(HistoricActivityInstance::getActivityId).contains(
                 "theStart", "theStart-theTask", "theTask", "theTask-theEnd", "theEnd"
             );
@@ -49,12 +50,13 @@ class HistoricProcessInstanceAssertTest {
     void variables(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.as("No variable exists in the process scope.")
                 .inHistory().variables().isEmpty();
         
         runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+        assertThatOneTaskProcess.as("Variable exists in the process scope, the variable must be present in the history.")
                 .inHistory()
                 .hasVariable("testVariable")
                 .hasVariableWithValue("testVariable", "variableValue")
@@ -64,7 +66,7 @@ class HistoricProcessInstanceAssertTest {
         Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
         taskService.complete(task.getId());
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+        assertThatOneTaskProcess.as("Variable exists in the process scope, the variable must be present in the history.")
                 .doesNotExist()
                 .inHistory()
                 .isFinished()
@@ -79,12 +81,13 @@ class HistoricProcessInstanceAssertTest {
     void hasVariable(RuntimeService runtimeService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.as("No variable exists in the process scope.")
                 .inHistory().variables().isEmpty();
 
         runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+        assertThatOneTaskProcess.as("Variable exists in the process scope, the variable must be present in the history.")
                 .inHistory().variables().hasSize(1).extracting("name", "value").
                 containsExactly(Tuple.tuple("testVariable", "variableValue"));
     }
@@ -94,16 +97,17 @@ class HistoricProcessInstanceAssertTest {
     void doesNotHaveVariable(RuntimeService runtimeService) {
         ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+        ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
+        assertThatOneTaskProcess.as("No variable exists in the process scope.")
                 .inHistory().doesNotHaveVariable("nonExistingVariable");
 
         runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
 
-        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+        assertThatOneTaskProcess.as("Variable exists in the process scope, the variable must be present in the history.")
                 .inHistory().doesNotHaveVariable("nonExistingVariable")
                 .hasVariable("testVariable");
 
-        assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().doesNotHaveVariable("testVariable"))
+        assertThatThrownBy(() -> assertThatOneTaskProcess.inHistory().doesNotHaveVariable("testVariable"))
                 .isInstanceOf(AssertionError.class)
                 .hasMessage("Expected process instance <oneTaskProcess, "+oneTaskProcess.getId()+"> does not have variable <testVariable> but variable exists in history.");
     }
