@@ -13,8 +13,11 @@
 
 package org.flowable.assertions.process;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.assertions.process.Utils.getProcessDescription;
+import static org.flowable.assertions.process.Utils.getProcessEngine;
+
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -24,13 +27,9 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
-import static org.flowable.assertions.process.FlowableProcessAssertions.assertThat;
-import static org.flowable.assertions.process.Utils.*;
-
 /**
  * @author martin.grofcik
  */
-
 public class HistoricProcessInstanceAssert extends AbstractAssert<HistoricProcessInstanceAssert, HistoricProcessInstance> {
 
     protected final ProcessServicesProvider processServicesProvider;
@@ -121,7 +120,7 @@ public class HistoricProcessInstanceAssert extends AbstractAssert<HistoricProces
         hasVariable(variableName);
 
         HistoricVariableInstance actualVariable = processServicesProvider.getHistoryService().createHistoricVariableInstanceQuery().processInstanceId(actual.getId()).variableName(variableName).singleResult();
-        Assertions.assertThat(actualVariable.getValue()).isEqualTo(expectedValue);
+        assertThat(actualVariable.getValue()).isEqualTo(expectedValue);
         return this;
     }
 
