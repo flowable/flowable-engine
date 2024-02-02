@@ -536,7 +536,9 @@
 		<module>modules/flowable-spring-security</module>
         <module>modules/flowable-http-common</module>
         <module>modules/flowable-mail</module>
-    </modules>
+        <module>modules/flowable-assertions</module>
+		<module>modules/flowable-assertions/flowable-process-assertions</module>
+	</modules>
 
 	<build>
 		<plugins>

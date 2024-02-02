@@ -1,0 +1,111 @@
+package org.flowable.assertions.process;
+
+import org.assertj.core.groups.Tuple;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableTest;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.assertions.process.TestUtils.createOneTaskProcess;
+
+/**
+ * @author martin.grofcik
+ */
+@FlowableTest
+class HistoricProcessInstanceAssertTest {
+
+    @Test
+    @Deployment(resources = "oneTask.bpmn20.xml")
+    void isFinishedForFinishedProcessInstance(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
+        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().activities().extracting(HistoricActivityInstance::getActivityId).contains(
+                        "theStart", "theStart-theTask", "theTask"
+                );
+
+        taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().isFinished()
+            .activities().extracting(HistoricActivityInstance::getActivityId).contains(
+                "theStart", "theStart-theTask", "theTask", "theTask-theEnd", "theEnd"
+            );
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
+        FlowableProcessAssertions.assertThat(historicProcessInstance).isFinished()
+                .activities().extracting(HistoricActivityInstance::getActivityId).contains(
+                        "theStart", "theStart-theTask", "theTask", "theTask-theEnd", "theEnd"
+                );
+    }
+
+    @Test
+    @Deployment(resources = "oneTask.bpmn20.xml")
+    void variables(RuntimeService runtimeService, TaskService taskService) {
+        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+                .inHistory().variables().isEmpty();
+        
+        runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+                .inHistory()
+                .hasVariable("testVariable")
+                .hasVariableWithValue("testVariable", "variableValue")
+                .variables().hasSize(1).extracting("name", "value").
+                containsExactly(Tuple.tuple("testVariable", "variableValue"));
+
+        Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+                .doesNotExist()
+                .inHistory()
+                .isFinished()
+                .hasVariable("testVariable")
+                .hasVariableWithValue("testVariable", "variableValue")
+                .variables().hasSize(1).extracting("name", "value").
+                containsExactly(Tuple.tuple("testVariable", "variableValue"));
+    }
+
+    @Test
+    @Deployment(resources = "oneTask.bpmn20.xml")
+    void hasVariable(RuntimeService runtimeService) {
+        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+                .inHistory().variables().isEmpty();
+
+        runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+                .inHistory().variables().hasSize(1).extracting("name", "value").
+                containsExactly(Tuple.tuple("testVariable", "variableValue"));
+    }
+
+    @Test
+    @Deployment(resources = "oneTask.bpmn20.xml")
+    void doesNotHaveVariable(RuntimeService runtimeService) {
+        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("No variable exists in the process scope.")
+                .inHistory().doesNotHaveVariable("nonExistingVariable");
+
+        runtimeService.setVariable(oneTaskProcess.getId(), "testVariable", "variableValue");
+
+        FlowableProcessAssertions.assertThat(oneTaskProcess).as("Variable exists in the process scope, the variable must be present in the history.")
+                .inHistory().doesNotHaveVariable("nonExistingVariable")
+                .hasVariable("testVariable");
+
+        assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).inHistory().doesNotHaveVariable("testVariable"))
+                .isInstanceOf(AssertionError.class)
+                .hasMessage("Expected process instance <oneTaskProcess, "+oneTaskProcess.getId()+"> does not have variable <testVariable> but variable exists in history.");
+    }
+
+}
