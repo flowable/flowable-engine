@@ -105,7 +105,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
     }
 
     /**
-     * Assert that process instance does on exist in <b>runtime</b>.
+     * Assert that process instance does not exist in <b>runtime</b>.
      *
      * @return Process instance assertion
      */

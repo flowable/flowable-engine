@@ -64,7 +64,7 @@ public class HistoricProcessInstanceAssert extends AbstractAssert<HistoricProces
         processExistsInHistory();
 
         if (processServicesProvider.getHistoryService().createHistoricProcessInstanceQuery().finished().processInstanceId(actual.getId()).count() != 1) {
-            failWithMessage(getProcessDescription(actual)+" to be finished, but is running in history.");
+            failWithMessage(getProcessDescription(actual) + " to be finished, but is running in history.");
         }
 
         return this;
@@ -87,7 +87,7 @@ public class HistoricProcessInstanceAssert extends AbstractAssert<HistoricProces
         processExistsInHistory();
 
         if (processServicesProvider.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(actual.getId()).variableExists(variableName).count() != 1) {
-            failWithMessage(getProcessDescription(actual)+" has variable <%s> but variable does not exist in history.", variableName);
+            failWithMessage(getProcessDescription(actual) + " has variable <%s> but variable does not exist in history.", variableName);
         }
 
         return this;
