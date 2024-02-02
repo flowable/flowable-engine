@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -283,8 +287,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             if (dueDate != null) {
                 if (dueDate instanceof Date) {
                     taskEntity.setDueDate((Date) dueDate);
-                } else if (dueDate instanceof String) {
 
+                } else if (dueDate instanceof String) {
                     String dueDateString = (String) dueDate;
                     if (dueDateString.startsWith("P")) {
                         taskEntity.setDueDate(new DateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime())
@@ -293,8 +297,17 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                         taskEntity.setDueDate(DateTime.parse(dueDateString).toDate());
                     }
 
+                } else if (dueDate instanceof Instant) {
+                    taskEntity.setDueDate(Date.from((Instant) dueDate));
+
+                } else if (dueDate instanceof LocalDate) {
+                    taskEntity.setDueDate(Date.from(((LocalDate) dueDate).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+
+                }  else if (dueDate instanceof LocalDateTime) {
+                    taskEntity.setDueDate(Date.from(((LocalDateTime) dueDate).atZone(ZoneId.systemDefault()).toInstant()));
+
                 } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + beforeContext.getDueDate());
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date, Instant, LocalDate, LocalDateTime or Date string: " + beforeContext.getDueDate());
                 }
             }
         }
@@ -397,13 +410,13 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
         List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
         if (taskEntities == null || taskEntities.isEmpty()) {
-            throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
+            throw new FlowableException("No task entity found for " + planItemInstance);
         }
 
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                TaskHelper.deleteTask(taskEntity, null, false, true, cmmnEngineConfiguration);
+                TaskHelper.completeTask(taskEntity, taskEntity.getTempCompletedBy(), cmmnEngineConfiguration);
             }
         }
 

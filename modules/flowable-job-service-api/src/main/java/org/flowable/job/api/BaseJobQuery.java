@@ -67,6 +67,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     U processDefinitionId(String processDefinitionId);
 
     /**
+     * Only select jobs which exist for the given process definition key
+     */
+    U processDefinitionKey(String processDefinitionKey);
+
+    /**
      * Only select jobs which exist for the given category
      */
     U category(String category);
@@ -115,6 +120,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Only select tasks for the given scope definition identifier.
      */
     U scopeDefinitionId(String scopeDefinitionId);
+
+    /**
+     * Only select tasks for the given case definition key.
+     */
+    U caseDefinitionKey(String caseDefinitionKey);
 
     /**
      * Only select jobs for the given case instance.

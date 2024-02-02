@@ -401,14 +401,15 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
-        String expectedMessage = "<html>\n"
-                + "                <body>\n"
-                + "                <ul>\n"
-                + "                  <li><b>Currency:</b>unknown</li>\n"
-                + "                  <li><b>Gender:</b>male</li>\n"
-                + "                  </ul>\n"
-                + "                </body>\n"
-                + "              </html>";
+        String expectedMessage = """
+                <html>
+                                <body>
+                                <ul>
+                                  <li><b>Currency:</b>unknown</li>
+                                  <li><b>Gender:</b>male</li>
+                                  </ul>
+                                </body>
+                              </html>""";
         assertEmailSend(messages.get(0), true, "Test", expectedMessage, "flowable@localhost", Collections.singletonList(
                 "kermit@flowable.org"), null);
     }
@@ -562,7 +563,8 @@ public class EmailServiceTaskTest extends EmailTestCase {
     public void testMissingAnyRecipientAddress() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
-            .hasMessage("No recipient could be found for sending email");
+            .hasMessageStartingWith("No recipient could be found for sending email for Execution[")
+            .hasMessageContainingAll(" - definition 'missingAnyRecipientAddress:1:", " - activity 'sendMail'");
     }
 
     @Test
@@ -571,7 +573,8 @@ public class EmailServiceTaskTest extends EmailTestCase {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
-            .hasMessage("No recipient could be found for sending email");
+            .hasMessageStartingWith("No recipient could be found for sending email for Execution[")
+            .hasMessageContainingAll(" - definition 'missingAnyRecipientAddress:1:", " - activity 'sendMail'");
     }
 
     // Helper

@@ -89,7 +89,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         // This happens if the job was already acquired, but not yet executed.
         // In that case, we can't allow to delete the job.
         if (job.getLockOwner() != null) {
-            throw new FlowableException("Cannot delete job when the job is being executed. Try again later.");
+            throw new FlowableException("Cannot delete " + job + " when the job is being executed. Try again later.");
         }
         return job;
     }

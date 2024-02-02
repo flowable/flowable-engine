@@ -81,7 +81,7 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
                 String processDefinitionId = execution.getProcessDefinitionId();
                 Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
                 if (process == null) {
-                    throw new FlowableException("Process model (id = " + processDefinitionId + ") could not be found");
+                    throw new FlowableException("Process model (id = " + processDefinitionId + ") could not be found for " + execution);
                 }
 
                 String compensationActivityId = null;

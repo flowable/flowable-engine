@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -40,8 +41,20 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         if (planItemInstanceEntity.getName() == null && planItemInstanceEntity.getPlanItem().getName() != null) {
             Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+            Object nameExpressionValue = nameExpression.getValue(planItemInstanceEntity);
+            if (nameExpressionValue != null) {
+                planItemInstanceEntity.setName(nameExpressionValue.toString());
+            }
         }
+
+        if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {
+            Expression businessStatusExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(stage.getBusinessStatus());
+            String actualBusinessStatus = (String) businessStatusExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatus)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(planItemInstanceEntity.getCaseInstanceId(), actualBusinessStatus);
+            }
+        }
+
         CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planItemInstanceEntity);
     }
     

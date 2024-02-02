@@ -39,7 +39,7 @@ public class DbSchemaDrop {
             AppEngine cmmnEngine = AppEngineConfiguration.createAppEngineConfigurationFromInputStream(inputStream).buildAppEngine();
             CommandExecutor commandExecutor = cmmnEngine.getAppEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
-            commandExecutor.execute(config, new Command<Object>() {
+            commandExecutor.execute(config, new Command<>() {
                 @Override
                 public Object execute(CommandContext commandContext) {
                     CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager().schemaDrop();

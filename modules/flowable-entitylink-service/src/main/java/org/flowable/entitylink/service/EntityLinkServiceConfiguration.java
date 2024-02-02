@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Tijs Rademakers
  */
-public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration {
+public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration<EntityLinkServiceConfiguration> {
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -46,26 +46,35 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     protected HistoricEntityLinkDataManager historicEntityLinkDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    
+
     protected EntityLinkEntityManager entityLinkEntityManager;
     protected HistoricEntityLinkEntityManager historicEntityLinkEntityManager;
-    
+
     protected HistoryLevel historyLevel;
-    
+
     protected ObjectMapper objectMapper;
-    
+
     public EntityLinkServiceConfiguration(String engineName) {
         super(engineName);
+    }
+
+    @Override
+    protected EntityLinkServiceConfiguration getService() {
+        return this;
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
+
+        configuratorsAfterInit();
     }
-    
+
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         if (logger.isDebugEnabled()) {
@@ -110,7 +119,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     public EntityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return this;
     }
-    
+
     public EntityLinkService getEntityLinkService() {
         return entityLinkService;
     }
@@ -119,7 +128,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkService = entityLinkService;
         return this;
     }
-    
+
     public HistoricEntityLinkService getHistoricEntityLinkService() {
         return historicEntityLinkService;
     }
@@ -137,7 +146,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkDataManager = entityLinkDataManager;
         return this;
     }
-    
+
     public HistoricEntityLinkDataManager getHistoricEntityLinkDataManager() {
         return historicEntityLinkDataManager;
     }
@@ -155,7 +164,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkEntityManager = entityLinkEntityManager;
         return this;
     }
-    
+
     public HistoricEntityLinkEntityManager getHistoricEntityLinkEntityManager() {
         return historicEntityLinkEntityManager;
     }
@@ -164,18 +173,18 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.historicEntityLinkEntityManager = historicEntityLinkEntityManager;
         return this;
     }
-    
+
     @Override
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
-    
+
     @Override
     public EntityLinkServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
         return this;
     }
-    
+
     @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;

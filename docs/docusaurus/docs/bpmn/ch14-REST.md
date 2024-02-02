@@ -7374,30 +7374,21 @@ The response body contains the binary content. By default, the content-type of t
 **Success response body:**
 
     {
-      "data": [
-        {
-          "id" : "5",
-          "businessKey" : "myKey",
-          "processDefinitionId" : "oneTaskProcess%3A1%3A4",
-          "processDefinitionUrl" : "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4",
-          "startTime" : "2013-04-17T10:17:43.902+0000",
-          "endTime" : "2013-04-18T14:06:32.715+0000",
-          "durationInMillis" : 86400056,
-          "startUserId" : "kermit",
-          "startActivityId" : "startEvent",
-          "endActivityId" : "endEvent",
-          "deleteReason" : null,
-          "superProcessInstanceId" : "3",
-          "url" : "http://localhost:8182/history/historic-process-instances/5",
-          "variables": null,
-          "tenantId":null
-        }
-      ],
-      "total": 1,
-      "start": 0,
-      "sort": "name",
-      "order": "asc",
-      "size": 1
+      "id" : "5",
+      "businessKey" : "myKey",
+      "processDefinitionId" : "oneTaskProcess%3A1%3A4",
+      "processDefinitionUrl" : "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4",
+      "startTime" : "2013-04-17T10:17:43.902+0000",
+      "endTime" : "2013-04-18T14:06:32.715+0000",
+      "durationInMillis" : 86400056,
+      "startUserId" : "kermit",
+      "startActivityId" : "startEvent",
+      "endActivityId" : "endEvent",
+      "deleteReason" : null,
+      "superProcessInstanceId" : "3",
+      "url" : "http://localhost:8182/history/historic-process-instances/5",
+      "variables": null,
+      "tenantId":null
     }
 
 ### List of historic process instances
@@ -8972,7 +8963,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "taskId" : "6",
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           }
         }
@@ -9041,7 +9032,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "taskId" : "6",
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           }
         }
@@ -9192,7 +9183,7 @@ The response body contains the binary value of the variable. When the variable i
           "revision" : 2,
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           },
           "propertyId": null,
@@ -9259,7 +9250,7 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
           "revision" : 2,
           "variable" : {
             "name" : "myVariable",
-            "variableScope", "global",
+            "variableScope": "global",
             "value" : "test"
           },
           "propertyId" : null,

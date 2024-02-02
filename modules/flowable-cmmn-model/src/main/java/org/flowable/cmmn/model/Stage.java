@@ -35,6 +35,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     protected String includeInStageOverview;
     protected List<PlanItemDefinition> planItemDefinitionList = new ArrayList<>();
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
+    protected String businessStatus;
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
         planItemDefinitionList.add(planItemDefinition);
@@ -193,6 +194,14 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     @Override
     public void setExitCriteria(List<Criterion> exitCriteria) {
         this.exitCriteria = exitCriteria;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
 }

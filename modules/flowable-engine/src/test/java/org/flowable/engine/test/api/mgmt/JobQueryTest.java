@@ -122,7 +122,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         timerThreeFireTime = new Date(t3.getTime() + ONE_HOUR);
 
         // Create one message
-        messageId = commandExecutor.execute(new Command<String>() {
+        messageId = commandExecutor.execute(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {
@@ -775,6 +775,55 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeadLetterJobQueryByProcessDefinitionKey() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+
+        DeadLetterJobEntity deadLetterJob = managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            DeadLetterJobEntityManager deadLetterJobEntityManager = jobServiceConfiguration.getDeadLetterJobEntityManager();
+            DeadLetterJobEntity job = deadLetterJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setProcessInstanceId(processInstance.getId());
+            job.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+            jobServiceConfiguration.getDeadLetterJobDataManager().insert(job);
+            return job;
+        });
+
+        DeadLetterJobEntity deadLetterJob2 = managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            DeadLetterJobEntityManager deadLetterJobEntityManager = jobServiceConfiguration.getDeadLetterJobEntityManager();
+            DeadLetterJobEntity job = deadLetterJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeId("scope1");
+            jobServiceConfiguration.getDeadLetterJobDataManager().insert(job);
+            return job;
+        });
+
+        DeadLetterJobQuery query = managementService.createDeadLetterJobQuery().processDefinitionKey("startToEnd");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).extracting(Job::getId).containsExactly(deadLetterJob.getId());
+        assertThat(query.singleResult().getId()).isEqualTo(deadLetterJob.getId());
+
+        query = managementService.createDeadLetterJobQuery().processDefinitionKey("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+
+        managementService.executeCommand((Command<Void>) commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            DeadLetterJobEntityManager deadLetterJobService = jobServiceConfiguration.getDeadLetterJobEntityManager();
+            List<Job> jobs = deadLetterJobService.findJobsByQueryCriteria(new DeadLetterJobQueryImpl(commandContext, jobServiceConfiguration));
+            for (Job job : jobs) {
+                deadLetterJobService.delete(job.getId());
+            }
+
+            return null;
+        });
+
+
+    }
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testDeadLetterJobQueryWithoutScopeType() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         DeadLetterJobEntity deadLetterJob = managementService.executeCommand((Command<DeadLetterJobEntity>) commandContext -> {
@@ -814,6 +863,55 @@ public class JobQueryTest extends PluggableFlowableTestCase {
             List<Job> jobs = deadLetterJobService.findJobsByQueryCriteria(new DeadLetterJobQueryImpl(commandContext, jobServiceConfiguration));
             for (Job job : jobs) {
                 deadLetterJobService.delete(job.getId());
+            }
+
+            return null;
+        });
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testSuspendedJobQueryByProcessDefinitionKey() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        SuspendedJobEntity suspendedJob = managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setProcessInstanceId(processInstance.getId());
+            job.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+            jobServiceConfiguration.getSuspendedJobEntityManager().insert(job);
+
+            return job;
+        });
+
+        SuspendedJobEntity suspendedJob2 = managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeId("scope1");
+            jobServiceConfiguration.getSuspendedJobEntityManager().insert(job);
+
+            return job;
+        });
+
+        SuspendedJobQuery query = managementService.createSuspendedJobQuery().processDefinitionKey("startToEnd");
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).extracting(Job::getId).containsExactly(suspendedJob.getId());
+        assertThat(query.singleResult().getId()).isEqualTo(suspendedJob.getId());
+
+        query = managementService.createSuspendedJobQuery().processDefinitionKey("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+
+        managementService.executeCommand((Command<Void>) commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            List<Job> jobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl(commandContext, jobServiceConfiguration));
+            for (Job job : jobs) {
+                suspendedJobEntityManager.delete(job.getId());
             }
 
             return null;
@@ -1005,7 +1103,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private JobEntity createJobWithType(String type) {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        return commandExecutor.execute(new Command<JobEntity>() {
+        return commandExecutor.execute(new Command<>() {
 
             @Override
             public JobEntity execute(CommandContext commandContext) {
@@ -1035,7 +1133,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     private JobEntity createJobWithHandlerType(String handlerType) {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        return commandExecutor.execute(new Command<JobEntity>() {
+        return commandExecutor.execute(new Command<>() {
 
             @Override
             public JobEntity execute(CommandContext commandContext) {

@@ -169,7 +169,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
                 eventRegistryEngine.getEventRegistryEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<Void>() {
+                new Command<>() {
 
                     @Override
                     public Void execute(CommandContext commandContext) {

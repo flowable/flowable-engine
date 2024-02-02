@@ -13,10 +13,8 @@
 package org.flowable.common.engine.impl.el;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
@@ -47,7 +45,8 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
-    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver;
+    protected FlowableFunctionResolver functionResolver;
+    protected FlowableFunctionResolverFactory functionResolverFactory = FunctionDelegatesFlowableFunctionResolver::new;
     protected List<FlowableAstFunctionCreator> astFunctionCreators;
 
     protected ELContext parsingElContext;
@@ -196,18 +195,7 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected void updateFunctionResolver() {
         if (this.functionDelegates != null) {
-            Map<String, FlowableFunctionDelegate> functionDelegateMap = new LinkedHashMap<>();
-            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
-                for (String prefix : functionDelegate.prefixes()) {
-                    for (String localName : functionDelegate.localNames()) {
-                        functionDelegateMap.put(prefix + ":" + localName, functionDelegate);
-                    }
-
-                }
-
-            }
-
-            this.functionResolver = (prefix, localName) -> functionDelegateMap.get(prefix + ":" + localName);
+            this.functionResolver = this.functionResolverFactory.create(this.functionDelegates);
 
         } else {
             this.functionResolver = null;
@@ -226,6 +214,17 @@ public class DefaultExpressionManager implements ExpressionManager {
         if (expressionFactory instanceof FlowableExpressionFactory) {
             ((FlowableExpressionFactory) expressionFactory).setAstFunctionCreators(astFunctionCreators);
         }
+    }
+
+    @Override
+    public FlowableFunctionResolverFactory getFunctionResolverFactory() {
+        return functionResolverFactory;
+    }
+
+    @Override
+    public void setFunctionResolverFactory(FlowableFunctionResolverFactory functionResolverFactory) {
+        this.functionResolverFactory = functionResolverFactory;
+        updateFunctionResolver();
     }
 
     public DeploymentCache<Expression> getExpressionCache() {

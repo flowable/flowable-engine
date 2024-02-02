@@ -199,6 +199,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_TASK_COMPLETER_VARIABLE_NAME = "taskCompleterVariableName";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
+    String ATTRIBUTE_IGNORE_REPETITION_COUNTER_VARIABLE = "ignoreCounterVariable";
     String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";
     String ATTRIBUTE_REPETITION_COLLECTION_VARIABLE_NAME = "collectionVariable";
     String ATTRIBUTE_REPETITION_ELEMENT_VARIABLE_NAME = "elementVariable";
@@ -220,6 +221,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
     String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
+    String START_EVENT_CORRELATION_MANUAL = "manualSubscription";
 
     String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
     String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";
@@ -241,5 +243,6 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DI_HEIGHT = "height";
     String ATTRIBUTE_DI_X = "x";
     String ATTRIBUTE_DI_Y = "y";
+    String ATTRIBUTE_DI_ROTATION = "rotation";
 
 }

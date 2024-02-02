@@ -235,7 +235,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             // Graphical information is not yet exposed publicly, so we need to
             // do some plumbing
             CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-            ProcessDefinition processDefinition = commandExecutor.execute(new Command<ProcessDefinition>() {
+            ProcessDefinition processDefinition = commandExecutor.execute(new Command<>() {
                 @Override
                 public ProcessDefinition execute(CommandContext commandContext) {
                     return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey("myProcess");

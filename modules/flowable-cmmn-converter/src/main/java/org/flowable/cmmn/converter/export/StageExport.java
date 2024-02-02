@@ -29,7 +29,7 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         return instance;
     }
 
-    private StageExport() {
+    protected StageExport() {
     }
 
     @Override
@@ -74,6 +74,9 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         }
         if (StringUtils.isNotEmpty(stage.getIncludeInStageOverview()) && !"true".equalsIgnoreCase(stage.getIncludeInStageOverview())) { // if it's missing, it's true by default
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, stage.getIncludeInStageOverview());
+        }
+        if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_BUSINESS_STATUS, stage.getBusinessStatus());
         }
     }
 

@@ -75,6 +75,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
 
+        assertThat(cmmnTaskService.getVariable(task.getId(), "repetitionCounter")).isEqualTo(1);
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", false);
         variables.put("description", "description task 0");
@@ -125,12 +126,14 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        assertThat(cmmnTaskService.getVariable(task.getId(), "repetitionCounter")).isEqualTo(2);
         variables.put("approved", true);
         variables.put("description", "description task 1");
         cmmnTaskService.setAssignee(task.getId(), "userTwo");
         cmmnTaskService.complete(task.getId(), variables);
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        assertThat(cmmnTaskService.getVariable(task.getId(), "repetitionCounter")).isEqualTo(3);
         variables.put("approved", false);
         variables.put("description", "description task 2");
         cmmnTaskService.setAssignee(task.getId(), "userThree");
@@ -166,6 +169,57 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                             + "]");
         }
 
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testSequentialRepeatingUserTaskIgnoreCounter() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("repeatingTask")
+            .variable("nrOfLoops", 3)
+            .variable("otherVariable", "Hello World")
+            .start();
+
+        ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ userId: null }"
+                        + "]");
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+
+        assertThat(cmmnTaskService.getVariable(task.getId(), "repetitionCounter")).isEqualTo(1); 
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 0");
+        cmmnTaskService.setAssignee(task.getId(), "userOne");
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ userId: 'userOne' }"
+                        + "]");
+
+        cmmnTaskService.complete(task.getId(), variables);
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
+                        + "{ userId: null }"
+                        + "]");
+
+        assertVariablesNotVisible(caseInstance);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        assertThat(cmmnTaskService.getVariable(task.getId(), "repetitionCounter")).isEqualTo(2);
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        cmmnTaskService.setAssignee(task.getId(), "userTwo");
+        cmmnTaskService.complete(task.getId(), variables);
     }
 
     @Test

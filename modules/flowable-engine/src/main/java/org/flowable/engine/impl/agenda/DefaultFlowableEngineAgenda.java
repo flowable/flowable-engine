@@ -15,6 +15,7 @@ package org.flowable.engine.impl.agenda;
 import java.util.Collection;
 
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -55,6 +56,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
         if (executionEntity != null) {
             CommandContextUtil.addInvolvedExecution(commandContext, executionEntity);
         }
+    }
+
+    @Override
+    protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getAgendaFutureMaxWaitTimeoutProvider();
     }
 
     /* SPECIFIC operations */

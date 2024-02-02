@@ -130,7 +130,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // Check if timer is eligible to be executed, when process in not yet suspended
         final JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        List<TimerJobEntity> jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
+        List<TimerJobEntity> jobs = commandExecutor.execute(new Command<>() {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
@@ -144,7 +144,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         runtimeService.suspendProcessInstanceById(procInst.getId());
 
         // Check if the timer is NOT acquired, even though the duedate is reached
-        jobs = commandExecutor.execute(new Command<List<TimerJobEntity>>() {
+        jobs = commandExecutor.execute(new Command<>() {
 
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
@@ -169,10 +169,12 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
     }
 
     protected List<TimerJobEntity> executeAcquireJobsCommand() {
-        return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
+        return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
+
             @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
-                JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+                JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations()
+                        .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
                 return jobServiceConfiguration.getTimerJobEntityManager().findJobsToExecute(null, new Page(0, 1));
             }
 

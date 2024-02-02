@@ -118,11 +118,12 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setAsynchronous(true);
         assertTask.setScriptFormat("groovy");
         assertTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
-                        "import static org.hamcrest.core.Is.is;\n" +
-                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
-                        "\n" +
-                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+                """
+                        import org.flowable.engine.impl.context.Context;
+                        import static org.hamcrest.core.Is.is;
+                        import static org.flowable.examples.test.MatcherAssert.assertThat;
+
+                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"""
         );
         testFlowNodesSkeleton.add(assertTask);
 
@@ -184,10 +185,11 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
                     completeTask.setAsynchronous(true);
                     completeTask.setScriptFormat("groovy");
                     completeTask.setScript(
-                            "import org.flowable.engine.impl.context.Context;\n" +
-                                    "\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
-                                    "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                            """
+                                    import org.flowable.engine.impl.context.Context;
+
+                                    taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
+                                    Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"""
                     );
                     flowNodes.add(completeTask);
                     break;
@@ -230,10 +232,11 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         completeTask.setAsynchronous(true);
         completeTask.setScriptFormat("groovy");
         completeTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
-                        "\n" +
-                        "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();\n" +
-                        "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                """
+                        import org.flowable.engine.impl.context.Context;
+
+                        taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
+                        Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"""
         );
         process.addFlowElement(completeTask);
 
@@ -243,11 +246,12 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setAsynchronous(true);
         assertTask.setScriptFormat("groovy");
         assertTask.setScript(
-                "import org.flowable.engine.impl.context.Context;\n" +
-                        "import static org.hamcrest.core.Is.is;\n" +
-                        "import static org.flowable.examples.test.MatcherAssert.assertThat;\n" +
-                        "\n" +
-                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"
+                """
+                        import org.flowable.engine.impl.context.Context;
+                        import static org.hamcrest.core.Is.is;
+                        import static org.flowable.examples.test.MatcherAssert.assertThat;
+
+                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"""
         );
         process.addFlowElement(assertTask);
 

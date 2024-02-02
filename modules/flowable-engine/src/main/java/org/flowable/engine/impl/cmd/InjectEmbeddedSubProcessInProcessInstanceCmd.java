@@ -83,7 +83,7 @@ public class InjectEmbeddedSubProcessInProcessInstanceCmd extends AbstractDynami
         }
         
         if (initialEvent == null) {
-            throw new FlowableException("Could not find a none start event in dynamic sub process");
+            throw new FlowableException("Could not find a none start event in dynamic sub process for " + processInstance);
         }
         
         childExecution.setCurrentFlowElement(initialEvent);

@@ -170,7 +170,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 processEngine.getProcessEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<Void>() {
+                new Command<>() {
 
                     @Override
                     public Void execute(CommandContext commandContext) {

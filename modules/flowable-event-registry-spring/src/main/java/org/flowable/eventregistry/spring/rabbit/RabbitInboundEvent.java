@@ -87,4 +87,13 @@ public class RabbitInboundEvent implements InboundEvent {
     public void setStringContentTypes(Collection<String> stringContentTypes) {
         this.stringContentTypes = stringContentTypes;
     }
+
+    @Override
+    public String toString() {
+        return "RabbitInboundEvent{" +
+                "message=" + message +
+                ", stringContentTypes=" + stringContentTypes +
+                ", headers=" + headers +
+                '}';
+    }
 }

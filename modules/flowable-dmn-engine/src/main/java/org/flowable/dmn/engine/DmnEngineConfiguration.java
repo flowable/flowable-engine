@@ -466,7 +466,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new DmnCommandInvoker();
+            commandInvoker = new DmnCommandInvoker(agendaOperationExecutionListeners);
         }
     }
     public void initDmnEngineAgendaFactory() {

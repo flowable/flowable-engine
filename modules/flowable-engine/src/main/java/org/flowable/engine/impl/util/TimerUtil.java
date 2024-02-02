@@ -14,6 +14,9 @@ package org.flowable.engine.impl.util;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -121,12 +124,19 @@ public class TimerUtil {
 
         } else if (dueDateValue instanceof Duration) {
         	dueDateString = ((Duration) dueDateValue).toString();
+
         } else if (dueDateValue instanceof Instant) {
             duedate = Date.from((Instant) dueDateValue);
             
+        } else if (dueDateValue instanceof LocalDate) {
+            duedate = Date.from(((LocalDate) dueDateValue).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
+        } else if (dueDateValue instanceof LocalDateTime) {
+            duedate = Date.from(((LocalDateTime) dueDateValue).atZone(ZoneId.systemDefault()).toInstant());
+
         } else if (dueDateValue != null) {
             throw new FlowableException("Timer '" + executionEntity.getActivityId()
-                    + "' was not configured with a valid duration/time, either hand in a java.util.Date or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                    + "' in " + executionEntity + " was not configured with a valid duration/time, either hand in a java.util.Date, java.time.LocalDate, java.time.LocalDateTime or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
         }
 
         if (duedate == null && dueDateString != null) {
@@ -176,7 +186,11 @@ public class TimerUtil {
             }
             
         } else {
-            throw new FlowableException("Due date could not be determined for timer job " + dueDateString);
+            StringBuilder sb = new StringBuilder("Due date could not be determined for timer job ").append(dueDateString);
+            if (executionEntity != null) {
+                sb.append(" for ").append(executionEntity);
+            }
+            throw new FlowableException(sb.toString());
         }
 
         if (StringUtils.isNotEmpty(timerEventDefinition.getTimeCycle())) {

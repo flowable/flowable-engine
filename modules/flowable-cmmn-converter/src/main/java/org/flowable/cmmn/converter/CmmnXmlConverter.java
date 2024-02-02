@@ -47,7 +47,7 @@ import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
-import org.flowable.cmmn.converter.export.StageExport;
+import org.flowable.cmmn.converter.export.PlanItemDefinitionExport;
 import org.flowable.cmmn.converter.export.TextAnnotationExport;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.model.Association;
@@ -128,6 +128,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
+        addElementConverter(new CmmnDiLabelXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
         addElementConverter(new CmmnDiExtensionXmlConverter());
         addElementConverter(new StandardEventXmlConverter());
@@ -294,7 +295,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
                 Stage planModel = caseModel.getPlanModel();
 
-                StageExport.getInstance().writePlanItemDefinition(model, planModel, xtw);
+                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw);
 
                 // end case element
                 xtw.writeEndElement();
@@ -393,6 +394,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         // set DI elements
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
+            if (diShape.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diShape.getCmmnElementRef(), diShape.getLabelGraphicInfo());
+            }
         }
 
         processDiEdges(cmmnModel, conversionHelper.getDiEdges());
@@ -438,6 +442,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
             cmmnModel.addEdgeInfo(diEdge.getId(), diEdge);
             cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
+            if (diEdge.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diEdge.getId(), diEdge.getLabelGraphicInfo());
+            }
         }
     }
 

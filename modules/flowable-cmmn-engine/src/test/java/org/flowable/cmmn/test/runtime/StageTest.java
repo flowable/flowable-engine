@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.StageResponse;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -941,5 +942,29 @@ public class StageTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId(), true);
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageBusinessStatus() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageBusinessStatus")
+                .businessStatus("beforeStage").variable("secondStageVar", "secondStage").start();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isEqualTo("beforeStage");
+
+        Task beforeStageTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("beforeStage").singleResult();
+        cmmnTaskService.complete(beforeStageTask.getId());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isEqualTo("firstStage");
+
+        Task insideStageTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("insideStage").singleResult();
+        cmmnTaskService.complete(insideStageTask.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicCaseInstance.getBusinessStatus()).isEqualTo("secondStage");
     }
 }

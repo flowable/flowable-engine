@@ -18,6 +18,8 @@
   "executor": "rabbitTaskExecutor",
   "ackMode": "NONE",
 
+  "eventFilterDelegateExpression": "testEventFilterExpression",
+
   "deserializerType": "json",
   "channelEventKeyDetection": {
     "jsonField": "eventKey"

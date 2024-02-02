@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,12 +27,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -71,6 +74,30 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
 
             // Every service task sleeps for 1s, but when we use futures it should take less then 2s.
             assertThat(historicProcessInstance.getDurationInMillis()).isLessThan(1500);
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesTest.testExpressionReturnsFuture.bpmn20.xml")
+    public void testAgendaFutureMaxWaitTimeoutOperationProvider() {
+
+        AgendaFutureMaxWaitTimeoutProvider originalTimeoutProvider = processEngineConfiguration.getAgendaFutureMaxWaitTimeoutProvider();
+        try {
+            processEngineConfiguration.setAgendaFutureMaxWaitTimeoutProvider(commandContext -> Duration.ofMillis(500));
+            CountDownLatch latch = new CountDownLatch(3);
+            TestBeanReturnsFuture testBean = new TestBeanReturnsFuture(latch, processEngineConfiguration.getAsyncTaskExecutor());
+            assertThatThrownBy(() -> {
+                runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("myProcess")
+                        .transientVariable("bean", testBean)
+                        .start();
+            })
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("None of the available futures completed within the max timeout of PT0.5S")
+                    .cause()
+                    .isInstanceOf(TimeoutException.class);
+        } finally {
+            processEngineConfiguration.setAgendaFutureMaxWaitTimeoutProvider(originalTimeoutProvider);
         }
     }
 

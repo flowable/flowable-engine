@@ -324,7 +324,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
     }
     
     protected static <T> T convertFromJsonNodeToObject(JsonNode jsonNode, ObjectMapper objectMapper) {
-        return objectMapper.convertValue(jsonNode, new TypeReference<T>() {
+        return objectMapper.convertValue(jsonNode, new TypeReference<>() {
 
         });
     }

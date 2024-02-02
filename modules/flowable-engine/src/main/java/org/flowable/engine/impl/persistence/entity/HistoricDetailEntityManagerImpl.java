@@ -56,7 +56,7 @@ public class HistoricDetailEntityManagerImpl
         if (activityInstance != null) {
             activityInstanceId = activityInstance.getId();
         } else {
-            throw new FlowableException("ActivityInstance not found for execution "+execution.getId());
+            throw new FlowableException("ActivityInstance not found for " + execution);
         }
         historicFormPropertyEntity.setActivityInstanceId(activityInstanceId);
 

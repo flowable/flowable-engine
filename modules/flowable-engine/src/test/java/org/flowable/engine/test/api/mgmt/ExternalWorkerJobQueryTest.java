@@ -117,6 +117,23 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testQueryByProcessDefinitionKey() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ExternalWorkerJobQuery query = managementService.createExternalWorkerJobQuery().processDefinitionKey(processInstance1.getProcessDefinitionKey());
+        assertThat(query.count()).isEqualTo(4);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getProcessInstanceId)
+                .containsOnly(processInstance1.getId(), processInstance2.getId());
+
+        query = managementService.createExternalWorkerJobQuery().processDefinitionKey("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
     public void testQueryByExecutionId() {
         runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
 
@@ -492,8 +509,12 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
             managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker1");
             
         }).isInstanceOf(FlowableException.class)
-          .hasMessageContaining("Job is locked with a different worker id");
-        
+                .hasMessage("ExternalWorkerJobEntity[id=" + worker2Job.getId()
+                        + ", jobHandlerType=external-worker-complete, jobType=externalWorker, elementId=externalCustomer1, correlationId="
+                        + worker2Job.getCorrelationId() + ", processInstanceId=" + worker2Job.getProcessInstanceId()
+                        + ", executionId=" + worker2Job.getExecutionId() + ", processDefinitionId=" + worker2Job.getProcessDefinitionId()
+                        + "] is locked with a different worker id");
+
         managementService.unacquireExternalWorkerJob(worker2Job.getId(), "testWorker2");
         
         assertThat(query.count()).isEqualTo(0);

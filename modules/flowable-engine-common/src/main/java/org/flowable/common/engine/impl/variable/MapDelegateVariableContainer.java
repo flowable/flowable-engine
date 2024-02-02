@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.variable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
 
@@ -144,5 +145,13 @@ public class MapDelegateVariableContainer implements VariableContainer {
     @Override
     public String getTenantId() {
         return this.delegate.getTenantId();
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", getClass().getSimpleName() + "[", "]")
+                .add("delegate=" + delegate)
+                .add("tenantId=" + getTenantId())
+                .toString();
     }
 }

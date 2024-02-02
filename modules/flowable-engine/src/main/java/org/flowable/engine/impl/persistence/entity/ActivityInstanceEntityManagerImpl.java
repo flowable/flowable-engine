@@ -20,9 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
@@ -32,6 +35,8 @@ import org.flowable.engine.impl.persistence.entity.data.ActivityInstanceDataMana
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author martin.grofcik
@@ -43,6 +48,7 @@ public class ActivityInstanceEntityManagerImpl
     protected static final String NO_ACTIVITY_ID_PREFIX = "_flow_";
     protected static final String NO_ACTIVITY_ID_SEPARATOR = "__";
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final boolean usePrefixId;
 
     public ActivityInstanceEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, ActivityInstanceDataManager activityInstanceDataManager) {
@@ -350,9 +356,32 @@ public class ActivityInstanceEntityManagerImpl
         }
 
         if (execution.getCurrentFlowElement() != null) {
-            activityInstanceEntity.setActivityName(execution.getCurrentFlowElement().getName());
+            String currentFlowName = execution.getCurrentFlowElement().getName();
+            if (StringUtils.isNotEmpty(currentFlowName) && (currentFlowName.contains("${") || currentFlowName.contains("#{"))) {
+                Expression activityNameExpression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager()
+                        .createExpression(currentFlowName);
+
+                String nameValue = null;
+                try {
+                    Object expressionValue = activityNameExpression.getValue(execution);
+                    if (expressionValue != null) {
+                        nameValue = expressionValue.toString();
+                    }
+                } catch (FlowableException e) {
+                    nameValue = currentFlowName;
+                    logger.warn("property not found in task name expression {} for execution {}", e.getMessage(), execution);
+                }
+                if (nameValue != null) {
+                    execution.setCurrentActivityName(nameValue);
+                    activityInstanceEntity.setActivityName(nameValue);
+                }
+            } else {
+                activityInstanceEntity.setActivityName(currentFlowName);
+            }
+
             activityInstanceEntity.setActivityType(parseActivityType(execution.getCurrentFlowElement()));
         }
+
         Date now = getClock().getCurrentTime();
         activityInstanceEntity.setStartTime(now);
         

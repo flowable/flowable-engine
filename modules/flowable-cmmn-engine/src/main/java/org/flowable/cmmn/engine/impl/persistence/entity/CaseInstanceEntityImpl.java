@@ -484,4 +484,19 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
         this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CaseInstance[id=").append(id)
+                .append(", caseDefinitionId=").append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+
+        sb.append("]");
+
+        return sb.toString();
+    }
 }

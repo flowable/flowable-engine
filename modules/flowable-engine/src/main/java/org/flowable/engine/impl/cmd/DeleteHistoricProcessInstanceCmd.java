@@ -49,7 +49,7 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
             throw new FlowableObjectNotFoundException("No historic process instance found with id: " + processInstanceId, HistoricProcessInstance.class);
         }
         if (instance.getEndTime() == null) {
-            throw new FlowableException("Process instance is still running, cannot delete historic process instance: " + processInstanceId);
+            throw new FlowableException("Process instance is still running, cannot delete " + instance);
         }
 
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, instance.getProcessDefinitionId())) {

@@ -1235,8 +1235,12 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
             cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker2");
 
         }).isInstanceOf(FlowableException.class)
-            .hasMessageContaining("Job is locked with a different worker id");
-        
+                .hasMessage("ExternalWorkerJobEntity[id=" + job.getId()
+                        + ", jobHandlerType=cmmn-external-worker-complete, jobType=externalWorker, elementId=externalWorkerTask, correlationId="
+                        + job.getCorrelationId() + ", scopeId=" + job.getScopeId()
+                        + ", subScopeId=" + job.getSubScopeId() + ", scopeType=cmmn, scopeDefinitionId=" + job.getScopeDefinitionId()
+                        + "] is locked with a different worker id");
+
         cmmnManagementService.unacquireExternalWorkerJob(job.getId(), "testWorker1");
         assertThat(query.count()).isEqualTo(0);
 

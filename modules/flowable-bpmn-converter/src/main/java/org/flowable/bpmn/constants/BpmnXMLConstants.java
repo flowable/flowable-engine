@@ -269,6 +269,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_SEND_SYNCHRONOUSLY = "sendSynchronously";
     public static final String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
     public static final String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
+    public static final String START_EVENT_CORRELATION_MANUAL = "manualSubscription";
 
     public static final String ATTRIBUTE_TRIGGERABLE = "triggerable";
     public static final String ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER = "triggerEventCorrelationParameter";
@@ -386,6 +387,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DI_SOURCE_DOCKER_Y = "sourceDockerY";
     public static final String ATTRIBUTE_DI_TARGET_DOCKER_X = "targetDockerX";
     public static final String ATTRIBUTE_DI_TARGET_DOCKER_Y = "targetDockerY";
+    public static final String ATTRIBUTE_DI_ROTATION = "rotation";
 
     public static final String ELEMENT_DATA_OBJECT = "dataObject";
     public static final String ATTRIBUTE_DATA_ID = "id";

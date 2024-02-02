@@ -24,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -196,6 +195,7 @@ import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
+import org.flowable.cmmn.engine.interceptor.HumanTaskStateInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
@@ -214,6 +214,7 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.ServiceConfigurator;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
@@ -334,6 +335,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String cmmnEngineName = CmmnEngines.NAME_DEFAULT;
 
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
+    protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl(this);
     protected DynamicCmmnService dynamicCmmnService = new DynamicCmmnServiceImpl(this);
@@ -386,6 +388,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
+    protected HumanTaskStateInterceptor humanTaskStateInterceptor;
     protected CreateCasePageTaskInterceptor createCasePageTaskInterceptor;
     protected CreateCmmnExternalWorkerJobInterceptor createCmmnExternalWorkerJobInterceptor;
     protected CmmnIdentityLinkInterceptor identityLinkInterceptor;
@@ -467,16 +470,20 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
-    
+    protected Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> identityLinkServiceConfigurators;
+
     // Entitylink support
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    protected Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> entityLinkServiceConfigurators;
     protected boolean enableEntityLinks;
     
     // EventSubscription support
     protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
+    protected Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> eventSubscriptionServiceConfigurators;
 
     // Task support
     protected TaskServiceConfiguration taskServiceConfiguration;
+    protected Collection<ServiceConfigurator<TaskServiceConfiguration>> taskServiceConfigurators;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
@@ -485,12 +492,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     // Batch support
     protected BatchServiceConfiguration batchServiceConfiguration;
+    protected Collection<ServiceConfigurator<BatchServiceConfiguration>> batchServiceConfigurators;
 
     // Variable support
     protected VariableTypes variableTypes;
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
+    protected Collection<ServiceConfigurator<VariableServiceConfiguration>> variableServiceConfigurators;
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
     /**
@@ -1010,7 +1019,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     public void initCommandInvoker() {
         if (this.commandInvoker == null) {
-            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner);
+            this.commandInvoker = new CmmnCommandInvoker(agendaOperationRunner, agendaOperationExecutionListeners);
         }
     }
 
@@ -1514,6 +1523,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
+        this.variableServiceConfiguration.setConfigurators(variableServiceConfigurators);
     }
 
     public void initVariableServiceConfiguration() {
@@ -1564,6 +1574,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
 
+        this.taskServiceConfiguration.setConfigurators(this.taskServiceConfigurators);
         this.taskServiceConfiguration.init();
 
         if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
@@ -1586,6 +1597,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
 
+        this.identityLinkServiceConfiguration.setConfigurators(this.identityLinkServiceConfigurators);
         this.identityLinkServiceConfiguration.init();
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
@@ -1604,6 +1616,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
     
+            this.entityLinkServiceConfiguration.setConfigurators(this.entityLinkServiceConfigurators);
             this.entityLinkServiceConfiguration.init();
     
             addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
@@ -1622,6 +1635,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.eventSubscriptionServiceConfiguration.setEventSubscriptionLockTime(this.eventRegistryUniqueCaseInstanceStartLockTime);
         
+        this.eventSubscriptionServiceConfiguration.setConfigurators(this.eventSubscriptionServiceConfigurators);
         this.eventSubscriptionServiceConfiguration.init();
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG, this.eventSubscriptionServiceConfiguration);
@@ -1907,6 +1921,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.batchServiceConfiguration.setObjectMapper(this.objectMapper);
             this.batchServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
+            this.batchServiceConfiguration.setConfigurators(this.batchServiceConfigurators);
             this.batchServiceConfiguration.init();
         }
 
@@ -2068,6 +2083,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnEngineAgendaFactory(CmmnEngineAgendaFactory cmmnEngineAgendaFactory) {
         this.cmmnEngineAgendaFactory = cmmnEngineAgendaFactory;
+        return this;
+    }
+
+    public AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return agendaFutureMaxWaitTimeoutProvider;
+    }
+
+    public CmmnEngineConfiguration setAgendaFutureMaxWaitTimeoutProvider(AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider) {
+        this.agendaFutureMaxWaitTimeoutProvider = agendaFutureMaxWaitTimeoutProvider;
         return this;
     }
 
@@ -2549,6 +2573,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public HumanTaskStateInterceptor getHumanTaskStateInterceptor() {
+        return humanTaskStateInterceptor;
+    }
+
+    public CmmnEngineConfiguration setHumanTaskStateInterceptor(HumanTaskStateInterceptor humanTaskStateInterceptor) {
+        this.humanTaskStateInterceptor = humanTaskStateInterceptor;
+        return this;
+    }
+
     public CreateCasePageTaskInterceptor getCreateCasePageTaskInterceptor() {
         return createCasePageTaskInterceptor;
     }
@@ -2873,13 +2906,49 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
         return this;
     }
-    
+
+    public Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> getIdentityLinkServiceConfigurators() {
+        return identityLinkServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setIdentityLinkServiceConfigurators(
+                    Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> identityLinkServiceConfigurators) {
+        this.identityLinkServiceConfigurators = identityLinkServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addIdentityLinkServiceConfigurator(ServiceConfigurator<IdentityLinkServiceConfiguration> configurator) {
+        if (this.identityLinkServiceConfigurators == null) {
+            this.identityLinkServiceConfigurators = new ArrayList<>();
+        }
+        this.identityLinkServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
         return entityLinkServiceConfiguration;
     }
 
     public CmmnEngineConfiguration setEntityLinkServiceConfiguration(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
         this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> getEntityLinkServiceConfigurators() {
+        return entityLinkServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setEntityLinkServiceConfigurators(
+                    Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> entityLinkServiceConfigurators) {
+        this.entityLinkServiceConfigurators = entityLinkServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addEntityLinkServiceConfigurator(ServiceConfigurator<EntityLinkServiceConfiguration> configurator) {
+        if (this.entityLinkServiceConfigurators == null) {
+            this.entityLinkServiceConfigurators = new ArrayList<>();
+        }
+        this.entityLinkServiceConfigurators.add(configurator);
         return this;
     }
 
@@ -2893,12 +2962,48 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public Collection<ServiceConfigurator<VariableServiceConfiguration>> getVariableServiceConfigurators() {
+        return variableServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setVariableServiceConfigurators(Collection<ServiceConfigurator<VariableServiceConfiguration>> variableServiceConfigurators) {
+        this.variableServiceConfigurators = variableServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addVariableServiceConfigurator(ServiceConfigurator<VariableServiceConfiguration> configurator) {
+        if (this.variableServiceConfigurators == null) {
+            this.variableServiceConfigurators = new ArrayList<>();
+        }
+
+        this.variableServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public TaskServiceConfiguration getTaskServiceConfiguration() {
         return taskServiceConfiguration;
     }
 
     public CmmnEngineConfiguration setTaskServiceConfiguration(TaskServiceConfiguration taskServiceConfiguration) {
         this.taskServiceConfiguration = taskServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<TaskServiceConfiguration>> getTaskServiceConfigurators() {
+        return taskServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setTaskServiceConfigurators(Collection<ServiceConfigurator<TaskServiceConfiguration>> taskServiceConfigurators) {
+        this.taskServiceConfigurators = taskServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addTaskServiceConfigurator(ServiceConfigurator<TaskServiceConfiguration> configurator) {
+        if (this.taskServiceConfigurators == null) {
+            this.taskServiceConfigurators = new ArrayList<>();
+        }
+
+        this.taskServiceConfigurators.add(configurator);
         return this;
     }
 
@@ -2935,6 +3040,25 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setBatchServiceConfiguration(BatchServiceConfiguration batchServiceConfiguration) {
         this.batchServiceConfiguration = batchServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<BatchServiceConfiguration>> getBatchServiceConfigurators() {
+        return batchServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setBatchServiceConfigurators(Collection<ServiceConfigurator<BatchServiceConfiguration>> batchServiceConfigurators) {
+        this.batchServiceConfigurators = batchServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addBatchServiceConfigurator(
+                    ServiceConfigurator<BatchServiceConfiguration> configurator) {
+        if (this.batchServiceConfigurators == null) {
+            this.batchServiceConfigurators = new ArrayList<>();
+        }
+
+        this.batchServiceConfigurators.add(configurator);
         return this;
     }
 
@@ -3946,6 +4070,26 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEventSubscriptionServiceConfiguration(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> getEventSubscriptionServiceConfigurators() {
+        return eventSubscriptionServiceConfigurators;
+    }
+
+    public CmmnEngineConfiguration setEventSubscriptionServiceConfigurators(
+                    Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> eventSubscriptionServiceConfigurators) {
+        this.eventSubscriptionServiceConfigurators = eventSubscriptionServiceConfigurators;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addEventSubscriptionServiceConfigurator(
+                    ServiceConfigurator<EventSubscriptionServiceConfiguration> configurator) {
+        if (this.eventSubscriptionServiceConfigurators == null) {
+            this.eventSubscriptionServiceConfigurators = new ArrayList<>();
+        }
+
+        this.eventSubscriptionServiceConfigurators.add(configurator);
         return this;
     }
 

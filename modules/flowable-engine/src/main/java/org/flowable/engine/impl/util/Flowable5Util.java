@@ -42,7 +42,7 @@ public class Flowable5Util {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean isFlowable5ProcessDefinition = Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
         if (isFlowable5ProcessDefinition) {
-            return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+            return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
                 @Override
                 public Boolean execute(CommandContext commandContext) {
                     CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().executeJobWithLockAndRetry(job);
@@ -86,7 +86,7 @@ public class Flowable5Util {
             return isFlowable5ProcessDefinition(processDefinition, processEngineConfiguration);
 
         } else {
-            return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+            return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public Boolean execute(CommandContext commandContext) {

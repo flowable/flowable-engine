@@ -106,6 +106,27 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/mgmt/ExternalWorkerJobQueryTest.cmmn")
+    public void testQueryByCaseDefinitionKey() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionKey("externalWorkerJobQueryTest");
+        assertThat(query.count()).isEqualTo(4);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getScopeId)
+                .containsOnly(caseInstance1.getId(), caseInstance2.getId());
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionKey("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/mgmt/ExternalWorkerJobQueryTest.cmmn")
     public void testQueryByPlanItemInstanceId() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("externalWorkerJobQueryTest")

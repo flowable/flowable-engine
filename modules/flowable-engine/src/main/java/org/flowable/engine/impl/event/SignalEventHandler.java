@@ -52,13 +52,13 @@ public class SignalEventHandler extends AbstractEventHandler {
             ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
             if (processDefinition.isSuspended()) {
-                throw new FlowableException("Could not handle signal: process definition with id: " + processDefinitionId + " is suspended");
+                throw new FlowableException("Could not handle signal: process definition with id: " + processDefinitionId + " is suspended for " + eventSubscription);
             }
 
             // Start process instance via the flow element linked to the event
             FlowElement flowElement = process.getFlowElement(eventSubscription.getActivityId(), true);
             if (flowElement == null) {
-                throw new FlowableException("Could not find matching FlowElement for activityId " + eventSubscription.getActivityId());
+                throw new FlowableException("Could not find matching FlowElement for " + eventSubscription);
             }
 
             ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
@@ -69,7 +69,7 @@ public class SignalEventHandler extends AbstractEventHandler {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getCaseInstanceService().handleSignalEvent(eventSubscription, getPayloadAsMap(payload));
         
         } else {
-            throw new FlowableException("Invalid signal handling: no execution nor process definition set");
+            throw new FlowableException("Invalid signal handling: no execution nor process definition set for " + eventSubscription);
         }
     }
 

@@ -13,15 +13,12 @@
 package org.flowable.job.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
-import org.flowable.common.engine.impl.ServiceConfigurator;
 import org.flowable.common.engine.impl.calendar.BusinessCalendarManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -64,12 +61,12 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJo
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This service configuration contains all settings and instances around job execution and management.
- * Note that a {@link JobServiceConfiguration} is not shared between engines and instantiated for each engine.
+ * This service configuration contains all settings and instances around job execution and management. Note that a {@link JobServiceConfiguration} is
+ * not shared between engines and instantiated for each engine.
  * 
  * @author Tijs Rademakers
  */
-public class JobServiceConfiguration extends AbstractServiceConfiguration {
+public class JobServiceConfiguration extends AbstractServiceConfiguration<JobServiceConfiguration> {
 
     public static final String JOB_EXECUTION_SCOPE_ALL = "all";
     public static final String JOB_EXECUTION_SCOPE_CMMN = "cmmn";
@@ -84,7 +81,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected JobManager jobManager;
 
     protected TimerJobScheduler timerJobScheduler;
-    protected Collection<ServiceConfigurator<JobServiceConfiguration>> configurators;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
@@ -116,50 +112,43 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected AsyncExecutor asyncExecutor;
     protected int asyncExecutorNumberOfRetries;
     protected int asyncExecutorResetExpiredJobsMaxTimeout;
-    
+
     protected String jobExecutionScope;
     protected Map<String, JobHandler> jobHandlers;
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
     protected List<JobProcessor> jobProcessors;
-    
+
     protected List<String> enabledJobCategories;
-    
+
     protected AsyncExecutor asyncHistoryExecutor;
     protected int asyncHistoryExecutorNumberOfRetries;
     protected String historyJobExecutionScope;
-    
+
     protected Map<String, HistoryJobHandler> historyJobHandlers;
     protected List<HistoryJobProcessor> historyJobProcessors;
-    
+
     public JobServiceConfiguration(String engineName) {
         super(engineName);
+    }
+
+    @Override
+    protected JobServiceConfiguration getService() {
+        return this;
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        List<ServiceConfigurator<JobServiceConfiguration>> configurators;
-        if (this.configurators != null) {
-            configurators = new ArrayList<>(this.configurators);
-            configurators.sort(Comparator.comparingInt(ServiceConfigurator::getPriority));
-        } else {
-            configurators = Collections.emptyList();
-        }
-
-        for (ServiceConfigurator<JobServiceConfiguration> configurator : configurators) {
-            configurator.beforeInit(this);
-        }
+        configuratorsBeforeInit();
 
         initTimerJobScheduler();
         initJobManager();
         initDataManagers();
         initEntityManagers();
 
-        for (ServiceConfigurator<JobServiceConfiguration> configurator : configurators) {
-            configurator.afterInit(this);
-        }
+        configuratorsAfterInit();
     }
 
     @Override
@@ -290,14 +279,6 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.timerJobScheduler = timerJobScheduler;
     }
 
-    public Collection<ServiceConfigurator<JobServiceConfiguration>> getConfigurators() {
-        return configurators;
-    }
-
-    public void setConfigurators(Collection<ServiceConfigurator<JobServiceConfiguration>> configurators) {
-        this.configurators = configurators;
-    }
-
     public JobDataManager getJobDataManager() {
         return jobDataManager;
     }
@@ -421,7 +402,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public void setInternalJobManager(InternalJobManager internalJobManager) {
         this.internalJobManager = internalJobManager;
     }
-    
+
     public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
         return internalJobCompatibilityManager;
     }
@@ -438,7 +419,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.asyncExecutor = asyncExecutor;
         return this;
     }
-    
+
     public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
@@ -447,7 +428,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
         return this;
     }
-    
+
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -465,7 +446,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.jobExecutionScope = jobExecutionScope;
         return this;
     }
-    
+
     public String getHistoryJobExecutionScope() {
         return historyJobExecutionScope;
     }
@@ -501,7 +482,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public JobServiceConfiguration addJobHandler(String type, JobHandler jobHandler) {
         if (this.jobHandlers == null) {
             this.jobHandlers = new HashMap<>();
@@ -536,7 +517,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.historyJobHandlers = historyJobHandlers;
         return this;
     }
-    
+
     public JobServiceConfiguration addHistoryJobHandler(String type, HistoryJobHandler historyJobHandler) {
         if (this.historyJobHandlers == null) {
             this.historyJobHandlers = new HashMap<>();
@@ -599,7 +580,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public InternalJobParentStateResolver getJobParentStateResolver() {
         return jobParentStateResolver;
     }
-    
+
     public List<String> getEnabledJobCategories() {
         return enabledJobCategories;
     }
@@ -612,7 +593,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (enabledJobCategories == null) {
             enabledJobCategories = new ArrayList<>();
         }
-        
+
         enabledJobCategories.add(jobCategory);
     }
 

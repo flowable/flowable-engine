@@ -51,20 +51,22 @@ public class VariableGetOrDefaultFunctionTest extends FlowableCmmnTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("loadRef", null);
         VariableContainer variableContainer = new VariableContainerWrapper(variables);
-        assertThat(executeExpression("<ul>\n"
-                + "        <li><b>Reference:</b>${vars:getOrDefault(loadRef, 'unknown')}</li>\n"
-                + "        <li><b>Currency:</b>${vars:getOrDefault(currencyRef, 'unknown')} (looked up from first loads LoadCostCurrency.)</ls>\n"
-                + "        <li><b>Customer:</b>${vars:getOrDefault(custRef, 'unknown')} (looked up from load.CustomerId)</li>\n"
-                + "        <li><b>Vendor:</b>${vars:getOrDefault(vendorRef, 'unknown')} (looked up from load.HaulierId)</li>\n"
-                + "        <li><b>Item:</b>${vars:getOrDefault(itemRef, 'unknown')} (ref data based on companyId)</li>\n"
-                + "        </ul>", variableContainer))
-                .isEqualTo("<ul>\n"
-                        + "        <li><b>Reference:</b>unknown</li>\n"
-                        + "        <li><b>Currency:</b>unknown (looked up from first loads LoadCostCurrency.)</ls>\n"
-                        + "        <li><b>Customer:</b>unknown (looked up from load.CustomerId)</li>\n"
-                        + "        <li><b>Vendor:</b>unknown (looked up from load.HaulierId)</li>\n"
-                        + "        <li><b>Item:</b>unknown (ref data based on companyId)</li>\n"
-                        + "        </ul>");
+        assertThat(executeExpression("""
+                <ul>
+                        <li><b>Reference:</b>${vars:getOrDefault(loadRef, 'unknown')}</li>
+                        <li><b>Currency:</b>${vars:getOrDefault(currencyRef, 'unknown')} (looked up from first loads LoadCostCurrency.)</ls>
+                        <li><b>Customer:</b>${vars:getOrDefault(custRef, 'unknown')} (looked up from load.CustomerId)</li>
+                        <li><b>Vendor:</b>${vars:getOrDefault(vendorRef, 'unknown')} (looked up from load.HaulierId)</li>
+                        <li><b>Item:</b>${vars:getOrDefault(itemRef, 'unknown')} (ref data based on companyId)</li>
+                        </ul>""", variableContainer))
+                .isEqualTo("""
+                        <ul>
+                                <li><b>Reference:</b>unknown</li>
+                                <li><b>Currency:</b>unknown (looked up from first loads LoadCostCurrency.)</ls>
+                                <li><b>Customer:</b>unknown (looked up from load.CustomerId)</li>
+                                <li><b>Vendor:</b>unknown (looked up from load.HaulierId)</li>
+                                <li><b>Item:</b>unknown (ref data based on companyId)</li>
+                                </ul>""");
     }
 
     @Test

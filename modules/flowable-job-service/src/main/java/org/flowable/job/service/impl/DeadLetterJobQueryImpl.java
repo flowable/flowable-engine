@@ -45,6 +45,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String handlerType;
     protected Collection<String> handlerTypes;
     protected String processDefinitionId;
+    protected String processDefinitionKey;
     protected String category;
     protected String categoryLike;
     protected String elementId;
@@ -55,6 +56,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String scopeType;
     protected boolean withoutScopeType;
     protected String scopeDefinitionId;
+    protected String caseDefinitionKey;
     protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
@@ -122,6 +124,15 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQueryImpl processDefinitionKey(String processDefinitionKey) {
+        if (processDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided process definition key is null");
+        }
+        this.processDefinitionKey = processDefinitionKey;
         return this;
     }
     
@@ -208,7 +219,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
-    
+
     @Override
     public DeadLetterJobQuery caseInstanceId(String caseInstanceId) {
         if (caseInstanceId == null) {
@@ -226,6 +237,15 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         }
         scopeDefinitionId(caseDefinitionId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQueryImpl caseDefinitionKey(String caseDefinitionKey) {
+        if (caseDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition key null");
+        }
+        this.caseDefinitionKey = caseDefinitionKey;
         return this;
     }
     
@@ -447,6 +467,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
+
     public boolean getExecutable() {
         return executable;
     }
@@ -482,6 +506,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
+
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
     
     public String getCategory() {
         return category;
@@ -502,7 +530,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public String getScopeId() {
         return scopeId;
     }
-    
+
     public boolean isWithoutScopeId() {
         return withoutScopeId;
     }
@@ -521,6 +549,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
     }
 
     public String getCorrelationId() {

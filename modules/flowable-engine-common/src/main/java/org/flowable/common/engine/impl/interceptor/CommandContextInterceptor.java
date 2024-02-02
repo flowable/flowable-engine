@@ -104,7 +104,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
             return next.execute(config, command, commandExecutor);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
             commandContext.exception(e);
 
@@ -135,7 +135,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
             if (exception instanceof FlowableException) {
                 throw (FlowableException) exception;
             } else {
-                throw new FlowableException("Exception during command execution", exception);
+                throw new FlowableException("Exception during execution of command " + command, exception);
             }
         }
 

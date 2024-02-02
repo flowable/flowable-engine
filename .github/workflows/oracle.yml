@@ -44,9 +44,10 @@ jobs:
           --health-timeout 10s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use oracle for the host here because we have specified a container for the job.
@@ -96,9 +97,10 @@ jobs:
           --health-timeout 10s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v2-beta
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
         with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use oracle for the host here because we have specified a container for the job.

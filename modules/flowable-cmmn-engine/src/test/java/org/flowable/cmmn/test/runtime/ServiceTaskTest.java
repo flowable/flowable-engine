@@ -484,7 +484,9 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 })
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
+                .hasMessageStartingWith("Error while evaluating expression: ${testBean.invoke()} with PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task One", "definitionId: serviceTask", "state: active", "elementId: planItem1",
+                        "caseInstanceId: ", "caseDefinitionId: ")
                 .cause()
                 .isInstanceOf(ELException.class)
                 .cause()
@@ -506,7 +508,9 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 })
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
+                .hasMessageStartingWith("Error while evaluating expression: ${testBean.invoke()} with PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task One", "definitionId: serviceTask", "state: active", "elementId: planItem1",
+                        "caseInstanceId: ", "caseDefinitionId: ")
                 .cause()
                 .isInstanceOf(ELException.class)
                 .cause()

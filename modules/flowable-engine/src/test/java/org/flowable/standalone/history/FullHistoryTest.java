@@ -853,7 +853,8 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Delete the historic process-instance, which is still running
         assertThatThrownBy(() -> historyService.deleteHistoricProcessInstance(processInstance.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageStartingWith("Process instance is still running, cannot delete historic process instance");
+                .hasMessageStartingWith("Process instance is still running, cannot delete HistoricProcessInstanceEntity")
+                .hasMessageContaining("definition=" + processInstance.getProcessDefinitionId());
     }
 
     /**

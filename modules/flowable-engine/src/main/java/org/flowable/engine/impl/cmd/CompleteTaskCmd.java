@@ -19,6 +19,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -30,6 +32,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
 
+    protected String userId;
     protected Map<String, Object> variables;
     protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
@@ -38,6 +41,11 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
         super(taskId);
         this.variables = variables;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables) {
+        this(taskId, variables);
+        this.userId = userId;
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
@@ -48,10 +56,20 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             this.variables = variables;
         }
     }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, boolean localScope) {
+        this(taskId, variables, localScope);
+        this.userId = userId;
+    }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         this(taskId, variables);
         this.transientVariables = transientVariables;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        this(taskId, variables, transientVariables);
+        this.userId = userId;
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
@@ -63,11 +81,18 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
         this.transientVariablesLocal = transientVariablesLocal;
     }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
+    }
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
-            throw new FlowableException("The task instance is created by the cmmn engine and should be completed via the cmmn engine API");
+            throw new FlowableException("The " + task + " is created by the cmmn engine and should be completed via the cmmn engine API");
         }
         
         // Backwards compatibility
@@ -89,12 +114,19 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        TaskHelper.completeTask(task, variables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+        TaskHelper.completeTask(task, userId, variables, variablesLocal, transientVariables, 
+                transientVariablesLocal, commandContext);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+            processEngineConfiguration.getUserTaskStateInterceptor().handleComplete(task, userId);
+        }
+        
         return null;
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot complete a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot complete";
     }
 }

@@ -81,4 +81,12 @@ public class JmsMessageInboundEvent implements InboundEvent {
             return message.toString();
         }
     }
+
+    @Override
+    public String toString() {
+        return "JmsMessageInboundEvent{" +
+                "message=" + message +
+                ", headers=" + headers +
+                '}';
+    }
 }

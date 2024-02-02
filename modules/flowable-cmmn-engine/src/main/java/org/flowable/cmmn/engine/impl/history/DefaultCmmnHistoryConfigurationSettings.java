@@ -29,6 +29,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -246,6 +247,11 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         String caseDefinitionId = getCaseDefinitionId(entityLink);
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance) {
+        return cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     protected String getCaseDefinitionId(EntityLinkEntity entityLink) {

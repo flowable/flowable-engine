@@ -123,7 +123,7 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
 
     private void assertSentryPartInstanceCount(CaseInstance caseInstance, int count) {
         List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor()
-                .execute(new Command<List<SentryPartInstanceEntity>>() {
+                .execute(new Command<>() {
 
                     @Override
                     public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {

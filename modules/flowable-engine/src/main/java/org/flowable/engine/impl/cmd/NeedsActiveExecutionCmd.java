@@ -49,7 +49,7 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
         }
 
         if (execution.isSuspended()) {
-            throw new FlowableException(getSuspendedExceptionMessage());
+            throw new FlowableException(getSuspendedExceptionMessagePrefix() + " a suspended " + execution);
         }
 
         return execute(commandContext, execution);
@@ -63,8 +63,8 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
     /**
      * Subclasses can override this to provide a more detailed exception message that will be thrown when the execution is suspended.
      */
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot execution operation because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot execute operation for";
     }
 
 }

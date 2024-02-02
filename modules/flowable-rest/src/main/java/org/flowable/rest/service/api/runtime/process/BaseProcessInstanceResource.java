@@ -108,6 +108,12 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessDefinitionEngineVersion() != null) {
             query.processDefinitionEngineVersion(queryRequest.getProcessDefinitionEngineVersion());
         }
+        if (queryRequest.getRootScopeId() != null) {
+            query.processInstanceRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.processInstanceParentScopeId(queryRequest.getParentScopeId());
+        }
         if (queryRequest.getDeploymentId() != null) {
             query.deploymentId(queryRequest.getDeploymentId());
         }

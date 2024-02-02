@@ -37,7 +37,7 @@ import org.flowable.task.service.impl.persistence.entity.data.impl.MyBatisHistor
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.MybatisTaskDataManager;
 
-public class TaskServiceConfiguration extends AbstractServiceConfiguration {
+public class TaskServiceConfiguration extends AbstractServiceConfiguration<TaskServiceConfiguration> {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/task/service/db/mapping/mappings.xml";
 
@@ -46,7 +46,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected TaskService taskService = new TaskServiceImpl(this);
     protected HistoricTaskService historicTaskService = new HistoricTaskServiceImpl(this);
-    
+
     protected IdmIdentityService idmIdentityService;
 
     // DATA MANAGERS ///////////////////////////////////////////////////
@@ -64,10 +64,10 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalTaskAssignmentManager internalTaskAssignmentManager;
-    
+
     protected boolean enableTaskRelationshipCounts;
     protected boolean enableLocalization;
-    
+
     protected TaskQueryInterceptor taskQueryInterceptor;
     protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
 
@@ -75,18 +75,27 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     // Events
     protected boolean enableHistoricTaskLogging;
-    
+
     public TaskServiceConfiguration(String engineName) {
         super(engineName);
+    }
+
+    @Override
+    protected TaskServiceConfiguration getService() {
+        return this;
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
         initTaskPostProcessor();
+
+        configuratorsAfterInit();
     }
 
     // Data managers
@@ -130,7 +139,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         this.taskService = taskService;
         return this;
     }
-    
+
     public HistoricTaskService getHistoricTaskService() {
         return historicTaskService;
     }

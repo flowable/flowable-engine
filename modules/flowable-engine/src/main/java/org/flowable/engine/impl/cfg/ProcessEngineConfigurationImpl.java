@@ -25,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -56,6 +55,8 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.HasVariableTypes;
 import org.flowable.common.engine.impl.ScriptingEngineAwareEngineConfiguration;
 import org.flowable.common.engine.impl.ServiceConfigurator;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
@@ -260,7 +261,7 @@ import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.DefaultIdentityLinkInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
-import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
+import org.flowable.engine.impl.interceptor.LoggingExecutionTreeAgendaOperationExecutionListener;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncLeaveJobHandler;
@@ -351,6 +352,7 @@ import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
+import org.flowable.engine.interceptor.UserTaskStateInterceptor;
 import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
 import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
@@ -526,13 +528,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DecisionTableVariableManager decisionTableVariableManager;
 
     protected VariableServiceConfiguration variableServiceConfiguration;
+    protected Collection<ServiceConfigurator<VariableServiceConfiguration>> variableServiceConfigurators;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    protected Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> identityLinkServiceConfigurators;
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    protected Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> entityLinkServiceConfigurators;
     protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
+    protected Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> eventSubscriptionServiceConfigurators;
     protected TaskServiceConfiguration taskServiceConfiguration;
+    protected Collection<ServiceConfigurator<TaskServiceConfiguration>> taskServiceConfigurators;
     protected JobServiceConfiguration jobServiceConfiguration;
     protected Collection<ServiceConfigurator<JobServiceConfiguration>> jobServiceConfigurators;
     protected BatchServiceConfiguration batchServiceConfiguration;
+    protected Collection<ServiceConfigurator<BatchServiceConfiguration>> batchServiceConfigurators;
 
     protected boolean enableEntityLinks;
 
@@ -743,6 +751,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
+    protected UserTaskStateInterceptor userTaskStateInterceptor;
     protected CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor;
     protected IdentityLinkInterceptor identityLinkInterceptor;
     protected ProcessInstanceQueryInterceptor processInstanceQueryInterceptor;
@@ -827,6 +836,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
+    protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
     protected SchemaManager identityLinkSchemaManager;
     protected SchemaManager entityLinkSchemaManager;
@@ -1016,12 +1026,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
+            Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners = this.agendaOperationExecutionListeners;
             if (enableVerboseExecutionTreeLogging) {
-                this.commandInvoker = new LoggingExecutionTreeCommandInvoker(agendaOperationRunner);
-
-            } else {
-                this.commandInvoker = new CommandInvoker(agendaOperationRunner);
+                if (agendaOperationExecutionListeners == null) {
+                    agendaOperationExecutionListeners = new ArrayList<>();
+                } else {
+                    agendaOperationExecutionListeners = new ArrayList<>(agendaOperationExecutionListeners);
+                }
+                agendaOperationExecutionListeners.add(new LoggingExecutionTreeAgendaOperationExecutionListener());
             }
+            this.commandInvoker = new CommandInvoker(agendaOperationRunner, agendaOperationExecutionListeners);
         }
     }
 
@@ -1341,7 +1355,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 addSessionFactory(new AgendaSessionFactory(agendaFactory));
             }
 
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
 
             commandContextFactory.setSessionFactories(sessionFactories);
 
@@ -1407,6 +1421,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
+        this.variableServiceConfiguration.setConfigurators(variableServiceConfigurators);
     }
 
     public void initVariableServiceConfiguration() {
@@ -1431,6 +1446,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.identityLinkServiceConfiguration.setIdentityLinkEventHandler(this.identityLinkEventHandler);
 
+        this.identityLinkServiceConfiguration.setConfigurators(this.identityLinkServiceConfigurators);
         this.identityLinkServiceConfiguration.init();
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
@@ -1449,6 +1465,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
             this.entityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
+            this.entityLinkServiceConfiguration.setConfigurators(this.entityLinkServiceConfigurators);
             this.entityLinkServiceConfiguration.init();
 
             addServiceConfiguration(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG, this.entityLinkServiceConfiguration);
@@ -1466,9 +1483,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.eventSubscriptionServiceConfiguration.setObjectMapper(this.objectMapper);
         this.eventSubscriptionServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.eventSubscriptionServiceConfiguration.setEventSubscriptionLockTime(this.eventRegistryUniqueProcessInstanceStartLockTime);
-        
+
+        this.eventSubscriptionServiceConfiguration.setConfigurators(this.eventSubscriptionServiceConfigurators);
         this.eventSubscriptionServiceConfiguration.init();
-        
+
         addServiceConfiguration(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG, this.eventSubscriptionServiceConfiguration);
     }
     
@@ -1519,7 +1537,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setEnableLocalization(this.performanceSettings.isEnableLocalization());
         this.taskServiceConfiguration.setTaskQueryInterceptor(this.taskQueryInterceptor);
         this.taskServiceConfiguration.setHistoricTaskQueryInterceptor(this.historicTaskQueryInterceptor);
-
+        
+        this.taskServiceConfiguration.setConfigurators(this.taskServiceConfigurators);
         this.taskServiceConfiguration.init();
 
         if (dbSqlSessionFactory != null && taskServiceConfiguration.getTaskDataManager() instanceof AbstractDataManager) {
@@ -1648,6 +1667,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.batchServiceConfiguration.setObjectMapper(this.objectMapper);
             this.batchServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
+            this.batchServiceConfiguration.setConfigurators(this.batchServiceConfigurators);
             this.batchServiceConfiguration.init();
         }
 
@@ -3064,12 +3084,48 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> getIdentityLinkServiceConfigurators() {
+        return identityLinkServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkServiceConfigurators(
+                    Collection<ServiceConfigurator<IdentityLinkServiceConfiguration>> identityLinkServiceConfigurators) {
+        this.identityLinkServiceConfigurators = identityLinkServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addIdentityLinkServiceConfigurator(ServiceConfigurator<IdentityLinkServiceConfiguration> configurator) {
+        if (this.identityLinkServiceConfigurators == null) {
+            this.identityLinkServiceConfigurators = new ArrayList<>();
+        }
+        this.identityLinkServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
         return entityLinkServiceConfiguration;
     }
 
     public ProcessEngineConfigurationImpl setEntityLinkServiceConfiguration(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
         this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> getEntityLinkServiceConfigurators() {
+        return entityLinkServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setEntityLinkServiceConfigurators(
+                    Collection<ServiceConfigurator<EntityLinkServiceConfiguration>> entityLinkServiceConfigurators) {
+        this.entityLinkServiceConfigurators = entityLinkServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addEntityLinkServiceConfigurator(ServiceConfigurator<EntityLinkServiceConfiguration> configurator) {
+        if (this.entityLinkServiceConfigurators == null) {
+            this.entityLinkServiceConfigurators = new ArrayList<>();
+        }
+        this.entityLinkServiceConfigurators.add(configurator);
         return this;
     }
 
@@ -3082,8 +3138,44 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public Collection<ServiceConfigurator<TaskServiceConfiguration>> getTaskServiceConfigurators() {
+        return taskServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskServiceConfigurators(Collection<ServiceConfigurator<TaskServiceConfiguration>> taskServiceConfigurators) {
+        this.taskServiceConfigurators = taskServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addTaskServiceConfigurator(ServiceConfigurator<TaskServiceConfiguration> configurator) {
+        if (this.taskServiceConfigurators == null) {
+            this.taskServiceConfigurators = new ArrayList<>();
+        }
+
+        this.taskServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public ProcessEngineConfigurationImpl setVariableServiceConfiguration(VariableServiceConfiguration variableServiceConfiguration) {
         this.variableServiceConfiguration = variableServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<VariableServiceConfiguration>> getVariableServiceConfigurators() {
+        return variableServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableServiceConfigurators(Collection<ServiceConfigurator<VariableServiceConfiguration>> variableServiceConfigurators) {
+        this.variableServiceConfigurators = variableServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addVariableServiceConfigurator(ServiceConfigurator<VariableServiceConfiguration> configurator) {
+        if (this.variableServiceConfigurators == null) {
+            this.variableServiceConfigurators = new ArrayList<>();
+        }
+
+        this.variableServiceConfigurators.add(configurator);
         return this;
     }
 
@@ -3335,6 +3427,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public UserTaskStateInterceptor getUserTaskStateInterceptor() {
+        return userTaskStateInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setUserTaskStateInterceptor(UserTaskStateInterceptor userTaskStateInterceptor) {
+        this.userTaskStateInterceptor = userTaskStateInterceptor;
+        return this;
+    }
+
     public CreateExternalWorkerJobInterceptor getCreateExternalWorkerJobInterceptor() {
         return createExternalWorkerJobInterceptor;
     }
@@ -3395,6 +3496,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAgendaFactory(FlowableEngineAgendaFactory agendaFactory) {
         this.agendaFactory = agendaFactory;
+        return this;
+    }
+
+    public AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return agendaFutureMaxWaitTimeoutProvider;
+    }
+
+    public ProcessEngineConfigurationImpl setAgendaFutureMaxWaitTimeoutProvider(AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider) {
+        this.agendaFutureMaxWaitTimeoutProvider = agendaFutureMaxWaitTimeoutProvider;
         return this;
     }
 
@@ -5370,12 +5480,51 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public Collection<ServiceConfigurator<BatchServiceConfiguration>> getBatchServiceConfigurators() {
+        return batchServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setBatchServiceConfigurators(Collection<ServiceConfigurator<BatchServiceConfiguration>> batchServiceConfigurators) {
+        this.batchServiceConfigurators = batchServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addBatchServiceConfigurator(
+                    ServiceConfigurator<BatchServiceConfiguration> configurator) {
+        if (this.batchServiceConfigurators == null) {
+            this.batchServiceConfigurators = new ArrayList<>();
+        }
+
+        this.batchServiceConfigurators.add(configurator);
+        return this;
+    }
+
     public EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
         return eventSubscriptionServiceConfiguration;
     }
 
     public ProcessEngineConfigurationImpl setEventSubscriptionServiceConfiguration(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
+        return this;
+    }
+
+    public Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> getEventSubscriptionServiceConfigurators() {
+        return eventSubscriptionServiceConfigurators;
+    }
+
+    public ProcessEngineConfigurationImpl setEventSubscriptionServiceConfigurators(
+                    Collection<ServiceConfigurator<EventSubscriptionServiceConfiguration>> eventSubscriptionServiceConfigurators) {
+        this.eventSubscriptionServiceConfigurators = eventSubscriptionServiceConfigurators;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addEventSubscriptionServiceConfigurator(
+                    ServiceConfigurator<EventSubscriptionServiceConfiguration> configurator) {
+        if (this.eventSubscriptionServiceConfigurators == null) {
+            this.eventSubscriptionServiceConfigurators = new ArrayList<>();
+        }
+
+        this.eventSubscriptionServiceConfigurators.add(configurator);
         return this;
     }
 

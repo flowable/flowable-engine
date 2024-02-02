@@ -527,7 +527,7 @@
                         <configuration>
                             <arguments>
                                 <argument>--spring.datasource.driver-class-name=com.mysql.jdbc.Driver</argument>
-                                <argument>--spring.datasource.url=jdbc:mysql://127.1.0-SNAPSHOT.1:3306/flowable?characterEncoding=UTF-8</argument>
+                                <argument>--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</argument>
                                 <argument>--spring.datasource.username=flowable</argument>
                                 <argument>--spring.datasource.password=flowable</argument>
                             </arguments>
@@ -559,7 +559,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>flowable/flowable-jre:17.0.9</image>
                             </from>
                             <to>
                                 <image>flowable-rest</image>
@@ -601,7 +601,17 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>flowable/flowable-jre:17.0.9</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>amd64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                    <platform>
+                                        <architecture>arm64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
                             </from>
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
@@ -647,7 +657,17 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.15</image>
+                                <image>flowable/flowable-jre:17.0.9</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>amd64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                    <platform>
+                                        <architecture>arm64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
                             </from>
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>

@@ -379,7 +379,7 @@ public class JakartaMailFlowableMailClient implements FlowableMailClient {
         properties.setProperty(MAIL_HOST, host);
 
         MailHostServerConfiguration.Transport transport = serverConfiguration.transport();
-        properties.setProperty(MAIL_TRANSPORT_STARTTLS_ENABLE, transport == MailHostServerConfiguration.Transport.SMTPS_TLS ? "true" : "false");
+        properties.setProperty(MAIL_TRANSPORT_STARTTLS_ENABLE, Boolean.toString(serverConfiguration.isStartTlsEnabled()));
         properties.setProperty(MAIL_TRANSPORT_STARTTLS_REQUIRED, "false");
 
         properties.setProperty(MAIL_SMTP_SEND_PARTIAL, "false");
@@ -390,7 +390,7 @@ public class JakartaMailFlowableMailClient implements FlowableMailClient {
             properties.setProperty(MAIL_SMTP_AUTH, "true");
         }
 
-        if (transport == MailHostServerConfiguration.Transport.SMTPS || transport == MailHostServerConfiguration.Transport.SMTPS_TLS) {
+        if (transport == MailHostServerConfiguration.Transport.SMTPS) {
             properties.setProperty(MAIL_SMTP_SOCKET_FACTORY_PORT, String.valueOf(serverConfiguration.port()));
             properties.setProperty(MAIL_SMTP_SOCKET_FACTORY_CLASS, "javax.net.ssl.SSLSocketFactory");
             properties.setProperty(MAIL_SMTP_SOCKET_FACTORY_FALLBACK, "false");

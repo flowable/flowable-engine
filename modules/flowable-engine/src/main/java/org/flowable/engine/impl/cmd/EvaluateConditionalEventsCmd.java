@@ -44,7 +44,7 @@ public class EvaluateConditionalEventsCmd extends NeedsActiveExecutionCmd<Object
     @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (!execution.isProcessInstanceType()) {
-            throw new FlowableException("Execution is not of type process instance");
+            throw new FlowableException(execution + " is not of type process instance");
         }
         
         if (processVariables != null) {
@@ -61,8 +61,8 @@ public class EvaluateConditionalEventsCmd extends NeedsActiveExecutionCmd<Object
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot evaluate conditions for an execution that is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot evaluate conditions for";
     }
 
 }

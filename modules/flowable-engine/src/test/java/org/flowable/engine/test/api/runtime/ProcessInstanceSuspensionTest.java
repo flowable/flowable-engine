@@ -219,63 +219,64 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // Suspend process instance
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+        String processInstanceError = "ProcessInstance[" + processInstance.getId() + "] - definition '" + processInstance.getProcessDefinitionId() + "'";
         runtimeService.suspendProcessInstanceById(processInstance.getId());
 
         assertThatThrownBy(() -> runtimeService.messageEventReceived("someMessage", processInstance.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot receive message for a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.messageEventReceived("someMessage", processInstance.getId(), new HashMap<>()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot receive message for a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.removeVariable(processInstance.getId(), "someVariable"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot remove variables from a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.removeVariableLocal(processInstance.getId(), "someVariable"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot remove variables from a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.removeVariables(processInstance.getId(), Arrays.asList("one", "two", "three")))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot remove variables from a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three")))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot remove variables from a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.setVariable(processInstance.getId(), "someVariable", "someValue"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot set variables to a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.setVariableLocal(processInstance.getId(), "someVariable", "someValue"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot set variables to a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.setVariables(processInstance.getId(), new HashMap<>()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot set variables to a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.setVariablesLocal(processInstance.getId(), new HashMap<>()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot set variables to a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.trigger(processInstance.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot trigger a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.trigger(processInstance.getId(), new HashMap<>()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot trigger a suspended " + processInstanceError);
 
         assertThatThrownBy(() -> runtimeService.signalEventReceived("someSignal", processInstance.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot throw signal event 'someSignal' because " + processInstanceError + " is suspended");
 
         assertThatThrownBy(() -> runtimeService.signalEventReceived("someSignal", processInstance.getId(), new HashMap<>()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("is suspended");
+                .hasMessage("Cannot throw signal event 'someSignal' because " + processInstanceError + " is suspended");
     }
 
     @Test

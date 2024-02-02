@@ -73,6 +73,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -193,6 +194,7 @@ public abstract class AbstractEngineConfiguration {
     protected CommandInterceptor commandInvoker;
 
     protected AgendaOperationRunner agendaOperationRunner = (commandContext, runnable) -> runnable.run();
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
@@ -748,7 +750,7 @@ public abstract class AbstractEngineConfiguration {
                 initDbSqlSessionFactory();
             }
 
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
             
             if (isLoggingSessionEnabled()) {
                 if (!sessionFactories.containsKey(LoggingSession.class)) {
@@ -1064,7 +1066,7 @@ public abstract class AbstractEngineConfiguration {
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                allConfigurators.sort(new Comparator<EngineConfigurator>() {
+                allConfigurators.sort(new Comparator<>() {
 
                     @Override
                     public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
@@ -1425,8 +1427,33 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public Collection<AgendaOperationExecutionListener> getAgendaOperationExecutionListeners() {
+        return agendaOperationExecutionListeners;
+    }
+
+    public AbstractEngineConfiguration addAgendaOperationExecutionListener(AgendaOperationExecutionListener listener) {
+        if (this.agendaOperationExecutionListeners == null) {
+            this.agendaOperationExecutionListeners = new ArrayList<>();
+        }
+        this.agendaOperationExecutionListeners.add(listener);
+        return this;
+    }
+
+    public AbstractEngineConfiguration setAgendaOperationExecutionListeners(Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
+        return this;
+    }
+
     public List<CommandInterceptor> getCustomPreCommandInterceptors() {
         return customPreCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration addCustomPreCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPreCommandInterceptors == null) {
+            this.customPreCommandInterceptors = new ArrayList<>();
+        }
+        this.customPreCommandInterceptors.add(commandInterceptor);
+        return this;
     }
 
     public AbstractEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
@@ -1436,6 +1463,14 @@ public abstract class AbstractEngineConfiguration {
 
     public List<CommandInterceptor> getCustomPostCommandInterceptors() {
         return customPostCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration addCustomPostCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPostCommandInterceptors == null) {
+            this.customPostCommandInterceptors = new ArrayList<>();
+        }
+        this.customPostCommandInterceptors.add(commandInterceptor);
+        return this;
     }
 
     public AbstractEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {

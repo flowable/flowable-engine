@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -451,6 +452,109 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                             tuple("With string value", processWithStringValue.getId())
                     );
         }
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() {
+        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance thirdLevelCallActivity1_1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(secondLevelCallActivity1_1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery().processInstanceRootScopeId(processInstance.getId()).list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(firstLevelCallActivity1.getCalledProcessInstanceId(), "simpleInnerParallelCallActivity"),
+                        tuple(secondLevelCallActivity1_1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(thirdLevelCallActivity1_1_1.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(secondLevelCallActivity1_2.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(firstLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
+
+        result = historyService.createHistoricProcessInstanceQuery().or().processInstanceRootScopeId(processInstance.getId()).endOr().list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(firstLevelCallActivity1.getCalledProcessInstanceId(), "simpleInnerParallelCallActivity"),
+                        tuple(secondLevelCallActivity1_1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(thirdLevelCallActivity1_1_1.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(secondLevelCallActivity1_2.getCalledProcessInstanceId(), "oneTaskProcess"),
+                        tuple(firstLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
+        assertThat(result).isEmpty();
+
+        result = historyService.createHistoricProcessInstanceQuery().processInstanceParentScopeId(firstLevelCallActivity1.getCalledProcessInstanceId()).list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(secondLevelCallActivity1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(secondLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
+
+        result = historyService.createHistoricProcessInstanceQuery().or().processInstanceParentScopeId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .endOr().list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId, HistoricProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder(
+                        tuple(secondLevelCallActivity1.getCalledProcessInstanceId(), "simpleProcessWithUserTaskAndCallActivity"),
+                        tuple(secondLevelCallActivity2.getCalledProcessInstanceId(), "oneTaskProcess")
+                );
     }
 
 }

@@ -397,7 +397,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // Try to delete the job. This should fail.
         assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Cannot delete job when the job is being executed. Try again later.");
+                .hasMessageContainingAll("Cannot delete JobEntity[", "jobHandlerType=trigger-timer, jobType=timer, elementId=escalationTimer",
+                        "processDefinitionId=timerOnTask:1:", " when the job is being executed. Try again later.");
 
         // Clean up
         managementService.executeJob(timerJob.getId());
@@ -424,7 +425,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // Try to delete the job. This should fail.
         assertThatThrownBy(() -> managementService.deleteTimerJob(timerJob.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Cannot delete timer job when the job is being executed. Try again later.");
+                .hasMessageContainingAll("Cannot delete TimerJobEntity[", "jobHandlerType=trigger-timer, jobType=timer, elementId=escalationTimer",
+                        "processDefinitionId=timerOnTask:1:", " when the job is being executed. Try again later.");
 
         // Clean up
         managementService.moveTimerToExecutableJob(timerJob.getId());

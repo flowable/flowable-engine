@@ -1190,4 +1190,13 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
     }
+
+    public String getRootScopeId() {
+        return null;
+    }
+
+    public String getParentScopeId() {
+        return null;
+    }
+
 }

@@ -488,7 +488,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected String getJobActivityId(Job job) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<Map<String, Object>>() {
+            Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<>() {
 
             });
             return (String) jobConfigurationMap.get("activityId");

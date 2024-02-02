@@ -617,7 +617,10 @@ public class ServiceTaskLoggingTest extends CustomCmmnConfigurationFlowableTestC
         assertThat(loggingNode.get("elementId").asText()).isEqualTo("stage1");
         assertThat(loggingNode.get("elementName").asText()).isEqualTo("Stage 1");
         assertThat(loggingNode.get("elementType").asText()).isEqualTo("Stage");
-        assertThat(loggingNode.get("exception").get("message").asText()).isEqualTo("Unknown property used in expression: ${gotoStage1}");
+        assertThat(loggingNode.get("exception").get("message").asText())
+                .startsWith("Unknown property used in expression: ${gotoStage1} with PlanItemInstance with id: ")
+                .contains("name: Stage 1", "definitionId: stage1", "state: available", "elementId: planItem2", "caseInstanceId: " + caseInstance.getId(),
+                        "caseDefinitionId: " + caseDefinition.getId());
         assertThat(loggingNode.get("exception").get("stackTrace").asText()).isNotNull();
         assertThat(loggingNode.get(LoggingSessionUtil.LOG_NUMBER).asInt()).isEqualTo(4);
         assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asText()).isNotNull();

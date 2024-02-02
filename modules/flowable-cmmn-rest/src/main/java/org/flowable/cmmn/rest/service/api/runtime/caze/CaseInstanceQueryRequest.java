@@ -38,6 +38,8 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceName;
     private String caseInstanceNameLike;
     private String caseInstanceNameLikeIgnoreCase;
+    private String caseInstanceRootScopeId;
+    private String caseInstanceParentScopeId;
     private String caseInstanceBusinessKey;
     private String caseInstanceBusinessStatus;
     private String caseInstanceParentId;
@@ -139,6 +141,22 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceNameLikeIgnoreCase(String caseInstanceNameLikeIgnoreCase) {
         this.caseInstanceNameLikeIgnoreCase = caseInstanceNameLikeIgnoreCase;
+    }
+
+    public String getCaseInstanceRootScopeId() {
+        return caseInstanceRootScopeId;
+    }
+
+    public void setCaseInstanceRootScopeId(String caseInstanceRootScopeId) {
+        this.caseInstanceRootScopeId = caseInstanceRootScopeId;
+    }
+
+    public String getCaseInstanceParentScopeId() {
+        return caseInstanceParentScopeId;
+    }
+
+    public void setCaseInstanceParentScopeId(String caseInstanceParentScopeId) {
+        this.caseInstanceParentScopeId = caseInstanceParentScopeId;
     }
 
     public String getCaseInstanceBusinessKey() {

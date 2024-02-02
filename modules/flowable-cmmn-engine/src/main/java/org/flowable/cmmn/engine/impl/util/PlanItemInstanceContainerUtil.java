@@ -218,7 +218,7 @@ public class PlanItemInstanceContainerUtil {
      */
     public static boolean isParentCompletionRuleForPlanItemEqualToType(PlanItemInstanceEntity planItemInstance, String parentCompletionRuleType) {
         if (planItemInstance.getPlanItem() == null) {
-            throw new FlowableException("Plan item could not be found for " + planItemInstance.getElementId());
+            throw new FlowableException("Plan item could not be found for " + planItemInstance);
         }
         
         if (planItemInstance.getPlanItem().getItemControl() != null && planItemInstance.getPlanItem().getItemControl().getParentCompletionRule() != null) {

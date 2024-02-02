@@ -238,10 +238,10 @@ class CompositeHistoryManagerTest {
         TaskEntity task = new TaskEntityImpl();
         ExecutionEntity instance = new ExecutionEntityImpl();
         Date endTime = Date.from(Instant.now().plus(1, ChronoUnit.MILLIS));
-        compositeHistoryManager.recordTaskEnd(task, instance, "test", endTime);
+        compositeHistoryManager.recordTaskEnd(task, instance, "kermit", "test", endTime);
 
-        verify(historyManager1).recordTaskEnd(same(task), same(instance), eq("test"), eq(endTime));
-        verify(historyManager2).recordTaskEnd(same(task), same(instance), eq("test"), eq(endTime));
+        verify(historyManager1).recordTaskEnd(same(task), same(instance), eq("kermit"), eq("test"), eq(endTime));
+        verify(historyManager2).recordTaskEnd(same(task), same(instance), eq("kermit"), eq("test"), eq(endTime));
     }
 
     @Test

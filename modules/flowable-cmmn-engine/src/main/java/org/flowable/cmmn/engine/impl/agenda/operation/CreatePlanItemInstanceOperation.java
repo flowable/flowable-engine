@@ -56,7 +56,10 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
                     planItemInstanceEntity.getParentVariableScope().setVariable(variableName, bpmnAggregation);
                 }
             }
-            setRepetitionCounter(planItemInstanceEntity, repetitionCounter + 1);
+            
+            if (repetitionRule.getAggregations() != null || !PlanItemInstanceUtil.hasIgnoreCounterVariable(planItemInstanceEntity)) {
+                setRepetitionCounter(planItemInstanceEntity, repetitionCounter + 1);
+            }
         }
 
         CmmnHistoryManager cmmnHistoryManager = CommandContextUtil.getCmmnHistoryManager(commandContext);

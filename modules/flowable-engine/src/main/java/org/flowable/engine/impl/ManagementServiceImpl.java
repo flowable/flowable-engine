@@ -396,11 +396,12 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
-        return commandExecutor.execute(config, new Command<String>() {
+        return commandExecutor.execute(config, new Command<>() {
             @Override
             public String execute(CommandContext commandContext) {
                 DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog, schema);
+                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog,
+                        schema);
                 commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
                 return CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaUpdate();
             }

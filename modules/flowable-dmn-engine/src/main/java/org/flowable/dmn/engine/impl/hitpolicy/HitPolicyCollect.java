@@ -67,6 +67,10 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
                 }
             }
         }
+
+        updateStackWithDecisionResults(decisionResults, executionContext);
+
+        // put decision results on audit container
         executionContext.getAuditContainer().setDecisionResult(decisionResults);
         // the `multipleResults` flag depends on the aggregator. If there is no aggregation there are more results.
         executionContext.getAuditContainer().setMultipleResults(isMultipleResults(executionContext.getAggregator()));

@@ -145,6 +145,16 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration) {
+        getEventSubscriptionEntityManager().updateEventSubscriptionProcessDefinitionId(oldProcessDefinitionId, newProcessDefinitionId, eventType, activityId, scopeDefinitionKey, configuration);
+    }
+
+    @Override
+    public void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration) {
+        getEventSubscriptionEntityManager().updateEventSubscriptionScopeDefinitionId(oldScopeDefinitionId, newScopeDefinitionId, eventType, scopeDefinitionKey, configuration);
+    }
+
+    @Override
     public void updateEventSubscription(EventSubscriptionEntity eventSubscription) {
         getEventSubscriptionEntityManager().update(eventSubscription);
     }
@@ -187,6 +197,16 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(scopeDefinitionId, scopeType);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(processDefinitionId, eventType, activityId, configuration);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(scopeDefinitionId, eventType, configuration);
     }
 
     public EventSubscription createEventSubscription(EventSubscriptionBuilder builder) {

@@ -85,7 +85,7 @@ public class BatchBuilderImpl implements BatchBuilder {
     public Batch create() {
         if (commandExecutor != null) {
             BatchBuilder selfBatchBuilder = this;
-            return commandExecutor.execute(new Command<Batch>() {
+            return commandExecutor.execute(new Command<>() {
 
                 @Override
                 public Batch execute(CommandContext commandContext) {

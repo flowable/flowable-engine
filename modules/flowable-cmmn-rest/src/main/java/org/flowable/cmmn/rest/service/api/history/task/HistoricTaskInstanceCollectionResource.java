@@ -86,6 +86,8 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
         @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
         @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns historic task instances without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
         @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "The plan item instance instance id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
@@ -281,6 +283,14 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("planItemInstanceId") != null) {
             queryRequest.setPlanItemInstanceId(allRequestParams.get("planItemInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
         }
 
         return getQueryResponse(queryRequest, allRequestParams);

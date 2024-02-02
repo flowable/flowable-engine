@@ -17,11 +17,14 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -200,13 +203,30 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     public void deleteJobsByExecutionId(String executionId) {
         JobEntityManager jobEntityManager = getJobEntityManager();
         Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionId);
+        if (jobsForExecution.isEmpty()) {
+            return;
+        }
+
+        InternalJobManager internalJobManager = configuration.getInternalJobManager();
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        boolean eventDispatcherEnabled = eventDispatcher != null && eventDispatcher.isEnabled();
         for (JobEntity job : jobsForExecution) {
-            getJobEntityManager().delete(job);
-            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+            if (internalJobManager != null) {
+                internalJobManager.handleJobDelete(job);
+            }
+
+            deleteByteArrayRef(job.getExceptionByteArrayRef());
+            deleteByteArrayRef(job.getCustomValuesByteArrayRef());
+
+            if (eventDispatcherEnabled) {
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.ENTITY_DELETED, job), configuration.getEngineName());
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
                         FlowableEngineEventType.JOB_CANCELED, job), configuration.getEngineName());
             }
         }
+
+        jobEntityManager.deleteJobsByExecutionId(executionId);
     }
     
     @Override
@@ -232,6 +252,12 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
                 getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
                         FlowableEngineEventType.JOB_CANCELED, job), configuration.getEngineName());
             }
+        }
+    }
+
+    protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
+        if (jobByteArrayRef != null) {
+            jobByteArrayRef.delete(configuration.getEngineName());
         }
     }
 

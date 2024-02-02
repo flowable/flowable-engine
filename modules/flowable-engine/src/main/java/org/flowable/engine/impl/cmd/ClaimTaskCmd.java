@@ -16,10 +16,12 @@ import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -44,9 +46,12 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             return null;
         }
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (userId != null) {
-            Clock clock = CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock();
+            Clock clock = processEngineConfiguration.getClock();
             task.setClaimTime(clock.getCurrentTime());
+            task.setClaimedBy(userId);
+            task.setState(Task.CLAIMED);
 
             if (task.getAssignee() != null) {
                 if (!task.getAssignee().equals(userId)) {
@@ -58,6 +63,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 
             } else {
                 TaskHelper.changeTaskAssignee(task, userId);
+                
+                if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+                    processEngineConfiguration.getUserTaskStateInterceptor().handleClaim(task, userId);
+                }
             }
             
             CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, userId, IdentityLinkType.ASSIGNEE, true);
@@ -66,11 +75,22 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
             if (task.getAssignee() != null) {
                 // Task claim time should be null
                 task.setClaimTime(null);
+                task.setClaimedBy(null);
+                
+                if (task.getInProgressStartTime() != null) {
+                    task.setState(Task.IN_PROGRESS);
+                } else {
+                    task.setState(Task.CREATED);
+                }
                 
                 String oldAssigneeId = task.getAssignee();
     
                 // Task should be assigned to no one
                 TaskHelper.changeTaskAssignee(task, null);
+                
+                if (processEngineConfiguration.getUserTaskStateInterceptor() != null) {
+                    processEngineConfiguration.getUserTaskStateInterceptor().handleUnclaim(task, userId);
+                }
                 
                 CommandContextUtil.getHistoryManager().createUserIdentityLinkComment(task, oldAssigneeId, IdentityLinkType.ASSIGNEE, true, true);
             }
@@ -80,8 +100,8 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot claim a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot claim";
     }
 
 }

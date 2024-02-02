@@ -24,13 +24,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -914,6 +917,189 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
 
         varValue = taskInstance.getTaskLocalVariables().get("taskVar");
         assertThat(varValue).isEqualTo(9);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
+
+        Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
+        Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskRootScopeId(processInstance.getId()).list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).list();
+
+        assertThat(taskList)
+                .extracting(HistoricTaskInstance::getId)
+                .containsExactlyInAnyOrder(
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByVariousTimeConstraints() {
+
+        // Test for https://github.com/flowable/flowable-engine/issues/3827
+
+        Date testStartTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(testStartTime);
+
+        Set<String> processInstanceIds = new HashSet<>();
+        for (int i = 0; i < 4; i++){
+            processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess").getId());
+        }
+
+        Date afterInstancesStartedTime = new Date(testStartTime.getTime() + 10_000);
+        processEngineConfiguration.getClock().setCurrentTime(afterInstancesStartedTime);
+
+        for (String processInstanceId : processInstanceIds) {
+
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId)).count()).isOne();
+
+            // Start time
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskCreatedAfter(new Date(testStartTime.getTime() - 10_000)).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskCreatedBefore(new Date(afterInstancesStartedTime.getTime())).count()).isOne();
+
+            // Claim --> change state
+            taskService.claim(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId(), "johnDoe");
+        }
+
+        Date afterClaimTime = new Date(afterInstancesStartedTime.getTime() + 10_000);
+        processEngineConfiguration.getClock().setCurrentTime(afterClaimTime);
+
+        for (String processInstanceId : processInstanceIds) {
+            // State
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskState(Task.CLAIMED).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskClaimedBy("johnDoe").count()).isOne();
+
+            // Claim time
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskClaimedAfter(new Date(afterInstancesStartedTime.getTime() - 10_000)).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskClaimedBefore(new Date(afterClaimTime.getTime())).count()).isOne();
+
+            // Make tasks in progress
+            taskService.startProgress(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId(), "johnDoe");
+        }
+
+        Date afterInProgressTime = new Date(afterClaimTime.getTime() + 10_000);
+        processEngineConfiguration.getClock().setCurrentTime(afterInProgressTime);
+
+        for (String processInstanceId : processInstanceIds) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskState(Task.IN_PROGRESS).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskInProgressStartedBy("johnDoe").count()).isOne();
+
+            // In progress time
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskInProgressStartTimeAfter(new Date(afterClaimTime.getTime() - 10_000)).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskInProgressStartTimeBefore(new Date(afterInProgressTime.getTime())).count()).isOne();
+
+            // Suspend the tasks
+            taskService.suspendTask(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId(), "johnDoe");
+        }
+
+        Date afterSuspendTime = new Date(afterInProgressTime.getTime() + 10_000);
+        processEngineConfiguration.getClock().setCurrentTime(afterSuspendTime);
+
+        for (String processInstanceId : processInstanceIds) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskState(Task.SUSPENDED).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskSuspendedBy("johnDoe").count()).isOne();
+
+            // Suspend time
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskSuspendedAfter(new Date(afterInProgressTime.getTime() - 10_000)).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskSuspendedBefore(new Date(afterSuspendTime.getTime())).count()).isOne();
+
+            // Complete the tasks
+            taskService.activateTask(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId(), "johnDoe");
+            taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId(), "johnDoe");
+        }
+
+        Date afterCompleteTime = new Date(afterSuspendTime.getTime() + 10_000);
+        processEngineConfiguration.getClock().setCurrentTime(afterSuspendTime);
+
+        for (String processInstanceId : processInstanceIds) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskState(Task.COMPLETED).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskCompletedBy("johnDoe").count()).isOne();
+
+            // Completion time
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskCompletedAfter(new Date(afterSuspendTime.getTime() - 10_000)).count()).isOne();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceIdIn(Collections.singletonList(processInstanceId))
+                    .taskCompletedBefore(new Date(afterCompleteTime.getTime())).count()).isOne();
+        }
+
     }
 
 }

@@ -97,11 +97,12 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
 
         // Test bulk update
         String lockOwner = "test";
-        commandExecutor.execute(new Command<Object>() {
+        commandExecutor.execute(new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
-                processEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager().bulkUpdateJobLockWithoutRevisionCheck(timerJobs, lockOwner, new Date());
+                processEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager()
+                        .bulkUpdateJobLockWithoutRevisionCheck(timerJobs, lockOwner, new Date());
                 return null;
             }
         });
@@ -166,7 +167,7 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
     }
 
     protected List<ByteArrayEntity> getByteArrays() {
-        return processEngineConfiguration.getCommandExecutor().execute(new Command<List<ByteArrayEntity>>() {
+        return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public List<ByteArrayEntity> execute(CommandContext commandContext) {

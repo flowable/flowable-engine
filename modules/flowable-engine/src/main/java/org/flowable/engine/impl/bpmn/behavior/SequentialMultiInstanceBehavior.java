@@ -128,7 +128,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             // Intermediate Event or Error Event Sub-Process in the process
             throw error;
         } catch (Exception e) {
-            throw new FlowableException("Could not execute inner activity behavior of multi instance behavior", e);
+            throw new FlowableException("Could not execute inner activity behavior of multi instance behavior for " + execution, e);
         }
     }
 }

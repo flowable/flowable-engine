@@ -61,14 +61,18 @@ public class TaskHelper {
         }
 
     }
+    
+    public static void completeTask(TaskEntity task, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        internalDeleteTask(task, userId, null, false, true, cmmnEngineConfiguration);
+    }
 
     public static void deleteTask(String taskId, String deleteReason, boolean cascade, CmmnEngineConfiguration cmmnEngineConfiguration) {
         TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (task != null) {
             if (task.getScopeId() != null && ScopeTypes.CMMN.equals(task.getScopeType())) {
-                throw new FlowableException("The task cannot be deleted because is part of a running case instance");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running case instance");
             } else if (task.getExecutionId() != null) {
-                throw new FlowableException("The task cannot be deleted because is part of a running process instance");
+                throw new FlowableException("The " + task + " cannot be deleted because is part of a running process instance");
             }
             deleteTask(task, deleteReason, cascade, true, cmmnEngineConfiguration);
             
@@ -76,15 +80,23 @@ public class TaskHelper {
             deleteHistoricTask(taskId, cmmnEngineConfiguration);
         }
     }
+    
+    public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, 
+            boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        internalDeleteTask(task, null, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
+    }
 
-    public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    protected static void internalDeleteTask(TaskEntity task, String userId, String deleteReason, boolean cascade, 
+            boolean fireEvents, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         if (!task.isDeleted()) {
             task.setDeleted(true);
 
             TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             List<Task> subTasks = taskService.findTasksByParentTaskId(task.getId());
             for (Task subTask : subTasks) {
-                deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
+                internalDeleteTask((TaskEntity) subTask, userId, deleteReason, cascade, fireEvents, cmmnEngineConfiguration);
             }
 
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
@@ -117,7 +129,7 @@ public class TaskHelper {
             if (cascade) {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
             } else {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason,
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, userId, deleteReason,
                         cmmnEngineConfiguration.getClock().getCurrentTime());
             }
 
@@ -197,8 +209,11 @@ public class TaskHelper {
                 for (HistoricTaskInstance subTask : subTasks) {
                     deleteHistoricTask(subTask.getId(), cmmnEngineConfiguration);
                 }
-    
-                cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+
+                if (cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabledForVariables(historicTaskInstance)) {
+                    cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
+                }
+
                 cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(taskId);
     
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
@@ -240,7 +255,7 @@ public class TaskHelper {
                     expressionManager.createExpression(formFieldValidationExpression).getValue(variableContainer)
                 );
                 if (formFieldValidationValue == null) {
-                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value");
+                    throw new FlowableException("Unable to resolve formFieldValidationExpression to boolean value for " + variableContainer);
                 }
                 return formFieldValidationValue;
             }

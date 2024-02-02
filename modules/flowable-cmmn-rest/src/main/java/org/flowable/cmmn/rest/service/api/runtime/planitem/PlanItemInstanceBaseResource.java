@@ -207,7 +207,7 @@ public class PlanItemInstanceBaseResource {
     }
 
     protected PlanItemInstance getPlanItemInstanceFromRequest(String planItemInstanceId) {
-        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).singleResult();
+        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).includeEnded().singleResult();
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find an plan item instance with id '" + planItemInstanceId + "'.", PlanItemInstance.class);
         }

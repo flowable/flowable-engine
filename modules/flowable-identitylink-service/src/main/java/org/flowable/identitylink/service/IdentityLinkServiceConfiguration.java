@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Tijs Rademakers
  */
-public class IdentityLinkServiceConfiguration extends AbstractServiceConfiguration {
+public class IdentityLinkServiceConfiguration extends AbstractServiceConfiguration<IdentityLinkServiceConfiguration> {
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -58,13 +58,22 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     public IdentityLinkServiceConfiguration(String engineName) {
         super(engineName);
     }
+    
+    @Override
+    protected IdentityLinkServiceConfiguration getService() {
+        return this;
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
+
+        configuratorsAfterInit();
     }
     
     @Override

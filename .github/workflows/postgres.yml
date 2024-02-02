@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres: [11, 12, 13, 14]
+        postgres: [11, 12, 13, 14, 15, 16]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -31,11 +31,10 @@ jobs:
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@v2-beta
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
         with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
-        with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use postgres for the host here because we have specified a container for the job.
@@ -57,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres: [11, 12, 13, 14]
+        postgres: [11, 12, 13, 14, 15, 16]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -69,11 +68,10 @@ jobs:
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@v2-beta
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
         with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
-        with:
+          distribution: 'zulu'
           java-version: 17
       - name: Test
         # use postgres for the host here because we have specified a container for the job.

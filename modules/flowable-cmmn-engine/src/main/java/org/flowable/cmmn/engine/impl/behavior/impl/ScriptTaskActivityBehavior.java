@@ -38,7 +38,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         ScriptingEngines scriptingEngines = CommandContextUtil.getCmmnEngineConfiguration().getScriptingEngines();
         if (scriptingEngines == null) {
-            throw new FlowableException("Could not execute script task instance: no scripting engines found.");
+            throw new FlowableException("Could not execute script task instance: no scripting engines found. For " + planItemInstanceEntity);
         }
         String scriptFormat = scriptTask.getScriptFormat() != null ? scriptTask.getScriptFormat() : ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
         

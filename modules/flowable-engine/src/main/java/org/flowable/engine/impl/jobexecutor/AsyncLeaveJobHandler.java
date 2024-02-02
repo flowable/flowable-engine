@@ -138,7 +138,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
         }
 
         if (sequenceFlow == null) {
-            throw new FlowableException("Programmatic error: no sequence flow could be found for async leave in job " + job.getId());
+            throw new FlowableException("Programmatic error: no sequence flow could be found for async leave in job " + job);
         }
 
         return sequenceFlow;

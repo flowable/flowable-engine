@@ -322,6 +322,17 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      */
     ProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
+
+    /**
+     * Only select process instances with a root instance with a name like the given value.
+     */
+    ProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
+
+    /**
+     * Only select process instances with the given parent process instance id.
+     */
+    ProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
     /**
      * Only select process instances with the given callback id. 
      */

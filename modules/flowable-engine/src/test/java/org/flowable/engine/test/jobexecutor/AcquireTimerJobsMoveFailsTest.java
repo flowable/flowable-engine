@@ -157,7 +157,7 @@ class AcquireTimerJobsMoveFailsTest extends JobExecutorTestCase {
         protected CountDownLatch unlockJobLatch;
 
         public CustomWaitCommandInvoker() {
-            super((commandContext, runnable) -> runnable.run());
+            super((commandContext, runnable) -> runnable.run(), null);
         }
 
         @Override

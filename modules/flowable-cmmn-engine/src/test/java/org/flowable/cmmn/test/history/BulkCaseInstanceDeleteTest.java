@@ -61,11 +61,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("serializableVar").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -101,7 +102,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -148,11 +149,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).variableName("localSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -200,7 +202,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             validateEmptyHistoricDataForCaseInstance(subCaseInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -250,11 +252,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -305,7 +308,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             validateEmptyHistoricDataForTask(task.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {

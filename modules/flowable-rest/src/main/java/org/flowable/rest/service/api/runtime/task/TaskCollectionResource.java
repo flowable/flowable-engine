@@ -56,7 +56,8 @@ public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return tasks with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return tasks with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
@@ -112,6 +113,8 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "categoryIn", dataType = "string", value = "Select tasks for the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotIn", dataType = "string", value = "Select tasks which are not assigned to the given categories. Does not return tasks without categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return tasks which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return tasks which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
@@ -123,6 +126,9 @@ public class TaskCollectionResource extends TaskBaseResource {
         TaskQueryRequest request = new TaskQueryRequest();
 
         // Populate filter-parameters
+        if (requestParams.containsKey("taskId")) {
+            request.setTaskId(requestParams.get("taskId"));
+        }
         if (requestParams.containsKey("name")) {
             request.setName(requestParams.get("name"));
         }
@@ -346,6 +352,14 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("categoryNotIn")) {
             request.setCategoryNotIn(csvToList("categoryNotIn", requestParams));
+        }
+
+        if (requestParams.containsKey("rootScopeId")) {
+            request.setRootScopeId(requestParams.get("rootScopeId"));
+        }
+
+        if (requestParams.containsKey("parentScopeId")) {
+            request.setParentScopeId(requestParams.get("parentScopeId"));
         }
 
         return getTasksFromQueryRequest(request, requestParams);

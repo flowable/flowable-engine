@@ -27,21 +27,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Tijs Rademakers
  */
-public class EventSubscriptionServiceConfiguration extends AbstractServiceConfiguration {
+public class EventSubscriptionServiceConfiguration extends AbstractServiceConfiguration<EventSubscriptionServiceConfiguration> {
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
     protected EventSubscriptionService eventSubscriptionService = new EventSubscriptionServiceImpl(this);
-   
+
     // DATA MANAGERS
     // /////////////////////////////////////////////////
 
     protected EventSubscriptionDataManager eventSubscriptionDataManager;
-    
+
     // ENTITY MANAGERS
     // ///////////////////////////////////////////////
-    
+
     protected EventSubscriptionEntityManager eventSubscriptionEntityManager;
 
     // LOCKING
@@ -57,19 +57,28 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
      * The value that should be used when locking eventsubscriptions.
      */
     private String lockOwner = UUID.randomUUID().toString();
-    
+
     protected ObjectMapper objectMapper;
-    
+
     public EventSubscriptionServiceConfiguration(String engineName) {
         super(engineName);
+    }
+
+    @Override
+    protected EventSubscriptionServiceConfiguration getService() {
+        return this;
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
+
+        configuratorsAfterInit();
     }
 
     // Data managers
@@ -93,7 +102,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
     public EventSubscriptionServiceConfiguration getIdentityLinkServiceConfiguration() {
         return this;
     }
-    
+
     public EventSubscriptionService getEventSubscriptionService() {
         return eventSubscriptionService;
     }
@@ -102,7 +111,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
         this.eventSubscriptionService = eventSubscriptionService;
         return this;
     }
-    
+
     public EventSubscriptionDataManager getEventSubscriptionDataManager() {
         return eventSubscriptionDataManager;
     }
@@ -111,7 +120,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
         this.eventSubscriptionDataManager = eventSubscriptionDataManager;
         return this;
     }
-    
+
     public EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return eventSubscriptionEntityManager;
     }
@@ -120,7 +129,7 @@ public class EventSubscriptionServiceConfiguration extends AbstractServiceConfig
         this.eventSubscriptionEntityManager = eventSubscriptionEntityManager;
         return this;
     }
-    
+
     @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;
