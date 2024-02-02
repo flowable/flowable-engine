@@ -65,7 +65,7 @@ public class HistoricProcessInstanceAssert extends AbstractAssert<HistoricProces
         processExistsInHistory();
 
         if (processServicesProvider.getHistoryService().createHistoricProcessInstanceQuery().finished().processInstanceId(actual.getId()).count() != 1) {
-            failWithMessage(getProcessDescription(actual)+" to be finished, but is running in history.");
+            failWithMessage(getProcessDescription(actual) + " to be finished, but is running in history.");
         }
 
         return this;
